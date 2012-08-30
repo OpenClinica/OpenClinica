@@ -34,7 +34,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
- * @author Leonel Gayard  (leonel.gayard@gmail.com)
+ * @author Leonel Gayard (leonel.gayard@gmail.com)
  */
 public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements ViewNotesDao {
 
@@ -44,9 +44,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
 
     private QueryStore queryStore;
 
-    private static final RowMapper<DiscrepancyNoteBean> DISCREPANCY_NOTE_ROW_MAPPER =
-            new RowMapper<DiscrepancyNoteBean>() {
+    private static final RowMapper<DiscrepancyNoteBean> DISCREPANCY_NOTE_ROW_MAPPER = new RowMapper<DiscrepancyNoteBean>() {
 
+        @Override
         public DiscrepancyNoteBean mapRow(ResultSet rs, int rowNum) throws SQLException {
             DiscrepancyNoteBean b = new DiscrepancyNoteBean();
             b.setId(rs.getInt("discrepancy_note_id"));
@@ -105,27 +105,28 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 b.setOwner(userBean);
             }
 
-            // The discrepancy note's item ID is retrieved in the entity ID column when type = 'itemData'
+            // The discrepancy note's item ID is not null only when type =
+            // 'itemData'
             if (b.getEntityType().equals("itemData")) {
-                b.setItemId(b.getEntityId());
+                b.setItemId(rs.getInt("item_id"));
             }
 
             return b;
         }
     };
 
-    public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
-            ViewNotesSortCriteria sort) {
+    @Override
+    public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort) {
         Map<String, Object> arguments = listNotesArguments(currentStudy);
-        List<DiscrepancyNoteBean> result = getNamedParameterJdbcTemplate().query(
-                listNotesSql(filter, sort, arguments, currentStudy.isSite(currentStudy.getParentStudyId())),
-                arguments, DISCREPANCY_NOTE_ROW_MAPPER);
+        List<DiscrepancyNoteBean> result =
+            getNamedParameterJdbcTemplate().query(listNotesSql(filter, sort, arguments, currentStudy.isSite(currentStudy.getParentStudyId())), arguments,
+                    DISCREPANCY_NOTE_ROW_MAPPER);
         return result;
     }
 
-    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy,
-            ViewNotesFilterCriteria filter) {
-        Map<String,Object> arguments = new HashMap<String, Object>(2);
+    @Override
+    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter) {
+        Map<String, Object> arguments = new HashMap<String, Object>(2);
         arguments.put("studyId", currentStudy.getId());
 
         List<String> terms = new ArrayList<String>();
@@ -136,7 +137,8 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
         }
 
-        // Reuse the filter criteria from #findAllDiscrepancyNotes, as both queries load data from the same view
+        // Reuse the filter criteria from #findAllDiscrepancyNotes, as both
+        // queries load data from the same view
         if (filter != null) {
             for (String filterKey : filter.getFilters().keySet()) {
                 String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
@@ -152,7 +154,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
 
         LOG.debug("SQL: " + query);
         getNamedParameterJdbcTemplate().query(query, arguments, new RowMapper<Void>() {
-            // Using 'void' as return type as the extractor uses the pre-populated 'result' object
+            // Using 'void' as return type as the extractor uses the
+            // pre-populated 'result' object
+            @Override
             public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
                 result[rs.getInt("resolution_status_id")][rs.getInt("discrepancy_note_type_id")] = rs.getInt("total");
                 return null;
@@ -162,8 +166,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         return new DiscrepancyNotesSummary(result);
     }
 
-    protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort,
-            Map<String, Object> arguments, boolean isSite) {
+    protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort, Map<String, Object> arguments, boolean isSite) {
         List<String> terms = new ArrayList<String>();
         terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.main"));
 
@@ -198,13 +201,13 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 terms.add(0, queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix"));
                 terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationSuffix"));
                 arguments.put("first", 1 + ((filter.getPageNumber() - 1) * filter.getPageSize()));
-                arguments.put("last",  filter.getPageSize() * filter.getPageNumber());
+                arguments.put("last", filter.getPageSize() * filter.getPageNumber());
             } else {
                 // Limit number of results (pagination)
                 terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
                 arguments.put("limit", filter.getPageSize());
                 arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
-        	}
+            }
         }
 
         String result = StringUtils.join(terms, ' ');
@@ -213,7 +216,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     }
 
     protected Map<String, Object> listNotesArguments(StudyBean currentStudy) {
-        Map<String,Object> arguments = new HashMap<String, Object>();
+        Map<String, Object> arguments = new HashMap<String, Object>();
         arguments.put("studyId", currentStudy.getId());
         arguments.put("limit", 50);
         return arguments;
