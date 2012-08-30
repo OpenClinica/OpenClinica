@@ -75,7 +75,7 @@ public class ChangeCRFVersionController {
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
     
-    ResourceBundle  resword,resformat;
+    ResourceBundle  resword,resformat, respage;
 
 
     public ChangeCRFVersionController() {
@@ -123,12 +123,7 @@ public class ChangeCRFVersionController {
     	request.setAttribute("crfversionId", crfVersionId);
     	request.setAttribute("crfVersionName",crfVersionName.trim());
        
-        ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
-        if (pageMessages == null) {
-            pageMessages = new ArrayList<String>();
-        }
-
-        request.setAttribute("pageMessages", pageMessages);
+        ArrayList<String> pageMessages = initPageMessages( request);
         Object errorMessage = request.getParameter("errorMessage");
         if ( errorMessage != null){
         	pageMessages.add( (String)errorMessage);
@@ -179,25 +174,7 @@ public class ChangeCRFVersionController {
         	}
         
         }
-       // String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
-        
-        /*
-        // check whether the speadsheet is available on the server
-        for (CRFVersionBean curVersion :  versions) {
-            File file = new File(dir + crfBean.getId() + curVersion.getOid() + ".xls");
-            logger.info("looking in " + dir + crfBean.getId() + curVersion.getOid() + ".xls");
-            if (file.exists()) {
-            	curVersion.setDownloadable(true);
-            } else {
-                File file2 = new File(dir + crfBean.getId() + curVersion.getName() + ".xls");
-                logger.info("initial failed, looking in " + dir + crfBean.getId() + curVersion.getName() + ".xls");
-                if (file2.exists()) {
-                	curVersion.setDownloadable(true);
-                }
-            }
-
-        }
-        */
+      
         crfBean.setVersions(versions);
         gridMap.addAttribute("numberOfVersions", crfBean.getVersions().size()+1);
         gridMap.addAttribute("crfBean", crfBean);
@@ -261,17 +238,12 @@ public class ChangeCRFVersionController {
     	request.setAttribute("eventOrdinal", eventOrdinal);
       	
         ModelMap gridMap = new ModelMap();
-        ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
-        if (pageMessages == null) {
-            pageMessages = new ArrayList<String>();
-        }
+        ArrayList<String> pageMessages =   initPageMessages( request);
+        
         setupResource(request);
         if ( selectedVersionId == -1){
         	
         	String errorMessage = resword.getString("confirm_crf_version_em_select_version");//"Please select CRF version";
-//        	pageMessages.add(errorMessage);
-//        	request.setAttribute("pageMessages",pageMessages);
-//        	request.setAttribute("errorMessage",errorMessage);
             StringBuffer params = new StringBuffer();
             params.append("/pages/managestudy/chooseCRFVersion?crfId="+crfId);
             params.append("&crfName="+crfName);
@@ -466,11 +438,8 @@ public class ChangeCRFVersionController {
     	  
       
         
-        ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
-        if (pageMessages == null) {
-            pageMessages = new ArrayList<String>();
-        }
-        request.setAttribute("pageMessages", pageMessages);
+    	ArrayList<String> pageMessages = initPageMessages( request);
+    	     
         setupResource(request);
 //update event_crf_id table
         try{
@@ -566,9 +535,14 @@ public class ChangeCRFVersionController {
         StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
         Role r = currentRole.getRole();
 
-        if (r.equals(Role.ADMIN) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
             return true;
         }
+        ArrayList<String> pageMessages = initPageMessages( request);
+        
+        pageMessages.add((respage.getString("no_have_correct_privilege_current_study") + 
+        		respage.getString("change_study_contact_sysadmin")));
+        
         return false;
     }
     private UserAccountBean getCurrentUser (HttpServletRequest request){
@@ -604,6 +578,17 @@ public class ChangeCRFVersionController {
     	SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
     	String s = formatter.format(date);
     	return s;
+    }
+    
+    private  ArrayList<String> initPageMessages(HttpServletRequest request){
+    	ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
+    
+	    if (pageMessages == null) {
+	        pageMessages = new ArrayList<String>();
+	    }
+
+	    request.setAttribute("pageMessages", pageMessages);
+	    return pageMessages;
     }
    
 }
