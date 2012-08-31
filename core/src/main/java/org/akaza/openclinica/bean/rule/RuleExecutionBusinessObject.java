@@ -1,27 +1,19 @@
 package org.akaza.openclinica.bean.rule;
 
-import org.akaza.openclinica.bean.core.ResponseType;
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.rule.RuleDAO;
-import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /*
  * @author Krikor Krumlian
@@ -29,7 +21,7 @@ import java.util.List;
 
 public class RuleExecutionBusinessObject {
 
-    private SessionManager sm;
+    private final SessionManager sm;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     protected StudyBean currentStudy;
     protected UserAccountBean ub;
@@ -54,14 +46,10 @@ public class RuleExecutionBusinessObject {
         // source data
         // ItemDataBean sourceItemDataBean = rule.getSourceItemDataBean();
         ItemDataBean sourceItemDataBean = null;
-        ItemBean sourceItemBean = getItemBean(sourceItemDataBean);
-        ItemFormMetadataBean sourceItemFormMetadataBean = getItemFormMetadaBean(sourceItemBean);
 
         // target data
         // ItemDataBean targetItemDataBean = rule.getTargetItemDataBean();
         ItemDataBean targetItemDataBean = null;
-        ItemBean targetItemBean = getItemBean(targetItemDataBean);
-        ItemFormMetadataBean targetItemFormMetadataBean = getItemFormMetadaBean(targetItemBean);
 
         // fireRules on source & target
         // TODO KK FIX HERE
@@ -78,27 +66,6 @@ public class RuleExecutionBusinessObject {
 
     }
 
-    private boolean fireRule(ItemDataBean itemDataBean, String valueProvidedInRule, ItemFormMetadataBean itemFormMetadataBean, Operator operator) {
-
-        ResponseType rt = itemFormMetadataBean.getResponseSet().getResponseType();
-
-        if (rt.equals(ResponseType.TEXT) || rt.equals(ResponseType.TEXTAREA)) {
-            StringEditCheck editCheck = new StringEditCheck(itemDataBean.getValue(), valueProvidedInRule, operator);
-            boolean result = editCheck.check();
-            logger.info("  TEXT or TEXTAREA : Edit Check Result : " + result);
-            return result;
-        }
-
-        if (rt.equals(ResponseType.RADIO) || rt.equals(ResponseType.SELECT)) {
-            String theValue = matchValueWithOptions(valueProvidedInRule, itemFormMetadataBean.getResponseSet().getOptions());
-            StringEditCheck editCheck = new StringEditCheck(itemDataBean.getValue(), theValue, operator);
-            boolean result = editCheck.check();
-            logger.info("  RADIO or SELECT : Edit Check Result : " + result);
-            return result;
-        }
-        return false;
-    }
-
     private void createDiscrepancyNote(String description, ItemDataBean targetItemDataBean, ItemDataBean sourceItemDataBean) {
 
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
@@ -111,7 +78,7 @@ public class RuleExecutionBusinessObject {
         // note.setParentDnId(parentId);
         // note.setField(field);
         note.setEntityId(targetItemDataBean.getId());
-        note.setEntityType("ItemData");
+        note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         note.setColumn("value");
         note.setStudyId(currentStudy.getId());
 
@@ -135,32 +102,6 @@ public class RuleExecutionBusinessObject {
     private ArrayList<RuleBean> getRuleBeans(RuleSetBean ruleSet) {
         RuleDAO ruleDao = new RuleDAO(sm.getDataSource());
         return ruleSet != null ? ruleDao.findByRuleSet(ruleSet) : new ArrayList<RuleBean>();
-    }
-
-    private ItemBean getItemBean(ItemDataBean itemDataBean) {
-        ItemDAO itemDao = new ItemDAO(sm.getDataSource());
-        return itemDataBean != null ? (ItemBean) itemDao.findByPK(itemDataBean.getItemId()) : null;
-    }
-
-    private ItemFormMetadataBean getItemFormMetadaBean(ItemBean itemBean) {
-        ArrayList<ItemFormMetadataBean> itemFormMetadataBeans = null;
-        ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(sm.getDataSource());
-        itemFormMetadataBeans = itemBean != null ? itemFormMetadataDao.findAllByItemId(itemBean.getId()) : new ArrayList<ItemFormMetadataBean>();
-        return !itemFormMetadataBeans.isEmpty() ? itemFormMetadataBeans.get(0) : null;
-    }
-
-    // Utility methods
-    private String matchValueWithOptions(String value, List options) {
-        String returnedValue = null;
-        if (!options.isEmpty()) {
-            for (Object responseOption : options) {
-                if (((ResponseOptionBean) responseOption).getText().equals(value)) {
-                    return ((ResponseOptionBean) responseOption).getValue();
-
-                }
-            }
-        }
-        return returnedValue;
     }
 
 }

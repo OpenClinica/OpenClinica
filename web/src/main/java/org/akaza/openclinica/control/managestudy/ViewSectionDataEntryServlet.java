@@ -39,7 +39,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -72,7 +71,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jxu <p/> View a CRF version section data entry
+ * @author jxu
+ *         <p/>
+ *         View a CRF version section data entry
  */
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
@@ -88,18 +89,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         mayAccess(request);
-        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         locale = LocaleResolver.getLocale(request);
-
-        // <
-        // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
-        // locale);
-        // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
 
         if (ub.isSysAdmin()) {
             return;
@@ -113,36 +105,14 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     }
 
-    // BWP 01/08 >>For out of container testing...
-    //JN:Commenting out, not required anymore
-   /* public void setRequest(HttpServletRequest _request) {
-        this.request = _request;
-    }
-
-    public void setResponse(HttpServletResponse _response) {
-        this.response = _response;
-    }
-
-    public void setSessionManager(SessionManager manager) {
-        this.sm = manager;
-    }
-
-    public void setSession(HttpSession session) {
-        this.session = session;
-    }
-
-    public void setUserAccountBean(UserAccountBean userBean) {
-        this.ub = userBean;
-    }
-*/
     public Map getErrors() {
         return errors;
     }
 
- /*   public void setStudy(StudyBean studyBean) {
-        this.currentStudy = studyBean;
-    }
-*/
+    /*
+     * public void setStudy(StudyBean studyBean) { this.currentStudy =
+     * studyBean; }
+     */
     public void initializeMembers(Locale locale) {
         resadmin = ResourceBundleProvider.getAdminBundle(locale);
         resaudit = ResourceBundleProvider.getAuditEventsBundle(locale);
@@ -160,12 +130,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
+        SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
         boolean isSubmitted = false;
-        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
         if (!fp.getString("exitTo").equals("")) {
             request.setAttribute("exitTo", fp.getString("exitTo"));
         }
@@ -338,8 +308,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
             String formattedInterviewerDate;
             try {
-                DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"),
-                        ResourceBundleProvider.getLocale());
+                DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
                 formattedInterviewerDate = local_df.format(tmpDate);
             } catch (Exception e) {
                 formattedInterviewerDate = "";
@@ -392,10 +361,10 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
         }
 
-       sb = (SectionBean) sdao.findByPK(sectionId);
+        sb = (SectionBean) sdao.findByPK(sectionId);
         if (eventCRFId == 0) {
             ecb = new EventCRFBean();
-           ecb.setCRFVersionId(sb.getCRFVersionId());
+            ecb.setCRFVersionId(sb.getCRFVersionId());
             if (currentStudy.getParentStudyId() > 0) {
                 // this is a site,find parent
                 StudyDAO studydao = new StudyDAO(getDataSource());
@@ -409,8 +378,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         } else {
             ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
-        request.setAttribute(INPUT_EVENT_CRF,ecb);
-        request.setAttribute(SECTION_BEAN,sb);
+            request.setAttribute(INPUT_EVENT_CRF, ecb);
+            request.setAttribute(SECTION_BEAN, sb);
 
             // This is the StudySubjectBean
             StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
@@ -470,9 +439,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
         DisplaySectionBean dsb;
         // want to get displayBean with grouped and ungrouped items
-        request.setAttribute(EVENT_DEF_CRF_BEAN,edcb);
-        request.setAttribute(INPUT_EVENT_CRF,ecb);
-        request.setAttribute(SECTION_BEAN,sb);
+        request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
+        request.setAttribute(INPUT_EVENT_CRF, ecb);
+        request.setAttribute(SECTION_BEAN, sb);
         dsb = super.getDisplayBean(hasItemGroup, false, request, isSubmitted);
 
         FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -489,13 +458,14 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         // If the Horizontal type table will be used, then set the
         // DisplaySectionBean's
         // DisplayFormGroups List to the ones we have just generated
-      //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
+        // @pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter
+        // 'isSubmitted' to method createItemWithGroups
         List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup, eventDefinitionCRFId, request, isSubmitted);
         dsb.setDisplayItemGroups(displayItemWithGroups);
 
         super.populateNotesWithDBNoteCounts(discNotes, dsb, request);
 
-        if(fp.getString("fromViewNotes")!=null && "1".equals(fp.getString("fromViewNotes"))) {
+        if (fp.getString("fromViewNotes") != null && "1".equals(fp.getString("fromViewNotes"))) {
             request.setAttribute("fromViewNotes", fp.getString("fromViewNotes"));
         } else {
             session.removeAttribute("viewNotesURL");
@@ -532,13 +502,13 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
                     // TODO work on this line
 
                     String inputName = getInputName(dib);
-                    AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+                    AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
                     ArrayList childItems = dib.getChildren();
                     for (int j = 0; j < childItems.size(); j++) {
                         DisplayItemBean child = (DisplayItemBean) childItems.get(j);
                         inputName = getInputName(child);
-                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
                     }
                 }
@@ -580,7 +550,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getBlankItemStatus
      * ()
@@ -592,48 +562,48 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus
      * ()
      */
     @Override
     protected Status getNonBlankItemStatus(HttpServletRequest request) {
-        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
         return edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations
      * ()
      */
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
         return ecb.getAnnotations();
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#setEventCRFAnnotations
      * (java.lang.String)
      */
     @Override
     protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
         ecb.setAnnotations(annotations);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getJSPPage()
      */
     @Override
@@ -643,7 +613,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
@@ -654,7 +624,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @seeorg.akaza.openclinica.control.submit.DataEntryServlet#
      * validateInputOnFirstRound()
      */
@@ -665,7 +635,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
      * (org.akaza.openclinica.core.form.Validator,
@@ -673,7 +643,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
      */
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
-        ItemBean ib = dib.getItem();
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
         // note that this step sets us up both for
@@ -696,7 +665,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @seeorg.akaza.openclinica.control.submit.DataEntryServlet#
      * validateDisplayItemGroupBean()
      */
@@ -710,7 +679,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#loadDBValues()
      */
     @Override
@@ -721,9 +690,10 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
     /**
      * Current User may access a requested event CRF in the current user's
      * studies
-     *
+     * 
      * @author ywang 10-18-2007
-     * @param request TODO
+     * @param request
+     *            TODO
      */
 
     private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {
@@ -739,20 +709,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dnBean);
             }
         }
-    }
-
-    private Date formatInterviewDate(Date datetoBeFormatted) {
-        Date tmpDate = new Date();
-        if (datetoBeFormatted == null) {
-            return null;
-        }
-        String tmpStr = datetoBeFormatted.toString().replaceAll("-", "/");
-        try {
-            tmpDate = new SimpleDateFormat("MM/dd/yyyy").parse(tmpStr);
-        } catch (java.text.ParseException pe) {
-            return datetoBeFormatted;
-        }
-        return tmpDate;
     }
 
     @Override
