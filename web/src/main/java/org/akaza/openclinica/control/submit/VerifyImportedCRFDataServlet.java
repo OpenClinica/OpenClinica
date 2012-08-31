@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
@@ -38,18 +46,10 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.ImportSpringJob;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 /**
  * View the uploaded data and verify what is going to be saved into the system
  * and what is not.
- *
+ * 
  * @author Krikor Krumlian
  */
 public class VerifyImportedCRFDataServlet extends SecureController {
@@ -94,7 +94,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         note.setField(itemBean.getName());
         note.setStudyId(study.getId());
         note.setEntityName(itemBean.getName());
-        note.setEntityType("ItemData");
+        note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         note.setEntityValue(displayItemBean.getData().getValue());
 
         note.setEventName(eventCrfBean.getName());
@@ -110,7 +110,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(ds);
         note = (DiscrepancyNoteBean) dndao.create(note);
         // so that the below method works, need to set the entity above
-        // System.out.println("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
+        // System.out.println("trying to create mapping with " + note.getId() +
+        // " " + note.getEntityId() + " " + note.getColumn() + " " +
+        // note.getEntityType());
         dndao.createMapping(note);
         // System.out.println("just created mapping");
         return note;
@@ -149,15 +151,13 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
         if ("save".equalsIgnoreCase(action)) {
 
-            //setup ruleSets to run if applicable
-            RuleSetServiceInterface ruleSetService =
-                    (RuleSetServiceInterface)SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
-            List<ImportDataRuleRunnerContainer> containers =
-                    this.ruleRunSetup(sm.getDataSource(), currentStudy, ub, ruleSetService);
-
+            // setup ruleSets to run if applicable
+            RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+            List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(sm.getDataSource(), currentStudy, ub, ruleSetService);
 
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session.getAttribute("importedData");
-            // System.out.println("Size of displayItemBeanWrappers : " + displayItemBeanWrappers.size());
+            // System.out.println("Size of displayItemBeanWrappers : " +
+            // displayItemBeanWrappers.size());
 
             for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
@@ -182,7 +182,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     // Template, a discrepancy note is automatically logged.
                     // The DN will have a type of Failed Validation Check, and
                     // a message of Failed Validation check."
-                    // System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                    // System.out.println("wrapper problems found : " +
+                    // wrapper.getValidationErrors().toString());
                     for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                         eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                         eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
@@ -222,8 +223,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             displayItemBean.getData().setId(itemDataBean.getId());
                         } else {
                             itemDataDao.create(displayItemBean.getData());
-                            logger.info("created: " + displayItemBean.getData().getItemId()+"event CRF ID = "+eventCrfBean.getId()+"CRF VERSION ID ="+eventCrfBean.getCRFVersionId());
-
+                            logger.info("created: " + displayItemBean.getData().getItemId() + "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
+                                + eventCrfBean.getCRFVersionId());
 
                             // does this dao function work for repeating
                             // events/groups?
@@ -247,7 +248,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
                         // logger.info("continued2: getName " +
                         // ibean.getName());
-                        // System.out.println("*** checking for validation errors: " + ibean.getName());
+                        // System.out.println("*** checking for validation errors: "
+                        // + ibean.getName());
                         String itemOid =
                             displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal() + "_"
                                 + wrapper.getStudySubjectOid();
@@ -268,7 +270,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                                             currentStudy);
                                 ImportSpringJob.createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), ub, sm.getDataSource(),
                                         currentStudy);
-                                // System.out.println("*** created disc note with message: " + message);
+                                // System.out.println("*** created disc note with message: "
+                                // + message);
                                 // displayItemBean);
                             }
                         }
@@ -276,7 +279,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                            // System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
+                            // System.out.println("*** just updated event crf bean: "
+                            // + eventCrfBean.getId());
                             eventCrfInts.add(new Integer(eventCrfBean.getId()));
                         }
                     }
@@ -302,31 +306,31 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         }
     }
 
-    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean,
-            UserAccountBean userBean, RuleSetServiceInterface ruleSetService) {
+    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+            RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
-        ODMContainer odmContainer = (ODMContainer)session.getAttribute("odmContainer");
-        if(odmContainer != null) {
+        ODMContainer odmContainer = (ODMContainer) session.getAttribute("odmContainer");
+        if (odmContainer != null) {
             ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-            if(ruleSetService.getCountByStudy(studyBean)>0) {
+            if (ruleSetService.getCountByStudy(studyBean) > 0) {
                 ImportDataRuleRunnerContainer container;
                 for (SubjectDataBean subjectDataBean : subjectDataBeans) {
                     container = new ImportDataRuleRunnerContainer();
                     container.initRuleSetsAndTargets(dataSource, studyBean, subjectDataBean, ruleSetService);
-                    if(container.getShouldRunRules())   containers.add(container);
+                    if (container.getShouldRunRules())
+                        containers.add(container);
                 }
-                if(containers != null && ! containers.isEmpty())
+                if (containers != null && !containers.isEmpty())
                     ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
             }
         }
         return containers;
     }
 
-    private List<String> runRules(StudyBean studyBean, UserAccountBean userBean,
-            List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
-            ExecutionMode executionMode) {
+    private List<String> runRules(StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+            RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
         List<String> messages = new ArrayList<String>();
-        if(containers != null && ! containers.isEmpty()) {
+        if (containers != null && !containers.isEmpty()) {
             HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
             messages = extractRuleActionWarnings(summary);
         }
@@ -335,11 +339,11 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
     private List<String> extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
         List<String> messages = new ArrayList<String>();
-        if(summaryMap != null && !summaryMap.isEmpty()) {
+        if (summaryMap != null && !summaryMap.isEmpty()) {
             for (String key : summaryMap.keySet()) {
-                StringBuilder mesg = new StringBuilder(key+" : ");
-                for(String s : summaryMap.get(key)) {
-                    mesg.append(s+", ");
+                StringBuilder mesg = new StringBuilder(key + " : ");
+                for (String s : summaryMap.get(key)) {
+                    mesg.append(s + ", ");
                 }
                 messages.add(mesg.toString());
             }
@@ -348,11 +352,12 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     }
 
     private String ruleActionWarnings(List<String> warnings) {
-        if(warnings.isEmpty()) return "";
+        if (warnings.isEmpty())
+            return "";
         else {
             StringBuilder mesg = new StringBuilder("Rule Action Warnings: ");
-            for(String s : warnings) {
-                mesg.append(s+"; ");
+            for (String s : warnings) {
+                mesg.append(s + "; ");
             }
             return mesg.toString();
         }
