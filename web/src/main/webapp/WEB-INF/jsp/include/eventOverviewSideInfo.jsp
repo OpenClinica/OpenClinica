@@ -129,7 +129,7 @@
 	</tr>
    
   
-  
+  <c:out value="${panel.submitDataModule}"/>
   <c:if test="${panel.submitDataModule}">    
   <tr id="sidebar_StudyEvents_open">
 		<td class="sidebar_tab">
