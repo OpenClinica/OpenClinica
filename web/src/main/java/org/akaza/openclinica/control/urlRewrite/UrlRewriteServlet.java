@@ -129,13 +129,15 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                    //@pgawade 16-Aug-2012: fix for issue https://issuetracker.openclinica.com/view.php?id=12343#c55853
 		                    //retrieve sectionId from tabId
 		                    SectionDAO sdao = new SectionDAO(getDataSource());
-		                    HashMap sectionIdMap = sdao.getSectionIdForTabId(ocResource.getFormVersionID(), Integer.parseInt(mapQueryParams.get("tabId")));
-		                    Integer sectionId = null;
-		                    if((sectionIdMap != null) && (sectionIdMap.size() != 0)){
-		                    	sectionId = (Integer) sectionIdMap.get("section_id");
-		                    }
-		                    if(null != sectionId){
-		                    	request.setAttribute("sectionId", sectionId);
+		                    if(mapQueryParams.containsKey("tabId")){
+			                    HashMap sectionIdMap = sdao.getSectionIdForTabId(ocResource.getFormVersionID(), Integer.parseInt(mapQueryParams.get("tabId")));
+			                    Integer sectionId = null;
+			                    if((sectionIdMap != null) && (sectionIdMap.size() != 0)){
+			                    	sectionId = (Integer) sectionIdMap.get("section_id");
+			                    }
+			                    if(null != sectionId){
+			                    	request.setAttribute("sectionId", sectionId);
+			                    }
 		                    }
 		                }
 		                //ToDo: Changes to work on to fix #0012507
