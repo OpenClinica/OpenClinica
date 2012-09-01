@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="org.akaza.openclinica.dao.core.CoreResources" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -21,11 +20,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <% String sysURL = CoreResources.getField("sysURL");
-String contextPath = "";
-		if(sysURL.contains("/MainMenu")){
-			contextPath = sysURL.substring(0, sysURL.indexOf("/MainMenu")+1);	
+<%
+StringBuffer contextPath = new StringBuffer("");
+String requestURL = "";
+String pattern = "/";  
+if(null != request.getRequestURL()){
+	requestURL = request.getRequestURL().toString();	
+	if(requestURL.contains(pattern)){
+		String[] elements = requestURL.split(pattern);  	
+		if(elements.length >= 3){
+			for(int i=0; i<4; i++){
+				contextPath.append(elements[i]+pattern);
+			}		
 		}
+	}
+}
+requestURL = null;
+pattern = null;
 %>
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
 

@@ -13,19 +13,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,16 +34,12 @@ import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
-import org.akaza.openclinica.control.submit.DataEntryServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -62,7 +53,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -72,29 +62,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jxu <p/> View a CRF version section data entry
+ * @author jxu
+ *         <p/>
+ *         View a CRF version section data entry
  */
 public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryServlet.class);
 
-    
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
+        SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
         boolean isSubmitted = false;
-        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
         if (!fp.getString("exitTo").equals("")) {
             request.setAttribute("exitTo", fp.getString("exitTo"));
         }
         int crfVersionId = fp.getInt("crfVersionId", true);
-        
-        Integer sectionId = (Integer)request.getAttribute("sectionId");
-        
+
+        Integer sectionId = (Integer) request.getAttribute("sectionId");
+
         int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
         int studySubjectId = fp.getInt("studySubjectId", true);
         String action = fp.getString("action");
@@ -132,9 +123,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         }
 
         // YW >>
-        //int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
-        Integer eventDefinitionCRFId = (Integer)(request.getAttribute("eventDefinitionCRFId"));
-        
+        // int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
+        Integer eventDefinitionCRFId = (Integer) (request.getAttribute("eventDefinitionCRFId"));
+
         EventDefinitionCRFDAO eventCrfDao = new EventDefinitionCRFDAO(getDataSource());
         edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
         if (eventCRFId == 0 && edcb.getStudyId() != currentStudy.getParentStudyId() && edcb.getStudyId() != currentStudy.getId()) {
@@ -185,8 +176,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             if (event.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)) {
                 request.setAttribute("isLocked", "yes");
                 // System.out.println("this event crf is locked");
-            } 
-            //@pgawade 28-Aug-2012 Reverted the change no. 2 in https://issuetracker.openclinica.com/view.php?id=12343#c56722
+            }
+            // @pgawade 28-Aug-2012 Reverted the change no. 2 in
+            // https://issuetracker.openclinica.com/view.php?id=12343#c56722
             else {
                 request.setAttribute("isLocked", "no");
             }
@@ -266,8 +258,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
             String formattedInterviewerDate;
             try {
-                DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"),
-                        ResourceBundleProvider.getLocale());
+                DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
                 formattedInterviewerDate = local_df.format(tmpDate);
             } catch (Exception e) {
                 formattedInterviewerDate = "";
@@ -320,10 +311,10 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
         }
 
-       sb = (SectionBean) sdao.findByPK(sectionId);
+        sb = (SectionBean) sdao.findByPK(sectionId);
         if (eventCRFId == 0) {
             ecb = new EventCRFBean();
-           ecb.setCRFVersionId(sb.getCRFVersionId());
+            ecb.setCRFVersionId(sb.getCRFVersionId());
             if (currentStudy.getParentStudyId() > 0) {
                 // this is a site,find parent
                 StudyDAO studydao = new StudyDAO(getDataSource());
@@ -337,8 +328,8 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         } else {
             ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
-        request.setAttribute(INPUT_EVENT_CRF,ecb);
-        request.setAttribute(SECTION_BEAN,sb);
+            request.setAttribute(INPUT_EVENT_CRF, ecb);
+            request.setAttribute(SECTION_BEAN, sb);
 
             // This is the StudySubjectBean
             StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
@@ -398,9 +389,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
         DisplaySectionBean dsb;
         // want to get displayBean with grouped and ungrouped items
-        request.setAttribute(EVENT_DEF_CRF_BEAN,edcb);
-        request.setAttribute(INPUT_EVENT_CRF,ecb);
-        request.setAttribute(SECTION_BEAN,sb);
+        request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);
+        request.setAttribute(INPUT_EVENT_CRF, ecb);
+        request.setAttribute(SECTION_BEAN, sb);
         dsb = super.getDisplayBean(hasItemGroup, false, request, isSubmitted);
 
         FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -417,13 +408,14 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         // If the Horizontal type table will be used, then set the
         // DisplaySectionBean's
         // DisplayFormGroups List to the ones we have just generated
-      //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
+        // @pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter
+        // 'isSubmitted' to method createItemWithGroups
         List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup, eventDefinitionCRFId, request, isSubmitted);
         dsb.setDisplayItemGroups(displayItemWithGroups);
 
         super.populateNotesWithDBNoteCounts(discNotes, dsb, request);
 
-        if(fp.getString("fromViewNotes")!=null && "1".equals(fp.getString("fromViewNotes"))) {
+        if (fp.getString("fromViewNotes") != null && "1".equals(fp.getString("fromViewNotes"))) {
             request.setAttribute("fromViewNotes", fp.getString("fromViewNotes"));
         } else {
             session.removeAttribute("viewNotesURL");
@@ -460,13 +452,13 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
                     // TODO work on this line
 
                     String inputName = getInputName(dib);
-                    AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+                    AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
                     ArrayList childItems = dib.getChildren();
                     for (int j = 0; j < childItems.size(); j++) {
                         DisplayItemBean child = (DisplayItemBean) childItems.get(j);
                         inputName = getInputName(child);
-                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), "ItemData", currentStudy);
+                        AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, dib.getData().getId(), DiscrepancyNoteBean.ITEM_DATA, currentStudy);
 
                     }
                 }
@@ -509,9 +501,10 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
     /**
      * Current User may access a requested event CRF in the current user's
      * studies
-     *
+     * 
      * @author ywang 10-18-2007
-     * @param request TODO
+     * @param request
+     *            TODO
      */
 
     private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {

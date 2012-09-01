@@ -18,7 +18,7 @@ drop view view_dn_subject;
      </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-2" dbms="postgresql">
-        <comment>Changing entity_id mapping in 'view_dn_item_data'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_item_data'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_item_data as select 
@@ -78,7 +78,7 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-3" dbms="postgresql">
-        <comment>Changing entity_id mapping in 'view_dn_event_crf'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_event_crf'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_event_crf as 
@@ -141,7 +141,7 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-4" dbms="postgresql">
-        <comment>Changing entity_id mapping in 'view_dn_event_crf'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_study_event'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_event as 
@@ -202,7 +202,7 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-5" dbms="postgresql">
-        <comment>Changing entity_id mapping in 'view_dn_event_crf'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_study_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_subject as 
@@ -256,7 +256,7 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-6" dbms="postgresql">
-        <comment>Changing entity_id mapping in 'view_dn_event_crf'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_subject as 
@@ -350,7 +350,7 @@ drop view view_dn_subject;
 
 
      <changeSet author="drodrigues" id="2012-08-29-14122-9" dbms="oracle">
-        <comment>Changing entity_id mapping in 'view_dn_item_data'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_item_data'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_item_data as 
@@ -413,7 +413,7 @@ create or replace view view_dn_item_data as
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-10" dbms="oracle">
-        <comment>Changing entity_id mapping in 'view_dn_event_crf'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_event_crf'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_event_crf as 
@@ -493,7 +493,7 @@ create or replace view view_dn_event_crf as
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-11" dbms="oracle">
-        <comment>Changing entity_id mapping in 'view_dn_study_event'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_study_event'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_event as 
@@ -562,7 +562,7 @@ create or replace view view_dn_study_event as
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-12" dbms="oracle">
-        <comment>Changing entity_id mapping in 'view_dn_study_subject'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_study_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
   create or replace view view_dn_study_subject as 
@@ -622,7 +622,7 @@ create or replace view view_dn_study_event as
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-08-29-14122-13" dbms="oracle">
-        <comment>Changing entity_id mapping in 'view_dn_subject'.</comment>
+        <comment>Adding item_id mapping to 'view_dn_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_subject as 
@@ -702,6 +702,16 @@ union all
 select * from view_dn_study_subject
 union all
 select * from view_dn_subject;
+]]>
+        </sql>
+     </changeSet>
+
+     <changeSet author="drodrigues" id="2012-08-29-14122-15">
+        <comment>Updating wrong entity names in study event mapping</comment>
+        <sql splitStatements="true">
+<![CDATA[
+update dn_study_event_map set column_name = 'start_date' where column_name = 'date_start';
+update dn_study_event_map set column_name = 'end_date' where column_name = 'date_end';
 ]]>
         </sql>
      </changeSet>
