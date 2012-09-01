@@ -118,6 +118,7 @@ import org.akaza.openclinica.view.form.DataEntryInputGenerator;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -2449,6 +2450,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // >>TBH below dual for loops need a breaker to avoid a performance hit
         int firstLoopBreak = 0;
         int secondLoopBreak = 0;
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
+        int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, digb.getItemGroupBean());
+        
+        repeatMax = ( repeatMax < maxOrdinal)? maxOrdinal:repeatMax;
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
             formGroup.setItemGroupBean(digb.getItemGroupBean());
@@ -3130,7 +3135,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         } else {
             idb.setStatus(getNonBlankItemStatus(request));
         }
-        if (StringUtil.isBlank(dib.getEditFlag())) {
+        if (StringUtils.isBlank(dib.getEditFlag())) {
 
             if (!idb.isActive()) {
                 // will this need to change for double data entry?
@@ -3179,41 +3184,42 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     LOGGER.debug("just ran upsert! " + idb.getId());
                 }
 
-            } else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
-                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
-                idb.setUpdater(ub);
-                idb.setStatus(Status.DELETED);
-                idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
-
-                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
-                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
-                if (!dnNotesOfRemovedItem.isEmpty()) {
-                    DiscrepancyNoteBean itemParentNote = null;
-                    for (Object obj : dnNotesOfRemovedItem) {
-                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
-                            itemParentNote = (DiscrepancyNoteBean) obj;
-                        }
-                    }
-                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-                    if (itemParentNote != null) {
-                        dnb.setParentDnId(itemParentNote.getId());
-                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-                    }
-                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                    dnb.setStudyId(currentStudy.getId());
-                    dnb.setAssignedUserId(ub.getId());
-                    dnb.setOwner(ub);
-                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-                    dnb.setEntityId(idb.getId());
-                    dnb.setCreatedDate(new Date());
-                    dnb.setColumn("value");
-                    dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
-                    dnDao.create(dnb);
-                    dnDao.createMapping(dnb);
-                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                    dnDao.update(itemParentNote);
-                }
-            }
+           } 
+   //             else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
+//                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
+//                idb.setUpdater(ub);
+//                idb.setStatus(Status.DELETED);
+//                idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
+//
+//                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
+//                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
+//                if (!dnNotesOfRemovedItem.isEmpty()) {
+//                    DiscrepancyNoteBean itemParentNote = null;
+//                    for (Object obj : dnNotesOfRemovedItem) {
+//                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+//                            itemParentNote = (DiscrepancyNoteBean) obj;
+//                        }
+//                    }
+//                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+//                    if (itemParentNote != null) {
+//                        dnb.setParentDnId(itemParentNote.getId());
+//                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+//                    }
+//                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+//                    dnb.setStudyId(currentStudy.getId());
+//                    dnb.setAssignedUserId(ub.getId());
+//                    dnb.setOwner(ub);
+//                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+//                    dnb.setEntityId(idb.getId());
+//                    dnb.setCreatedDate(new Date());
+//                    dnb.setColumn("value");
+//                    dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+//                    dnDao.create(dnb);
+//                    dnDao.createMapping(dnb);
+//                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+//                    dnDao.update(itemParentNote);
+//                }
+           // }
 
         }
 
