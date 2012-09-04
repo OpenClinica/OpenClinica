@@ -96,24 +96,7 @@
         }
 
 </script>
-<%
-StringBuffer contextPath = new StringBuffer("");
-String requestURL = "";
-String pattern = "/";  
-if(null != request.getRequestURL()){
-	requestURL = request.getRequestURL().toString();	
-	if(requestURL.contains(pattern)){
-		String[] elements = requestURL.split(pattern);  	
-		if(elements.length >= 3){
-			for(int i=0; i<4; i++){
-				contextPath.append(elements[i]+pattern);
-			}		
-		}
-	}
-}
-requestURL = null;
-pattern = null;
-%>
+<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
@@ -237,7 +220,7 @@ pattern = null;
        onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${inputName}"/>' });"
        NAME="anchor<c:out value="${inputName}"/>"
        ID="anchor<c:out value="${inputName}"/>">
-        <img src="<c:out value="<%=contextPath%>" />images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
+        <img src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
 
     </a>
     <%-- TODO l10n for the above line? --%>
@@ -522,7 +505,7 @@ pattern = null;
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_input<c:out value="${inputName}" />" src=
-    "<c:out value="<%=contextPath%>" />images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
+    "<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
      ></a>
 
@@ -536,7 +519,7 @@ pattern = null;
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
-    "<c:out value="<%=contextPath%>" />images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    "<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a>
     
     </c:if>

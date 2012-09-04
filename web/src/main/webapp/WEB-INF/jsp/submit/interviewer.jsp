@@ -25,6 +25,8 @@
 <c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
+<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <style type="text/css">
 
@@ -224,7 +226,7 @@ function callTip(html)
         <tr id="CRF_infobox_closed" style="display:none;">
             <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                    <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                    <img src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
                 </a>
             </td>
@@ -242,7 +244,7 @@ function callTip(html)
                                 <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
 
                                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                    <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
+                                    <img src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
                                 </a>
 
@@ -257,7 +259,7 @@ function callTip(html)
         <tr id="CRF_infobox_closed">
             <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                    <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                    <img src="<c:out value="${contextPath}" />/images/sidebar_expand.gif" align="left" border="0" hspace="10">
                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
                 </a>
             </td>
@@ -275,7 +277,7 @@ function callTip(html)
                                 <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
 
                                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                                    <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
+                                    <img src="<c:out value="${contextPath}" />/images/sidebar_collapse.gif" align="left" border="0" hspace="10">
                                     <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
                                 </a>
                             </div></div></div>

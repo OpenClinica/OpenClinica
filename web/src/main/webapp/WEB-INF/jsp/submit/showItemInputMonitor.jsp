@@ -63,24 +63,7 @@ function genToolTips(itemId){
 	}
 
   </script>
-<%
-StringBuffer contextPath = new StringBuffer("");
-String requestURL = "";
-String pattern = "/";  
-if(null != request.getRequestURL()){
-	requestURL = request.getRequestURL().toString();	
-	if(requestURL.contains(pattern)){
-		String[] elements = requestURL.split(pattern);  	
-		if(elements.length >= 3){
-			for(int i=0; i<4; i++){
-				contextPath.append(elements[i]+pattern);
-			}		
-		}
-	}
-}
-requestURL = null;
-pattern = null;
-%>
+<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="inputVal" value="input${itemId}" />
@@ -195,7 +178,7 @@ form element in red --%>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
     <A HREF="#" onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${itemId}"/>' });"
        NAME="anchor<c:out value="${itemId}"/>" ID="anchor<c:out value="${itemId}"/>">
-        <img src="<c:out value="<%=contextPath%>" />images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" ID="anchor<c:out value="${itemId}"/>"/></a>
+        <img src="<c:out value="${contextPath}" />/images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" ID="anchor<c:out value="${itemId}"/>"/></a>
 
     <c:set var="numOfDate" value="${numOfDate+1}"/>
   </c:if>
@@ -440,7 +423,7 @@ form element in red --%>
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}"/>" name="flag_input<c:out value="${itemId}"/>" src=
-    "<c:out value="<%=contextPath%>" />images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
+    "<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a></td>
 
@@ -454,7 +437,7 @@ form element in red --%>
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&blank=<c:out value="${isBlank}"/>&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
-    "<c:out value="<%=contextPath%>" />images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
+    "<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a></td>
     </c:if>

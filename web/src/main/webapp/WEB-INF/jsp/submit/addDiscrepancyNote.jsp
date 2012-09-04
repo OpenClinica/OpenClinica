@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean scope='request' id='strResStatus' class='java.lang.String' />
 <jsp:useBean scope='request' id='strUserAccountId' class='java.lang.String' />
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
@@ -14,26 +15,9 @@
 
 <html>
 <head>
-<%
-StringBuffer contextPath = new StringBuffer("");
-String requestURL = "";
-String pattern = "/";  
-if(null != request.getRequestURL()){
-	requestURL = request.getRequestURL().toString();	
-	if(requestURL.contains(pattern)){
-		String[] elements = requestURL.split(pattern);  	
-		if(elements.length >= 3){
-			for(int i=0; i<4; i++){
-				contextPath.append(elements[i]+pattern);
-			}		
-		}
-	}
-}
-requestURL = null;
-pattern = null;
-%>
+
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
-<link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/styles.css" type="text/css">
+<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>

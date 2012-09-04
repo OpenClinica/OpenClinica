@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -14,31 +14,14 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<%
-StringBuffer contextPath = new StringBuffer("");
-String requestURL = "";
-String pattern = "/";  
-if(null != request.getRequestURL()){
-	requestURL = request.getRequestURL().toString();	
-	if(requestURL.contains(pattern)){
-		String[] elements = requestURL.split(pattern);  	
-		if(elements.length >= 3){
-			for(int i=0; i<4; i++){
-				contextPath.append(elements[i]+pattern);
-			}		
-		}
-	}
-}
-requestURL = null;
-pattern = null;
-%>
+<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-<link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/styles.css" type="text/css"/>
+<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css"/>
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -51,7 +34,7 @@ pattern = null;
   <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
   <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
     <!-- Added for the new Calender -->
-
+	
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
      <!--  fix for issue 14427 Removed the mapping with wrong file name calendar_en.js-->
