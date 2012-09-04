@@ -22,7 +22,7 @@
 <table border="0" cellpadding="0">
     <tr height="40"><td colspan="3">&nbsp;</td></tr>
     <tr><td class="formlabel"><fmt:message key="old_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-    <input type="password" name="oldPasswd" value="${userBean1.passwd }" class="formfieldXL"></div>
+    <input type="password" name="oldPasswd" value="" class="formfieldXL"></div>
     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="oldPasswd"/></jsp:include></td><td class="formlabel">*</td></tr>
     <tr><td class="formlabel"><fmt:message key="new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="password" name="passwd" value="" class="formfieldXL"></div>
   <c:choose>
