@@ -34,7 +34,7 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 
 /**
  * @author jxu
- *
+ * 
  */
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     // private DAODigester digester;
@@ -95,6 +95,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
      * getEntityFromHashMap, the method that gets the object from the database
      * query.
      */
+    @Override
     public Object getEntityFromHashMap(HashMap hm) {
         EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
         super.setEntityAuditInformation(eb, hm);
@@ -125,6 +126,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    @Override
     public Collection findAll() {
         this.setTypesExpected();
         ArrayList alist = this.select(digester.getQuery("findAll"));
@@ -155,7 +157,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
-     *
+     * 
      * @param study
      * @param definitionId
      * @return
@@ -168,7 +170,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find all EventDefinitionCRFBean which have no parent
      * EventDefinitionCRFBean.
-     *
+     * 
      * @param definitionId
      * @return
      */
@@ -190,7 +192,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the site
-     *
+     * 
      * @param definitionId
      * @param siteId
      * @param parentStudyId
@@ -232,12 +234,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return al;
     }
 
+    @Override
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public EntityBean findByPK(int ID) {
         EventDefinitionCRFBean eb = new EventDefinitionCRFBean();
         this.setTypesExpected();
@@ -259,6 +263,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Creates a new studysubject
      */
+    @Override
     public EntityBean create(EntityBean eb) {
         EventDefinitionCRFBean sb = (EventDefinitionCRFBean) eb;
         HashMap nullVars = new HashMap();
@@ -307,6 +312,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Updates a Study event
      */
+    @Override
     public EntityBean update(EntityBean eb) {
         EventDefinitionCRFBean sb = (EventDefinitionCRFBean) eb;
         HashMap nullVars = new HashMap();
@@ -349,12 +355,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return sb;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
         ArrayList al = new ArrayList();
 
@@ -394,14 +402,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
-     *
+     * 
      * @param study
      * @param eventDefinitionId
      * @return
      */
     public Collection findAllByEventDefinitionId(StudyBean study, int eventDefinitionId) {
-        return study.isSite(study.getParentStudyId()) ? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(), study
-                .getParentStudyId()) : findAllParentsByEventDefinitionId(eventDefinitionId);
+        return study.isSite(study.getParentStudyId()) ? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(),
+                study.getParentStudyId()) : findAllParentsByEventDefinitionId(eventDefinitionId);
     }
 
     public Collection findAllParentsByEventDefinitionId(int definitionId) {
@@ -450,7 +458,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find all active EventDefinitionCRFBean for the StudyBean and the
      * study_event_definition_id
-     *
+     * 
      * @param study
      * @param eventDefinitionId
      * @return
@@ -522,7 +530,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * isRequiredInDefinition, looks at a specific EventCRF and determines if
      * it's required or not
-     *
+     * 
      * @return boolean to tell us if it's required or not.
      */
     public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
@@ -537,8 +545,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
          * event_crf.crf_version_id and crf_version.crf_id =
          * event_definition_crf.crf_id and
          * event_definition_crf.study_event_definition_id =
-         * study_event.study_event_definition_id and study_event.study_event_id =
-         * 91
+         * study_event.study_event_definition_id and study_event.study_event_id
+         * = 91
          */
 
         this.unsetTypeExpected();
@@ -602,7 +610,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find the EventDefinitionCRFBean of a study. So this
      * EventDefinitionCRFBean has no parent.
-     *
+     * 
      * @param studyEventId
      *            The requested study event id.
      * @param crfVersionId
@@ -705,21 +713,21 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find EventDefinitionCRFBean for the StudyBean.
-     *
+     * 
      * @param study
      * @param studyEventDefinitionId
      * @param crfId
      * @return
      */
     public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(StudyBean study, int studyEventDefinitionId, int crfId) {
-        return study.isSite(study.getParentStudyId()) ? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(studyEventDefinitionId, crfId, study
-                .getId(), study.getParentStudyId()) : findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfId);
+        return study.isSite(study.getParentStudyId()) ? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(studyEventDefinitionId, crfId,
+                study.getId(), study.getParentStudyId()) : findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfId);
     }
 
     /**
      * Find EventDefinitionCRFBean for a study. So this EventDefinitionCRFBean
      * has no parent.
-     *
+     * 
      * @param studyEventDefinitionId
      * @param crfId
      * @return
@@ -806,12 +814,13 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     }
 
     /**
-     * Loads all {@link EventDefinitionCRFBean} associated to the list of {@link StudyEventDefinitionBean}
-     *
+     * Loads all {@link EventDefinitionCRFBean} associated to the list of
+     * {@link StudyEventDefinitionBean}
+     * 
      * @return
      */
-    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinition(
-            Integer studySubjectId, Integer siteId, Integer parentStudyId) {
+    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinition(Integer studySubjectId, Integer siteId,
+            Integer parentStudyId) {
         this.setTypesExpected(); // <== Must be called first
 
         HashMap<Integer, Object> param = new HashMap<Integer, Object>();
@@ -824,22 +833,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
         List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinition"), param);
 
-        Map<Integer, SortedSet<EventDefinitionCRFBean>> result =
-                new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> result = new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
         Iterator it = selectResult.iterator();
         while (it.hasNext()) {
             EventDefinitionCRFBean bean = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
             Integer studyEventDefinitionId = bean.getStudyEventDefinitionId();
 
             if (!result.containsKey(studyEventDefinitionId)) {
-                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(
-                        new Comparator<EventDefinitionCRFBean>() {
-                            public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
-                                Integer ord1 = o1.getOrdinal();
-                                Integer ord2 = o2.getOrdinal();
-                                return ord1.compareTo(ord2);
-                            }
-                        }));
+                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(new EventDefinitionCRFComparator()));
             }
             result.get(studyEventDefinitionId).add(bean);
 
@@ -848,39 +849,46 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return result;
     }
 
-    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinitionForStudy(
-            Integer studySubjectId) {
+    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinitionForStudy(Integer studySubjectId) {
         this.setTypesExpected(); // <== Must be called first
 
         HashMap<Integer, Object> param = new HashMap<Integer, Object>();
         int i = 1;
         param.put(i++, studySubjectId);
 
-        List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinitionForStudy"),
-                param);
+        List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinitionForStudy"), param);
 
-        Map<Integer, SortedSet<EventDefinitionCRFBean>> result =
-                new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> result = new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
         Iterator it = selectResult.iterator();
         while (it.hasNext()) {
             EventDefinitionCRFBean bean = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
             Integer studyEventDefinitionId = bean.getStudyEventDefinitionId();
 
             if (!result.containsKey(studyEventDefinitionId)) {
-                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(
-                        new Comparator<EventDefinitionCRFBean>() {
-                            public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
-                                Integer ord1 = o1.getOrdinal();
-                                Integer ord2 = o2.getOrdinal();
-                                return ord1.compareTo(ord2);
-                            }
-                        }));
+                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(new EventDefinitionCRFComparator()));
             }
             result.get(studyEventDefinitionId).add(bean);
 
         }
 
         return result;
+    }
+
+    private class EventDefinitionCRFComparator implements Comparator<EventDefinitionCRFBean> {
+
+        @Override
+        public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
+            Integer ord1 = o1.getOrdinal();
+            Integer ord2 = o2.getOrdinal();
+            /*
+             * There are DB entries with same ordinal, that cause one of the
+             * beans to not be added to the set. To avoid that this method will
+             * return -1 when comparing them.
+             */
+            int comparison = ord1.compareTo(ord2);
+            return comparison == 0 ? -1 : comparison;
+        }
+
     }
 
 }
