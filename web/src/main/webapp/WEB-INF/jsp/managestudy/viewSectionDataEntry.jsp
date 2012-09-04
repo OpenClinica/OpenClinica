@@ -221,7 +221,7 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
-    <img src="images/arrow_back_dis.gif" border="0"/></td>
+    <img src="<c:out value="${contextPath}" />/images/arrow_back_dis.gif" border="0"/></td>
 </c:if>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -327,7 +327,7 @@ function checkDataStatus() {
 <c:if test="${fn:length(toc.sections) gt 1}">
 
 <td align="right" id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
+<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="<c:out value="${contextPath}" />/images/arrow_next.gif" border="0" style=
   "margin-top:10px;margin-right:6px"/></a></td>
 <td>&nbsp;
     <div class="formfieldM_BG_noMargin">
