@@ -314,7 +314,7 @@ public class CreateUserAccountServlet extends SecureController {
         StringBuffer body = new StringBuffer();
         		
         body.append(resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " " + createdUserAccountBean.getLastName() + ",<br><br> ");
-        body.append(restext.getString("a_new_user_account_has_been_created_for_you") + "<br>,br>");
+        body.append(restext.getString("a_new_user_account_has_been_created_for_you") + "<br><br>");
         body.append( resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "<br>");
         body.append( resword.getString("password") + ": " + password + "<br><br>");
         body.append( restext.getString("please_test_your_login_information_and_let") + "<br>");
