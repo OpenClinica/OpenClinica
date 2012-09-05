@@ -3,22 +3,72 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-1" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
+     <!-- 
+     ==================================================
+     ==========        POSTGRES VIEWS        ==========
+     ==================================================
+      -->
+
+     <changeSet author="drodrigues" id="2012-08-29-14122-01" dbms="postgresql">
+        <comment>View 'view_dn_stats'.</comment>
         <sql splitStatements="true">
 <![CDATA[
-drop view view_discrepancy_note;
-drop view view_dn_item_data;
-drop view view_dn_event_crf;
-drop view view_dn_study_event;
-drop view view_dn_study_subject;
-drop view view_dn_subject;
+create or replace view "view_dn_stats" as select 
+dn.discrepancy_note_id, 
+case
+    when dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3 then (current_date - totals.date_updated)
+    else null
+end as "days",
+case 
+    when dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3 then (current_date - dn.date_created)
+    when dn.resolution_status_id = 4 then (totals.date_updated - dn.date_created)
+    else null
+end as "age",
+totals.total_notes,
+dn.date_created,
+totals.date_updated
+from discrepancy_note dn,
+(
+    select dn1.parent_dn_id, max(dn1.date_created) as "date_updated", count(dn1.discrepancy_note_id) as "total_notes" from discrepancy_note dn1 group by dn1.parent_dn_id
+) as "totals"
+where 
+(dn.parent_dn_id is null or dn.parent_dn_id = 0)
+and dn.discrepancy_note_id = totals.parent_dn_id;
 ]]>
         </sql>
-     </changeSet>
+    </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-2" dbms="postgresql">
-        <comment>Adding item_id mapping to 'view_dn_item_data'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-02" dbms="postgresql">
+        <comment>View 'view_study_hidden_event_definition_crf'.</comment>
+        <sql splitStatements="true">
+<![CDATA[
+create or replace view view_study_hidden_event_definition_crf as
+SELECT edc.event_definition_crf_id, edc.hide_crf, edc.study_id, se.study_event_id, cv.crf_version_id
+from
+event_definition_crf edc
+join study_event se on (edc.study_event_definition_id = se.study_event_definition_id and edc.parent_id is null)
+join crf_version cv on (edc.crf_id = cv.crf_id)
+]]>
+        </sql>
+    </changeSet>
+
+     <changeSet author="drodrigues" id="2012-08-29-14122-03" dbms="postgresql">
+        <comment>View 'view_site_hidden_event_definition_crf'.</comment>
+        <sql splitStatements="true">
+<![CDATA[
+create or replace view view_site_hidden_event_definition_crf as
+select edc.event_definition_crf_id, edc.hide_crf, edc.study_id, se.study_event_id, cv.crf_version_id
+from
+event_definition_crf edc
+join study_event se on (edc.study_event_definition_id = se.study_event_definition_id and edc.event_definition_crf_id not in (select parent_id from event_definition_crf where parent_id is not null or parent_id <> 0))
+join crf_version cv on (edc.crf_id = cv.crf_id)
+]]>
+        </sql>
+    </changeSet>
+
+
+     <changeSet author="drodrigues" id="2012-08-29-14122-04" dbms="postgresql">
+        <comment>View 'view_dn_item_data'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_item_data as select 
@@ -77,8 +127,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-3" dbms="postgresql">
-        <comment>Adding item_id mapping to 'view_dn_event_crf'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-05" dbms="postgresql">
+        <comment>View 'view_dn_event_crf'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_event_crf as 
@@ -140,8 +190,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-4" dbms="postgresql">
-        <comment>Adding item_id mapping to 'view_dn_study_event'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-06" dbms="postgresql">
+        <comment>View 'view_dn_study_event'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_event as 
@@ -201,8 +251,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-5" dbms="postgresql">
-        <comment>Adding item_id mapping to 'view_dn_study_subject'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-07" dbms="postgresql">
+        <comment>View 'view_dn_study_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_subject as 
@@ -255,8 +305,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-6" dbms="postgresql">
-        <comment>Adding item_id mapping to 'view_dn_subject'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-08" dbms="postgresql">
+        <comment>View 'view_dn_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_subject as 
@@ -308,14 +358,13 @@ join user_account ua2 on (dn.owner_id = ua2.user_id)
 join subject su on (map.subject_id = su.subject_id)
 join study_subject ss on (su.subject_id = ss.subject_id)
 join study s on (ss.study_id = s.study_id)
-left join user_account ua on (dn.assigned_user_id = ua.user_id)
-;
+left join user_account ua on (dn.assigned_user_id = ua.user_id);
 ]]>
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-7" dbms="postgresql">
-        <comment>Recreating 'view_discrepancy_note'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-09" dbms="postgresql">
+        <comment>View 'view_discrepancy_note'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_discrepancy_note as 
@@ -328,29 +377,117 @@ union all
 select * from view_dn_study_subject
 union all
 select * from view_dn_subject;
-
 ]]>
         </sql>
      </changeSet>
-
-
-     <changeSet author="drodrigues" id="2012-08-29-14122-8" dbms="oracle">
-        <comment>Dropping old view definitions.</comment>
+     
+     <changeSet author="drodrigues" id="2012-08-29-14122-10" dbms="postgresql">
+        <comment>Indexes for the tables used in the view_discrepancy_notes query.</comment>
         <sql splitStatements="true">
 <![CDATA[
-drop view view_discrepancy_note;
-drop view view_dn_item_data;
-drop view view_dn_event_crf;
-drop view view_dn_study_event;
-drop view view_dn_study_subject;
-drop view view_dn_subject;
+create index discrepancy_note_idx_entity_type on discrepancy_note(entity_type);
+create index discrepancy_note_idx_parent on discrepancy_note(discrepancy_note_id) where ((parent_dn_id is null) or (parent_dn_id = 0));
+create index study_subject_idx_study on study_subject(study_id);
+create index event_definition_crf_idx_study_event_definition on event_definition_crf(study_event_definition_id);
+create index study_event_idx_study_event_definition on study_event(study_event_definition_id);
+create index event_definition_crf_idx_crf on event_definition_crf(crf_id);
+create index crf_version_idx_crf on crf_version(crf_id);
+create index event_definition_crf_idx_parent_null on event_definition_crf(parent_id) where (parent_id is null);
+create index event_definition_crf_idx_parent_zero on event_definition_crf(parent_id) where (parent_id is not null or parent_id <> 0);
 ]]>
         </sql>
-     </changeSet>
+    </changeSet>
+     
+     
+     
+     <!-- 
+     ==================================================
+     ==========         ORACLE VIEWS         ==========
+     ==================================================
+      -->
+
+  <changeSet author="leonelag" id="2012-08-29-14122-01-ora" dbms="oracle">
+    <comment>View 'view_dn_stats'.</comment>
+    <sql splitStatements="true">
+  <![CDATA[
+  create or replace view view_dn_stats as
+    select dn.discrepancy_note_id, 
+      current_date - (
+          select dn2.date_created
+          from discrepancy_note dn2
+          where dn2.parent_dn_id = dn.discrepancy_note_id
+          and dn2.discrepancy_note_id = (
+              select max(discrepancy_note_id) 
+                from discrepancy_note dn3
+                where
+                  dn3.parent_dn_id = dn.discrepancy_note_id 
+                  AND dn.resolution_status_id != 4
+                  AND dn.resolution_status_id != 5   
+          )
+      ) as days, (
+          select max(dn2.discrepancy_note_id)
+            from discrepancy_note dn2
+            where dn2.parent_dn_id = dn.discrepancy_note_id
+      ) as age,
+      j.total_notes,
+      j.date_created,
+      j.date_updated
+    from discrepancy_note dn, (
+          select
+            dn2.parent_dn_id,
+            count(dn2.discrepancy_note_id) as total_notes, 
+            min(dn2.date_created) as date_created,
+            max(dn2.date_created) as date_updated 
+          from discrepancy_note dn2 
+          group by dn2.parent_dn_id 
+          having (dn2.parent_dn_id is not null and dn2.parent_dn_id <> 0)
+      ) j
+    where
+      dn.parent_dn_id is null
+      and dn.discrepancy_note_id = j.parent_dn_id
+    ]]>
+    </sql>
+  </changeSet>
 
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-9" dbms="oracle">
-        <comment>Adding item_id mapping to 'view_dn_item_data'.</comment>
+  <changeSet author="leonelag" id="2012-08-29-14122-02-ora" dbms="oracle">
+    <comment>View 'view_study_hidden_evt_def_crf'.</comment>
+    <sql splitStatements="true" >
+    <![CDATA[
+create or replace view view_study_hidden_evt_def_crf as
+  SELECT edc.event_definition_crf_id, edc.hide_crf, edc.study_id, se.study_event_id, cv.crf_version_id
+  from event_definition_crf edc
+  join study_event se
+    on (edc.study_event_definition_id = se.study_event_definition_id
+    and edc.parent_id is null)
+  join crf_version cv
+    on (edc.crf_id = cv.crf_id)
+      ]]>
+    </sql>
+  </changeSet>
+
+  <changeSet author="leonelag" id="2012-08-29-14122-03-ora" dbms="oracle">
+    <comment>View 'view_site_hidden_evt_def_crf'.</comment>
+    <sql splitStatements="true" >
+    <![CDATA[
+create or replace view view_site_hidden_evt_def_crf as
+  select edc.event_definition_crf_id, edc.hide_crf, edc.study_id, se.study_event_id, cv.crf_version_id
+  from
+  event_definition_crf edc
+  join study_event se
+    on (edc.study_event_definition_id = se.study_event_definition_id
+    and edc.event_definition_crf_id not in (
+      select parent_id from event_definition_crf where parent_id is not null or parent_id <> 0)
+    )
+  join crf_version cv
+    on (edc.crf_id = cv.crf_id)
+      ]]>
+    </sql>
+  </changeSet>
+
+
+     <changeSet author="drodrigues" id="2012-08-29-14122-04-ora" dbms="oracle">
+        <comment>View 'view_dn_item_data'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_item_data as 
@@ -412,8 +549,8 @@ create or replace view view_dn_item_data as
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-10" dbms="oracle">
-        <comment>Adding item_id mapping to 'view_dn_event_crf'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-05-ora" dbms="oracle">
+        <comment>View 'view_dn_event_crf'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_event_crf as 
@@ -492,8 +629,8 @@ create or replace view view_dn_event_crf as
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-11" dbms="oracle">
-        <comment>Adding item_id mapping to 'view_dn_study_event'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-06-ora" dbms="oracle">
+        <comment>View 'view_dn_study_event'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_event as 
@@ -561,8 +698,8 @@ create or replace view view_dn_study_event as
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-12" dbms="oracle">
-        <comment>Adding item_id mapping to 'view_dn_study_subject'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-07-ora" dbms="oracle">
+        <comment>View 'view_dn_study_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
   create or replace view view_dn_study_subject as 
@@ -621,8 +758,8 @@ create or replace view view_dn_study_event as
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-13" dbms="oracle">
-        <comment>Adding item_id mapping to 'view_dn_subject'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-08-ora" dbms="oracle">
+        <comment>View 'view_dn_subject'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_subject as 
@@ -688,8 +825,8 @@ create or replace view view_dn_subject as
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-14" dbms="oracle">
-        <comment>Recreating 'view_discrepancy_note'.</comment>
+     <changeSet author="drodrigues" id="2012-08-29-14122-09-ora" dbms="oracle">
+        <comment>View 'view_discrepancy_note'.</comment>
         <sql splitStatements="true">
 <![CDATA[
 create or replace view view_discrepancy_note as 
@@ -705,8 +842,15 @@ select * from view_dn_subject;
 ]]>
         </sql>
      </changeSet>
+     
+     <!-- 
+     ==================================================
+     ==========        SHARED QUERIES        ==========
+     ==================================================
+      -->
+     
 
-     <changeSet author="drodrigues" id="2012-08-29-14122-15">
+     <changeSet author="drodrigues" id="2012-08-29-14122-10-shared">
         <comment>Updating wrong entity names in study event mapping</comment>
         <sql splitStatements="true">
 <![CDATA[
