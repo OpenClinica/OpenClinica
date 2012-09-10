@@ -359,17 +359,17 @@ public class AuditEventDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), tableName);
 
         String sql = digester.getQuery("findAggregatesByTableName");
-        logger.info("sql is: " + sql);
+        logger.debug("sql is: " + sql);
         ArrayList alist = this.select(sql, variables);
-        logger.info("size is: " + alist.size());
+        logger.debug("size is: " + alist.size());
 
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
 
         while (it.hasNext()) {
-            logger.info("has next..");
+            logger.debug("has next..");
             AuditEventBean eb = (AuditEventBean) this.getColumnNameFromHashMap((HashMap) it.next());
-            logger.info("got bean");
+            logger.debug("got bean");
             al.add(eb);
         }
 

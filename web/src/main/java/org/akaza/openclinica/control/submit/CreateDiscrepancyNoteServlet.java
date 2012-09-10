@@ -330,8 +330,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         DiscrepancyNoteBean parent = new DiscrepancyNoteBean();
         if (parentId > 0) {
             dndao.setFetchMapping(true);
-            parent = (DiscrepancyNoteBean) dndao.findByPK(parentId);
-            if (parent.isActive()) {
+            parent = (DiscrepancyNoteBean) dndao.findByPK(parentId);            if (parent.isActive()) {
                 request.setAttribute("parent", parent);
             }
             dndao.setFetchMapping(false);
@@ -362,7 +361,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // request.setAttribute("parent", parent);
         } else {
             request.setAttribute("hasNotes", "no");
-            logger.info("has notes:" + "no");
+            logger.debug("has notes:" + "no");
         }
 
               //only for adding a new thread
@@ -587,7 +586,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             if (noteTree == null) {
                 noteTree = new FormDiscrepancyNotes();
-                logger.info("No note tree initailized in session");
+                logger.debug("No note tree initailized in session");
             }
 
             Validator v = new Validator(request);
@@ -1008,4 +1007,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
     }
 
+    
+    
+    ///place holder
+    
+    //this method should recalculate the ordinals
 }
