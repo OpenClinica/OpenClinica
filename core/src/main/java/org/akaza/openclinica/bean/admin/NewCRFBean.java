@@ -72,7 +72,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             this.setCrfVersions(this.listVersionNames());
         } catch (Exception pe) {
             pe.printStackTrace();
-            logger.info("hit an exception in creating new crf bean;" + " empty item name list exists");
+            logger.debug("hit an exception in creating new crf bean;" + " empty item name list exists");
             this.setItemNames(new HashMap());
             this.setCrfVersions(new HashMap());
         }
@@ -374,7 +374,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             // tbh 8-13
             con.setAutoCommit(false);
             Set mySet = itemQueries.entrySet();
-            logger.info("---start of item query generation here---");
+            logger.debug("---start of item query generation here---");
               for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
                 String pQuery = (String) ment.getValue();
@@ -387,7 +387,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 // never throw
                 // an error. Never say never though...
             }
-            logger.info("---pause in query generation, items---");
+            logger.debug("---pause in query generation, items---");
             // Iterator it = queries.iterator();
             // using iterator gets us out of order, and throws everything off.
             // try a for loop instead
@@ -403,9 +403,9 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             // the below lines are temporarily commented out for instrument
             // upload, tbh 8-13
             con.commit();
-            logger.info("---end of query generation, all queries committed---");
+            logger.debug("---end of query generation, all queries committed---");
             con.setAutoCommit(true);
-            logger.info("---end of query generation, autocommit set to true---");
+            logger.debug("---end of query generation, autocommit set to true---");
             // at this point we check to see if there is a active version, if
             // not, set THIS
             // to be the active version, tbh, 8-29
@@ -441,7 +441,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             se.printStackTrace();
             try {
                 con.rollback();
-                logger.info("Error detected, rollback " + se.getMessage());
+                logger.debug("Error detected, rollback " + se.getMessage());
                 String msg2 = "The following error was returned from the database: " + se.getMessage() + " using the following query: " + queries.get(count);
                 error.add(msg2);
                 this.setErrors(error);
@@ -449,7 +449,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.info("Error within rollback " + seq.getMessage());
+                logger.debug("Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the database: " + seq.getMessage();
                 error.add(msg2);
                 this.setErrors(error);
@@ -459,7 +459,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             pe.printStackTrace();
             try {
                 con.rollback();
-                logger.info("OpenClinica Error detected, rollback " + pe.getMessage());
+                logger.debug("OpenClinica Error detected, rollback " + pe.getMessage());
                 String msg2 = "The following error was returned from the application: " + pe.getMessage();
                 error.add(msg2);
                 this.setErrors(error);
@@ -467,7 +467,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.info("OpenClinica Error within rollback " + seq.getMessage());
+                logger.debug("OpenClinica Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the application: " + seq.getMessage();
                 error.add(msg2);
                 this.setErrors(error);
@@ -547,7 +547,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             se.printStackTrace();
             try {
                 con.rollback();
-                logger.info("Error detected, rollback " + se.getMessage());
+                logger.debug("Error detected, rollback " + se.getMessage());
                 String msg2 =
                     "The following error was returned from the database: " + se.getMessage() + " using the following query: " + deleteQueries.get(count);
                 error.add(msg2);
@@ -556,7 +556,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.info("Error within rollback " + seq.getMessage());
+                logger.debug("Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the database: " + seq.getMessage();
                 error.add(msg2);
                 this.setDeleteErrors(error);
@@ -566,7 +566,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             pe.printStackTrace();
             try {
                 con.rollback();
-                logger.info("OpenClinica Error detected, rollback " + pe.getMessage());
+                logger.debug("OpenClinica Error detected, rollback " + pe.getMessage());
                 String msg2 = "The following error was returned from the application: " + pe.getMessage();
                 error.add(msg2);
                 this.setDeleteErrors(error);
@@ -574,7 +574,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.info("OpenClinica Error within rollback " + seq.getMessage());
+                logger.debug("OpenClinica Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the application: " + seq.getMessage();
                 error.add(msg2);
                 this.setDeleteErrors(error);

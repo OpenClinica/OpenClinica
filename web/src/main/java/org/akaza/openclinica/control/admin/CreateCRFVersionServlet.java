@@ -99,13 +99,13 @@ public class CreateCRFVersionServlet extends SecureController {
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
 
         if (StringUtil.isBlank(action)) {
-            logger.info("action is blank");
+            logger.debug("action is blank");
             request.setAttribute("version", version);
             forwardPage(Page.CREATE_CRF_VERSION);
         } else if ("confirm".equalsIgnoreCase(action)) {
             String dir = SQLInitServlet.getField("filePath");
             if (!new File(dir).exists()) {
-                logger.info("The filePath in datainfo.properties is invalid " + dir);
+                logger.debug("The filePath in datainfo.properties is invalid " + dir);
                 addPageMessage(resword.getString("the_filepath_you_defined"));
                 forwardPage(Page.CREATE_CRF_VERSION);
                 // BWP 01/13/2009 >>
@@ -116,7 +116,7 @@ public class CreateCRFVersionServlet extends SecureController {
             String theDir = dir + "crf" + File.separator + "original" + File.separator;
             if (!new File(theDir).isDirectory()) {
                 new File(theDir).mkdirs();
-                logger.info("Made the directory " + theDir);
+                logger.debug("Made the directory " + theDir);
             }
             //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
             String tempFile = "";
@@ -150,7 +150,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 session.setAttribute("version", version);
             }
             if (!errors.isEmpty()) {
-                logger.info("has validation errors ");
+                logger.debug("has validation errors ");
                 request.setAttribute("formMessages", errors);
                 forwardPage(Page.CREATE_CRF_VERSION);
             } else {
@@ -160,7 +160,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     CRFVersionBean version1 = (CRFVersionBean) versions.get(i);
                     if (version.getName().equals(version1.getName())) {
                         // version already exists
-                        logger.info("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
+                        logger.debug("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
                         if (ub.getId() != version1.getOwnerId()) {// not owner
                             addPageMessage(respage.getString("CRF_version_try_upload_exists_database") + version1.getOwner().getName()
                                 + respage.getString("please_contact_owner_to_delete"));
@@ -186,17 +186,17 @@ public class CreateCRFVersionServlet extends SecureController {
                 }
                 // didn't find same version in the DB,let user upload the excel
                 // file
-                logger.info("didn't find same version in the DB,let user upload the excel file.");
+                logger.debug("didn't find same version in the DB,let user upload the excel file.");
 
                 // List excelErr =
                 // ((ArrayList)request.getAttribute("excelErrors"));
                 List excelErr = (ArrayList) session.getAttribute("excelErrors");
-                logger.info("excelErr.isEmpty()=" + excelErr.isEmpty());
+                logger.debug("excelErr.isEmpty()=" + excelErr.isEmpty());
                 if (excelErr != null && excelErr.isEmpty()) {
                     addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"));
                     forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW);
                 } else {
-                    logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
+                    logger.debug("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
                     forwardPage(Page.CREATE_CRF_VERSION_CONFIRM);
                 }
 
@@ -214,11 +214,11 @@ public class CreateCRFVersionServlet extends SecureController {
             Boolean deletePreviousVersion = (Boolean) session.getAttribute("deletePreviousVersion");
             Integer previousVersionId = (Integer) session.getAttribute("previousVersionId");
             if (deletePreviousVersion != null && deletePreviousVersion.equals(Boolean.TRUE) && previousVersionId != null && previousVersionId.intValue() > 0) {
-                logger.info("Need to delete previous version");
+                logger.debug("Need to delete previous version");
                 // whether we can delete
                 canDelete = canDeleteVersion(previousVersionId.intValue());
                 if (!canDelete) {
-                    logger.info("but cannot delete previous version");
+                    logger.debug("but cannot delete previous version");
                     if (session.getAttribute("itemsHaveData") == null && session.getAttribute("eventsForVersion") == null) {
                         addPageMessage(respage.getString("you_are_not_owner_some_items_cannot_delete"));
                     }
@@ -257,7 +257,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
 
             // submit
-            logger.info("commit sql");
+            logger.debug("commit sql");
             NewCRFBean nib1 = (NewCRFBean) session.getAttribute("nib");
             if (nib1 != null) {
                 try {
@@ -270,7 +270,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
                     ArrayList crfvbeans = new ArrayList();
 
-                    logger.info("CRF-ID [" + version.getCrfId() + "]");
+                    logger.debug("CRF-ID [" + version.getCrfId() + "]");
                     int crfVersionId = 0;
                     String versionOID = null;
                     if (version.getCrfId() != 0) {
@@ -315,7 +315,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     // save new version spreadsheet
                     String tempFile = (String) session.getAttribute("tempFileName");
                     if (tempFile != null) {
-                        logger.info("*** ^^^ *** saving new version spreadsheet" + tempFile);
+                        logger.debug("*** ^^^ *** saving new version spreadsheet" + tempFile);
                         try {
                             String dir = SQLInitServlet.getField("filePath");
                             File f = new File(dir + "crf" + File.separator + "original" + File.separator + tempFile);
@@ -326,7 +326,7 @@ public class CreateCRFVersionServlet extends SecureController {
                             String finalDir = dir + "crf" + File.separator + "new" + File.separator;
 
                             if (!new File(finalDir).isDirectory()) {
-                                logger.info("need to create folder for excel files" + finalDir);
+                                logger.debug("need to create folder for excel files" + finalDir);
                                 new File(finalDir).mkdirs();
                             }
 
@@ -334,13 +334,13 @@ public class CreateCRFVersionServlet extends SecureController {
                             // version.getName() + ".xls";
 
                             String newFile = version.getCrfId() + version.getOid() + ".xls";
-                            logger.info("*** ^^^ *** new file: " + newFile);
+                            logger.debug("*** ^^^ *** new file: " + newFile);
                             File nf = new File(finalDir + newFile);
-                            logger.info("copying old file " + f.getName() + " to new file " + nf.getName());
+                            logger.debug("copying old file " + f.getName() + " to new file " + nf.getName());
                             copy(f, nf);
                             // ?
                         } catch (IOException ie) {
-                            logger.info("==============");
+                            logger.debug("==============");
                             addPageMessage(respage.getString("CRF_version_spreadsheet_could_not_saved_contact"));
                         }
 
@@ -351,7 +351,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     session.removeAttribute("htmlTab");
                     forwardPage(Page.CREATE_CRF_VERSION_DONE);
                 } catch (OpenClinicaException pe) {
-                    logger.info("--------------");
+                    logger.debug("--------------");
                     session.setAttribute("excelErrors", nib1.getErrors());
                     // request.setAttribute("excelErrors", nib1.getErrors());
                     forwardPage(Page.CREATE_CRF_VERSION_ERROR);
@@ -360,16 +360,16 @@ public class CreateCRFVersionServlet extends SecureController {
                 forwardPage(Page.CREATE_CRF_VERSION);
             }
         } else if ("delete".equalsIgnoreCase(action)) {
-            logger.info("user wants to delete previous version");
+            logger.debug("user wants to delete previous version");
             List excelErr = (ArrayList) session.getAttribute("excelErrors");
-            logger.info("for overwrite CRF version, excelErr.isEmpty()=" + excelErr.isEmpty());
+            logger.debug("for overwrite CRF version, excelErr.isEmpty()=" + excelErr.isEmpty());
             if (excelErr != null && excelErr.isEmpty()) {
                 addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"));
                 session.setAttribute("deletePreviousVersion", Boolean.TRUE);//should be moved to excelErr != null block
                 forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW);
              } else {
                 session.setAttribute("deletePreviousVersion", Boolean.FALSE);//should be moved to excelErr != null block
-                logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
+                logger.debug("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
                 forwardPage(Page.CREATE_CRF_VERSION_CONFIRM);
             }
 
@@ -392,18 +392,18 @@ public class CreateCRFVersionServlet extends SecureController {
             //String name = (String) files.nextElement();
             //File f = multi.getFile(name);
             if (f == null || f.getName() == null) {
-                logger.info("file is empty.");
+                logger.debug("file is empty.");
                 Validator.addError(errors, "excel_file", resword.getString("you_have_to_provide_spreadsheet"));
                 session.setAttribute("version", version);
                 return tempFile;
             } else if (f.getName().indexOf(".xls") < 0 && f.getName().indexOf(".XLS") < 0) {
-                logger.info("file name:" + f.getName());
+                logger.debug("file name:" + f.getName());
                 Validator.addError(errors, "excel_file", respage.getString("file_you_uploaded_not_seem_excel_spreadsheet"));
                 session.setAttribute("version", version);
                 return tempFile;
 
             } else {
-                logger.info("file name:" + f.getName());
+                logger.debug("file name:" + f.getName());
                 tempFile = f.getName();
                 // create the inputstream here, so that it can be enclosed in a
                 // try/finally block and closed :: BWP, 06/08/2007
@@ -430,7 +430,7 @@ public class CreateCRFVersionServlet extends SecureController {
                         sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getId());
                         sstc.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
                     }
-                    // logger.info("finishing with feedin file-input-stream, did
+                    // logger.debug("finishing with feedin file-input-stream, did
                     // we error out here?");
 
                     if (htab.isRepeating()) {
@@ -481,7 +481,7 @@ public class CreateCRFVersionServlet extends SecureController {
                         // throw FileNotFoundException
                         exc.printStackTrace();
                         String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
-                        logger.info(message + ": " + exc.getMessage());
+                        logger.debug(message + ": " + exc.getMessage());
                         this.addPageMessage(message);
                     } finally {
                         if (inputStream != null) {
@@ -574,12 +574,12 @@ public class CreateCRFVersionServlet extends SecureController {
         for (int i = 0; i < items.size(); i++) {
             ItemBean item = (ItemBean) items.get(i);
             if (ub.getId() != item.getOwner().getId()) {
-                logger.info("not owner" + item.getOwner().getId() + "<>" + ub.getId());
+                logger.debug("not owner" + item.getOwner().getId() + "<>" + ub.getId());
                 return false;
             }
             if (cdao.hasItemData(item.getId())) {
                 itemsHaveData.add(item);
-                logger.info("item has data");
+                logger.debug("item has data");
                 session.setAttribute("itemsHaveData", itemsHaveData);
                 return false;
             }
@@ -615,7 +615,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 if (!item.getUnits().equalsIgnoreCase(newItem.getUnits()) || item.isPhiStatus() != newItem.isPhiStatus()
                     || item.getDataType().getId() != newItem.getDataType().getId() || !item.getDescription().equalsIgnoreCase(newItem.getDescription())) {
 
-                    logger.info("found two items with same name but different units/phi/datatype/description");
+                    logger.debug("found two items with same name but different units/phi/datatype/description");
                   
                     diffItems.add(newItem);
                 }
@@ -703,10 +703,10 @@ public class CreateCRFVersionServlet extends SecureController {
                         break;
                     }
                     if (text1.equalsIgnoreCase(text) && !value1.equals(value)) {
-                        logger.info("different response value:" + value1 + "|" + value);
+                        logger.debug("different response value:" + value1 + "|" + value);
                         return rob;
                     } else if (!text1.equalsIgnoreCase(text) && value1.equals(value)) {
-                        logger.info("different response text:" + text1 + "|" + text);
+                        logger.debug("different response text:" + text1 + "|" + text);
                         return rob;
                     }
                     break;

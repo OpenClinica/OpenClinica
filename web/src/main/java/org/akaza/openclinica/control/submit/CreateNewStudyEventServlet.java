@@ -209,8 +209,8 @@ public class CreateNewStudyEventServlet extends SecureController {
             }
 
             // tbh
-            logger.info("set preset values: " + presetValues.toString());
-            logger.info("found def.w.CRF list, size " + eventDefinitions.size());
+            logger.debug("set preset values: " + presetValues.toString());
+            logger.debug("found def.w.CRF list, size " + eventDefinitions.size());
             // tbh
             setPresetValues(presetValues);
 
@@ -227,11 +227,11 @@ public class CreateNewStudyEventServlet extends SecureController {
             // tbh
             // String dateCheck = (String)request.getAttribute("startDate");
             // String endCheck = (String)request.getAttribute("endDate");
-            // logger.info(dateCheck+"; "+endCheck);
+            // logger.debug(dateCheck+"; "+endCheck);
 
             String dateCheck2 = request.getParameter("startDate");
             String endCheck2 = request.getParameter("endDate");
-            logger.info(dateCheck2 + "; " + endCheck2);
+            logger.debug(dateCheck2 + "; " + endCheck2);
 
             // YW, 3-12-2008, 2220 fix <<
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
@@ -251,7 +251,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 
             // for (java.util.Enumeration enu = request.getAttributeNames();
             // enu.hasMoreElements() ;) {
-            // logger.info(">>> found "+enu.nextElement().toString());
+            // logger.debug(">>> found "+enu.nextElement().toString());
             // }
             // tbh
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -284,7 +284,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             boolean hasScheduledEvent = false;
             for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
                 if (!StringUtil.isBlank(fp.getString(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
-                    // logger.info("has scheduled definition******");
+                    // logger.debug("has scheduled definition******");
                     v.addValidation(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
                     if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
@@ -305,7 +305,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             }
 
             HashMap errors = v.validate();
-            // logger.info("v is not null *****");
+            // logger.debug("v is not null *****");
             String location = resword.getString("location");
             // don't allow user to use the default value 'Location' since
             // location
@@ -429,7 +429,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             // YW >>
             logger.error("we have errors; number of this; " + errors.size());
             if (!errors.isEmpty()) {
-                logger.info("we have errors; number of this; " + errors.size());
+                logger.debug("we have errors; number of this; " + errors.size());
                 logger.error("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));
                 addPageMessage(respage.getString("errors_in_submission_see_below"));
                 setInputMessages(errors);
@@ -483,7 +483,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 // YW >>
                 studyEvent.setDateStarted(start);
                 // comment to find bug 1389, tbh
-                logger.info("found start date: " + local_df.format(start));
+                logger.debug("found start date: " + local_df.format(start));
                 Date startScheduled2[] = new Date[ADDITIONAL_SCHEDULED_NUM];
                 for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
                     startScheduled2[i] = getInputStartDateScheduled(i);
@@ -524,7 +524,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 for (String element : eventFields) {
                     AddNewSubjectServlet.saveFieldNotes(element, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 }
-                // logger.info("here ok 3333333333333333");
+                // logger.debug("here ok 3333333333333333");
                 if (hasScheduledEvent) {
                     for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 

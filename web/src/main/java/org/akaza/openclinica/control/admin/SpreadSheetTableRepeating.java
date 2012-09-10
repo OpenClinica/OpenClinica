@@ -218,11 +218,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                  */
                 int numRows = sheet.getPhysicalNumberOfRows();
                 int lastNumRow = sheet.getLastRowNum();
-                // logger.info("PhysicalNumberOfRows" +
+                // logger.debug("PhysicalNumberOfRows" +
                 // sheet.getPhysicalNumberOfRows());
                 // great minds apparently think alike...tbh, commented out
                 // 06/19/2007
-                // logger.info("LastRowNum()" + sheet.getLastRowNum());
+                // logger.debug("LastRowNum()" + sheet.getLastRowNum());
                 String secName = "";
                 String page = "";
                 // YW << for holding "responseLabel_responseType"
@@ -242,7 +242,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                 int blankRowCount = 0;
                 String itemName=null;String default_value=null;
                 if (sheetName.equalsIgnoreCase("Items")) {
-                    logger.info("read an item in sheet" + sheetName);
+                    logger.debug("read an item in sheet" + sheetName);
                     Map labelWithOptions = new HashMap();
                     Map labelWithValues = new HashMap();
                     Map labelWithType = new HashMap<String, String>();
@@ -866,7 +866,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                             if (regexp1.startsWith("regexp:")) {
                                 String finalRegexp = regexp1.substring(7).trim();
-                                // logger.info("reg:" + finalRegexp);
+                                // logger.debug("reg:" + finalRegexp);
                                 if (finalRegexp.contains("\\\\")) {
                                     // \\ in the regular expression it should
                                     // not be allowed
@@ -980,7 +980,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String phi = getValue(cell);
                         // String phi = "";
-                        // logger.info("++ phi: "+getValue(cell));
+                        // logger.debug("++ phi: "+getValue(cell));
                         if (StringUtil.isBlank(phi)) {
                             phi = "0";
                         } else
@@ -1479,7 +1479,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 }
                                 queries.add(sql2_1);
                             } else {
-                                logger.info("No insert into scd_item_metadata for item name = " + itemName +
+                                logger.debug("No insert into scd_item_metadata for item name = " + itemName +
                                         "with Simple_Conditional_Display = \"" + display + "\".");
                             }
                         }
@@ -1780,7 +1780,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 }
                               
                             } else {
-                                logger.info("found a non-numeric code in a numeric field: groupRepeatNumber");
+                                logger.debug("found a non-numeric code in a numeric field: groupRepeatNumber");
                               
                             }
                         }
@@ -1811,7 +1811,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     }
                                 }
                             } else {
-                                logger.info("found a non-numeric code in a numeric field: groupRepeatMax");
+                                logger.debug("found a non-numeric code in a numeric field: groupRepeatMax");
                             }
                         }
                         // >> tbh 02/2010 adding show_hide for Dynamics
@@ -1941,12 +1941,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // if (!StringUtil.isBlank(groupLabel)) {
                         // String itemName =
                         // (String)itemsToGrouplabels.get(groupLabel);
-                        // logger.info("found "+itemName+" when we passed group
+                        // logger.debug("found "+itemName+" when we passed group
                         // label "+groupLabel);
                         // ItemGroupBean itemGroup = new ItemGroupBean();
-                        // //logger.info("found "+groupLabel);
+                        // //logger.debug("found "+groupLabel);
                         // itemGroup= (ItemGroupBean)itemGroups.get(groupLabel);
-                        // logger.info("*** Found "+
+                        // logger.debug("*** Found "+
                         // groupLabel+
                         // " and matched with "+
                         // itemGroup.getName());
@@ -1991,7 +1991,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     // BORDER, tbh
                     for (int k = 1; k < numRows; k++) {
                         if (blankRowCount == 5) {
-                            // logger.info("hit end of the row ");
+                            // logger.debug("hit end of the row ");
                             // kludgey way to zero out the rows that can get
                             // created in the
                             // editing process; is there a better way? tbh
@@ -2030,7 +2030,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("sections_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("DUPLICATE_FIELD"));
                         }
-                        // logger.info("section name:" + secLabel + "row num:"
+                        // logger.debug("section name:" + secLabel + "row num:"
                         // +k);
                         secNames.add(secLabel);
                         cell = sheet.getRow(k).getCell((short) 1);
@@ -2110,7 +2110,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         queries.add(sql);
                     }// end for loop
                 } else if (sheetName.equalsIgnoreCase("CRF")) {
-                    logger.info("read crf");
+                    logger.debug("read crf");
                     // one row, four cells, all strings
                     if (sheet == null || sheet.getRow(1) == null || sheet.getRow(1).getCell((short) 0) == null) {
                         throw new CRFReadingException("Blank row found in sheet CRF.");
@@ -2149,7 +2149,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     // try {
                     // CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
                     // if (!checkName.getName().equals(crfName)) {
-                    // logger.info("crf name is mismatch");
+                    // logger.debug("crf name is mismatch");
                     // //errors.add("The CRF_NAME column did not match the
                     // intended CRF version "
                     // // + "you want to upload. Make sure this reads '" +
@@ -2284,7 +2284,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     boolean overwrite = false;
 
                     if (checkCRFVersions.containsKey(version)) {
-                        logger.info("found a matching version name..." + version);
+                        logger.debug("found a matching version name..." + version);
                         /*
                          * errors.add("The VERSION column is not unique. This
                          * can cause confusion in " + "selecting the correct
@@ -2409,7 +2409,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         if (!errors.isEmpty()) {
             ncrf.setErrors(errors);
         }
-        // logger.info("html table:" + buf.toString());
+        // logger.debug("html table:" + buf.toString());
         ncrf.setHtmlTable(buf.toString());
         return ncrf;
     }
@@ -2468,12 +2468,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
             if ((dphi - (int) dphi) * 1000 == 0) {
                 val = (int) dphi + "";
             }
-            // logger.info("found a numeric cell after transfer: "+val);
+            // logger.debug("found a numeric cell after transfer: "+val);
             break;
         case HSSFCell.CELL_TYPE_STRING:
             val = cell.getStringCellValue();
             if (val.matches("'")) {
-                // logger.info("Found single quote! "+val);
+                // logger.debug("Found single quote! "+val);
                 val.replaceAll("'", "''");
             }
             // buf.append("<td><font class=\"bodytext\">" +

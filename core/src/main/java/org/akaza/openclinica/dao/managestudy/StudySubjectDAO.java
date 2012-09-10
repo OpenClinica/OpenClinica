@@ -1175,7 +1175,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             // logger.info("gender here:" + hm.get("gender").getClass());
             try {
                 if (hm.get("gender") == null || ((String) hm.get("gender")).equals(" ")) {
-                    logger.info("here");
+                    logger.debug("here");
                     ssb.setGender(' ');
 
                 } else {
