@@ -1547,7 +1547,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             // item data
                             // update an item data won't touch its ordinal
                           //  int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
-                      
+
 
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
@@ -1932,7 +1932,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     tabNum = fp.getInt("tab");
                                 }
                                 request.setAttribute("tab", new Integer(tabNum - 1).toString());
-                                
+
                               //  forwardPage(getServletPage(request), request, response);
                                 getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
                             }
@@ -2049,7 +2049,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	            	isRFCFiled = true;
 	            }
             }
-	            
+
              if (!isRFCFiled) {
                      errors.put(formName, error);
             } else {
@@ -2435,7 +2435,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int secondLoopBreak = 0;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, digb.getItemGroupBean());
-        
+
         repeatMax = ( repeatMax < maxOrdinal)? maxOrdinal:repeatMax;
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
@@ -3167,7 +3167,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     LOGGER.debug("just ran upsert! " + idb.getId());
                 }
 
-           } 
+           }
    //             else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
 //                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
 //                idb.setUpdater(ub);
@@ -4448,7 +4448,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
     		List<String> nullValuesList, boolean isSubmitted)
     {
-  
+
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, itemGroup.getItemGroupBean());
@@ -4505,7 +4505,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             itemGroups.add(dig);
         }
 
-       
+
        diwgb.setItemGroups(itemGroups);
        diwgb.setDbItemGroups(itemGroups);
         return diwgb;
@@ -5301,7 +5301,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return manualRows;
     }
 
-    private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems, 
+    private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems,
     		HttpServletRequest request) {
         int manualRows = 0;
         if (errors == null || errors.size() <1){ return errors;}
@@ -5328,7 +5328,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             }
                         }
                     }
-   
+
                 else { // everything in between
                         manualRows++;
                         for (DisplayItemBean dib : dibs) {
@@ -5356,13 +5356,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList<DiscrepancyNoteBean> fieldNote = null;
         String intendedKey = null;
         String replacementKey = null;
-        
+
         if ((noteSubmitted == null || noteSubmitted.size() < 1)
-        		&& ( noteTree == null || noteTree.getFieldNotes() != null || noteTree.getFieldNotes().size() < 1))
+        		&& ( noteTree == null || noteTree.getFieldNotes() == null || noteTree.getFieldNotes().size() < 1))
         { return;        }
-        
-        
-        
+
+
+
         for (int i = 0; i < allItems.size(); i++) {
             DisplayItemWithGroupBean diwb = allItems.get(i);
 
@@ -5380,7 +5380,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                              replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_" + j + getInputName(dib);
                             if (!replacementKey.equals(intendedKey) ){
                             	if (noteSubmitted.containsKey(intendedKey)) {
-                            
+
 	                                noteSubmitted.put(replacementKey, Boolean.TRUE);
 	                                noteSubmitted.remove(intendedKey);
                             	}
@@ -5392,12 +5392,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             		 }
                             		  //not changing here because this hash should not be used
 //                                      noteTree.addIdNote(note.getEntityId(), field);
-//                                      
+//
                             	}
                             }
                         }
                     }
-   
+
                 else { // everything in between
                         manualRows++;
                         for (DisplayItemBean dib : dibs) {
@@ -5405,7 +5405,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                              replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_manual" + j + getInputName(dib);
                             if (!replacementKey.equals(intendedKey) ){
                             	if( noteSubmitted.containsKey(intendedKey)) {
-                           
+
                             	 noteSubmitted.put(replacementKey, Boolean.TRUE);
                                  noteSubmitted.remove(intendedKey);
 	                            }
@@ -5425,7 +5425,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
         }
         request.getSession().setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
-        
+
     }
 
     /*Determining the resolution status that will be shown in color flag for an item.*/
