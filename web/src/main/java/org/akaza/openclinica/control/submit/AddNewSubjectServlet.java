@@ -49,6 +49,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +87,8 @@ public class AddNewSubjectServlet extends SecureController {
 
     public static final String INPUT_GROUP = "group";
 
+    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
+
 
     public static final String BEAN_GROUPS = "groups";
 
@@ -100,7 +103,7 @@ public class AddNewSubjectServlet extends SecureController {
 
     public static final String EXISTING_SUB_SHOWN = "existingSubShown";
 
-    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
+    
 
     public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
     public static final String LOCATION = "location";
@@ -229,14 +232,14 @@ public class AddNewSubjectServlet extends SecureController {
             }
             v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-            if (!StringUtil.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
+            if (!StringUtils.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
                 v.addValidation(INPUT_SECONDARY_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
             }
 
             String dobSetting = currentStudy.getStudyParameterConfig().getCollectDob();
             if (dobSetting.equals("1")) {// date of birth
                 v.addValidation(INPUT_DOB, Validator.IS_A_DATE);
-                if (!StringUtil.isBlank(fp.getString("INPUT_DOB"))) {
+                if (!StringUtils.isBlank(fp.getString("INPUT_DOB"))) {
                     v.alwaysExecuteLastValidation(INPUT_DOB);
                 }
                 v.addValidation(INPUT_DOB, Validator.DATE_IN_PAST);
@@ -907,6 +910,13 @@ public class AddNewSubjectServlet extends SecureController {
      * @param sb
      */
     public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb) {
+    	
+    	 saveFieldNotes( field,  notes,  dndao,  entityId,  entityType,  sb, -1) ;
+	
+    	}
+    public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, 
+    		DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb,
+    		int event_crf_id) {
 
         if (notes == null || dndao == null || sb == null) {
             // logger.info("AddNewSubjectServlet,saveFieldNotes:parameter is
@@ -914,6 +924,9 @@ public class AddNewSubjectServlet extends SecureController {
             return;
         }
         ArrayList fieldNotes = notes.getNotes(field);
+        if ((fieldNotes == null || fieldNotes.size() < 1 ) && event_crf_id >0){
+          	fieldNotes = notes.getNotes(event_crf_id +"_"+field);
+        }
         // System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
         for (int i = 0; i < fieldNotes.size(); i++) {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNotes.get(i);

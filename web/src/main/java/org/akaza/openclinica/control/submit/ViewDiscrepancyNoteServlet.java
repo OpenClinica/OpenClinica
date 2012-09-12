@@ -85,10 +85,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String AUTOVIEWS = "autoViews";
     public static final String BOX_TO_SHOW = "boxToShow";
     public static final String VIEW_DN_LINK = "viewDNLink";
-    // public static final String USER_ACCOUNT_ID = "strUserAccountId"; // use
-    // to provide a
-    // single user id, to whom the query is assigned, tbh 02/2009
-    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
     public static final String IS_REASON_FOR_CHANGE = "isRfc";
     public static final String CAN_MONITOR = "canMonitor";
     public static final String ERROR_FLAG = "errorFlag";
@@ -127,6 +123,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
 
+        int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
+        request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
+        
         request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
@@ -467,7 +466,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // new DiscrepancyNoteUtil().updateStatusOfParents(notes,
         // sm.getDataSource(), currentStudy);
 
-        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
         Map<Integer, DiscrepancyNoteBean> noteTree = new LinkedHashMap<Integer, DiscrepancyNoteBean>();
 

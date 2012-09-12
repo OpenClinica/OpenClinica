@@ -63,14 +63,13 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String ENTITY_TYPE = "name";
     public static final String ENTITY_COLUMN = "column";
     public static final String ENTITY_FIELD = "field";
-    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-    //public static final String DIS_NOTE = "discrepancyNote";
     public static final String RES_STATUS_ID = "resStatusId";
     public static final String SUBMITTED_USER_ACCOUNT_ID = "userAccountId";
     public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
     public static final String BOX_DN_MAP = "boxDNMap";
     public static final String BOX_TO_SHOW = "boxToShow";
+   
 
     /*
      * (non-Javadoc)
@@ -98,6 +97,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
 
+        int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
+        request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
+        
         int parentId = fp.getInt(PARENT_ID);
         DiscrepancyNoteBean parent = parentId > 0 ? (DiscrepancyNoteBean) dndao.findByPK(parentId) : new DiscrepancyNoteBean();
         HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) session.getAttribute(BOX_DN_MAP);
@@ -112,13 +114,14 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         }
         String entityType = fp.getString(ENTITY_TYPE, true);
 
-        FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+        FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         if (noteTree == null) {
             noteTree = new FormDiscrepancyNotes();
         }
         String ypos = fp.getString("ypos"+parentId);
         int refresh = 0;
-
+        String field = fp.getString(ENTITY_FIELD, true);
+        
         String description = fp.getString("description" + parentId);
         int typeId = fp.getInt("typeId" + parentId);
         String detailedDes = fp.getString("detailedDes" + parentId);
@@ -165,8 +168,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             ArrayList<String> mess = new ArrayList<String>();
 
             String column = fp.getString(ENTITY_COLUMN, true);
-            String field = fp.getString(ENTITY_FIELD, true);
-
+            
             dn.setOwner(ub);
             dn.setStudyId(currentStudy.getId());
             dn.setEntityId(entityId);
@@ -206,9 +208,11 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                 if(success == false) {
                     mess.add(restext.getString("failed_create_dn_mapping_for_dnId") + dn.getId()+". ");
                 }
-                noteTree.addNote(field, dn);
+                
+          
+                noteTree.addNote(eventCRFId+"_"+field, dn);
                 noteTree.addIdNote(dn.getEntityId(), field);
-                session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
+                session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, noteTree);
                 if (dn.getParentDnId() == 0) {
                     // see issue 2659 this is a new thread, we will create
                     // two notes in this case,
@@ -221,9 +225,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                         if(!dndao.isQuerySuccessful()) {
                             mess.add(restext.getString("failed_create_dn_mapping_for_dnId")+dn.getId()+". ");
                         }
-                        noteTree.addNote(field, dn);
+                        noteTree.addNote(eventCRFId+"_"+field, dn);
                         noteTree.addIdNote(dn.getEntityId(), field);
-                        session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
+                        session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, noteTree);
                     } else {
                         mess.add(restext.getString("failed_create_child_dn_for_new_parent_dnId")+dn.getId()+". ");
                     }
@@ -244,7 +248,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                  * make sure the system flags error while changing data for items
                  * which already has a DiscrepanyNote
                  */
-                manageReasonForChangeState(session, entityId);
+                manageReasonForChangeState(session,eventCRFId +"_"+field);
                 String email = fp.getString(EMAIL_USER_ACCOUNT+parentId);
                 if (dn.getAssignedUserId() > 0 && "1".equals(email.trim())) {
                     logger.info("++++++ found our way here");
@@ -426,10 +430,10 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         }
     }
 
-    private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
-        HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+    private void manageReasonForChangeState(HttpSession session, String itemDataBeanId) {
+        HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
         if (noteSubmitted == null) {
-            noteSubmitted = new HashMap<Integer, Boolean>();
+            noteSubmitted = new HashMap<String, Boolean>();
         }
         noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
         session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
