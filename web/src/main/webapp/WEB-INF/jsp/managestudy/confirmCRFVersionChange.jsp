@@ -88,19 +88,11 @@
 <!-- default version label here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_current_crf_version_title" bundle="${resword}"/>:</td>
-<td>
-<a href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfId}"/>&crfVersionId=<c:out value="${crfversionId}"/>&tabId=1&crfListPage=yes','','','')">
-<c:out value="${crfVersionName}"/>
-</a>
-</td></tr>
+<td><c:out value="${crfVersionName}"/></td></tr>
 
 <tr><td>
-<fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: </td>
-<td>
-<a href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfId}"/>&crfVersionId=<c:out value="${selectedVersionId}"/>&tabId=1&crfListPage=yes','','','')">
-<c:out value="${selectedVersionName}"/>
-</a>
-</td></tr>
+<fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>:</td>
+<td><c:out value="${selectedVersionName}"/></td></tr>
 </table>
 <!-- header ends -->
 
