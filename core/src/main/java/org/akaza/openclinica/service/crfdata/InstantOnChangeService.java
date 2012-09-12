@@ -48,14 +48,14 @@ public class InstantOnChangeService {
         Map<Integer,List<InstantOnChangePairContainer>> insMap
             = getItemFormMetadataDAO().sectionInstantMapInSameSection(crfVersionId);
         if(insMap == null || insMap.size()==0) {
-            logger.info("cannot find instant-calculation item in crf_version =" + crfVersionId);
+            logger.debug("cannot find instant-calculation item in crf_version =" + crfVersionId);
         } else {
             for (Integer sectionId : insMap.keySet()) {
                 Map<String,Map<Integer,InstantOnChangeFrontStrGroup>> repOrigins = new HashMap<String,Map<Integer,InstantOnChangeFrontStrGroup>>();
                 Map<Integer,InstantOnChangeFrontStrGroup> nonRepOrigins = new HashMap<Integer,InstantOnChangeFrontStrGroup>();
                 List<InstantOnChangePairContainer> instantPairs = insMap.get(sectionId);
                 if(instantPairs == null || instantPairs.size() == 0) {
-                    logger.info("get empty instantPair list in section_id = " + sectionId);
+                    logger.debug("get empty instantPair list in section_id = " + sectionId);
                 } else {
                     for(InstantOnChangePairContainer meta : instantPairs) {
                         if(meta.getOriginRepeating().equals(Boolean.TRUE)) {
@@ -98,7 +98,7 @@ public class InstantOnChangeService {
             if(repOrigins.containsKey(oigOid)) {
                 Map<Integer,InstantOnChangeFrontStrGroup> strMap = repOrigins.get(oigOid);
                 if(strMap==null) {
-                    logger.info("repeating "+oigOid+" contains Null InstantOnChangeFrontStr.");
+                    logger.debug("repeating "+oigOid+" contains Null InstantOnChangeFrontStr.");
                 } else {
                     if(strMap.containsKey(oigItemId)) {
                         InstantOnChangeFrontStr repGrpFrontStr = strMap.get(oigItemId).getSameRepGrpFrontStr();
@@ -127,7 +127,7 @@ public class InstantOnChangeService {
                 }
             }
         } else {
-            logger.info("Empty found upon origin_group_oid/item_ids/option_value, so no InstantOnChangeFrontStrGroup available.");
+            logger.debug("Empty found upon origin_group_oid/item_ids/option_value, so no InstantOnChangeFrontStrGroup available.");
         }
     }
 
@@ -150,7 +150,7 @@ public class InstantOnChangeService {
                 }
             }
         } else {
-            logger.info("Empty found upon item_ids/option_value, so no InstantOnChangeFrontStrGroup available.");
+            logger.debug("Empty found upon item_ids/option_value, so no InstantOnChangeFrontStrGroup available.");
         }
     }
 

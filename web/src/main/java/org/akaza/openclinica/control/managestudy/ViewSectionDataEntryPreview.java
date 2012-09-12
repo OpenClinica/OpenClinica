@@ -110,7 +110,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             // addPageMessage
             String msg = respage.getString("preview_data_has_timed_out");
             this.addPageMessage(msg, request);
-            LOGGER.info("The session attribute \"preview_crf\" has expired or gone out of scope in: " + this.getClass().getName());
+            LOGGER.debug("The session attribute \"preview_crf\" has expired or gone out of scope in: " + this.getClass().getName());
             this.forwardPage(Page.CRF_LIST_SERVLET, request, response);
         }
 
@@ -297,7 +297,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             request.setAttribute("tabId", new Integer("1"));
         }
         if (hasGroups) {
-            LOGGER.info("has group, new_table is true");
+            LOGGER.debug("has group, new_table is true");
             request.setAttribute("new_table", true);
         }
         // YW 07-23-2007 << for issue 0000937

@@ -1,5 +1,6 @@
 <assembly>
   <id>OpenClinica</id>
+  <baseDirectory>OpenClinica-${project.version}</baseDirectory>
   <formats>
     <format>zip</format>
   </formats>

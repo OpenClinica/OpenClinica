@@ -285,4 +285,9 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+    	<assembly.name>OpenClinica-ws</assembly.name>
+    </properties>
+
 </project>

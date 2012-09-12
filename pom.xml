@@ -388,6 +388,7 @@
                             <descriptor>${project.basedir}/src/assemble/openclinica-assemble.xml</descriptor>
                         </descriptors>
                         <appendAssemblyId>false</appendAssemblyId>
+                        <finalName>${assembly.name}-${project.version}</finalName>
                     </configuration>
                 </plugin>
                 <plugin>

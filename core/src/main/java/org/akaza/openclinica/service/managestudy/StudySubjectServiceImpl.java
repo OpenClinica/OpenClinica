@@ -44,7 +44,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
- *
+ * 
  */
 public class StudySubjectServiceImpl implements StudySubjectService {
 
@@ -52,8 +52,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject,
-            UserAccountBean userAccount, StudyUserRoleBean currentRole) {
+    public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject, UserAccountBean userAccount,
+            StudyUserRoleBean currentRole) {
 
         StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
@@ -63,38 +63,29 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         CRFDAO crfDao = new CRFDAO(dataSource);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 
-
         ArrayList events = studyEventDao.findAllByStudySubject(studySubject);
 
-        Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent =
-                studyEventDefinitionDao.findByStudySubject(studySubject.getId());
+        Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent = studyEventDefinitionDao.findByStudySubject(studySubject.getId());
 
         StudyBean study = (StudyBean) studyDao.findByPK(studySubject.getStudyId());
 
         Map<Integer, SortedSet<EventDefinitionCRFBean>> eventDefinitionCrfByStudyEventDefinition;
         if (study.getParentStudyId() < 1) { // Is a study
-            eventDefinitionCrfByStudyEventDefinition =
-                    eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinitionForStudy(
-                            studySubject.getId());
+            eventDefinitionCrfByStudyEventDefinition = eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinitionForStudy(studySubject.getId());
         } else { // Is a site
             eventDefinitionCrfByStudyEventDefinition =
-                    eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(),
-                    study.getId(), study.getParentStudyId());
+                eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(), study.getId(), study.getParentStudyId());
         }
 
+        Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(studySubject.getId());
 
-        Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(
-                studySubject.getId());
-
-        Map<Integer, Integer> maxOrdinalByStudyEvent = studyEventDefinitionDao.buildMaxOrdinalByStudyEvent(
-                studySubject.getId());
+        Map<Integer, Integer> maxOrdinalByStudyEvent = studyEventDefinitionDao.buildMaxOrdinalByStudyEvent(studySubject.getId());
 
         Set<Integer> nonEmptyEventCrf = eventCrfDao.buildNonEmptyEventCrfIds(studySubject.getId());
 
         Map<Integer, CRFVersionBean> crfVersionById = crfVersionDao.buildCrfVersionById(studySubject.getId());
 
         Map<Integer, CRFBean> crfById = crfDao.buildCrfById(studySubject.getId());
-
 
         ArrayList<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
         for (int i = 0; i < events.size(); i++) {
@@ -103,25 +94,25 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             StudyEventDefinitionBean sed = eventDefinitionByEvent.get(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            List eventDefinitionCRFs = new ArrayList(
-                    (eventDefinitionCrfByStudyEventDefinition.containsKey(sed.getId()) ?
-                            eventDefinitionCrfByStudyEventDefinition.get(sed.getId()) : Collections.EMPTY_LIST));
+            List eventDefinitionCRFs =
+                new ArrayList((eventDefinitionCrfByStudyEventDefinition.containsKey(sed.getId()) ? eventDefinitionCrfByStudyEventDefinition.get(sed.getId())
+                    : Collections.EMPTY_LIST));
 
-            List eventCRFs = new ArrayList((eventCrfListByStudyEvent.containsKey(event.getId())) ?
-                    eventCrfListByStudyEvent.get(event.getId()) : Collections.EMPTY_LIST);
+            List eventCRFs =
+                new ArrayList((eventCrfListByStudyEvent.containsKey(event.getId())) ? eventCrfListByStudyEvent.get(event.getId()) : Collections.EMPTY_LIST);
 
             // construct info needed on view study event page
             DisplayStudyEventBean de = new DisplayStudyEventBean();
             de.setStudyEvent(event);
-            de.setDisplayEventCRFs((ArrayList<DisplayEventCRFBean>) getDisplayEventCRFs(eventCRFs, userAccount,
-                    currentRole, event.getSubjectEventStatus(), study, nonEmptyEventCrf, crfVersionById, crfById,
-                    event.getStudyEventDefinitionId(), eventDefinitionCRFs));
-            ArrayList<DisplayEventDefinitionCRFBean> al = getUncompletedCRFs(eventDefinitionCRFs,
-                    eventCRFs, event.getSubjectEventStatus(), nonEmptyEventCrf, crfVersionById, crfById);
+            de.setDisplayEventCRFs((ArrayList<DisplayEventCRFBean>) getDisplayEventCRFs(eventCRFs, userAccount, currentRole, event.getSubjectEventStatus(),
+                    study, nonEmptyEventCrf, crfVersionById, crfById, event.getStudyEventDefinitionId(), eventDefinitionCRFs));
+            ArrayList<DisplayEventDefinitionCRFBean> al =
+                getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus(), nonEmptyEventCrf, crfVersionById, crfById);
             populateUncompletedCRFsWithCRFAndVersions(al, crfVersionById, crfById);
             de.setUncompletedCRFs(al);
 
-            //de.setMaximumSampleOrdinal(studyEventDao.getMaxSampleOrdinal(sed, studySubject));
+            // de.setMaximumSampleOrdinal(studyEventDao.getMaxSampleOrdinal(sed,
+            // studySubject));
             de.setMaximumSampleOrdinal(maxOrdinalByStudyEvent.get(event.getStudyEventDefinitionId()));
 
             displayEvents.add(de);
@@ -130,14 +121,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         }
 
-
         return displayEvents;
     }
 
-    private List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub,
-            StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study, Set<Integer> nonEmptyEventCrf,
-            Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById, Integer studyEventDefinitionId,
-            List eventDefinitionCRFs) {
+    private List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status,
+            StudyBean study, Set<Integer> nonEmptyEventCrf, Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById,
+            Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
 
         for (int i = 0; i < eventCRFs.size(); i++) {
@@ -146,12 +135,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             // populate the event CRF with its crf bean
             int crfVersionId = ecb.getCRFVersionId();
 
-            //CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
+            // CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
             CRFVersionBean cvb = crfVersionById.get(crfVersionId);
             ecb.setCrfVersion(cvb);
 
-
-            //CRFBean cb = crfDao.findByVersionId(crfVersionId);
+            // CRFBean cb = crfDao.findByVersionId(crfVersionId);
             CRFBean cb = crfById.get(cvb.getCrfId());
             ecb.setCrf(cb);
 
@@ -166,8 +154,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             }
             // below added 092007 tbh
             // rules updated 112007 tbh
-            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED) ||
-                    status.equals(SubjectEventStatus.STOPPED)) {
+            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED) || status.equals(SubjectEventStatus.STOPPED)) {
                 ecb.setStage(DataEntryStage.LOCKED);
 
                 // we need to set a SED-wide flag here, because other edcs
@@ -204,9 +191,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return answer;
     }
 
-    private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs,
-            List eventCRFs, SubjectEventStatus status, Set<Integer> nonEmptyEventCrf,
-            Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById) {
+    private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, SubjectEventStatus status,
+            Set<Integer> nonEmptyEventCrf, Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById) {
         int i;
         HashMap<Integer, Boolean> completed = new HashMap<Integer, Boolean>();
         HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<Integer, EventCRFBean>();
@@ -219,10 +205,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
          * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
          * answer; This algorithm is guaranteed to find all the event
          * definitions for which no event CRF exists.
-         *
+         * 
          * The motivation for using this algorithm is reducing the number of
          * database hits.
-         *
+         * 
          * -jun-we have to add more CRFs here: the event CRF which dones't have
          * item data yet
          */
@@ -236,9 +222,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         for (i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
             // System.out.println("########event crf id:" + ecrf.getId());
-            //int crfId = crfVersionDao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
+            // int crfId =
+            // crfVersionDao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
             int crfId = crfVersionById.get(ecrf.getCRFVersionId()).getCrfId();
-            if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data already
+            if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data
+                                                          // already
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
                 startedButIncompleted.put(new Integer(crfId), ecrf);
@@ -250,36 +238,28 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
 
-            // System.out.println("created dedc with edcrf
-            // "+edcrf.getCrfName()+" default version "+
-            // edcrf.getDefaultVersionName()+", id
-            // "+edcrf.getDefaultVersionId());
-
-            dedc.setEdc(edcrf);
-            // below added tbh, 112007 to fix bug 1943
-            if (status.equals(SubjectEventStatus.LOCKED)) {
-                dedc.setStatus(Status.LOCKED);
+            // Display event definition without event CRF data only if it is
+            // available (i.e., not removed)
+            if (edcrf.getStatus().equals(Status.AVAILABLE)) {
+                dedc.setEdc(edcrf);
+                // below added tbh, 112007 to fix bug 1943
+                if (status.equals(SubjectEventStatus.LOCKED)) {
+                    dedc.setStatus(Status.LOCKED);
+                }
+                Boolean b = completed.get(new Integer(edcrf.getCrfId()));
+                EventCRFBean ev = startedButIncompleted.get(new Integer(edcrf.getCrfId()));
+                if (b == null || !b.booleanValue()) {
+                    dedc.setEventCRF(ev);
+                    answer.add(dedc);
+                }
             }
-            Boolean b = completed.get(new Integer(edcrf.getCrfId()));
-            EventCRFBean ev = startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-            if (b == null || !b.booleanValue()) {
 
-                // System.out.println("entered boolean loop with ev
-                // "+ev.getId()+" crf version id "+
-                // ev.getCRFVersionId());
-
-                dedc.setEventCRF(ev);
-                answer.add(dedc);
-
-
-            }
         }
         return answer;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void populateUncompletedCRFsWithCRFAndVersions(
-            ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
+    public void populateUncompletedCRFsWithCRFAndVersions(ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
             Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById) {
 
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
@@ -287,12 +267,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         int size = uncompletedEventDefinitionCRFs.size();
         for (int i = 0; i < size; i++) {
             DisplayEventDefinitionCRFBean dedcrf = uncompletedEventDefinitionCRFs.get(i);
-            //CRFBean cb = (CRFBean) crfDao.findByPK(dedcrf.getEdc().getCrfId());
+            // CRFBean cb = (CRFBean)
+            // crfDao.findByPK(dedcrf.getEdc().getCrfId());
             CRFBean cb = crfById.get(dedcrf.getEdc().getCrfId());
             dedcrf.getEdc().setCrf(cb);
 
-            ArrayList<CRFVersionBean> theVersions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(
-                    dedcrf.getEdc().getCrfId());
+            ArrayList<CRFVersionBean> theVersions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
             ArrayList<CRFVersionBean> versions = new ArrayList<CRFVersionBean>();
             HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
 

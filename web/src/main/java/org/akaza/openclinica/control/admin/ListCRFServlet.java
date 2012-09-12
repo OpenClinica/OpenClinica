@@ -103,7 +103,7 @@ public class ListCRFServlet extends SecureController {
         ArrayList crfs = (ArrayList) cdao.findAll();
         for (int i = 0; i < crfs.size(); i++) {
             CRFBean eb = (CRFBean) crfs.get(i);
-            logger.info("crf id:" + eb.getId());
+            logger.debug("crf id:" + eb.getId());
             ArrayList versions = (ArrayList) vdao.findAllByCRF(eb.getId());
 
             // check whether the speadsheet is available on the server

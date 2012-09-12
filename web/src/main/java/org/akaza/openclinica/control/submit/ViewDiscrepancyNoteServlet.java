@@ -441,30 +441,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             if (null != studyBeanSub) {
                 parentStudyForNoteSub = studyBeanSub.getParentStudyId();
             }
-            // int parentStudyForNote = 0;
 
-            // StudyBean studyBeanSub = (StudyBean)
-            // studyDAO.findByPK(note.getStudyId());
-
-            // if (null != studyBeanSub) {
-            // parentStudyForNote = studyBeanSub.getParentStudyId();
-            // }
-
-            // if (note.getStudyId() != currentStudy.getId() &&
-            // note.getStudyId() != currentStudy.getParentStudyId()) {
-
-            // if (note.getStudyId() != currentStudy.getId() &&
-            // currentStudy.getId() != parentStudyForNote) {
             if (notessub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNoteSub) {
                 addPageMessage(noAccessMessage);
                 throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
             }
         }
-        // BWP 5/13/2009 3468 WHO; update the resolution status of parent disc
-        // notes based
-        // on the status of child notes
-        // new DiscrepancyNoteUtil().updateStatusOfParents(notes,
-        // sm.getDataSource(), currentStudy);
 
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -634,27 +616,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         dn.setAssignedUserId(preUserId);
                     }
                 }
-                // if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) &&
-                // currentStudy.getId() != currentStudy.getParentStudyId()) {
-                // dn.setAssignedUserId(note.getOwner().getId());
-                // // assigning back to OP, tbh
-                // //request.setAttribute(USER_ACCOUNT_ID, new
-                // Integer(parent.getOwnerId()).toString());
-                // //System.out.println("assigned owner id: " +
-                // parent.getOwnerId());
-                // } else if (note.getEventCRFId() > 0) {
-                // //System.out.println("found a event crf id: " +
-                // dnb.getEventCRFId());
-                // EventCRFDAO eventCrfDAO = new
-                // EventCRFDAO(sm.getDataSource());
-                // EventCRFBean eventCrfBean = new EventCRFBean();
-                // eventCrfBean = (EventCRFBean)
-                // eventCrfDAO.findByPK(note.getEventCRFId());
-                // dn.setAssignedUserId(eventCrfBean.getOwner().getId());
-                // //request.setAttribute(USER_ACCOUNT_ID, new
-                // Integer(eventCrfBean.getOwnerId()).toString());
-                // //System.out.println("assigned owner id: " +
-                // eventCrfBean.getOwnerId());
                 boxDNMap.put(key, dn);
             }
         }

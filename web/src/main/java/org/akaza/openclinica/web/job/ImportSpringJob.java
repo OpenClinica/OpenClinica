@@ -287,8 +287,9 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     private String generateMsg(String msg, String contactEmail) {
+    	//@pgawade 07-Sept-2012: fix for https://issuetracker.openclinica.com/view.php?id=13261#c57418
         String returnMe =
-            respage.getString("html_email_header_1") + contactEmail + respage.getString("your_job_ran_success_html") + "  "
+            respage.getString("html_email_header_1") + " " + contactEmail + respage.getString("your_job_ran_success_html") + "  "
                 + respage.getString("please_review_the_data_html") + msg;
         return returnMe;
     }
@@ -735,16 +736,20 @@ public class ImportSpringJob extends QuartzJobBean {
 
     private void cutAndPaste(File[] tar, File[] dest) throws IOException {
         InputStream in = null;
-        OutputStream out = null;
-        int fle_count = 0;
+        OutputStream out = null; 
+        //@pgawade 07-Sept-2012: fix for https://issuetracker.openclinica.com/view.php?id=13261#c57418
+//        int fle_count = 0;
+        int fle_count = -1;
 
         for (File cur_file : tar) {
-            if (cur_file == null)
+            if (cur_file == null){
+            	fle_count++;
                 continue;
+            }
             try {
                 in = new FileInputStream(cur_file);
-                out = new FileOutputStream(dest[fle_count++]);
-
+                fle_count++;
+                out = new FileOutputStream(dest[fle_count]);                
                 byte[] buf = new byte[1024];
                 int len = 0;
 

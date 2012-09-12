@@ -236,8 +236,8 @@ public class CreateUserAccountServlet extends SecureController {
                 Role r = Role.get(fp.getInt(INPUT_ROLE));
                 createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, r);
                 UserType type = UserType.get(fp.getInt("type"));
-                logger.warn("*** found type: " + fp.getInt("type"));
-                logger.warn("*** setting type: " + type.getDescription());
+                logger.debug("*** found type: " + fp.getInt("type"));
+                logger.debug("*** setting type: " + type.getDescription());
                 createdUserAccountBean.addUserType(type);
                 createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
                 AuthoritiesDao authoritiesDao = (AuthoritiesDao) SpringServletAccess.getApplicationContext(context).getBean("authoritiesDao");
@@ -309,7 +309,7 @@ public class CreateUserAccountServlet extends SecureController {
     }
 
     private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password) throws Exception {
-        logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
+        logger.debug("Sending account creation notification to " + createdUserAccountBean.getName());
 
         StringBuffer body = new StringBuffer();
         		

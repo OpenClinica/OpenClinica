@@ -135,7 +135,7 @@ public class DefineStudyEventServlet extends SecureController {
 //                            boolean redir = "y".equalsIgnoreCase((String)request.getParameter("r"));
 //                            if(redir)  { return;}
                         } else {
-                            logger.info("actionName ==> 3");
+                            logger.debug("actionName ==> 3");
                             submitDefinition();
                             StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
                             sed.setStudyId(currentStudy.getId());
@@ -198,9 +198,9 @@ public class DefineStudyEventServlet extends SecureController {
         session.setAttribute("definition", createStudyEventDefinition());
 
         if (errors.isEmpty()) {
-            logger.info("no errors in the first section");
-            // logger.info("actionName*******" + fp.getString("actionName"));
-            // logger.info("pageNum*******" + fp.getString("pageNum"));
+            logger.debug("no errors in the first section");
+            // logger.debug("actionName*******" + fp.getString("actionName"));
+            //debugger.debug("pageNum*******" + fp.getString("pageNum"));
             CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             ArrayList crfArray = new ArrayList();
             /*
@@ -255,7 +255,7 @@ public class DefineStudyEventServlet extends SecureController {
              forwardPage(Page.DEFINE_STUDY_EVENT2);
 
         } else {
-            logger.info("has validation errors in the first section");
+            logger.debug("has validation errors in the first section");
             request.setAttribute("formMessages", errors);
             forwardPage(Page.DEFINE_STUDY_EVENT1);
         }
@@ -403,7 +403,7 @@ public class DefineStudyEventServlet extends SecureController {
             String selected = fp.getString("selected" + i);
             // logger.info("selected:" + selected);
             if (!StringUtils.isBlank(selected) && "yes".equalsIgnoreCase(selected.trim())) {
-                logger.info("one crf selected");
+                logger.debug("one crf selected");
                 CRFBean cb = new CRFBean();
                 cb.setId(id);
                 cb.setName(name);
@@ -484,7 +484,7 @@ public class DefineStudyEventServlet extends SecureController {
         if (sed.getName() == "" || sed.getName() == null) {
             throw new NullPointerException();
         }
-        logger.info("Definition bean to be created:" + sed.getName() + sed.getStudyId());
+        logger.debug("Definition bean to be created:" + sed.getName() + sed.getStudyId());
 
         // fine the last one's ordinal
         ArrayList defs = edao.findAllByStudy(currentStudy);

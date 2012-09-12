@@ -350,7 +350,7 @@ public class StudyModuleController {
 
 
        private void logMe(String msg){
-            logger.info(msg);
+            logger.debug(msg);
         }
 
 
