@@ -254,6 +254,8 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="isHorizontal" value="${param.isHorizontal}" />
 <c:set var="defValue" value="${param.defaultValue}" />
 
+
+
 <%-- What is the including JSP (e.g., doubleDataEntry)--%>
 <c:set var="originJSP" value="${param.originJSP}" />
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
@@ -270,7 +272,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <c:set var="inputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
   <c:set var="parsedInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
 </c:if>
-
+<c:set var="item_data_id"  value="${displayItem.data.id}" />
+<c:if test="${item_data_id == 0}">
+   <c:set var="item_data_id"  value="-1" />
+</c:if> 
 <c:set var="isLocked" value="${param.isLocked}" />
 
 <!--  is a data's value is blank, so monitor can enter discrepancy note -->
@@ -286,7 +291,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
  <c:if test="${! empty formMessages}">
  	<c:set var="pageHasErrors" value="${true}" />
  </c:if>
- 
+  <c:set var="eventCRFId" value="${section.eventCRF.id}"/>
 <%-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors --%>
 <c:choose>
 
@@ -788,7 +793,7 @@ include the default value first in the select list --%>
 
     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
-    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNoteWindow('ViewDiscrepancyNote?rowCount=${param.rowCount}&eventCRFId=${eventCRFId}&isGroup=1&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${item_data_id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_input<c:out value="${inputName}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -799,18 +804,16 @@ include the default value first in the select list --%>
     <c:otherwise>
      <c:if test="${(isLocked == null) || (isLocked eq 'no')}">
       <c:set var="imageFileName" value="icon_noNote" />
-  		 <c:set var="writeToDb" value="1" />
-         <c:if test="${displayItem.isNewItem}">
-              <c:set var="writeToDb" value="0"/>
-           </c:if>
+  		 
        
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
-
+		
+		
        <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
-    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&writeToDB=${writeToDb}&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNWindow('CreateDiscrepancyNote?rowCount=${param.rowCount}&eventCRFId=${eventCRFId}&isGroup=1&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a>

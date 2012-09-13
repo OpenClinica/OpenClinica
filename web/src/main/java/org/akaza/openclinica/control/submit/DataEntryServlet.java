@@ -1278,6 +1278,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         String formName = getInputName(displayItem);
 
                         ItemDataBean idb = displayItem.getData();
+                        ItemBean item_bean = displayItem.getItem();
                         ItemFormMetadataBean ifmb = displayItem.getMetadata();
                         LOGGER.debug("-- found group label " + ifmb.getGroupLabel());
                         if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase("")) {
@@ -1304,7 +1305,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
                                 if (testFormName.equals(formName2)) {
                                     formName = formName2;
-                                    this.setReasonForChangeError(idb, formName, error, request);
+                                    this.setReasonForChangeError(  ecb,item_bean,idb, formName, error, request);
                                     changedItemsMap.remove(formName2);
                                     LOGGER.debug("form name changed: " + formName);
                                     break;
@@ -1315,7 +1316,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             }
 
                         } else {
-                            this.setReasonForChangeError(idb, formName, error, request);
+                            this.setReasonForChangeError(  ecb,item_bean,idb, formName, error, request);
                             LOGGER.debug("form name added: " + formName);
                         }
                     }
@@ -1406,6 +1407,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //                }
 
                 errors = reshuffleErrorGroupNamesKK(errors, allItems, request);
+                reshuffleReasonForChangeHashAndDiscrepancyNotes( allItems, request, ecb);
                 // reset manual rows, so that we can catch errors correctly
                 // but it needs to be set per block of repeating items?  what if there are two or more?
 
@@ -1545,7 +1547,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             // item data
                             // update an item data won't touch its ordinal
                           //  int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
-                      
+
 
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
@@ -1582,7 +1584,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
                                 LOGGER.trace("&&& we get previous looking at input name: " + inputName);
                                 // input name 2 removed from below
-                                AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy);
+                                AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy, ecb.getId());
                                 success = success && temp;
                             }
                         }
@@ -1625,7 +1627,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                         String inputName = getInputName(dib);
                         LOGGER.trace("3 - found input name: " + inputName);
-                        AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, dib.getData().getId(), "itemData", currentStudy);
+                        AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, dib.getData().getId(), "itemData", currentStudy, ecb.getId());
 
                         success = success && temp;
 
@@ -1641,7 +1643,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 newUploadedFiles.remove(child.getItem().getId() + "");
                             }
                             inputName = getInputName(child);
-                            AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, child.getData().getId(), "itemData", currentStudy);
+                            AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, child.getData().getId(), "itemData", currentStudy, ecb.getId());
                             success = success && temp;
                         }
                     }
@@ -1930,7 +1932,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     tabNum = fp.getInt("tab");
                                 }
                                 request.setAttribute("tab", new Integer(tabNum - 1).toString());
-                                
+
                               //  forwardPage(getServletPage(request), request, response);
                                 getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
                             }
@@ -2033,47 +2035,28 @@ public abstract class DataEntryServlet extends CoreSecureController {
      * @param error
      * @param request TODO
      */
-    protected void setReasonForChangeError(ItemDataBean idb, String formName, String error, HttpServletRequest request) {
-        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
-        HttpSession session = request.getSession();
-        FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-        HashMap idNotes = fdn.getIdNotes();
-        int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
-        if (existingNotes > 0) {
-
-            LOGGER.debug("has a note in db " + formName);
-
+    protected void setReasonForChangeError( EventCRFBean ecb, ItemBean item_bean, ItemDataBean idb, String formName, String error, HttpServletRequest request) {
+          HttpSession session = request.getSession();
             /*
              * Having existing notes is not enough to let it pass through after changing data. There has to be a DiscrepancyNote for the latest changed data
              */
-            HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-            if (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted.get(idb.getId())) {
-                  //There would be no exception for Reason for change discrepancy notes.issue-5056.
-//                boolean hasRfcAlready = false;
-//                ArrayList<DiscrepancyNoteBean> notes = dndao.findExistingNotesForItemData(idb.getId());
-//                for (DiscrepancyNoteBean note : notes) {
-//                    if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-//                        hasRfcAlready = true;
-//                        logger.debug("has Rfc already: " + formName + " note id " + note.getId());
-//                    }
-//                }
-//                if (!hasRfcAlready) {
-                    errors.put(formName, error);
-//                }
+            HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+            //String key_for_rfc = String.valueOf(idb.getId());
+            String key_for_rfc = String.valueOf(ecb.getId()+"_"+formName);
+            boolean isRFCFiled = false;
+            if ( noteSubmitted != null){
+	            if ( noteSubmitted.get(key_for_rfc) != null){//item in database
+	            	isRFCFiled = true;
+	            }
+            }
+
+             if (!isRFCFiled) {
+                     errors.put(formName, error);
             } else {
-                LOGGER.debug("found note in session");
                 LOGGER.debug("has a note in db: entered an error here: " + formName + ": " + errors.toString());
             }
 
-            // session.removeAttribute(DataEntryServlet.NOTE_SUBMITTED);
-        } else if (idNotes.containsKey(idb.getId())) {
-            LOGGER.debug("has note in session");
-        } else {
-            // none, which means the error is thrown
-            // nonforcedChanges++;
-            LOGGER.debug("setting an error for " + formName);
-            errors.put(formName, error);
-        }
+
     }
 
     /**
@@ -2452,7 +2435,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int secondLoopBreak = 0;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, digb.getItemGroupBean());
-        
+
         repeatMax = ( repeatMax < maxOrdinal)? maxOrdinal:repeatMax;
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
@@ -3184,7 +3167,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     LOGGER.debug("just ran upsert! " + idb.getId());
                 }
 
-           } 
+           }
    //             else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
 //                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
 //                idb.setUpdater(ub);
@@ -4465,7 +4448,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
     		List<String> nullValuesList, boolean isSubmitted)
     {
-  
+
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, itemGroup.getItemGroupBean());
@@ -4522,7 +4505,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             itemGroups.add(dig);
         }
 
-       
+
        diwgb.setItemGroups(itemGroups);
        diwgb.setDbItemGroups(itemGroups);
         return diwgb;
@@ -5318,8 +5301,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return manualRows;
     }
 
-    private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems, HttpServletRequest request) {
+    private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems,
+    		HttpServletRequest request) {
         int manualRows = 0;
+        if (errors == null || errors.size() <1){ return errors;}
         for (int i = 0; i < allItems.size(); i++) {
             DisplayItemWithGroupBean diwb = allItems.get(i);
 
@@ -5343,24 +5328,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             }
                         }
                     }
-    /*
-     * #12190,12191 -> if rule is trigered from last row of RG page never saved,
-     * the commented block has been introduced for 5044, I cannot reproduced wrong behaviour mentioned in this item,
-     * however, OC marked several OK fields as one in error in UI, messages are OK
-     *
-     */
-//                    else if (j == dgbs.size() - 1) { // last repeat
-//                        for (DisplayItemBean dib : dibs) {
-//                            String intendedKey = digb.getInputId() + getInputName(dib);
-//                            String replacementKey = digb.getItemGroupBean().getOid() + "_1" + getInputName(dib);
-//                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
-//                                // String errorMessage = (String)errors.get(intendedKey);
-//                                errors.put(replacementKey, errors.get(intendedKey));
-//                                errors.remove(intendedKey);
-//                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
-//                            }
-//                        }
-                   // }
+
                 else { // everything in between
                         manualRows++;
                         for (DisplayItemBean dib : dibs) {
@@ -5381,7 +5349,84 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return errors;
     }
 
+    private void reshuffleReasonForChangeHashAndDiscrepancyNotes( List<DisplayItemWithGroupBean> allItems, HttpServletRequest request, EventCRFBean ecb) {
+        int manualRows = 0;
+        HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+        FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+        ArrayList<DiscrepancyNoteBean> fieldNote = null;
+        String intendedKey = null;
+        String replacementKey = null;
 
+        if ((noteSubmitted == null || noteSubmitted.size() < 1)
+        		&& ( noteTree == null || noteTree.getFieldNotes() == null || noteTree.getFieldNotes().size() < 1))
+        { return;        }
+
+
+
+        for (int i = 0; i < allItems.size(); i++) {
+            DisplayItemWithGroupBean diwb = allItems.get(i);
+
+            if (diwb.isInGroup()) {
+                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                for (int j = 0; j < dgbs.size(); j++) {
+                    DisplayItemGroupBean digb = dgbs.get(j);
+
+                    ItemGroupBean igb = digb.getItemGroupBean();
+                    List<DisplayItemBean> dibs = digb.getItems();
+
+                    if (j == 0) { // first repeat
+                        for (DisplayItemBean dib : dibs) {
+                             intendedKey = ecb.getId()+"_"+ digb.getInputId() + getInputName(dib);
+                             replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_" + j + getInputName(dib);
+                            if (!replacementKey.equals(intendedKey) ){
+                            	if (noteSubmitted.containsKey(intendedKey)) {
+
+	                                noteSubmitted.put(replacementKey, Boolean.TRUE);
+	                                noteSubmitted.remove(intendedKey);
+                            	}
+                            	if(  noteTree.getNotes(intendedKey) != null){
+                            		 fieldNote = (ArrayList<DiscrepancyNoteBean>) noteTree.getNotes(intendedKey) ;
+                            		 if ( fieldNote != null && fieldNote.size() > 0){
+	                            		  noteTree.getFieldNotes().put(replacementKey, fieldNote);
+	                            		  noteTree.getFieldNotes().remove(intendedKey);
+                            		 }
+                            		  //not changing here because this hash should not be used
+//                                      noteTree.addIdNote(note.getEntityId(), field);
+//
+                            	}
+                            }
+                        }
+                    }
+
+                else { // everything in between
+                        manualRows++;
+                        for (DisplayItemBean dib : dibs) {
+                             intendedKey = ecb.getId()+"_"+digb.getInputId() + getInputName(dib);
+                             replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_manual" + j + getInputName(dib);
+                            if (!replacementKey.equals(intendedKey) ){
+                            	if( noteSubmitted.containsKey(intendedKey)) {
+
+                            	 noteSubmitted.put(replacementKey, Boolean.TRUE);
+                                 noteSubmitted.remove(intendedKey);
+	                            }
+	                            if(  noteTree.getNotes(intendedKey) != null){
+	                       		  fieldNote = (ArrayList<DiscrepancyNoteBean>) noteTree.getNotes(intendedKey) ;
+	                       		  if ( fieldNote != null && fieldNote.size() > 0){
+		                       		  noteTree.getFieldNotes().put(replacementKey, fieldNote);
+		                       		  noteTree.getFieldNotes().remove(intendedKey);
+	                       		  }
+	                            }
+                            }
+                        }
+                    }
+                    LOGGER.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
+
+                }
+            }
+        }
+        request.getSession().setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
+
+    }
 
     /*Determining the resolution status that will be shown in color flag for an item.*/
     private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {

@@ -182,6 +182,7 @@ function setYPos(id) {
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
 	<input type="hidden" name="ypos${parentId}" value="0"/>
+	<input type="hidden" name="eventCRFId" value="${eventCRFId}"/>
 
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">

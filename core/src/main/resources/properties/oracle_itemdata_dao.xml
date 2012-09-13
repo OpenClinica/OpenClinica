@@ -182,4 +182,18 @@
 		<name>updateStatus</name>
 		<sql>UPDATE item_data SET status_id=? WHERE item_data_id=?</sql>
 	</query>
+	
+	<query>
+		<name>getMaxOrdinalForGroupByGroupOID</name>
+		<sql>	
+				SELECT max(ordinal) AS max_ord
+			FROM item_data where event_crf_id = ? and item_id in
+			(select item_id from item_group_metadata where item_group_id in
+			( select item_group_id from item_group where oc_oid=?));
+	</sql>
+	</query>
+		<query>
+		<name>isItemExists</name>
+		<sql>select item_data_id from item_data where item_id=? and ordinal=?  AND event_crf_id = ?</sql>
+	</query>
 </queries>

@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2012 Akaza Research
  */
 package org.akaza.openclinica.control.submit;
 
@@ -53,6 +53,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Create a discrepancy note for a data entity
@@ -74,6 +75,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String SUBJECT_ID = "subjectId";
 
     public static final String ITEM_ID = "itemId";
+    
+      
+    public static final String IS_GROUP_ITEM = "isGroup";
 
     public static final String PARENT_ID = "parentId";// parent note id
 
@@ -83,8 +87,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
     public static final String ENTITY_FIELD = "field";
 
-    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-
+    
     public static final String DIS_NOTE = "discrepancyNote";
 
     public static final String WRITE_TO_DB = "writeToDB";
@@ -125,6 +128,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
 
     public static final String WHICH_RES_STATUSES = "whichResStatus";
+    
+    public static final String EVENT_CRF_ID = "eventCRFId";
+    public static final String PARENT_ROW_COUNT = "rowCount";
 
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
@@ -138,13 +144,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     protected void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
         locale = LocaleResolver.getLocale(request);
-        // <
-        // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
-        // locale);
-
+       
         if (SubmitDataServlet.mayViewData(ub, currentRole)) {
             return;
         }
@@ -161,16 +161,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
         request.setAttribute(DIS_TYPES, types);
         request.setAttribute(RES_STATUSES, ResolutionStatus.list);
-        // types.remove(DiscrepancyNoteType.ANNOTATION);//this for legancy data
-        // only, not for new notes
-
-        /*
-         * ArrayList ress = ResolutionStatus.toArrayList(); for ( int i=0;
-         * i<ress.size(); i++) { ResolutionStatus s=
-         * (ResolutionStatus)ress.get(i); System.out.println("status:" +
-         * s.getName()) ; }
-         */
-
+        
         boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); //this should be set based on a new property of DisplayItemBean
         boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
         int entityId = fp.getInt(ENTITY_ID);
@@ -179,10 +170,27 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         int subjectId = fp.getInt(SUBJECT_ID);
         int itemId = fp.getInt(ITEM_ID);
         String entityType = fp.getString(ENTITY_TYPE);
+        
         String field = fp.getString(ENTITY_FIELD);
         String column = fp.getString(ENTITY_COLUMN);
         int parentId = fp.getInt(PARENT_ID);
-
+        
+        
+        //patch for repeating groups and RFC on empty fields
+        
+	        int isGroup = fp.getInt(IS_GROUP_ITEM);
+	      //  request.setAttribute(IS_GROUP_ITEM, new Integer(isGroup));
+	        int eventCRFId = fp.getInt(EVENT_CRF_ID);
+	        request.setAttribute(EVENT_CRF_ID, new Integer(eventCRFId));
+	        int rowCount = fp.getInt(PARENT_ROW_COUNT);
+	    // run only once: try to recalculate writeToDB
+	    if (!StringUtils.isBlank(entityType) && "itemData".equalsIgnoreCase(entityType)
+	    		&& isGroup !=0 && eventCRFId != 0 ){
+	      //  request.setAttribute(PARENT_ROW_COUNT, new Integer(eventCRFId));
+	        int ordinal_for_repeating_group_field = calculateOrdinal( isGroup, field,eventCRFId,rowCount);
+	        int writeToDBStatus = isWriteToDB( isGroup,  field,  entityId,itemId,  ordinal_for_repeating_group_field, eventCRFId);
+	        writeToDB = (writeToDBStatus == -1)? false : (( writeToDBStatus==1)? true:writeToDB); 
+        }
         boolean isInError = fp.getBoolean(ERROR_FLAG);
 
         boolean isNew = fp.getBoolean(NEW_NOTE);
@@ -205,10 +213,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute("monitor", monitor);
 
             enteringData = true;
-
-            // } else if ("1".equalsIgnoreCase(monitor) &&
-            // "1".equalsIgnoreCase(blank)){
-        } else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+       } else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
             // enter note for all items,
             // not just blank items
 
@@ -226,7 +231,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
         DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
         int preUserId = 0;
-        if (!StringUtil.isBlank(entityType)) {
+        if (!StringUtils.isBlank(entityType)) {
             if ("itemData".equalsIgnoreCase(entityType)||"itemdata".equalsIgnoreCase(entityType)) {
                 ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
                 ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(sm.getDataSource()).findByPK(entityId);
@@ -239,7 +244,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 StudySubjectBean ssub = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(entityId);
                 SubjectBean sub = (SubjectBean)new SubjectDAO(sm.getDataSource()).findByPK(ssub.getSubjectId());
                 preUserId = ssub.getOwnerId();
-                if (!StringUtil.isBlank(column)) {
+                if (!StringUtils.isBlank(column)) {
                     if ("enrollment_date".equalsIgnoreCase(column)) {
                         if (ssub.getEnrollmentDate() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(ssub.getEnrollmentDate()));
@@ -267,7 +272,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             } else if ("subject".equalsIgnoreCase(entityType)) {
                 SubjectBean sub = (SubjectBean) new SubjectDAO(sm.getDataSource()).findByPK(entityId);
                 preUserId = sub.getOwnerId();
-                if (!StringUtil.isBlank(column)) {
+                if (!StringUtils.isBlank(column)) {
                     if ("gender".equalsIgnoreCase(column)) {
                         request.setAttribute("entityValue", sub.getGender() + "");
                         request.setAttribute("entityName", resword.getString("gender"));
@@ -284,7 +289,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             } else if ("studyEvent".equalsIgnoreCase(entityType)) {
                 StudyEventBean se = (StudyEventBean)new StudyEventDAO(sm.getDataSource()).findByPK(entityId);
                 preUserId = se.getOwnerId();
-                if (!StringUtil.isBlank(column)) {
+                if (!StringUtils.isBlank(column)) {
                     if ("location".equalsIgnoreCase(column)) {
                         request.setAttribute("entityValue", se.getLocation().equals("") || se.getLocation() == null ? resword.getString("N/A") : se.getLocation());
                         request.setAttribute("entityName", resword.getString("location"));
@@ -307,7 +312,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             } else if ("eventCrf".equalsIgnoreCase(entityType)) {
                 EventCRFBean ec = (EventCRFBean) new EventCRFDAO(sm.getDataSource()).findByPK(entityId);
                 preUserId = ec.getOwnerId();
-                if (!StringUtil.isBlank(column)) {
+                if (!StringUtils.isBlank(column)) {
                     if ("date_interviewed".equals(column)) {
                         if (ec.getDateInterviewed() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(ec.getDateInterviewed()));
@@ -330,27 +335,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         DiscrepancyNoteBean parent = new DiscrepancyNoteBean();
         if (parentId > 0) {
             dndao.setFetchMapping(true);
-            parent = (DiscrepancyNoteBean) dndao.findByPK(parentId);            if (parent.isActive()) {
+            parent = (DiscrepancyNoteBean) dndao.findByPK(parentId);     
+			if (parent.isActive()) {
                 request.setAttribute("parent", parent);
             }
             dndao.setFetchMapping(false);
-        } /*
-        else {
-            if (!isNew) {// not a new note, so try to find the parent note
-                for (int i = 0; i < notes.size(); i++) {
-                    DiscrepancyNoteBean note1 = (DiscrepancyNoteBean) notes.get(i);
-                    if (note1.getParentDnId() == 0) {
-                        parent = note1;
-                        parent.setEntityId(note1.getEntityId());
-                        parent.setColumn(note1.getColumn());
-                        parent.setId(note1.getId());
-                        request.setAttribute("parent", note1);
-                        break;
-                    }
-                }
-            }
-        }*/
-        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+        } 
+        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
         if (newNotes == null) {
             newNotes = new FormDiscrepancyNotes();
@@ -358,7 +349,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
         if (!notes.isEmpty() || !newNotes.getNotes(field).isEmpty()) {
             request.setAttribute("hasNotes", "yes");
-            // request.setAttribute("parent", parent);
         } else {
             request.setAttribute("hasNotes", "no");
             logger.debug("has notes:" + "no");
@@ -389,11 +379,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
             request.setAttribute(RES_STATUSES, resStatuses); ;
             request.setAttribute(WHICH_RES_STATUSES, "2");
-            //it's for parentDNId is null or 0 and FVC
-            //ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
-            //resStatuses.add(ResolutionStatus.OPEN);
-            //resStatuses.add(ResolutionStatus.RESOLVED);
-            //request.setAttribute(RES_STATUSES, resStatuses);
         }
 
         if (!fp.isSubmitted()) {
@@ -414,10 +399,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 if (null != studyBeanSub) {
                     parentStudyForSubject = studyBeanSub.getParentStudyId();
                 }
-                // if (ssub.getStudyId() != currentStudy.getId() &&
-                // ssub.getStudyId() != currentStudy.getParentStudyId()) {
-                // if (ssub.getStudyId() != currentStudy.getId() &&
-                // ssub.getStudyId() != parentStudyForSubject) {
                 if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForSubject) {
                     addPageMessage(noAccessMessage);
                     throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
@@ -481,7 +462,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     if (isReasonForChange) {
                         dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
                         dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                        // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
                     }
                     // << tbh 02/2010, trumps failed evaluation error checks
                     // can we put this in admin editing
@@ -549,11 +529,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             if (dnb.getCrfName() == null || dnb.getCrfName().equals("")) {
                 dnb.setCrfName(fp.getString("crfName"));
             }
-            //            String detailedDes = fp.getString("strErrMsg");
-            //            if (detailedDes != null) {
-            //            	dnb.setDetailedNotes(detailedDes);
-            //            	// System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
-            //            }
             //            // #4346 TBH 10/2009
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
@@ -582,7 +557,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             forwardPage(Page.ADD_DISCREPANCY_NOTE);
 
         } else {
-            FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
+            FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
 
             if (noteTree == null) {
                 noteTree = new FormDiscrepancyNotes();
@@ -595,9 +570,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID);
             int resStatusId = fp.getInt(RES_STATUS_ID);
             String detailedDes = fp.getString("detailedDes");
-            // #4346 TBH 10/2009
-            // String detailedDes = fp.getString("strErrMsg");
-            // System.out.println("found strErrMsg: " +fp.getString("strErrMsg") + " and detailedDes: " + fp.getString("detailedDes"));
             int sectionId = fp.getInt("sectionId");
             DiscrepancyNoteBean note = new DiscrepancyNoteBean();
             v.addValidation("description", Validator.NO_BLANKS);
@@ -655,7 +627,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             } else {
                 note.setEntityId(parent.getEntityId());
                 note.setEntityType(parent.getEntityType());
-                if (!StringUtil.isBlank(parent.getColumn())) {
+                if (!StringUtils.isBlank(parent.getColumn())) {
                     note.setColumn(parent.getColumn());
                 } else {
                     note.setColumn(column);
@@ -689,14 +661,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             if (errors.isEmpty()) {
 
                 if (!writeToDB) {
-                    noteTree.addNote(field, note);
+                    noteTree.addNote(eventCRFId+"_"+field, note);
                     noteTree.addIdNote(note.getEntityId(), field);
-                    session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
+                    
+ //-> catcher                //   FORM_DISCREPANCY_NOTES_NAME
+                    session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, noteTree);
                     //
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
-                    //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
-                    manageReasonForChangeState(session, entityId);
+                    manageReasonForChangeState(session, eventCRFId+"_"+field);
                     forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE);
                 } else {
                     // if not creating a new thread(note), update exsiting notes
@@ -751,7 +724,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
                     //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
                     //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
-                    manageReasonForChangeState(session, entityId);
+                   // String field_id_for_RFC_hash = buildDiscrepancyNoteIdForRFCHash(eventCRFId,entityId, isGroup, field, ordinal_for_repeating_group_field);
+                    String field_id_for_RFC_hash =  eventCRFId+"_"+field;
+                    
+                    manageReasonForChangeState(session, field_id_for_RFC_hash);
 
                     logger.debug("found resolution status: " + note.getResolutionStatusId());
 
@@ -824,27 +800,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         message.append(respage.getString("email_body_separator"));
                         message.append(respage.getString("email_footer"));
 
-
-                        /*
-                         *
-                         *
-                         *
-                         * Please select the link below to view the information
-                         * provided. You may need to login to
-                         * OpenClinica_testbed with your user name and password
-                         * after selecting the link. If you receive a page
-                         * cannot be displayed message, please make sure to
-                         * select the Change Study/Site link in the upper right
-                         * table of the page, select the study referenced above,
-                         * and select the link again.
-                         *
-                         * https://openclinica.s-3.com/OpenClinica_testbed/
-                         * ViewSectionDataEntry ?ecId=117&sectionId=142&tabId=2
-                         */
-//                        message.append("<P>" + respage.getString("please_select_the_link_below_dn") + "</P>");
-
-
-
                         String emailBodyString = message.toString();
                         sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), note.getEntityName()), emailBodyString, true, null,
                                 null, true);
@@ -887,7 +842,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
      * @return
      */
     public static String getAddChildURL(DiscrepancyNoteBean note, ResolutionStatus preset, boolean toView) {
-        ArrayList arguments = new ArrayList();
+        ArrayList<String> arguments = new ArrayList<String>();
 
         arguments.add(ENTITY_TYPE + "=" + note.getEntityType());
         arguments.add(ENTITY_ID + "=" + note.getEntityId());
@@ -998,14 +953,92 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         }
     }
 
-    private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
-        HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+    private void manageReasonForChangeState(HttpSession session, String itemDataBeanId) {
+        @SuppressWarnings("unchecked")
+		HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
         if (noteSubmitted == null) {
-            noteSubmitted = new HashMap<Integer, Boolean>();
+            noteSubmitted = new HashMap<String, Boolean>();
         }
         noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
         session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
     }
+     
+    
+    
+    /*
+     * @return 0 - not defined; 1 - yes, -1 - no
+     * 
+     */
+    private int isWriteToDB(int isGroup, String field, int item_data_id, 
+    		int item_id, int ordinal_for_repeating_group_field, int event_crf_id){
+    	if ( item_data_id > 0 && isGroup==-1){//non repeating group; coming from showItemInput.jsp
+     		return 1;
+	     }
+	     else if ( item_data_id < 0 && isGroup==-1){//non repeating group; coming from showItemInput.jsp
+	 		 return -1;
+	     }
+	     else if (  isGroup==1){// repeating group; 
+	     	//initial data entry or if template cell is empty (last row)
+	     	if ( item_data_id < 0 ){		return -1;} 
+	     	if ( item_data_id > 0 ){
+	     		// first row IG_TEST__GROUP1_6727_0input320
+	     		// row without X     IG_TEST__GROUP1_6727_manual1input320
+	     		// row with X			IG_TEST__GROUP1_6727_1input320
+	     		if (field.contains("_0input") || field.contains("manual")){
+	     			//get ordinal
+	     			ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource(), locale);
+		    		
+	     			boolean isExistInDB = iddao.isItemExists(item_id,ordinal_for_repeating_group_field,event_crf_id);
+	     			return (isExistInDB)? 1: -1;
+	     		}
+	     		else if (field.contains("input")){
+	     			return -1;
+	     		}
+	     	}
+	     }
+	     return 0;			
+    }
+    	
+    public int calculateOrdinal(int isGroup, String field_name, int event_crf_id, int rowCount){
+    	// first row IG_TEST__GROUP1_6727_0input320
+ 		// row without X     IG_TEST__GROUP1_6727_manual1input320
+ 		// row with X			IG_TEST__GROUP1_6727_1input320
+    	int ordinal = 0;
+    	int start = -1;int end=-1;
+    	if ( isGroup == -1){ return 1;}
+    	if (field_name.contains("_0input")) { return 1;}
+    	try{
+	    	if ( field_name.contains("manual")){
+	    		 start =  field_name.indexOf("manual")+5;
+	    		 end =  field_name.indexOf("input");
+	    		 if ( start == 4 || end == -1){ return 0;}
+	    		ordinal = Integer.valueOf(field_name.substring(start+1, end));
+	    		return ordinal+1; 	
+	    		
+	    	}else{
+	    		//get max ordinal from DB
+	    		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource(), locale);
+	    		//IG_TEST__GROUP1_6727_manual1input320
+	    		String[] field_name_items=field_name.split("_");
+	    		String group_oid = field_name.substring(0, field_name.indexOf(field_name_items[4])-1);
+	            int maxOrdinal = iddao.getMaxOrdinalForGroupByGroupOID(group_oid, event_crf_id);
+	            
+	    		//get ordinal from field
+	    		 end =  field_name.indexOf("input");
+	    		 start =  field_name.lastIndexOf("_");
+	    		if ( end == -1 || start ==-1){ return 0;}
+	    		ordinal = Integer.valueOf(field_name.substring(start+1, end));
+	    		return ordinal+maxOrdinal+rowCount; 
+	    	}
+    	}catch(NumberFormatException e){
+    		//DO NOTHING
+    	}
+    	
+    	
+    	return ordinal;
+ 
+    }
+    
 
     
     

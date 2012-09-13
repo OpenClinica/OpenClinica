@@ -41,7 +41,8 @@
 <%-- A boolean request attribute set in DataEntryServlet...--%>
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
-
+ <c:set var="eventCRFId" value="${section.eventCRF.id}"/>
+        
 <c:if test="${(respLayout eq 'Horizontal' || respLayout eq 'horizontal')}">
   <c:set var="isHorizontal" value="${true}" />
 </c:if>
@@ -55,7 +56,10 @@
   <c:if test="${! empty formMessages}">
  	<c:set var="pageHasErrors" value="${true}" />
  </c:if>
- 
+<c:set var="item_data_id"  value="${displayItem.data.id}" />
+<c:if test="${item_data_id == 0}">
+   <c:set var="item_data_id"  value="-1" />
+</c:if> 
  <%-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors --%>
 <c:choose>
   <c:when test="${(originJSP eq 'doubleDataEntry' ||
@@ -960,7 +964,7 @@ include the default value first in the select list --%>
 
        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
-    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNoteWindow('ViewDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -971,7 +975,7 @@ include the default value first in the select list --%>
 
 		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"    onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
-    "openDNWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNWindow('ViewDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -982,7 +986,7 @@ include the default value first in the select list --%>
 
        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
-    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNWindow('CreateDiscrepancyNote?eventCRFId=${eventCRFId}&isGroup=-1&subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -997,7 +1001,7 @@ include the default value first in the select list --%>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
     	<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
 	           onmouseout="UnTip()" onClick=
-	    "openDNWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+	    "openDNWindow('ViewDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
 	    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
 	    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
 	    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
@@ -1010,7 +1014,7 @@ include the default value first in the select list --%>
 
 	    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
 	           onmouseout="UnTip()" onClick=
-	    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+	    "openDNWindow('CreateDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
 	    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
 	    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
 	    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
