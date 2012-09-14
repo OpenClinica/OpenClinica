@@ -381,7 +381,7 @@ select * from view_dn_subject;
         </sql>
      </changeSet>
      
-     <changeSet author="drodrigues" id="2012-08-29-14122-10" dbms="postgresql">
+     <changeSet author="drodrigues" id="2012-08-29-14122-10" dbms="postgresql" failOnError="false">
         <comment>Indexes for the tables used in the view_discrepancy_notes query.</comment>
         <sql splitStatements="true">
 <![CDATA[
