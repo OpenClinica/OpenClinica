@@ -742,10 +742,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ArrayList alist = this.select(digester.getQuery("isItemExists"), variables);
         Iterator it = alist.iterator();
         if (it.hasNext()) {
-            try {
-                return true;
-            } catch (Exception e) {
-            }
+            return true;
         }
 
         return false;

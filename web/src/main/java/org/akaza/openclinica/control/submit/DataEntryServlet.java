@@ -1452,6 +1452,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 setUpPanel(section);
                 forwardPage(getJSPPage(), request, response);
             } else {
+            	//reshuffleReasonForChangeHashAndDiscrepancyNotes( allItems, request, ecb);
                 LOGGER.debug("Do we hit this in save ?????");
                 logMe("Do we hit this in save ????  "+System.currentTimeMillis());
 
@@ -1584,6 +1585,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
                                 LOGGER.trace("&&& we get previous looking at input name: " + inputName);
                                 // input name 2 removed from below
+                                inputName = displayItem.getFieldName();
                                 AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy, ecb.getId());
                                 success = success && temp;
                             }
@@ -4684,6 +4686,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     inputName = getGroupItemManualInputName(digb, i, displayItem);
                 }
                 ArrayList valueArray = fp.getStringArray(inputName);
+                displayItem.setFieldName(inputName);
                 displayItem.loadFormValue(valueArray);
 
             } else {
@@ -4692,6 +4695,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 } else {
                     inputName = getGroupItemManualInputName(digb, i, displayItem);
                 }
+                displayItem.setFieldName(inputName);
                 displayItem.loadFormValue(fp.getString(inputName));
                 // BWP issue 3257 << This seems to be an apt place to check any
                 // single-select options as "selected"
@@ -5402,7 +5406,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         manualRows++;
                         for (DisplayItemBean dib : dibs) {
                              intendedKey = ecb.getId()+"_"+digb.getInputId() + getInputName(dib);
-                             replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_manual" + j + getInputName(dib);
+                             replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_manual" + (j) + getInputName(dib);
                             if (!replacementKey.equals(intendedKey) ){
                             	if( noteSubmitted.containsKey(intendedKey)) {
 

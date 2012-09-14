@@ -452,8 +452,16 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         Map<Integer, DiscrepancyNoteBean> noteTree = new LinkedHashMap<Integer, DiscrepancyNoteBean>();
 
-        if (newNotes != null && !newNotes.getNotes(field).isEmpty()) {
-            ArrayList newFieldNotes = newNotes.getNotes(field);
+        String session_key = eventCRFId+"_"+field;
+        ArrayList newFieldNotes=null;
+        if (newNotes != null && (!newNotes.getNotes(field).isEmpty() || 
+        		!newNotes.getNotes(session_key).isEmpty() ))
+        
+        {
+            newFieldNotes = newNotes.getNotes(field);
+            if (newFieldNotes == null || newFieldNotes.size() == 0){
+            	newFieldNotes = newNotes.getNotes(session_key);
+            }
             // System.out.println("how many notes:" + newFieldNotes.size());
             for (int i = 0; i < newFieldNotes.size(); i++) {
                 DiscrepancyNoteBean note = (DiscrepancyNoteBean) newFieldNotes.get(i);

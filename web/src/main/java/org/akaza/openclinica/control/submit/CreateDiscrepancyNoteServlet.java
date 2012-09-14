@@ -346,8 +346,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         if (newNotes == null) {
             newNotes = new FormDiscrepancyNotes();
         }
-
-        if (!notes.isEmpty() || !newNotes.getNotes(field).isEmpty()) {
+        boolean isNotesExistInSession = (!newNotes.getNotes(field).isEmpty())? true : (!newNotes.getNotes(eventCRFId+"_"+field).isEmpty())? true:false;
+        if (!notes.isEmpty() || isNotesExistInSession) {
             request.setAttribute("hasNotes", "yes");
         } else {
             request.setAttribute("hasNotes", "no");

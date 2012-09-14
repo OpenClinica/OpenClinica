@@ -52,7 +52,7 @@
      </c:if>
         <c:if test="${hasNotes == 'yes'}">        
         <tr valign="top">
-            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>">
+            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&eventCRFId=<c:out value="${eventCRFId}"/>&column=<c:out value="${discrepancyNote.column}"/>">
             <fmt:message key="view_parent_and_related_note" bundle="${resword}"/></a> 
            </td>         
         </tr>

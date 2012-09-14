@@ -25,6 +25,7 @@ public class DisplayItemBean implements Comparable {
     private String editFlag = "";// used for items in a group
     private ItemDataBean dbData; // used for DDE, items in a group
     private boolean isNewItem;
+    private String fieldName;
 
     //adding totals here for display purposes
 
@@ -164,7 +165,7 @@ public class DisplayItemBean implements Comparable {
     public void setMetadata(ItemFormMetadataBean metadata) {
         this.metadata = metadata;
 
-        ResponseSetBean rsb = metadata.getResponseSet();
+        ResponseSetBean rsb = getMetadata().getResponseSet();
         // BWP 09/18/07 >> rsb cannot be null here because I added this line to
         // ItemFormMetadataBean's
         // constructor: responseSet=new ResponseSetBean();
@@ -187,7 +188,7 @@ public class DisplayItemBean implements Comparable {
                 }
             }
         }
-        metadata.setResponseSet(rsb);
+        getMetadata().setResponseSet(rsb);
     }
 
     /**
@@ -248,7 +249,7 @@ public class DisplayItemBean implements Comparable {
         }
 
         DisplayItemBean arg = (DisplayItemBean) o;
-        return metadata.getOrdinal() - arg.metadata.getOrdinal();
+        return getMetadata().getOrdinal() - arg.getMetadata().getOrdinal();
     }
 
     /**
@@ -259,7 +260,7 @@ public class DisplayItemBean implements Comparable {
      * @param values
      */
     public void loadFormValue(ArrayList values) {
-        ResponseSetBean rsb = metadata.getResponseSet();
+        ResponseSetBean rsb = getMetadata().getResponseSet();
 
         String valueForDB = "";
         String glue = "";
@@ -277,12 +278,12 @@ public class DisplayItemBean implements Comparable {
             glue = ",";
         }
 
-        metadata.setResponseSet(rsb);
-        data.setValue(valueForDB);
+        getMetadata().setResponseSet(rsb);
+        getData().setValue(valueForDB);
     }
 
     public void loadFormValue(String value) {
-        ResponseSetBean rsb = metadata.getResponseSet();
+        ResponseSetBean rsb = getMetadata().getResponseSet();
         org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
 
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) //|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CODING)
@@ -296,8 +297,8 @@ public class DisplayItemBean implements Comparable {
         }
         // logger.info("loadFormValue, line 241, DisplayItemBean
         // "+rsb.getResponseType().getName());
-        metadata.setResponseSet(rsb);
-        data.setValue(value);// comment set by tbh, 112007
+        getMetadata().setResponseSet(rsb);
+        getData().setValue(value);// comment set by tbh, 112007
     }
 
     public void loadDBValue() {
@@ -608,5 +609,19 @@ public class DisplayItemBean implements Comparable {
 
 	public void setIsNewItem(boolean isNewItem) {
 		this.isNewItem = isNewItem;
+	}
+
+	/**
+	 * @return the fieldName
+	 */
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	/**
+	 * @param fieldName the fieldName to set
+	 */
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
 	}
 }
