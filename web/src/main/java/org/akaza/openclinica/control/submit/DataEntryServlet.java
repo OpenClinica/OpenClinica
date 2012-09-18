@@ -931,7 +931,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // A map from item name to item bean object.
             HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
             HashMap<String, String> scoreItemdata = new HashMap<String, String>();
-            HashMap<Integer, String> oldItemdata = prepareSectionItemdata(sb.getId(), request);
+            HashMap<String, ItemDataBean> oldItemdata = prepareSectionItemdataObject(sb.getId(), request);
             // hold all item names of changed ItemBean in current section
             TreeSet<String> changedItems = new TreeSet<String>();
             // holds complete disply item beans for checking against 'request
@@ -1280,8 +1280,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         ItemDataBean idb = displayItem.getData();
                         ItemBean item_bean = displayItem.getItem();
                         ItemFormMetadataBean ifmb = displayItem.getMetadata();
+                        
+                        	
                         LOGGER.debug("-- found group label " + ifmb.getGroupLabel());
-                        if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase("")) {
+                        if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase(""))
+                        
+                        {
                             // << tbh 11/2009 sometimes the group label is blank instead of ungrouped???
                             Iterator iter = changedItemsMap.entrySet().iterator();
                             while (iter.hasNext()) {
@@ -4855,6 +4859,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         return itemdata;
     }
+    protected HashMap<String, ItemDataBean> prepareSectionItemdataObject(int sectionId, HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
+        HashMap<String, ItemDataBean> itemdata = new HashMap<String, ItemDataBean>();
+        ArrayList<ItemDataBean> idbs = iddao.findAllActiveBySectionIdAndEventCRFId(sectionId, ecb.getId());
+        for (ItemDataBean idb : idbs) {
+            itemdata.put(idb.getItemId()+","+idb.getOrdinal(), idb);
+        }
+        return itemdata;
+    }
 
     protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata) {
         String value = idb.getValue();
@@ -4876,9 +4890,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return false;
     }
 
-    protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
+    protected boolean isChanged(DisplayItemBean dib, HashMap<String, ItemDataBean> oldItemdata, String attachedFilePath) {
         ItemDataBean idb = dib.getData();
         String value = idb.getValue();
+        int ordinal = idb.getOrdinal();
         // if(value != null && value.length()>0 && dib.getItem().getDataType().getId()==11) {
         // value = attachedFilePath + value;
         // }
@@ -4888,8 +4903,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         		rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION )){
         	return false;
         }
-
-        if (!oldItemdata.containsKey(idb.getId()))
+String tempKey = idb.getItemId()+","+idb.getOrdinal();
+        if (!oldItemdata.containsKey(tempKey))
         {
             if(value!=null && value.isEmpty())//This is to address the case where the record does not exist due to Import and upon saving the value could be empty string.
                 return false;
@@ -4899,14 +4914,18 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
         }
         else {
-            String oldValue = oldItemdata.get(idb.getId());
+           ItemDataBean existingItemData =  oldItemdata.get(tempKey);
+        	String oldValue =existingItemData.getValue();
+        	int oldOrdinal = existingItemData.getOrdinal();
+        	
             if (oldValue != null) {
                 if (value == null)
+                { if(ordinal==oldOrdinal)
                     return true;
-                else if (dib.getItem().getDataType().getId() == 11) {
+                }else if (dib.getItem().getDataType().getId() == 11) {
                     String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
                     return !value.equals(theOldValue);
-                } else if (!oldValue.equals(value))
+                } else if (!oldValue.equals(value) &&  (ordinal==oldOrdinal))
                     return true;
             }
             else if (value!=null && value.isEmpty())
@@ -4919,7 +4938,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return false;
     }
 
-    protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
+    protected boolean isChanged(ItemDataBean idb, HashMap<String, ItemDataBean> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
         //if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
             //return false;
 
