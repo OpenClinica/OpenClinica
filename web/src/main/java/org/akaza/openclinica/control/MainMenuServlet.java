@@ -111,31 +111,36 @@ public class MainMenuServlet extends SecureController {
         // Event Definition list and Group Class list for add suybject window.
         request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
         request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
-        if (lastPwdChangeDate != null) {// not a new user
-            Calendar cal = Calendar.getInstance();
-            // compute difference between current date and lastPwdChangeDate
-            long difference = Math.abs(cal.getTime().getTime() - lastPwdChangeDate.getTime());
-            long days = difference / (1000 * 60 * 60 * 24);
-            session.setAttribute("passwordExpired", "no");
-
-            if (pwdExpireDay > 0 && days >= pwdExpireDay) {// password expired, need to be changed
-                studies = (ArrayList) sdao.findAllByUser(ub.getName());
-                request.setAttribute("studies", studies);
-                session.setAttribute("userBean1", ub);
-                addPageMessage(respage.getString("password_expired"));
-                // YW 06-25-2007 << add the feature that if password is expired,
-                // have to go through /ResetPassword page
-                session.setAttribute("passwordExpired", "yes");
-                if (pwdChangeRequired == 1) {
-                    request.setAttribute("mustChangePass", "yes");
-                    addPageMessage(respage.getString("your_password_has_expired_must_change"));
-                } else {
-                    request.setAttribute("mustChangePass", "no");
-                    addPageMessage(respage.getString("password_expired") + " " + respage.getString("if_you_do_not_want_change_leave_blank"));
-                }
-                forwardPage(Page.RESET_PASSWORD);
-                // YW >>
-            } else {
+        //@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
+        if( (lastPwdChangeDate != null) || ((lastPwdChangeDate == null) && (pwdChangeRequired == 0))) {// not a new user
+            if(lastPwdChangeDate != null){
+	        	Calendar cal = Calendar.getInstance();
+	            
+	            // compute difference between current date and lastPwdChangeDate
+	            long difference = Math.abs(cal.getTime().getTime() - lastPwdChangeDate.getTime());
+	            long days = difference / (1000 * 60 * 60 * 24);
+	            session.setAttribute("passwordExpired", "no");
+	
+	            if (pwdExpireDay > 0 && days >= pwdExpireDay) {// password expired, need to be changed
+	                studies = (ArrayList) sdao.findAllByUser(ub.getName());
+	                request.setAttribute("studies", studies);
+	                session.setAttribute("userBean1", ub);
+	                addPageMessage(respage.getString("password_expired"));
+	                // YW 06-25-2007 << add the feature that if password is expired,
+	                // have to go through /ResetPassword page
+	                session.setAttribute("passwordExpired", "yes");
+	                if (pwdChangeRequired == 1) {
+	                    request.setAttribute("mustChangePass", "yes");
+	                    addPageMessage(respage.getString("your_password_has_expired_must_change"));
+	                } else {
+	                    request.setAttribute("mustChangePass", "no");
+	                    addPageMessage(respage.getString("password_expired") + " " + respage.getString("if_you_do_not_want_change_leave_blank"));
+	                }
+	                forwardPage(Page.RESET_PASSWORD);
+	                // YW >>
+	            } 
+            }
+//            else {
 
                 if (ub.getNumVisitsToMainMenu() <= 1) {
                     if (ub.getLastVisitDate() != null) {
@@ -194,7 +199,7 @@ public class MainMenuServlet extends SecureController {
                 }
 
                 forwardPage(Page.MENU);
-            }
+//            }
 
         } else {// a new user's first log in
             studies = (ArrayList) sdao.findAllByUser(ub.getName());
@@ -202,7 +207,7 @@ public class MainMenuServlet extends SecureController {
             session.setAttribute("userBean1", ub);
 //            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
 //                + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
-
+            
             if (pwdChangeRequired == 1) {
             } else {
                 forwardPage(Page.MENU);
