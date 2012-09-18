@@ -288,10 +288,35 @@ public class ChangeCRFVersionController {
 	        	hash_new_item_form_mdata.put(new Integer(bn.getItemId()), bn);
 	        }
 	        //get items description
-	        ArrayList<ItemBean> cur_items = item_dao.findAllWithItemDataByCRFVersionId(crfVersionId,eventCRFId);
+	        ArrayList<ItemBean> cur_items_with_data = item_dao.findAllWithItemDataByCRFVersionId(crfVersionId, eventCRFId);
+	        HashMap <String, ItemBean> hash_items_with_data = new HashMap<String,ItemBean>(cur_items_with_data.size());
+	        for (ItemBean item : cur_items_with_data){
+	        	hash_items_with_data.put(item.getOid(), item);
+	        }
+	        ArrayList<ItemBean> cur_items = item_dao.findAllItemsByVersionId(crfVersionId);
+	        ItemBean temp=null;
+	        for (ItemBean item : cur_items){
+	        	temp = hash_items_with_data.get(item.getOid());
+	        	if ( temp != null){
+	        		item.setItemDataElements(temp.getItemDataElements());
+	        	}
+	        }
+	        
+	        
+	        ArrayList<ItemBean> new_items_with_data = item_dao.findAllWithItemDataByCRFVersionId(selectedVersionId, eventCRFId);
+	        hash_items_with_data = new HashMap<String,ItemBean>(new_items_with_data.size());
+	        for (ItemBean item : new_items_with_data){
+	        	hash_items_with_data.put(item.getOid(), item);
+	        }
 	        ArrayList<ItemBean> new_items = item_dao.findAllItemsByVersionId(selectedVersionId);
-	       
-	         ItemBean cur_element=null; ItemBean new_element=null;
+	        for (ItemBean item : new_items){
+	        	temp = hash_items_with_data.get(item.getOid());
+	        	if ( temp != null){
+	        		item.setItemDataElements(temp.getItemDataElements());
+	        	}
+	        }
+      
+            ItemBean cur_element=null; ItemBean new_element=null;
 	        ItemGroupMetadataBean bn_mdata= null;ItemGroupMetadataBean bn_new_mdata=null;
 	        while ( cur_counter < cur_items.size() || new_counter < new_items.size()){
 	        	
@@ -337,27 +362,49 @@ public class ChangeCRFVersionController {
     	String[] row = new String[8];
     	int cycle_count=0;
     	if (cur_element == null && new_element != null){
-    		row[0]=row[1]=row[2]=row[3]=row[7]="";
-    		row[4]=(new_bean_mdata.isRepeatingGroup())? new_element.getName()+"(1)":new_element.getName();
-    		row[5]=new_element.getOid();
-    		row[6]=String.valueOf(new_element.getId());
-    		rows.add(row);
-    		return;
+    		if (new_element.getItemDataElements() == null || new_element.getItemDataElements().size() <1){
+	    		row[0]=row[1]=row[2]=row[3]=row[7]="";
+	    		row[4]=(new_bean_mdata.isRepeatingGroup())? new_element.getName()+"(1)":new_element.getName();
+	    		row[5]=new_element.getOid();
+	    		row[6]=String.valueOf(new_element.getId());
+	    		rows.add(row);
+	    		return;
+    		}
+    		else{
+    			for (ItemDataBean data_item : new_element.getItemDataElements()){
+        			row = new String[8];
+        			row[0]=row[1]=row[2]=row[3]=row[7]="";
+    	    		row[4]=(new_bean_mdata.isRepeatingGroup())? new_element.getName()+"("+data_item.getOrdinal()+")":new_element.getName();
+    	    		row[5]=new_element.getOid();
+    	    		row[6]=String.valueOf(new_element.getId());
+    	    		row[7]=data_item.getValue();
+    	    		rows.add(row);
+    			}
+    			return;
+    		}
     	}
     	else if (cur_element != null && new_element == null) {
-    		
-    		for (ItemDataBean data_item : cur_element.getItemDataElements()){
-    			row = new String[8];
-    			row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+" ("+data_item.getOrdinal()+")": cur_element.getName();
+    		if(cur_element.getItemDataElements() == null || cur_element.getItemDataElements().size() < 1){
+    			row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+"(1)": cur_element.getName();
     			row[1]=		cur_element.getOid();
     			row[2]=		String.valueOf(cur_element.getId());
-    			row[3]=		data_item.getValue()	;
-    			row[4]=row[6]=row[7]=row[5]="";
+    			row[4]=row[6]=row[7]=row[5]=row[3]="";
     			rows.add(row);
-    			cycle_count++;
-    			if ( cycle_count >0 && !cur_bean_mdata.isRepeatingGroup()){
-    				break;
-    			}
+    		}
+    		else{
+	    		for (ItemDataBean data_item : cur_element.getItemDataElements()){
+	    			row = new String[8];
+	    			row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+" ("+data_item.getOrdinal()+")": cur_element.getName();
+	    			row[1]=		cur_element.getOid();
+	    			row[2]=		String.valueOf(cur_element.getId());
+	    			row[3]=		data_item.getValue()	;
+	    			row[4]=row[6]=row[7]=row[5]="";
+	    			rows.add(row);
+	    			cycle_count++;
+	    			if ( cycle_count >0 && !cur_bean_mdata.isRepeatingGroup()){
+	    				break;
+	    			}
+	    		}
     		}
     		return;
     	}
@@ -365,6 +412,19 @@ public class ChangeCRFVersionController {
     		//for repeating groups: 3 cases
     		//one cycle: repeating group item -> none-repeating group item
     		//second cycle -> back none-repeating to prev repeating
+    		if(cur_element.getItemDataElements() == null ){
+    			row[4]=(new_bean_mdata.isRepeatingGroup())? new_element.getName()+"(1)":new_element.getName();
+	    		row[5]=new_element.getOid();
+	    		row[6]=String.valueOf(new_element.getId());
+	    		row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+"(1)": cur_element.getName();
+    			row[1]=		cur_element.getOid();
+    			row[2]=		String.valueOf(cur_element.getId());
+    			row[3]=row[7]="";
+    			rows.add(row);
+    			return;
+    		}
+    		
+    		
     		for (ItemDataBean data_item : cur_element.getItemDataElements()){
     			row = new String[8];
     			if (!cur_bean_mdata.isRepeatingGroup() && cycle_count>0 ){

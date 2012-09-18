@@ -45,7 +45,7 @@
 <h1><span class="title_manage">
 <fmt:message key="confirm_CRF_version" bundle="${resword}"/>
 
- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/crf-version-migration')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+ <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/crf-version-migration')"><img src="../../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
  
 </span></h1>
 
@@ -73,9 +73,7 @@
 <td><c:out value="${eventOrdinal}" /></td></tr>
 </c:if>     
 
-<!--  <tr><td>
-<fmt:message key="study" bundle="${resword}"/>:</td>
-<td><c:out value="${studySubjectLabel}"/></td></tr>-->
+
 
 <!-- CRF name  here -->
 <tr><td>
@@ -97,6 +95,8 @@
 <!-- header ends -->
 
 <br><br>
+<h3><fmt:message key="data_mapping" bundle="${resword}"/></h3>
+
 <fmt:message key="confirm_crf_version_table_comment" bundle="${resword}"/>
 
 <br><br>
@@ -106,8 +106,7 @@
 <tr><td>
 <table cellpadding="2" cellspacing="2" border="0" >
 <tr>
-<td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '
-<c:out value="${crfVersionName}"/>'</td></tr>
+<td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '<c:out value="${crfVersionName}"/>'</td></tr>
 <tr>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_name" bundle="${resword}"/></td>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_oid" bundle="${resword}"/></td>
