@@ -3,6 +3,9 @@ OPENCLINICA RELEASE NOTES
 OpenClinica Version ${project.version}
 Document Version 1.0
 --------------------------------------------------------------
+Please check the following URL for the latest release notes:
+
+https://docs.openclinica.com/release-notes/openclinica-3.1.3-release-notes
 
 --------------------------------------------------------------
 Updated: ${changeSetDate}
