@@ -1556,10 +1556,37 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
+                                boolean writeDN = true;
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
                                 LOGGER.debug("group item value: " + displayItem.getData().getValue());
                                 if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                                     displayItem.getData().setValue("");
+                                }
+                               
+                                //15350, this particular logic, takes into consideration that a DN is created properly as long as the item data record exists and it fails to get created when it doesnt.
+                                //so, we are expanding the logic from writeToDb method to avoid creating duplicate records.
+                                if (StringUtils.isBlank(displayItem.getEditFlag())){
+                                	   if (!displayItem.getData().isActive()) {
+                                		   writeDN = true;
+                                	   }
+                                	   else
+                                		   writeDN=false;
+                                	   
+                                }
+                                else{
+                                	 if ("add".equalsIgnoreCase(displayItem.getEditFlag())){
+                                		 writeDN=true;
+                                	 }
+                                	  else if ("edit".equalsIgnoreCase(displayItem.getEditFlag())){
+                                		  if(displayItem.getData().getId()!=0)
+                                			  {
+                                			  	writeDN=false;
+                                			  }
+                                		  else
+                                		  {
+                                			  writeDN=true;
+                                		  }
+                                	  }
                                 }
                                 //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
                                 nextOrdinal =      displayItem.getData().getOrdinal();
@@ -1590,7 +1617,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 LOGGER.trace("&&& we get previous looking at input name: " + inputName);
                                 // input name 2 removed from below
                                 inputName = displayItem.getFieldName();
-                                AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy, ecb.getId());
+                              if(writeDN)
+                                {
+                            	  AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, displayItem.getData().getId(), "itemData", currentStudy, ecb.getId());
+                                }
                                 success = success && temp;
                             }
                         }
