@@ -1020,7 +1020,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 	    		ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource(), locale);
 	    		//IG_TEST__GROUP1_6727_manual1input320
 	    		String[] field_name_items=field_name.split("_");
-	    		String group_oid = field_name.substring(0, field_name.indexOf(field_name_items[4])-1);
+	    		
+	    		String group_oid = field_name.substring(0, field_name.indexOf(field_name_items[field_name_items.length-1])-1);
 	            int maxOrdinal = iddao.getMaxOrdinalForGroupByGroupOID(group_oid, event_crf_id);
 	            
 	    		//get ordinal from field
