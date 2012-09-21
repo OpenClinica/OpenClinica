@@ -521,7 +521,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 passwdTimeOut(request, response, ub);
             }
             mayProceed(request, response);
-            pingJobServer(request);
+         //   pingJobServer(request);
             processRequest(request, response);
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
