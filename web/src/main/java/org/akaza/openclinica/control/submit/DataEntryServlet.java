@@ -1631,6 +1631,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         // TODO work on this line
 
                         this.addAttachedFilePath(dib, attachedFilePath);
+                        boolean writeDN = writeDN(dib);
                         temp = writeToDB(dib, iddao, 1, request);
                         LOGGER.debug("just executed writeToDB - 3");
                         if (temp && newUploadedFiles.containsKey(dib.getItem().getId() + "")) {
@@ -1641,7 +1642,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                         String inputName = getInputName(dib);
                         LOGGER.trace("3 - found input name: " + inputName);
-                        if( writeDN(dib))
+                        if(writeDN )
                         AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, dib.getData().getId(), "itemData", currentStudy, ecb.getId());
 
                         success = success && temp;
@@ -1650,6 +1651,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         for (int j = 0; j < childItems.size(); j++) {
                             DisplayItemBean child = (DisplayItemBean) childItems.get(j);
                             this.addAttachedFilePath(child, attachedFilePath);
+                            writeDN =  writeDN(child);
                             temp = writeToDB(child, iddao, 1, request);
                             LOGGER.debug("just executed writeToDB - 4");
                             if (temp && newUploadedFiles.containsKey(child.getItem().getId() + "")) {
@@ -1658,7 +1660,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 newUploadedFiles.remove(child.getItem().getId() + "");
                             }
                             inputName = getInputName(child);
-                            if( writeDN(child))
+                            if( writeDN)
                             AddNewSubjectServlet.saveFieldNotes(inputName, fdn, dndao, child.getData().getId(), "itemData", currentStudy, ecb.getId());
                             success = success && temp;
                         }
