@@ -1,11 +1,8 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
 OpenClinica Version ${project.version}
-Document Version 1.0
 --------------------------------------------------------------
-Please check the following URL for the latest release notes:
 
-https://docs.openclinica.com/release-notes/openclinica-3.1.3-release-notes
 
 --------------------------------------------------------------
 Updated: ${changeSetDate}
@@ -16,10 +13,11 @@ Updated: ${changeSetDate}
 OVERVIEW
 --------------------------------------------------------------
 
-This is the latest development release of OpenClinica ${project.version} code branch. 
+This is OpenClinica release ${project.version}. 
 
-A list of changes in each development release can be found at 
-https://issuetracker.openclinica.com/roadmap_page.php?project_id=160
+Please check the following URL for the latest release notes:
+
+https://docs.openclinica.com/release-notes/openclinica-3.1.3-release-notes
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 
@@ -28,10 +26,9 @@ CONTENTS OF THIS DOCUMENT
 --------------------------------------------------------------
  
 I.   OVERALL PRODUCT FEATURES
-II.  ISSUES ADDRESSED AND KNOWN ISSUES
-III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
-IV.  ABOUT OPENCLINICA
-V.   GNU LGPL LICENSE
+II. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
+III.  ABOUT OPENCLINICA
+IV.   GNU LGPL LICENSE
 
 --------------------------------------------------------------
 I. OVERALL PRODUCT FEATURES
@@ -58,14 +55,10 @@ Some key features of OpenClinica include:
 
 
 
---------------------------------------------------------------
-II. ISSUES ADDRESSED AND KNOWN ISSUES
---------------------------------------------------------------
 
-This is a development release. There will be bugs and it is not recommended for use in production. 
 
 --------------------------------------------------------------
-III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
+II. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 --------------------------------------------------------------
 
 Pre-requisites (versions):
@@ -74,12 +67,12 @@ Pre-requisites (versions):
     JDK : 1.6.0
     Application server : Tomcat 6.0
     Database server : PostgreSQL 8.4 or Oracle 10g
-    OpenClinica version for Upgrades only: OpenClinica 3.0.x
+    OpenClinica version for Upgrades only: OpenClinica 3.0.x,OpenClinica 3.1.X
 
 The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://dev.openclinica.com/hg/.
 
 --------------------------------------------------------------
-IV. ABOUT OPENCLINICA
+III. ABOUT OPENCLINICA
 --------------------------------------------------------------
 
 OpenClinica: Open Source Software Platform for Clinical Trials Electronic Data Capture
@@ -109,7 +102,7 @@ http://www.OpenClinica.com/ [^] [^]
 
 
 --------------------------------------------------------------
-V. GNU LGPL LICENSE
+IV. GNU LGPL LICENSE
 --------------------------------------------------------------
 
 OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL), 
