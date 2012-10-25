@@ -13,8 +13,8 @@ RETVAL=$?
 export INIT_NAME="tomcat"
 export CATALINA_HOME="/usr/local/tomcat"
 export JAVA_HOME="/usr/local/java"
-#please note that -#XX:ParallelGCThreads need to be equivalent of number of cores
-export JAVA_OPTS="$JAVA_OPTS   -Xmx1280m -XX:+UseParallelGC -XX:ParallelGCThreads=1 -XX:MaxPermSize=180m -XX:+CMSClassUnloadingEnabled"
+export JAVA_OPTS="$JAVA_OPTS -Xmx1280m -XX:MaxPermSize=180m"
+
 case "$1" in
  start)
         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/$INIT_NAME_process_count.txt
