@@ -123,6 +123,10 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                    if (mapQueryParams.containsKey("tabId")) {
 		                        request.setAttribute("tabId", mapQueryParams.get("tabId"));
 		                    }
+		                 /*   else
+		                    	{
+		                    	request.setAttribute("tabId", new Integer(1));
+		                    	}*/
 		                    if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
 		                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 		                    }
@@ -138,7 +142,11 @@ public class UrlRewriteServlet extends CoreSecureController {
 			                    if(null != sectionId){
 			                    	request.setAttribute("sectionId", sectionId);
 			                    }
+			                    
 		                    }
+		                   /* else{
+		                    	request.setAttribute("sectionId",1);
+		                    }*/
 		                }
 		                //ToDo: Changes to work on to fix #0012507
 //		                else{
@@ -252,6 +260,8 @@ public class UrlRewriteServlet extends CoreSecureController {
                         // oID values in future.
 
                         URLParamValue = tokens[i].trim();
+                        //System.out.println("URLParamValue::"+URLParamValue);
+                        logger.info("URLPAramValue::"+URLParamValue);
                         if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
                             switch (i) {
                             case 0: {// study OID
@@ -298,6 +308,14 @@ public class UrlRewriteServlet extends CoreSecureController {
                                     seoid = URLParamValue.substring(0, URLParamValue.indexOf("%5B"));
                                     openClinicaResource.setStudyEventDefOID(seoid);
                                     eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("%5B") + 3, URLParamValue.indexOf("%5D"));
+                                }
+                                else if (URLParamValue.contains("[") && URLParamValue.contains("]")) {
+                                    seoid = URLParamValue.substring(0, URLParamValue.indexOf("["));
+                                    logger.info("seoid"+seoid);
+                                    openClinicaResource.setStudyEventDefOID(seoid);
+                                    eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("[") + 1, URLParamValue.indexOf("]"));
+                                    logger.info("eventOrdinal::"+eventOrdinal);
+                                    
                                 }
                                 else{//event ordinal not specified
                                 	openClinicaResource.setInValid(true);
