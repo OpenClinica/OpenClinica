@@ -80,12 +80,16 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         boolean isSubmitted = false;
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) request.getAttribute(EVENT_DEF_CRF_BEAN);
         if (!fp.getString("exitTo").equals("")) {
-            request.setAttribute("exitTo", fp.getString("exitTo"));
+            request.setAttribute("exitTo",getContextPath(request)+"/"+ fp.getString("exitTo"));
+
         }
         int crfVersionId = fp.getInt("crfVersionId", true);
 
         Integer sectionId = (Integer) request.getAttribute("sectionId");
-
+        if(sectionId==null || sectionId == 0)
+        {
+        	sectionId = new Integer(1);
+        }
         int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
         int studySubjectId = fp.getInt("studySubjectId", true);
         String action = fp.getString("action");
