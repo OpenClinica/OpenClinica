@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -20,11 +22,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
-import java.util.Locale;
-
 // allows both deletion and restoration of a study user role
 
 public class UnLockUserServlet extends SecureController {
+
+    private static final long serialVersionUID = 5028384981301316490L;
 
     // < ResourceBundle restext;
     Locale locale;
@@ -67,10 +69,12 @@ public class UnLockUserServlet extends SecureController {
             u.setUpdater(ub);
 
             SecurityManager sm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
-            String password = sm.genPassword();
-            String passwordHash = sm.encrytPassword(password, getUserDetails());
 
-            u.setPasswd(passwordHash);
+            String password = sm.genPassword();
+            if (!u.isLdapUser()) {
+                String passwordHash = sm.encrytPassword(password, getUserDetails());
+                u.setPasswd(passwordHash);
+            }
             u.setPasswdTimestamp(null);
             u.setAccountNonLocked(Boolean.TRUE);
             u.setStatus(Status.AVAILABLE);
@@ -82,7 +86,9 @@ public class UnLockUserServlet extends SecureController {
                 message = respage.getString("the_user_has_been_unlocked");
 
                 try {
-                    sendRestoreEmail(u, password);
+                    if (!u.isLdapUser()) {
+                        sendRestoreEmail(u, password);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     message += respage.getString("however_was_error_sending_user_email_regarding");

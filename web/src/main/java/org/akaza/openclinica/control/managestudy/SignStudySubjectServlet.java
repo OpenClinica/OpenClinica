@@ -1,5 +1,15 @@
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
@@ -46,16 +56,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import javax.sql.DataSource;
 
 /**
  * Created by IntelliJ IDEA. User: bads Date: Jun 10, 2008 Time: 5:28:46 PM To
@@ -225,7 +225,7 @@ public class SignStudySubjectServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            if (securityManager.isPasswordValid(ub.getPasswd(), password, getUserDetails()) && ub.getName().equals(username)) {
+            if (securityManager.verifyPassword(password, getUserDetails()) && ub.getName().equals(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
                     // Making the StudySubject signed as all the events have
                     // become signed.
@@ -387,7 +387,7 @@ public class SignStudySubjectServlet extends SecureController {
     /**
      * Each of the event CRFs with its corresponding CRFBean. Then generates a
      * list of DisplayEventCRFBeans, one for each event CRF.
-     * 
+     *
      * @param eventCRFs
      *            The list of event CRFs for this study event.
      * @return The list of DisplayEventCRFBeans for this study event.
@@ -473,7 +473,7 @@ public class SignStudySubjectServlet extends SecureController {
     /**
      * Finds all the event definitions for which no event CRF exists - which is
      * the list of event definitions with uncompleted event CRFs.
-     * 
+     *
      * @param eventDefinitionCRFs
      *            All of the event definition CRFs for this study event.
      * @param eventCRFs
@@ -493,10 +493,10 @@ public class SignStudySubjectServlet extends SecureController {
          * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
          * answer; This algorithm is guaranteed to find all the event
          * definitions for which no event CRF exists.
-         * 
+         *
          * The motivation for using this algorithm is reducing the number of
          * database hits.
-         * 
+         *
          * -jun-we have to add more CRFs here: the event CRF which dones't have
          * item data yet
          */

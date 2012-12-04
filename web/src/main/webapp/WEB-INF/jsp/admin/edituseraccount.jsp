@@ -76,6 +76,10 @@
     <c:if test='${presetValue.key == "notifyPassword"}'>
         <c:set var="notifyPassword" value="${presetValue.value}" />
     </c:if>
+    <c:if test='${presetValue.key == "ldapUser"}'>
+        <c:set var="ldapUser" value="${presetValue.value}" />
+    </c:if>
+    
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
   <!--
@@ -226,6 +230,7 @@
         </td>
     </tr>
     
+    <c:if test="${not ldapUser}">
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="can_run_web_services" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -288,6 +293,7 @@
        </c:choose>
       </td>
     </tr>
+    </c:if>
     </table>
     </div>
 

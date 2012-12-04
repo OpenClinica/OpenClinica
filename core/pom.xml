@@ -5,7 +5,7 @@
     <name>OpenClinica Core</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
+        <artifactId>OpenClinica-Parent</artifactId>
       <version>3.1-SNAPSHOT</version>
     </parent>
     <dependencies>

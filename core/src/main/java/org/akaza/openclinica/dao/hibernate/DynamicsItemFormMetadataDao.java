@@ -48,6 +48,7 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 
+         throw new RuntimeException("Error saving DynamicsItemFormMetadataBean", e);
     public List<Integer> findItemIdsForAGroupInSection(int groupId, int sectionId, int crfVersionId, int eventCrfId) {
         String oracle = "select distinct ditem.item_id from dyn_item_form_metadata ditem"
             + " where ditem.item_data_id in (select idata.item_data_id from item_data idata"

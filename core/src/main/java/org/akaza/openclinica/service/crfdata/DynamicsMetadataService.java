@@ -1,5 +1,10 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -36,11 +41,6 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
 
 public class DynamicsMetadataService implements MetadataServiceInterface {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

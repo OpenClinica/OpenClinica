@@ -27,7 +27,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
-
 /**
  * Reset expired password
  *
@@ -92,7 +91,6 @@ public class ResetPasswordServlet extends SecureController {
         request.setAttribute("userBean1", ubForm);
         
         SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
-        if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
             Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
             request.setAttribute("formMessages", errors);
            

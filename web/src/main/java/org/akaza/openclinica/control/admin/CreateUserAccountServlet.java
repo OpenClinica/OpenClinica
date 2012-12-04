@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -25,17 +33,11 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.domain.user.LdapUser;
+import org.akaza.openclinica.service.user.LdapUserService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * Servlet for creating a user account.
@@ -47,6 +49,7 @@ public class CreateUserAccountServlet extends SecureController {
     // < ResourceBundle restext;
     Locale locale;
 
+    public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_USERNAME = "userName";
     public static final String INPUT_FIRST_NAME = "firstName";
     public static final String INPUT_LAST_NAME = "lastName";
@@ -163,9 +166,11 @@ public class CreateUserAccountServlet extends SecureController {
             }
             request.setAttribute("roles", roleMap);
         }
+        request.setAttribute("ldapEnabled", isLdapEnabled());
         request.setAttribute("activeStudy", activeStudy);
         if (!fp.isSubmitted() || changeRoles) {
-            String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+            String textFields[] = { INPUT_USER_SOURCE, INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL,
+                    INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
             fp.setCurrentStringValuesAsPreset(textFields);
 
             String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
@@ -216,9 +221,14 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setEmail(fp.getString(INPUT_EMAIL));
                 createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 
-                SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
-                String password = secm.genPassword();
-                String passwordHash = secm.encrytPassword(password, getUserDetails());
+                boolean isLdap = fp.getString(INPUT_USER_SOURCE).equals("ldap");
+                String password = null;
+                String passwordHash = UserAccountBean.LDAP_PASSWORD;
+                if (!isLdap){
+        SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
+                    password = secm.genPassword();
+                    passwordHash = secm.encrytPassword(password, getUserDetails());
+                }
 
                 createdUserAccountBean.setPasswd(passwordHash);
 
@@ -247,15 +257,17 @@ public class CreateUserAccountServlet extends SecureController {
                 if (createdUserAccountBean.isActive()) {
                     addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName() + "\""
                         + respage.getString("was_created_succesfully"));
-                    if ("no".equalsIgnoreCase(displayPwd)) {
-                        try {
-                            sendNewAccountEmail(createdUserAccountBean, password);
-                        } catch (Exception e) {
-                            addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
+                    if (!isLdap) {
+                        if ("no".equalsIgnoreCase(displayPwd)) {
+                            try {
+                                sendNewAccountEmail(createdUserAccountBean, password);
+                            } catch (Exception e) {
+                                addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
+                            }
+                        } else {
+                            addPageMessage(respage.getString("user_password") + ":<br/>" + password + "<br/> "
+                                + respage.getString("please_write_down_the_password_and_provide"));
                         }
-                    } else {
-                        addPageMessage(respage.getString("user_password") + ":<br/>" + password + "<br/> "
-                            + respage.getString("please_write_down_the_password_and_provide"));
                     }
                 } else {
                     addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName() + "\""
@@ -283,6 +295,37 @@ public class CreateUserAccountServlet extends SecureController {
                 forwardPage(Page.CREATE_ACCOUNT);
             }
         }
+    }
+
+    protected boolean isLdapEnabled() {
+        LdapUserService ldapUserService = SpringServletAccess.getApplicationContext(context).getBean(LdapUserService.class);
+        return ldapUserService.isLdapServerConfigured();
+    }
+
+    /**
+     * Reusing the <code>setPresetValues</code> method to process a <code>ldapUser</code> which was previously stored
+     * in the session scope.
+     * @param presetValues
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    protected void setPresetValues(HashMap presetValues) {
+        HashMap map = presetValues;
+        if (isLdapEnabled()) {
+            LdapUser ldapUser = (LdapUser) session.getAttribute("ldapUser");
+            if (ldapUser != null) {
+                session.removeAttribute("ldapUser");
+                if (map == null) {
+                    map = new HashMap();
+                }
+                map.put("userName", ldapUser.getUsername());
+                map.put("firstName", ldapUser.getFirstName());
+                map.put("lastName", ldapUser.getLastName());
+                map.put("email", ldapUser.getEmail());
+                map.put("institutionalAffiliation", ldapUser.getOrganization());
+            }
+        }
+        super.setPresetValues(map);
     }
 
     private ArrayList getRoles() {

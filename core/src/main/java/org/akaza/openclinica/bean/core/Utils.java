@@ -125,6 +125,7 @@ public class Utils {
      * @param to_pattern
      * @return
      */
+    //ywang 12-06-2007
     public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern) {
         return resolveItemDateValue(itemValue, from_pattern, to_pattern, null);
     }
@@ -167,6 +168,7 @@ public class Utils {
      * @param content
      *
      */
+    //ywang (07-2008)
     public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
         try {
             File dir = new File(filePath);

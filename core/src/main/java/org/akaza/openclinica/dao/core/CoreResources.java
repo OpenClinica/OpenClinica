@@ -25,7 +25,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-
 public class CoreResources implements ResourceLoaderAware {
 
     private ResourceLoader resourceLoader;
@@ -179,17 +178,6 @@ public class CoreResources implements ResourceLoaderAware {
         if (catalina == null) {
             catalina = System.getenv("catalina.home");
         }
-        //        logMe("catalina home - " + value);
-        //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
-        //        logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
-        //        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
-        //        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
-        //        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
-        //        Map<String, String> env = System.getenv();
-        //        for (String envName : env.keySet()) {
-        //            logMe("%s=%s%n"+ envName+ env.get(envName));
-        //        }
-
 
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
@@ -368,7 +356,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
-    private void copyBaseToDest(ResourceLoader resourceLoader) {
+   private void copyBaseToDest(ResourceLoader resourceLoader) {
     	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
     	Resource[] resources;
     	try {
@@ -378,6 +366,8 @@ public class CoreResources implements ResourceLoaderAware {
     		 * See: http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html#resources-classpath-wildcards
     		 */
     		resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
+                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[9])
+                        .getInputStream();
 
     	} catch (IOException ioe) {
     		logger.debug(ioe.getMessage(), ioe);
@@ -407,6 +397,7 @@ public class CoreResources implements ResourceLoaderAware {
     	}
     }
 
+ 
     private void copyImportRulesFiles() throws IOException
     {
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
@@ -507,9 +498,6 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-            // File placeholder_file = new
-            // File(resourceLoader.getResource("classpath:properties" +
-            // File.separator + "placeholder.properties").getURL().getFile());
             File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
 
             String placeholder_file_path = placeholder_file.getPath();
@@ -541,8 +529,6 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
     }
-
-
 
     public ResourceLoader getResourceLoader() {
         return resourceLoader;
@@ -662,7 +648,6 @@ public class CoreResources implements ResourceLoaderAware {
 
         // tbh change to print out properties
 
-        // System.out.println("found " + ret.size() + " records in extract.properties");
         return ret;
     }
 
@@ -683,10 +668,8 @@ public class CoreResources implements ResourceLoaderAware {
         while (i < cnt) {
 
             File f = new File(getField("filePath") + "xslt" + File.separator + extractFields[i]);
-            // System.out.println(getField("filePath") + "xslt" + File.separator + extractFields[i]);
             if (!f.exists())
                 throw new OpenClinicaSystemException("FileNotFound -- Please make sure" + extractFields[i] + "exists");
-
             i++;
 
         }
@@ -723,7 +706,6 @@ public class CoreResources implements ResourceLoaderAware {
              * finally { outputStream.close(); inputStream.close(); }
              */
             return f;
-
         } catch (IOException e) {
             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
@@ -872,5 +854,4 @@ public class CoreResources implements ResourceLoaderAware {
 //         System.out.println(message);
     // logger.info(message);
     // }
-
 }

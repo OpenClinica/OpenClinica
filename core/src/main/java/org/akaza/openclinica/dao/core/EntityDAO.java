@@ -533,7 +533,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     private void logMe(String message){
        // System.out.println(message);
-        logger.debug(message);
+         logger.debug(message);
     }
     public ArrayList processResultRows(ResultSet rs) {// throws SQLException
         ArrayList al = new ArrayList();
@@ -724,7 +724,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         String sql = digester.getQuery(queryName);
         logMe("query:"+queryName+"variables:"+variables);
-
+        
         ArrayList rows;
         if (variables == null || variables.isEmpty()) {
             rows = this.select(sql);

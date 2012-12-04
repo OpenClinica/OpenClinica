@@ -121,6 +121,10 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
         try {
             EntityBean eb = getUserAccountDao().findByUserName(username);
             userAccountBean = eb.getId() != 0 ? (UserAccountBean) eb : null;
+
+            if (userAccountBean == null) {
+                throw new BadCredentialsException("Bad Credentials");
+            }
             // Manually Checking if the user is locked which should be thrown by authenticate. Mantis Issue: 9016
             // ToDo somebody should find why getAuthenticationManager().authenticate is not working!
             if (userAccountBean != null && userAccountBean.getStatus().isLocked()) {

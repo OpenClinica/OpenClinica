@@ -41,6 +41,7 @@ public class StringUtil {
     }
 
    
+    */
 
     /**
      * Checks whether a string is blank
@@ -100,11 +101,12 @@ public class StringUtil {
      * @param dateFormat
      * @return
      */
-    public static boolean isFormatDate(String s, String dateFormat) {
+    // ywang (Nov., 2008)
+    public static boolean isFormatDate(String s, String dateFormat) { 
         String dateformat = parseDateFormat(dateFormat);
         return isSameDate(dateformat, dateformat, s);
     }
-
+    
     public static boolean isFormatDate(String s, String dateFormat, Locale locale) {
         String dateformat = parseDateFormat(dateFormat);
         return isSameDate(dateformat, dateformat, s, locale);
@@ -138,6 +140,7 @@ public class StringUtil {
      * @param yearFormat
      * @return
      */
+    //ywang (Nov., 2008)
     public static boolean isPartialYear(String s, String yearFormat) {
         return partialYear(s, yearFormat, null);
     }
@@ -182,6 +185,7 @@ public class StringUtil {
      * @param yearMonthFormat
      * @return
      */
+    //ywang (Nov., 2008)
     public static boolean isPartialYearMonth(String s, String yearMonthFormat) {
         String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
         String sym = s + "-18";

@@ -7,8 +7,6 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * @author Jun Xu
@@ -164,7 +164,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         boolean validArg = false;
 
         //String status_name = name.trim().replace(" ", "_").toLowerCase();
-        
+
         for (String statusName : getSubjectEventStatusValues()) {
             if(resterm.getString(statusName) != null) {
                 if (name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
@@ -185,7 +185,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         }
         return 0;
     }
-    
+
     public static SubjectEventStatus getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
             SubjectEventStatus temp = (SubjectEventStatus) list.get(i);
