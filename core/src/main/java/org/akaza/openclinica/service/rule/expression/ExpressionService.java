@@ -218,9 +218,9 @@ public class ExpressionService {
 
     }
 
-    public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
+ public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
         if (isExpressionPartial(expression)) {
-            throw new OpenClinicaSystemException("getValueFromDbb:We cannot get the Value of a PARTIAL expression : " + expression);
+            throw new OpenClinicaSystemException("getValueFromDb:We cannot get the Value of a PARTIAL expression : " + expression);
         }
         try {
             // Get the studyEventId from RuleSet Target so we can know which
@@ -236,48 +236,30 @@ public class ExpressionService {
             studyEventDefinitionOrdinal = studyEventDefinitionOrdinal.equals("") ? "1" : studyEventDefinitionOrdinal;
             String studySubjectId = String.valueOf(studyEvent.getStudySubjectId());
 
-            logger.debug("getValueFromDbb:ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
+            logger.debug("ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
                     new Object[] { studyEvent.getId(), studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal, studySubjectId });
 
             StudyEventBean studyEventofThisExpression =
                 getStudyEventDao().findAllByStudyEventDefinitionAndCrfOidsAndOrdinal(studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal,
                         studySubjectId);
 
-            logger.debug("getValueFromDbb:studyEvent : {} , itemOid {} , itemGroupOid {}", new Object[] { studyEventofThisExpression.getId(),
+            logger.debug("studyEvent : {} , itemOid {} , itemGroupOid {}", new Object[] { studyEventofThisExpression.getId(),
                 getItemOidFromExpression(expression), getItemGroupOidFromExpression(expression) });
 
-            //looking in db while it can be not saved yet-> first entry -> need to get from forms as well
             List<ItemDataBean> itemData =
                 getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventofThisExpression.getId()), getItemOidFromExpression(expression),
                         getItemGroupOidFromExpression(expression));
 
             expression = fixGroupOrdinal(expression, ruleSetExpression, itemData, expressionWrapper.getEventCrf());
+
             Integer index =
                 getItemGroupOidOrdinalFromExpression(expression).equals("") ? 0 : Integer.valueOf(getItemGroupOidOrdinalFromExpression(expression)) - 1;
 
-            String valueFromDb =null;ItemBean itemBean =null;
-            if (itemData != null && itemData.size()> 0 && index <= itemData.size() ){
-	            ItemDataBean itemDataBean = itemData.get(index);
-	            itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
-	            valueFromDb = itemData.get(index).getValue();
-	            valueFromDb=ifValueIsDate(itemBean, valueFromDb);
-            }
-            
-            String valueFromForm = null;
-            if (items == null) {
-                valueFromForm = getValueFromForm(expression);
-            } else {
-                valueFromForm = getValueFromForm(expression, items);
-            }
-          
-            logger.debug("getValueFromDbb:valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
-            if (valueFromForm == null && valueFromDb == null) {
-                throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { expression,
-                    expressionWrapper.getRuleSet().getTarget().getValue() });
-            }
-         
-            String value = valueFromForm == null ? valueFromDb : valueFromForm;
-            
+            ItemDataBean itemDataBean = itemData.get(index);
+            ItemBean itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
+            String value = itemData.get(index).getValue();
+            value = ifValueIsDate(itemBean, value);
+
             return value;
         } catch (Exception e) {
             return null;
