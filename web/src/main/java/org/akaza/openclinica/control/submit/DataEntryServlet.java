@@ -5416,7 +5416,6 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
     private void reshuffleReasonForChangeHashAndDiscrepancyNotes( List<DisplayItemWithGroupBean> allItems, HttpServletRequest request, EventCRFBean ecb) {
         int manualRows = 0;
         HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-      //  FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(CreateDiscrepancyNoteServlet.FLAG_DISCREPANCY_RFC);
        
         ArrayList<DiscrepancyNoteBean> fieldNote = null;
