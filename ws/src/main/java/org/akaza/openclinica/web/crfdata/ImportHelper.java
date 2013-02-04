@@ -131,7 +131,7 @@ public class ImportHelper {
                     // a string's size could be more than 255, which is more
                     // than
                     // the db field length
-                	discValidator.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+                	discValidator.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3999);
 
                 } else if (idt.equals(ItemDataType.INTEGER)) {
                     // hard edit check, will comment out for now, tbh 05/2008

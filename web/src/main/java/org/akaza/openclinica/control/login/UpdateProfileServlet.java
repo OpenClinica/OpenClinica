@@ -170,6 +170,7 @@ public class UpdateProfileServlet extends SecureController {
         }
 
     }
+	}
 
     /**
      * Updates user new profile

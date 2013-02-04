@@ -115,6 +115,8 @@ public class MainMenuServlet extends SecureController {
             // "Forge" a password change date for LDAP user
             lastPwdChangeDate = new Date();
         }
+System.out.println("is ub a ldapuser??"+ub.isLdapUser());
+
 
         //@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
         if( (lastPwdChangeDate != null) || ((lastPwdChangeDate == null) && (pwdChangeRequired == 0))) {// not a new user
@@ -128,7 +130,8 @@ public class MainMenuServlet extends SecureController {
 	            session.setAttribute("passwordExpired", "no");
 	
 	            if (!ub.isLdapUser() && pwdExpireDay > 0 && days >= pwdExpireDay) {// password expired, need to be changed
-	                studies = (ArrayList) sdao.findAllByUser(ub.getName());
+			System.out.println("here");
+			studies = (ArrayList) sdao.findAllByUser(ub.getName());
 	                request.setAttribute("studies", studies);
 	                session.setAttribute("userBean1", ub);
 	                addPageMessage(respage.getString("password_expired"));

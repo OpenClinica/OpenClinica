@@ -260,7 +260,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public void passwdTimeOut() {
         Date lastChangeDate = ub.getPasswdTimestamp();
-        if (lastChangeDate == null) {
+        if (!ub.isLdapUser() && lastChangeDate == null) {
         	//@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
             //addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
             // + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");

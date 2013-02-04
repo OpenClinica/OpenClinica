@@ -41,7 +41,7 @@ public class StringUtil {
     }
 
    
-    */
+    
 
     /**
      * Checks whether a string is blank

@@ -81,8 +81,7 @@
     <bean id="queryStore" class="org.akaza.openclinica.dao.QueryStore" init-method="init">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-       <property name="dataSource" ref="dataSource"/>
-    </bean>
+      
     <!-- Exposing old-fashioned DAOs as Spring beans -->
     <bean class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
