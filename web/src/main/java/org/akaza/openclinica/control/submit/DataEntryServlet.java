@@ -5416,7 +5416,8 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
     private void reshuffleReasonForChangeHashAndDiscrepancyNotes( List<DisplayItemWithGroupBean> allItems, HttpServletRequest request, EventCRFBean ecb) {
         int manualRows = 0;
         HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-        FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+        FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(CreateDiscrepancyNoteServlet.FLAG_DISCREPANCY_RFC);
+       
         ArrayList<DiscrepancyNoteBean> fieldNote = null;
         String intendedKey = null;
         String replacementKey = null;
@@ -5468,12 +5469,12 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                              intendedKey = ecb.getId()+"_"+digb.getInputId() + getInputName(dib);
                              replacementKey = ecb.getId()+"_"+digb.getItemGroupBean().getOid() + "_manual" + (j) + getInputName(dib);
                             if (!replacementKey.equals(intendedKey) ){
-                            	if( noteSubmitted.containsKey(intendedKey)) {
+                            	if( noteSubmitted!=null && noteSubmitted.containsKey(intendedKey)) {
 
                             	 noteSubmitted.put(replacementKey, Boolean.TRUE);
                                  noteSubmitted.remove(intendedKey);
 	                            }
-	                            if(  noteTree.getNotes(intendedKey) != null){
+	                            if( noteTree!=null && noteTree.getNotes(intendedKey) != null){
 	                       		  fieldNote = (ArrayList<DiscrepancyNoteBean>) noteTree.getNotes(intendedKey) ;
 	                       		  if ( fieldNote != null && fieldNote.size() > 0){
 		                       		  noteTree.getFieldNotes().put(replacementKey, fieldNote);

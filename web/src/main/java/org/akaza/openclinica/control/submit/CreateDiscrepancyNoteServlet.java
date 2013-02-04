@@ -134,6 +134,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
+    
+    public static final String FLAG_DISCREPANCY_RFC ="flagDNRFC";
+    
+    
      
     /*
      * (non-Javadoc)
@@ -558,11 +562,16 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
         } else {
             FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-
+            FormDiscrepancyNotes noteTree_RFC_REPEAT = (FormDiscrepancyNotes) session.getAttribute(FLAG_DISCREPANCY_RFC);;
+    
+            if(noteTree_RFC_REPEAT == null)
+            	noteTree_RFC_REPEAT = new FormDiscrepancyNotes();
+            
             if (noteTree == null) {
                 noteTree = new FormDiscrepancyNotes();
                 logger.debug("No note tree initailized in session");
             }
+            
 
             Validator v = new Validator(request);
             String description = fp.getString("description");
@@ -661,11 +670,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             if (errors.isEmpty()) {
 
                 if (!writeToDB) {
-                    noteTree.addNote(eventCRFId+"_"+field, note);
+                    noteTree.addNote(field, note);
                     noteTree.addIdNote(note.getEntityId(), field);
+                    noteTree_RFC_REPEAT.addNote(EVENT_CRF_ID+"_"+field, note);
+                    noteTree_RFC_REPEAT.addIdNote(note.getEntityId(), field);
                     
  //-> catcher                //   FORM_DISCREPANCY_NOTES_NAME
                     session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, noteTree);
+                    session.setAttribute(FLAG_DISCREPANCY_RFC, noteTree_RFC_REPEAT);
+                    
                     //
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/

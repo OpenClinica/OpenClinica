@@ -925,7 +925,7 @@ public class AddNewSubjectServlet extends SecureController {
         }
         ArrayList fieldNotes = notes.getNotes(field);
         if ((fieldNotes == null || fieldNotes.size() < 1 ) && event_crf_id >0){
-          	fieldNotes = notes.getNotes(event_crf_id +"_"+field);
+          	fieldNotes = notes.getNotes(field);
         }
         // System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
         for (int i = 0; i < fieldNotes.size(); i++) {
