@@ -3,9 +3,9 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
     <packaging>pom</packaging>
-  <version>3.1-Utah</version>
+  <version>3.1-SNAPSHOT</version>
     <name>OpenClinica</name>
-    <description>OpenClinica 3.1-Utah</description>
+    <description>OpenClinica 3.1-SNAPSHOT</description>
 
     <modules>
         <module>core</module>
