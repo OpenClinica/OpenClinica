@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+ <changeSet author="drodrigues" id="2013-02-14-MR100-1">
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.enabled"/>
+	    	<column name="value" value="false"/>
+	    	<column name="description" value="Flag to enable or disable ldap"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.host"/>
+	    	<column name="value" value="ldap://anaconda.isovera.local:389"/>
+	    	<column name="description" value=" LDAP host in the form ldap://host:port"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userDn"/>
+	    	<column name="value" value="cn=chin,ou=chin_ldap,dc=isovera,dc=local"/>
+	    	<column name="description" value="User distinguished name used to authenticate to LDAP"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.password"/>
+	    	<column name="value" value="12345454454"/>
+	    	<column name="description" value=" Password used to authenticate to LDAP"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.loginQuery"/>
+	    	<column name="value" value="(sAMAccountName={0})"/>
+	    	<column name="description" value=" Query used to during login to find the LDAP user by username. Should always return a maximum of one result."/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.passwordRecoveryURL"/>
+	    	<column name="value" value="www.google.com? &amp;q=what+do+i+do+if+i+forgot+my+password%3F"/>
+	    	<column name="description" value=" URL to redirect LDAP users to retrieve a forgotten password"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userSearch.baseDn"/>
+	    	<column name="value" value="DC=isovera,dc=local"/>
+	    	<column name="description" value="BaseDN to search for users"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+
+    
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userSearch.query"/>
+	    	<column name="value" value="(&amp;(memberOf=CN=ldapgroup,OU=ldap,DC=isovera,dc=local)(|(sAMAccountName=*{0}*)))"/>
+	    	<column name="description" value="Sophisticated query, searches username, first name, last name and email"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.distinguishedName"/>
+	    	<column name="value" value="distinguishedName"/>
+	    	<column name="description" value="Field used to retrieve the user's distinguished name"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.username"/>
+	    	<column name="value" value="sAMAccountName"/>
+	    	<column name="description" value="Field used to retrieve the user's username"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.firstName"/>
+	    	<column name="value" value="givenName"/>
+	    	<column name="description" value="Field used to retrieve the user's first name"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	  	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.lastName"/>
+	    	<column name="value" value="sn"/>
+	    	<column name="description" value="Field used to retrieve the user's last name"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	  	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.email"/>
+	    	<column name="value" value="mail"/>
+	    	<column name="description" value="Field used to retrieve the user's email"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    	  	<insert tableName="configuration">
+	    	<column name="key" value="ldap.userData.organization"/>
+	    	<column name="value" value="company"/>
+	    	<column name="description" value="Field used to retrieve the user's organization"/>
+	    	<column name="version" value="0"/>
+    	</insert>
+    </changeSet>
+</databaseChangeLog>
