@@ -40,6 +40,5 @@
 	<include file="migration/amethyst/2012-07-16-14454.xml"/>
 	<include file="migration/amethyst/2012-08-29-14122.xml"/>
 	<include file="migration/amethyst/2012-08-31-13347.xml"/>
-	<include file="migration/amethyst/2013-02-14-MR100.xml"/>
 
 </databaseChangeLog>
