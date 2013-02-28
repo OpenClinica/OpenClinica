@@ -1,0 +1,15 @@
+  head.js("js/lib/jquery-1.8.1.min.js", 
+		   "js/lib/jquery-ui-1.8.23.custom.min.js",
+           "js/lib/jquery.tmpl.js",
+           "js/lib/underscore-min.js",           
+           "js/lib/backbone-min.js",
+           "js/lib/date.format.js",           
+           "js/util.js",
+           "js/app.js",           
+           "js/com/openclinica/renderer/ODMRenderer.js",           
+           "js/com/openclinica/renderer/StudyRenderer.js",           
+           "js/com/openclinica/renderer/FormDefRenderer.js",           
+           "js/com/openclinica/renderer/ItemDefRenderer.js",           
+           "js/com/openclinica/renderer/ParseUtil.js",           
+           "js/com/openclinica/renderer/RenderUtil.js"           
+         );
