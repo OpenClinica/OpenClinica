@@ -90,13 +90,13 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-  <filter>
-      <filter-name>localeFilter</filter-name>
-      <filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
+	<filter>
+   		<filter-name>localeFilter</filter-name>
+   		<filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
    </filter>
    <filter-mapping>
-      <filter-name>localeFilter</filter-name>
-      <url-pattern>/*</url-pattern>
+   		<filter-name>localeFilter</filter-name>
+   		<url-pattern>/*</url-pattern>
    </filter-mapping>
      <filter>
         <filter-name>compressFilter</filter-name>
@@ -106,31 +106,31 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <filter-name>compressFilter</filter-name>
         <url-pattern>/InitialDataEntry</url-pattern>
      </filter-mapping>
-      <filter-mapping>
+	    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/ViewSectionDataEntry</url-pattern>
      </filter-mapping>
-    <filter-mapping>
+	  <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/AdministrativeEditing</url-pattern>
      </filter-mapping>
-  <filter-mapping>
+	<filter-mapping>
         <filter-name>compressFilter</filter-name>
-      <url-pattern>/DoubleDataEntry</url-pattern>
+  	  <url-pattern>/DoubleDataEntry</url-pattern>
     </filter-mapping>
-  <filter-mapping>
+	<filter-mapping>
         <filter-name>compressFilter</filter-name>
-    <url-pattern>/ListStudySubjects</url-pattern>
+  	<url-pattern>/ListStudySubjects</url-pattern>
     </filter-mapping>
-    <filter-mapping>
+		<filter-mapping>
         <filter-name>compressFilter</filter-name>
    <url-pattern>/SectionPreview</url-pattern>
     </filter-mapping>
-    <filter-mapping>
+		<filter-mapping>
         <filter-name>compressFilter</filter-name>
    <url-pattern>/CreateCRFVersion</url-pattern>
     </filter-mapping>
-  <filter-mapping>
+	<filter-mapping>
     <filter-name>compressFilter</filter-name>
    <url-pattern>/*</url-pattern>
     </filter-mapping>
@@ -150,7 +150,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <filter-name>hibernateFilter</filter-name>
         <url-pattern>/*</url-pattern>
    </filter-mapping>
-  <filter>
+	<filter>
         <filter-name>logFilter</filter-name>
         <filter-class>org.akaza.openclinica.control.core.OCServletFilter</filter-class>
     </filter>
@@ -185,7 +185,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
 <!--
 <filter>
 <filter-name>HistoryLog</filter-name>
-  <filter-class>org.akaza.openclinica.history.HistoryLog</filter-class>
+	<filter-class>org.akaza.openclinica.history.HistoryLog</filter-class>
 
 </filter>
 <filter-mapping>
@@ -989,11 +989,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet>
         <servlet-name>PrintCRFServlet</servlet-name>
         <display-name>PrintCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.PrintCRFServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>PrintCRFOldServlet</servlet-name>
-        <display-name>PrintCRFOld</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintCRFServlet</servlet-class>
     </servlet>
     <servlet>
@@ -1392,7 +1387,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/UpdateJobExport</url-pattern>
     </servlet-mapping>
 
-  <servlet-mapping>
+	<servlet-mapping>
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
@@ -1979,10 +1974,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/PrintDataEntry</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PrintCRFOldServlet</servlet-name>
-        <url-pattern>/PrintCRFOld</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>PrintCRFServlet</servlet-name>
         <url-pattern>/PrintCRF</url-pattern>
     </servlet-mapping>
@@ -2087,8 +2078,8 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/DownloadVersionSpreadSheet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-      <servlet-name>DownloadAttachedFileServlet</servlet-name>
-      <url-pattern>/DownloadAttachedFile</url-pattern>
+    	<servlet-name>DownloadAttachedFileServlet</servlet-name>
+    	<url-pattern>/DownloadAttachedFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewNotesServlet</servlet-name>
@@ -2180,9 +2171,9 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
     <servlet>
-  <servlet-name>urlRewriterServlet</servlet-name>
+	<servlet-name>urlRewriterServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet
-    </servlet-class>
+		</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -2850,7 +2841,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     </security-role>
     -->
     <error-page>
-    <error-code>404</error-code>
-    <location>/WEB-INF/jsp/404.jsp</location>
-    </error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/jsp/404.jsp</location>
+  	</error-page>
 </web-app>
