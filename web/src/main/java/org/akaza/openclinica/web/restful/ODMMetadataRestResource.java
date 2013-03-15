@@ -9,11 +9,14 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 /**
- * 
+ *  Rest service for ODM metadata 
+ *  usage ROOT_CONTEXT/rest/metadata/{format}/{mode}/{STUDYOID}
+ *  format:xml/ json
+ *  mode:view
  * @author jnyayapathi
  *
  */
-@Path("/MetaData")
+@Path("/metadata")
 @Component
 @Scope("prototype")
 public class ODMMetadataRestResource {
@@ -41,6 +44,16 @@ public void setMetadataCollectorResource(
 		//return "ODM";
 		
 		return metadataCollectorResource.collectODMMetadata(studyOID);
+	}
+	
+	@GET
+	@Path("/json/view/{studyOID}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getODMMetadataJson(@PathParam("studyOID") String studyOID ){
+		System.out.println("returning here........"+studyOID);
+		//return "ODM";
+		
+		return metadataCollectorResource.collectODMMetadataJson(studyOID);
 	}
 	
 	

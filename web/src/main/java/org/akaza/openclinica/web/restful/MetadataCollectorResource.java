@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
+import net.sf.json.JSON;
+import net.sf.json.xml.XMLSerializer;
+
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
@@ -13,6 +16,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+
 /**
  * R
  * @author jnyayapathi
@@ -20,7 +24,7 @@ import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
  */
 public class MetadataCollectorResource {
 
-	
+    private static final int INDENT_LEVEL = 2;
 	private DataSource dataSource;
 	
 	private StudyDAO studyDao;
@@ -115,5 +119,12 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 		return report.getXmlOutput().toString().trim();
 	}
 	
+	
+	public String collectODMMetadataJson(String studyOID){
+		net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
+		JSON json = xmlserializer.read(collectODMMetadata(studyOID));
+		return json.toString(INDENT_LEVEL);
+		
+	}
 	
 }
