@@ -14,7 +14,7 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">
 
-
+   <bean id="printCRFController" class="org.akaza.openclinica.controller.PrintCRFController" />
      
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
@@ -24,6 +24,7 @@
     <property name="mappings">
       <props>
         <prop key="/oauth/confirm_access">accessConfirmationController</prop>
+        <prop key="/pages/PrintCRF/*/*">printCRFController</prop>
       </props>
     </property>
     <property name="alwaysUseFullPath" value="true"/>
@@ -38,7 +39,6 @@
 
     <!-- Scans the classpath of this application for @Components to deploy as beans -->
     <context:component-scan base-package="org.akaza.openclinica.controller" />
-    
 
     <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
         <property name="alertsBoxSetup" value="OPENALERTS" />

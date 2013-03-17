@@ -1,7 +1,6 @@
 var INITIALIZED = false;
 
 var JSON_INDENT_LEVEL = 2;
-
 var app_crfJson;
 var app_odmRenderer;
 var app_basicDefinitions;
@@ -27,10 +26,9 @@ $(document).ready(function() {
   
   
 function getPrintableContent() {
-  $.post("PrintCRF", {}, function(data) {
+  $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('#form_wrapper').css({display: "block"});
-    app_crfJson = $.parseJSON(data);
-    app_odmRenderer = new ODMRenderer(app_crfJson);
+    app_odmRenderer = new ODMRenderer(data);
     $('#form_wrapper').html(app_odmRenderer.renderPrintableForm(mode));
    });
 }

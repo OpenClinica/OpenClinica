@@ -5,6 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
+<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 
 
 <c:choose>
@@ -122,7 +123,7 @@
                                             name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${version.id}"/>')"
+  <a href="javascript:openPrintCRFWindow('pages/PrintCRF/<c:out value="${study.oid}"/>/<c:out value="${version.oid}"/>')"
                                        onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                                        onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
                                             name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>

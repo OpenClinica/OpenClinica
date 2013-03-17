@@ -32,6 +32,33 @@ function StudyRenderer(json) {
     }
   }
   
+  this.loadItemGroupRefs = function() {
+    var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
+    debug("loading item groups");
+    app_itemGroupDefs = {};
+    app_itemGroupMap = {};
+    for (var i=0;i< itemGroupDefs.length;i++) {
+      var itemGroupDef = itemGroupDefs[i];
+      var itemGroupKey = itemGroupDef["@OID"]; 
+      var repeatNumber = 
+      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined ? 
+      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"] : 
+      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
+          
+      var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
+      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
+      var currentItemGroup = {};
+      currentItemGroup.repeatNumber = repeatNumber;
+      currentItemGroup.repeating = repeating;
+      app_itemGroupDefs[itemGroupKey] = currentItemGroup;
+      for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
+        var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
+        debug("Attaching " +itemKey);
+        app_itemGroupMap[itemKey] = itemGroupKey;
+      }
+    }
+  }
+  
   this.loadItemGroupDefs = function() {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
     debug("loading item groups");
@@ -53,6 +80,7 @@ function StudyRenderer(json) {
       app_itemGroupDefs[itemGroupKey] = currentItemGroup;
       for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
         var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
+        debug("Attaching " +itemKey);
         app_itemGroupMap[itemKey] = itemGroupKey;
       }
     }
@@ -79,8 +107,16 @@ function StudyRenderer(json) {
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
     
+    var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
+    var formDef = undefined;
+    for (var i=0;i< formDefs.length;i++) {
+      if (formDefs[i]["@OID"] == app_formOID) {
+        formDef = formDefs[i];
+      }
+    }
+    
     // Get Form Wrapper
-    var formDefRenderer = new FormDefRenderer(this.study["MetaDataVersion"]["FormDef"]);
+    var formDefRenderer = new FormDefRenderer(formDef);
     //var renderString = formDefRenderer.render();
     var renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingRenderString = "";
@@ -98,13 +134,20 @@ function StudyRenderer(json) {
       var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+                        
+      debug("Form OID: " + itemDetails["@FormOID"]);
+      
+      if (itemDetails["@FormOID"] != formDef["@OID"]) {
+        continue;
+      }
+      
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
       var itemHeader = itemDetails["OpenClinica:ItemHeader"];
       var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
       var name = itemDetails["OpenClinica:LeftItemText"];
       var columnNumber = itemDetails["@ColumnNumber"];
       var columns = itemDetails["OpenClinica:Layout"] ? itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
-      //debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader);
+      debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader);
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
