@@ -1197,6 +1197,19 @@ function openDocWindow(inURL) {
     //Name changed to blank because it shows error on IE7 and IE8. Mantis issue: 5553.
 }
 
+
+//-------------------------------------------------------------------------
+// Function: openPrintCRFWindow
+//
+//-------------------------------------------------------------------------
+
+function openPrintCRFWindow(inURL) {
+  openNewWindow(inURL,
+   		'',
+        'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
+        'print');
+}
+
 //-------------------------------------------------------------------------
 // Function: openNewWindow
 //
@@ -1256,6 +1269,11 @@ function openNewWindow(inURL, name, features, windowSize) {
     {
         height = 350;
         width = 450;
+    }
+    if(windowSize == 'print')
+    {
+        height = 700;
+        width = 800;
     }
 
 

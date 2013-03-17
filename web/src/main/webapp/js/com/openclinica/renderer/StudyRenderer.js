@@ -89,7 +89,7 @@ function StudyRenderer(json) {
   this.setStudy = function (mode) {
     switch (mode) {
       case 'BLANK_SINGLE_CRF':
-        this.study = this.json["Study"][0];
+        this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
       break;	
     }	
   }
