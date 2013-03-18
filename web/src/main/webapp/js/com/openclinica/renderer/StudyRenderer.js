@@ -100,6 +100,7 @@ function StudyRenderer(json) {
     this.loadItemGroupDefs();
   }
   
+  
   this.renderPrintableForm = function(mode) {
 	  
     this.setStudy(mode);  
@@ -108,11 +109,18 @@ function StudyRenderer(json) {
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
     
     var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
+    
     var formDef = undefined;
-    for (var i=0;i< formDefs.length;i++) {
-      if (formDefs[i]["@OID"] == app_formOID) {
-        formDef = formDefs[i];
+    
+    if (formDefs[0] != undefined) { 
+      for (var i=0;i< formDefs.length;i++) {
+        if (formDefs[i]["@OID"] == app_formOID) {
+          formDef = formDefs[i];
+        }
       }
+    }
+    else {
+      formDef = this.study["MetaDataVersion"]["FormDef"]; 
     }
     
     // Get Form Wrapper
