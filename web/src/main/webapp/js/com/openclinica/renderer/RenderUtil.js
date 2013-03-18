@@ -12,7 +12,7 @@ var RenderUtil = Backbone.Model.extend({}, {
     var loadTemplate = function(index) {
         var name = names[index];
         debug('Loading template: ' + name);
-        $.get('template/' + name + '.html', function(data) {
+        $.get(app_contextPath + '/template/' + name + '.html', function(data) {
             that.templates[name] = data;
             index++;
             if (index < names.length) {
