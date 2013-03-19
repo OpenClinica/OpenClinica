@@ -1,7 +1,6 @@
 function StudyRenderer(json) {
   this.json = json;
   this.study = undefined;
-  // this.OID = json["@OID"];
   
   this.loadBasicDefinitions = function() {
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
@@ -32,32 +31,6 @@ function StudyRenderer(json) {
     }
   }
   
-  this.loadItemGroupRefs = function() {
-    var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
-    debug("loading item groups");
-    app_itemGroupDefs = {};
-    app_itemGroupMap = {};
-    for (var i=0;i< itemGroupDefs.length;i++) {
-      var itemGroupDef = itemGroupDefs[i];
-      var itemGroupKey = itemGroupDef["@OID"]; 
-      var repeatNumber = 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined ? 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"] : 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-          
-      var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
-      var currentItemGroup = {};
-      currentItemGroup.repeatNumber = repeatNumber;
-      currentItemGroup.repeating = repeating;
-      app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-      for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
-        var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-        debug("Attaching " +itemKey);
-        app_itemGroupMap[itemKey] = itemGroupKey;
-      }
-    }
-  }
   
   this.loadItemGroupDefs = function() {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
@@ -102,14 +75,11 @@ function StudyRenderer(json) {
   
   
   this.renderPrintableForm = function(mode) {
-	  
     this.setStudy(mode);  
 	this.initStudyLists();   
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    
     var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
-    
     var formDef = undefined;
     
     if (formDefs[0] != undefined) { 
@@ -143,7 +113,7 @@ function StudyRenderer(json) {
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
                         
-      debug("Form OID: " + itemDetails["@FormOID"]);
+      //debug("Form OID: " + itemDetails["@FormOID"]);
       
       if (itemDetails["@FormOID"] != formDef["@OID"]) {
         continue;
