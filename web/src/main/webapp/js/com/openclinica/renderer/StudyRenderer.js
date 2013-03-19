@@ -63,8 +63,8 @@ function StudyRenderer(json) {
     switch (mode) {
       case 'BLANK_SINGLE_CRF':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
-      break;	
-    }	
+      break;  
+    }  
   }
   
   this.initStudyLists = function () {
@@ -76,7 +76,7 @@ function StudyRenderer(json) {
   
   this.renderPrintableForm = function(mode) {
     this.setStudy(mode);  
-	this.initStudyLists();   
+  this.initStudyLists();   
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
     var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
@@ -145,13 +145,25 @@ function StudyRenderer(json) {
       
       var repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
       var repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
+     
+      
+      var nextItemDef = undefined;
+      var nextColumnNumber = undefined;
+      if (i+1 < itemDefs.length) {
+        nextItemDef = itemDefs[i+1];
+        var nextItemDetails = nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
+                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
+                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+        nextColumnNumber = nextItemDetails["@ColumnNumber"];
+        debug("next item column number: " + nextItemDetails["@ColumnNumber"]);
+      }       
       
       if (columnNumber == 1) {
         repeatingRenderString = "<div class='blocking'>";
       }
       itemDefRenderer = new ItemDefRenderer(itemDef);
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
-      if (columnNumber == 2 && columns === undefined || columns == columnNumber) {
+      if (columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
           renderString += repeatingRenderString;
