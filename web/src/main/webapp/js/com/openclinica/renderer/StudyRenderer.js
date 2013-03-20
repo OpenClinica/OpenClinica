@@ -1,7 +1,6 @@
 function StudyRenderer(json) {
   this.json = json;
   this.study = undefined;
-  // this.OID = json["@OID"];
   
   this.loadBasicDefinitions = function() {
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
@@ -32,32 +31,6 @@ function StudyRenderer(json) {
     }
   }
   
-  this.loadItemGroupRefs = function() {
-    var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
-    debug("loading item groups");
-    app_itemGroupDefs = {};
-    app_itemGroupMap = {};
-    for (var i=0;i< itemGroupDefs.length;i++) {
-      var itemGroupDef = itemGroupDefs[i];
-      var itemGroupKey = itemGroupDef["@OID"]; 
-      var repeatNumber = 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined ? 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"] : 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-          
-      var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
-      var currentItemGroup = {};
-      currentItemGroup.repeatNumber = repeatNumber;
-      currentItemGroup.repeating = repeating;
-      app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-      for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
-        var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-        debug("Attaching " +itemKey);
-        app_itemGroupMap[itemKey] = itemGroupKey;
-      }
-    }
-  }
   
   this.loadItemGroupDefs = function() {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
@@ -90,8 +63,8 @@ function StudyRenderer(json) {
     switch (mode) {
       case 'BLANK_SINGLE_CRF':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
-      break;	
-    }	
+      break;  
+    }  
   }
   
   this.initStudyLists = function () {
@@ -100,19 +73,24 @@ function StudyRenderer(json) {
     this.loadItemGroupDefs();
   }
   
+  
   this.renderPrintableForm = function(mode) {
-	  
     this.setStudy(mode);  
-	this.initStudyLists();   
+  this.initStudyLists();   
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    
     var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
     var formDef = undefined;
-    for (var i=0;i< formDefs.length;i++) {
-      if (formDefs[i]["@OID"] == app_formOID) {
-        formDef = formDefs[i];
+    
+    if (formDefs[0] != undefined) { 
+      for (var i=0;i< formDefs.length;i++) {
+        if (formDefs[i]["@OID"] == app_formOID) {
+          formDef = formDefs[i];
+        }
       }
+    }
+    else {
+      formDef = this.study["MetaDataVersion"]["FormDef"]; 
     }
     
     // Get Form Wrapper
@@ -135,7 +113,7 @@ function StudyRenderer(json) {
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
                         
-      debug("Form OID: " + itemDetails["@FormOID"]);
+      //debug("Form OID: " + itemDetails["@FormOID"]);
       
       if (itemDetails["@FormOID"] != formDef["@OID"]) {
         continue;
@@ -167,13 +145,25 @@ function StudyRenderer(json) {
       
       var repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
       var repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
+     
+      
+      var nextItemDef = undefined;
+      var nextColumnNumber = undefined;
+      if (i+1 < itemDefs.length) {
+        nextItemDef = itemDefs[i+1];
+        var nextItemDetails = nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
+                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
+                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+        nextColumnNumber = nextItemDetails["@ColumnNumber"];
+        debug("next item column number: " + nextItemDetails["@ColumnNumber"]);
+      }       
       
       if (columnNumber == 1) {
         repeatingRenderString = "<div class='blocking'>";
       }
       itemDefRenderer = new ItemDefRenderer(itemDef);
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
-      if (columnNumber == 2 && columns === undefined || columns == columnNumber) {
+      if (columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
           renderString += repeatingRenderString;

@@ -56,7 +56,7 @@ h3.link_title {
   position: relative;
   margin: 0 auto;
   width: 1024px;
-  height: 835px;
+  /* height: 835px; */
 }
 
 
@@ -143,26 +143,5 @@ span.item_def_control_3col{
 
 .title_manage { 
   color: #D4A718;
-}
-
-@media print { 
-  .no_print {
-    display: none; 
-  }
-
-  .non-first_section_header {
-    page-break-before: always;
-  }
-
-  .gray_bg {
-    background-color:#DDDDDD;
-    padding-left:10px;
-    padding-right:10px;
-  }
-  
-   #footer {
-    position: absolute;
-    bottom: 0;
-  }
 }
 
