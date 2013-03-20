@@ -160,43 +160,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
    </filter-mapping>
 
 
-   <!--
-   <filter>
-        <filter-name>sitemesh</filter-name>
-        <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>sitemesh</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-     -->
-
-    <!--<filter>-->
-        <!--<filter-name>timerFilter</filter-name>-->
-        <!--<filter-class>org.akaza.openclinica.web.filter.TimerFilter</filter-class>-->
-    <!--</filter>-->
-
-    <!--<filter-mapping>-->
-        <!--<filter-name>timerFilter</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-
-<!--
-<filter>
-<filter-name>HistoryLog</filter-name>
-  <filter-class>org.akaza.openclinica.history.HistoryLog</filter-class>
-
-</filter>
-<filter-mapping>
-<filter-name>HistoryLog</filter-name>
-<servlet-name>ViewStudySubjectjsp</servlet-name>
-
-<dispatcher>FORWARD</dispatcher>
-   <url-pattern>/ViewStudySubject1</url-pattern>
-
-</filter-mapping>-->
-
 
    <servlet>
         <servlet-name>pages</servlet-name>

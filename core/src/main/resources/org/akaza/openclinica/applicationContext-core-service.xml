@@ -97,12 +97,5 @@
     <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
 
 
-<bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource">
-<property name="dataSource" ref="dataSource"></property>
-<property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
-<property name="coreResources" ref="coreResources"/>
-</bean>
-<bean id="odmMetadataRestResource" class="org.akaza.openclinica.web.restful.ODMMetadataRestResource">
-	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
-</bean>
+
 </beans>
