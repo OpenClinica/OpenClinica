@@ -14,8 +14,6 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">
 
-   <bean id="printCRFController" class="org.akaza.openclinica.controller.PrintCRFController" />
-     
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
     </bean> 
@@ -24,7 +22,6 @@
     <property name="mappings">
       <props>
         <prop key="/oauth/confirm_access">accessConfirmationController</prop>
-        <prop key="/pages/PrintCRF/*/*">printCRFController</prop>
       </props>
     </property>
     <property name="alwaysUseFullPath" value="true"/>
@@ -97,6 +94,6 @@
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"
           p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
          
-      
+     
 
 </beans>
