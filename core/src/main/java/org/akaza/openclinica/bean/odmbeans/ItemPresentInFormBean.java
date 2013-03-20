@@ -29,7 +29,18 @@ public class ItemPresentInFormBean {
     private ItemResponseBean itemResponse;
     private SimpleConditionalDisplayBean simpleConditionalDisplay;
     
-    public ItemPresentInFormBean() {
+    
+    private Integer orderInForm;
+    
+    public Integer getOrderInForm() {
+		return orderInForm;
+	}
+
+	public void setOrderInForm(Integer orderInForm) {
+		this.orderInForm = orderInForm;
+	}
+
+	public ItemPresentInFormBean() {
         itemResponse = new ItemResponseBean();
         simpleConditionalDisplay = new SimpleConditionalDisplayBean();
     }

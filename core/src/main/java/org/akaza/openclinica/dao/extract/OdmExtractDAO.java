@@ -89,6 +89,8 @@ import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 
 public class OdmExtractDAO extends DatasetDAO {
 
+	
+
     public OdmExtractDAO(DataSource ds) {
         super(ds);
     }
@@ -230,6 +232,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_number
         ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_max
         ++i;    this.setTypeExpected(i, TypeNames.BOOL);// show_group
+        ++i;	this.setTypeExpected(i, TypeNames.INT);//item_order
     }
 
     public void setSubjectEventFormDataTypesExpected() {
@@ -1248,7 +1251,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String dfValue = (String) row.get("default_value");
             Boolean phi = (Boolean) row.get("phi_status");
             Boolean showItem = (Boolean) row.get("show_item");
-
+            Integer orderInForm = (Integer)row.get("item_order");
             if((cvId+"-"+igId).equals(prevCvIg)) {
             } else {
                 prevCvIg = cvId+"-"+igId;
@@ -1280,6 +1283,7 @@ public class OdmExtractDAO extends DatasetDAO {
             itInForm.setParentItemOid(parentItemOIDs.get(itPId));
             itInForm.setSectionLabel(sectionLabels.get(itSecId));
             itInForm.setPhi(phi==false?"No":"Yes");
+            itInForm.setOrderInForm(orderInForm);
             itInForm.setShowItem(showItem==true?"Yes":"No");
             ItemResponseBean itemResponse = new ItemResponseBean();
             itemResponse.setResponseLayout(layout);
@@ -1687,6 +1691,23 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
+    
+    
+    public void getClinicalData(StudyBean study,OdmClinicalDataBean data,String odmVersion,String studySubjectIds,String odmType){
+    	
+    	String dbName = CoreResources.getDBName();
+        String subprev = "";
+        HashMap<String, Integer> sepos = new HashMap<String, Integer>();
+        String seprev = "";
+        String formprev = "";
+        HashMap<String, Integer> igpos = new HashMap<String, Integer>();
+        String igprev = "";
+        String oidPos = "";
+        HashMap<Integer, String> oidPoses = new HashMap<Integer, String>();
+        HashMap<Integer, String> idataOidPoses = new HashMap<Integer, String>();
+        String studyIds = study.getId() + "";
+        
+    }
     protected void setErasedScoreItemDataValues(OdmClinicalDataBean data, String itemIds, String itemDataIds, HashMap<Integer,String> idataOidPoses, String odmVersion) {
         this.setErasedScoreItemDataIdsTypesExpected();
         ArrayList<Integer> rows = this.select(this.getErasedScoreItemDataIdsSql(itemIds, itemDataIds));
@@ -2588,16 +2609,26 @@ public class OdmExtractDAO extends DatasetDAO {
             + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
             + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
             + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, item.phi_status, ifm.show_item, "
-            + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group from crf_version cv, (select crf_version_id, item_id, response_set_id,"
+            + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group,orderInForm.item_order from crf_version cv, (select crf_version_id, item_id, response_set_id,"
             + " header as item_header, subheader, section_id, left_item_text, right_item_text,"
             + " parent_id, column_number, page_number_label, response_layout,"
             + " default_value, show_item from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
             + " (select crf_version_id, item_group_id, item_id, header as item_group_header,"
             + " repeat_number, repeat_max, show_group from item_group_metadata where crf_version_id in ("
-            + crfVersionIds + "))igm," + " item_group ig "
-            + this.getItemGroupAndItemMetaCondition(crfVersionIds);
+            + crfVersionIds + "))igm," + " item_group ig, "
+            + this.getOrderInForm(crfVersionIds)
+            + this.getItemGroupAndItemMetaConditionalOrderItems(crfVersionIds)
+            ;
     }
 
+    /**
+     * The form display is determined the way items are ordered in CRF and this information is obtained from OID and nothing hence this approach
+     * @param crfVersionIds
+     * @return
+     */
+    protected String getOrderInForm(String crfVersionIds){
+    	return "(select ordinal  as item_order,crf_version_id, item_id from item_form_metadata ifmd )orderInForm";
+    }
     protected String getItemGroupAndItemMetaCondition(String crfVersionIds) {
         return " where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
         + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
@@ -2605,6 +2636,14 @@ public class OdmExtractDAO extends DatasetDAO {
         + " order by cv.crf_id, cv.crf_version_id desc, ig.item_group_id, item.item_id, rs.response_set_id";
     }
 
+    protected String getItemGroupAndItemMetaConditionalOrderItems(String crfVersionIds) {
+        return " where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
+        + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
+        + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"  +
+        " and orderInForm.crf_version_id = cv.crf_version_id and orderInForm.item_id = ifm.item_id"
+      
+        + " order by cv.crf_id, cv.crf_version_id desc, ig.item_group_id, item.item_id, rs.response_set_id";
+    }
     protected String getSubjectEventFormSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         return "select ss.oc_oid as study_subject_oid, sed.ordinal as definition_order, sed.oc_oid as definition_oid,"
             + " sed.repeating as definition_repeating, se.sample_ordinal as sample_ordinal, edc.ordinal as crf_order, "
@@ -2984,5 +3023,5 @@ public class OdmExtractDAO extends DatasetDAO {
             + " select rs.response_set_id from response_set rs where rs.response_type_id in (8,9))"
             + "      and ifm.item_id in " + itemIds + ")";
     }
-
+	
 }

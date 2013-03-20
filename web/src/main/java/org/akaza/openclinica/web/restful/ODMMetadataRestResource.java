@@ -6,6 +6,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 /**
@@ -21,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class ODMMetadataRestResource {
 	
-
+	  private static final Logger LOGGER = LoggerFactory.getLogger(ODMMetadataRestResource.class);
 private MetadataCollectorResource metadataCollectorResource;
 
 	
@@ -40,7 +42,7 @@ public void setMetadataCollectorResource(
 	@Path("/xml/view/{studyOID}")
 	@Produces(MediaType.TEXT_XML)
 	public String getODMMetadata(@PathParam("studyOID") String studyOID ){
-		System.out.println("returning here........"+studyOID);
+		LOGGER.debug("returning here........"+studyOID);
 		//return "ODM";
 		
 		return metadataCollectorResource.collectODMMetadata(studyOID);
@@ -50,7 +52,7 @@ public void setMetadataCollectorResource(
 	@Path("/json/view/{studyOID}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getODMMetadataJson(@PathParam("studyOID") String studyOID ){
-		System.out.println("returning here........"+studyOID);
+		LOGGER.debug("returning here........"+studyOID);
 		//return "ODM";
 		
 		return metadataCollectorResource.collectODMMetadataJson(studyOID);

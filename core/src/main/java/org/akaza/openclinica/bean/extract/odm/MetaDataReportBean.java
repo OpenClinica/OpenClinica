@@ -1043,7 +1043,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(temp != null && temp.length() > 0 ? " PageNumber=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
             temp = inform.getDefaultValue();
             xml.append(temp != null && temp.length() > 0 ? " DefaultValue=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
-            xml.append(" PHI=\"" + inform.getPhi() + "\" ShowItem=\"" + inform.getShowItem()+"\">");
+            xml.append(" PHI=\"" + inform.getPhi() + "\" ShowItem=\"" + inform.getShowItem()+ "\" OrderInForm= \""+inform.getOrderInForm()+ "\">");
+            
             xml.append(nls);
             temp = inform.getLeftItemText();
             xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:LeftItemText>" + StringEscapeUtils.escapeXml(temp)
