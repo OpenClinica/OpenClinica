@@ -74,7 +74,24 @@ function StudyRenderer(json) {
   }
   
   
+  this.getItemListLength = function(itemDefs, formDef) {
+  var itemListLength = 0;
+    for (var i=0;i< itemDefs.length;i++) {
+       var itemDef = itemDefs[i];
+       var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
+                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
+                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+       if (itemDetails["@FormOID"] != formDef["@OID"]) {
+         continue;
+       }
+       itemListLength++;
+    }
+    return itemListLength;
+  }
+  
+  
   this.renderPrintableForm = function(mode) {
+    var orderedItems = new Array();
     this.setStudy(mode);  
     this.initStudyLists();   
   
@@ -105,8 +122,22 @@ function StudyRenderer(json) {
     var prevItemSubHeader = undefined;
     var isFirstSection = true;
     
+    // var itemListLength = this.getItemListLength(itemDefs, formDef);
+    
+    // Sort itemDefs by OrderInForm property
     for (var i=0;i< itemDefs.length;i++) {
       var itemDef = itemDefs[i];
+      var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
+                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
+                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      if (itemDetails["@FormOID"] == formDef["@OID"]) {
+        var orderInForm = itemDetails["@OrderInForm"];
+        orderedItems[orderInForm-1] = itemDef;
+      }
+    }
+    
+    for (var i=0;i< orderedItems.length;i++) {
+      var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
       var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
@@ -149,8 +180,8 @@ function StudyRenderer(json) {
       
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
-      if (i+1 < itemDefs.length) {
-        nextItemDef = itemDefs[i+1];
+      if (i+1 < orderedItems.length) {
+        nextItemDef = orderedItems[i+1];
         var nextItemDetails = nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
                         nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
