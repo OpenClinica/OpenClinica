@@ -2144,16 +2144,16 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewItemAuditLogServlet</servlet-name>
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
-<!--     <servlet> -->
-<!--   <servlet-name>urlRewriterServlet</servlet-name> -->
-<!--         <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet -->
-<!--     </servlet-class> -->
-<!--     </servlet> -->
+    <servlet>
+  <servlet-name>urlRewriterServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet
+    </servlet-class>
+    </servlet>
 
-<!--     <servlet-mapping> -->
-<!--         <servlet-name>urlRewriterServlet</servlet-name> -->
-<!--         <url-pattern>/ClinicalData/html/view/*</url-pattern> -->
-<!--     </servlet-mapping> -->
+    <servlet-mapping>
+        <servlet-name>urlRewriterServlet</servlet-name>
+        <url-pattern>/ClinicalData/html/view/*</url-pattern>
+    </servlet-mapping>
     <error-page>
     <error-code>404</error-code>
     <location>/WEB-INF/jsp/404.jsp</location>
