@@ -76,7 +76,7 @@ function StudyRenderer(json) {
   
   this.renderPrintableForm = function(mode) {
     this.setStudy(mode);  
-  this.initStudyLists();   
+    this.initStudyLists();   
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
     var formDefs = this.study["MetaDataVersion"]["FormDef"]; 

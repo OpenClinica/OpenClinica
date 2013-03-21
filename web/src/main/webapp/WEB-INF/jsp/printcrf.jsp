@@ -3,8 +3,8 @@
 
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
-  var app_studyOID = (window.location.pathname.split('/'))[4];
-  var app_formOID = (window.location.pathname.split('/'))[5];
+  var app_studyOID = '${studyOID}';
+  var app_formOID = '${formOID}';
 </script>
 
 <html>
