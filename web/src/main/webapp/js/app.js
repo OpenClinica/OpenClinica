@@ -9,7 +9,7 @@ var app_itemGroupDefs;
 var app_itemGroupMap;
 var app_templateNames = 
 ['print_form_def','print_item_def','print_item_def_3col','e_form_def','e_item_def','e_item_def_3col'];
-var mode = 'BLANK_SINGLE_CRF';
+var renderMode = 'UNPOPULATED_SINGLE_CRF';
 
 debug("console debugging enabled.");
 
@@ -29,6 +29,9 @@ function getPrintableContent() {
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('#form_wrapper').css({display: "block"});
     app_odmRenderer = new ODMRenderer(data);
-    $('#form_wrapper').html(app_odmRenderer.renderPrintableForm(mode));
+    $('#form_wrapper').html(app_odmRenderer.renderPrintableForm(renderMode));
    });
+}
+
+function setRenderMode() {
 }

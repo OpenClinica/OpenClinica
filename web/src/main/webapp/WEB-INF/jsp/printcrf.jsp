@@ -4,6 +4,7 @@
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
   var app_studyOID = '${studyOID}';
+  var app_eventOID = '${eventOID}';
   var app_formOID = '${formOID}';
 </script>
 

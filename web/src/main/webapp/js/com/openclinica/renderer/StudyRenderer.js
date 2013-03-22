@@ -59,9 +59,9 @@ function StudyRenderer(json) {
     }
   }
   
-  this.setStudy = function (mode) {
-    switch (mode) {
-      case 'BLANK_SINGLE_CRF':
+  this.setStudy = function (renderMode) {
+    switch (renderMode) {
+      case 'UNPOPULATED_SINGLE_CRF':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
       break;  
     }  
@@ -74,25 +74,9 @@ function StudyRenderer(json) {
   }
   
   
-  this.getItemListLength = function(itemDefs, formDef) {
-  var itemListLength = 0;
-    for (var i=0;i< itemDefs.length;i++) {
-       var itemDef = itemDefs[i];
-       var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-       if (itemDetails["@FormOID"] != formDef["@OID"]) {
-         continue;
-       }
-       itemListLength++;
-    }
-    return itemListLength;
-  }
-  
-  
-  this.renderPrintableForm = function(mode) {
+  this.renderPrintableForm = function(renderMode) {
     var orderedItems = new Array();
-    this.setStudy(mode);  
+    this.setStudy(renderMode);  
     this.initStudyLists();   
   
     var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
@@ -122,8 +106,6 @@ function StudyRenderer(json) {
     var prevItemSubHeader = undefined;
     var isFirstSection = true;
     
-    // var itemListLength = this.getItemListLength(itemDefs, formDef);
-    
     // Sort itemDefs by OrderInForm property
     for (var i=0;i< itemDefs.length;i++) {
       var itemDef = itemDefs[i];
@@ -144,8 +126,6 @@ function StudyRenderer(json) {
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
                         
-      //debug("Form OID: " + itemDetails["@FormOID"]);
-      
       if (itemDetails["@FormOID"] != formDef["@OID"]) {
         continue;
       }

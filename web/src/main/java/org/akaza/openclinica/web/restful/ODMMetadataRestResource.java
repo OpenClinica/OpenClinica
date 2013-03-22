@@ -70,14 +70,16 @@ public void setMetadataCollectorResource(
 	
 	
   @GET
-  @Path("/html/view/{studyOID}/{formOID}")
+  @Path("/html/view/{studyOID}/{eventOID}/{formOID}")
   public Viewable getPrintCRFController( 
     @Context HttpServletRequest request,
     @Context HttpServletResponse response, 
     @PathParam("studyOID") String studyOID,
+    @PathParam("eventOID") String eventOID,
     @PathParam("formOID") String formOID
     ) throws Exception {
       request.setAttribute("studyOID", studyOID);
+      request.setAttribute("eventOID", eventOID);
       request.setAttribute("formOID", formOID);
       return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
   }
