@@ -11,7 +11,7 @@
 <html>
  <head>
   <meta charset="UTF-8">
-  <title>OpenClinica - Print CRF Test</title>
+  <title>OpenClinica - Printable Forms</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/normalize.css" type="text/css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css" type="text/css"/>
   <script src="${pageContext.request.contextPath}/js/lib/head.min.js"></script>

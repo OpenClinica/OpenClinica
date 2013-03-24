@@ -59,9 +59,38 @@ function StudyRenderer(json) {
     }
   }
   
+  
+  this.loadStudyEventDefs = function() {
+    debug("loading study events");
+    app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
+    if (app_studyEventDefs[0] == undefined) { 
+      app_studyEventDefs = new Array();
+      app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
+    }
+  }
+  
+  this.loadItemDefs = function() {
+    debug("loading item items");
+    app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
+    if (app_itemDefs[0] == undefined) { 
+      app_itemDefs = new Array();
+      app_itemDefs.push(this.study["MetaDataVersion"]["ItemDef"]);
+    }
+  }
+  
+  this.loadFormDefs = function() {
+    debug("loading crfs");
+    app_formDefs = this.study["MetaDataVersion"]["FormDef"];
+    if (app_formDefs[0] == undefined) { 
+      app_formDefs = new Array();
+      app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
+    }
+  }
+  
   this.setStudy = function (renderMode) {
     switch (renderMode) {
-      case 'UNPOPULATED_SINGLE_CRF':
+      case 'UNPOPULATED_FORM_CRFS':
+      case 'UNPOPULATED_EVENT_CRFS':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
       break;  
     }  
@@ -70,33 +99,48 @@ function StudyRenderer(json) {
   this.initStudyLists = function () {
     this.loadBasicDefinitions();
     this.loadCodeLists();
+    this.loadItemDefs();
     this.loadItemGroupDefs();
+    this.loadFormDefs();
+    this.loadStudyEventDefs();
   }
   
   
   this.renderPrintableForm = function(renderMode) {
-    var orderedItems = new Array();
+    
     this.setStudy(renderMode);  
     this.initStudyLists();   
+    
+    if (renderMode == "UNPOPULATED_FORM_CRFS") {
+      return this.renderPrintableFormDefs(renderMode);
+    }
+    else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
+    }
+
+  }
   
-    var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    var formDefs = this.study["MetaDataVersion"]["FormDef"]; 
+  
+  this.renderPrintableFormDefs = function(renderMode) {
+  
+    var orderedItems = new Array();
+    var formDefsToRender = new Array();
     var formDef = undefined;
     
-    if (formDefs[0] != undefined) { 
-      for (var i=0;i< formDefs.length;i++) {
-        if (formDefs[i]["@OID"] == app_formOID) {
-          formDef = formDefs[i];
-        }
+    // select CRF by OID
+    for (var i=0;i< app_formDefs.length;i++) {
+      if (app_formDefs[i]["@OID"] == app_formOID) {
+        formDef = app_formDefs[i];
       }
     }
-    else {
-      formDef = this.study["MetaDataVersion"]["FormDef"]; 
+   /* 
+    for (var i=0;i< formDefsToRender.length;i++) {
+      var formDef = formDefsToRender[i];
+      this.renderPrintableFormDef(formDef, renderMode);
     }
+    */
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
-    //var renderString = formDefRenderer.render();
     var renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingRenderString = "";
  
@@ -107,8 +151,8 @@ function StudyRenderer(json) {
     var isFirstSection = true;
     
     // Sort itemDefs by OrderInForm property
-    for (var i=0;i< itemDefs.length;i++) {
-      var itemDef = itemDefs[i];
+    for (var i=0;i< app_itemDefs.length;i++) {
+      var itemDef = app_itemDefs[i];
       var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
                         itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
@@ -187,86 +231,10 @@ function StudyRenderer(json) {
   }
   
   
-  this.renderInteractiveForm = function() {
-    var itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    
-    // Get Form Wrapper
-    var formDefRenderer = new FormDefRenderer(this.study["MetaDataVersion"]["FormDef"]);
-    //var renderString = formDefRenderer.render();
-    var renderString = formDefRenderer.renderInteractiveForm()[0].outerHTML;
-    renderString += "<div id='section_tabs'>";
-    renderString += "<ul>";
-    var repeatingRenderString = "";
-    var tabDivsRenderString = "";
- 
-    // Get Form Items
-    var prevSectionLabel = undefined;
-    var prevItemHeader = undefined;
-    var prevItemSubHeader = undefined;
-    var isFirstSection = true;
-    
-    for (var i=0;i< itemDefs.length;i++) {
-      var itemDef = itemDefs[i];
-      var itemOID = itemDef["@OID"];
-      var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
-      var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-      var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
-      var itemHeader = itemDetails["OpenClinica:ItemHeader"];
-      var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
-      var name = itemDetails["OpenClinica:LeftItemText"];
-      var columnNumber = itemDetails["@ColumnNumber"];
-      var columns = itemDetails["OpenClinica:Layout"] ? itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
-      //debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader);
-      
-      if (sectionLabel != prevSectionLabel) {
-      
-        if (isFirstSection == true) {
-          isFirstSection = false;
-        }
-        else {
-          tabDivsRenderString += "</div>";
-        }
-       
-        renderString += "<li><a href='#section_"+i+"'>"+sectionLabel+"</a></li>";
-        tabDivsRenderString += "<div id='section_"+i+"' class='form_wrapper centered'>";
-      }
-      if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        tabDivsRenderString += "<div class='e_gray_bg'><h3>"+itemHeader+"</h3></div>"; 
-      }
-      if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        tabDivsRenderString += "<div class='e_gray_bg'><h4>"+itemSubHeader+"</h4></div>"; 
-      }
-      
-      var repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
-      var repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
-      
-      if (columnNumber == 1) {
-        repeatingRenderString = "<div class='blocking'>";
-      }
-      itemDefRenderer = new ItemDefRenderer(itemDef);
-      repeatingRenderString += itemDefRenderer.renderInteractiveItem();
-      if (repeatNumber > 1 && columns == columnNumber) {
-        repeatingRenderString += "<button stype='remove' type='button' class='button_remove'></button>";
-      }
-      if (columnNumber == 2 && columns === undefined || columns == columnNumber) {
-        repeatingRenderString += "</div>";
-        for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          tabDivsRenderString += repeatingRenderString;
-        }
-        if (repeatNumber > 1) {
-          tabDivsRenderString += "<button stype='add' type='button' class='button_search'>Add</button>";
-        }
-      }
 
-      prevSectionLabel = sectionLabel;
-      prevItemHeader = itemHeader;
-    }
-    renderString += "</ul>";
-    renderString += tabDivsRenderString;
-    renderString += "</div>";
-    return renderString;
+  
+  
+  this.renderInteractiveForm = function() {
   }
   
 }
