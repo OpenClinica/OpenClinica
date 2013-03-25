@@ -89,8 +89,9 @@ function StudyRenderer(json) {
   
   this.setStudy = function (renderMode) {
     switch (renderMode) {
-      case 'UNPOPULATED_FORM_CRFS':
+      case 'UNPOPULATED_FORM_CRF':
       case 'UNPOPULATED_EVENT_CRFS':
+      case 'UNPOPULATED_STUDY_CRFS':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
       break;  
     }  
@@ -111,33 +112,40 @@ function StudyRenderer(json) {
     this.setStudy(renderMode);  
     this.initStudyLists();   
     
-    if (renderMode == "UNPOPULATED_FORM_CRFS") {
-      return this.renderPrintableFormDefs(renderMode);
+    if (renderMode == "UNPOPULATED_FORM_CRF") {
+      // select CRF by OID
+      for (var i=0;i< app_formDefs.length;i++) {
+        if (app_formDefs[i]["@OID"] == app_formOID) {
+          formDef = app_formDefs[i];
+        }
+      }
+      return this.renderPrintableFormDef(formDef);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
+      // select all CRFs from event
+      var formDefsToRender = new Array();
+      var multipleFormsString = "";
+      for (var i=0;i< formDefsToRender.length;i++) {
+        var formDef = formDefsToRender[i];
+        multipleFormsString += this.renderPrintableFormDef(formDef);
+      }
+      return multipleFormsString;
+    }
+    else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
+      // select all CRFs from study
     }
 
   }
   
+  this.getItemDetails = function(itemDef) {
+     return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
+                   itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
+                   itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+  }
   
-  this.renderPrintableFormDefs = function(renderMode) {
   
+  this.renderPrintableFormDef = function(formDef) {
     var orderedItems = new Array();
-    var formDefsToRender = new Array();
-    var formDef = undefined;
-    
-    // select CRF by OID
-    for (var i=0;i< app_formDefs.length;i++) {
-      if (app_formDefs[i]["@OID"] == app_formOID) {
-        formDef = app_formDefs[i];
-      }
-    }
-   /* 
-    for (var i=0;i< formDefsToRender.length;i++) {
-      var formDef = formDefsToRender[i];
-      this.renderPrintableFormDef(formDef, renderMode);
-    }
-    */
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
@@ -153,9 +161,7 @@ function StudyRenderer(json) {
     // Sort itemDefs by OrderInForm property
     for (var i=0;i< app_itemDefs.length;i++) {
       var itemDef = app_itemDefs[i];
-      var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      var itemDetails = this.getItemDetails(itemDef);
       if (itemDetails["@FormOID"] == formDef["@OID"]) {
         var orderInForm = itemDetails["@OrderInForm"];
         orderedItems[orderInForm-1] = itemDef;
@@ -166,9 +172,7 @@ function StudyRenderer(json) {
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
-      var itemDetails = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                        itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      var itemDetails = this.getItemDetails(itemDef);
                         
       if (itemDetails["@FormOID"] != formDef["@OID"]) {
         continue;
@@ -206,9 +210,7 @@ function StudyRenderer(json) {
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
         nextItemDef = orderedItems[i+1];
-        var nextItemDetails = nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                        nextItemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+        var nextItemDetails = this.getItemDetails(nextItemDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         debug("next item column number: " + nextItemDetails["@ColumnNumber"]);
       }       
