@@ -269,8 +269,17 @@
 						 	    		</c:if>
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
-								       <tr valign="top"><td class="table_cell_left"><a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
+								       <tr valign="top"><td class="table_cell_left">
+								       <!--
+								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
+								       -->
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.oid}"/>')"
+								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
+								       <!--
+								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
+								       -->
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.oid}"/>')"
+								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus =='invalid' }">
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;

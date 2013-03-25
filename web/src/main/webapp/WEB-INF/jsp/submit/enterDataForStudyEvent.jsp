@@ -414,7 +414,10 @@
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
             </td><td >
+            <!--
             <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${dedc.edc.defaultVersionId}"/>')"
+            -->
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/enterDataForStudyEvent.jsp/<c:out value="${version.oid}"/>')"
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
               name="bt_Print1" align="left" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
