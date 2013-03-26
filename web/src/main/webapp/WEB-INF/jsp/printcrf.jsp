@@ -20,6 +20,7 @@
  
  <body>
   <div id="main_screen">
+   <img id="loading" src="${pageContext.request.contextPath}/images/loading_wh.gif" class="spinner"/> 
    <div id="form_wrapper" class="centered"> </div>
   </div>
  </body>

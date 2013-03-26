@@ -29,11 +29,13 @@ $(document).ready(function() {
   
   
 function getPrintableContent() {
+    $('.spinner').css({display: "block"});
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('#form_wrapper').css({display: "block"});
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
     $('#form_wrapper').html(app_odmRenderer.renderPrintableForm(renderMode));
+    $('.spinner').css({display: "none"});
    });
 }
 
