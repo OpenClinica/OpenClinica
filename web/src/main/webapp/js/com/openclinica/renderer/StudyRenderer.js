@@ -201,11 +201,6 @@ function StudyRenderer(json) {
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
       var itemDetails = this.getItemDetails(itemDef);
-                        
-      if (itemDetails["@FormOID"] != formDef["@OID"]) {
-        continue;
-      }
-      
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
       var itemHeader = itemDetails["OpenClinica:ItemHeader"];
       var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
@@ -243,12 +238,12 @@ function StudyRenderer(json) {
         debug("next item column number: " + nextItemDetails["@ColumnNumber"]);
       }       
       
-      if (columnNumber == 1) {
+      if (columnNumber === undefined || columnNumber == 1) {
         repeatingRenderString = "<div class='blocking'>";
       }
       itemDefRenderer = new ItemDefRenderer(itemDef);
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
-      if (columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
+      if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
           renderString += repeatingRenderString;
