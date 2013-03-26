@@ -116,8 +116,8 @@ function StudyRenderer(json) {
     for (var i=0;i< studyEventFormRefs.length;i++) {
       var formDef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length;j++) {
-        if (app_formDefs[i]["@OID"] == formDef["@FormOID"]) {
-          formDef = app_formDefs[i];
+        if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
+          formDef = app_formDefs[j];
           multipleFormsString += this.renderPrintableFormDef(formDef);
           break;
         }
