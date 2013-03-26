@@ -160,8 +160,8 @@ function handleUserSource() {
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
-    jQuery("input[name='userSource']").change(function() {
-    	handleUserSource();
+    jQuery("input[name='userSource']").click(function() {
+        	handleUserSource();
     	jQuery("#userName").val('');
     });
     
@@ -178,9 +178,23 @@ jQuery(document).ready(function() {
         jQuery.unblockUI();
     });
     
-    handleUserSource();
+   
 });
-
+function handleUserSource() {
+    var userTypeVal = jQuery("input:radio[name='userSource']:checked").val();
+   
+    if (userTypeVal == "ldap") {
+        jQuery(".passwordRow").hide();
+        jQuery(".webservicesRow").hide();
+        jQuery(".ldapSelect").show();
+        jQuery("#userName").attr('readonly', 'true');
+    } else {
+        jQuery(".passwordRow").show();
+        jQuery(".webservicesRow").show();
+        jQuery(".ldapSelect").hide();
+        jQuery("#userName").removeAttr('readonly');
+    }
+}
 </script>
 </c:if>
 		<!-- Table Contents -->
@@ -191,7 +205,7 @@ jQuery(document).ready(function() {
     <tr valign="top">
         <td class="formlabel"><fmt:message key="createUserAccount.userSource.label" bundle="${resword}"/></td>
         <td valign="top">
-            <input type="radio" name="userSource" value="ldap"<c:if test="${empty userSource or userSource eq 'ldap' }"> checked="checked"</c:if>> 
+            <input type="radio" name="userSource" value="ldap"<c:if test="${empty userSource or userSource eq 'ldap' or userSource eq '' }"> checked="checked"</c:if>> 
             <fmt:message key="createUserAccount.userSource.ldap.label" bundle="${resword}"/> - 
             <input type="radio" name="userSource" value="local"<c:if test="${userSource eq 'local' }"> checked="checked"</c:if>> 
             <fmt:message key="createUserAccount.userSource.local.label" bundle="${resword}"/> 
