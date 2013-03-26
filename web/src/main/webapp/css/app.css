@@ -7,7 +7,12 @@ div.blocking {
 }
 
 .spinner {
-  display:none;
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -190px;
+  margin-left: -259px;
 }
 
 a:link {

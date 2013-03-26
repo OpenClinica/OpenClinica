@@ -31,7 +31,6 @@ function StudyRenderer(json) {
     }
   }
   
-  
   this.loadItemGroupDefs = function() {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
     debug("loading item groups");
@@ -106,35 +105,64 @@ function StudyRenderer(json) {
     this.loadStudyEventDefs();
   }
   
+  this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+    // select all CRFs from StudyEvent
+    var studyEventFormRefs =  eventDef["FormRef"];
+    if (studyEventFormRefs[0] == undefined) { 
+      studyEventFormRefs = new Array();
+      studyEventFormRefs.push(eventDef["FormRef"]);
+    }
+    var multipleFormsString = "";
+    for (var i=0;i< studyEventFormRefs.length;i++) {
+      var formDef = studyEventFormRefs[i];
+      for (var j=0;j< app_formDefs.length;j++) {
+        if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
+          formDef = app_formDefs[j];
+          multipleFormsString += this.renderPrintableFormDef(formDef);
+          break;
+        }
+      }
+    }
+    return multipleFormsString;
+  }
+  
   
   this.renderPrintableForm = function(renderMode) {
     
     this.setStudy(renderMode);  
     this.initStudyLists();   
+    var formDef = undefined;
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
       for (var i=0;i< app_formDefs.length;i++) {
         if (app_formDefs[i]["@OID"] == app_formOID) {
           formDef = app_formDefs[i];
+          break; 
         }
       }
       return this.renderPrintableFormDef(formDef);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
-      // select all CRFs from event
-      var formDefsToRender = new Array();
+      var eventDef = undefined;
+      // select StudyEvent by OID
+      for (var i=0;i< app_studyEventDefs.length;i++) {
+        if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
+          eventDef = app_studyEventDefs[i];
+          break;
+        }
+      }
+      return this.renderPrintableEventCRFs(renderMode, eventDef);
+    }
+    else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
       var multipleFormsString = "";
-      for (var i=0;i< formDefsToRender.length;i++) {
-        var formDef = formDefsToRender[i];
-        multipleFormsString += this.renderPrintableFormDef(formDef);
+      // select all CRFs from study
+      for (var i=0;i< app_studyEventDefs.length;i++) {
+        eventDef = app_studyEventDefs[i];
+        multipleFormsString += this.renderPrintableEventCRFs(renderMode, eventDef);
       }
       return multipleFormsString;
     }
-    else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      // select all CRFs from study
-    }
-
   }
   
   this.getItemDetails = function(itemDef) {

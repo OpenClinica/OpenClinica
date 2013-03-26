@@ -74,8 +74,15 @@
 <div class="homebox_bullets"><a href="ViewCRFVersion?id=<c:out value="${toc.crfVersion.id}"/>"><fmt:message key="view_CRF_version_metadata" bundle="${resword}"/></a></div>
 <p>
 <div class="homebox_bullets" style="width:117">
-<a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${toc.crfVersion.id}"/>')"><fmt:message key="print_entire_CRF" bundle="${resword}"/>
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
+  <!--
+<a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${toc.crfVersion.id}"/>')">
+-->
+<fmt:message key="print_entire_CRF" bundle="${resword}"/>
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
+<!--
 <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${toc.crfVersion.id}"/>')"
+-->
 					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
 					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
 					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_out_form" bundle="${resword}"/>" title="<fmt:message key="print_out_form" bundle="${resword}"/>" ></a>
