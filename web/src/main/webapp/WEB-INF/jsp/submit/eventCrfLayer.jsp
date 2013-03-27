@@ -233,15 +233,15 @@
 							          <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								      <tr valign="top"><td class="table_cell_left">
 								      <!--
-								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
-								      -->
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+								      -->
+								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
 								      
 								      <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
 								      <!--
-								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
-								      -->
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+								      -->
+								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
 								      
 								      <fmt:message key="print" bundle="${resword}"/></a></td></tr>
                                     <!-- New Statement for locked or frozen study -->
@@ -282,14 +282,14 @@
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
 								       <!--
-								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
-								       -->
   <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.id}"/>')"
+								       -->
+								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
 								       <!--
-								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
-								       -->
   <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.id}"/>')"
+								       -->
+								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus =='invalid' }">
@@ -297,15 +297,15 @@
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
 <!--								       
-								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
-								       -->
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+								       -->
+								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
 								       
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
 								       <!--
-								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
-								       -->
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+								       -->
+								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
 								       
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								    <c:if test="${studySubjectStatusId != 5 && studySubjectStatusId != 7}">
@@ -342,10 +342,10 @@
 								  
 									<tr valign="top"><td class="table_cell_left">
 									<!--
-									<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
-									-->
-									
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+									-->
+									<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+									
 									<img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
 								<!--	
      <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
