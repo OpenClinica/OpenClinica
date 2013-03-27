@@ -1,8 +1,6 @@
-function ItemDefRenderer(json) {
+function ItemDefRenderer(json, itemDetails) {
   this.json = json;
-  this.itemDetails = json["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                  json["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                  json["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+  this.itemDetails = itemDetails;
   this.name = this.itemDetails["OpenClinica:LeftItemText"];
   this.dataType = json["@DataType"];
   this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
