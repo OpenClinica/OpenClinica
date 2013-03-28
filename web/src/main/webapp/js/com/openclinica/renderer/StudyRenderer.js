@@ -173,7 +173,6 @@ function StudyRenderer(json) {
            return itemPresentInForm[i]; 
         }
       }
-      // return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1];
     }
     return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
   }
