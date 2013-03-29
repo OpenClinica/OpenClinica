@@ -50,5 +50,4 @@ function setRenderMode() {
   else if (app_eventOID != "*" && app_formOID == "*") {
     renderMode = 'UNPOPULATED_EVENT_CRFS';
   }
-
 }
