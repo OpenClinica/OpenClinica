@@ -165,10 +165,16 @@ function StudyRenderer(json) {
     }
   }
   
-  this.getItemDetails = function(itemDef) {
-     return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined ?
-                   itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] :
-                   itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+  this.getItemDetails = function(itemDef, formDef) {
+    if ( itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
+      var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      for (var i=0;i< itemPresentInForm.length;i++) {
+        if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
+           return itemPresentInForm[i]; 
+        }
+      }
+    }
+    return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
   }
   
   
@@ -189,7 +195,7 @@ function StudyRenderer(json) {
     // Sort itemDefs by OrderInForm property
     for (var i=0;i< app_itemDefs.length;i++) {
       var itemDef = app_itemDefs[i];
-      var itemDetails = this.getItemDetails(itemDef);
+      var itemDetails = this.getItemDetails(itemDef, formDef);
       if (itemDetails["@FormOID"] == formDef["@OID"]) {
         var orderInForm = itemDetails["@OrderInForm"];
         orderedItems[orderInForm-1] = itemDef;
@@ -200,12 +206,7 @@ function StudyRenderer(json) {
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
-      var itemDetails = this.getItemDetails(itemDef);
-                        
-      if (itemDetails["@FormOID"] != formDef["@OID"]) {
-        continue;
-      }
-      
+      var itemDetails = this.getItemDetails(itemDef, formDef);
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
       var itemHeader = itemDetails["OpenClinica:ItemHeader"];
       var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
@@ -238,17 +239,17 @@ function StudyRenderer(json) {
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
         nextItemDef = orderedItems[i+1];
-        var nextItemDetails = this.getItemDetails(nextItemDef);
+        var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         debug("next item column number: " + nextItemDetails["@ColumnNumber"]);
       }       
       
-      if (columnNumber == 1) {
+      if (columnNumber === undefined || columnNumber == 1) {
         repeatingRenderString = "<div class='blocking'>";
       }
-      itemDefRenderer = new ItemDefRenderer(itemDef);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
-      if (columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
+      if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
           renderString += repeatingRenderString;
