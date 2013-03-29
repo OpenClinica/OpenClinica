@@ -35,7 +35,10 @@ function getPrintableContent() {
     $('#form_wrapper').css({display: "block"});
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
-    $('#form_wrapper').html(app_odmRenderer.renderPrintableForm(renderMode));
+    var renderString = app_odmRenderer.renderPrintableForm(renderMode);
+    renderString = renderString.replace(/\&lt;/g, '<');
+    renderString = renderString.replace(/\&gt;/g, '>');
+    $('#form_wrapper').html(renderString);
    });
 }
 

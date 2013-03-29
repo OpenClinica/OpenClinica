@@ -77,8 +77,8 @@ h3.link_title {
   display:inline-block;
   width:450px;
   min-height:50px;
-  margin-top:20px;
-  margin-bottom:20px;
+  margin-top:5px;
+  margin-bottom:5px;
   margin-left:20px;
 }
 
@@ -86,8 +86,8 @@ h3.link_title {
   display:inline-block;
   width:300px;
   min-height:50px;
-  margin-top:20px;
-  margin-bottom:20px;
+  margin-top:5px;
+  margin-bottom:5px;
   margin-left:10px;
 }
 
