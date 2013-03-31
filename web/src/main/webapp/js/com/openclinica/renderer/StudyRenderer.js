@@ -31,19 +31,51 @@ function StudyRenderer(json) {
     }
   }
   
-  this.loadItemGroupDefs = function() {
+  
+  this.getItemDetails = function(itemDef, formDef) {
+    if (itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
+      var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      for (var i=0;i< itemPresentInForm.length;i++) {
+        if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
+           return itemPresentInForm[i]; 
+        }
+      }
+    }
+    return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+  }
+  
+  
+  this.loadItemGroupDefs = function(formDef) {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
     debug("loading item groups");
     app_itemGroupDefs = {};
     app_itemGroupMap = {};
+    
     for (var i=0;i< itemGroupDefs.length;i++) {
       var itemGroupDef = itemGroupDefs[i];
       var itemGroupKey = itemGroupDef["@OID"]; 
+      
+      /*
       var repeatNumber = 
       itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined ? 
       itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"] : 
       itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-          
+      */
+      
+      var repeatNumber = undefined; 
+      if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
+        var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
+        for (var j=0;j< presentInForm.length;j++) {
+          if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
+           repeatNumber = presentInForm[j].repeatNumber; 
+           break;
+          }
+        }
+      }
+      else {
+        repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
+      }
+      
       var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
       debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
       var currentItemGroup = {};
@@ -100,7 +132,6 @@ function StudyRenderer(json) {
     this.loadBasicDefinitions();
     this.loadCodeLists();
     this.loadItemDefs();
-    this.loadItemGroupDefs();
     this.loadFormDefs();
     this.loadStudyEventDefs();
   }
@@ -165,21 +196,10 @@ function StudyRenderer(json) {
     }
   }
   
-  this.getItemDetails = function(itemDef, formDef) {
-    if ( itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
-      var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-      for (var i=0;i< itemPresentInForm.length;i++) {
-        if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
-           return itemPresentInForm[i]; 
-        }
-      }
-    }
-    return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-  }
-  
-  
   this.renderPrintableFormDef = function(formDef) {
     var orderedItems = new Array();
+    
+    this.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
@@ -231,8 +251,19 @@ function StudyRenderer(json) {
         renderString += "<div class='blocking gray_bg'><h4>"+itemSubHeader+"</h4></div>"; 
       }
       
-      var repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
-      var repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
+      var repeatNumber = 1;
+      var repeating = false;
+      
+      if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
+        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
+      }
+      if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
+        repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
+      }
+      
+      if (repeatNumber === undefined ) {
+        repeatNumber = 1;
+      }
      
       
       var nextItemDef = undefined;

@@ -5,7 +5,7 @@
   <span class='item_def_control'> __________ </span>
   {{else responseType == 'radio'}}
   <span class='item_def_control'> Yes ____&nbsp;&nbsp;&nbsp;No ____ </span>
-  {{else responseType == 'single-select' || responseType == 'checkbox'}}
+  {{else responseType == 'single-select' || responseType == 'multi-select' || responseType == 'checkbox'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
