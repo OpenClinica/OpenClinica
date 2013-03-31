@@ -6,6 +6,31 @@ div.blocking {
  width:100%; 
 }
 
+h1,h2,h3,h4 {font-weight:normal}
+
+#main_screen {
+  position: relative;
+  margin: 0 auto;
+  width: 1024px;
+}
+
+#form_wrapper{
+  width:940px;
+  padding:10px 10px 10px 10px;
+  margin-top:0px;
+  margin-bottom:0px;
+  display: none;
+}
+
+.single-page {
+  position: relative;
+  margin: 0 auto;
+  margin-top: 30px;
+  border:1px solid black;
+  width:700px;
+  height:920px;
+}
+
 
 .spinner {
   display: none;
@@ -58,21 +83,7 @@ h3.link_title {
   color: red;
 }
 
-#main_screen {
-  position: relative;
-  margin: 0 auto;
-  width: 1024px;
-}
 
-
-
-#form_wrapper{
-  width:940px;
-  padding:15px 15px 15px 15px;
-  margin-top:50px;
-  margin-bottom:50px;
-	display: none;
-}
 
 .item_def_wrapper{
   display:inline-block;
@@ -96,7 +107,7 @@ h3.link_title {
   vertical-align: top;
   display: inline-block;
   font-size: 0.9em;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .item_def_title{
@@ -104,7 +115,7 @@ h3.link_title {
   display: inline-block;
   width:170px;
   font-size: 0.9em;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 div.item_def_control{
