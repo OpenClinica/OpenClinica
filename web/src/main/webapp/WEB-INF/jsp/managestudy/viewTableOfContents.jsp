@@ -76,11 +76,11 @@
 <div class="homebox_bullets" style="width:117">
 <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${toc.crfVersion.id}"/>')">
   <!--
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
 -->
 <fmt:message key="print_entire_CRF" bundle="${resword}"/>
 <!--
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/view/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/viewTableOfContents.jsp/<c:out value="${version.oid}"/>')"
 -->
 <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${toc.crfVersion.id}"/>')"
 					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"

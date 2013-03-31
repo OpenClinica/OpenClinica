@@ -70,7 +70,7 @@ public void setMetadataCollectorResource(
 	
 	
   @GET
-  @Path("/html/view/{studyOID}/{eventOID}/{formOID}")
+  @Path("/html/print/{studyOID}/{eventOID}/{formOID}")
   public Viewable getPrintCRFController( 
     @Context HttpServletRequest request,
     @Context HttpServletResponse response, 
