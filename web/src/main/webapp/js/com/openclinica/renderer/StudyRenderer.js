@@ -37,7 +37,7 @@ function StudyRenderer(json) {
       var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
       for (var i=0;i< itemPresentInForm.length;i++) {
         if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
-           return itemPresentInForm[i]; 
+          return itemPresentInForm[i]; 
         }
       }
     }
@@ -54,13 +54,6 @@ function StudyRenderer(json) {
     for (var i=0;i< itemGroupDefs.length;i++) {
       var itemGroupDef = itemGroupDefs[i];
       var itemGroupKey = itemGroupDef["@OID"]; 
-      
-      /*
-      var repeatNumber = 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined ? 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"] : 
-      itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-      */
       
       var repeatNumber = undefined; 
       if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
@@ -221,7 +214,13 @@ function StudyRenderer(json) {
         orderedItems[orderInForm-1] = itemDef;
       }
     }
-    
+    /*
+     1) Open Template
+     2) calculate and render appropriate header 
+     3) render enough body to fit, break if end of event, crf, or section  
+     4) calculate and render appropriate footer 
+    */
+      
     for (var i=0;i< orderedItems.length;i++) {
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
@@ -265,7 +264,6 @@ function StudyRenderer(json) {
         repeatNumber = 1;
       }
      
-      
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
