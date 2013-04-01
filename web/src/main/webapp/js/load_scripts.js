@@ -10,6 +10,7 @@
            app_contextPath + "/js/com/openclinica/renderer/StudyRenderer.js",           
            app_contextPath + "/js/com/openclinica/renderer/FormDefRenderer.js",           
            app_contextPath + "/js/com/openclinica/renderer/ItemDefRenderer.js",           
+           app_contextPath + "/js/com/openclinica/renderer/PrintPageRenderer.js",           
            app_contextPath + "/js/com/openclinica/renderer/ParseUtil.js",           
            app_contextPath + "/js/com/openclinica/renderer/RenderUtil.js"           
          );

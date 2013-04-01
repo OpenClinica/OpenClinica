@@ -10,8 +10,9 @@ var app_itemGroupMap;
 var app_itemDefs;
 var app_formDefs;
 var app_studyEventDefs;
+var app_pagesArray = undefined;
 var app_templateNames = 
-['print_form_def','print_item_def','print_item_def_3col','e_form_def','e_item_def','e_item_def_3col'];
+['print_page','print_form_def','print_item_def','print_item_def_3col','e_form_def','e_item_def','e_item_def_3col'];
 var renderMode;
 
 debug("console debugging enabled.");
@@ -33,9 +34,10 @@ function getPrintableContent() {
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('.spinner').css({display: "none"});
     $('#form_wrapper').css({display: "block"});
+    app_pagesArray = new Array();
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
-    var renderString = app_odmRenderer.renderPrintableForm(renderMode);
+    var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
     renderString = renderString.replace(/\&lt;/g, '<');
     renderString = renderString.replace(/\&gt;/g, '>');
     $('#form_wrapper').html(renderString);

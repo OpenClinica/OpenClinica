@@ -37,7 +37,7 @@ function StudyRenderer(json) {
       var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
       for (var i=0;i< itemPresentInForm.length;i++) {
         if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
-          return itemPresentInForm[i]; 
+           return itemPresentInForm[i]; 
         }
       }
     }
@@ -54,7 +54,6 @@ function StudyRenderer(json) {
     for (var i=0;i< itemGroupDefs.length;i++) {
       var itemGroupDef = itemGroupDefs[i];
       var itemGroupKey = itemGroupDef["@OID"]; 
-      
       var repeatNumber = undefined; 
       if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
         var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
@@ -151,11 +150,14 @@ function StudyRenderer(json) {
   }
   
   
-  this.renderPrintableForm = function(renderMode) {
+  this.renderPrintableStudy = function(renderMode) {
+    
+    var printPageRenderer = new PrintPageRenderer();
     
     this.setStudy(renderMode);  
     this.initStudyLists();   
     var formDef = undefined;
+    var studyString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
@@ -165,7 +167,8 @@ function StudyRenderer(json) {
           break; 
         }
       }
-      return this.renderPrintableFormDef(formDef);
+      studyString += this.renderPrintableFormDef(formDef);
+      app_pagesArray.push(studyString);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -176,7 +179,7 @@ function StudyRenderer(json) {
           break;
         }
       }
-      return this.renderPrintableEventCRFs(renderMode, eventDef);
+      studyString += this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
       var multipleFormsString = "";
@@ -185,8 +188,14 @@ function StudyRenderer(json) {
         eventDef = app_studyEventDefs[i];
         multipleFormsString += this.renderPrintableEventCRFs(renderMode, eventDef);
       }
-      return multipleFormsString;
+      studyString += multipleFormsString;
     }
+    for (var i=0;i< app_pagesArray.length;i++) {
+      var pageString =  app_pagesArray[i];
+      var pageTemplateString = printPageRenderer.render(pageString)[0].outerHTML;
+      debug(pageTemplateString);
+    }
+    return studyString;
   }
   
   this.renderPrintableFormDef = function(formDef) {
@@ -214,13 +223,7 @@ function StudyRenderer(json) {
         orderedItems[orderInForm-1] = itemDef;
       }
     }
-    /*
-     1) Open Template
-     2) calculate and render appropriate header 
-     3) render enough body to fit, break if end of event, crf, or section  
-     4) calculate and render appropriate footer 
-    */
-      
+    
     for (var i=0;i< orderedItems.length;i++) {
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
@@ -259,11 +262,10 @@ function StudyRenderer(json) {
       if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
       }
-      
       if (repeatNumber === undefined ) {
         repeatNumber = 1;
       }
-     
+      
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
@@ -294,7 +296,7 @@ function StudyRenderer(json) {
 
   
   
-  this.renderInteractiveForm = function() {
+  this.renderStudy = function() {
   }
   
 }
