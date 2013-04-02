@@ -280,7 +280,7 @@ public class CreateUserAccountServlet extends SecureController {
                     forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
                 }
             } else {
-                String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+                String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD,INPUT_USER_SOURCE };
                 fp.setCurrentStringValuesAsPreset(textFields);
 
                 String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
@@ -318,6 +318,7 @@ public class CreateUserAccountServlet extends SecureController {
                 if (map == null) {
                     map = new HashMap();
                 }
+                
                 map.put("userName", ldapUser.getUsername());
                 map.put("firstName", ldapUser.getFirstName());
                 map.put("lastName", ldapUser.getLastName());
