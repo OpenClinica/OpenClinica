@@ -177,7 +177,7 @@ jQuery(document).ready(function() {
     jQuery("#closeLdapSelect").click(function() {
         jQuery.unblockUI();
     });
-    
+    handleUserSource();   
    
 });
 function handleUserSource() {
@@ -215,6 +215,9 @@ function handleUserSource() {
     <c:if test="${not ldapEnabled}">
         <input type="hidden" name="userSource" value="local"/>
     </c:if>
+    
+    
+    <c:if test="${ldapEnabled}">
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="username2" bundle="${resword}"/>:</td>
 		<td valign="top">
@@ -232,6 +235,7 @@ function handleUserSource() {
 			</table>
 		</td>
 	</tr>
+	</c:if>
 
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="first_name" bundle="${resword}"/>:</td>
