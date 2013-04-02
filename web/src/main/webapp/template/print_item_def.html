@@ -1,6 +1,6 @@
 <div class='item_def_wrapper'>
-  <span class='item_def_number'>${itemNumber}</span>
-  <span class='item_def_title'>${name}</span>
+  <span class='item_def_number'>{{html itemNumber}}</span>
+  <span class='item_def_title'>{{html name}}</span>
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file'}}
   <span class='item_def_control'> __________ </span>
   {{else responseType == 'radio'}}
@@ -9,13 +9,13 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
-        <div><input type='checkbox'/> ${label}</div>
+        <div><input type='checkbox'/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
   {{else}}
     who knows?
   {{/if}}
-  <span class="item_def_format_label">${unitLabel}</span> 
+  <span class="item_def_format_label">{{html unitLabel}}</span> 
 </div> 
 

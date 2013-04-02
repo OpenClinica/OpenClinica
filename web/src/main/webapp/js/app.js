@@ -38,8 +38,6 @@ function getPrintableContent() {
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
     var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
-    renderString = renderString.replace(/\&lt;/g, '<');
-    renderString = renderString.replace(/\&gt;/g, '>');
     $('#form_wrapper').html(renderString);
    });
 }

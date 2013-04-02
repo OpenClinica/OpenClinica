@@ -193,7 +193,7 @@ function StudyRenderer(json) {
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
       var pageTemplateString = printPageRenderer.render(pageString)[0].outerHTML;
-      debug(pageTemplateString);
+      //debug(pageTemplateString);
     }
     return studyString;
   }
