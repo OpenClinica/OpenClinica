@@ -1,5 +1,6 @@
 var INITIALIZED = false;
 
+var app_maxPixelHeight = 510;
 var JSON_INDENT_LEVEL = 2;
 var app_crfJson;
 var app_odmRenderer;
@@ -33,12 +34,12 @@ function getPrintableContent() {
     $('.spinner').css({display: "block"});
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('.spinner').css({display: "none"});
-    $('#form_wrapper').css({display: "block"});
+    $('#single-page').css({display: "block"});
     app_pagesArray = new Array();
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
     var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
-    $('#form_wrapper').html(renderString);
+    $('body').html(renderString);
    });
 }
 

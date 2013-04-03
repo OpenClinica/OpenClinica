@@ -3,32 +3,29 @@ body {
 }
 
 div.blocking {
- width:100%; 
+ width:1030px; 
+ padding-left: 15px;
+ padding-right: 15px;
 }
 
 h1,h2,h3,h4 {font-weight:normal}
 
-#main_screen {
-  position: relative;
-  margin: 0 auto;
-  width: 1024px;
-}
-
-#form_wrapper{
-  width:940px;
-  padding:10px 10px 10px 10px;
-  margin-top:0px;
-  margin-bottom:0px;
-  display: none;
+.page-footer {
+  position:absolute;
+  width:100%;
+  bottom:0px;  
 }
 
 .single-page {
   position: relative;
   margin: 0 auto;
-  margin-top: 30px;
-  border:1px solid black;
-  width:700px;
-  height:920px;
+  margin-top: 20px;
+  margin-bottom: 120px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border:1px inset #333333;
+  width:1030px;
+  height:1320px;
 }
 
 
@@ -121,7 +118,7 @@ h3.link_title {
 div.item_def_control{
   vertical-align: bottom;
   display: block;
-  min-height: 50px;
+  min-height: 20px;
   width:140px;
 }
 

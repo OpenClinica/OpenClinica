@@ -1,6 +1,8 @@
 function StudyRenderer(json) {
   this.json = json;
   this.study = undefined;
+  this.accumulatedPixelHeight = 0;
+  this.renderString = "";
   
   this.loadBasicDefinitions = function() {
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
@@ -158,6 +160,7 @@ function StudyRenderer(json) {
     this.initStudyLists();   
     var formDef = undefined;
     var studyString = "";
+    var pageTemplateString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
@@ -168,7 +171,10 @@ function StudyRenderer(json) {
         }
       }
       studyString += this.renderPrintableFormDef(formDef);
-      app_pagesArray.push(studyString);
+      //app_pagesArray.push(studyString);
+      app_pagesArray.push(this.renderString);
+      this.renderString = "";
+      this.accumulatedPixelHeight = 0;
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -192,11 +198,24 @@ function StudyRenderer(json) {
     }
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      var pageTemplateString = printPageRenderer.render(pageString)[0].outerHTML;
+      pageTemplateString += printPageRenderer.render(pageString)[0].outerHTML;
       //debug(pageTemplateString);
     }
-    return studyString;
+    //return studyString;
+    return pageTemplateString;
   }
+  
+  this.renderPrintableRow = function(htmlString, rowHeight) {
+    this.renderString += htmlString;
+    this.accumulatedPixelHeight += rowHeight;
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight);
+    if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+      // load page array and start another
+      app_pagesArray.push(this.renderString);
+      this.accumulatedPixelHeight = 0;
+      this.renderString = "";
+    }
+  } 
   
   this.renderPrintableFormDef = function(formDef) {
     var orderedItems = new Array();
@@ -205,7 +224,7 @@ function StudyRenderer(json) {
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
-    var renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    this.renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingRenderString = "";
  
     // Get Form Items
@@ -225,6 +244,7 @@ function StudyRenderer(json) {
     }
     
     for (var i=0;i< orderedItems.length;i++) {
+      var accumulatedPixelHeight = 0;
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
@@ -239,18 +259,21 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          renderString += "<div class='blocking gray_bg'><h2>"+sectionLabel+"</h2></div>"; 
+          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15);
         }
         else {
-          renderString += "<div class='blocking non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>"; 
+          app_pagesArray.push(this.renderString);
+          this.accumulatedPixelHeight = 0;
+          this.renderString = "";
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15); 
         }
         isFirstSection = false;
       }
       if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        renderString += "<div class='blocking gray_bg'><h3>"+itemHeader+"</h3></div>"; 
+        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15); 
       }
       if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        renderString += "<div class='blocking gray_bg'><h4>"+itemSubHeader+"</h4></div>"; 
+        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15); 
       }
       
       var repeatNumber = 1;
@@ -283,13 +306,13 @@ function StudyRenderer(json) {
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          renderString += repeatingRenderString;
+          this.renderPrintableRow(repeatingRenderString, 50);
         }
       }
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    return renderString;
+    return this.renderString;
   }
   
   
