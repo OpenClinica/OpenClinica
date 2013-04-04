@@ -1,7 +1,23 @@
+/*
+ * OpenClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2013 OpenClinica
+ */
+
+
+/* StudyRenderer
+ * This is the main rendering class where most of the processing occurs.
+ */
 function StudyRenderer(json) {
   this.json = json;
   this.study = undefined;
-  
+  this.accumulatedPixelHeight = 0;
+  this.renderString = "";
+ 
+  /* loadBasicDefinitions()
+   */
   this.loadBasicDefinitions = function() {
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
     debug("loading basic definitions");
@@ -12,7 +28,9 @@ function StudyRenderer(json) {
       app_basicDefinitions[key] = value;
     }
   }
-  
+ 
+  /* loadCodeLists()
+   */
   this.loadCodeLists = function() {
     var codeLists = this.study["MetaDataVersion"]["CodeList"];
     debug("loading code lists");
@@ -32,6 +50,9 @@ function StudyRenderer(json) {
   }
   
   
+ /* getItemDetails(itemDef, formDef) 
+  * A convenience function to get the ItemDetails properties for an Item
+  */ 
   this.getItemDetails = function(itemDef, formDef) {
     if (itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
       var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
@@ -45,6 +66,9 @@ function StudyRenderer(json) {
   }
   
   
+ /* loadItemGroupDefs(formDef)
+  * Associate all Items with their ItemGroups
+  */  
   this.loadItemGroupDefs = function(formDef) {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
     debug("loading item groups");
@@ -67,7 +91,6 @@ function StudyRenderer(json) {
       else {
         repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
       }
-      
       var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
       debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
       var currentItemGroup = {};
@@ -82,7 +105,9 @@ function StudyRenderer(json) {
     }
   }
   
-  
+  /* loadStudyEventDefs()
+   * Load all StudyEvents
+   */ 
   this.loadStudyEventDefs = function() {
     debug("loading study events");
     app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
@@ -91,7 +116,11 @@ function StudyRenderer(json) {
       app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
     }
   }
+ 
   
+  /* loadItemDefs()
+   * Load all ItemDefs
+   */
   this.loadItemDefs = function() {
     debug("loading item items");
     app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
@@ -100,7 +129,11 @@ function StudyRenderer(json) {
       app_itemDefs.push(this.study["MetaDataVersion"]["ItemDef"]);
     }
   }
+ 
   
+  /* loadFormDefs()
+   * Load all FormDefs
+   */
   this.loadFormDefs = function() {
     debug("loading crfs");
     app_formDefs = this.study["MetaDataVersion"]["FormDef"];
@@ -110,6 +143,10 @@ function StudyRenderer(json) {
     }
   }
   
+  
+ /* setStudy(renderMode)
+  * Set the current study being rendered
+  */ 
   this.setStudy = function (renderMode) {
     switch (renderMode) {
       case 'UNPOPULATED_FORM_CRF':
@@ -119,7 +156,10 @@ function StudyRenderer(json) {
       break;  
     }  
   }
+ 
   
+  /* initStudyLists()
+   */
   this.initStudyLists = function () {
     this.loadBasicDefinitions();
     this.loadCodeLists();
@@ -127,7 +167,11 @@ function StudyRenderer(json) {
     this.loadFormDefs();
     this.loadStudyEventDefs();
   }
+ 
   
+  /* renderPrintableEventCRFs(renderMode, eventDef)
+   * Render all CRFS associated with a StudyEvent
+   */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -150,14 +194,18 @@ function StudyRenderer(json) {
   }
   
   
+  /* renderPrintableStudy(renderMode)
+   * A kind of factory function for the different study
+   * rendering scenarios.
+   */ 
   this.renderPrintableStudy = function(renderMode) {
     
     var printPageRenderer = new PrintPageRenderer();
-    
     this.setStudy(renderMode);  
     this.initStudyLists();   
     var formDef = undefined;
     var studyString = "";
+    var pageTemplateString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
@@ -168,7 +216,7 @@ function StudyRenderer(json) {
         }
       }
       studyString += this.renderPrintableFormDef(formDef);
-      app_pagesArray.push(studyString);
+      this.startNewPage();
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -192,12 +240,30 @@ function StudyRenderer(json) {
     }
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      var pageTemplateString = printPageRenderer.render(pageString)[0].outerHTML;
+      pageTemplateString += printPageRenderer.render(pageString)[0].outerHTML;
       //debug(pageTemplateString);
     }
-    return studyString;
+    return pageTemplateString;
   }
+ 
   
+  /* renderPrintableRow(htmlString, rowHeight)
+   * Render each row of a CRF.
+   * Decide whether a page break is needed
+   */
+  this.renderPrintableRow = function(htmlString, rowHeight) {
+    this.renderString += htmlString;
+    this.accumulatedPixelHeight += rowHeight;
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight);
+    if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+      this.startNewPage();
+    }
+  } 
+ 
+  
+  /* renderPrintableFormDef(formDef)
+   * The heart of StudyRenderer: render the CRF
+   */
   this.renderPrintableFormDef = function(formDef) {
     var orderedItems = new Array();
     
@@ -205,7 +271,7 @@ function StudyRenderer(json) {
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
-    var renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    this.renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingRenderString = "";
  
     // Get Form Items
@@ -225,6 +291,7 @@ function StudyRenderer(json) {
     }
     
     for (var i=0;i< orderedItems.length;i++) {
+      var accumulatedPixelHeight = 0;
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
@@ -239,18 +306,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          renderString += "<div class='blocking gray_bg'><h2>"+sectionLabel+"</h2></div>"; 
+          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15);
         }
-        else {
-          renderString += "<div class='blocking non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>"; 
+        else if (this.accumulatedPixelHeight > 0) {
+          this.startNewPage();
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15); 
         }
         isFirstSection = false;
       }
       if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        renderString += "<div class='blocking gray_bg'><h3>"+itemHeader+"</h3></div>"; 
+        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15); 
       }
       if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        renderString += "<div class='blocking gray_bg'><h4>"+itemSubHeader+"</h4></div>"; 
+        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15); 
       }
       
       var repeatNumber = 1;
@@ -283,19 +351,30 @@ function StudyRenderer(json) {
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          renderString += repeatingRenderString;
+          this.renderPrintableRow(repeatingRenderString, 50);
         }
       }
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    return renderString;
+    return this.renderString;
   }
   
   
+  /* startNewPage()
+   * Starts a new page in the pages array
+   */
+  this.startNewPage = function() {
+    debug("Starting New Page"); 
+    app_pagesArray.push(this.renderString);
+    this.accumulatedPixelHeight = 0;
+    this.renderString = "";
+  }
 
   
-  
+  /* renderStudy()
+   * When this is implemented it will render the web form
+   */
   this.renderStudy = function() {
   }
   
