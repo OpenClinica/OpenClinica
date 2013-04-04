@@ -40,16 +40,6 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		if(userBean.isSysAdmin())
 			return containerRequest;
 		else{
-		//System.out.println(request.getSession());
-		//System.out.println("url"+containerRequest.getAbsolutePath());
-		
-		//System.out.println("sutdyOID?"+studyOIDS);
-		
-	//	StudyUserRoleBean r = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-		//StudyDAO studyDAO = new StudyDAO(context.getBean("dataSource"));
-		
-		//System.out.println(containerRequest.getPathSegments());
-		//System.out.println(containerRequest.getPathSegments().get(3).getPath());
 		String studyOID = containerRequest.getPathSegments().get(3).getPath();
 		
 		//parse to get studyOID
