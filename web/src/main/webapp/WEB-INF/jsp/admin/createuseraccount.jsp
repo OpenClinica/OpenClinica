@@ -225,8 +225,10 @@ function handleUserSource() {
 					<td valign="top"><div class="formfieldM_BG">
 						<input type="text" id="userName" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
 					</div></td>
-					<td><a class="ldapSelect" href="#"><img alt="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" 
-					   title="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" src="images/create_new.gif" border="0"></a>*</td>
+					<td><c:if test="${ldapEnabled}"><a class="ldapSelect" href="#"><img alt="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" 
+					   title="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" src="images/create_new.gif" border="0"></a>
+					   </c:if>
+					   *</td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userName" /></jsp:include></td>
