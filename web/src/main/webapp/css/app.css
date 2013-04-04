@@ -10,6 +10,10 @@ div.blocking {
 
 h1,h2,h3,h4 {font-weight:normal}
 
+.page-header {
+  padding-top:15px;
+}
+
 .page-footer {
   position:absolute;
   width:100%;
@@ -62,6 +66,10 @@ a:link {
 
 .text-right-aligned {
   text-align: right; 
+}
+
+.text-left-aligned {
+  text-align: left; 
 }
 
 p.link_title {
@@ -168,17 +176,40 @@ span.item_def_control_3col{
 .select-option { 
 }
 
+#header-subject-id {
+  color: #333333;
+  font-size: 13px;
+  float: right;
+}
+
+#header-protocol-id {
+  color: #333333;
+  font-size: 13px;
+}
+
+#header-study-name {
+  color: #333333;
+  font-size: 13px;
+}
+
+#header-site-name {
+  color: #333333;
+  font-size: 13px;
+}
+
 #footer-investigator {
+  color: #333333;
   padding-bottom: 8px;
+  display: none;
 }
 
 #footer-pager {
-  color: #CCCCCC;
+  color: #BBBBBB;
   font-size: 11px;
 }
 
 #footer-date {
-  color: #CCCCCC;
+  color: #BBBBBB;
   font-size: 11px;
   padding-right:40px;
 }

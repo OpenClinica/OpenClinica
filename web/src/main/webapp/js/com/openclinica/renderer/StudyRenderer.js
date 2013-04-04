@@ -153,6 +153,9 @@ function StudyRenderer(json) {
       case 'UNPOPULATED_EVENT_CRFS':
       case 'UNPOPULATED_STUDY_CRFS':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
+        app_studyName = this.study["GlobalVariables"]["StudyName"];
+        app_siteName = this.study["GlobalVariables"]["StudyName"];
+        app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
       break;  
     }  
   }
@@ -240,7 +243,15 @@ function StudyRenderer(json) {
     }
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render(pageString, i+1, app_pagesArray.length, app_printTime)[0].outerHTML;
+      pageTemplateString += printPageRenderer.render(
+          pageString, 
+          i+1, 
+          app_pagesArray.length, 
+          app_printTime,
+          app_studyName,
+          app_siteName,
+          app_protocolName
+      )[0].outerHTML;
       //debug(pageTemplateString);
     }
     return pageTemplateString;

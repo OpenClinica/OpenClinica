@@ -4,7 +4,10 @@ function PrintPageRenderer() {
       pageRenderString: pageRenderString,
       currPage: currPage,
       totalPages: totalPages,
-      printTime: printTime 
+      printTime: printTime,
+      studyName: app_studyName, 
+      siteName: app_siteName, 
+      protocolName: app_protocolName
     });
   }
 }
