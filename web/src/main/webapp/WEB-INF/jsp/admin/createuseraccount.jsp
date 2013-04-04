@@ -216,8 +216,7 @@ function handleUserSource() {
         <input type="hidden" name="userSource" value="local"/>
     </c:if>
     
-    
-    <c:if test="${ldapEnabled}">
+   
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="username2" bundle="${resword}"/>:</td>
 		<td valign="top">
@@ -235,7 +234,7 @@ function handleUserSource() {
 			</table>
 		</td>
 	</tr>
-	</c:if>
+
 
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="first_name" bundle="${resword}"/>:</td>
