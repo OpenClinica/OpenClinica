@@ -31,6 +31,7 @@ $(document).ready(function() {
   
   
 function getPrintableContent() {
+    $('body').css({"background-color": "white"});
     $('.spinner').css({display: "block"});
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
     $('.spinner').css({display: "none"});
@@ -40,6 +41,7 @@ function getPrintableContent() {
     app_odmRenderer = new ODMRenderer(data);
     var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
     $('body').html(renderString);
+    $('body').css({"background-color": "#AAAAAA"});
    });
 }
 

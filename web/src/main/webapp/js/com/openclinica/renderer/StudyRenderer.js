@@ -240,7 +240,7 @@ function StudyRenderer(json) {
     }
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render(pageString)[0].outerHTML;
+      pageTemplateString += printPageRenderer.render(pageString, i+1, app_pagesArray.length, app_printTime)[0].outerHTML;
       //debug(pageTemplateString);
     }
     return pageTemplateString;
