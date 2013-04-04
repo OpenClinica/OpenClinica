@@ -69,6 +69,23 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
   </listener>
 
 
+<!-- <filter> -->
+<!-- <filter-name>restODMFilter</filter-name> -->
+<!-- <filter-class>org.akaza.openclinica.web.filter.rest.RestODMFilter</filter-class> -->
+<!-- <init-param> -->
+<!--   <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> -->
+<!--   <param-value>org.akaza.openclinica.web.filter.rest</param-value> -->
+<!-- </init-param> -->
+<!-- </filter> -->
+
+
+<!-- <filter-mapping> -->
+<!-- <filter-name>restODMFilter</filter-name> -->
+<!-- <url-pattern>/rest/*</url-pattern> -->
+<!-- </filter-mapping> -->
+
+
+
     <filter>
         <filter-name>encodingFilter</filter-name>
             <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -954,6 +971,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet>
         <servlet-name>PrintCRFServlet</servlet-name>
         <display-name>PrintCRF</display-name>
+        <servlet-class>org.akaza.openclinica.control.admin.PrintCRFServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PrintCRFOldServlet</servlet-name>
+        <display-name>PrintCRFOld</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintCRFServlet</servlet-class>
     </servlet>
     <servlet>
@@ -1939,6 +1961,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/PrintDataEntry</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>PrintCRFOldServlet</servlet-name>
+        <url-pattern>/PrintCRFOld</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>PrintCRFServlet</servlet-name>
         <url-pattern>/PrintCRF</url-pattern>
     </servlet-mapping>
@@ -2165,6 +2191,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
 			<param-value> org.akaza.openclinica.web.restful</param-value>
 							
 		</init-param>
+		<init-param>
+  <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+  <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
+</init-param>
 		<load-on-startup>1</load-on-startup>
 </servlet>
 
