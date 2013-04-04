@@ -13,6 +13,9 @@ h1,h2,h3,h4 {font-weight:normal}
 .page-footer {
   position:absolute;
   width:100%;
+  padding-bottom:10px;
+  padding-left:20px;
+  padding-right:20px;
   bottom:0px;  
 }
 
@@ -26,6 +29,7 @@ h1,h2,h3,h4 {font-weight:normal}
   border:1px inset #333333;
   width:1030px;
   height:1320px;
+  background-color: white;
 }
 
 
@@ -54,6 +58,10 @@ a:link {
 
 .text_centered {
   text-align: center; 
+}
+
+.text-right-aligned {
+  text-align: right; 
 }
 
 p.link_title {
@@ -158,5 +166,20 @@ span.item_def_control_3col{
 }
 
 .select-option { 
+}
+
+#footer-investigator {
+  padding-bottom: 8px;
+}
+
+#footer-pager {
+  color: #CCCCCC;
+  font-size: 11px;
+}
+
+#footer-date {
+  color: #CCCCCC;
+  font-size: 11px;
+  padding-right:40px;
 }
 
