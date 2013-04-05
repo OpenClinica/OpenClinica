@@ -44,6 +44,27 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		
 		//parse to get studyOID
 		StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
+		
+		containerRequest = checkAuth(studyBean,userBean,containerRequest);
+		if(containerRequest!=null) return containerRequest;
+		else
+		{
+			if(studyBean.getParentStudyId()==0){
+			int parentStudyID = studyBean.getParentStudyId();
+			studyBean = getStudyByID(parentStudyID,getDataSource());
+			containerRequest = checkAuth(studyBean,userBean,containerRequest);
+			if(containerRequest!=null)return containerRequest;
+		}
+		
+		}   
+		}
+		throw new WebApplicationException(Response.Status.FORBIDDEN);
+
+	}
+
+	
+	
+	private ContainerRequest checkAuth(StudyBean studyBean,UserAccountBean userBean,ContainerRequest containerRequest){
 		StudyUserRoleBean studyRole = getRoleByStudy(studyBean,getDataSource(),userBean);
 		Role r = studyRole.getRole();
 			if (r != null) {
@@ -53,11 +74,9 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
                 return containerRequest;
             }
         }
-		}            throw new WebApplicationException(Response.Status.FORBIDDEN);
-
+return null;
 	}
-
-	
+		
 	private DataSource getDataSource(){
 	return (DataSource) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean("dataSource");	
 	}
@@ -70,6 +89,10 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
 		return userAccountDAO.findRoleByUserNameAndStudyId(userBean.getName(), studyBean.getId());
 		
+	}
+	private StudyBean getStudyByID(int id,DataSource ds){
+		StudyDAO studyDAO = new StudyDAO(ds);
+		return (StudyBean) studyDAO.findByPK(id);
 	}
 	@Override
 	public ContainerRequestFilter getRequestFilter() {
