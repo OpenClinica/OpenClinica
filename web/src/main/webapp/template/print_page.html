@@ -1,6 +1,11 @@
 <div class='single-page'>
   <div class='page-header'>
-    <h1 class='centered text_centered'> -- header -- </h1>  
+    <div id='header-first-row'>
+      <span id='header-protocol-id' class='text-left-aligned'>Protocol ID: ${protocolName}</span>  
+      <span id='header-subject-id'>Study Subject ID:___________</span>  
+    </div> 
+    <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName}</div>  
+    <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName}</div>  
   </div>
   <div class='page-content'>
   {{html pageRenderString}}
