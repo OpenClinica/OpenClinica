@@ -45,15 +45,15 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		//parse to get studyOID
 		StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
 		
-		containerRequest = checkAuth(studyBean,userBean,containerRequest);
-		if(containerRequest!=null) return containerRequest;
+		
+		if(checkAuth(studyBean,userBean)) return containerRequest;
 		else
 		{
-			if(studyBean.getParentStudyId()==0){
+			if(studyBean.getParentStudyId()!=0){
 			int parentStudyID = studyBean.getParentStudyId();
 			studyBean = getStudyByID(parentStudyID,getDataSource());
-			containerRequest = checkAuth(studyBean,userBean,containerRequest);
-			if(containerRequest!=null)return containerRequest;
+			 
+			if(checkAuth(studyBean,userBean))return containerRequest;
 		}
 		
 		}   
@@ -64,17 +64,18 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 
 	
 	
-	private ContainerRequest checkAuth(StudyBean studyBean,UserAccountBean userBean,ContainerRequest containerRequest){
+	private Boolean checkAuth(StudyBean studyBean,UserAccountBean userBean){
+		Boolean auth = false;
 		StudyUserRoleBean studyRole = getRoleByStudy(studyBean,getDataSource(),userBean);
 		Role r = studyRole.getRole();
 			if (r != null) {
             // r = userBean.getActiveStudyRole();
             if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
                     r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) ||r.equals(Role.MONITOR) )) {
-                return containerRequest;
+                return true;
             }
         }
-return null;
+return auth;
 	}
 		
 	private DataSource getDataSource(){
