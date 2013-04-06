@@ -192,6 +192,11 @@ span.item_def_control_3col{
   font-size: 13px;
 }
 
+#header-event-name {
+  color: #333333;
+  font-size: 13px;
+}
+
 #header-site-name {
   color: #333333;
   font-size: 13px;

@@ -7,7 +7,8 @@ function PrintPageRenderer() {
       printTime: printTime,
       studyName: app_studyName, 
       siteName: app_siteName, 
-      protocolName: app_protocolName
+      protocolName: app_protocolName,
+      eventName: app_eventName
     });
   }
 }

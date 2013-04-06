@@ -6,6 +6,9 @@
     </div> 
     <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName}</div>  
     <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName}</div>  
+    {{if eventName !== undefined}}
+      <div id='header-event-name' class='text-left-aligned'>Event: ${eventName}</div>  
+    {{/if}}
   </div>
   <div class='page-content'>
   {{html pageRenderString}}

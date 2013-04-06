@@ -188,6 +188,7 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
           formDef = app_formDefs[j];
+          app_eventName = eventDef["@Name"];
           multipleFormsString += this.renderPrintableFormDef(formDef);
           break;
         }
@@ -219,7 +220,7 @@ function StudyRenderer(json) {
         }
       }
       studyString += this.renderPrintableFormDef(formDef);
-      this.startNewPage();
+      this.startNewPage(false);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -244,30 +245,26 @@ function StudyRenderer(json) {
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
       pageTemplateString += printPageRenderer.render(
-          pageString, 
-          i+1, 
-          app_pagesArray.length, 
-          app_printTime,
-          app_studyName,
-          app_siteName,
-          app_protocolName
+        pageString, 
+        i+1, 
+        app_pagesArray.length, 
+        app_printTime
       )[0].outerHTML;
-      //debug(pageTemplateString);
     }
     return pageTemplateString;
   }
  
   
-  /* renderPrintableRow(htmlString, rowHeight)
+  /* renderPrintableRow(htmlString, rowHeight, inCrf)
    * Render each row of a CRF.
    * Decide whether a page break is needed
    */
-  this.renderPrintableRow = function(htmlString, rowHeight) {
+  this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
     this.renderString += htmlString;
     this.accumulatedPixelHeight += rowHeight;
     debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
-      this.startNewPage();
+      this.startNewPage(inCrf);
     }
   } 
  
@@ -282,7 +279,7 @@ function StudyRenderer(json) {
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
-    this.renderString = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    this.renderString = app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingRenderString = "";
  
     // Get Form Items
@@ -317,19 +314,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15);
+          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true);
         }
         else if (this.accumulatedPixelHeight > 0) {
-          this.startNewPage();
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15); 
+          this.startNewPage(true);
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true); 
         }
         isFirstSection = false;
       }
       if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15); 
+        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15, true); 
       }
       if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15); 
+        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15, true); 
       }
       
       var repeatNumber = 1;
@@ -362,7 +359,7 @@ function StudyRenderer(json) {
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          this.renderPrintableRow(repeatingRenderString, 50);
+          this.renderPrintableRow(repeatingRenderString, 50, true);
         }
       }
       prevSectionLabel = sectionLabel;
@@ -372,14 +369,15 @@ function StudyRenderer(json) {
   }
   
   
-  /* startNewPage()
+  /* startNewPage(inCrf)
    * Starts a new page in the pages array
+   * param inForm: true if we are not at the start of a new CRF
    */
-  this.startNewPage = function() {
+  this.startNewPage = function(inCrf) {
     debug("Starting New Page"); 
     app_pagesArray.push(this.renderString);
     this.accumulatedPixelHeight = 0;
-    this.renderString = "";
+    inCrf ? this.renderString = app_crfHeader : this.renderString = "";
   }
 
   
