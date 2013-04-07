@@ -10,11 +10,24 @@ div.blocking {
 
 h1,h2,h3,h4 {font-weight:normal}
 
-.page-header {
+#page-header {
   padding-top:15px;
 }
 
-.page-footer {
+#left-header {
+  display: inline-block;
+  width: 500px; 
+  vertical-align: top;
+}
+
+#right-header{
+  display: inline-block;
+  width: 300px; 
+  vertical-align: top;
+  margin-left: 200px;
+}
+
+#page-footer {
   position:absolute;
   width:100%;
   padding-bottom:10px;
@@ -176,10 +189,24 @@ span.item_def_control_3col{
 .select-option { 
 }
 
+#header-subject-dob {
+  color: #333333;
+  font-size: 13px;
+}
+
+#header-interviewer-name {
+  color: #333333;
+  font-size: 13px;
+}
+
+#header-interview-date {
+  color: #333333;
+  font-size: 13px;
+}
+
 #header-subject-id {
   color: #333333;
   font-size: 13px;
-  float: right;
 }
 
 #header-protocol-id {
@@ -201,6 +228,17 @@ span.item_def_control_3col{
   color: #333333;
   font-size: 13px;
 }
+
+#header-event-location {
+  color: #333333;
+  font-size: 13px;
+}
+
+#header-secondary-id {
+  color: #333333;
+  font-size: 13px;
+}
+
 
 #footer-investigator {
   color: #333333;

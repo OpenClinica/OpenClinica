@@ -15,6 +15,35 @@ function StudyRenderer(json) {
   this.study = undefined;
   this.accumulatedPixelHeight = 0;
   this.renderString = "";
+  
+  
+ /* getStudyParamValue(itemDef, formDef) 
+  * A convenience function to get the study detail parameter value
+  */ 
+  this.getStudyParamValue = function(studyParamList, listId) {
+    for (var i=0;i< studyParamList.length;i++) {
+      if (studyParamList[i]["@StudyParameterListID"] == listId) {
+        return studyParamList[i]["@Value"];
+      }
+    }
+  }
+  
+  
+  /* loadStudyDetails()
+   */
+  this.loadStudyDetails = function() {
+    debug("loading study details");
+    app_studyDetails = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"];
+    var studyParamList = app_studyDetails["OpenClinica:StudyParameterConfiguration"]["OpenClinica:StudyParameterListRef"];
+    app_collectSubjectDOB =  this.getStudyParamValue(studyParamList, "SPL_collectDob");
+    app_personIDRequired = this.getStudyParamValue(studyParamList, "SPL_subjectPersonIdRequired");
+    app_showPersonID = this.getStudyParamValue(studyParamList, "SPL_personIdShownOnCRF");
+    app_interviewerNameRequired = this.getStudyParamValue(studyParamList, "SPL_interviewerNameRequired");
+    app_interviewDateRequired = this.getStudyParamValue(studyParamList, "SPL_interviewDateRequired");
+    app_secondaryLabelViewable = this.getStudyParamValue(studyParamList, "SPL_secondaryLabelViewable");
+    app_eventLocationRequired = this.getStudyParamValue(studyParamList, "SPL_eventLocationRequired");
+  }
+  
  
   /* loadBasicDefinitions()
    */
@@ -169,6 +198,7 @@ function StudyRenderer(json) {
     this.loadItemDefs();
     this.loadFormDefs();
     this.loadStudyEventDefs();
+    this.loadStudyDetails();
   }
  
   
