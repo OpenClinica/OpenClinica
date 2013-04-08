@@ -15,6 +15,8 @@ function StudyRenderer(json) {
   this.study = undefined;
   this.accumulatedPixelHeight = 0;
   this.renderString = "";
+  var pageTemplateString = "";
+  var printPageRenderer;
   
   
  /* getStudyParamValue(itemDef, formDef) 
@@ -202,29 +204,71 @@ function StudyRenderer(json) {
   }
  
   
+  /* createStudyEventCoverPage()
+   */
+  this.createStudyEventCoverPage = function (eventDef) {
+    var str = "<h3>" + eventDef["@Name"] + ":</h3>";
+    var studyEventFormRefs =  eventDef["FormRef"];
+    for (var i=0;i< studyEventFormRefs.length;i++) {
+      var formRef = studyEventFormRefs[i];
+      for (var j=0;j< app_formDefs.length;j++) {
+        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+          var formDef = app_formDefs[j];
+          str += "<div>" + formDef["@Name"] + "</div>";
+        }
+      }
+    }
+    return str;
+  }
+  
+  
+   /* createStudyCoverPage()
+   */ 
+  this.createStudyCoverPage = function () {
+    var str = "<table border='1' style='margin-top:50px'>";
+    for (var i=0;i< app_studyEventDefs.length;i++) {
+      var eventDef = app_studyEventDefs[i];
+      str +="<tr><td>" + eventDef["@Name"] + "</td>";
+      var studyEventFormRefs =  eventDef["FormRef"];
+      for (var j=0;j< studyEventFormRefs.length;j++) {
+        var formRef = studyEventFormRefs[j];
+        for (var k=0;k< app_formDefs.length;k++) {
+          if (app_formDefs[k]["@OID"] == formRef["@FormOID"]) {
+            var formDef = app_formDefs[k];
+            str += "<td>" + formDef["@Name"] + "</td>";
+          }
+        }
+      }
+      str += "</tr>";
+    }
+    str += "</table>";
+    return str;
+  }
+  
+  
   /* renderPrintableEventCRFs(renderMode, eventDef)
    * Render all CRFS associated with a StudyEvent
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+    var studyEventCoverPageString = printPageRenderer.render( this.createStudyEventCoverPage(eventDef), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+    app_pagesArray.push(studyEventCoverPageString);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
       studyEventFormRefs = new Array();
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
-    var multipleFormsString = "";
     for (var i=0;i< studyEventFormRefs.length;i++) {
       var formDef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
           formDef = app_formDefs[j];
           app_eventName = eventDef["@Name"];
-          multipleFormsString += this.renderPrintableFormDef(formDef);
+          this.renderPrintableFormDef(formDef);
           break;
         }
       }
     }
-    return multipleFormsString;
   }
   
   
@@ -234,12 +278,11 @@ function StudyRenderer(json) {
    */ 
   this.renderPrintableStudy = function(renderMode) {
     
-    var printPageRenderer = new PrintPageRenderer();
+    printPageRenderer = new PrintPageRenderer();
     this.setStudy(renderMode);  
     this.initStudyLists();   
     var formDef = undefined;
-    var studyString = "";
-    var pageTemplateString = "";
+    pageTemplateString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
@@ -249,7 +292,7 @@ function StudyRenderer(json) {
           break; 
         }
       }
-      studyString += this.renderPrintableFormDef(formDef);
+      this.renderPrintableFormDef(formDef);
       this.startNewPage(false);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
@@ -261,25 +304,21 @@ function StudyRenderer(json) {
           break;
         }
       }
-      studyString += this.renderPrintableEventCRFs(renderMode, eventDef);
+      this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      var multipleFormsString = "";
+      var studyCoverPageString = printPageRenderer.render( this.createStudyCoverPage(), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+      app_pagesArray.push(studyCoverPageString);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
-        multipleFormsString += this.renderPrintableEventCRFs(renderMode, eventDef);
+        this.renderPrintableEventCRFs(renderMode, eventDef);
       }
-      studyString += multipleFormsString;
     }
+    // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render(
-        pageString, 
-        i+1, 
-        app_pagesArray.length, 
-        app_printTime
-      )[0].outerHTML;
+      pageTemplateString += printPageRenderer.render( pageString, i+2, app_pagesArray.length+1, app_printTime )[0].outerHTML;
     }
     return pageTemplateString;
   }
