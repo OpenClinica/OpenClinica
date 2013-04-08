@@ -1,6 +1,10 @@
 package org.akaza.openclinica.web.filter.rest;
 
+import java.io.IOException;
+import java.util.ResourceBundle;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -10,8 +14,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 
@@ -27,11 +31,13 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 
 	@Context
 	HttpServletRequest request;
+	@Context
+	HttpServletResponse response;
 	  
 	WebApplicationContext context;
 	String studyOIDS;
 	
-
+	 public static ResourceBundle  restext;
 	
 	@Override
 	
@@ -58,8 +64,15 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		
 		}   
 		}
-		throw new WebApplicationException(Response.Status.FORBIDDEN);
+		
+		
+        request.setAttribute(SecureController.PAGE_MESSAGE, "You don't have correct permission in your current Study.");
+        
+        
+        
 
+		throw new WebApplicationException(Response.Status.FORBIDDEN);
+       
 	}
 
 	
