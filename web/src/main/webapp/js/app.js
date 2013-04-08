@@ -12,9 +12,20 @@ var app_itemDefs;
 var app_formDefs;
 var app_studyEventDefs;
 var app_pagesArray = undefined;
+var app_eventName = undefined;
+var app_crfHeader;
+var app_crfPageNumber = 0;
 var app_templateNames = 
 ['print_page','print_form_def','print_item_def','print_item_def_3col','e_form_def','e_item_def','e_item_def_3col'];
 var renderMode;
+var app_collectSubjectDOB;
+var app_personIDRequired;
+var app_showPersonID;
+var app_interviewerNameRequired;
+var app_interviewDateRequired;
+var app_secondaryLabelViewable;
+var app_eventLocationRequired;
+var app_studyDetails = undefined;
 
 debug("console debugging enabled.");
 

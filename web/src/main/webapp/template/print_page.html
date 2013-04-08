@@ -1,21 +1,57 @@
 <div class='single-page'>
-  <div class='page-header'>
-    <div id='header-first-row'>
-      <span id='header-protocol-id' class='text-left-aligned'>Protocol ID: ${protocolName}</span>  
-      <span id='header-subject-id'>Study Subject ID:___________</span>  
+
+  <div id='page-header'>
+    <div id='left-header'>
+      <div id='header-protocol-id' class='text-left-aligned'>Protocol ID: ${protocolName}</div>  
+      <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName}</div>  
+      <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName}</div>  
+      {{if secondaryLabelViewable == true}}
+        <div id='header-secondary-id' class='text-left-aligned'>Secondary ID: </div>  
+      {{/if}}
+      {{if eventName !== undefined}}
+        <div id='header-event-name' class='text-left-aligned'>Event: ${eventName}</div>  
+      {{/if}}
+      {{if eventLocationRequired == 'required'}}
+        <div id='header-event-location' class='text-left-aligned'>Event Location *: ${eventName}</div>  
+      {{else eventLocationRequired == 'optional'}}
+        <div id='header-event-location' class='text-left-aligned'>Event Location: ${eventName}</div>  
+      {{/if}}
     </div> 
-    <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName}</div>  
-    <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName}</div>  
+    <div id='right-header'>
+      {{if showPersonID == true && personIDRequired == 'required'}}
+      <div id='header-subject-id'>Study Subject ID *:___________</div>  
+      {{else showPersonID == true && personIDRequired == 'optional'}}
+      <div id='header-subject-id'>Study Subject ID:___________</div>  
+      {{/if}}
+      {{if collectSubjectDOB == 1}}
+        <div id='header-subject-dob'>Study Subject DOB:___________</div>  
+      {{else collectSubjectDOB == 2}}
+        <div id='header-subject-dob'>Study Subject Birth Year:___________</div>  
+      {{/if}}
+      {{if interviewerNameRequired == true}}
+        <div id='header-interviewer-name'>Interviewer *:___________</div>  
+      {{else interviewerNameRequired == false}}
+        <div id='header-interviewer-name'>Interviewer:___________</div>  
+      {{/if}}
+      {{if interviewDateRequired == true}}
+        <div id='header-interview-date'>Interview Date *:___________</div>  
+      {{else interviewDateRequired == false}}
+        <div id='header-interview-date'>Interview Date:___________</div>  
+      {{/if}}
+      
+    </div>
   </div>
+  
   <div class='page-content'>
-  {{html pageRenderString}}
+    {{html pageRenderString}}
   </div>
-  <div class="vertical-spacer"></div>
-  <div class='page-footer'>
+  
+  <div id='page-footer'>
     <div id='footer-investigator' class='centered text_centered'>
       Investigator Name: ___________________&nbsp;&nbsp;&nbsp;&nbsp;Investigator Signature: ___________________
     </div>
     <div id='footer-pager' class='centered text_centered'>Page ${currPage} of ${totalPages} </div>  
     <div id='footer-date' class='text-right-aligned'>Last printed ${printTime}</div>  
   </div>
+  
 </div>
