@@ -2,6 +2,7 @@ var INITIALIZED = false;
 
 var app_maxPixelHeight = 510;
 var JSON_INDENT_LEVEL = 2;
+var app_logLevel = util_logInfo;
 var app_crfJson;
 var app_odmRenderer;
 var app_basicDefinitions;
@@ -28,7 +29,7 @@ var app_secondaryLabelViewable;
 var app_eventLocationRequired;
 var app_studyDetails = undefined;
 
-debug("console debugging enabled.");
+debug("console debugging enabled.", util_logInfo );
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
