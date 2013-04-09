@@ -222,21 +222,40 @@ function StudyRenderer(json) {
   }
   
   
-   /* createStudyCoverPage()
+  /* createStudyCoverPage()
    */ 
   this.createStudyCoverPage = function () {
     var str = "<table border='1' style='margin-top:50px'>";
+    
+    // create header row of Study Events
+    str += "<tr><td style='width:200px'></td>";
+    // iterate over study event defs and examine each event
     for (var i=0;i< app_studyEventDefs.length;i++) {
       var eventDef = app_studyEventDefs[i];
-      str +="<tr><td>" + eventDef["@Name"] + "</td>";
-      var studyEventFormRefs =  eventDef["FormRef"];
-      for (var j=0;j< studyEventFormRefs.length;j++) {
-        var formRef = studyEventFormRefs[j];
-        for (var k=0;k< app_formDefs.length;k++) {
-          if (app_formDefs[k]["@OID"] == formRef["@FormOID"]) {
-            var formDef = app_formDefs[k];
-            str += "<td>" + formDef["@Name"] + "</td>";
+      // load event name into column header
+      str +="<td style='padding:10px'>" + eventDef["@Name"] + "</td>";
+    }  
+    str += "</tr>";
+    //iterate over each of the formDefs in the study    
+    for (var i=0;i< app_formDefs.length;i++) {
+      var formDef = app_formDefs[i];
+      // load crf name into the first column of the CRF row
+      str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+      
+      for (var j=0;j< app_studyEventDefs.length;j++) {
+        var eventDef = app_studyEventDefs[j];
+        var formFound = false; 
+        var studyEventFormRefs =  eventDef["FormRef"];
+        for (var k=0;k< studyEventFormRefs.length;k++) {
+          var formRef = studyEventFormRefs[k];
+          if (formRef["@FormOID"] == formDef["@OID"]) {
+            str += "<td style='text-align:center'>X</td>";
+            formFound = true; 
+            break;
           }
+        }
+        if (formFound == false) {
+          str += "<td></td>";
         }
       }
       str += "</tr>";
