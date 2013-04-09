@@ -982,12 +982,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 + "\" ParentFormOID=\"" + StringEscapeUtils.escapeXml(detail.getParentFormOid())+"\"");
         xml.append(">");
         xml.append(nls);
-        
-        xml.append("<OpenClinica:SectionDetails>");
-        
+
+        xml.append(currentIndent+ indent+"<OpenClinica:SectionDetails>");
+        xml.append(nls);
         ArrayList<SectionDetails> sections = (ArrayList<SectionDetails>) detail.getSectionDetails();
         for (SectionDetails ig : sections) {
-            xml.append(currentIndent + indent + "<OpenClinica:Section SectionID=\"" + ig.getSectionId() + "\" SectionLabel=\""
+            xml.append(currentIndent + indent +indent +"<OpenClinica:Section SectionID=\"" + ig.getSectionId() + "\" SectionLabel=\""
                 +StringEscapeUtils.escapeXml(ig.getSectionLabel()) +   "\" SectionTitle=\""
                         +StringEscapeUtils.escapeXml(ig.getSectionTitle()) + 
                 		 "\" SectionSubtitle=\"" +StringEscapeUtils.escapeXml(ig.getSectionSubtitle()) + 
@@ -996,9 +996,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             		"\"/>");
             xml.append(nls);
         }
-        
-        xml.append("</OpenClinica:SectionDetails>");
-        
+      
+        xml.append(currentIndent+  indent+"</OpenClinica:SectionDetails>");
+        xml.append(nls);
         temp = detail.getVersionDescription();
         xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:VersionDescription>" + StringEscapeUtils.escapeXml(temp)
             + "</OpenClinica:VersionDescription>" + nls : "");
