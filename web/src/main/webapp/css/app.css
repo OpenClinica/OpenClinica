@@ -8,7 +8,22 @@ div.blocking {
  padding-right: 15px;
 }
 
-h1,h2,h3,h4 {font-weight:normal}
+h1 {
+  font-weight:normal
+  font-size: 12px;
+}
+h2 {
+  font-weight:normal
+  font-size: 11px;
+}
+h3 {
+  font-weight:normal
+  font-size: 10px;
+}
+h4 {
+  font-weight:normal
+  font-size: 9px;
+}
 
 #page-header {
   padding-top:15px;
@@ -85,26 +100,6 @@ a:link {
   text-align: left; 
 }
 
-p.link_title {
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  margin: 0;
-  color: white;
-  font-size: 1.3em;
-}
-
-
-h3.link_title {
-  position: absolute;
-  left: 14px;
-  bottom: 20px;
-  margin: 0;
-  color: white;
-  font-size: 1.6em;
-  font-weight:normal;
-}
-
 #loginError  {
   color: red;
 }
@@ -113,7 +108,7 @@ h3.link_title {
 
 .item_def_wrapper{
   display:inline-block;
-  width:450px;
+  min-width:450px;
   min-height:50px;
   margin-top:5px;
   margin-bottom:5px;
@@ -122,7 +117,7 @@ h3.link_title {
 
 .item_def_wrapper_3col{
   display:inline-block;
-  width:300px;
+  min-width:300px;
   min-height:50px;
   margin-top:5px;
   margin-bottom:5px;
@@ -132,7 +127,7 @@ h3.link_title {
 .item_def_number{
   vertical-align: top;
   display: inline-block;
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-weight: normal;
 }
 
@@ -140,7 +135,7 @@ h3.link_title {
   vertical-align: top;
   display: inline-block;
   width:170px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-weight: normal;
 }
 
@@ -169,11 +164,11 @@ span.item_def_control_3col{
 .item_def_format_label{
   display: inline-block;
   vertical-align: bottom;
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 .checkbox_control{
-  font-size: 0.7em;
+  font-size: 0.6em;
 }
 
 .gray_bg {

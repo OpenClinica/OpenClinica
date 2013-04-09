@@ -15,6 +15,8 @@ function StudyRenderer(json) {
   this.study = undefined;
   this.accumulatedPixelHeight = 0;
   this.renderString = "";
+  var pageTemplateString = "";
+  var printPageRenderer;
   
   
  /* getStudyParamValue(itemDef, formDef) 
@@ -202,29 +204,90 @@ function StudyRenderer(json) {
   }
  
   
+  /* createStudyEventCoverPage()
+   */
+  this.createStudyEventCoverPage = function (eventDef) {
+    var str = "<h3>" + eventDef["@Name"] + ":</h3>";
+    var studyEventFormRefs =  eventDef["FormRef"];
+    for (var i=0;i< studyEventFormRefs.length;i++) {
+      var formRef = studyEventFormRefs[i];
+      for (var j=0;j< app_formDefs.length;j++) {
+        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+          var formDef = app_formDefs[j];
+          str += "<div>" + formDef["@Name"] + "</div>";
+        }
+      }
+    }
+    return str;
+  }
+  
+  
+  /* createStudyCoverPage()
+   */ 
+  this.createStudyCoverPage = function () {
+    var str = "<table border='1' style='margin-top:50px'>";
+    
+    // create header row of Study Events
+    str += "<tr><td style='width:200px'></td>";
+    // iterate over study event defs and examine each event
+    for (var i=0;i< app_studyEventDefs.length;i++) {
+      var eventDef = app_studyEventDefs[i];
+      // load event name into column header
+      str +="<td style='padding:10px'>" + eventDef["@Name"] + "</td>";
+    }  
+    str += "</tr>";
+    //iterate over each of the formDefs in the study    
+    for (var i=0;i< app_formDefs.length;i++) {
+      var formDef = app_formDefs[i];
+      // load crf name into the first column of the CRF row
+      str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+      
+      for (var j=0;j< app_studyEventDefs.length;j++) {
+        var eventDef = app_studyEventDefs[j];
+        var formFound = false; 
+        var studyEventFormRefs =  eventDef["FormRef"];
+        for (var k=0;k< studyEventFormRefs.length;k++) {
+          var formRef = studyEventFormRefs[k];
+          if (formRef["@FormOID"] == formDef["@OID"]) {
+            str += "<td style='text-align:center'>X</td>";
+            formFound = true; 
+            break;
+          }
+        }
+        if (formFound == false) {
+          str += "<td></td>";
+        }
+      }
+      str += "</tr>";
+    }
+    str += "</table>";
+    return str;
+  }
+  
+  
   /* renderPrintableEventCRFs(renderMode, eventDef)
    * Render all CRFS associated with a StudyEvent
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+    var studyEventCoverPageString = printPageRenderer.render( this.createStudyEventCoverPage(eventDef), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+    app_pagesArray.push(studyEventCoverPageString);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
       studyEventFormRefs = new Array();
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
-    var multipleFormsString = "";
     for (var i=0;i< studyEventFormRefs.length;i++) {
       var formDef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
           formDef = app_formDefs[j];
           app_eventName = eventDef["@Name"];
-          multipleFormsString += this.renderPrintableFormDef(formDef);
+          this.renderPrintableFormDef(formDef);
           break;
         }
       }
     }
-    return multipleFormsString;
   }
   
   
@@ -234,12 +297,11 @@ function StudyRenderer(json) {
    */ 
   this.renderPrintableStudy = function(renderMode) {
     
-    var printPageRenderer = new PrintPageRenderer();
+    printPageRenderer = new PrintPageRenderer();
     this.setStudy(renderMode);  
     this.initStudyLists();   
     var formDef = undefined;
-    var studyString = "";
-    var pageTemplateString = "";
+    pageTemplateString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
@@ -249,7 +311,7 @@ function StudyRenderer(json) {
           break; 
         }
       }
-      studyString += this.renderPrintableFormDef(formDef);
+      this.renderPrintableFormDef(formDef);
       this.startNewPage(false);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
@@ -261,25 +323,21 @@ function StudyRenderer(json) {
           break;
         }
       }
-      studyString += this.renderPrintableEventCRFs(renderMode, eventDef);
+      this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      var multipleFormsString = "";
+      var studyCoverPageString = printPageRenderer.render( this.createStudyCoverPage(), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+      app_pagesArray.push(studyCoverPageString);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
-        multipleFormsString += this.renderPrintableEventCRFs(renderMode, eventDef);
+        this.renderPrintableEventCRFs(renderMode, eventDef);
       }
-      studyString += multipleFormsString;
     }
+    // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render(
-        pageString, 
-        i+1, 
-        app_pagesArray.length, 
-        app_printTime
-      )[0].outerHTML;
+      pageTemplateString += printPageRenderer.render( pageString, i+2, app_pagesArray.length+1, app_printTime )[0].outerHTML;
     }
     return pageTemplateString;
   }
@@ -344,19 +402,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true);
+          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, true);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true); 
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, true); 
         }
         isFirstSection = false;
       }
       if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, true); 
       }
       if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, true); 
       }
       
       var repeatNumber = 1;
