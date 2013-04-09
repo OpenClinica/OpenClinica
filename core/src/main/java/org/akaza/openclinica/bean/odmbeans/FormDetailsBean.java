@@ -9,70 +9,35 @@
 package org.akaza.openclinica.bean.odmbeans;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 
 public class FormDetailsBean extends ElementDefBean {
     //attributes
     private String parentFormOid;
-    /*
-    private String isDefaultVersion;
-    private String nullValues;
-    private String passwordRequired;
-    private String doubleDataEntry;
-    private String hideCrf;
-    private String sourceDataVerification;
-    */
+
     //elements
     private String versionDescription;
     private String revisionNotes;
     private ArrayList<PresentInEventDefinitionBean> presentInEventDefinitions = new ArrayList<PresentInEventDefinitionBean>();
     
+    private List<SectionDetails> SectionDetails;
     
-    public String getParentFormOid() {
+    
+    public ArrayList<SectionDetails> getSectionDetails() {
+		return (ArrayList<org.akaza.openclinica.bean.odmbeans.SectionDetails>) SectionDetails;
+	}
+	public void setSectionDetails(List<SectionDetails> sectionDetails) {
+		SectionDetails = sectionDetails;
+	}
+	public String getParentFormOid() {
         return parentFormOid;
     }
     public void setParentFormOid(String parentFormOid) {
         this.parentFormOid = parentFormOid;
     }
-    /*
-    public String getIsDefaultVersion() {
-        return isDefaultVersion;
-    }
-    public void setIsDefaultVersion(String isDefaultVersion) {
-        this.isDefaultVersion = isDefaultVersion;
-    }
-    public String getNullValues() {
-        return nullValues;
-    }
-    public void setNullValues(String nullValues) {
-        this.nullValues = nullValues;
-    }
-    public String getPasswordRequired() {
-        return passwordRequired;
-    }
-    public void setPasswordRequired(String passwordRequired) {
-        this.passwordRequired = passwordRequired;
-    }
-    public String getDoubleDataEntry() {
-        return doubleDataEntry;
-    }
-    public void setDoubleDataEntry(String doubleDataEntry) {
-        this.doubleDataEntry = doubleDataEntry;
-    }
-    public String getHideCrf() {
-        return hideCrf;
-    }
-    public void setHideCrf(String hideCrf) {
-        this.hideCrf = hideCrf;
-    }
-    public String getSourceDataVerification() {
-        return sourceDataVerification;
-    }
-    public void setSourceDataVerification(String sourceDataVerification) {
-        this.sourceDataVerification = sourceDataVerification;
-    }
-    */
+  
     public String getVersionDescription() {
         return versionDescription;
     }
@@ -91,4 +56,7 @@ public class FormDetailsBean extends ElementDefBean {
     public void setPresentInEventDefinitions(ArrayList<PresentInEventDefinitionBean> presentInEventDefinitions) {
         this.presentInEventDefinitions = presentInEventDefinitions;
     }
+    
+    
+    
 }

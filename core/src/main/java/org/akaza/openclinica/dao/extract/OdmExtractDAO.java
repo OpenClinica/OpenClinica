@@ -54,6 +54,7 @@ import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.PresentInEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.PresentInFormBean;
+import org.akaza.openclinica.bean.odmbeans.SectionDetails;
 import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
@@ -62,6 +63,7 @@ import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
@@ -74,6 +76,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.JobTerminationMonitor;
@@ -1043,6 +1046,10 @@ public class OdmExtractDAO extends DatasetDAO {
         metadata.setSectionIds(sectionIds);
     }
 
+    
+    public void getODMMetadata(int parentStudyId,int crfVersionOID,MetaDataVersionBean metadata){
+    	
+    }
     /**
      * Metadata for ODM_1.2 OpenClinica extension and partial ODM_1.3 OpenClinica extension
      *
@@ -1172,6 +1179,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 formDetail.setRevisionNotes(notes);
                 formDetail.setParentFormOid(cOID);
                 formDetail.setVersionDescription(cvDesc);
+                //ArrayList sectionBeansRows = this.select(this.getSectionDetails(cvOID),cvId);
+               formDetail =  setSectionBean(formDetail,cvId);
+                
                 PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
                 p.setStudyEventOid(sedOID);
                 p.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
@@ -1192,6 +1202,31 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
+    
+    private FormDetailsBean setSectionBean(FormDetailsBean formDetail,Integer crfVId){
+    	
+    	HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVId));
+        ArrayList<SectionDetails>sectionBeans = new ArrayList<SectionDetails>();
+        
+        SectionDAO secdao = new SectionDAO(this.ds);
+        ArrayList sections = secdao.findAllByCRFVersionId (crfVId);
+    	Iterator iter = sections.iterator();
+    	 while(iter.hasNext()){
+    		 SectionDetails sectionDetails = new SectionDetails();
+    		 SectionBean sectionBean = (SectionBean) iter.next();
+    		 sectionDetails.setSectionId(sectionBean.getId());
+    		 sectionDetails.setSectionLabel(sectionBean.getLabel());
+    		 sectionDetails.setSectionTitle(sectionBean.getTitle());
+    		 sectionDetails.setSectionSubtitle(sectionBean.getSubtitle());
+    		 sectionDetails.setSectionInstructions(sectionBean.getInstructions());
+    		 sectionDetails.setSectionPageNumber(sectionBean.getPageNumberLabel());
+    		 
+    		 sectionBeans.add(sectionDetails);
+    	 }
+    	 formDetail.setSectionDetails(sectionBeans);
+    	 return formDetail;
+    }
     public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
         this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
 
@@ -3024,4 +3059,9 @@ public class OdmExtractDAO extends DatasetDAO {
             + "      and ifm.item_id in " + itemIds + ")";
     }
 	
+    
+    protected String getSectionDetails(String CrfVersionOID)
+    {
+    	return "select section_id, label,title,subtitle,instructions,page_number_label from section section where crf_version_id=?";
+    }
 }
