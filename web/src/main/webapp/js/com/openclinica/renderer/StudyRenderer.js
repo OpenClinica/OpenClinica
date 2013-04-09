@@ -402,19 +402,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true);
+          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, true);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>", 15, true); 
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, true); 
         }
         isFirstSection = false;
       }
       if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h3>"+itemHeader+"</h3></div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, true); 
       }
       if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'><h4>"+itemSubHeader+"</h4></div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, true); 
       }
       
       var repeatNumber = 1;
