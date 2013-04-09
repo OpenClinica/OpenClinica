@@ -236,6 +236,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_max
         ++i;    this.setTypeExpected(i, TypeNames.BOOL);// show_group
         ++i;	this.setTypeExpected(i, TypeNames.INT);//item_order
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// crf_version_oid
     }
 
     public void setSubjectEventFormDataTypesExpected() {
@@ -1272,7 +1273,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer igRepeatNum = (Integer) row.get("repeat_number");
             Integer igRepeatMax = (Integer) row.get("repeat_max");
             Boolean showGroup = (Boolean) row.get("show_group");
-
+            String itemGroupHeader = (String)row.get("item_group_header");
+            
             String itHeader = (String) row.get("item_header");
             String left = (String) row.get("left_item_text");
             String right = (String) row.get("right_item_text");
@@ -1300,6 +1302,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 igr.setRepeatNumber(igRepeatNum);
                 inForm.setItemGroupRepeatBean(igr);
                 inForm.setShowGroup(showGroup==true?"Yes":"No");
+                inForm.setItemGroupHeader(itemGroupHeader);
                 igDetail.getPresentInForms().add(inForm);
             }
 
@@ -2644,7 +2647,7 @@ public class OdmExtractDAO extends DatasetDAO {
             + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
             + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
             + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, item.phi_status, ifm.show_item, "
-            + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group,orderInForm.item_order from crf_version cv, (select crf_version_id, item_id, response_set_id,"
+            + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group,orderInForm.item_order,igm.item_group_header from crf_version cv, (select crf_version_id, item_id, response_set_id,"
             + " header as item_header, subheader, section_id, left_item_text, right_item_text,"
             + " parent_id, column_number, page_number_label, response_layout,"
             + " default_value, show_item from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
