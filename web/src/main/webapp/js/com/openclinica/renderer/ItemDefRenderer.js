@@ -18,7 +18,6 @@ function ItemDefRenderer(json, itemDetails) {
                        {itemNumber:this.itemNumber, name:this.name, responseType:this.responseType, unitLabel:this.unitLabel, 
                         optionNames: app_codeLists[this.codeListOID], columns:this.columns});
     return s[0].outerHTML;
-    //return s;
   }
   
   this.renderInteractiveItem = function() { 
@@ -27,6 +26,5 @@ function ItemDefRenderer(json, itemDetails) {
                        {itemNumber:this.itemNumber, name:this.name, dataType:this.dataType,responseType:this.responseType, unitLabel:this.unitLabel, 
                         optionNames: app_codeLists[this.codeListOID], columns:this.columns});
     return s[0].outerHTML;
-    //return s;
   }
 }
