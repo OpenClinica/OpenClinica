@@ -269,7 +269,7 @@ function StudyRenderer(json) {
    * Render all CRFS associated with a StudyEvent
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
-    var studyEventCoverPageString = printPageRenderer.render( this.createStudyEventCoverPage(eventDef), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+    var studyEventCoverPageString = printPageRenderer.render( this.createStudyEventCoverPage(eventDef), 1, app_pagesArray.length+1, app_printTime, app_studyEventCoverPageType )[0].outerHTML;
     app_pagesArray.push(studyEventCoverPageString);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -326,7 +326,7 @@ function StudyRenderer(json) {
       this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      var studyCoverPageString = printPageRenderer.render( this.createStudyCoverPage(), 1, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+      var studyCoverPageString = printPageRenderer.render( this.createStudyCoverPage(), 1, app_pagesArray.length+1, app_printTime, app_studyCoverPageType )[0].outerHTML;
       app_pagesArray.push(studyCoverPageString);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -337,7 +337,7 @@ function StudyRenderer(json) {
     // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render( pageString, i+2, app_pagesArray.length+1, app_printTime )[0].outerHTML;
+      pageTemplateString += printPageRenderer.render( pageString, i+2, app_pagesArray.length+1, app_printTime, app_studyContentPageType)[0].outerHTML;
     }
     return pageTemplateString;
   }

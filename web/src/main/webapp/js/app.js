@@ -27,6 +27,9 @@ var app_interviewDateRequired;
 var app_secondaryLabelViewable;
 var app_eventLocationRequired;
 var app_studyDetails = undefined;
+var app_studyEventCoverPageType = "study_event_cover_page_type";
+var app_studyCoverPageType = "study_cover_page_type";
+var app_studyContentPageType = "study_content_page_type";
 
 debug("console debugging enabled.", util_logInfo );
 

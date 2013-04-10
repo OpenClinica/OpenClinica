@@ -47,9 +47,11 @@
   </div>
   
   <div id='page-footer'>
+    {{if pageType == app_studyEventCoverPageType}}
     <div id='footer-investigator' class='centered text_centered'>
       Investigator Name: ___________________&nbsp;&nbsp;&nbsp;&nbsp;Investigator Signature: ___________________
     </div>
+    {{/if}}
     <div id='footer-pager' class='centered text_centered'>Page ${currPage} of ${totalPages} </div>  
     <div id='footer-date' class='text-right-aligned'>Last printed ${printTime}</div>  
   </div>
