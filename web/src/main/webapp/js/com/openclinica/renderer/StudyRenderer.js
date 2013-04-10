@@ -436,18 +436,21 @@ function StudyRenderer(json) {
         nextItemDef = orderedItems[i+1];
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
-        debug("next item column number: " + nextItemDetails["@ColumnNumber"], util_logInfo );
+        debug("next item column number: " + nextItemDetails["@ColumnNumber"], util_logDebug );
       }       
       
       if (columnNumber === undefined || columnNumber == 1) {
         repeatingRenderString = "<div class='blocking'>";
       }
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
+      var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
+      var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * 10) : 50; 
+      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logInfo );
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
         for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          this.renderPrintableRow(repeatingRenderString, 50, true);
+          this.renderPrintableRow(repeatingRenderString, itemRowHeightInPixels, true);
         }
       }
       prevSectionLabel = sectionLabel;
