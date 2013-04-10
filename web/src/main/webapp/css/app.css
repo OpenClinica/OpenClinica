@@ -134,7 +134,7 @@ a:link {
 .item_def_title{
   vertical-align: top;
   display: inline-block;
-  width:170px;
+  min-width:170px;
   font-size: 0.8em;
   font-weight: normal;
 }
@@ -149,6 +149,7 @@ div.item_def_control{
 span.item_def_control{
   vertical-align: bottom;
   display: inline-block;
+  font-size: 0.7em;
   min-height: 20px;
   min-width:140px;
 }
@@ -157,6 +158,7 @@ span.item_def_control{
 span.item_def_control_3col{
   vertical-align: bottom;
   display: inline-block;
+  font-size: 0.7em;
   min-height: 20px;
   min-width:100px;
 }
@@ -165,6 +167,7 @@ span.item_def_control_3col{
   display: inline-block;
   vertical-align: bottom;
   font-size: 0.7em;
+  min-width:100px;
 }
 
 .checkbox_control{
