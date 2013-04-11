@@ -34,7 +34,7 @@ function StudyRenderer(json) {
   /* loadStudyDetails()
    */
   this.loadStudyDetails = function() {
-    debug("loading study details", util_logInfo );
+    debug("loading study details", util_logDebug );
     app_studyDetails = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"];
     var studyParamList = app_studyDetails["OpenClinica:StudyParameterConfiguration"]["OpenClinica:StudyParameterListRef"];
     app_collectSubjectDOB =  this.getStudyParamValue(studyParamList, "SPL_collectDob");
@@ -51,7 +51,7 @@ function StudyRenderer(json) {
    */
   this.loadBasicDefinitions = function() {
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
-    debug("loading basic definitions", util_logInfo );
+    debug("loading basic definitions", util_logDebug );
     app_basicDefinitions = {};
     for (var i=0;i< basicDefinitions.length;i++) {
       var key = basicDefinitions[i]["@OID"]; 
@@ -64,7 +64,7 @@ function StudyRenderer(json) {
    */
   this.loadCodeLists = function() {
     var codeLists = this.study["MetaDataVersion"]["CodeList"];
-    debug("loading code lists", util_logInfo );
+    debug("loading code lists", util_logDebug );
     app_codeLists = {};
     for (var i=0;i< codeLists.length;i++) {
       var codeListKey = codeLists[i]["@OID"]; 
@@ -102,7 +102,7 @@ function StudyRenderer(json) {
   */  
   this.loadItemGroupDefs = function(formDef) {
     var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
-    debug("loading item groups", util_logInfo );
+    debug("loading item groups", util_logDebug );
     app_itemGroupDefs = {};
     app_itemGroupMap = {};
     
@@ -123,7 +123,7 @@ function StudyRenderer(json) {
         repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
       }
       var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber, util_logInfo );
+      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber, util_logDebug );
       var currentItemGroup = {};
       currentItemGroup.repeatNumber = repeatNumber;
       currentItemGroup.repeating = repeating;
@@ -140,7 +140,7 @@ function StudyRenderer(json) {
    * Load all StudyEvents
    */ 
   this.loadStudyEventDefs = function() {
-    debug("loading study events", util_logInfo );
+    debug("loading study events", util_logDebug );
     app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
     if (app_studyEventDefs[0] == undefined) { 
       app_studyEventDefs = new Array();
@@ -153,7 +153,7 @@ function StudyRenderer(json) {
    * Load all ItemDefs
    */
   this.loadItemDefs = function() {
-    debug("loading item items", util_logInfo );
+    debug("loading item items", util_logDebug );
     app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
     if (app_itemDefs[0] == undefined) { 
       app_itemDefs = new Array();
@@ -166,7 +166,7 @@ function StudyRenderer(json) {
    * Load all FormDefs
    */
   this.loadFormDefs = function() {
-    debug("loading crfs", util_logInfo );
+    debug("loading crfs", util_logDebug );
     app_formDefs = this.study["MetaDataVersion"]["FormDef"];
     if (app_formDefs[0] == undefined) { 
       app_formDefs = new Array();
@@ -356,7 +356,7 @@ function StudyRenderer(json) {
   this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
     this.renderString += htmlString;
     this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logInfo );
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug );
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
       this.startNewPage(inCrf);
     }
@@ -404,7 +404,7 @@ function StudyRenderer(json) {
       var name = itemDetails["OpenClinica:LeftItemText"];
       var columnNumber = itemDetails["@ColumnNumber"];
       var columns = itemDetails["OpenClinica:Layout"] ? itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
-      debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logInfo );
+      debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
@@ -451,7 +451,7 @@ function StudyRenderer(json) {
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * 10) : 50; 
-      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logInfo );
+      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug );
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
         repeatingRenderString += "</div>";
@@ -471,7 +471,7 @@ function StudyRenderer(json) {
    * param inForm: true if we are not at the start of a new CRF
    */
   this.startNewPage = function(inCrf) {
-    debug("Starting New Page", util_logInfo ); 
+    debug("Starting New Page", util_logDebug ); 
     var currentPage = {};
     currentPage.data = this.renderString;
     currentPage.type = app_studyContentPageType;
