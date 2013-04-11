@@ -987,7 +987,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(nls);
         ArrayList<SectionDetails> sections = (ArrayList<SectionDetails>) detail.getSectionDetails();
         for (SectionDetails ig : sections) {
-            xml.append(currentIndent + indent +indent +"<OpenClinica:Section SectionID=\"" + ig.getSectionId() + "\" SectionLabel=\""
+            xml.append(currentIndent + indent +indent +"<OpenClinica:Section SectionLabel=\""
                 +StringEscapeUtils.escapeXml(ig.getSectionLabel()) +   "\" SectionTitle=\""
                         +StringEscapeUtils.escapeXml(ig.getSectionTitle()) + 
                 		 "\" SectionSubtitle=\"" +StringEscapeUtils.escapeXml(ig.getSectionSubtitle()) + 
