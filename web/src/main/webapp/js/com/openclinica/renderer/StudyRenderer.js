@@ -270,7 +270,10 @@ function StudyRenderer(json) {
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
     var studyEventCoverPageString = this.createStudyEventCoverPage(eventDef);
-    app_pagesArray.push(studyEventCoverPageString);
+    var currentPage = {};
+    currentPage.data = studyEventCoverPageString;
+    currentPage.type = app_studyEventCoverPageType;
+    app_pagesArray.push(currentPage);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
@@ -327,7 +330,10 @@ function StudyRenderer(json) {
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
       var studyCoverPageString = this.createStudyCoverPage();
-      app_pagesArray.push(studyCoverPageString);
+      var currentPage = {};
+      currentPage.data = studyCoverPageString;
+      currentPage.type = app_studyCoverPageType;
+      app_pagesArray.push(currentPage);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
@@ -336,8 +342,8 @@ function StudyRenderer(json) {
     }
     // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
-      var pageString =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render( pageString, i+1, app_pagesArray.length, app_printTime, app_studyContentPageType)[0].outerHTML;
+      var currentPage =  app_pagesArray[i];
+      pageTemplateString += printPageRenderer.render( currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type)[0].outerHTML;
     }
     return pageTemplateString;
   }
@@ -466,7 +472,10 @@ function StudyRenderer(json) {
    */
   this.startNewPage = function(inCrf) {
     debug("Starting New Page", util_logInfo ); 
-    app_pagesArray.push(this.renderString);
+    var currentPage = {};
+    currentPage.data = this.renderString;
+    currentPage.type = app_studyContentPageType;
+    app_pagesArray.push(currentPage);
     this.accumulatedPixelHeight = 0;
     inCrf ? this.renderString = app_crfHeader : this.renderString = "";
   }
