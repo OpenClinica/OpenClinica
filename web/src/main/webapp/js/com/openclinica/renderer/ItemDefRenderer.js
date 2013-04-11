@@ -5,7 +5,7 @@ function ItemDefRenderer(json, itemDetails) {
   this.dataType = json["@DataType"];
   this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
   this.OID = json["@OID"];
-  debug("In ItemDefRenderer: " + this.OID + "  responseType: " + this.responseType);
+  debug("In ItemDefRenderer: " + this.OID + "  responseType: " + this.responseType, util_logDebug );
   this.repeating = ParseUtil.parseYesNo(json["@Repeating"]);
   this.itemNumber = json["Question"]["@OpenClinica:QuestionNumber"] ? json["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
   this.unitLabel = json["MeasurementUnitRef"] ? "("+app_basicDefinitions[json["MeasurementUnitRef"]["@MeasurementUnitOID"]]+")" : "";
@@ -18,7 +18,6 @@ function ItemDefRenderer(json, itemDetails) {
                        {itemNumber:this.itemNumber, name:this.name, responseType:this.responseType, unitLabel:this.unitLabel, 
                         optionNames: app_codeLists[this.codeListOID], columns:this.columns});
     return s[0].outerHTML;
-    //return s;
   }
   
   this.renderInteractiveItem = function() { 
@@ -27,6 +26,5 @@ function ItemDefRenderer(json, itemDetails) {
                        {itemNumber:this.itemNumber, name:this.name, dataType:this.dataType,responseType:this.responseType, unitLabel:this.unitLabel, 
                         optionNames: app_codeLists[this.codeListOID], columns:this.columns});
     return s[0].outerHTML;
-    //return s;
   }
 }

@@ -1,10 +1,11 @@
 function PrintPageRenderer() {
-  this.render = function(pageRenderString, currPage, totalPages, printTime) { 
+  this.render = function(pageRenderString, currPage, totalPages, printTime, pageType) { 
     return RenderUtil.render(RenderUtil.get("print_page"), {
       pageRenderString: pageRenderString,
       currPage: currPage,
       totalPages: totalPages,
       printTime: printTime,
+      pageType: pageType,
       studyName: app_studyName, 
       siteName: app_siteName, 
       protocolName: app_protocolName,

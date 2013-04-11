@@ -108,7 +108,7 @@ a:link {
 
 .item_def_wrapper{
   display:inline-block;
-  min-width:450px;
+  min-width:400px;
   min-height:50px;
   margin-top:5px;
   margin-bottom:5px;
@@ -117,7 +117,7 @@ a:link {
 
 .item_def_wrapper_3col{
   display:inline-block;
-  min-width:300px;
+  min-width:150px;
   min-height:50px;
   margin-top:5px;
   margin-bottom:5px;
@@ -134,7 +134,7 @@ a:link {
 .item_def_title{
   vertical-align: top;
   display: inline-block;
-  width:170px;
+  min-width:170px;
   font-size: 0.8em;
   font-weight: normal;
 }
@@ -143,28 +143,31 @@ div.item_def_control{
   vertical-align: bottom;
   display: block;
   min-height: 20px;
-  width:140px;
+  min-width:140px;
 }
 
 span.item_def_control{
   vertical-align: bottom;
   display: inline-block;
+  font-size: 0.7em;
   min-height: 20px;
-  width:140px;
+  min-width:140px;
 }
 
 
 span.item_def_control_3col{
   vertical-align: bottom;
   display: inline-block;
+  font-size: 0.7em;
   min-height: 20px;
-  width:100px;
+  min-width:100px;
 }
 
 .item_def_format_label{
   display: inline-block;
   vertical-align: bottom;
   font-size: 0.7em;
+  min-width:100px;
 }
 
 .checkbox_control{
@@ -238,7 +241,6 @@ span.item_def_control_3col{
 #footer-investigator {
   color: #333333;
   padding-bottom: 8px;
-  display: none;
 }
 
 #footer-pager {

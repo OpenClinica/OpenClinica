@@ -2,6 +2,7 @@ var INITIALIZED = false;
 
 var app_maxPixelHeight = 510;
 var JSON_INDENT_LEVEL = 2;
+var app_logLevel = util_logInfo;
 var app_crfJson;
 var app_odmRenderer;
 var app_basicDefinitions;
@@ -16,8 +17,7 @@ var app_eventName = undefined;
 var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
-['print_page','print_form_def','print_item_def','print_item_def_3col','e_form_def','e_item_def',
- 'study_cover_page','study_event_cover_page','e_item_def_3col'];
+['print_page','print_form_def','print_item_def','print_item_def_3col'];
 var renderMode;
 var app_collectSubjectDOB;
 var app_personIDRequired;
@@ -27,8 +27,11 @@ var app_interviewDateRequired;
 var app_secondaryLabelViewable;
 var app_eventLocationRequired;
 var app_studyDetails = undefined;
+var app_studyEventCoverPageType = "study_event_cover_page_type";
+var app_studyCoverPageType = "study_cover_page_type";
+var app_studyContentPageType = "study_content_page_type";
 
-debug("console debugging enabled.");
+debug("console debugging enabled.", util_logDebug);
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {

@@ -1,6 +1,9 @@
-var debug = function (log_txt) {
-  if (window.console != undefined) {
-    console.log(log_txt);
+var util_logInfo = 1;
+var util_logDebug = 2;
+
+var debug = function (logText, logLevel) {
+  if (window.console != undefined && logLevel <= app_logLevel) {
+    console.log(logText);
   }
 }
 

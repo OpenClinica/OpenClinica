@@ -4,7 +4,7 @@
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file'}}
   <span class='item_def_control'> __________ </span>
   {{else responseType == 'radio'}}
-  <span class='item_def_control'> Yes ____&nbsp;&nbsp;&nbsp;No ____ </span>
+  <span class='item_def_control'>{{each optionNames}}{{html label}} ______ &nbsp;&nbsp;&nbsp;{{/each}}</span>
   {{else responseType == 'single-select' || responseType == 'multi-select' || responseType == 'checkbox'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
