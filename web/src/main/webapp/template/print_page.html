@@ -8,7 +8,7 @@
       {{if secondaryLabelViewable == true}}
         <div id='header-secondary-id' class='text-left-aligned'>Secondary ID: </div>  
       {{/if}}
-      {{if eventName !== undefined}}
+      {{if pageType != app_studyCoverPageType}}
         <div id='header-event-name' class='text-left-aligned'>Event: ${eventName}</div>  
       {{/if}}
       {{if eventLocationRequired == 'required'}}

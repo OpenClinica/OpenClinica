@@ -269,10 +269,12 @@ function StudyRenderer(json) {
    * Render all CRFS associated with a StudyEvent
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+    app_eventName = eventDef["@Name"];
     var studyEventCoverPageString = this.createStudyEventCoverPage(eventDef);
     var currentPage = {};
     currentPage.data = studyEventCoverPageString;
     currentPage.type = app_studyEventCoverPageType;
+    currentPage.eventName = app_eventName;
     app_pagesArray.push(currentPage);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -285,7 +287,6 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formDef["@FormOID"]) {
           formDef = app_formDefs[j];
-          app_eventName = eventDef["@Name"];
           this.renderPrintableFormDef(formDef);
           break;
         }
@@ -332,6 +333,7 @@ function StudyRenderer(json) {
       var studyCoverPageString = this.createStudyCoverPage();
       var currentPage = {};
       currentPage.data = studyCoverPageString;
+      currentPage.eventName = app_eventName;
       currentPage.type = app_studyCoverPageType;
       app_pagesArray.push(currentPage);
       // select all CRFs from study
@@ -343,7 +345,7 @@ function StudyRenderer(json) {
     // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var currentPage =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render( currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type)[0].outerHTML;
+      pageTemplateString += printPageRenderer.render( currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
     }
     return pageTemplateString;
   }
@@ -475,6 +477,7 @@ function StudyRenderer(json) {
     var currentPage = {};
     currentPage.data = this.renderString;
     currentPage.type = app_studyContentPageType;
+    currentPage.eventName = app_eventName;
     app_pagesArray.push(currentPage);
     this.accumulatedPixelHeight = 0;
     inCrf ? this.renderString = app_crfHeader : this.renderString = "";
