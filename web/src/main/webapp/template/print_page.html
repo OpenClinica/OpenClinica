@@ -16,6 +16,9 @@
       {{else eventLocationRequired == 'optional'}}
         <div id='header-event-location' class='text-left-aligned'>Event Location: ${eventName}</div>  
       {{/if}}
+      {{if pageType != app_studyCoverPageType}}
+        <div id='header-event-date' class='text-left-aligned'>Event Date: ___________________</div>  
+      {{/if}}
     </div> 
     <div id='right-header'>
       {{if showPersonID == true && personIDRequired == 'required'}}
