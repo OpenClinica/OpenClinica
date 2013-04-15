@@ -13,72 +13,12 @@
 function StudyRenderer(json) {
   this.json = json;
   this.study = undefined;
+  this.studyDataLoader = undefined;
   this.accumulatedPixelHeight = 0;
   this.renderString = "";
   var pageTemplateString = "";
   var printPageRenderer;
-  
-  
- /* getStudyParamValue(itemDef, formDef) 
-  * A convenience function to get the study detail parameter value
-  */ 
-  this.getStudyParamValue = function(studyParamList, listId) {
-    for (var i=0;i< studyParamList.length;i++) {
-      if (studyParamList[i]["@StudyParameterListID"] == listId) {
-        return studyParamList[i]["@Value"];
-      }
-    }
-  }
-  
-  
-  /* loadStudyDetails()
-   */
-  this.loadStudyDetails = function() {
-    debug("loading study details", util_logDebug );
-    app_studyDetails = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"];
-    var studyParamList = app_studyDetails["OpenClinica:StudyParameterConfiguration"]["OpenClinica:StudyParameterListRef"];
-    app_collectSubjectDOB =  this.getStudyParamValue(studyParamList, "SPL_collectDob");
-    app_personIDRequired = this.getStudyParamValue(studyParamList, "SPL_subjectPersonIdRequired");
-    app_showPersonID = this.getStudyParamValue(studyParamList, "SPL_personIdShownOnCRF");
-    app_interviewerNameRequired = this.getStudyParamValue(studyParamList, "SPL_interviewerNameRequired");
-    app_interviewDateRequired = this.getStudyParamValue(studyParamList, "SPL_interviewDateRequired");
-    app_secondaryLabelViewable = this.getStudyParamValue(studyParamList, "SPL_secondaryLabelViewable");
-    app_eventLocationRequired = this.getStudyParamValue(studyParamList, "SPL_eventLocationRequired");
-  }
-  
- 
-  /* loadBasicDefinitions()
-   */
-  this.loadBasicDefinitions = function() {
-    var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
-    debug("loading basic definitions", util_logDebug );
-    app_basicDefinitions = {};
-    for (var i=0;i< basicDefinitions.length;i++) {
-      var key = basicDefinitions[i]["@OID"]; 
-      var value = basicDefinitions[i]["@Name"]; 
-      app_basicDefinitions[key] = value;
-    }
-  }
- 
-  /* loadCodeLists()
-   */
-  this.loadCodeLists = function() {
-    var codeLists = this.study["MetaDataVersion"]["CodeList"];
-    debug("loading code lists", util_logDebug );
-    app_codeLists = {};
-    for (var i=0;i< codeLists.length;i++) {
-      var codeListKey = codeLists[i]["@OID"]; 
-      var currentCodeList = [];
-      var codeListItems = codeLists[i]["CodeListItem"];
-      for (var j=0;j< codeListItems.length;j++) {
-        var currentCodeListItem = {};
-        currentCodeListItem.id = codeListItems[j]["@CodedValue"]; 
-        currentCodeListItem.label = codeListItems[j]["Decode"]["TranslatedText"]; 
-        currentCodeList.push(currentCodeListItem);
-      }
-      app_codeLists[codeListKey] = currentCodeList;
-    }
-  }
+
   
   
  /* getItemDetails(itemDef, formDef) 
@@ -96,84 +36,7 @@ function StudyRenderer(json) {
     return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
   }
   
-  
- /* loadItemGroupDefs(formDef)
-  * Associate all Items with their ItemGroups
-  */  
-  this.loadItemGroupDefs = function(formDef) {
-    var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
-    debug("loading item groups", util_logDebug );
-    app_itemGroupDefs = {};
-    app_itemGroupMap = {};
-    
-    for (var i=0;i< itemGroupDefs.length;i++) {
-      var itemGroupDef = itemGroupDefs[i];
-      var itemGroupKey = itemGroupDef["@OID"]; 
-      var repeatNumber = undefined; 
-      if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
-        var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
-        for (var j=0;j< presentInForm.length;j++) {
-          if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
-           repeatNumber = presentInForm[j].repeatNumber; 
-           break;
-          }
-        }
-      }
-      else {
-        repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-      }
-      var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber, util_logDebug );
-      var currentItemGroup = {};
-      currentItemGroup.repeatNumber = repeatNumber;
-      currentItemGroup.repeating = repeating;
-      app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-      for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
-        var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-        debug("Attaching " +itemKey, util_logDebug );
-        app_itemGroupMap[itemKey] = itemGroupKey;
-      }
-    }
-  }
-  
-  /* loadStudyEventDefs()
-   * Load all StudyEvents
-   */ 
-  this.loadStudyEventDefs = function() {
-    debug("loading study events", util_logDebug );
-    app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
-    if (app_studyEventDefs[0] == undefined) { 
-      app_studyEventDefs = new Array();
-      app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
-    }
-  }
- 
-  
-  /* loadItemDefs()
-   * Load all ItemDefs
-   */
-  this.loadItemDefs = function() {
-    debug("loading item items", util_logDebug );
-    app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    if (app_itemDefs[0] == undefined) { 
-      app_itemDefs = new Array();
-      app_itemDefs.push(this.study["MetaDataVersion"]["ItemDef"]);
-    }
-  }
- 
-  
-  /* loadFormDefs()
-   * Load all FormDefs
-   */
-  this.loadFormDefs = function() {
-    debug("loading crfs", util_logDebug );
-    app_formDefs = this.study["MetaDataVersion"]["FormDef"];
-    if (app_formDefs[0] == undefined) { 
-      app_formDefs = new Array();
-      app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
-    }
-  }
-  
+
   
  /* setStudy(renderMode)
   * Set the current study being rendered
@@ -191,18 +54,7 @@ function StudyRenderer(json) {
     }  
   }
  
-  
-  /* initStudyLists()
-   */
-  this.initStudyLists = function () {
-    this.loadBasicDefinitions();
-    this.loadCodeLists();
-    this.loadItemDefs();
-    this.loadFormDefs();
-    this.loadStudyEventDefs();
-    this.loadStudyDetails();
-  }
- 
+
   
   /* createStudyEventCoverPage()
    */
@@ -303,7 +155,8 @@ function StudyRenderer(json) {
     
     printPageRenderer = new PrintPageRenderer();
     this.setStudy(renderMode);  
-    this.initStudyLists();   
+    this.studyDataLoader = new StudyDataLoader(this.study); 
+    this.studyDataLoader.loadStudyLists();   
     var formDef = undefined;
     pageTemplateString = "";
     
@@ -371,7 +224,7 @@ function StudyRenderer(json) {
   this.renderPrintableFormDef = function(formDef) {
     var orderedItems = new Array();
     
-    this.loadItemGroupDefs(formDef);
+    this.studyDataLoader.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
