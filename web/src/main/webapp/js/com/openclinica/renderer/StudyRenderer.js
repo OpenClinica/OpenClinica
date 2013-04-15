@@ -11,6 +11,8 @@
  * This is the main rendering class where most of the processing occurs.
  */
 function StudyRenderer(json) {
+  this.ITEM_OPTION_HEIGHT = 10;
+  this.DEFAULT_ITEM_HEIGHT = 50; 
   this.json = json;
   this.study = undefined;
   this.studyDataLoader = undefined;
@@ -305,7 +307,7 @@ function StudyRenderer(json) {
       }
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
-      var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * 10) : 50; 
+      var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT) : this.DEFAULT_ITEM_HEIGHT; 
       debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug );
       repeatingRenderString += itemDefRenderer.renderPrintableItem();
       if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
