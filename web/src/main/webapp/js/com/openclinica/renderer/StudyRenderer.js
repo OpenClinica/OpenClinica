@@ -282,16 +282,17 @@ function StudyRenderer(json) {
       
       var repeatNumber = 1;
       var repeating = false;
+      var repeatMax = undefined; 
       
       if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
-      }
-      if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
+        repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax;
       }
       if (repeatNumber === undefined ) {
         repeatNumber = 1;
       }
+      debug(name + " - repeating: " + repeating + ", repeatMax: " + repeatMax, util_logInfo);
       
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;

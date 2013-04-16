@@ -31,6 +31,9 @@ function StudyDataLoader(study) {
   this.loadStudyDetails = function() {
     debug("loading study details", util_logDebug );
     app_studyDetails = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"];
+    if (!app_studyDetails) {
+      return;
+    }
     var studyParamList = app_studyDetails["OpenClinica:StudyParameterConfiguration"]["OpenClinica:StudyParameterListRef"];
     app_collectSubjectDOB =  this.getStudyParamValue(studyParamList, "SPL_collectDob");
     app_personIDRequired = this.getStudyParamValue(studyParamList, "SPL_subjectPersonIdRequired");
@@ -89,22 +92,26 @@ function StudyDataLoader(study) {
       var itemGroupDef = itemGroupDefs[i];
       var itemGroupKey = itemGroupDef["@OID"]; 
       var repeatNumber = undefined; 
+      var repeatMax = undefined; 
       if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
         var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
         for (var j=0;j< presentInForm.length;j++) {
           if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
            repeatNumber = presentInForm[j].repeatNumber; 
+           repeatMax = presentInForm[j].repeatMax; 
            break;
           }
         }
       }
       else {
         repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
+        repeatMax =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"];
       }
       var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber, util_logDebug );
+      debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
       var currentItemGroup = {};
       currentItemGroup.repeatNumber = repeatNumber;
+      currentItemGroup.repeatMax = repeatMax;
       currentItemGroup.repeating = repeating;
       app_itemGroupDefs[itemGroupKey] = currentItemGroup;
       for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
