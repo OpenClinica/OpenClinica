@@ -13,6 +13,7 @@
 function StudyRenderer(json) {
   this.ITEM_OPTION_HEIGHT = 10;
   this.DEFAULT_ITEM_HEIGHT = 50; 
+  this.DEFAULT_MAX_REPEAT = 40; 
   this.json = json;
   this.study = undefined;
   this.studyDataLoader = undefined;
@@ -231,7 +232,7 @@ function StudyRenderer(json) {
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
     this.renderString = app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
-    var repeatingRenderString = "";
+    var itemRenderString = "";
  
     // Get Form Items
     var prevSectionLabel = undefined;
@@ -285,14 +286,12 @@ function StudyRenderer(json) {
       var repeatMax = undefined; 
       
       if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
-        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber;
+        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
-        repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax;
+        repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax : this.DEFAULT_MAX_REPEAT;
       }
-      if (repeatNumber === undefined ) {
-        repeatNumber = 1;
-      }
-      debug(name + " - repeating: " + repeating + ", repeatMax: " + repeatMax, util_logInfo);
+      
+      debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logInfo);
       
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
@@ -300,27 +299,34 @@ function StudyRenderer(json) {
         nextItemDef = orderedItems[i+1];
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
-        debug("next item column number: " + nextItemDetails["@ColumnNumber"], util_logDebug );
+        debug("next item column number: " + nextColumnNumber, util_logDebug );
       }       
       
-      if (columnNumber === undefined || columnNumber == 1) {
-        repeatingRenderString = "<div class='blocking'>";
-      }
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT) : this.DEFAULT_ITEM_HEIGHT; 
       debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug );
-      repeatingRenderString += itemDefRenderer.renderPrintableItem();
-      if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
-        repeatingRenderString += "</div>";
-        for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          this.renderPrintableRow(repeatingRenderString, itemRowHeightInPixels, true);
+      
+      if (repeating == true) {
+        for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
+          debug("1 REPEATING -- " + name + " - repeatCounter: " + repeatCounter + ", repeatMax: " + repeatMax, util_logInfo);
         }
       }
+      else { 
+        if (columnNumber === undefined || columnNumber == 1) {
+          itemRenderString = "<div class='blocking'>";
+        }
+        itemRenderString += itemDefRenderer.renderPrintableItem();
+        if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
+          itemRenderString += "</div>";
+          this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, true);
+        }
+      }
+      
+      
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    return this.renderString;
   }
   
   

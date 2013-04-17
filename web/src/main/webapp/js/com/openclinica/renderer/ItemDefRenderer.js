@@ -20,11 +20,4 @@ function ItemDefRenderer(json, itemDetails) {
     return s[0].outerHTML;
   }
   
-  this.renderInteractiveItem = function() { 
-    var template = this.columns == 3 ? "e_item_def_3col" : "e_item_def";
-    var s = RenderUtil.render(RenderUtil.get(template), 
-                       {itemNumber:this.itemNumber, name:this.name, dataType:this.dataType,responseType:this.responseType, unitLabel:this.unitLabel, 
-                        optionNames: app_codeLists[this.codeListOID], columns:this.columns});
-    return s[0].outerHTML;
-  }
 }
