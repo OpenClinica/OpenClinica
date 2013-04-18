@@ -114,10 +114,17 @@ function StudyDataLoader(study) {
       currentItemGroup.repeatMax = repeatMax;
       currentItemGroup.repeating = repeating;
       app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-      for (var j=0;j< itemGroupDef["ItemRef"].length;j++) {
+      var itemGroupLength = itemGroupDef["ItemRef"].length;
+      for (var j=0;j< itemGroupLength;j++) {
         var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-        debug("Attaching " +itemKey, util_logDebug );
-        app_itemGroupMap[itemKey] = itemGroupKey;
+        var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
+        var currentItem = {};
+        currentItem.orderNumber = orderNumber;
+        currentItem.itemGroupKey = itemGroupKey;
+        currentItem.itemGroupLength = itemGroupLength;
+        app_itemGroupMap[itemKey] = currentItem;
+        debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logInfo);
+        //app_itemGroupMap[itemKey] = itemGroupKey;
       }
     }
   }

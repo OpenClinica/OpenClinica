@@ -17,7 +17,7 @@ var app_eventName = undefined;
 var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
-['print_page','print_form_def','print_item_def','print_item_def_3col'];
+['print_page','print_form_def','print_item_def','print_item_def_3col','print_repeating_item_group','print_repeating_item'];
 var renderMode;
 var app_collectSubjectDOB;
 var app_personIDRequired;

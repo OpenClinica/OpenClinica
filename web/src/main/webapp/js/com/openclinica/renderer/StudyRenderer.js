@@ -207,20 +207,6 @@ function StudyRenderer(json) {
   }
  
   
-  /* renderPrintableRow(htmlString, rowHeight, inCrf)
-   * Render each row of a CRF.
-   * Decide whether a page break is needed
-   */
-  this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
-    this.renderString += htmlString;
-    this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug );
-    if (this.accumulatedPixelHeight > app_maxPixelHeight) {
-      this.startNewPage(inCrf);
-    }
-  } 
- 
-  
   /* renderPrintableFormDef(formDef)
    * The heart of StudyRenderer: render the CRF
    */
@@ -233,6 +219,9 @@ function StudyRenderer(json) {
     var formDefRenderer = new FormDefRenderer(formDef);
     this.renderString = app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var itemRenderString = "";
+    var repeatingHeaderString = "";
+    var repeatingRowString = "";
+    var repeatingRows = "";
  
     // Get Form Items
     var prevSectionLabel = undefined;
@@ -252,6 +241,8 @@ function StudyRenderer(json) {
     
     for (var i=0;i< orderedItems.length;i++) {
       var accumulatedPixelHeight = 0;
+      var repeatingRowHeight = 0;
+      var repeatingTableHeight = 0;
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
@@ -285,13 +276,13 @@ function StudyRenderer(json) {
       var repeating = false;
       var repeatMax = undefined; 
       
-      if (app_itemGroupDefs[app_itemGroupMap[itemOID]]) {
-        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatNumber : 1;
-        repeating = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeating;
-        repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID]].repeatMax : this.DEFAULT_MAX_REPEAT;
+      if (app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
+        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
+        repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
+        repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
       }
       
-      debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logInfo);
+      debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
       
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
@@ -299,24 +290,55 @@ function StudyRenderer(json) {
         nextItemDef = orderedItems[i+1];
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
-        debug("next item column number: " + nextColumnNumber, util_logDebug );
+        var nextItemOID = nextItemDef["@OID"];
+        debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT) : this.DEFAULT_ITEM_HEIGHT; 
-      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug );
+      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug);
       
       if (repeating == true) {
-        for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
-          debug("1 REPEATING -- " + name + " - repeatCounter: " + repeatCounter + ", repeatMax: " + repeatMax, util_logInfo);
+        var orderNumber = app_itemGroupMap[itemOID].orderNumber;
+        var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
+        debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
+       
+        // in first item in repeating group
+        if (orderNumber == itemGroupLength) { 
+           repeatingRowString = "<tr class='repeating_item_group'>";
+           repeatingHeaderString = "<tr class='repeating_item_group'>";
+        }
+        
+        repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
+        repeatingHeaderString += "<td class='repeating_item_header'>" + name + "</td>";
+         
+        // in last item in repeating group
+        if (orderNumber == 1) {
+          repeatingRowString += "</tr>";
+          repeatingHeaderString += "</tr>";
+          if(repeatingRowHeight < itemRowHeightInPixels) {
+            repeatingRowHeight = itemRowHeightInPixels;
+          }
+          
+          
+          for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
+            repeatingRows += repeatingRowString;
+            repeatingTableHeight += repeatingRowHeight;
+            if (repeatingTableHeight > app_maxPixelHeight) {
+              var repeatingRowsRendered = RenderUtil.render(RenderUtil.get(
+                  "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
+              this.renderPrintableRow(repeatingRowsRendered, repeatingTableHeight, true);
+            }
+          }
+
         }
       }
       else { 
         if (columnNumber === undefined || columnNumber == 1) {
           itemRenderString = "<div class='blocking'>";
         }
-        itemRenderString += itemDefRenderer.renderPrintableItem();
+        itemRenderString += itemDefRenderer.renderPrintableItem(repeating);
         if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
           itemRenderString += "</div>";
           this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, true);
@@ -328,6 +350,20 @@ function StudyRenderer(json) {
       prevItemHeader = itemHeader;
     }
   }
+  
+  
+  /* renderPrintableRow(htmlString, rowHeight, inCrf)
+   * Render each row of a CRF.
+   * Decide whether a page break is needed
+   */
+  this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
+    this.renderString += htmlString;
+    this.accumulatedPixelHeight += rowHeight;
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug );
+    if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+      this.startNewPage(inCrf);
+    }
+  } 
   
   
   /* startNewPage(inCrf)
