@@ -276,7 +276,7 @@ function StudyRenderer(json) {
       var repeating = false;
       var repeatMax = undefined; 
       
-      if (app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
+      if (app_itemGroupDefs[app_itemGroupMap[itemOID]] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
