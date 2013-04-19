@@ -170,7 +170,11 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         List<String> terms = new ArrayList<String>();
         terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.main"));
 
-        terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
+        if(!isSite)
+        {
+        	//terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
+        }
+       
         if (isSite) {
             terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
         }
