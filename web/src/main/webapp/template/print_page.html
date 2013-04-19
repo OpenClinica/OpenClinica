@@ -8,13 +8,16 @@
       {{if secondaryLabelViewable == true}}
         <div id='header-secondary-id' class='text-left-aligned'>Secondary ID: </div>  
       {{/if}}
-      {{if eventName !== undefined}}
+      {{if pageType != app_studyCoverPageType}}
         <div id='header-event-name' class='text-left-aligned'>Event: ${eventName}</div>  
       {{/if}}
       {{if eventLocationRequired == 'required'}}
         <div id='header-event-location' class='text-left-aligned'>Event Location *: ${eventName}</div>  
       {{else eventLocationRequired == 'optional'}}
         <div id='header-event-location' class='text-left-aligned'>Event Location: ${eventName}</div>  
+      {{/if}}
+      {{if pageType != app_studyCoverPageType}}
+        <div id='header-event-date' class='text-left-aligned'>Event Date: ___________________</div>  
       {{/if}}
     </div> 
     <div id='right-header'>

@@ -7,6 +7,7 @@
            app_contextPath + "/js/util.js",
            app_contextPath + "/js/app.js",           
            app_contextPath + "/js/com/openclinica/renderer/ODMRenderer.js",           
+           app_contextPath + "/js/com/openclinica/renderer/StudyDataLoader.js",           
            app_contextPath + "/js/com/openclinica/renderer/StudyRenderer.js",           
            app_contextPath + "/js/com/openclinica/renderer/FormDefRenderer.js",           
            app_contextPath + "/js/com/openclinica/renderer/ItemDefRenderer.js",           
