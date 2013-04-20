@@ -11,8 +11,9 @@
  * This is the main rendering class where most of the processing occurs.
  */
 function StudyRenderer(json) {
-  this.ITEM_OPTION_HEIGHT = 10;
-  this.DEFAULT_ITEM_HEIGHT = 50; 
+  this.ITEM_OPTION_HEIGHT = 7;
+  this.DEFAULT_ITEM_HEIGHT = 40; 
+  this.DEFAULT_GRID_ITEM_HEIGHT = 20; 
   this.DEFAULT_MAX_REPEAT = 40; 
   this.json = json;
   this.study = undefined;
@@ -221,7 +222,6 @@ function StudyRenderer(json) {
     var itemRenderString = "";
     var repeatingHeaderString = "";
     var repeatingRowString = "";
-    var repeatingRows = "";
  
     // Get Form Items
     var prevSectionLabel = undefined;
@@ -240,9 +240,7 @@ function StudyRenderer(json) {
     }
     
     for (var i=0;i< orderedItems.length;i++) {
-      var accumulatedPixelHeight = 0;
-      var repeatingRowHeight = 0;
-      var repeatingTableHeight = 0;
+      var repeatingRows = "";
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
@@ -296,10 +294,9 @@ function StudyRenderer(json) {
       
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
-      var itemRowHeightInPixels = app_codeLists[codeListOID] ?  (app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT) : this.DEFAULT_ITEM_HEIGHT; 
-      debug("calculated itemRowHeightInPixels: " + itemRowHeightInPixels, util_logDebug);
       
       if (repeating == true) {
+        var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
@@ -317,24 +314,23 @@ function StudyRenderer(json) {
         if (orderNumber == 1) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
-          if(repeatingRowHeight < itemRowHeightInPixels) {
-            repeatingRowHeight = itemRowHeightInPixels;
-          }
-          
           
           for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
             repeatingRows += repeatingRowString;
-            repeatingTableHeight += repeatingRowHeight;
-            if (repeatingTableHeight > app_maxPixelHeight) {
-              var repeatingRowsRendered = RenderUtil.render(RenderUtil.get(
-                  "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
-              this.renderPrintableRow(repeatingRowsRendered, repeatingTableHeight, true);
+            this.accumulatedPixelHeight += itemRowHeightInPixels;
+            if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+              this.renderString += RenderUtil.render(RenderUtil.get(
+              "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
+              this.startNewPage(true);
+              repeatingRows = "";
             }
           }
-
+          this.renderString += RenderUtil.render(RenderUtil.get(
+          "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
         }
       }
-      else { 
+      else if (repeating == false) { 
+        var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
           itemRenderString = "<div class='blocking'>";
         }
@@ -344,6 +340,7 @@ function StudyRenderer(json) {
           this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, true);
         }
       }
+      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logInfo);
       
       
       prevSectionLabel = sectionLabel;
@@ -359,7 +356,7 @@ function StudyRenderer(json) {
   this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
     this.renderString += htmlString;
     this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug );
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
       this.startNewPage(inCrf);
     }
@@ -371,7 +368,7 @@ function StudyRenderer(json) {
    * param inForm: true if we are not at the start of a new CRF
    */
   this.startNewPage = function(inCrf) {
-    debug("Starting New Page", util_logDebug ); 
+    debug("Starting New Page", util_logDebug); 
     var currentPage = {};
     currentPage.data = this.renderString;
     currentPage.type = app_studyContentPageType;

@@ -123,8 +123,7 @@ function StudyDataLoader(study) {
         currentItem.itemGroupKey = itemGroupKey;
         currentItem.itemGroupLength = itemGroupLength;
         app_itemGroupMap[itemKey] = currentItem;
-        debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logInfo);
-        //app_itemGroupMap[itemKey] = itemGroupKey;
+        debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
       }
     }
   }

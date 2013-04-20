@@ -55,7 +55,7 @@ h4 {
   position: relative;
   margin: 0 auto;
   margin-top: 20px;
-  margin-bottom: 120px;
+  margin-bottom: 20px;
   padding-left: 10px;
   padding-right: 10px;
   border:1px inset #333333;
@@ -107,8 +107,8 @@ a:link {
 .repeating_item_wrapper{
   display:inline-block;
   min-height:40px;
-  margin-top:5px;
-  margin-bottom:5px;
+  margin-top:0px;
+  margin-bottom:0px;
   margin-left:5x;
 }
 
@@ -117,8 +117,8 @@ a:link {
   display:inline-block;
   min-width:400px;
   min-height:50px;
-  margin-top:5px;
-  margin-bottom:5px;
+  margin-top:0px;
+  margin-bottom:0px;
   margin-left:20px;
 }
 
@@ -126,8 +126,8 @@ a:link {
   display:inline-block;
   min-width:150px;
   min-height:50px;
-  margin-top:5px;
-  margin-bottom:5px;
+  margin-top:0px;
+  margin-bottom:0px;
   margin-left:10px;
 }
 
@@ -149,14 +149,12 @@ a:link {
 div.item_def_control{
   vertical-align: bottom;
   display: block;
-  min-height: 20px;
 }
 
 span.item_def_control{
   vertical-align: bottom;
   display: inline-block;
   font-size: 0.7em;
-  min-height: 20px;
 }
 
 
@@ -164,7 +162,6 @@ span.item_def_control_3col{
   vertical-align: bottom;
   display: inline-block;
   font-size: 0.7em;
-  min-height: 20px;
 }
 
 .item_def_format_label{
