@@ -222,6 +222,10 @@ function StudyRenderer(json) {
     var itemRenderString = "";
     var repeatingHeaderString = "";
     var repeatingRowString = "";
+    var currentItemGroupOID = "";
+    var previousItemGroupOID = "";
+    var isFirstRepeatingItem = true;
+    var lastRepeatingOrderInFormNumber;
  
     // Get Form Items
     var prevSectionLabel = undefined;
@@ -243,6 +247,7 @@ function StudyRenderer(json) {
       var repeatingRows = "";
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
+      
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
       var itemDetails = this.getItemDetails(itemDef, formDef);
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
@@ -275,6 +280,7 @@ function StudyRenderer(json) {
       var repeatMax = undefined; 
       
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
+        currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
@@ -295,23 +301,34 @@ function StudyRenderer(json) {
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       
+      
+      // process repeating group of items 
       if (repeating == true) {
+      
+        debug("REPEATING current: " + currentItemGroupOID + ", previous: " + previousItemGroupOID + " i: " + i + ", limit: " + lastRepeatingOrderInFormNumber, util_logDebug);
+     
+        if (currentItemGroupOID != previousItemGroupOID) {
+          isFirstRepeatingItem = true;
+        }
+      
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
        
         // in first item in repeating group
-        if (orderNumber == itemGroupLength) { 
+        if (isFirstRepeatingItem == true) {
            repeatingRowString = "<tr class='repeating_item_group'>";
            repeatingHeaderString = "<tr class='repeating_item_group'>";
+           isFirstRepeatingItem = false;
+           lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
         repeatingHeaderString += "<td class='repeating_item_header'>" + name + "</td>";
          
         // in last item in repeating group
-        if (orderNumber == 1) {
+        if (i == lastRepeatingOrderInFormNumber) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
           
@@ -340,9 +357,9 @@ function StudyRenderer(json) {
           this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, true);
         }
       }
-      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logInfo);
+      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logDebug);
       
-      
+      previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
