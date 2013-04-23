@@ -27,7 +27,7 @@
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <style type="text/css">
 
 .tooltip {

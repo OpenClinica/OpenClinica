@@ -10,7 +10,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
   <title>OpenClinica</title>
   <link type="text/css" rel="stylesheet" href="<c:url value="/style.css"/>"/>
-  <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
+  <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
   <script type="text/javascript">
       $(document).ready( function() {
           $('#confirmationForm').submit();

@@ -22,7 +22,7 @@
 
 <link type="text/css" href="includes/jmesa/jmesa.css"  rel="stylesheet">    
 
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>

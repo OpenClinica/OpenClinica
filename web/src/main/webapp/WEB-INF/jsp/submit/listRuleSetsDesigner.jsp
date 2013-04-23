@@ -24,7 +24,7 @@
 <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
 <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
