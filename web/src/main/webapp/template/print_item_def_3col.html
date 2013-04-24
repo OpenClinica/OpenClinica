@@ -1,7 +1,7 @@
 <div class='item_def_wrapper_3col'>
   <span class='item_def_number'>{{html itemNumber}}</span>
   <span class='item_def_title'>{{html name}}</span>
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file'}}
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
   <span class='item_def_control_3col'> __________ </span>
   {{else responseType == 'radio'}}
   <span class='item_def_control_3col'>{{each optionNames}}{{html label}} ______ &nbsp;&nbsp;&nbsp;{{/each}}</span>
