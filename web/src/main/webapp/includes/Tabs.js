@@ -17,6 +17,7 @@ function DecreaseTabValue()
 function AdvanceTabs()
 	{
 	leftnavExpand('Tab' + TabValue); 
+	if(typeof TabsShown != 'undefined')
 	leftnavExpand('Tab' + (TabValue+TabsShown));
 	}
 
@@ -30,11 +31,17 @@ function EnableArrows()
 		}
 	else {}
 
+	
+	
+	
+	if(typeof TabsNumber != 'undefined'){
 	if (TabValue==TabsNumber-(TabsShown+1))
 		{
 		leftnavExpand('TabsNextDis');
 		leftnavExpand('TabsNext');
 		}
+		}
+		
 	else {}
 
 }
