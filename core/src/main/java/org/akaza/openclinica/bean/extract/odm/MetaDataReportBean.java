@@ -308,6 +308,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     addMultiSelectList(currentIndent + indent);
                     addStudyGroupClassList(currentIndent + indent);
                     if (meta.getStudy().getParentStudyId() > 0) {
+                    	 this.addStudyDetails(currentIndent + indent);
                     } else {
                         this.addStudyDetails(currentIndent + indent);
                     }
@@ -353,7 +354,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
             // add EventDefinitionDetails for oc1.3
-            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+            //MR=416
+            if ("oc1.3".equals(this.getODMVersion()) ) {
                 this.addEventDefinitionDetails(sed.getEventDefinitionDetais(), currentIndent + indent);
             }
             xml.append(currentIndent + "</StudyEventDef>");
@@ -376,7 +378,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
             // add FormDetails for oc1.3
-            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+            if ("oc1.3".equals(this.getODMVersion())) {
                 this.addFormDetails(form.getFormDetails(), currentIndent + indent);
             }
             xml.append(currentIndent + "</FormDef>");
@@ -436,7 +438,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
             // add ItemGroupDetails for oc1.3
-            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+            if ("oc1.3".equals(this.getODMVersion()) ) {
                 this.addItemGroupDetails(ig.getItemGroupDetails(), currentIndent + indent);
             }
             xml.append(currentIndent + "</ItemGroupDef>");
@@ -566,7 +568,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 }
             }
             // add ItemDetails for oc1.3
-            if ("oc1.3".equals(ODMVersion) && isStudy) {
+            if ("oc1.3".equals(ODMVersion)) {
                 if (!hasNode) {
                     hasNode = true;
                     xml.append(">");
