@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css'/>" type="text/css"/>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.9.1.min.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.min.js'/>"></script>
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
