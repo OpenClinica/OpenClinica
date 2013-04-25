@@ -707,7 +707,21 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         StudyBean study = odmstudy.getMetaDataVersion().getStudy();
         String temp = "";
         if (study.getId() > 0) {
-            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\"" + StringEscapeUtils.escapeXml(study.getOid()) + "\">");
+            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\"" + StringEscapeUtils.escapeXml(study.getOid())+ "\"" );
+            
+            if(study.getParentStudyId()>0){
+                     	temp = study.getName();
+            	if(temp!=null && temp.length()>0){
+            		xml.append(" SiteName=\""+ StringEscapeUtils.escapeXml(temp) + "\"");
+            		
+            	}
+            	temp = study.getParentStudyName();
+            	if(temp!=null && temp.length()>0){
+            		xml.append(" ParentStudyName=\""+ StringEscapeUtils.escapeXml(temp) + "\"");
+            	}
+            	
+            }
+            xml.append(">");
             xml.append(nls);
             xml.append(currentIndent + indent + "<OpenClinica:StudyDescriptionAndStatus");
             temp = study.getOfficialTitle();
