@@ -264,7 +264,7 @@ function StudyRenderer(json) {
       var itemDef = orderedItems[i];
       var itemOID = itemDef["@OID"];
       
-      var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
+      var itemNumber = itemDef["Question"] && itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
       var itemDetails = this.getItemDetails(itemDef, formDef);
       var sectionDetails = this.getSectionDetails(itemDetails, formDef);
       var sectionTitle = sectionDetails["@SectionTitle"];
