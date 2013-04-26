@@ -1,14 +1,21 @@
 <td class='repeating_item_group'>
 <div class='repeating_item_wrapper'>
-  <span class='item_def_number'>{{html itemNumber}}</span>
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file'}}
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
   <span class='item_def_control'> __________ </span>
   {{else responseType == 'radio'}}
   <span class='item_def_control'>{{each optionNames}}{{html label}} ______ &nbsp;&nbsp;&nbsp;{{/each}}</span>
-  {{else responseType == 'single-select' || responseType == 'multi-select' || responseType == 'checkbox'}}
+  {{else responseType == 'single-select'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
+        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+      {{/each}}
+    </div>
+  </div>
+ {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+  <div class='item_def_control'> 
+    <div class='checkbox_control'>
+      {{each multiSelectOptionNames}}
         <div class='select-option'><input type='checkbox'/> {{html label}}</div>
       {{/each}}
     </div>

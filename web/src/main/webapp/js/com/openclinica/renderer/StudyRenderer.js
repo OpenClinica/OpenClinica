@@ -300,6 +300,7 @@ function StudyRenderer(json) {
       
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
+      var multiSelectListOID = itemDef["MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
       
       // process repeating group of items 
@@ -312,6 +313,7 @@ function StudyRenderer(json) {
         }
       
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
+        itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
@@ -325,7 +327,7 @@ function StudyRenderer(json) {
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
-        repeatingHeaderString += "<td class='repeating_item_header'>" + name + "</td>";
+        repeatingHeaderString += "<td class='repeating_item_header'>" + itemNumber + " " + name + "</td>";
          
         // in last item in repeating group
         if (i == lastRepeatingOrderInFormNumber) {
@@ -348,6 +350,7 @@ function StudyRenderer(json) {
       }
       else if (repeating == false) { 
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
+        itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
           itemRenderString = "<div class='blocking'>";
         }

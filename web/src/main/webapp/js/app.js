@@ -7,6 +7,7 @@ var app_crfJson;
 var app_odmRenderer;
 var app_basicDefinitions;
 var app_codeLists;
+var app_multiSelectLists;
 var app_itemGroupDefs;
 var app_itemGroupMap;
 var app_itemDefs;

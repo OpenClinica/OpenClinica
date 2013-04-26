@@ -670,7 +670,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
         if("oc1.3".equals(odmVersion)) {
             if(metadata.getStudy().getParentStudyId() > 0) {
-                this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+              //  this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+            	 this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion);
             } else {
                 this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion);
             }

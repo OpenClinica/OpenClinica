@@ -1,14 +1,22 @@
 <div class='item_def_wrapper_3col'>
   <span class='item_def_number'>{{html itemNumber}}</span>
   <span class='item_def_title'>{{html name}}</span>
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file'}}
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
   <span class='item_def_control_3col'> __________ </span>
   {{else responseType == 'radio'}}
   <span class='item_def_control_3col'>{{each optionNames}}{{html label}} ______ &nbsp;&nbsp;&nbsp;{{/each}}</span>
-  {{else responseType == 'single-select' || responseType == 'multi-select' || responseType == 'checkbox'}}
-  <div class='item_def_control_3col'> 
+  {{else responseType == 'single-select'}}
+  <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
+        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+      {{/each}}
+    </div>
+  </div>
+ {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+  <div class='item_def_control'> 
+    <div class='checkbox_control'>
+      {{each multiSelectOptionNames}}
         <div class='select-option'><input type='checkbox'/> {{html label}}</div>
       {{/each}}
     </div>
@@ -17,4 +25,5 @@
     who knows?
   {{/if}}
   <span class="item_def_format_label">{{html unitLabel}}</span> 
+  <span class='item_def_format_label'>{{html rightItemText}}</span>
 </div> 
