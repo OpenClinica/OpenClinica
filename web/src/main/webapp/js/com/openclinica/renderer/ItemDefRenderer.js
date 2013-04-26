@@ -6,7 +6,7 @@ function ItemDefRenderer(json, itemDetails) {
   this.dataType = json["@DataType"];
   this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
   this.OID = json["@OID"];
-  this.itemNumber = json["Question"]["@OpenClinica:QuestionNumber"] ? json["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
+  this.itemNumber = json["Question"] && json["Question"]["@OpenClinica:QuestionNumber"] ? json["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
   this.unitLabel = json["MeasurementUnitRef"] ? "("+app_basicDefinitions[json["MeasurementUnitRef"]["@MeasurementUnitOID"]]+")" : "";
   this.codeListOID = json["CodeListRef"] ? json["CodeListRef"]["@CodeListOID"] : "";
   this.multiSelectListOID = json["OpenClinica:MultiSelectListRef"] ? json["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : "";

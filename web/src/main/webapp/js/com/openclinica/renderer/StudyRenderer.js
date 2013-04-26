@@ -296,12 +296,14 @@ function StudyRenderer(json) {
       var repeatNumber = 1;
       var repeating = false;
       var repeatMax = undefined; 
+      var itemGroupName = undefined; 
       
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
+        itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
@@ -357,13 +359,13 @@ function StudyRenderer(json) {
             this.accumulatedPixelHeight += itemRowHeightInPixels;
             if (this.accumulatedPixelHeight > app_maxPixelHeight) {
               this.renderString += RenderUtil.render(RenderUtil.get(
-              "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
+              "print_repeating_item_group"), {name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
               this.startNewPage(true);
               repeatingRows = "";
             }
           }
           this.renderString += RenderUtil.render(RenderUtil.get(
-          "print_repeating_item_group"), {tableHeader: repeatingHeaderString, tableBody: repeatingRows})[0].outerHTML; 
+          "print_repeating_item_group"), {name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
         }
       }
       else if (repeating == false) { 
