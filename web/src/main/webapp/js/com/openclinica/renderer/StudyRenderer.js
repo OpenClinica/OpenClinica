@@ -25,6 +25,22 @@ function StudyRenderer(json) {
 
   
   
+ /* getSectionDetails(itemDef, formDef) 
+  * A convenience function to get the SectionDetails properties for an Item
+  */ 
+  this.getSectionDetails = function(itemDetails, formDef) {
+    if (formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"][1] != undefined) { 
+      var sections = formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
+      for (var i=0;i< sections.length;i++) {
+        if (sections[i]["@SectionLabel"] == itemDetails["OpenClinica:SectionLabel"]) {
+          return sections[i];
+        }
+      }
+    } 
+    return formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
+  }
+  
+  
  /* getItemDetails(itemDef, formDef) 
   * A convenience function to get the ItemDetails properties for an Item
   */ 
@@ -250,6 +266,8 @@ function StudyRenderer(json) {
       
       var itemNumber = itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"]+"." : "";
       var itemDetails = this.getItemDetails(itemDef, formDef);
+      var sectionDetails = this.getSectionDetails(itemDetails, formDef);
+      var sectionTitle = sectionDetails["@SectionTitle"];
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
       var itemHeader = itemDetails["OpenClinica:ItemHeader"];
       var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
@@ -264,7 +282,7 @@ function StudyRenderer(json) {
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, true); 
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionTitle+"</div>", 15, true); 
         }
         isFirstSection = false;
       }
