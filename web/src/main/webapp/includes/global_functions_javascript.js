@@ -748,6 +748,7 @@ function unCheckSiblings(radioObject,
         var name = radioObject.getAttribute("name");
         //Get radio elements in adjacent TD cells that have the same name
         //then uncheck them
+	if($(radioObject) != null) {
         var allTDs = $(radioObject).up().siblings();
         var _elements;
         if(allTDs)  {
@@ -773,7 +774,7 @@ function unCheckSiblings(radioObject,
         }//outer if
 
     }
-
+  }
 }
 
 function unCheckObject(radioObject) {
