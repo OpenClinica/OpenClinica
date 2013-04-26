@@ -79,6 +79,28 @@ function StudyDataLoader(study) {
   }
   
   
+  
+  /* loadMultSelectLists()
+   */
+  this.loadMultiSelectLists = function() {
+    var multiSelectLists = this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"];
+    debug("loading multi select lists", util_logDebug );
+    app_multiSelectLists = {};
+    for (var i=0;i< multiSelectLists.length;i++) {
+      var multiSelectListKey = multiSelectLists[i]["@ID"]; 
+      var currentMultiSelectList = [];
+      var multiSelectListItems = multiSelectLists[i]["OpenClinica:MultiSelectListItem"];
+      for (var j=0;j< multiSelectListItems.length;j++) {
+        var currentMultiSelectListItem = {};
+        currentMultiSelectListItem.id = multiSelectListItems[j]["@CodedOptionValue"]; 
+        currentMultiSelectListItem.label = multiSelectListItems[j]["Decode"]["TranslatedText"]; 
+        currentMultiSelectList.push(currentMultiSelectListItem);
+      }
+      app_multiSelectLists[multiSelectListKey] = currentMultiSelectList;
+    }
+  }
+  
+  
  /* loadItemGroupDefs(formDef)
   * Associate all Items with their ItemGroups
   */  
@@ -172,6 +194,7 @@ function StudyDataLoader(study) {
   this.loadStudyLists = function () {
     this.loadBasicDefinitions();
     this.loadCodeLists();
+    this.loadMultiSelectLists();
     this.loadItemDefs();
     this.loadFormDefs();
     this.loadStudyEventDefs();
