@@ -327,7 +327,7 @@ function StudyRenderer(json) {
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
-        repeatingHeaderString += "<td class='repeating_item_header'>" + name + "</td>";
+        repeatingHeaderString += "<td class='repeating_item_header'>" + itemNumber + " " + name + "</td>";
          
         // in last item in repeating group
         if (i == lastRepeatingOrderInFormNumber) {
