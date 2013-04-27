@@ -276,23 +276,6 @@ function StudyRenderer(json) {
       var columns = itemDetails["OpenClinica:Layout"] ? itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
       debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
-      if (sectionLabel != prevSectionLabel) {
-        if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, true);
-        }
-        else if (this.accumulatedPixelHeight > 0) {
-          this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionTitle+"</div>", 15, true); 
-        }
-        isFirstSection = false;
-      }
-      if (itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, true); 
-      }
-      if (itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, true); 
-      }
-      
       var repeatNumber = 1;
       var repeating = false;
       var repeatMax = undefined; 
@@ -304,6 +287,23 @@ function StudyRenderer(json) {
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
         itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
+      }
+      
+      if (sectionLabel != prevSectionLabel) {
+        if (isFirstSection == true) {
+          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, true);
+        }
+        else if (this.accumulatedPixelHeight > 0) {
+          this.startNewPage(true);
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, true); 
+        }
+        isFirstSection = false;
+      }
+      if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
+        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, true); 
+      }
+      if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
+        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, true); 
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
