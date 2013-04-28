@@ -168,7 +168,6 @@ span.item_def_control_3col{
   display: inline-block;
   vertical-align: bottom;
   font-size: 0.7em;
-  min-width:100px;
 }
 
 .checkbox_control{
@@ -188,6 +187,17 @@ span.item_def_control_3col{
   height: 20px;
   margin-left:5px;
   margin-right:5px;
+}
+
+.text-background-repeating {
+  display: inline-block;
+  vertical-align:middle;
+  background-color:#EEEEEE;
+  width: 110px;
+  height: 20px;
+  margin-left:5px;
+  margin-right:5px;
+  margin-top:10px;
 }
 
 .title_manage { 
