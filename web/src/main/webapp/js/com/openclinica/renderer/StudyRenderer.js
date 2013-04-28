@@ -359,13 +359,13 @@ function StudyRenderer(json) {
             this.accumulatedPixelHeight += itemRowHeightInPixels;
             if (this.accumulatedPixelHeight > app_maxPixelHeight) {
               this.renderString += RenderUtil.render(RenderUtil.get(
-              "print_repeating_item_group"), {name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
               this.startNewPage(true);
               repeatingRows = "";
             }
           }
           this.renderString += RenderUtil.render(RenderUtil.get(
-          "print_repeating_item_group"), {name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+          "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
         }
       }
       else if (repeating == false) { 
