@@ -320,7 +320,7 @@ function StudyRenderer(json) {
       
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
-      var multiSelectListOID = itemDef["MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
+      var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
       
       // process repeating group of items 
@@ -347,7 +347,23 @@ function StudyRenderer(json) {
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
-        repeatingHeaderString += "<td class='repeating_item_header'>" + itemNumber + " " + name + "</td>";
+        var responseLayout = itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
+        var responseType = itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
+        
+        if (responseLayout == "Horizontal") {
+          var options = responseType == 'multi-select' ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
+          var optionsLength = options == undefined ? 0 : options.length;
+          var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
+          var optionsRow = "<tr>";
+          for (var j=0;j< optionsLength;j++) {
+            optionsRow += "<td valign='top' class='repeating_item_group'>" + options[j].label + "</td>";
+          }
+          optionsRow += "</tr>";
+          repeatingHeaderString += "<td class='repeating_item_header' valign='top'><table border='1'>" + itemNameRow + optionsRow + "</table></td>";
+        }
+        else {
+          repeatingHeaderString += "<td class='repeating_item_header' valign='top'>" + itemNumber + " " + name + "</td>";
+        }
          
         // in last item in repeating group
         if (i == lastRepeatingOrderInFormNumber) {
@@ -368,6 +384,7 @@ function StudyRenderer(json) {
           "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
         }
       }
+      // standard non-repeating items
       else if (repeating == false) { 
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
         itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
