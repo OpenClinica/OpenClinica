@@ -138,7 +138,7 @@
 		<b><fmt:message key="study_events" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">  
-           <c:import url="../include/submitDataSide.jsp"/>	
+         
      	</div>
 
 		</td>
