@@ -20,6 +20,14 @@ function StudyRenderer(json) {
   this.studyDataLoader = undefined;
   this.accumulatedPixelHeight = 0;
   this.renderString = "";
+  this.currentRowWidth = 0;
+  this.IN_CRF = true;
+  this.CHECK_ROW_WIDTH = true;
+  this.DONT_CHECK_ROW_WIDTH = false;
+  this.NOT_IN_CRF = false;
+  this.LANDSCAPE = "single-page-landscape";
+  this.PORTRAIT = "single-page";
+  this.printMode = this.PORTRAIT;
   var pageTemplateString = "";
   var printPageRenderer;
 
@@ -147,6 +155,7 @@ function StudyRenderer(json) {
     currentPage.data = studyEventCoverPageString;
     currentPage.type = app_studyEventCoverPageType;
     currentPage.eventName = app_eventName;
+    currentPage.printMode = this.PORTRAIT;
     app_pagesArray.push(currentPage);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -208,6 +217,7 @@ function StudyRenderer(json) {
       currentPage.data = studyCoverPageString;
       currentPage.eventName = app_eventName;
       currentPage.type = app_studyCoverPageType;
+      currentPage.printMode = this.PORTRAIT;
       app_pagesArray.push(currentPage);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -218,7 +228,8 @@ function StudyRenderer(json) {
     // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var currentPage =  app_pagesArray[i];
-      pageTemplateString += printPageRenderer.render( currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
+      pageTemplateString += 
+      printPageRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName, currentPage.printMode)[0].outerHTML;
     }
     return pageTemplateString;
   }
@@ -291,19 +302,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, true);
+          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, true); 
+          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
         }
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, true); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
@@ -340,10 +351,11 @@ function StudyRenderer(json) {
        
         // in first item in repeating group
         if (isFirstRepeatingItem == true) {
-           repeatingRowString = "<tr class='repeating_item_group'>";
-           repeatingHeaderString = "<tr class='repeating_item_group'>";
-           isFirstRepeatingItem = false;
-           lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
+          repeatingRowString = "<tr class='repeating_item_group'>";
+          repeatingHeaderString = "<tr class='repeating_item_group'>";
+          isFirstRepeatingItem = false;
+          lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
+          this.currentRowWidth = 0;
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
@@ -351,6 +363,7 @@ function StudyRenderer(json) {
         var responseType = itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
         
         if (responseLayout == "Horizontal") {
+          this.currentRowWidth += app_repeatingHorizItemWidth;
           var options = responseType == 'multi-select' ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
           var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
@@ -362,6 +375,7 @@ function StudyRenderer(json) {
           repeatingHeaderString += "<td class='repeating_item_header' valign='top'><table border='1'>" + itemNameRow + optionsRow + "</table></td>";
         }
         else {
+          this.currentRowWidth += app_repeatingItemWidth;
           repeatingHeaderString += "<td class='repeating_item_header' valign='top'>" + itemNumber + " " + name + "</td>";
         }
          
@@ -369,11 +383,15 @@ function StudyRenderer(json) {
         if (i == lastRepeatingOrderInFormNumber) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
-          
+          if (this.currentRowWidth > app_maxPixelWidth && this.printMode == this.PORTRAIT) {
+            this.printMode = this.LANDSCAPE;
+          }
           for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
             repeatingRows += repeatingRowString;
             this.accumulatedPixelHeight += itemRowHeightInPixels;
-            if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+ 
+            if ((this.printMode == this.PORTRAIT && this.accumulatedPixelHeight > app_maxPixelHeight) || 
+               (this.printMode == this.LANDSCAPE && this.accumulatedPixelHeight > app_maxLandscapePixelHeight)) { 
               this.renderString += RenderUtil.render(RenderUtil.get(
               "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
               this.startNewPage(true);
@@ -386,6 +404,7 @@ function StudyRenderer(json) {
       }
       // standard non-repeating items
       else if (repeating == false) { 
+        this.currentRowWidth += app_itemWidth;
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
         itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
@@ -394,7 +413,7 @@ function StudyRenderer(json) {
         itemRenderString += itemDefRenderer.renderPrintableItem(repeating);
         if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
           itemRenderString += "</div>";
-          this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, true);
+          this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, this.IN_CRF, this.CHECK_ROW_WIDTH);
         }
       }
       debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logDebug);
@@ -406,23 +425,31 @@ function StudyRenderer(json) {
   }
   
   
-  /* renderPrintableRow(htmlString, rowHeight, inCrf)
+  /* renderPrintableRow(htmlString, rowHeight, inCrf, checkRowWidth)
    * Render each row of a CRF.
    * Decide whether a page break is needed
+   * param htmlString: the string to render
+   * param rowHeight: the row height in pixels
+   * param inCRF: true if we are not at the start of a new CRF
+   * param checkRowWidth: true if row width is to be inspected
    */
-  this.renderPrintableRow = function(htmlString, rowHeight, inCrf) {
+  this.renderPrintableRow = function(htmlString, rowHeight, inCrf, checkRowWidth) {
     this.renderString += htmlString;
     this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight, util_logDebug);
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + "this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
+      if (checkRowWidth == true && this.currentRowWidth > app_maxPixelWidth && this.printMode == this.PORTRAIT) {
+        this.printMode = this.LANDSCAPE;
+      }
       this.startNewPage(inCrf);
     }
+    this.currentRowWidth = 0;
   } 
   
   
   /* startNewPage(inCrf)
    * Starts a new page in the pages array
-   * param inForm: true if we are not at the start of a new CRF
+   * param inCRF: true if we are not at the start of a new CRF
    */
   this.startNewPage = function(inCrf) {
     debug("Starting New Page", util_logDebug); 
@@ -430,8 +457,10 @@ function StudyRenderer(json) {
     currentPage.data = this.renderString;
     currentPage.type = app_studyContentPageType;
     currentPage.eventName = app_eventName;
+    currentPage.printMode = this.printMode;
     app_pagesArray.push(currentPage);
     this.accumulatedPixelHeight = 0;
+    this.printMode = this.PORTRAIT;
     inCrf ? this.renderString = app_crfHeader : this.renderString = "";
   }
 

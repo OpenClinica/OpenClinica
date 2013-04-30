@@ -64,6 +64,19 @@ h4 {
   background-color: white;
 }
 
+.single-page-landscape {
+  position: relative;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border:1px inset #333333;
+  width:1320px;
+  height:1030px;
+  background-color: white;
+}
+
 
 .spinner {
   display: none;

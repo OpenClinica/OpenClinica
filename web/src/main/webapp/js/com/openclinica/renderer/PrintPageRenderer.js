@@ -1,5 +1,5 @@
 function PrintPageRenderer() {
-  this.render = function(pageRenderString, currPage, totalPages, printTime, pageType, eventName) { 
+  this.render = function(pageRenderString, currPage, totalPages, printTime, pageType, eventName, printMode) { 
     return RenderUtil.render(RenderUtil.get("print_page"), {
       pageRenderString: pageRenderString,
       currPage: currPage,
@@ -10,6 +10,7 @@ function PrintPageRenderer() {
       siteName: app_siteName, 
       protocolName: app_protocolName,
       eventName: eventName,
+      printMode: printMode,
       collectSubjectDOB: app_collectSubjectDOB, 
       personIDRequired: app_personIDRequired,
       showPersonID: app_showPersonID,
