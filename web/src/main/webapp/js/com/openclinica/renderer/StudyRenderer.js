@@ -302,7 +302,7 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
@@ -311,10 +311,10 @@ function StudyRenderer(json) {
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
@@ -408,11 +408,11 @@ function StudyRenderer(json) {
         var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
         itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
-          itemRenderString = "<div class='blocking'>";
+          itemRenderString = "<table class='item-row'>";
         }
         itemRenderString += itemDefRenderer.renderPrintableItem(repeating);
         if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
-          itemRenderString += "</div>";
+          itemRenderString += "</table>";
           this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, this.IN_CRF, this.CHECK_ROW_WIDTH);
         }
       }
