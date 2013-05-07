@@ -1,4 +1,8 @@
 @media print { 
+  body {
+    background-color: white;
+  }
+  
   .no_print {
     display: none; 
   }
@@ -11,6 +15,7 @@
     background-color:#DDDDDD;
     padding-left:10px;
     padding-right:10px;
+    margin-bottom:10px;
   }
   
    #footer {
@@ -19,6 +24,10 @@
   }
   
   .single-page {
+    border:none;
+  }
+  
+  .single-page-landscape {
     border:none;
   }
 

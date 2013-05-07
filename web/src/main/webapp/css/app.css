@@ -57,26 +57,26 @@ h4 {
 .single-page {
   position: relative;
   margin: 0 auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 0px;
+  margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
   border:1px inset #333333;
-  width:1030px;
-  height:1320px;
+  width:1095px;
+  height:1472px;
   background-color: white;
 }
 
 .single-page-landscape {
   position: relative;
   margin: 0 auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 0px;
+  margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
   border:1px inset #333333;
-  width:1320px;
-  height:1030px;
+  width:1472px;
+  height:1095px;
   background-color: white;
 }
 
