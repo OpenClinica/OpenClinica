@@ -738,6 +738,16 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ViewStudyUser</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
     </servlet>
+	
+	<!-- Export Excel -->
+	<servlet>
+        <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
+        <display-name>ExportExcelStudySubjectAuditLog</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ExportExcelStudySubjectAuditLogServlet</servlet-class>
+    </servlet>
+	
+	
+	
     <servlet>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <display-name>SetStudyUserRole</display-name>
@@ -1939,6 +1949,12 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet-mapping>
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
+    </servlet-mapping>
+	
+	<!--  Export Excel -->
+    <servlet-mapping>
+        <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
+        <url-pattern>/ExportExcelStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewSectionDataEntryServlet</servlet-name>
