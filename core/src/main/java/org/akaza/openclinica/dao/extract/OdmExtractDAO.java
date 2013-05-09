@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -63,6 +64,7 @@ import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
@@ -71,11 +73,13 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -682,6 +686,450 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
+    
+    /**
+     * Metadata to be obtained based on formVersionOID. This particular 
+     * @param metadata
+     * @param formVersionOID
+     */
+    
+    //The method underneath tries to reuse the code based on getODMMetadata
+    public void getODMMetadataForForm(MetaDataVersionBean metadata,String formVersionOID,String odmVersion){
+    	  FormDefBean formDef = new FormDefBean();
+    	String cvIds = new String("");
+    	 ArrayList rows  = new ArrayList();
+         ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>)metadata.getItemGroupDefs();
+         HashMap<String,Integer> igPoses = getItemGroupOIDPos(metadata);
+         ArrayList<ItemDefBean> its = (ArrayList<ItemDefBean>)metadata.getItemDefs();
+         igPoses = new HashMap();
+         HashMap<String,Integer> itPoses = getItemOIDPos(metadata);
+         HashMap<String,Integer> inPoses = new HashMap<String, Integer>();
+    	 Iterator it ;
+    	 	CRFVersionDAO<String, ArrayList> crfVersionDAO = new CRFVersionDAO<String, ArrayList>(this.ds);
+    	 	CRFVersionBean crfVersionBean = crfVersionDAO.findByOid(formVersionOID);
+    	 	cvIds =crfVersionBean.getId()+"";
+    	 	metadata.setCvIds(cvIds);
+    	    HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
+            this.setItemDataMaxLengthTypesExpected();
+            rows.clear();
+            logger.debug("Begin to execute GetItemDataMaxLengths");
+            rows = select(this.getItemDataMaxLengths(cvIds));
+            it = rows.iterator();
+            while (it.hasNext()) {
+                HashMap row = (HashMap) it.next();
+                maxLengths.put((Integer) row.get("item_id"), (Integer) row.get("max_length"));
+            }
+            ItemDefBean itDef = new ItemDefBean();
+            formDef =   fetchFormDetails(crfVersionBean,formDef);
+            this.setItemGroupAndItemMetaWithUnitTypesExpected();
+            rows.clear();
+            String prevCvIg = "";
+          
+            logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
+            logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaWithUnitSql(cvIds));   HashMap<Integer,String> sectionLabels = this.getSectionLabels(metadata.getSectionIds());
+            HashMap<Integer,String> parentItemOIDs = this.getParentItemOIDs(cvIds);
+            this.setItemGroupAndItemMetaOC1_3TypesExpected();
+            logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
+            logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
+             rows = select(this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
+            Iterator iter = rows.iterator();
+            while (iter.hasNext()) {
+                HashMap row = (HashMap) iter.next();
+                //Integer cId = (Integer) row.get("crf_id");
+                Integer cvId = (Integer) row.get("crf_version_id");
+                Integer igId = (Integer) row.get("item_group_id");
+                //Integer itId = (Integer) row.get("item_id");
+                //Integer rsId = (Integer) row.get("response_set_id");
+                String cvOID = (String) row.get("crf_version_oid");
+                String igOID = (String) row.get("item_group_oid");
+                String itOID = (String) row.get("item_oid");
+
+                Integer igRepeatNum = (Integer) row.get("repeat_number");
+                Integer igRepeatMax = (Integer) row.get("repeat_max");
+                Boolean showGroup = (Boolean) row.get("show_group");
+                String itemGroupHeader = (String)row.get("item_group_header");
+                
+                String itHeader = (String) row.get("item_header");
+                String left = (String) row.get("left_item_text");
+                String right = (String) row.get("right_item_text");
+                String itSubheader = (String) row.get("subheader");
+                Integer itSecId = (Integer) row.get("section_id");
+                Integer itPId = (Integer) row.get("parent_id");
+                Integer itColNum = (Integer) row.get("column_number");
+                String itpgNum = (String) row.get("page_number_label");
+                String layout = (String) row.get("response_layout");
+                Integer rsTypeId = (Integer) row.get("response_type_id");
+                String dfValue = (String) row.get("default_value");
+                Boolean phi = (Boolean) row.get("phi_status");
+                Boolean showItem = (Boolean) row.get("show_item");
+                Integer orderInForm = (Integer)row.get("item_order");
+                if((cvId+"-"+igId).equals(prevCvIg)) {
+                } else {
+                    prevCvIg = cvId+"-"+igId;
+                    ItemGroupDefBean ig;
+                    if(igPoses.containsKey(igOID))
+                     ig = igs.get(igPoses.get(igOID));
+                    else
+                    	ig = new ItemGroupDefBean();
+                    
+                    ItemGroupDetailsBean igDetail = ig.getItemGroupDetails();
+                    igDetail.setOid(igOID);
+                    PresentInFormBean inForm = new PresentInFormBean();
+                    inForm.setFormOid(cvOID);
+                    ItemGroupRepeatBean igr = new ItemGroupRepeatBean();
+                    igr.setRepeatMax(igRepeatMax);
+                    igr.setRepeatNumber(igRepeatNum);
+                    inForm.setItemGroupRepeatBean(igr);
+                    inForm.setShowGroup(showGroup==true?"Yes":"No");
+                    inForm.setItemGroupHeader(itemGroupHeader);
+                    igDetail.getPresentInForms().add(inForm);
+                    ig.setItemGroupDetails(igDetail);
+                    igs.add(ig);
+                  
+                    
+                }
+                
+                if(its.contains(itOID))
+                
+                itDef = its.get(itPoses.get(itOID));
+                else
+                	itDef = new ItemDefBean();
+                
+                ItemDetailsBean itDetail = itDef.getItemDetails();
+                itDetail.setOid(itOID);
+                ItemPresentInFormBean itInForm = new ItemPresentInFormBean();
+                itInForm.setFormOid(cvOID);
+                itInForm.setColumnNumber(itColNum);
+                itInForm.setDefaultValue(dfValue);
+                itInForm.setItemHeader(itHeader);
+                itInForm.setLeftItemText(left);
+                itInForm.setRightItemText(right);
+                itInForm.setItemSubHeader(itSubheader);
+                itInForm.setPageNumber(itpgNum);
+                itInForm.setParentItemOid(parentItemOIDs.get(itPId));
+                itInForm.setSectionLabel(sectionLabels.get(itSecId));
+                itInForm.setPhi(phi==false?"No":"Yes");
+                itInForm.setOrderInForm(orderInForm);
+                itInForm.setShowItem(showItem==true?"Yes":"No");
+                ItemResponseBean itemResponse = new ItemResponseBean();
+                itemResponse.setResponseLayout(layout);
+                itemResponse.setResponseType(ResponseType.get(rsTypeId).getName());
+                itInForm.setItemResponse(itemResponse);
+                itDetail.getItemPresentInForm().add(itInForm);
+                inPoses.put(itOID+"-"+cvOID, itDetail.getItemPresentInForm().size()-1);
+            }
+            metadata.getItemGroupDefs().addAll(igs);
+            this.getSCDs(cvIds, its, itPoses, inPoses);
+            
+        /*    rows = select(this.getItemGroupAndItemMetaWithUnitSql(cvIds));
+            it = rows.iterator();
+            ArrayList<ItemGroupDefBean> itemGroupDefs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
+            ArrayList<ItemDefBean> itemDefs = (ArrayList<ItemDefBean>) metadata.getItemDefs();
+            ArrayList<CodeListBean> codeLists = (ArrayList<CodeListBean>) metadata.getCodeLists();
+            ArrayList<MultiSelectListBean> multiSelectLists = (ArrayList<MultiSelectListBean>) metadata.getMultiSelectLists();
+            ArrayList<ElementRefBean> itemGroupRefs = new ArrayList<ElementRefBean>();
+            Set<String> igset = new HashSet<String>();
+            HashMap<String,Integer> igdPos = new HashMap<String,Integer>();
+            Set<String> itset = new HashSet<String>();
+            Set<Integer> itdset = new HashSet<Integer>();
+            Set<Integer> clset = new HashSet<Integer>();
+            Set<Integer> mslset = new HashSet<Integer>();
+            ItemGroupDefBean igdef = new ItemGroupDefBean();
+            HashMap<String, String> igMandatories = new HashMap<String, String>();
+            boolean isLatest = false;
+            int cvprev = -1;
+            String igrprev = "";
+            String igdprev = "";
+            String itMandatory = "No";
+            int itOrder = 0;
+            Integer igId = -1;
+            String sectionIds = ",";
+            while (it.hasNext()) {
+                HashMap row = (HashMap) it.next();
+                Integer cId = (Integer) row.get("crf_id");
+                Integer cvId = (Integer) row.get("crf_version_id");
+                igId = (Integer) row.get("item_group_id");
+                Integer itId = (Integer) row.get("item_id");
+                Integer rsId = (Integer) row.get("response_set_id");
+                String cvOID = (String) row.get("crf_version_oid");
+                String igOID = (String) row.get("item_group_oid");
+                String itOID = (String) row.get("item_oid");
+                String igName = (String) row.get("item_group_name");
+                String itName = (String) row.get("item_name");
+                Integer dataTypeId = (Integer) row.get("item_data_type_id");
+                Integer secId = (Integer) row.get("section_id");
+                String header = (String) row.get("item_header");
+                String left = (String) row.get("left_item_text");
+                String right = (String) row.get("right_item_text");
+                Boolean itRequired = (Boolean) row.get("item_required");
+                String regexp = (String) row.get("regexp");
+                String regexpErr = (String) row.get("regexp_error_msg");
+                String widthDecimal = (String) row.get("width_decimal");
+                Integer rsTypeId = (Integer) row.get("response_type_id");
+                String rsText = (String) row.get("options_text");
+                String rsValue = (String) row.get("options_values");
+                String rsLabel = (String) row.get("response_label");
+                String igHeader = (String) row.get("item_group_header");
+                String itDesc = (String) row.get("item_description");
+                String itQuesNum = (String) row.get("question_number_label");
+                String muOid = (String) row.get("mu_oid");
+                if (cvprev != cvId) {
+                    // at this point, itemGroupRefs is for old cvId
+                    if (itemGroupRefs != null && itemGroupRefs.size() > 0) {
+                        String temp = igMandatories.containsKey(igdprev) ? igMandatories.get(igdprev) : itMandatory;
+                        itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(temp);
+                    }
+                    itMandatory = "No";
+                    // now update to new cvId
+                    cvprev = cvId;
+                  
+                    
+//                    FormDefBean formDef =metadata.getFormDefs().get(0);
+                    
+                    if (cvIdPoses.containsKey(cvId)) {
+                        int p = cvIdPoses.get(cvId);
+                        formDef = metadata.getFormDefs().get(p);
+                    } else {
+                        logger.debug("crf_version_id=" + cvId + " couldn't find from studyEventAndFormMetaSql");
+                    }
+                    itemGroupRefs = (ArrayList<ElementRefBean>) formDef.getItemGroupRefs();
+                }
+
+                // mandatory is based on the last crf-version
+                String igDefKey = igId + "";
+
+                if (!igdprev.equals(igDefKey)) {
+                    if(igdPos.containsKey(igDefKey)) {
+                        igdef = itemGroupDefs.get(igdPos.get(igDefKey));
+                        isLatest = false;
+                        itOrder = igdef.getItemRefs().size();
+                    } else {
+                        igdef = new ItemGroupDefBean();
+                        itOrder = 0;
+                        igMandatories.put(igdprev, itMandatory);
+                        isLatest = true;
+                        igdef.setOid(igOID);
+                        igdef.setName("ungrouped".equalsIgnoreCase(igName) ? igOID : igName);
+                        //igdef.setName(igName);
+                        igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
+                        igdef.setComment(igHeader);
+                        igdef.setPreSASDatasetName(igName.toUpperCase());
+                        itemGroupDefs.add(igdef);
+                        igdPos.put(igDefKey, itemGroupDefs.size()-1);
+                    }
+                    igdprev = igDefKey;
+                }
+
+                String igRefKey = igId + "-" + cvId;
+                if (igrprev.equals(igRefKey)) {
+                    itMandatory = isLatest && itRequired && "No".equals(itMandatory) ? "Yes" : itMandatory;
+                } else {
+                    if (!igset.contains(igRefKey)) {
+                        igset.add(igRefKey);
+                        ElementRefBean igref = new ElementRefBean();
+                        igref.setElementDefOID(igOID);
+                        int size = itemGroupRefs.size();
+                        if (size > 0) {
+                            String prev = igrprev.split("-")[0].trim();
+                            String temp = igMandatories.containsKey(prev) ? igMandatories.get(prev) : itMandatory;
+                            itemGroupRefs.get(size - 1).setMandatory(temp);
+                        }
+                        itemGroupRefs.add(igref);
+                        itMandatory = "No";
+                    }
+                    igrprev = igRefKey;
+                }
+
+                String mandatory = itRequired ? "Yes" : "No";
+                if (!itset.contains(igDefKey + "-" + itId)) {
+                    ++itOrder;
+                    itset.add(igDefKey + "-" + itId);
+                    ElementRefBean itemRef = new ElementRefBean();
+                    itemRef.setElementDefOID(itOID);
+                    if (itemRef.getMandatory() == null || itemRef.getMandatory().length() <= 0) {
+                        itemRef.setMandatory(mandatory);
+                    }
+                    itemRef.setOrderNumber(itOrder);
+                    igdef.getItemRefs().add(itemRef);
+                }
+
+                boolean hasCode = MetadataUnit.needCodeList(rsTypeId, dataTypeId);
+                LinkedHashMap<String, String> codes = new LinkedHashMap<String, String>();
+                if (hasCode) {
+                    
+                     * //null value will not be added to codelist if (nullMap.containsKey(cvId)) { codes = MetadataUnit.parseCode(rsText, rsValue,
+                     * nullMap.get(cvId)); } else { codes = MetadataUnit.parseCode(rsText, rsValue); }
+                     
+                    codes = MetadataUnit.parseCode(rsText, rsValue);
+                    // no action has been taken if rsvalue/rstext go wrong,
+                    // since they have been validated when uploading crf.
+                }
+
+                boolean hasMultiSelect = MetadataUnit.needMultiSelectList(rsTypeId);
+                LinkedHashMap<String, String> multi = new LinkedHashMap<String, String>();
+                if (hasMultiSelect) {
+                    multi = MetadataUnit.parseCode(rsText, rsValue);
+                    // no action has been taken if rsvalue/rstext go wrong,
+                    // since they have been validated when uploading crf.
+                }
+
+                String datatype = MetadataUnit.getOdmItemDataType(rsTypeId, dataTypeId, odmVersion);
+                if(sectionIds.contains(","+secId+",")) {
+                }else {
+                    sectionIds += secId+",";
+                }
+
+                if (!itdset.contains(itId)) {
+                    itdset.add(itId);
+                    ItemDefBean idef = new ItemDefBean();
+                    idef.setOid(itOID);
+                    idef.setName(itName);
+                    idef.setComment(itDesc);
+                    if (muOid != null && muOid.length() > 0) {
+                        ElementRefBean measurementUnitRef = new ElementRefBean();
+                        measurementUnitRef.setElementDefOID(muOid);
+                        idef.setMeasurementUnitRef(measurementUnitRef);
+                    }
+                    idef.setPreSASFieldName(itName);
+                    idef.setCodeListOID(hasCode ? "CL_" + rsId : "");
+                    if (hasMultiSelect) {
+                        ElementRefBean multiSelectListRef = new ElementRefBean();
+                        multiSelectListRef.setElementDefOID("MSL_" + rsId);
+                        idef.setMultiSelectListRef(multiSelectListRef);
+                    }
+                    // if(nullMap.containsKey(cvId)) {
+                    // }
+                    idef.getQuestion().setQuestionNumber(itQuesNum);
+                    idef.getQuestion().getQuestion().setText(MetadataUnit.getItemQuestionText(header, left, right));
+                    if (regexp != null && regexp.startsWith("func:")) {
+                        idef.setRangeCheck(MetadataUnit.getItemRangeCheck(regexp.substring(5).trim(), metadata.getSoftHard(), regexpErr, muOid));
+                    }
+                    idef.setDataType(datatype);
+                    int len = 0;
+                    int sig = 0;
+                    if (widthDecimal != null && widthDecimal.length() > 0) {
+                        // now there is no validation for width_decimal here.
+                        len = parseWidth(widthDecimal);
+                        sig = parseDecimal(widthDecimal);
+                    }
+                    if (rsTypeId == 3 || rsTypeId == 7) {// 3:checkbox;
+                        // //7:multi-select
+                       // len = maxLengths.containsKey(itId) ? maxLengths.get(itId) : 0;
+                        //len = Math.max(len, Math.max(rsText.length(), rsValue.length()));
+                        Iterator<String> iter = multi.keySet().iterator();
+                        String temp = "";
+                        while (iter.hasNext()) {
+                        temp += iter.next();
+                        temp += ",";
+
+                        }
+                        idef.setLength(temp.length());
+                    } else if ("text".equalsIgnoreCase(datatype)) {
+                        if (len > 0) {
+                            idef.setLength(len);
+                        } else {
+                            idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet()) : maxLengths.containsKey(itId) ? maxLengths.get(itId)
+                                : MetaDataCollector.getTextLength());
+                        }
+                    } else if ("integer".equalsIgnoreCase(datatype)) {
+                        if (len > 0) {
+                            idef.setLength(len);
+                        } else {
+                            idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet()) : 10);
+                        }
+                    } else if ("float".equalsIgnoreCase(datatype)) {
+                        if (len > 0) {
+                            idef.setLength(len);
+                        } else {
+                            // idef.setLength(hasCode ?
+                            // MetadataUnit.getDataTypeLength(codes.keySet()) : 32);
+                           idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet()) : 25);
+                        }
+                    } else {
+                        idef.setLength(0);
+                    }
+                    idef.setSignificantDigits(sig > 0 ? sig : MetadataUnit.getSignificantDigits(datatype, codes.keySet(), hasCode));
+                    itemDefs.add(idef);
+                }
+
+                if (hasCode && !clset.contains(rsId)) {
+                    clset.add(rsId);
+                    CodeListBean cl = new CodeListBean();
+                    cl.setOid("CL_" + rsId);
+                    cl.setName(rsLabel);
+                    cl.setPreSASFormatName(rsLabel);
+                    cl.setDataType(datatype);
+                    Iterator<String> iter = codes.keySet().iterator();
+                    while (iter.hasNext()) {
+                        String de = iter.next();
+                        CodeListItemBean cli = new CodeListItemBean();
+                        cli.setCodedValue(de);
+                        TranslatedTextBean tt = cli.getDecode();
+                        // cli.getDecode().setText(codes.get(de));
+                        tt.setText(codes.get(de));
+                        tt.setXmlLang(CoreResources.getField("translated_text_language"));
+                        cli.setDecode(tt);
+                        cl.getCodeListItems().add(cli);
+                    }
+                    codeLists.add(cl);
+                }
+
+             //   if (odmVersion.startsWith("oc") && hasMultiSelect && !mslset.contains(rsId)) {
+                    mslset.add(rsId);
+                    MultiSelectListBean msl = new MultiSelectListBean();
+                    msl.setOid("MSL_" + rsId);
+                    msl.setName(rsLabel);
+                    msl.setDataType(datatype);
+                    msl.setActualDataType(datatype);
+                    Iterator<String> iter = multi.keySet().iterator();
+                    while (iter.hasNext()) {
+                        String de = iter.next();
+                        MultiSelectListItemBean msli = new MultiSelectListItemBean();
+                        msli.setCodedOptionValue(de);
+                        TranslatedTextBean tt = new TranslatedTextBean();
+                        String t = multi.get(de);
+                        tt.setText(t);
+                        tt.setXmlLang(CoreResources.getField("translated_text_language"));
+                        msli.setDecode(tt);
+                        msl.getMultiSelectListItems().add(msli);
+                    }
+                    multiSelectLists.add(msl);
+             //   }
+            }
+            if (itemGroupRefs != null && itemGroupRefs.size() > 0) {
+                String last = igMandatories.containsKey(igId + "") ? igMandatories.get(igId + "") : itMandatory;
+                itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(last);
+            }
+            sectionIds = sectionIds.length()>0?sectionIds.substring(1, sectionIds.length()-1):"";
+        
+            
+            metadata.setSectionIds(sectionIds);*/
+            metadata.getFormDefs().add(formDef);
+    }
+    
+    
+    
+    
+    public FormDefBean fetchFormDetails(CRFVersionBean crfVBean,FormDefBean formDef){
+    
+    	CRFDAO<String, ArrayList> crfDao = new CRFDAO(this.ds);
+    	CRFBean crfBean   = crfDao.findByVersionId(crfVBean.getCrfId());  	
+    	formDef.setOid(crfVBean.getOid());
+    	formDef.setName(crfVBean.getName());
+    	formDef.setRepeating("No");
+    	FormDetailsBean formDetails = new FormDetailsBean();
+    	formDetails.setName(crfVBean.getName());
+    	formDetails.setOid(crfVBean.getOid());
+    	formDetails.setParentFormOid(crfBean.getOid());
+    	
+    	
+    setSectionBean(formDetails,new Integer(crfVBean.getId()));
+    	
+    formDef.setFormDetails(formDetails);
+    	
+    	return formDef;
+    }
+    
     /**
      * metadata for ODM extraction only
      */
@@ -1137,6 +1585,92 @@ public class OdmExtractDAO extends DatasetDAO {
         // return nullClSet;
     }
 
+    
+    
+    
+    public void getOCMetadataForGlobals(int crfId, MetaDataVersionBean metadata, String odmVersion) {
+    
+        String cvIds = crfId+"";
+        if (odmVersion.startsWith("oc")) {
+            // add CRFVersions that itemDef belong to
+            HashMap<String, String> itDefCVs = new HashMap<String, String>();
+            this.setItemCVOIDsTypesExpected();
+            ArrayList al = this.select(this.getItemCVOIDsSql(cvIds));
+            Iterator iter = al.iterator();
+            while (iter.hasNext()) {
+                HashMap row = (HashMap) iter.next();
+                Integer cId = (Integer) row.get("crf_id");
+                Integer cvId = (Integer) row.get("crf_version_id");
+                Integer itId = (Integer) row.get("item_id");
+                String cvOID = (String) row.get("cv_oid");
+                String itOID = (String) row.get("item_oid");
+                if (itDefCVs.containsKey(itOID)) {
+                    String cvs = itDefCVs.get(itOID);
+                    if (!cvs.contains(cvOID + ",")) {
+                        cvs += cvOID + ",";
+                    }
+                    itDefCVs.put(itOID, cvs);
+                } else {
+                    itDefCVs.put(itOID, cvOID + ",");
+                }
+            }
+            for (ItemDefBean itdef : metadata.getItemDefs()) {
+                String key = itdef.getOid();
+                if (itDefCVs.containsKey(key)) {
+                    String cvs = itDefCVs.get(key);
+                    itdef.setFormOIDs(cvs.substring(0, cvs.length() - 1));
+                }
+            }
+
+            // add StudyGroupClassList
+/*            this.setStudyGroupClassTypesExpected();
+            logger.debug("Begin to execute GetStudyGroupClassSql");
+            logger.debug("getStudyGroupClassSql=" + getStudyGroupClassSql(parentStudyId));
+            ArrayList rows = select(this.getStudyGroupClassSql(parentStudyId));
+            Iterator it = rows.iterator();
+            ArrayList<StudyGroupClassListBean> sgcLists = (ArrayList<StudyGroupClassListBean>) metadata.getStudyGroupClassLists();
+            String sgcprev = "";
+            while (it.hasNext()) {
+                HashMap row = (HashMap) it.next();
+                Integer sgcid = (Integer) row.get("study_group_class_id");
+                String sgcname = (String) row.get("sgc_name");
+                String sgctype = (String) row.get("sgc_type");
+                Integer statusid = (Integer) row.get("status_id");
+                String subassign = (String) row.get("subject_assignment");
+                String sgname = (String) row.get("sg_name");
+                String des = (String) row.get("description");
+
+                if (sgcprev.equals(sgcid + "")) {
+                    StudyGroupItemBean sg = new StudyGroupItemBean();
+                    sg.setName(sgname);
+                    sg.setDescription(des);
+                    StudyGroupClassListBean sgc = sgcLists.get(sgcLists.size() - 1);
+                    sgc.getStudyGroupItems().add(sg);
+                } else {
+                    sgcprev = sgcid + "";
+                    StudyGroupClassListBean sgc = new StudyGroupClassListBean();
+                    sgc.setID("SGC_" + sgcid);
+                    sgc.setName(sgcname);
+                    sgc.setType(sgctype);
+                    sgc.setStatus(Status.get(statusid).getName());
+                    sgc.setSubjectAssignment(subassign);
+                    StudyGroupItemBean sg = new StudyGroupItemBean();
+                    sg.setName(sgname);
+                    sg.setDescription(des);
+                    sgc.getStudyGroupItems().add(sg);
+                    sgcLists.add(sgc);
+                }
+            }*/
+        }
+        // return nullClSet;
+    }
+
+    public void getFormDefForGlobalCRFS(int formId,String formVerionOID,String odmVersion){
+    	
+    }
+    
+    
+    
     public void getStudyEventAndFormMetaOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite) {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>)metadata.getStudyEventDefs();
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>)metadata.getFormDefs();
@@ -3068,4 +3602,10 @@ public class OdmExtractDAO extends DatasetDAO {
     {
     	return "select section_id, label,title,subtitle,instructions,page_number_label from section section where crf_version_id=?";
     }
+    
+    
+    
+    
+    
+    
 }
