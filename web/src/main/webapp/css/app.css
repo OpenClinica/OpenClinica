@@ -122,7 +122,7 @@ a:link {
 
 .repeating_item_wrapper{
   display:inline-block;
-  max-height:40px;
+  max-height:200px;
   margin-top:0px;
   margin-bottom:0px;
   margin-left:5x;
@@ -203,10 +203,19 @@ span.item_def_control_3col{
   font-size: 0.6em;
 }
 
-.gray_bg {
+.header-title {
   background-color:#DDDDDD;
   padding-left:10px;
   padding-right:10px;
+  margin-top:20px;
+  margin-bottom:10px;
+}
+
+.section-title {
+  background-color:#DDDDDD;
+  padding-left:10px;
+  padding-right:10px;
+  margin-top:20px;
   margin-bottom:10px;
 }
 
@@ -316,6 +325,7 @@ span.item_def_control_3col{
   font-size: 11px;
   font-weight: bold;
   background-color: #DDDDDD;
+  max-height: 200px;
 }
 
 .repeating_item_group {

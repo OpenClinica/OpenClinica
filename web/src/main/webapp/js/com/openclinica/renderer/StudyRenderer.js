@@ -76,7 +76,7 @@ function StudyRenderer(json) {
       case 'UNPOPULATED_STUDY_CRFS':
         this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
         app_studyName = this.study["GlobalVariables"]["StudyName"];
-        app_siteName = this.study["GlobalVariables"]["StudyName"];
+        app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
         app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
       break;  
     }  
@@ -311,19 +311,19 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='gray_bg'>"+sectionLabel+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          this.renderPrintableRow("<div class='section-title'>"+sectionLabel+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header gray_bg'>"+sectionLabel+"</div>", 15, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          this.renderPrintableRow("<div class='non-first_section_header section-title'>"+sectionLabel+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
         }
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemHeader+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderPrintableRow("<div class='header-title'>"+itemHeader+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='gray_bg'>"+itemSubHeader+"</div>", 25, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderPrintableRow("<div class='header-title'>"+itemSubHeader+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
