@@ -104,6 +104,19 @@ public class MetadataUnit extends OdmUnit {
         	}
         
     }
+    
+    
+    public void collectOdmStudy(){
+    	  StudyBean study = studyBase.getStudy();
+          String studyOID = study.getOid();
+          if (studyOID == null || studyOID.length() <= 0) {
+              logger.info("Constructed studyOID using study_id because oc_oid is missing from the table - study.");
+              studyOID = "" + study.getId();
+          }
+          collectGlobalVariables();     
+      	collectBasicDefinitions();
+      	collectMetaDataVersion();
+    }
 
     private void collectGlobalVariables() {
         StudyBean study = studyBase.getStudy();
