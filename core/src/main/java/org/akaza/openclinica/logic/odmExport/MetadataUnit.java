@@ -99,6 +99,7 @@ public class MetadataUnit extends OdmUnit {
         else
         	{
         	collectGlobalVariables();
+        	collectBasicDefinitions(formVersionOID);
         	collectMetaDataVersion(formVersionOID)
         	;
         	}
@@ -139,6 +140,10 @@ public class MetadataUnit extends OdmUnit {
         new OdmExtractDAO(this.ds).getBasicDefinitions(studyid, odmStudy.getBasicDefinitions());
     }
     
+    
+    private void collectBasicDefinitions(String formVersionOID){
+    	new OdmExtractDAO(this.ds).getBasicDefinitions(formVersionOID, odmStudy.getBasicDefinitions());
+    }
     /**
      * To retrieve the ODM with form version OID as one of the parameters
      * @param formVersionOID
