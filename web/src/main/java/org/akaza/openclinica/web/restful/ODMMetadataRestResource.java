@@ -84,5 +84,17 @@ public void setMetadataCollectorResource(
       return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
   }
 	
+  
+  
+  @GET
+	@Path("/xml/view/{studyOID}/{studyEventDefinitionOId}/{formOID}/{formVersionOID}")
+	@Produces(MediaType.TEXT_XML)
+	public String getODMMetadataWithFormVersionOID(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
+	  
+		LOGGER.debug("returning here........"+formVersionOID);
+		//return "ODM";
+		
+		return metadataCollectorResource.collectODMMetadataForForm(studyOID,formVersionOID);
+	}
 	
 }

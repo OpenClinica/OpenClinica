@@ -62,6 +62,24 @@ public class OdmStudyBase {
         return studyBase;
     }
 
+    /**
+     * 
+     * @param ds
+     * @param study
+     * @param seds
+     */
+    
+    public OdmStudyBase(DataSource ds, StudyBean study,List<StudyEventDefinitionBean> seds) {
+        if (study == null) {
+            logger.info("Study is null!");
+            return;
+        }
+        this.study = study;
+        int parentStudyId = this.study.getParentStudyId() > 0 ? this.study.getParentStudyId() : this.study.getId();
+        this.sedBeansInStudy = seds;
+    }
+    
+    
     public void setStudy(StudyBean study) {
         this.study = study;
     }

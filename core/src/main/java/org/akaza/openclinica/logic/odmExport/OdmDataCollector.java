@@ -15,12 +15,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.slf4j.Logger;
@@ -61,24 +63,60 @@ public abstract class OdmDataCollector {
             logger.info("DataSource is null!");
             return;
         }
-        if (study.getId() < 1) {
-            logger.info("There is no study.");
-            return;
-        }
-        dataset = new DatasetBean();
-        odmbean = new ODMBean();
-
-        if (study.isSite(study.getParentStudyId())) {
-            this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
-            this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
-            this.category = 0;
-        } else {
-            int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-            this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
-            category = 1;
+        if(study == null)
+        	    	createFakeStudyObj();
+       
+        else{
+        	
+	        if (study.getId() < 1) {
+	            logger.info("There is no study.");
+	            return;
+	        }
+	        dataset = new DatasetBean();
+	        odmbean = new ODMBean();
+	
+	        if(study!=null)
+	        { 
+		        if (study.isSite(study.getParentStudyId())) {
+		            this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
+		            this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
+		            this.category = 0;
+		        } else {
+		            int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+		            this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
+		            category = 1;
+		        }
+	        }
         }
     }
 
+    
+    
+    private void createFakeStudyObj()
+    {
+        dataset = new DatasetBean();
+        odmbean = new ODMBean();
+        
+    	StudyBean studyBean = new StudyBean();
+    	studyBean.setName(MetadataUnit.FAKE_STUDY_NAME);
+    	studyBean.setOid(MetadataUnit.FAKE_STUDY_OID);
+    	studyBean.setParentStudyId(0);
+    	StudyEventDefinitionBean sedFake =  new StudyEventDefinitionBean();
+    	sedFake.setName(MetadataUnit.FAKE_SE_NAME);
+    	sedFake.setOid(MetadataUnit.FAKE_STUDY_EVENT_OID);
+    	
+    	
+    	List<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
+    	seds.add(sedFake);
+    	
+    	
+    	LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
+    	Bases.put(studyBean.getOid(),new OdmStudyBase(ds, studyBean,seds));
+        //this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
+        this.studyBaseMap = Bases;
+
+    	
+    }
     /**
      * Constructor for dataset of current study. If current study is a site,
      * only contains information of this site. If current study is a study,
@@ -106,7 +144,10 @@ public abstract class OdmDataCollector {
             category = 1;
         }
     }
-
+    
+    
+    
+   
     /**
      * Populate a HashMap<String, OdmStudyBase> of a study and its sites if
      * appliable, the key is study/site oc_oid.
