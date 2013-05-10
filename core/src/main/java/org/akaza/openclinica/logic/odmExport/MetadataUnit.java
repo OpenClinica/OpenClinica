@@ -43,9 +43,18 @@ import javax.sql.DataSource;
 
 public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
-    private StudyBean parentStudy;
+  
+	private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
 
+    public static final String FAKE_STUDY_NAME ="OC_FORM_LIB_STUDY";
+    public static final String FAKE_STUDY_OID = "OC_FORM_LIB";
+    public static final String FAKE_STUDY_EVENT_OID = "OC_FORM_LIB_SE";
+    public static final String FAKE_SE_NAME = "OC_FORM_LIB_SE_NAME";
+    public static final String FAKE_SE_REPEATING="NO";
+    public static final String FAKE_SE_TYPE ="SCHEDULED";
+    public static final String FAKE_FR_MANDATORY = "No";
+    
     public MetadataUnit() {
     }
 
@@ -57,6 +66,10 @@ public class MetadataUnit extends OdmUnit {
         } else {
             this.parentStudy = new StudyBean();
         }
+    }
+    
+    public MetadataUnit(DataSource ds){
+    	this.ds = ds;
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,RuleSetRuleDao ruleSetRuleDao) {
@@ -70,7 +83,7 @@ public class MetadataUnit extends OdmUnit {
         }
     }
 
-    public void collectOdmStudy() {
+    public void collectOdmStudy(String formVersionOID) {
         StudyBean study = studyBase.getStudy();
         String studyOID = study.getOid();
         if (studyOID == null || studyOID.length() <= 0) {
@@ -78,9 +91,18 @@ public class MetadataUnit extends OdmUnit {
             studyOID = "" + study.getId();
         }
         odmStudy.setOid(studyOID);
-        collectGlobalVariables();
-        collectBasicDefinitions();
-        collectMetaDataVersion();
+        if(!studyOID.equals(FAKE_STUDY_OID)){
+        	collectGlobalVariables();     
+        	collectBasicDefinitions();
+        	collectMetaDataVersion();
+        }
+        else
+        	{
+        	collectGlobalVariables();
+        	collectMetaDataVersion(formVersionOID)
+        	;
+        	}
+        
     }
 
     private void collectGlobalVariables() {
@@ -103,6 +125,37 @@ public class MetadataUnit extends OdmUnit {
         int studyid = studyBase.getStudy().getParentStudyId()>0 ? studyBase.getStudy().getParentStudyId() : studyBase.getStudy().getId();
         new OdmExtractDAO(this.ds).getBasicDefinitions(studyid, odmStudy.getBasicDefinitions());
     }
+    
+    /**
+     * To retrieve the ODM with form version OID as one of the parameters
+     * @param formVersionOID
+     */
+    private void collectMetaDataVersion(String formVersionOID){
+        StudyBean study = studyBase.getStudy();
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
+        MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
+        
+        ODMBean odmBean = new ODMBean();
+        odmBean.setODMVersion("oc1.3");
+       setOdmBean( odmBean);
+        
+    	 ArrayList<StudyEventDefinitionBean> sedBeansInStudy = (ArrayList<StudyEventDefinitionBean>) studyBase.getSedBeansInStudy();
+         if (sedBeansInStudy == null || sedBeansInStudy.size() < 1) {
+             logger.info("null, because there is no study event definition in this study.");
+             return;
+         }
+         
+         
+         if (metadata.getOid() == null || metadata.getOid().length() <= 0) {
+             metadata.setOid("v1.0.0");
+         }
+         if (metadata.getName() == null || metadata.getName().length() <= 0) {
+             metadata.setName("MetaDataVersion_v1.0.0");
+         }
+
+         oedao.getODMMetadataForForm(metadata,formVersionOID,this.odmBean.getODMVersion());
+    	
+    }
 
     private void collectMetaDataVersion() {
         ArrayList<StudyEventDefinitionBean> sedBeansInStudy = (ArrayList<StudyEventDefinitionBean>) studyBase.getSedBeansInStudy();
@@ -112,8 +165,10 @@ public class MetadataUnit extends OdmUnit {
         }
 
         StudyBean study = studyBase.getStudy();
+     
         StudyConfigService studyConfig = new StudyConfigService(this.ds);
         study = studyConfig.setParametersForStudy(study);
+   
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
         metadata.setStudy(study);
 
@@ -479,4 +534,13 @@ public class MetadataUnit extends OdmUnit {
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
+    
+    public StudyBean getParentStudy() {
+  		return parentStudy;
+  	}
+
+  	public void setParentStudy(StudyBean parentStudy) {
+  		this.parentStudy = parentStudy;
+  	}
+
 }

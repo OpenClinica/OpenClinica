@@ -57,7 +57,9 @@ public class MetaDataCollector extends OdmDataCollector {
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
-    public MetaDataCollector() {
+    public MetaDataCollector(DataSource ds,RuleSetRuleDao ruleSetRuleDao) {
+    	this.ruleSetRuleDao = ruleSetRuleDao;
+    	
     }
 
     @Override
@@ -74,7 +76,38 @@ public class MetaDataCollector extends OdmDataCollector {
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
             MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(),getRuleSetRuleDao());
-            meta.collectOdmStudy();
+            meta.collectOdmStudy(null);
+            if (this.getCategory() == 1) {
+                if (study.isSite(study.getParentStudyId())) {
+                    meta.getOdmStudy().setParentStudyOID(meta.getParentOdmStudyOid());
+                    MetaDataVersionProtocolBean p = meta.getOdmStudy().getMetaDataVersion().getProtocol();
+                    if (p != null && p.getStudyEventRefs().size() > 0) {
+                    } else {
+                        logger.error("site " + study.getName() + " will be assigned protocol with StudyEventRefs size=" + protocol.getStudyEventRefs().size());
+                        meta.getOdmStudy().getMetaDataVersion().setProtocol(protocol);
+                    }
+                } else {
+                    protocol = meta.getOdmStudy().getMetaDataVersion().getProtocol();
+
+
+                }
+            }
+            odmStudyMap.put(u.getStudy().getOid(), meta.getOdmStudy());
+        }
+    }
+    public void collectMetadataUnitMap(String formVersionOID) {
+        Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
+        MetaDataVersionProtocolBean protocol = new MetaDataVersionProtocolBean();
+        while (it.hasNext()) {
+            JobTerminationMonitor.check();
+            OdmStudyBase u = it.next();
+            StudyBean study = u.getStudy();
+            MetadataUnit meta = new MetadataUnit(this.ds);
+            meta.setStudyBase(u);
+            meta.setOdmStudy(new OdmStudyBean());
+            meta.setParentStudy(new StudyBean());
+
+            meta.collectOdmStudy(formVersionOID);
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {
                     meta.getOdmStudy().setParentStudyOID(meta.getParentOdmStudyOid());
@@ -117,4 +150,10 @@ public class MetaDataCollector extends OdmDataCollector {
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
+
+	public void collectFileData(String formVersionOID) {
+		  this.collectOdmRoot();
+	        this.collectMetadataUnitMap(formVersionOID);
+		
+	}
 }

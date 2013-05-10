@@ -42,6 +42,7 @@ import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.castor.xml.XMLConfiguration;
 import org.exolab.castor.mapping.Mapping;
@@ -87,7 +88,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         this.coreResources = coreResources;
     }
 
-    private static String nls = System.getProperty("line.separator");
+    public MetaDataReportBean() {
+		// TODO Auto-generated constructor stub
+	}
+
+	private static String nls = System.getProperty("line.separator");
 
     /**
      * has not been implemented yet
@@ -224,9 +229,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(currentIndent + "<Symbol>");
         xml.append(nls);
         for (TranslatedTextBean text : symbol.getTranslatedText()) {
-            // xml.append(currentIndent + indent + "<TranslatedText xml:lang=\""
-            // + text.getXmlLang() + "\">" + text.getText() +
-            // "</TranslatedText>");
+           
             xml.append(currentIndent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(text.getText()) + "</TranslatedText>");
             xml.append(nls);
         }
@@ -234,29 +237,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(nls);
     }
 
-    /*
-     * public void addStudyMetaDataVersion(boolean isDataset) { StringBuffer xml = this.getXmlOutput(); String indent =
-     * this.getIndent(); String currentIndent = indent + indent; String ODMVersion = this.getODMVersion(); MetaDataVersionBean
-     * meta = odmstudy.getMetaDataVersion(); if (isDataset) { xml.append(currentIndent + "<MetaDataVersion OID=\"" +
-     * StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\"" + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
-     * xml.append(nls); // for <Include>, // 1. In order to have <Include>, previous metadataversionOID must // be // given.
-     * // 2. If there is no previous study, then previous study OID is as // the // same as the current study OID // 3. there
-     * is no Include if both previous study and previous // metadataversionOID are empty if (meta.getInclude() != null) {
-     * String pmOid = meta.getInclude().getMetaDataVersionOID(); if (pmOid != null && pmOid.length() > 0) {
-     * xml.append(currentIndent + indent); String psOid = meta.getInclude().getStudyOID(); if (psOid != null && psOid.length()
-     * > 0) { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) + "\""); } else {
-     * xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\""); }
-     * xml.append(" MetaDataVersionOID=\"" + StringEscapeUtils.escapeXml(pmOid) + "\"/>"); xml.append(nls); } } } else {
-     * xml.append(currentIndent + "<MetaDataVersion>"); xml.append(nls); } // addProtocol(currentIndent + indent); boolean
-     * isStudy = meta.getStudy().getParentStudyId()>0 ? false : true; if (meta.getStudyEventDefs().size() > 0) {
-     * addStudyEventDef(isStudy, currentIndent + indent); if (meta.getItemGroupDefs().size() > 0) { addFormDef(isStudy,
-     * currentIndent + indent); addItemGroupDef(isStudy, currentIndent + indent); addItemDef(isStudy, currentIndent + indent);
-     * addCodeList(currentIndent + indent); if ("oc1.2".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent +
-     * indent); addStudyGroupClassList(currentIndent + indent); } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
-     * addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent);
-     * if(meta.getStudy().getParentStudyId()>0) { } else { this.addStudyDetails(currentIndent+indent); } } } }
-     * xml.append(currentIndent + "</MetaDataVersion>"); xml.append(nls); }
-     */
+    
     public void addStudyMetaDataVersion(boolean isDataset) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
@@ -267,15 +248,6 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\""
             + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
         xml.append(nls);
-        // for <Include>,
-        // 1. In order to have <Include>, previous metadataversionOID must
-        // be
-        // given.
-        // 2. If there is no previous study, then previous study OID is as
-        // the
-        // same as the current study OID
-        // 3. there is no Include if both previous study and previous
-        // metadataversionOID are empty
         if (meta.getInclude() != null) {
             String pmOid = meta.getInclude().getMetaDataVersionOID();
             if (pmOid != null && pmOid.length() > 0) {
@@ -315,6 +287,13 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 }
             }
         }
+        else if(odmstudy.getOid().equals(MetadataUnit.FAKE_STUDY_OID)){
+        	 addFormDef(isStudy, currentIndent + indent);
+             addItemGroupDef(isStudy, currentIndent + indent);
+             addItemDef(isStudy, currentIndent + indent);
+        }
+        	
+        	
 
         addNodeRulesData(meta);
 
@@ -679,28 +658,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         }
     }
 
-    /*
-     * public void addMultiSelectList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent =
-     * this.getIndent(); ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>)
-     * odmstudy.getMetaDataVersion().getMultiSelectLists(); if (lists != null) { if (lists.size() > 0) { for
-     * (MultiSelectListBean l : lists) { xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" +
-     * StringEscapeUtils.escapeXml(l.getOid()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" +
-     * StringEscapeUtils.escapeXml(l.getName()) + "\" "); } if (l.getDataType() != null) {
-     * xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" "); } if (l.getActualDataType() != null) {
-     * xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" "); }
-     * xml.append(">"); xml.append(nls); ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>)
-     * l.getMultiSelectListItems(); if (mslis != null && mslis.size() > 0) { for (MultiSelectListItemBean msli : mslis) {
-     * xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" +
-     * StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">"); xml.append(nls); xml.append(currentIndent + indent +
-     * indent + "<Decode>"); xml.append(nls); TranslatedTextBean tt = msli.getDecode(); if (tt.getXmlLang().length() > 0) {
-     * xml.append(currentIndent + indent + indent + indent + "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">" +
-     * StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>"); } else { xml.append(currentIndent +
-     * indent + indent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) +
-     * "</TranslatedText>"); } xml.append(nls); xml.append(currentIndent + indent + indent + "</Decode>"); xml.append(nls);
-     * xml.append(currentIndent + indent + "</OpenClinica:MultiSelectListItem>"); xml.append(nls); } }
-     * xml.append(currentIndent + "</OpenClinica:MultiSelectList>"); xml.append(nls); } } } }
-     */
-
+  
     public void addStudyDetails(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
@@ -719,7 +677,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             	if(temp!=null && temp.length()>0){
             		xml.append(" ParentStudyName=\""+ StringEscapeUtils.escapeXml(temp) + "\"");
             	}
-            	
+//            	
             }
             xml.append(">");
             xml.append(nls);
