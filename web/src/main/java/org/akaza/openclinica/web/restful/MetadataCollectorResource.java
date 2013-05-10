@@ -147,7 +147,10 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         odmb.setODMVersion("oc1.3");
         mdc.setODMBean(odmb);
         adc.setOdmbean(odmb);
+        if(studyBean==null)
         mdc.collectFileData(formVersionOID);
+        else
+        	mdc.collectFileData();
         adc.collectFileData();
         
         FullReportBean report = new FullReportBean();

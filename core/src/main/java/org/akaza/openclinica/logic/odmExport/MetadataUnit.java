@@ -91,17 +91,19 @@ public class MetadataUnit extends OdmUnit {
             studyOID = "" + study.getId();
         }
         odmStudy.setOid(studyOID);
-        if(!studyOID.equals(FAKE_STUDY_OID)){
-        	collectGlobalVariables();     
-        	collectBasicDefinitions();
-        	collectMetaDataVersion();
-        }
-        else
-        	{
+        if(studyOID.equals(FAKE_STUDY_OID)){
+        	
         	collectGlobalVariables();
         	collectBasicDefinitions(formVersionOID);
         	collectMetaDataVersion(formVersionOID)
         	;
+        }
+        else
+        	{
+        	collectGlobalVariables();     
+        	collectBasicDefinitions();
+        	collectMetaDataVersion();
+        	
         	}
         
     }
