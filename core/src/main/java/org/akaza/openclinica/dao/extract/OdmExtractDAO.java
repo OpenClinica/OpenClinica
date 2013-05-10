@@ -609,35 +609,6 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getBasicDefinitions(String crfVersionOID, BasicDefinitionsBean basicDef) {
-        ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
-        String uprev = "";
-        this.setStudyMeasurementUnitsTypesExpected();
-        ArrayList rows = this.select(this.getStudyMeasurementUnitsSql(crfVersionOID));
-        Iterator it = rows.iterator();
-        while (it.hasNext()) {
-            HashMap row = (HashMap) it.next();
-            String oid = (String) row.get("mu_oid");
-            String name = (String) row.get("name");
-            MeasurementUnitBean u = new MeasurementUnitBean();
-            SymbolBean symbol = new SymbolBean();
-            ArrayList<TranslatedTextBean> texts = new ArrayList<TranslatedTextBean>();
-            if (uprev.equals(oid)) {
-                u = units.get(units.size() - 1);
-                symbol = u.getSymbol();
-                texts = symbol.getTranslatedText();
-            } else {
-                u.setOid(oid);
-                u.setName(name);
-                units.add(u);
-            }
-            TranslatedTextBean t = new TranslatedTextBean();
-            t.setText(name);
-            texts.add(t);
-            symbol.setTranslatedText(texts);
-            u.setSymbol(symbol);
-        }
-    }
     public void getUpdatedSiteMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
         this.setStudyEventAndFormMetaTypesExpected();
@@ -3485,12 +3456,6 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             + " and item.units = mu.name order by mu.oc_oid";
     }
 
-    protected String getStudyMeasurementUnitsSql(String crfVersionOid) {
-        return "select distinct mu.oc_oid as mu_oid, mu.name from  crf_version cv, versioning_map vm, item, measurement_unit mu " +
-        		"where cv.oc_OID in (\'"+crfVersionOid +"\')   and cv.crf_version_id = vm.crf_version_id and vm.item_id = item.item_id " +
-        		"and item.units = mu.name order by mu.oc_oid";
-    }
-  
     protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
             String studySubjectIds) {
         return "select cvit.*, mu.oc_oid as mu_oid from ("
