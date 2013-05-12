@@ -50,7 +50,7 @@
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <div style="float:right;padding-right:6px;width:8%;clear:both">
-   <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/*')"
+   <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/*/*')"
    onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
    onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>

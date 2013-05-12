@@ -7,6 +7,7 @@
   var app_siteOID = '${studyOID}';
   var app_eventOID = '${eventOID}';
   var app_formOID = '${formOID}';
+  var app_formVersionOID = '${formVersionOID}';
   var app_printTime = '<%= new java.util.Date() %>';
 </script>
 
