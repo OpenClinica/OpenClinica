@@ -89,7 +89,7 @@ public void setMetadataCollectorResource(
   
   
   @GET
-	@Path("/xml/view/{studyOID}/{studyEventDefinitionOId}/{formOID}/{formVersionOID}")
+	@Path("/xml/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
 	@Produces(MediaType.TEXT_XML)
 	public String getODMMetadataWithFormVersionOID(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
 	  
@@ -101,7 +101,7 @@ public void setMetadataCollectorResource(
   
   
   @GET
- 	@Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formOID}/{formVersionOID}")
+ 	@Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
  	@Produces(MediaType.APPLICATION_JSON)
  	public String getODMMetadataJson(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
  	  
