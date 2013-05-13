@@ -70,10 +70,10 @@ function getPrintableContent() {
 
 function setRenderMode() {
   renderMode = 'UNPOPULATED_FORM_CRF';
-  if (app_studyOID != "*" && app_eventOID == "*" && app_formOID == "*") {
+  if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*") {
     renderMode = 'UNPOPULATED_STUDY_CRFS';
   }
-  else if (app_eventOID != "*" && app_formOID == "*") {
+  else if (app_eventOID != "*" && app_formVersionOID == "*") {
     renderMode = 'UNPOPULATED_EVENT_CRFS';
   }
 }

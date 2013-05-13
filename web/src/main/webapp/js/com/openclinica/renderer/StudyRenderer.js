@@ -201,7 +201,7 @@ function StudyRenderer(json) {
     if (renderMode == "UNPOPULATED_FORM_CRF") {
       // select CRF by OID
       for (var i=0;i< app_formDefs.length;i++) {
-        if (app_formDefs[i]["@OID"] == app_formOID) {
+        if (app_formDefs[i]["@OID"] == app_formVersionOID) {
           formDef = app_formDefs[i];
           break; 
         }
