@@ -106,7 +106,7 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         odmb.setODMVersion("oc1.3");
         mdc.setODMBean(odmb);
      adc.setOdmbean(odmb);
-        mdc.collectFileData("ajhjahsd");
+        mdc.collectFileData();
    adc.collectFileData();
         
         FullReportBean report = new FullReportBean();
@@ -128,6 +128,12 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 	}
 
 
+	
+	public String collectODMMetadataJson(String studyOID,String formVersionOID){
+		net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
+		JSON json = xmlserializer.read(collectODMMetadataForForm(studyOID,formVersionOID));
+		return json.toString(INDENT_LEVEL);
+	}
 
 	public String collectODMMetadataForForm(String studyOID,String formVersionOID) {
 		StudyBean studyBean = getStudyDao().findByOid(studyOID);

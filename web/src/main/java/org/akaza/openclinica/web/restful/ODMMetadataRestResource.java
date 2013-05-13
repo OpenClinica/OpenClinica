@@ -98,5 +98,17 @@ public void setMetadataCollectorResource(
 		
 		return metadataCollectorResource.collectODMMetadataForForm(studyOID,formVersionOID);
 	}
+  
+  
+  @GET
+ 	@Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formOID}/{formVersionOID}")
+ 	@Produces(MediaType.APPLICATION_JSON)
+ 	public String getODMMetadataJson(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
+ 	  
+ 		LOGGER.debug("returning here........"+formVersionOID);
+ 		//return "ODM";
+ 		
+ 		return metadataCollectorResource.collectODMMetadataJson(studyOID,formVersionOID);
+ 	}
 	
 }
