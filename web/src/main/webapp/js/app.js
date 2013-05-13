@@ -56,7 +56,7 @@ $(document).ready(function() {
 function getPrintableContent() {
     $('body').css({"background-color": "white"});
     $('.spinner').css({display: "block"});
-  $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID, {}, function(data) {
+  $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID, {}, function(data) {
     $('.spinner').css({display: "none"});
     $('#single-page').css({display: "block"});
     app_pagesArray = new Array();
@@ -75,5 +75,8 @@ function setRenderMode() {
   }
   else if (app_eventOID != "*" && app_formVersionOID == "*") {
     renderMode = 'UNPOPULATED_EVENT_CRFS';
+  }
+  else if (app_studyOID == "*" && app_eventOID == "*" && app_formVersionOID != "*") {
+    renderMode = 'UNPOPULATED_GLOBAL_CRF';
   }
 }

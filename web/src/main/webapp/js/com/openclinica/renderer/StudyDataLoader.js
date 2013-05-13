@@ -48,6 +48,9 @@ function StudyDataLoader(study) {
   /* loadBasicDefinitions()
    */
   this.loadBasicDefinitions = function() {
+    if (this.study["BasicDefinitions"] == undefined) {
+      return; 
+    }
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
     debug("loading basic definitions", util_logDebug );
     app_basicDefinitions = {};

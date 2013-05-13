@@ -70,14 +70,19 @@ function StudyRenderer(json) {
   * Set the current study being rendered
   */ 
   this.setStudy = function (renderMode) {
+    this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
     switch (renderMode) {
       case 'UNPOPULATED_FORM_CRF':
       case 'UNPOPULATED_EVENT_CRFS':
       case 'UNPOPULATED_STUDY_CRFS':
-        this.study = this.json["Study"][0] != undefined ? this.json["Study"][0] : this.json["Study"];
         app_studyName = this.study["GlobalVariables"]["StudyName"];
         app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
         app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
+      break;  
+      case 'UNPOPULATED_GLOBAL_CRF':
+        app_studyName = "";
+        app_siteName = "";
+        app_protocolName = "";
       break;  
     }  
   }
@@ -198,7 +203,7 @@ function StudyRenderer(json) {
     var formDef = undefined;
     pageTemplateString = "";
     
-    if (renderMode == "UNPOPULATED_FORM_CRF") {
+    if (renderMode == "UNPOPULATED_FORM_CRF" || renderMode == "UNPOPULATED_GLOBAL_CRF") {
       // select CRF by OID
       for (var i=0;i< app_formDefs.length;i++) {
         if (app_formDefs[i]["@OID"] == app_formVersionOID) {

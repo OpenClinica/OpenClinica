@@ -10,6 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
@@ -76,11 +77,13 @@ public void setMetadataCollectorResource(
     @Context HttpServletResponse response, 
     @PathParam("studyOID") String studyOID,
     @PathParam("eventOID") String eventOID,
-    @PathParam("formVersionOID") String formVersionOID 
+    @PathParam("formVersionOID") String formVersionOID,
+    @QueryParam("fromGlobal") boolean fromGlobal
     ) throws Exception {
       request.setAttribute("studyOID", studyOID);
       request.setAttribute("eventOID", eventOID);
       request.setAttribute("formVersionOID", formVersionOID);
+      request.setAttribute("fromGlobal", fromGlobal);
       return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
   }
 	

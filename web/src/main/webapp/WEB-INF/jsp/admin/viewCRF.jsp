@@ -125,7 +125,7 @@
                                             name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/<c:out value="${version.oid}"/>')"
+  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/<c:out value="${version.oid}"/>?fromGlobal=${module == 'admin'}')"
                                        onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                                        onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
                                             name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
