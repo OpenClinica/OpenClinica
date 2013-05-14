@@ -981,7 +981,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet>
         <servlet-name>PrintCRFServlet</servlet-name>
         <display-name>PrintCRF</display-name>
-        <servlet-class>org.akaza.openclinica.control.admin.PrintCRFServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.managestudy.PrintCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>PrintCRFOldServlet</servlet-name>
