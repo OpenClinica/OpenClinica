@@ -64,6 +64,9 @@ function StudyDataLoader(study) {
   /* loadCodeLists()
    */
   this.loadCodeLists = function() {
+    if (this.study["MetaDataVersion"]["CodeList"] == undefined) {
+      return; 
+    }
     var codeLists = this.study["MetaDataVersion"]["CodeList"];
     debug("loading code lists", util_logDebug );
     app_codeLists = {};
@@ -86,6 +89,9 @@ function StudyDataLoader(study) {
   /* loadMultSelectLists()
    */
   this.loadMultiSelectLists = function() {
+    if (this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"] == undefined) {
+      return; 
+    }
     var multiSelectLists = this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"];
     debug("loading multi select lists", util_logDebug );
     app_multiSelectLists = {};
