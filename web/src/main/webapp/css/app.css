@@ -143,13 +143,6 @@ a:link {
   padding-left: 5px;
 }
 
-.item_def_wrapper_3col{
-  min-width:150px;
-  margin-top:0px;
-  margin-bottom:0px;
-  margin-left:10px;
-}
-
 .item_def_number{
   vertical-align: top;
   display: inline-block;
@@ -185,13 +178,6 @@ span.item_def_control{
   padding-bottom:0;
   margin-top:0;
   margin-bottom:0;
-}
-
-
-span.item_def_control_3col{
-  vertical-align: bottom;
-  display: inline-block;
-  font-size: 0.7em;
 }
 
 .item_def_format_label{

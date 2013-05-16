@@ -15,7 +15,7 @@ function ItemDefRenderer(json, itemDetails) {
   this.columns = this.itemDetails["OpenClinica:Layout"] ? this.itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
   
   this.renderPrintableItem = function(isRepeating) { 
-    var template = this.columns == 3 ? "print_item_def_3col" : "print_item_def";
+    var template = "print_item_def";
     if (isRepeating == true) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
