@@ -48,12 +48,12 @@ function StudyDataLoader(study) {
   /* loadBasicDefinitions()
    */
   this.loadBasicDefinitions = function() {
+    app_basicDefinitions = {};
     if (this.study["BasicDefinitions"] == undefined) {
       return; 
     }
     var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
     debug("loading basic definitions", util_logDebug );
-    app_basicDefinitions = {};
     for (var i=0;i< basicDefinitions.length;i++) {
       var key = basicDefinitions[i]["@OID"]; 
       var value = basicDefinitions[i]["@Name"]; 
@@ -64,12 +64,12 @@ function StudyDataLoader(study) {
   /* loadCodeLists()
    */
   this.loadCodeLists = function() {
+    app_codeLists = {};
     if (this.study["MetaDataVersion"]["CodeList"] == undefined) {
       return; 
     }
     var codeLists = this.study["MetaDataVersion"]["CodeList"];
     debug("loading code lists", util_logDebug );
-    app_codeLists = {};
     for (var i=0;i< codeLists.length;i++) {
       var codeListKey = codeLists[i]["@OID"]; 
       var currentCodeList = [];
@@ -89,12 +89,12 @@ function StudyDataLoader(study) {
   /* loadMultSelectLists()
    */
   this.loadMultiSelectLists = function() {
+    app_multiSelectLists = {};
     if (this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"] == undefined) {
       return; 
     }
     var multiSelectLists = this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"];
     debug("loading multi select lists", util_logDebug );
-    app_multiSelectLists = {};
     for (var i=0;i< multiSelectLists.length;i++) {
       var multiSelectListKey = multiSelectLists[i]["@ID"]; 
       var currentMultiSelectList = [];

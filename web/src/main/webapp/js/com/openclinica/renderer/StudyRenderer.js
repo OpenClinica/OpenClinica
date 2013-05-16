@@ -357,8 +357,8 @@ function StudyRenderer(json) {
           isFirstRepeatingItem = true;
         }
       
-        var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
-        itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
+        var itemRowHeightInPixels = codeListOID && app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
+        itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
@@ -419,8 +419,8 @@ function StudyRenderer(json) {
       // standard non-repeating items
       else if (repeating == false) { 
         this.currentRowWidth += app_itemWidth;
-        var itemRowHeightInPixels = app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
-        itemRowHeightInPixels = app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
+        var itemRowHeightInPixels = codeListOID && app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
+        itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
           itemRenderString = "<table class='item-row'>";
         }
