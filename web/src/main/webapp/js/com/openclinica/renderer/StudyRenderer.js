@@ -13,7 +13,7 @@
 function StudyRenderer(json) {
   this.ITEM_OPTION_HEIGHT = 7;
   this.DEFAULT_ITEM_HEIGHT = 40; 
-  this.DEFAULT_GRID_ITEM_HEIGHT = 20; 
+  this.DEFAULT_GRID_ITEM_HEIGHT = 50; 
   this.DEFAULT_MAX_REPEAT = 40; 
   this.json = json;
   this.study = undefined;
@@ -361,7 +361,7 @@ function StudyRenderer(json) {
         itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
-        debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
+        debug("repeating group: item " + orderNumber + " of " + itemGroupLength + ".  height = " + itemRowHeightInPixels, util_logInfo);
        
         // in first item in repeating group
         if (isFirstRepeatingItem == true) {
@@ -381,7 +381,7 @@ function StudyRenderer(json) {
           var options = responseType == 'multi-select' ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
           var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
-          var optionsRow = "<tr>";
+          var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
             optionsRow += "<td valign='top' class='repeating_item_group'>" + options[j].label + "</td>";
           }
@@ -430,7 +430,7 @@ function StudyRenderer(json) {
           this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, this.IN_CRF, this.CHECK_ROW_WIDTH);
         }
       }
-      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logDebug);
+      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logInfo);
       
       previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
@@ -450,7 +450,7 @@ function StudyRenderer(json) {
   this.renderPrintableRow = function(htmlString, rowHeight, inCrf, checkRowWidth) {
     this.renderString += htmlString;
     this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + "this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
+    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + ", this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
       if (checkRowWidth == true && this.currentRowWidth > app_maxPixelWidth && this.printMode == this.PORTRAIT) {
         this.printMode = this.LANDSCAPE;

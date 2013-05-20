@@ -65,6 +65,7 @@ h4 {
   width:1095px;
   height:1472px;
   background-color: white;
+  overflow: hidden;
 }
 
 .single-page-landscape {
@@ -78,6 +79,7 @@ h4 {
   width:1472px;
   height:1095px;
   background-color: white;
+  overflow: hidden;
 }
 
 
@@ -122,7 +124,8 @@ a:link {
 
 .repeating_item_wrapper{
   display:inline-block;
-  max-height:200px;
+  min-height: 50px;
+  max-height: 400px;
   margin-top:0px;
   margin-bottom:0px;
   margin-left:5x;
@@ -311,17 +314,20 @@ span.item_def_control{
   font-size: 11px;
   font-weight: bold;
   background-color: #DDDDDD;
-  max-height: 200px;
+  max-height: 300px;
 }
 
 .repeating_item_group {
   /* border:1px solid; */ 
+  min-height: 50px;
 }
 .repeating_item_option_names {
+  min-height: 50px;
   /* border:1px solid; */ 
 }
 
 td.item-def-cell {
+  min-height: 50px;
   vertical-align: top;  
 }
 

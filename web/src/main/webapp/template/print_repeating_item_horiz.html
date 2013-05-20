@@ -5,31 +5,19 @@
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
   <div class='text-background-repeating'></div>
   {{else responseType == 'radio'}}
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
-      {{each optionNames}}
-        <td align='center' valign='center'><div class='select-option'><input type='radio'/></div></td>
-      {{/each}}
-    </div>
-  </div>
+    {{each optionNames}}
+      <td align='center' valign='center' class='repeating_item_group'><div class='select-option'><input type='radio'/></div></td>
+    {{/each}}
   {{else responseType == 'single-select'}}
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
-      {{each optionNames}}
-        <td align='center' valign='center'><div class='select-option'><input type='checkbox'/></div></td>
-      {{/each}}
-    </div>
-  </div>
- {{else responseType == 'multi-select' || responseType == 'checkbox'}}
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
-      {{each multiSelectOptionNames}}
-        <td align='center' valign='center'><div class='select-option'><input type='checkbox'/></div></td>
-      {{/each}}
-    </div>
-  </div>
+    {{each optionNames}}
+      <td align='center' valign='center' class='repeating_item_group'><div class='select-option'><input type='checkbox'/></div></td>
+    {{/each}}
+  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+    {{each multiSelectOptionNames}}
+      <td align='center' valign='center' class='repeating_item_group'><div class='select-option'><input type='checkbox'/></div></td>
+    {{/each}}
   {{else}}
-    who knows?
+    [item]
   {{/if}}
   </tr>
   </table>
