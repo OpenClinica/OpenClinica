@@ -25,9 +25,6 @@ function StudyRenderer(json) {
   this.CHECK_ROW_WIDTH = true;
   this.DONT_CHECK_ROW_WIDTH = false;
   this.NOT_IN_CRF = false;
-  this.LANDSCAPE = "single-page-landscape";
-  this.PORTRAIT = "single-page";
-  this.printMode = this.PORTRAIT;
   var pageTemplateString = "";
   var printPageRenderer;
 
@@ -166,7 +163,6 @@ function StudyRenderer(json) {
     currentPage.data = studyEventCoverPageString;
     currentPage.type = app_studyEventCoverPageType;
     currentPage.eventName = app_eventName;
-    currentPage.printMode = this.PORTRAIT;
     app_pagesArray.push(currentPage);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -231,7 +227,6 @@ function StudyRenderer(json) {
       currentPage.data = studyCoverPageString;
       currentPage.eventName = app_eventName;
       currentPage.type = app_studyCoverPageType;
-      currentPage.printMode = this.PORTRAIT;
       app_pagesArray.push(currentPage);
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -243,7 +238,7 @@ function StudyRenderer(json) {
     for (var i=0;i< app_pagesArray.length;i++) {
       var currentPage =  app_pagesArray[i];
       pageTemplateString += 
-      printPageRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName, currentPage.printMode)[0].outerHTML;
+      printPageRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
     }
     return pageTemplateString;
   }
@@ -397,15 +392,14 @@ function StudyRenderer(json) {
         if (i == lastRepeatingOrderInFormNumber) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
-          if (this.currentRowWidth > app_maxPixelWidth && this.printMode == this.PORTRAIT) {
-            this.printMode = this.LANDSCAPE;
+          if (this.currentRowWidth > app_maxPixelWidth) {
+            //this.printMode = this.LANDSCAPE;
           }
           for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
             repeatingRows += repeatingRowString;
             this.accumulatedPixelHeight += itemRowHeightInPixels;
  
-            if ((this.printMode == this.PORTRAIT && this.accumulatedPixelHeight > app_maxPixelHeight) || 
-               (this.printMode == this.LANDSCAPE && this.accumulatedPixelHeight > app_maxLandscapePixelHeight)) { 
+            if (this.accumulatedPixelHeight > app_maxPixelHeight) {
               this.renderString += RenderUtil.render(RenderUtil.get(
               "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
               this.startNewPage(true);
@@ -452,8 +446,8 @@ function StudyRenderer(json) {
     this.accumulatedPixelHeight += rowHeight;
     debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + ", this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
-      if (checkRowWidth == true && this.currentRowWidth > app_maxPixelWidth && this.printMode == this.PORTRAIT) {
-        this.printMode = this.LANDSCAPE;
+      if (checkRowWidth == true && this.currentRowWidth > app_maxPixelWidth) {
+        //this.printMode = this.LANDSCAPE;
       }
       this.startNewPage(inCrf);
     }
@@ -471,10 +465,8 @@ function StudyRenderer(json) {
     currentPage.data = this.renderString;
     currentPage.type = app_studyContentPageType;
     currentPage.eventName = app_eventName;
-    currentPage.printMode = this.printMode;
     app_pagesArray.push(currentPage);
     this.accumulatedPixelHeight = 0;
-    this.printMode = this.PORTRAIT;
     inCrf ? this.renderString = app_crfHeader : this.renderString = "";
   }
 
