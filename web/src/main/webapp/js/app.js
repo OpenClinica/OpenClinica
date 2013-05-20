@@ -1,11 +1,11 @@
 var INITIALIZED = false;
 
-var app_maxPixelHeight = 510;
+var app_maxPixelHeight = 610;
 var app_maxLandscapePixelHeight = 400;
-var app_maxPixelWidth = 950;
-var app_maxLandscapePixelWidth = 1250;
+var app_maxPixelWidth = 850;
+var app_maxLandscapePixelWidth = 1350;
 var app_itemWidth = 250;
-var app_repeatingItemWidth = 200;
+var app_repeatingItemWidth = 250;
 var app_repeatingHorizItemWidth = 400;
 var JSON_INDENT_LEVEL = 2;
 var app_logLevel = util_logInfo;
