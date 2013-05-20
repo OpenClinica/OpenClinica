@@ -1,6 +1,7 @@
 package org.akaza.openclinica.web.filter.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.apache.bcel.generic.NEW;
 
 import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -38,57 +40,88 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 	String studyOIDS;
 	
 	 public static ResourceBundle  restext;
+	 
+	 private static String GlOBAL_STUDY_OID = "*";
 	
 	@Override
 	
 	public ContainerRequest filter(ContainerRequest containerRequest) {
 		UserAccountBean userBean = (UserAccountBean)request.getSession().getAttribute("userBean");	
-		if(userBean.isSysAdmin())
-			return containerRequest;
-		else{
+		
+		
+		
 		String studyOID = containerRequest.getPathSegments().get(3).getPath();
-		
+
 		//parse to get studyOID
-		StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
+	
 		
-		
-		if(checkAuth(studyBean,userBean)) return containerRequest;
-		else
+		if(studyOID.equals(GlOBAL_STUDY_OID))
 		{
-			if(studyBean.getParentStudyId()!=0){
-			int parentStudyID = studyBean.getParentStudyId();
-			studyBean = getStudyByID(parentStudyID,getDataSource());
-			 
-			if(checkAuth(studyBean,userBean))return containerRequest;
+			if(checkAuth(userBean)) return containerRequest;
+			
+				
 		}
-		
-		}   
+	
+		else{
+			StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
+			if(checkAuth(studyBean,userBean)) return containerRequest;
+			else
+			{
+				if(studyBean.getParentStudyId()!=0){
+				int parentStudyID = studyBean.getParentStudyId();
+				studyBean = getStudyByID(parentStudyID,getDataSource());
+				if(checkAuth(studyBean,userBean))return containerRequest;
+			}
+			}   
+			
+	        request.setAttribute(SecureController.PAGE_MESSAGE, "You don't have correct permission in your current Study.");
 		}
-		
-		
-        request.setAttribute(SecureController.PAGE_MESSAGE, "You don't have correct permission in your current Study.");
-        
         
         
 
 		throw new WebApplicationException(Response.Status.FORBIDDEN);
-       
+	
 	}
+
 
 	
 	
+	private Boolean checkAuth(UserAccountBean userBean) {
+		Boolean auth = false;
+		
+		  ArrayList userRoles = userBean.getRoles();
+	        for (int i = 0; (i < userRoles.size() && auth==false); i++) {
+	            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+
+				if(studyRole.getRole().equals(Role.ADMIN) || studyRole.getRole().equals(Role.COORDINATOR) ||studyRole.getRole().equals(Role.STUDYDIRECTOR))
+				{
+					auth = true;
+					
+				}
+	        }
+		return auth;
+	}
+
+
+
+
 	private Boolean checkAuth(StudyBean studyBean,UserAccountBean userBean){
 		Boolean auth = false;
 		StudyUserRoleBean studyRole = getRoleByStudy(studyBean,getDataSource(),userBean);
 		Role r = studyRole.getRole();
 			if (r != null) {
             // r = userBean.getActiveStudyRole();
-            if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
-                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) ||r.equals(Role.MONITOR) )) {
-                return true;
+            if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR )  )) {
+               auth = true;
+            }
+            else if(userBean.isTechAdmin()||userBean.isSysAdmin())
+            {
+            	if(r!=null && (r.equals(Role.ADMIN)||r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR)||r.equals(Role.MONITOR)||r.equals(Role.RESEARCHASSISTANT) ) ){
+            		auth = true;
+            	}
             }
         }
-return auth;
+			return auth;
 	}
 		
 	private DataSource getDataSource(){
