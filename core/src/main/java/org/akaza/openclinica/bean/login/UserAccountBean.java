@@ -445,7 +445,7 @@ public class UserAccountBean extends AuditableEntityBean {
     /**
      * @return Returns the roles.
      */
-    public ArrayList<Role> getRoles() {
+    public ArrayList getRoles() {
         return roles;
     }
 
