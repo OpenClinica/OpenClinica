@@ -2,19 +2,19 @@
 
   <div id='page-header'>
     <div id='left-header'>
-      <div id='header-protocol-id' class='text-left-aligned'>Protocol ID: ${protocolName}</div>  
-      <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName}</div>  
-      <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName}</div>  
+      <div id='header-protocol-id' class='text-left-aligned'>Protocol ID: ${protocolName ? protocolName : '___________________'}</div>  
+      <div id='header-study-name' class='text-left-aligned'>Study Name: ${studyName ? studyName : '___________________'}</div>  
+      <div id='header-site-name' class='text-left-aligned'>Site Name: ${siteName ? siteName : '___________________'}</div>  
       {{if secondaryLabelViewable == true}}
         <div id='header-secondary-id' class='text-left-aligned'>Secondary ID: </div>  
       {{/if}}
       {{if pageType != app_studyCoverPageType}}
-        <div id='header-event-name' class='text-left-aligned'>Event: ${eventName}</div>  
+        <div id='header-event-name' class='text-left-aligned'>Event: ${eventName ? eventName : '___________________'}</div>  
       {{/if}}
       {{if eventLocationRequired == 'required'}}
-        <div id='header-event-location' class='text-left-aligned'>Event Location *: ${eventName}</div>  
+        <div id='header-event-location' class='text-left-aligned'>Event Location *: ${eventName ? eventName : '___________________'}</div>  
       {{else eventLocationRequired == 'optional'}}
-        <div id='header-event-location' class='text-left-aligned'>Event Location: ${eventName}</div>  
+        <div id='header-event-location' class='text-left-aligned'>Event Location: ${eventName ? eventName : '___________________'}</div>  
       {{/if}}
       {{if pageType != app_studyCoverPageType}}
         <div id='header-event-date' class='text-left-aligned'>Event Date: ___________________</div>  
