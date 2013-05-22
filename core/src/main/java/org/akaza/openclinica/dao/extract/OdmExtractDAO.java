@@ -869,9 +869,10 @@ public class OdmExtractDAO extends DatasetDAO {
 	public FormDefBean fetchFormDetails(CRFVersionBean crfVBean,FormDefBean formDef){
     
     	CRFDAO<String, ArrayList> crfDao = new CRFDAO(this.ds);
-    	CRFBean crfBean   = crfDao.findByVersionId(crfVBean.getCrfId());  	
+    	CRFBean crfBean   = (CRFBean) crfDao.findByPK(crfVBean.getCrfId());  	
     	formDef.setOid(crfVBean.getOid());
-    	formDef.setName(crfVBean.getName());
+    	formDef.setName(crfBean.getName() + " - " +crfVBean.getName());
+    	
     	formDef.setRepeating("No");
     	FormDetailsBean formDetails = new FormDetailsBean();
     	formDetails.setName(crfVBean.getName());
