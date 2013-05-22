@@ -96,7 +96,8 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
-          if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes") {
+          if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" || 
+              formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
             continue;
           }
           str += "<div>" + formDef["@Name"] + "</div>";
@@ -124,7 +125,8 @@ function StudyRenderer(json) {
     //iterate over each of the formDefs in the study    
     for (var i=0;i< app_formDefs.length;i++) {
       var formDef = app_formDefs[i];
-      if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes") {
+      if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" ||
+          formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
         continue;
       }
       // load crf name into the first column of the CRF row
@@ -175,7 +177,8 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
-          if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes") {
+          if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" ||
+          formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
             continue;
           }
           this.renderPrintableFormDef(formDef);
