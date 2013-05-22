@@ -77,13 +77,11 @@ public void setMetadataCollectorResource(
     @Context HttpServletResponse response, 
     @PathParam("studyOID") String studyOID,
     @PathParam("eventOID") String eventOID,
-    @PathParam("formVersionOID") String formVersionOID,
-    @QueryParam("fromGlobal") boolean fromGlobal
+    @PathParam("formVersionOID") String formVersionOID
     ) throws Exception {
       request.setAttribute("studyOID", studyOID);
       request.setAttribute("eventOID", eventOID);
       request.setAttribute("formVersionOID", formVersionOID);
-      request.setAttribute("fromGlobal", fromGlobal);
       return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
   }
 	

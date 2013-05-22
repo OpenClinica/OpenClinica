@@ -2,9 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <script>
-  var app_fromGlobal = ${fromGlobal};
   var app_contextPath = '${pageContext.request.contextPath}'; 
-  var app_studyOID = app_fromGlobal == true ? '*' : '${studyOID}';
+  var app_studyOID = '${studyOID}';
   var app_siteOID = '${studyOID}';
   var app_eventOID = '${eventOID}';
   var app_formVersionOID = '${formVersionOID}';
