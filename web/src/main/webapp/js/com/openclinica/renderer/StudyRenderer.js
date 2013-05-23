@@ -314,11 +314,11 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='section-title'>"+sectionLabel+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          this.renderPrintableRow("<div class='section-title'>"+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header section-title'>"+sectionLabel+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          this.renderPrintableRow("<div class='non-first_section_header section-title'>"+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
         }
         isFirstSection = false;
       }

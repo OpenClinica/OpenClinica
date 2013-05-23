@@ -14,6 +14,8 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 
@@ -137,7 +139,7 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 
 	public String collectODMMetadataForForm(String studyOID,String formVersionOID) {
 		StudyBean studyBean = getStudyDao().findByOid(studyOID);
-		
+		studyBean  = populateStudyBean(studyBean);
 	    MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean,getRuleSetRuleDao());
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
@@ -168,5 +170,28 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         report.createStudyMetaOdmXml(Boolean.FALSE);
 		return report.getXmlOutput().toString().trim();
 	}
+
+
+
+	private StudyBean populateStudyBean(StudyBean studyBean) {
+		 StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.dataSource);
+		  @SuppressWarnings("rawtypes")
+		ArrayList studyParameters = spvdao.findParamConfigByStudy(studyBean);
+
+		  studyBean.setStudyParameters(studyParameters);
+		  StudyConfigService scs = new StudyConfigService(this.dataSource);
+          if (studyBean.getParentStudyId() <= 0) {// top study
+        	  studyBean =      scs.setParametersForStudy(studyBean);
+
+          } else {
+              // YW <<
+        	  studyBean.setParentStudyName(((StudyBean) getStudyDao().findByPK(studyBean.getParentStudyId())).getName());
+              // YW >>
+        	  studyBean =  scs.setParametersForSite(studyBean);
+          }
+		 
+	return studyBean;
+	}
+	
 	
 }
