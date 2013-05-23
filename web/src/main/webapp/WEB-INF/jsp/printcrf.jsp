@@ -20,7 +20,12 @@
   var app_investigatorLabel = '<fmt:message key="investigator" bundle="${resterm}"/>'
   var app_timeAndEventsLabel = '<fmt:message key="time_and_events" bundle="${resterm}"/>'
   var app_investigatorNameLabel = '<fmt:message key="investigator_name" bundle="${resterm}"/>'
-  var app_investigatorSignatureLabel = '<fmt:message key="investigator_signature" bundle="${resterm}"/>'
+  var app_investigatorSignatureLabel = '<fmt:message key="investigator_signature" bundle="${resterm}"/>';
+  var app_sectionTitle =  '<fmt:message key="section_title" bundle="${resword}"/>'+":";
+  var app_sectionSubtitle = '<fmt:message key="subtitle" bundle="${resword}"/>'+":";
+  var app_sectionInstructions = '<fmt:message key="instructions" bundle="${resword}"/>'+":";
+  var app_sectionPage = '<fmt:message key="page" bundle="${resword}"/>'+":";
+  
 </script>
 
 <html>

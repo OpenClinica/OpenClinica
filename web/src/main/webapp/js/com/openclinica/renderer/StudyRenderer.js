@@ -291,6 +291,9 @@ function StudyRenderer(json) {
       var itemDetails = this.getItemDetails(itemDef, formDef);
       var sectionDetails = this.getSectionDetails(itemDetails, formDef);
       var sectionTitle = sectionDetails["@SectionTitle"];
+      var sectionSubTitle = sectionDetails["@SectionSubtitle"];
+      var sectionInstructions = sectionDetails["@SectionInstructions"];
+      var sectionPageNumber = sectionDetails["@SectionPageNumber"];
       var sectionLabel = itemDetails["OpenClinica:SectionLabel"];
       var itemHeader = itemDetails["OpenClinica:ItemHeader"];
       var itemSubHeader = itemDetails["OpenClinica:ItemSubHeader"];
@@ -314,11 +317,17 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          this.renderPrintableRow("<div class='section-title'>"+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+        if(sectionTitle!='')  this.renderPrintableRow("<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          if(sectionSubTitle!='')this.renderPrintableRow("<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+       if(sectionInstructions)   this.renderPrintableRow("<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+        if(sectionPageNumber)  this.renderPrintableRow("<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
         }
         else if (this.accumulatedPixelHeight > 0) {
           this.startNewPage(true);
-          this.renderPrintableRow("<div class='non-first_section_header section-title'>"+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          if(sectionTitle!='') this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          if(sectionSubTitle!='') this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          if(sectionInstructions) this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          if(sectionPageNumber)  this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
         }
         isFirstSection = false;
       }
