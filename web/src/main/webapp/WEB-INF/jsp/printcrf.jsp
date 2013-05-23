@@ -1,5 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
@@ -8,6 +12,15 @@
   var app_eventOID = '${eventOID}';
   var app_formVersionOID = '${formVersionOID}';
   var app_printTime = '<%= new java.util.Date() %>';
+  var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>'
+  var app_siteNameLabel = '<fmt:message key="site_name" bundle="${resword}"/>'
+  var app_studyNameLabel = '<fmt:message key="study_name" bundle="${resword}"/>'
+  var app_studySubjectIDLabel = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'
+  var app_pageNumberLabel = '<fmt:message key="page_x_de_y" bundle="${resword}"/>'.replace(/[{}]/g, '');
+  var app_investigatorLabel = '<fmt:message key="investigator" bundle="${resterm}"/>'
+  var app_timeAndEventsLabel = '<fmt:message key="time_and_events" bundle="${resterm}"/>'
+  var app_investigatorNameLabel = '<fmt:message key="investigator_name" bundle="${resterm}"/>'
+  var app_investigatorSignatureLabel = '<fmt:message key="investigator_signature" bundle="${resterm}"/>'
 </script>
 
 <html>
