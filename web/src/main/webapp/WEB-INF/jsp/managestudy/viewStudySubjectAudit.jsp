@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 </head>
-
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
@@ -22,11 +21,17 @@
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <body>
+<!-- Head Anchor-->
+<a name="root"></a>
+
+<form action="ExportExcelStudySubjectAuditLog">
+<input type="hidden" value="<c:out value="${id}"/>" name="id"/><br>    
 
 <h1><span class="title_manage">
     <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
+    <input type="image" src="images/bt_Download.gif"  border="0" width="24 " height="15" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>"/><br>   
 </h1>
-
+</form>
 
 <%-- Subject Summary --%>
 <table border="0" cellpadding="0" cellspacing="0" width="650" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
@@ -51,6 +56,8 @@
     </tr>
 </table><br><br>
 
+		<!-- excel encoding -->
+	
 <%-- Subject Audit Events --%>
 <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
     <tr>
@@ -76,7 +83,6 @@
 </table>
 <br>
 <%-- Study Events--%>
-<%-- TODO:Anchor these to the Study Event Summaries --%>
 <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
     <tr>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="study_events" bundle="${resword}"/></b><br></td>
@@ -86,7 +92,9 @@
     </tr>
     <c:forEach var="event" items="${events}">
         <tr>
-            <td class="table_header_column"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</td>
+			<!-- Link to Dynamic Anchor -->
+			<td class="table_header_column"><a href="#<c:out value="${event.studyEventDefinition.name}"/><c:out value="${event.sampleOrdinal}"/>"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</a></td>
+            <%-- <td class="table_header_column"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</td> --%>
             <td class="table_header_column"><c:out value="${event.location}"/>&nbsp;</td>
             <c:choose>
                 <c:when test="${event.startTimeFlag=='false'}">
@@ -103,6 +111,8 @@
 <br>
 <c:forEach var="event" items="${events}">
 <%-- Study Event Summary --%>
+<!-- Embedded Anchor -->
+<a name="<c:out value="${event.studyEventDefinition.name}"/><c:out value="${event.sampleOrdinal}"/>"></a>
 <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
 <tr>
     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="name" bundle="${resword}"/></b></td>
@@ -364,11 +374,13 @@
         </td></tr></table><%-- Margin --%>
     </td>
     </tr>
-    <tr><td colspan="2">&nbsp;</td></tr>
+	<!-- Return to Root -->
+    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
+	
+
 </c:forEach>
 </table>
 <br>
 </c:forEach>
-
 <hr>
 </body>
