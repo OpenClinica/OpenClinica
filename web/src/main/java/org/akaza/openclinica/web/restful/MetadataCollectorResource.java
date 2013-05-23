@@ -139,6 +139,7 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 
 	public String collectODMMetadataForForm(String studyOID,String formVersionOID) {
 		StudyBean studyBean = getStudyDao().findByOid(studyOID);
+	if(studyBean!=null)
 		studyBean  = populateStudyBean(studyBean);
 	    MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean,getRuleSetRuleDao());
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
