@@ -331,6 +331,13 @@ span.item_def_control{
   max-height: 300px;
 }
 
+
+.repeating_item_group_header{
+font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+font-size: 11px;
+line-height: 15px;
+color: #4D4D4D;
+}
 .repeating_item_group {
   /* border:1px solid; */ 
   min-height: 50px;
