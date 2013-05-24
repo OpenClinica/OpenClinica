@@ -306,6 +306,7 @@ function StudyRenderer(json) {
       var repeating = false;
       var repeatMax = undefined; 
       var itemGroupName = undefined; 
+      var itemGroupHeader =undefined;
       
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
@@ -313,6 +314,7 @@ function StudyRenderer(json) {
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
         itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
+        itemGroupHeader = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].groupHeader;
       }
       
       if (sectionLabel != prevSectionLabel) {
@@ -368,6 +370,7 @@ function StudyRenderer(json) {
         itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
+      
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength + ".  height = " + itemRowHeightInPixels, util_logInfo);
        
         // in first item in repeating group
@@ -413,13 +416,13 @@ function StudyRenderer(json) {
  
             if (this.accumulatedPixelHeight > app_maxPixelHeight) {
               this.renderString += RenderUtil.render(RenderUtil.get(
-              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
               this.startNewPage(true);
               repeatingRows = "";
             }
           }
           this.renderString += RenderUtil.render(RenderUtil.get(
-          "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupName, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+          "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
         }
       }
       // standard non-repeating items

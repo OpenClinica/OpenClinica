@@ -125,12 +125,16 @@ function StudyDataLoader(study) {
       var itemGroupName = itemGroupDef["@Name"]; 
       var repeatNumber = undefined; 
       var repeatMax = undefined; 
+      var groupHeader = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupHeader"];
+      
       if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
         var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
+      
         for (var j=0;j< presentInForm.length;j++) {
           if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
            repeatNumber = presentInForm[j].repeatNumber; 
            repeatMax = presentInForm[j].repeatMax; 
+           
            break;
           }
         }
@@ -146,6 +150,7 @@ function StudyDataLoader(study) {
       currentItemGroup.repeatMax = repeatMax;
       currentItemGroup.repeating = repeating;
       currentItemGroup.name = itemGroupName;
+      currentItemGroup.groupHeader = groupHeader;
       app_itemGroupDefs[itemGroupKey] = currentItemGroup;
       var itemGroupLength = itemGroupDef["ItemRef"].length;
       for (var j=0;j< itemGroupLength;j++) {
