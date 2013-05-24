@@ -64,7 +64,7 @@ function getPrintableContent() {
     app_odmRenderer = new ODMRenderer(data);
     var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
     $('body').html(renderString);
-    $('body').css({"background-color": "#AAAAAA"});
+    //$('body').css({"background-color": "#AAAAAA"});
    });
 }
 

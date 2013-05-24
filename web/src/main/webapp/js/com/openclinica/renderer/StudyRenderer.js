@@ -211,7 +211,7 @@ function StudyRenderer(json) {
         }
       }
       this.renderPrintableFormDef(formDef);
-      this.startNewPage(false);
+      //this.startNewPage(false);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -237,6 +237,7 @@ function StudyRenderer(json) {
         this.renderPrintableEventCRFs(renderMode, eventDef);
       }
     }
+    /*
     // render loaded pages array
     for (var i=0;i< app_pagesArray.length;i++) {
       var currentPage =  app_pagesArray[i];
@@ -244,6 +245,8 @@ function StudyRenderer(json) {
       printPageRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
     }
     return pageTemplateString;
+    */
+    return this.renderString;
   }
  
   
@@ -257,7 +260,7 @@ function StudyRenderer(json) {
     
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
-    this.renderString = app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var itemRenderString = "";
     var repeatingHeaderString = "";
     var repeatingRowString = "";
@@ -305,8 +308,8 @@ function StudyRenderer(json) {
       var repeatNumber = 1;
       var repeating = false;
       var repeatMax = undefined; 
+      var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
-      var itemGroupHeader =undefined;
       
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
@@ -319,17 +322,18 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-        if(sectionTitle!='')  this.renderPrintableRow("<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
-          if(sectionSubTitle!='')this.renderPrintableRow("<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
-       if(sectionInstructions)   this.renderPrintableRow("<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
-        if(sectionPageNumber)  this.renderPrintableRow("<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
-        }
-        else if (this.accumulatedPixelHeight > 0) {
-          this.startNewPage(true);
-          if(sectionTitle!='') this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
-          if(sectionSubTitle!='') this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
-          if(sectionInstructions) this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
-          if(sectionPageNumber)  this.renderPrintableRow("<div class='non-first_section_header section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+          if (sectionTitle!='')  {
+            this.renderPrintableRow("<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          }
+          if (sectionSubTitle!='') {
+            this.renderPrintableRow("<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          }
+          if (sectionInstructions) {   
+            this.renderPrintableRow("<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          }
+          if (sectionPageNumber)  {
+            this.renderPrintableRow("<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          }
         }
         isFirstSection = false;
       }
@@ -370,7 +374,6 @@ function StudyRenderer(json) {
         itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
-      
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength + ".  height = " + itemRowHeightInPixels, util_logInfo);
        
         // in first item in repeating group
@@ -413,16 +416,17 @@ function StudyRenderer(json) {
           for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
             repeatingRows += repeatingRowString;
             this.accumulatedPixelHeight += itemRowHeightInPixels;
- 
+/* 
             if (this.accumulatedPixelHeight > app_maxPixelHeight) {
               this.renderString += RenderUtil.render(RenderUtil.get(
-              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
-              this.startNewPage(true);
+              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML;
+              //this.startNewPage(true);
               repeatingRows = "";
             }
+            */
           }
-          this.renderString += RenderUtil.render(RenderUtil.get(
-          "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+           this.renderString += RenderUtil.render(RenderUtil.get(
+           "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
         }
       }
       // standard non-repeating items
@@ -458,6 +462,7 @@ function StudyRenderer(json) {
    */
   this.renderPrintableRow = function(htmlString, rowHeight, inCrf, checkRowWidth) {
     this.renderString += htmlString;
+    /*
     this.accumulatedPixelHeight += rowHeight;
     debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + ", this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
     if (this.accumulatedPixelHeight > app_maxPixelHeight) {
@@ -467,6 +472,7 @@ function StudyRenderer(json) {
       this.startNewPage(inCrf);
     }
     this.currentRowWidth = 0;
+    */
   } 
   
   

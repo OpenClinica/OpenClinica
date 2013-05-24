@@ -3,10 +3,10 @@ body {
 }
 
 table.item-row {
- width:1000px; 
  padding-left: 15px;
  padding-right: 15px;
  /*
+ width:1000px; 
  border:1px solid;  
  */
 }
@@ -61,11 +61,13 @@ h4 {
   margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
-  border:1px inset #333333;
+  /* border:1px inset #333333;*/
+  border: none;
+  /*
   width:1095px;
   height:1472px;
+  */
   background-color: white;
-  overflow: hidden;
 }
 
 .single-page-landscape {
@@ -75,11 +77,13 @@ h4 {
   margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
-  border:1px inset #333333;
+  /*border:1px inset #333333;*/
+  border: none;
+  /*
   width:1472px;
   height:1095px;
+  */
   background-color: white;
-  overflow: hidden;
 }
 
 
@@ -156,6 +160,8 @@ a:link {
 .item_def_title{
   vertical-align: top;
   display: inline-block;
+  /*
+  */
   min-width:170px;
   font-size: 0.8em;
   font-weight: normal;
@@ -331,13 +337,6 @@ span.item_def_control{
   max-height: 300px;
 }
 
-
-.repeating_item_group_header{
-font-family: Tahoma, Arial, Helvetica, Sans-Serif;
-font-size: 11px;
-line-height: 15px;
-color: #4D4D4D;
-}
 .repeating_item_group {
   /* border:1px solid; */ 
   min-height: 50px;
@@ -350,5 +349,12 @@ color: #4D4D4D;
 td.item-def-cell {
   min-height: 50px;
   vertical-align: top;  
+}
+
+.repeating_item_group_header{
+  font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+  font-size: 11px;
+  line-height: 15px;
+  color: #4D4D4D;
 }
 
