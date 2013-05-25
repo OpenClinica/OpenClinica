@@ -11,23 +11,12 @@
  * This is the main rendering class where most of the processing occurs.
  */
 function StudyRenderer(json) {
-  this.ITEM_OPTION_HEIGHT = 7;
-  this.DEFAULT_ITEM_HEIGHT = 40; 
-  this.DEFAULT_GRID_ITEM_HEIGHT = 50; 
   this.DEFAULT_MAX_REPEAT = 40; 
   this.json = json;
   this.study = undefined;
   this.studyDataLoader = undefined;
-  this.accumulatedPixelHeight = 0;
   this.renderString = "";
-  this.currentRowWidth = 0;
-  this.IN_CRF = true;
-  this.CHECK_ROW_WIDTH = true;
-  this.DONT_CHECK_ROW_WIDTH = false;
-  this.NOT_IN_CRF = false;
-  var pageTemplateString = "";
   var printPageRenderer;
-
   
   
  /* getSectionDetails(itemDef, formDef) 
@@ -200,7 +189,6 @@ function StudyRenderer(json) {
     this.studyDataLoader = new StudyDataLoader(this.study); 
     this.studyDataLoader.loadStudyLists();   
     var formDef = undefined;
-    pageTemplateString = "";
     
     if (renderMode == "UNPOPULATED_FORM_CRF" || renderMode == "UNPOPULATED_GLOBAL_CRF") {
       // select CRF by OID
@@ -211,7 +199,6 @@ function StudyRenderer(json) {
         }
       }
       this.renderPrintableFormDef(formDef);
-      //this.startNewPage(false);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -237,15 +224,6 @@ function StudyRenderer(json) {
         this.renderPrintableEventCRFs(renderMode, eventDef);
       }
     }
-    /*
-    // render loaded pages array
-    for (var i=0;i< app_pagesArray.length;i++) {
-      var currentPage =  app_pagesArray[i];
-      pageTemplateString += 
-      printPageRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
-    }
-    return pageTemplateString;
-    */
     return this.renderString;
   }
  
@@ -261,7 +239,6 @@ function StudyRenderer(json) {
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
     this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
-    var itemRenderString = "";
     var repeatingHeaderString = "";
     var repeatingRowString = "";
     var currentItemGroupOID = "";
@@ -322,26 +299,26 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          if (sectionTitle!='')  {
-            this.renderPrintableRow("<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          if (sectionTitle != '')  {
+            this.renderString += "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>";
           }
-          if (sectionSubTitle!='') {
-            this.renderPrintableRow("<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+          if (sectionSubTitle != '') {
+            this.renderString += "<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>";
           }
           if (sectionInstructions) {   
-            this.renderPrintableRow("<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+            this.renderString += "<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>";
           }
           if (sectionPageNumber)  {
-            this.renderPrintableRow("<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>", 1, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH);
+            this.renderString += "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>";
           }
         }
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
-        this.renderPrintableRow("<div class='header-title'>"+itemHeader+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderString += "<div class='header-title'>"+itemHeader+"</div>";
       }
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
-        this.renderPrintableRow("<div class='header-title'>"+itemSubHeader+"</div>", 30, this.IN_CRF, this.DONT_CHECK_ROW_WIDTH); 
+        this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
       }
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
@@ -370,11 +347,9 @@ function StudyRenderer(json) {
           isFirstRepeatingItem = true;
         }
       
-        var itemRowHeightInPixels = codeListOID && app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
-        itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
-        debug("repeating group: item " + orderNumber + " of " + itemGroupLength + ".  height = " + itemRowHeightInPixels, util_logInfo);
+        debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
        
         // in first item in repeating group
         if (isFirstRepeatingItem == true) {
@@ -382,7 +357,6 @@ function StudyRenderer(json) {
           repeatingHeaderString = "<tr class='repeating_item_group'>";
           isFirstRepeatingItem = false;
           lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
-          this.currentRowWidth = 0;
         }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
@@ -390,7 +364,6 @@ function StudyRenderer(json) {
         var responseType = itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
         
         if (responseLayout == "Horizontal") {
-          this.currentRowWidth += app_repeatingHorizItemWidth;
           var options = responseType == 'multi-select' ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
           var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
@@ -402,7 +375,6 @@ function StudyRenderer(json) {
           repeatingHeaderString += "<td class='repeating_item_header' valign='top'><table border='1'>" + itemNameRow + optionsRow + "</table></td>";
         }
         else {
-          this.currentRowWidth += app_repeatingItemWidth;
           repeatingHeaderString += "<td class='repeating_item_header' valign='top'>" + itemNumber + " " + name + "</td>";
         }
          
@@ -410,20 +382,8 @@ function StudyRenderer(json) {
         if (i == lastRepeatingOrderInFormNumber) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
-          if (this.currentRowWidth > app_maxPixelWidth) {
-            //this.printMode = this.LANDSCAPE;
-          }
           for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
             repeatingRows += repeatingRowString;
-            this.accumulatedPixelHeight += itemRowHeightInPixels;
-/* 
-            if (this.accumulatedPixelHeight > app_maxPixelHeight) {
-              this.renderString += RenderUtil.render(RenderUtil.get(
-              "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML;
-              //this.startNewPage(true);
-              repeatingRows = "";
-            }
-            */
           }
            this.renderString += RenderUtil.render(RenderUtil.get(
            "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
@@ -431,19 +391,14 @@ function StudyRenderer(json) {
       }
       // standard non-repeating items
       else if (repeating == false) { 
-        this.currentRowWidth += app_itemWidth;
-        var itemRowHeightInPixels = codeListOID && app_codeLists[codeListOID] ? app_codeLists[codeListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_ITEM_HEIGHT; 
-        itemRowHeightInPixels = multiSelectListOID && app_multiSelectLists[multiSelectListOID] ? app_multiSelectLists[multiSelectListOID].length * this.ITEM_OPTION_HEIGHT : this.DEFAULT_GRID_ITEM_HEIGHT; 
         if (columnNumber === undefined || columnNumber == 1) {
-          itemRenderString = "<table class='item-row'>";
+          this.renderString += "<table class='item-row'>";
         }
-        itemRenderString += itemDefRenderer.renderPrintableItem(repeating);
+        this.renderString += itemDefRenderer.renderPrintableItem(repeating);
         if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
-          itemRenderString += "</table>";
-          this.renderPrintableRow(itemRenderString, itemRowHeightInPixels, this.IN_CRF, this.CHECK_ROW_WIDTH);
+          this.renderString += "</table>";
         }
       }
-      debug("calculated itemRowHeightInPixels for " + name + ": " + itemRowHeightInPixels, util_logInfo);
       
       previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
@@ -451,46 +406,6 @@ function StudyRenderer(json) {
     }
   }
   
-  
-  /* renderPrintableRow(htmlString, rowHeight, inCrf, checkRowWidth)
-   * Render each row of a CRF.
-   * Decide whether a page break is needed
-   * param htmlString: the string to render
-   * param rowHeight: the row height in pixels
-   * param inCRF: true if we are not at the start of a new CRF
-   * param checkRowWidth: true if row width is to be inspected
-   */
-  this.renderPrintableRow = function(htmlString, rowHeight, inCrf, checkRowWidth) {
-    this.renderString += htmlString;
-    /*
-    this.accumulatedPixelHeight += rowHeight;
-    debug("this.accumulatedPixelHeight = " + this.accumulatedPixelHeight + ", this.currentRowWidth = " + this.currentRowWidth , util_logInfo);
-    if (this.accumulatedPixelHeight > app_maxPixelHeight) {
-      if (checkRowWidth == true && this.currentRowWidth > app_maxPixelWidth) {
-        //this.printMode = this.LANDSCAPE;
-      }
-      this.startNewPage(inCrf);
-    }
-    this.currentRowWidth = 0;
-    */
-  } 
-  
-  
-  /* startNewPage(inCrf)
-   * Starts a new page in the pages array
-   * param inCRF: true if we are not at the start of a new CRF
-   */
-  this.startNewPage = function(inCrf) {
-    debug("Starting New Page", util_logDebug); 
-    var currentPage = {};
-    currentPage.data = this.renderString;
-    currentPage.type = app_studyContentPageType;
-    currentPage.eventName = app_eventName;
-    app_pagesArray.push(currentPage);
-    this.accumulatedPixelHeight = 0;
-    inCrf ? this.renderString = app_crfHeader : this.renderString = "";
-  }
-
   
   /* renderStudy()
    * When this is implemented it will render the web form

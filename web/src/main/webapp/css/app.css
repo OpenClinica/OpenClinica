@@ -5,10 +5,6 @@ body {
 table.item-row {
  padding-left: 15px;
  padding-right: 15px;
- /*
- width:1000px; 
- border:1px solid;  
- */
 }
 
 h1 {
@@ -61,12 +57,7 @@ h4 {
   margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
-  /* border:1px inset #333333;*/
   border: none;
-  /*
-  width:1095px;
-  height:1472px;
-  */
   background-color: white;
 }
 
@@ -77,12 +68,7 @@ h4 {
   margin-bottom: 0px;
   padding-left: 10px;
   padding-right: 10px;
-  /*border:1px inset #333333;*/
   border: none;
-  /*
-  width:1472px;
-  height:1095px;
-  */
   background-color: white;
 }
 
@@ -128,8 +114,6 @@ a:link {
 
 .repeating_item_wrapper{
   display:inline-block;
-  min-height: 50px;
-  max-height: 400px;
   margin-top:0px;
   margin-bottom:0px;
   margin-left:5x;
@@ -137,10 +121,6 @@ a:link {
 
 
 .item_def_wrapper{
- /* 
- background-color: #dddddd;
-  border:1px solid;  
- */
   min-width:400px;
   padding-top:0px;
   padding-bottom:0px;
@@ -160,8 +140,6 @@ a:link {
 .item_def_title{
   vertical-align: top;
   display: inline-block;
-  /*
-  */
   min-width:170px;
   font-size: 0.8em;
   font-weight: normal;
@@ -170,9 +148,6 @@ a:link {
 div.item_def_control{
   vertical-align: bottom;
   display: block;
-  /*
-  background-color: red;
-  */
   padding-top:0;
   padding-bottom:0;
   margin-top:0;
@@ -338,12 +313,10 @@ span.item_def_control{
 }
 
 .repeating_item_group {
-  /* border:1px solid; */ 
   min-height: 50px;
 }
 .repeating_item_option_names {
   min-height: 50px;
-  /* border:1px solid; */ 
 }
 
 td.item-def-cell {
