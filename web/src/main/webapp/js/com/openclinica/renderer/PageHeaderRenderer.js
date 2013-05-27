@@ -1,4 +1,4 @@
-function PrintPageRenderer() {
+function PageHeaderRenderer() {
   this.render = function(pageRenderString, currPage, totalPages, printTime, pageType, eventName) { 
     return RenderUtil.render(RenderUtil.get("print_page"), {
       pageRenderString: pageRenderString,

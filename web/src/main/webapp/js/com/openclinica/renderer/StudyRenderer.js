@@ -16,7 +16,7 @@ function StudyRenderer(json) {
   this.study = undefined;
   this.studyDataLoader = undefined;
   this.renderString = "";
-  var printPageRenderer;
+  var pageHeaderRenderer;
   
   
  /* getSectionDetails(itemDef, formDef) 
@@ -149,12 +149,7 @@ function StudyRenderer(json) {
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
     app_eventName = eventDef["@Name"];
-    var studyEventCoverPageString = this.createStudyEventCoverPage(eventDef);
-    var currentPage = {};
-    currentPage.data = studyEventCoverPageString;
-    currentPage.type = app_studyEventCoverPageType;
-    currentPage.eventName = app_eventName;
-    app_pagesArray.push(currentPage);
+    this.renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
@@ -184,7 +179,7 @@ function StudyRenderer(json) {
    */ 
   this.renderPrintableStudy = function(renderMode) {
     
-    printPageRenderer = new PrintPageRenderer();
+    pageHeaderRenderer = new PageHeaderRenderer();
     this.setStudy(renderMode);  
     this.studyDataLoader = new StudyDataLoader(this.study); 
     this.studyDataLoader.loadStudyLists();   
@@ -212,12 +207,7 @@ function StudyRenderer(json) {
       this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      var studyCoverPageString = this.createStudyCoverPage();
-      var currentPage = {};
-      currentPage.data = studyCoverPageString;
-      currentPage.eventName = app_eventName;
-      currentPage.type = app_studyCoverPageType;
-      app_pagesArray.push(currentPage);
+      this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
@@ -299,18 +289,10 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == true) {
-          if (sectionTitle != '')  {
-            this.renderString += "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>";
-          }
-          if (sectionSubTitle != '') {
-            this.renderString += "<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>";
-          }
-          if (sectionInstructions) {   
-            this.renderString += "<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>";
-          }
-          if (sectionPageNumber)  {
-            this.renderString += "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>";
-          }
+          this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
+          this.renderString += sectionSubTitle != '' ? "<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
+          this.renderString += sectionInstructions ? "<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
+          this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
         }
         isFirstSection = false;
       }
@@ -404,6 +386,12 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
+  }
+  
+  /* renderHeader()
+   */
+  this.renderHeader = function() {
+   this.renderString += pageHeaderRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
   }
   
   
