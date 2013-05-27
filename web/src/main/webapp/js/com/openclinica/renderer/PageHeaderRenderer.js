@@ -1,9 +1,6 @@
 function PageHeaderRenderer() {
-  this.render = function(pageRenderString, currPage, totalPages, printTime, pageType, eventName) { 
-    return RenderUtil.render(RenderUtil.get("print_page"), {
-      pageRenderString: pageRenderString,
-      currPage: currPage,
-      totalPages: totalPages,
+  this.render = function(printTime, pageType, eventName) { 
+    return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
       pageType: pageType,
       studyName: app_studyName, 

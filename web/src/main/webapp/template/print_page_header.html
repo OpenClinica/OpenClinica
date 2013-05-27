@@ -1,0 +1,54 @@
+<div class'page-header insert-page-break'>
+  <div class='left-header'>
+    <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}: ${protocolName ? protocolName : '___________________'}</div>  
+    <div class='header-text text-left-aligned'>{{html app_studyNameLabel}}: ${studyName ? studyName : '___________________'}</div>  
+    <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}: ${siteName ? siteName : '___________________'}</div>  
+    {{if secondaryLabelViewable == true}}
+      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: </div>  
+    {{/if}}
+    {{if pageType != app_studyCoverPageType}}
+      <div class='header-text text-left-aligned'>{{html app_eventNameLabel}}: ${eventName ? eventName : '___________________'}</div>  
+    {{/if}}
+    {{if eventLocationRequired == 'required'}}
+      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}} *: ${eventName ? eventName : '___________________'}</div>  
+    {{else eventLocationRequired == 'optional'}}
+      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventName ? eventName : '___________________'}</div>  
+    {{/if}}
+    {{if pageType != app_studyCoverPageType}}
+      <div class='header-text text-left-aligned'>{{html app_eventDateLabel}}: ___________________</div>  
+    {{/if}}
+  </div> 
+  <div class='right-header'>
+    {{if showPersonID == true && personIDRequired == 'required'}}
+    <div class='header-text'>{{html app_eventLocationLabel}} *:___________</div>  
+    {{else showPersonID == true && personIDRequired == 'optional'}}
+    <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
+    {{/if}}
+    <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
+    {{if collectSubjectDOB == 1}}
+      <div class='header-text'>{{html app_studySubjectDOBLabel}}:___________</div>  
+    {{else collectSubjectDOB == 2}}
+      <div class='header-text'>{{html app_studySubjectBirthYearLabel}}:___________</div>  
+    {{/if}}
+    {{if interviewerNameRequired == true}}
+      <div class='header-text'>Interviewer *:___________</div>  
+    {{else interviewerNameRequired == false}}
+      <div class='header-text'>Interviewer:___________</div>  
+    {{/if}}
+    {{if interviewDateRequired == true}}
+      <div class='header-text'>{{html app_interviewDateLabel}} *:___________</div>  
+    {{else interviewDateRequired == false}}
+      <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
+    {{/if}}
+  </div>
+  
+  {{if pageType == app_studyEventCoverPageType}}
+  <div class='investigator-text centered text_centered'>
+    {{html app_investigatorNameLabel}}: ___________________&nbsp;&nbsp;&nbsp;&nbsp;{{html app_investigatorSignatureLabel}}: ___________________
+  </div>
+  {{/if}}
+ <!-- 
+  <div id='footer-date' class='text-right-aligned'>{{html app_datePrintedLabel}} ${app_printTime}</div>  
+-->
+
+</div>

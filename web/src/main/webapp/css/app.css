@@ -24,17 +24,17 @@ h4 {
   font-size: 9px;
 }
 
-#page-header {
+.page-header {
   padding-top:15px;
 }
 
-#left-header {
+.left-header {
   display: inline-block;
   width: 500px; 
   vertical-align: top;
 }
 
-#right-header{
+.right-header{
   display: inline-block;
   width: 300px; 
   vertical-align: top;
@@ -221,74 +221,13 @@ span.item_def_control{
   padding-top:1px;
 }
 
-#header-subject-dob {
+.header-text {
   color: #333333;
   font-size: 13px;
   padding-bottom: 7px;
 }
 
-#header-interviewer-name {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-interview-date {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-subject-id {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-protocol-id {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-study-name {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-event-name {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-event-date {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-site-name {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-event-location {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-#header-secondary-id {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
-}
-
-
-#footer-investigator {
+.investigator-text {
   color: #333333;
   padding-bottom: 8px;
 }

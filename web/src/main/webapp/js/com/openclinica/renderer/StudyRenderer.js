@@ -101,7 +101,6 @@ function StudyRenderer(json) {
    */ 
   this.createStudyCoverPage = function () {
     var str = "<table border='1' style='margin-top:50px'>";
-    
     // create header row of Study Events
     str += "<tr><td style='width:200px'></td>";
     // iterate over study event defs and examine each event
@@ -149,6 +148,7 @@ function StudyRenderer(json) {
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
     app_eventName = eventDef["@Name"];
+    this.renderPageHeader(app_printTime, app_studyEventCoverPageType, app_eventName);
     this.renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -207,6 +207,7 @@ function StudyRenderer(json) {
       this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
+      this.renderPageHeader(app_printTime, app_studyCoverPageType, '');
       this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -388,10 +389,10 @@ function StudyRenderer(json) {
     }
   }
   
-  /* renderHeader()
+  /* renderPageHeader()
    */
-  this.renderHeader = function() {
-   this.renderString += pageHeaderRenderer.render(currentPage.data, i+1, app_pagesArray.length, app_printTime, currentPage.type, currentPage.eventName)[0].outerHTML;
+  this.renderPageHeader = function(printTime, currentPageType, currentPageEventName) {
+    this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   
   

@@ -7,7 +7,7 @@
     display: none; 
   }
 
-  .non-first_section_header {
+  .insert-page-break {
     page-break-before: always; 
   }
 
