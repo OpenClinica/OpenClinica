@@ -12,6 +12,8 @@
  */
 function StudyRenderer(json) {
   this.DEFAULT_MAX_REPEAT = 40; 
+  this.NO_PAGE_BREAK = false; 
+  this.PAGE_BREAK = true; 
   this.json = json;
   this.study = undefined;
   this.studyDataLoader = undefined;
@@ -148,7 +150,7 @@ function StudyRenderer(json) {
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef) {
     app_eventName = eventDef["@Name"];
-    this.renderPageHeader(app_printTime, app_studyEventCoverPageType, app_eventName);
+    this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyEventCoverPageType, app_eventName);
     this.renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -207,7 +209,7 @@ function StudyRenderer(json) {
       this.renderPrintableEventCRFs(renderMode, eventDef);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      this.renderPageHeader(app_printTime, app_studyCoverPageType, '');
+      this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, '');
       this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -223,6 +225,9 @@ function StudyRenderer(json) {
    * The heart of StudyRenderer: render the CRF
    */
   this.renderPrintableFormDef = function(formDef) {
+  
+    this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+    
     var orderedItems = new Array();
     
     this.studyDataLoader.loadItemGroupDefs(formDef);
@@ -290,6 +295,7 @@ function StudyRenderer(json) {
       }
       
       if (sectionLabel != prevSectionLabel) {
+        this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
@@ -322,7 +328,6 @@ function StudyRenderer(json) {
       
       // process repeating group of items 
       if (repeating == true) {
-      
         debug("REPEATING current: " + currentItemGroupOID + ", previous: " + previousItemGroupOID + " i: " + i + ", limit: " + lastRepeatingOrderInFormNumber, util_logDebug);
      
         if (currentItemGroupOID != previousItemGroupOID) {
@@ -390,8 +395,10 @@ function StudyRenderer(json) {
   
   /* renderPageHeader()
    */
-  this.renderPageHeader = function(printTime, currentPageType, currentPageEventName) {
-    this.renderString += "<div class='page-break'></div>";
+  this.renderPageHeader = function(pageBreak, printTime, currentPageType, currentPageEventName) {
+    if (pageBreak == true) {
+      this.renderString += "<div class='page-break'></div>";
+    }
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   
