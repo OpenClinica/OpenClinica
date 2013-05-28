@@ -265,7 +265,7 @@ td.item-def-cell {
 }
 
 .repeating_item_group_header{
-  font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+
   font-size: 11px;
   line-height: 15px;
   color: #4D4D4D;
@@ -282,4 +282,5 @@ td.item-def-cell {
 @media print {
   .page-break { display: block; page-break-before: always; }
 }
+
 
