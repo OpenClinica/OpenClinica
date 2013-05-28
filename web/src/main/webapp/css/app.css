@@ -41,38 +41,6 @@ h4 {
   margin-left: 200px;
 }
 
-#page-footer {
-  position:absolute;
-  width:100%;
-  padding-bottom:10px;
-  padding-left:20px;
-  padding-right:20px;
-  bottom:0px;  
-}
-
-.single-page {
-  position: relative;
-  margin: 0 auto;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border: none;
-  background-color: white;
-}
-
-.single-page-landscape {
-  position: relative;
-  margin: 0 auto;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border: none;
-  background-color: white;
-}
-
-
 .spinner {
   display: none;
   position: fixed;
@@ -178,19 +146,19 @@ span.item_def_control{
   padding-left:10px;
   padding-right:10px;
   margin-top:20px;
-  margin-bottom:10px;
+  margin-bottom:0px;
 }
 
 .section-title {
-    background-color: #B5B5B5;
-	 border: thin solid #999999;
+  background-color: #B5B5B5;
+  border: thin solid #999999;
   font-size: 11px;
   font-weight:bold;
-    padding-top: 3px;
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-bottom: 3px;
-    vertical-align: top;
+  padding-top: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  vertical-align: top;
 }
 
 .text-background {
@@ -233,17 +201,6 @@ span.item_def_control{
   padding-bottom: 8px;
 }
 
-#footer-pager {
-  color: #BBBBBB;
-  font-size: 11px;
-}
-
-#footer-date {
-  color: #BBBBBB;
-  font-size: 11px;
-  padding-right:40px;
-}
-
 .repeating_item_header {
   border:1px solid;  
   font-size: 11px;
@@ -281,6 +238,15 @@ td.item-def-cell {
 
 @media print {
   .page-break { display: block; page-break-before: always; }
+  
+  body {
+    background-color: white;
+  }
+  
+  .no_print {
+    display: none; 
+  }
+  
 }
 
 

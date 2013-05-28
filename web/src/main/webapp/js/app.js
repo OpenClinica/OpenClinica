@@ -56,7 +56,6 @@ function getPrintableContent() {
     $('.spinner').css({display: "block"});
   $.get(app_contextPath + '/rest/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID, {}, function(data) {
     $('.spinner').css({display: "none"});
-    $('#single-page').css({display: "block"});
     app_pagesArray = new Array();
     setRenderMode();
     app_odmRenderer = new ODMRenderer(data);
