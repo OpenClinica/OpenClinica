@@ -392,6 +392,7 @@ function StudyRenderer(json) {
   /* renderPageHeader()
    */
   this.renderPageHeader = function(printTime, currentPageType, currentPageEventName) {
+    this.renderString += "<div class='page-break'></div>";
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   

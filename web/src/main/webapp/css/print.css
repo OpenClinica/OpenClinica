@@ -7,10 +7,6 @@
     display: none; 
   }
 
-  .insert-page-break {
-    page-break-before: always; 
-  }
-
   .header-title {
     background-color:#DDDDDD;
     padding-left:10px;

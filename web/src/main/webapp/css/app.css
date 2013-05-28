@@ -270,3 +270,15 @@ td.item-def-cell {
   color: #4D4D4D;
 }
 
+.insert-page-break {
+  page-break-before: always; 
+}
+
+@media all {
+  .page-break { display: none; }
+}
+
+@media print {
+  .page-break { display: block; page-break-before: always; }
+}
+
