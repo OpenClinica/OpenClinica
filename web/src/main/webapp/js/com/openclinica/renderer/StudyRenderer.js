@@ -290,12 +290,10 @@ function StudyRenderer(json) {
       }
       
       if (sectionLabel != prevSectionLabel) {
-       // if (isFirstSection == true) {
-          this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
-          this.renderString += sectionSubTitle != '' ? "<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
-          this.renderString += sectionInstructions ? "<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
-          this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
-      //  }
+        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
+        this.renderString += sectionSubTitle != '' ? "<div class='section-title'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
+        this.renderString += sectionInstructions ? "<div class='section-title'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
+        this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
@@ -366,7 +364,7 @@ function StudyRenderer(json) {
         if (i == lastRepeatingOrderInFormNumber) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
-          for (var repeatCounter=0;repeatCounter<repeatMax;repeatCounter++) {
+          for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
             repeatingRows += repeatingRowString;
           }
            this.renderString += RenderUtil.render(RenderUtil.get(
