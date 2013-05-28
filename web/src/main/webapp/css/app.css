@@ -184,7 +184,8 @@ span.item_def_control{
 .section-title {
     background-color: #B5B5B5;
 	 border: thin solid #999999;
-     font-size: 0.6em;
+  font-size: 11px;
+  font-weight:bold;
     padding-top: 3px;
     padding-left: 6px;
     padding-right: 6px;
