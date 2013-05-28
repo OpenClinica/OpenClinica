@@ -161,6 +161,18 @@ span.item_def_control{
   vertical-align: top;
 }
 
+
+.section-info {
+  background-color: #B5B5B5;
+  border: thin solid #999999;
+  font-size: 11px;
+   padding-top: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  vertical-align: top;
+}
+
 .text-background {
   display: inline-block;
   background-color:#EEEEEE;
@@ -187,7 +199,7 @@ span.item_def_control{
 }
 
 .select-option { 
-  padding-top:1px;
+  padding-top:1px;s
 }
 
 .header-text {
