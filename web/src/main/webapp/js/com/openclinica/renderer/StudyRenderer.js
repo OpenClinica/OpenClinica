@@ -145,12 +145,12 @@ function StudyRenderer(json) {
   }
   
   
-  /* renderPrintableEventCRFs(renderMode, eventDef)
+  /* renderPrintableEventCRFs(renderMode, eventDef, pageBreak)
    * Render all CRFS associated with a StudyEvent
    */
-  this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+  this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
     app_eventName = eventDef["@Name"];
-    this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyEventCoverPageType, app_eventName);
+    this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
     this.renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -159,6 +159,7 @@ function StudyRenderer(json) {
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
     for (var i=0;i< studyEventFormRefs.length;i++) {
+      pageBreak = this.PAGE_BREAK
       var formRef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
@@ -167,7 +168,8 @@ function StudyRenderer(json) {
           formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
             continue;
           }
-          this.renderPrintableFormDef(formDef);
+          this.renderPrintableFormDef(formDef, pageBreak);
+          //pageBreak = this.PAGE_BREAK;
           break;
         }
       }
@@ -195,7 +197,7 @@ function StudyRenderer(json) {
           break; 
         }
       }
-      this.renderPrintableFormDef(formDef);
+      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -206,7 +208,7 @@ function StudyRenderer(json) {
           break;
         }
       }
-      this.renderPrintableEventCRFs(renderMode, eventDef);
+      this.renderPrintableEventCRFs(renderMode, eventDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
       this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, '');
@@ -214,19 +216,19 @@ function StudyRenderer(json) {
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
-        this.renderPrintableEventCRFs(renderMode, eventDef);
+        this.renderPrintableEventCRFs(renderMode, eventDef, this.PAGE_BREAK);
       }
     }
     return this.renderString;
   }
  
   
-  /* renderPrintableFormDef(formDef)
+  /* renderPrintableFormDef(formDef, pageBreak)
    * The heart of StudyRenderer: render the CRF
    */
-  this.renderPrintableFormDef = function(formDef) {
+  this.renderPrintableFormDef = function(formDef, pageBreak) {
   
-    this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+    this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, app_eventName);
     
     var orderedItems = new Array();
     
@@ -295,7 +297,9 @@ function StudyRenderer(json) {
       }
       
       if (sectionLabel != prevSectionLabel) {
-        this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
+        if (isFirstSection == false) {
+          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
+        }
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
