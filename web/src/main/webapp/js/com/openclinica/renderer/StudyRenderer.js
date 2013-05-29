@@ -169,7 +169,6 @@ function StudyRenderer(json) {
             continue;
           }
           this.renderPrintableFormDef(formDef, pageBreak);
-          //pageBreak = this.PAGE_BREAK;
           break;
         }
       }
@@ -401,6 +400,7 @@ function StudyRenderer(json) {
    */
   this.renderPageHeader = function(pageBreak, printTime, currentPageType, currentPageEventName) {
     if (pageBreak == true) {
+      this.renderString += "<div class='page-break-screen'><hr/></div>";
       this.renderString += "<div class='page-break'></div>";
     }
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;

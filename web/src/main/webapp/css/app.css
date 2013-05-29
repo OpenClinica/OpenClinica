@@ -240,9 +240,12 @@ td.item-def-cell {
   color: #4D4D4D;
 }
 
-.insert-page-break {
-  page-break-before: always; 
+.page-break-screen {
+  display: block; 
+  margin-top: 300px;
+  margin-bottom:50px;
 }
+
 
 @media all {
   .page-break { display: none; }
@@ -259,6 +262,9 @@ td.item-def-cell {
     display: none; 
   }
   
+  .page-break-screen {
+    display: none; 
+  }
 }
 
 
