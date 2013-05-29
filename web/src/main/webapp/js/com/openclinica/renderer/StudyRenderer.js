@@ -290,10 +290,10 @@ function StudyRenderer(json) {
       }
       
       if (sectionLabel != prevSectionLabel) {
-        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
-        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
-        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
-        this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
+        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+"&nbsp;"+sectionTitle+"</div>" : "";
+        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>" : "";
+        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
+        this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
