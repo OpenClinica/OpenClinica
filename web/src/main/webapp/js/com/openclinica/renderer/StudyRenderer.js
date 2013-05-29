@@ -300,10 +300,11 @@ function StudyRenderer(json) {
           this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
         }
         this.renderString += "<div class='vertical-spacer-30px'></div>";
-        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
-        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
-        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
-        this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
+        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+"&nbsp;"+sectionTitle+"</div>" : "";
+        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>" : "";
+        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
+        this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
+        
         this.renderString += "<div class='vertical-spacer-20px'></div>";
         isFirstSection = false;
       }
