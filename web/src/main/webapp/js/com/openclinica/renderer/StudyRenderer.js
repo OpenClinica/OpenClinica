@@ -299,10 +299,12 @@ function StudyRenderer(json) {
         if (isFirstSection == false) {
           this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
         }
+        this.renderString += "<div class='vertical-spacer-30px'></div>";
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
         this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
+        this.renderString += "<div class='vertical-spacer-20px'></div>";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
@@ -311,6 +313,8 @@ function StudyRenderer(json) {
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
         this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
       }
+      
+      this.renderString += "<div class='vertical-spacer-20px'></div>";
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
       
