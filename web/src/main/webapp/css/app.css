@@ -26,6 +26,7 @@ h4 {
 
 .page-header {
   padding-top:15px;
+  margin-bottom:30px;
 }
 
 .left-header {
@@ -240,9 +241,20 @@ td.item-def-cell {
   color: #4D4D4D;
 }
 
-.insert-page-break {
-  page-break-before: always; 
+.page-break-screen {
+  display: block; 
+  margin-top: 300px;
+  margin-bottom:50px;
 }
+
+.vertical-spacer-30px {
+  margin-top: 30px;
+}
+
+.vertical-spacer-20px {
+  margin-top: 20px;
+}
+
 
 @media all {
   .page-break { display: none; }
@@ -259,6 +271,9 @@ td.item-def-cell {
     display: none; 
   }
   
+  .page-break-screen {
+    display: none; 
+  }
 }
 
 

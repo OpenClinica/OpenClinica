@@ -12,6 +12,8 @@
  */
 function StudyRenderer(json) {
   this.DEFAULT_MAX_REPEAT = 40; 
+  this.NO_PAGE_BREAK = false; 
+  this.PAGE_BREAK = true; 
   this.json = json;
   this.study = undefined;
   this.studyDataLoader = undefined;
@@ -143,12 +145,12 @@ function StudyRenderer(json) {
   }
   
   
-  /* renderPrintableEventCRFs(renderMode, eventDef)
+  /* renderPrintableEventCRFs(renderMode, eventDef, pageBreak)
    * Render all CRFS associated with a StudyEvent
    */
-  this.renderPrintableEventCRFs = function(renderMode, eventDef) {
+  this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
     app_eventName = eventDef["@Name"];
-    this.renderPageHeader(app_printTime, app_studyEventCoverPageType, app_eventName);
+    this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
     this.renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -157,6 +159,7 @@ function StudyRenderer(json) {
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
     for (var i=0;i< studyEventFormRefs.length;i++) {
+      pageBreak = this.PAGE_BREAK
       var formRef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
@@ -165,7 +168,7 @@ function StudyRenderer(json) {
           formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
             continue;
           }
-          this.renderPrintableFormDef(formDef);
+          this.renderPrintableFormDef(formDef, pageBreak);
           break;
         }
       }
@@ -193,7 +196,7 @@ function StudyRenderer(json) {
           break; 
         }
       }
-      this.renderPrintableFormDef(formDef);
+      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
       var eventDef = undefined;
@@ -204,25 +207,28 @@ function StudyRenderer(json) {
           break;
         }
       }
-      this.renderPrintableEventCRFs(renderMode, eventDef);
+      this.renderPrintableEventCRFs(renderMode, eventDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      this.renderPageHeader(app_printTime, app_studyCoverPageType, '');
+      this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, '');
       this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
         eventDef = app_studyEventDefs[i];
-        this.renderPrintableEventCRFs(renderMode, eventDef);
+        this.renderPrintableEventCRFs(renderMode, eventDef, this.PAGE_BREAK);
       }
     }
     return this.renderString;
   }
  
   
-  /* renderPrintableFormDef(formDef)
+  /* renderPrintableFormDef(formDef, pageBreak)
    * The heart of StudyRenderer: render the CRF
    */
-  this.renderPrintableFormDef = function(formDef) {
+  this.renderPrintableFormDef = function(formDef, pageBreak) {
+  
+    this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, app_eventName);
+    
     var orderedItems = new Array();
     
     this.studyDataLoader.loadItemGroupDefs(formDef);
@@ -290,10 +296,15 @@ function StudyRenderer(json) {
       }
       
       if (sectionLabel != prevSectionLabel) {
-        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+"&nbsp;"+sectionTitle+"</div>" : "";
-        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>" : "";
-        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
-        this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
+        if (isFirstSection == false) {
+          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
+        }
+        this.renderString += "<div class='vertical-spacer-30px'></div>";
+        this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
+        this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
+        this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
+        this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
+        this.renderString += "<div class='vertical-spacer-20px'></div>";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
@@ -302,6 +313,8 @@ function StudyRenderer(json) {
       if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
         this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
       }
+      
+      this.renderString += "<div class='vertical-spacer-20px'></div>";
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
       
@@ -322,7 +335,6 @@ function StudyRenderer(json) {
       
       // process repeating group of items 
       if (repeating == true) {
-      
         debug("REPEATING current: " + currentItemGroupOID + ", previous: " + previousItemGroupOID + " i: " + i + ", limit: " + lastRepeatingOrderInFormNumber, util_logDebug);
      
         if (currentItemGroupOID != previousItemGroupOID) {
@@ -390,8 +402,11 @@ function StudyRenderer(json) {
   
   /* renderPageHeader()
    */
-  this.renderPageHeader = function(printTime, currentPageType, currentPageEventName) {
-    this.renderString += "<div class='page-break'></div>";
+  this.renderPageHeader = function(pageBreak, printTime, currentPageType, currentPageEventName) {
+    if (pageBreak == true) {
+      this.renderString += "<div class='page-break-screen'><hr/></div>";
+      this.renderString += "<div class='page-break'></div>";
+    }
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   
