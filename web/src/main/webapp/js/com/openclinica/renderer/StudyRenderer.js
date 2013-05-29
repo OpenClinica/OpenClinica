@@ -293,7 +293,7 @@ function StudyRenderer(json) {
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+sectionTitle+"</div>" : "";
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+sectionInstructions+"</div>" : "";
-        this.renderString += sectionPageNumber ? "<div class='section-title'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
+        this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+sectionPageNumber+"</div>" : "";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
