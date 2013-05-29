@@ -24,17 +24,16 @@
 <!-- Head Anchor-->
 <a name="root"></a>
 
+<h1><span class="title_manage">
+    <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
+</h1>
 
 
 <!-- Excel Export Button -->
 <form action="ExportExcelStudySubjectAuditLog">
     <input type="hidden" value="<c:out value="${id}"/>" name="id"/><br>
-<input type="image" src="images/bt_Download.gif"  border="0" width="24 " height="15" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>"/><br>   
+    <input type="submit" value="Export to Excel" class="button_xlong"/><br>
    </form>
-   <h1><span class="title_manage">
-    <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
-</h1>
-   
 <!-- End Excel Export Button -->
 
 <%-- Subject Summary --%>
