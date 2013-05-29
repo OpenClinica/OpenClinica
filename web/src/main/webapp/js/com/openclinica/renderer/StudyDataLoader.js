@@ -95,6 +95,19 @@ function StudyDataLoader(study) {
     }
     var multiSelectLists = this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"];
     debug("loading multi select lists", util_logDebug );
+   if(!multiSelectLists.length){
+	   var multiSelectListKey = multiSelectLists["@ID"]; 
+	      var currentMultiSelectList = [];
+	      var multiSelectListItems = multiSelectLists["OpenClinica:MultiSelectListItem"];
+	      for (var j=0;j< multiSelectListItems.length;j++) {
+	        var currentMultiSelectListItem = {};
+	        currentMultiSelectListItem.id = multiSelectListItems[j]["@CodedOptionValue"]; 
+	        currentMultiSelectListItem.label = multiSelectListItems[j]["Decode"]["TranslatedText"]; 
+	        currentMultiSelectList.push(currentMultiSelectListItem);
+	      }
+	      app_multiSelectLists[multiSelectListKey] = currentMultiSelectList;
+   }
+   else{
     for (var i=0;i< multiSelectLists.length;i++) {
       var multiSelectListKey = multiSelectLists[i]["@ID"]; 
       var currentMultiSelectList = [];
@@ -107,6 +120,7 @@ function StudyDataLoader(study) {
       }
       app_multiSelectLists[multiSelectListKey] = currentMultiSelectList;
     }
+  }
   }
   
   
