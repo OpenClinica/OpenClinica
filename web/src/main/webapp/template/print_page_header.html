@@ -3,15 +3,15 @@
     <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}: ${protocolName ? protocolName : '___________________'}</div>  
     <div class='header-text text-left-aligned'>{{html app_studyNameLabel}}: ${studyName ? studyName : '___________________'}</div>  
     <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}: ${siteName ? siteName : '___________________'}</div>  
-    {{if secondaryLabelViewable == true}}
-      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: </div>  
+    {{if app_secondaryLabelViewable == 'true'}}
+      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: ${app_secondaryIDs ? app_secondaryIDs : '___________________'}</div>  
     {{/if}}
     {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>{{html app_eventNameLabel}}: ${eventName ? eventName : '___________________'}</div>  
     {{/if}}
-    {{if eventLocationRequired == 'required'}}
+    {{if app_eventLocationRequired == 'required'}}
       <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}} *: ${eventName ? eventName : '___________________'}</div>  
-    {{else eventLocationRequired == 'optional'}}
+    {{else app_eventLocationRequired == 'optional'}}
       <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventName ? eventName : '___________________'}</div>  
     {{/if}}
     {{if pageType != app_studyCoverPageType}}

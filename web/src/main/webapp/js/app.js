@@ -32,6 +32,7 @@ var app_showPersonID;
 var app_interviewerNameRequired;
 var app_interviewDateRequired;
 var app_secondaryLabelViewable;
+var app_secondaryLabel;
 var app_eventLocationRequired;
 var app_studyDetails = undefined;
 var app_studyEventCoverPageType = "study_event_cover_page_type";

@@ -42,6 +42,7 @@ function StudyDataLoader(study) {
     app_interviewDateRequired = this.getStudyParamValue(studyParamList, "SPL_interviewDateRequired");
     app_secondaryLabelViewable = this.getStudyParamValue(studyParamList, "SPL_secondaryLabelViewable");
     app_eventLocationRequired = this.getStudyParamValue(studyParamList, "SPL_eventLocationRequired");
+    app_secondaryIDs = app_studyDetails["OpenClinica:StudyDescriptionAndStatus"]["@SecondaryIDs"];
   }
   
  
