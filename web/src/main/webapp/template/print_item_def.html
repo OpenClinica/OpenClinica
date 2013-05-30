@@ -29,6 +29,8 @@
       {{/each}}
     </div>
   </div>
+  {{else responseType == 'textarea'}}
+ <span><textarea cols="40" rows="5"></textarea></span>
   {{else}}
     [item]
   {{/if}}
