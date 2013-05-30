@@ -2,7 +2,7 @@
   <table border='1' width='100%' height='100%'>
   <tr class="repeating_item_option_names">
   
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td align='center' valign='center'><div class='text-background-repeating'></div></td>
   {{else responseType == 'radio'}}
     {{each optionNames}}
@@ -16,6 +16,8 @@
     {{each multiSelectOptionNames}}
       <td align='center' valign='center' class='repeating_item_group'><div class='select-option'><input type='checkbox'/></div></td>
     {{/each}}
+   {{else responseType == 'textarea'}}
+ <td align='center' valign='center' class='repeating_item_group'><span><textarea cols="40" rows="5"></textarea></span></td>
   {{else}}
     [item]
   {{/if}}
