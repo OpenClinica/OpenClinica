@@ -2,7 +2,8 @@
 <div class='item_def_wrapper'>
   <span class='item_def_number'>{{html itemNumber}}</span>
   <span class='item_def_title'>{{html name}}</span>
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || responseType == 'instant-calculation'}}
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
+       responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <div class='text-background'></div>
   {{else responseType == 'radio'}}
   <div class='item_def_control'> 
@@ -28,10 +29,7 @@
       {{/each}}
     </div>
   </div>
-   {{else responseType == 'textarea'}}
-
- <span><textarea cols="40" rows="5"></textarea></span>
- {{else}}
+  {{else}}
     [item]
   {{/if}}
   <span class="item_def_format_label">{{html unitLabel}}</span> 
