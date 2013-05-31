@@ -162,8 +162,8 @@ function StudyDataLoader(study) {
         
           for (var j=0;j< presentInForm.length;j++) {
             if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
-             repeatNumber = presentInForm[j].repeatNumber; 
-             repeatMax = presentInForm[j].repeatMax; 
+                repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
+                repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
              
              break;
             }
