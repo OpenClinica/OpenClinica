@@ -1274,7 +1274,7 @@ function openNewWindow(inURL, name, features, windowSize) {
     if(windowSize == 'print')
     {
         height = 700;
-        width = 800;
+        width = 900;
     }
 
 
