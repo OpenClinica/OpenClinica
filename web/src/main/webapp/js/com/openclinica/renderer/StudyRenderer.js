@@ -366,10 +366,10 @@ function StudyRenderer(json) {
           var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
           var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
-            optionsRow += "<td valign='top' class='repeating_item_group'>" + options[j].label + "</td>";
+            optionsRow += "<td valign='top' align='center' class='repeating_item_group'>" + options[j].label + "</td>";
           }
           optionsRow += "</tr>";
-          repeatingHeaderString += "<td class='repeating_item_header' valign='top'><table border='1'>" + itemNameRow + optionsRow + "</table></td>";
+          repeatingHeaderString += "<td class='repeating_item_header' valign='top'><table>" + itemNameRow + optionsRow + "</table></td>";
         }
         else {
           repeatingHeaderString += "<td class='repeating_item_header' valign='top'>" + itemNumber + " " + name + "</td>";

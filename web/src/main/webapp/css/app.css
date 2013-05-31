@@ -255,6 +255,10 @@ td.item-def-cell {
   margin-top: 20px;
 }
 
+table.repeating-horiz-items td, th {
+   border:none;
+}
+
 
 @media all {
   .page-break { display: none; }
