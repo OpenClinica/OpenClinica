@@ -287,7 +287,8 @@ function StudyRenderer(json) {
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
       
-      if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
+     if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey])
+      {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
@@ -353,7 +354,7 @@ function StudyRenderer(json) {
           repeatingHeaderString = "<tr class='repeating_item_group'>";
           isFirstRepeatingItem = false;
           lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
-        }
+       }
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
         var responseLayout = itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
