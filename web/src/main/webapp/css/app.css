@@ -134,7 +134,7 @@ span.item_def_control{
 }
 
 .item_def_format_label{
-  vertical-align: bottom;
+  vertical-align: middle;
   font-size: 0.7em;
 }
 
@@ -184,10 +184,10 @@ span.item_def_control{
 }
 
 .text-background-repeating {
-  display: inline-block;
+  display: block;
   vertical-align:middle;
   background-color:#EEEEEE;
-  width: 50px;
+  width: 100px;
   height: 20px;
   margin-left:5px;
   margin-right:5px;
@@ -200,6 +200,7 @@ span.item_def_control{
 }
 
 .select-option { 
+  display: block;
   padding-top:1px;s
 }
 
@@ -216,26 +217,22 @@ span.item_def_control{
 
 .repeating_item_header {
   border:1px solid;  
-  font-size: 11px;
+  font-size: 13px;
   font-weight: bold;
   background-color: #DDDDDD;
-  max-height: 300px;
 }
 
 .repeating_item_group {
-  min-height: 50px;
 }
 .repeating_item_option_names {
-  min-height: 50px;
+  font-weight: bold;
 }
 
 td.item-def-cell {
-  min-height: 50px;
   vertical-align: top;  
 }
 
 .repeating_item_group_header{
-
   font-size: 11px;
   line-height: 15px;
   color: #4D4D4D;
