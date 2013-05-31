@@ -3,9 +3,6 @@
     <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}: ${protocolName ? protocolName : '___________________'}</div>  
     <div class='header-text text-left-aligned'>{{html app_studyNameLabel}}: ${studyName ? studyName : '___________________'}</div>  
     <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}: ${siteName ? siteName : '___________________'}</div>  
-    {{if app_secondaryLabelViewable == 'true'}}
-      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: ${app_secondaryIDs ? app_secondaryIDs : '___________________'}</div>  
-    {{/if}}
     {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>{{html app_eventNameLabel}}: ${eventName ? eventName : '___________________'}</div>  
     {{/if}}
@@ -19,12 +16,16 @@
     {{/if}}
   </div> 
   <div class='right-header'>
+    <div class='header-text'>{{html app_studySubjectIDLabel}}:___________</div>  
     {{if showPersonID == true && personIDRequired == 'required'}}
     <div class='header-text'>{{html app_eventLocationLabel}}:___________</div>  
     {{else showPersonID == true && personIDRequired == 'optional'}}
     <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
     {{/if}}
     <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
+    {{if app_secondaryLabelViewable == 'true'}}
+      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: ___________________</div>  
+    {{/if}}
     {{if collectSubjectDOB == 1}}
       <div class='header-text'>{{html app_studySubjectDOBLabel}}:___________</div>  
     {{else collectSubjectDOB == 2}}
