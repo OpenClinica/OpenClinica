@@ -96,6 +96,11 @@ function StudyRenderer(json) {
         }
       }
     }
+    str += "<div class='investigator-text'>";
+    str += app_investigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
+    str += app_investigatorSignatureLabel +": ___________________&nbsp;&nbsp;&nbsp;&nbsp";
+    str += app_dateLabel +": ___________________";
+    str += "</div>";
     return str;
   }
   
