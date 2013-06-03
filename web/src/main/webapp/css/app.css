@@ -142,6 +142,10 @@ span.item_def_control{
   font-size: 0.6em;
 }
 
+.item_def_repeating_unit {
+  font-size: 0.6em;
+}
+
 .header-title {
   background-color:#DDDDDD;
   padding-left:10px;
@@ -201,7 +205,7 @@ span.item_def_control{
 
 .select-option { 
   display: block;
-  padding-top:1px;s
+  padding-top:1px;
 }
 
 .header-text {
