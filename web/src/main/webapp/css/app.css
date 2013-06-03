@@ -1,5 +1,6 @@
 body {
   font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+  margin-left:10px;
 }
 
 table.item-row {
@@ -140,6 +141,7 @@ span.item_def_control{
 }
 
 .item_def_repeating_unit {
+  display: inline-block;
   font-size: 0.6em;
 }
 
@@ -237,9 +239,10 @@ table.repeating-horiz-items td, th {
 }
 
 input[type="text"], textarea {
+  display: inline-block;
   background-color : #EEEEEE; 
   border: none;
-  width: 90%;
+  width: 70%;
   margin-top:3px;
   margin-bottom:3px;
 }

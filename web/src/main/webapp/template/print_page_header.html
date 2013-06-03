@@ -9,9 +9,9 @@
       <div class='header-text text-left-aligned'>{{html app_eventNameLabel}}: ${eventName ? eventName : '___________________'}</div>  
     {{/if}}
     {{if app_eventLocationRequired == 'required'}}
-      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventName ? eventName : '___________________'}</div>  
+      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>  
     {{else app_eventLocationRequired == 'optional'}}
-      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventName ? eventName : '___________________'}</div>  
+      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>  
     {{/if}}
     {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>{{html app_eventDateLabel}}: ___________________</div>  

@@ -1,11 +1,16 @@
 <td class='item-def-cell'>
 <div class='item_def_wrapper'>
+  <table border="0">
+  <tr>
+  <td> 
   <span class='item_def_number'>{{html itemNumber}}</span>
   <span class='item_def_title'>{{html name}}</span>
+  </td>
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-    <input type='text'/>
+  <td>  <input type='text'/> </td>
   {{else responseType == 'radio'}}
+  <td>
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
@@ -13,7 +18,9 @@
       {{/each}}
     </div>
   </div>
+  </td>
   {{else responseType == 'single-select'}}
+  <td>
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
@@ -21,7 +28,9 @@
       {{/each}}
     </div>
   </div>
+  </td>
  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+  <td>
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each multiSelectOptionNames}}
@@ -29,12 +38,21 @@
       {{/each}}
     </div>
   </div>
+  </td>
   {{else responseType == 'textarea'}}
+  <td>
  <span><textarea cols="40" rows="5"></textarea></span>
+  </td>
   {{else}}
     [item]
   {{/if}}
+  <td>
   <span class="item_def_format_label">{{html unitLabel}}</span> 
+  </td>
+  <td>
   <span class='item_def_format_label'>{{html rightItemText}}</span>
+  </td>
+  </tr>
+  </table>
 </div> 
 </td>
