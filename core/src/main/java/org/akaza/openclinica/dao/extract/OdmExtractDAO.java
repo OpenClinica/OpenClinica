@@ -207,10 +207,11 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(21, TypeNames.STRING);// options_values
         this.setTypeExpected(22, TypeNames.STRING);// response_label
         this.setTypeExpected(23, TypeNames.STRING);// item_group_header
-        this.setTypeExpected(24, TypeNames.STRING);// item_description
-        this.setTypeExpected(25, TypeNames.INT);// section_id
-        this.setTypeExpected(26, TypeNames.STRING); // question_number_label
-        this.setTypeExpected(27, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(24,TypeNames.BOOL);//is Repeating?
+        this.setTypeExpected(25, TypeNames.STRING);// item_description
+        this.setTypeExpected(26, TypeNames.INT);// section_id
+        this.setTypeExpected(27, TypeNames.STRING); // question_number_label
+        this.setTypeExpected(28, TypeNames.STRING);// mu_oid
     }
 
     public void setItemGroupAndItemMetaOC1_3TypesExpected() {
@@ -805,9 +806,11 @@ public class OdmExtractDAO extends DatasetDAO {
                     ig = igs.get(igPoses.get(igOID));
                     ItemGroupDetailsBean igDetail = ig.getItemGroupDetails();
                     igDetail.setOid(igOID);
+                    
                     PresentInFormBean inForm = new PresentInFormBean();
                     inForm.setFormOid(cvOID);
                     ItemGroupRepeatBean igr = new ItemGroupRepeatBean();
+                    
                     igr.setRepeatMax(igRepeatMax);
                     igr.setRepeatNumber(igRepeatNum);
                     inForm.setItemGroupRepeatBean(igr);
@@ -1022,6 +1025,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String rsValue = (String) row.get("options_values");
             String rsLabel = (String) row.get("response_label");
             String igHeader = (String) row.get("item_group_header");
+            Boolean isRepeating = (Boolean)row.get("repeating_group");
             String itDesc = (String) row.get("item_description");
             String itQuesNum = (String) row.get("question_number_label");
             String muOid = (String) row.get("mu_oid");
@@ -1060,7 +1064,9 @@ public class OdmExtractDAO extends DatasetDAO {
                     igdef.setOid(igOID);
                     igdef.setName("ungrouped".equalsIgnoreCase(igName) ? igOID : igName);
                     //igdef.setName(igName);
-                    igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
+                    
+                    igdef.setRepeating(isRepeating ? "Yes" : "No");
+                    
                     igdef.setComment(igHeader);
                     igdef.setPreSASDatasetName(igName.toUpperCase());
                     itemGroupDefs.add(igdef);
@@ -1720,6 +1726,8 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
           String rsValue = (String) row.get("options_values");
           String rsLabel = (String) row.get("response_label");
           String igHeader = (String) row.get("item_group_header");
+          
+          Boolean isRepeating = (Boolean)row.get("repeating_group");
           String itDesc = (String) row.get("item_description");
           String itQuesNum = (String) row.get("question_number_label");
           String muOid = (String) row.get("mu_oid");
@@ -1759,7 +1767,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
                   igdef.setOid(igOID);
                   igdef.setName("ungrouped".equalsIgnoreCase(igName) ? igOID : igName);
                   //igdef.setName(igName);
-                  igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
+                  igdef.setRepeating(isRepeating ? "Yes" : "No");
                   igdef.setComment(igHeader);
                   igdef.setPreSASDatasetName(igName.toUpperCase());
                   itemGroupDefs.add(igdef);
@@ -3218,10 +3226,10 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
             + " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
             + " rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,"
-            + " igm.item_group_header, item.description as item_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
+            + " igm.item_group_header, igm.repeating_group,item.description as item_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
             + " (select crf_version_id, item_id, response_set_id, header as item_header, left_item_text, right_item_text, required, regexp,"
             + " regexp_error_msg, width_decimal, section_id, question_number_label from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
-            + " (select crf_version_id, item_group_id, item_id, header as item_group_header from item_group_metadata where crf_version_id in (" + crfVersionIds
+            + " (select crf_version_id, item_group_id, item_id, header as item_group_header,repeating_group from item_group_metadata where crf_version_id in (" + crfVersionIds
             + "))igm," + " item_group ig "
             + this.getItemGroupAndItemMetaCondition(crfVersionIds);
     }
