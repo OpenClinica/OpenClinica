@@ -1,4 +1,6 @@
-<div class'page-header'>
+<table border="0" class="page-header">
+<tr>
+<td>
   <div class='left-header'>
     <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}: ${protocolName ? protocolName : '___________________'}</div>  
     <div class='header-text text-left-aligned'>{{html app_studyNameLabel}}: ${studyName ? studyName : '___________________'}</div>  
@@ -15,6 +17,8 @@
       <div class='header-text text-left-aligned'>{{html app_eventDateLabel}}: ___________________</div>  
     {{/if}}
   </div> 
+</td>
+<td>
   <div class='right-header'>
     <div class='header-text'>{{html app_studySubjectIDLabel}}:___________</div>  
     {{if showPersonID == true && personIDRequired == 'required'}}
@@ -42,9 +46,6 @@
       <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
     {{/if}}
   </div>
-
- <!-- 
-  <div id='footer-date' class='text-right-aligned'>{{html app_datePrintedLabel}} ${app_printTime}</div>  
--->
-
-</div>
+</td>
+</tr>
+</table>
