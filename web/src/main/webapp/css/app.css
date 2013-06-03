@@ -77,9 +77,6 @@ a:link {
   text-align: left; 
 }
 
-#loginError  {
-  color: red;
-}
 
 .repeating_item_wrapper{
   display:inline-block;
@@ -178,27 +175,6 @@ span.item_def_control{
   vertical-align: top;
 }
 
-.text-background {
-  display: inline-block;
-  background-color:#EEEEEE;
-  width: 110px;
-  height: 20px;
-  margin-left:5px;
-  margin-right:5px;
-}
-
-.text-background-repeating {
-  display: block;
-  vertical-align:middle;
-  background-color:#EEEEEE;
-  width: 100px;
-  height: 20px;
-  margin-left:5px;
-  margin-right:5px;
-  margin-top:5px;
-  margin-bottom:5px;
-}
-
 .title_manage { 
   color: #D4A718;
 }
@@ -258,6 +234,14 @@ td.item-def-cell {
 
 table.repeating-horiz-items td, th {
    border:none;
+}
+
+input[type="text"], textarea {
+  background-color : #EEEEEE; 
+  border: none;
+  width: 90%;
+  margin-top:3px;
+  margin-bottom:3px;
 }
 
 
