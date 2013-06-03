@@ -30,6 +30,7 @@
   var app_interviewDateLabel = '<fmt:message key="interview_date" bundle="${resword}"/>'; 
   var app_secondaryLabel = '<fmt:message key="secondary_label" bundle="${resword}"/>'; 
   var app_studySubjectDOBLabel = '<fmt:message key="study_subject_dob" bundle="${resword}"/>'; 
+  var app_dateLabel = '<fmt:message key="date" bundle="${resword}"/>'; 
   var app_studySubjectBirthYearLabel = '<fmt:message key="study_subject_birth_year" bundle="${resword}"/>'; 
   var app_datePrintedLabel = '<fmt:message key="date_printed" bundle="${resword}"/>'; 
   var app_sectionTitle =  '<fmt:message key="section_title" bundle="${resword}"/>'+":";

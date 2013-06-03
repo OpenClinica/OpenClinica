@@ -96,6 +96,11 @@ function StudyRenderer(json) {
         }
       }
     }
+    str += "<div class='investigator-text'>";
+    str += app_investigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
+    str += app_investigatorSignatureLabel +": ___________________&nbsp;&nbsp;&nbsp;&nbsp";
+    str += app_dateLabel +": ___________________";
+    str += "</div>";
     return str;
   }
   
@@ -361,7 +366,7 @@ function StudyRenderer(json) {
         var responseType = itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
         
         if (responseLayout == "Horizontal") {
-          var options = responseType == 'multi-select' ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
+          var options = (responseType == 'multi-select' || responseType == 'checkbox') ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
           var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
           var optionsRow = "<tr class='repeating_item_group'>";

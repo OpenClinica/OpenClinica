@@ -32,6 +32,7 @@ h4 {
 .left-header {
   display: inline-block;
   width: 500px; 
+  padding-right:100px;
   vertical-align: top;
 }
 
@@ -39,7 +40,6 @@ h4 {
   display: inline-block;
   width: 300px; 
   vertical-align: top;
-  margin-left: 200px;
 }
 
 .spinner {
@@ -212,7 +212,7 @@ span.item_def_control{
 
 .investigator-text {
   color: #333333;
-  padding-bottom: 8px;
+  padding-top: 100px;
 }
 
 .repeating_item_header {
