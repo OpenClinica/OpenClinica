@@ -397,7 +397,7 @@ function StudyRenderer(json) {
           this.renderString += "<table class='item-row'>";
         }
         this.renderString += itemDefRenderer.renderPrintableItem(repeating);
-        if (columnNumber === undefined || columnNumber == 2 && columns === undefined || columns == columnNumber || nextColumnNumber == 1) {
+        if (columns == columnNumber || nextColumnNumber == 1) {
           this.renderString += "</table>";
         }
       }
