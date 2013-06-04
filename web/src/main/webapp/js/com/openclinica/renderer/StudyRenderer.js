@@ -312,7 +312,7 @@ function StudyRenderer(json) {
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
         this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
         
-        this.renderString += "<div class='vertical-spacer-20px'></div>";
+        //this.renderString += "<div class='vertical-spacer-20px'></div>";
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
