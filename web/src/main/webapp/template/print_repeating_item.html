@@ -1,5 +1,7 @@
 <td class='repeating_item_group'>
-<div class='repeating_item_wrapper'>
+  <table border="0">
+  <tr>
+  <td>
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
    <input type='text' style='margin-left:3px'/>
@@ -32,7 +34,14 @@
   {{else}}
     [item]
   {{/if}}
-  <span class="item_def_repeating_unit">{{html unitLabel}}</span> 
-</div> 
+   </td> 
+   <td>
+  <span class="item_def_format_label">{{html unitLabel}}</span> 
+  </td>
+  <td>
+  <span class='item_def_format_label'>{{html rightItemText}}</span>
+  </td>
+  </tr>
+  </table> 
 </td>
 
