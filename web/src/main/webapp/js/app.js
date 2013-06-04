@@ -20,6 +20,7 @@ var app_itemDefs;
 var app_formDefs;
 var app_studyEventDefs;
 var app_eventName = undefined;
+var app_eventLocation = undefined;
 var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
