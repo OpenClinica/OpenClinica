@@ -162,15 +162,76 @@ function StudyDataLoader(study) {
         
           for (var j=0;j< presentInForm.length;j++) {
             if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
-             repeatNumber = presentInForm[j].repeatNumber; 
-             repeatMax = presentInForm[j].repeatMax; 
-             
-             break;
+                repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
+                repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
+                var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
+                debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
+                var currentItemGroup = {};
+                currentItemGroup.repeatNumber = repeatNumber;
+                currentItemGroup.repeatMax = repeatMax;
+                currentItemGroup.repeating = repeating;
+                currentItemGroup.name = itemGroupName;
+                currentItemGroup.groupHeader = groupHeader;
+                app_itemGroupDefs[itemGroupKey] = currentItemGroup;
+                var itemGroupLength = itemGroupDef["ItemRef"].length;
+               if(!itemGroupLength){
+              	 var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
+              	 var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
+              	 var currentItem = {};
+              	 currentItem.orderNumber = orderNumber;
+                   currentItem.itemGroupKey = itemGroupKey;
+                   currentItem.itemGroupLength = 1;
+                   app_itemGroupMap[itemKey] = currentItem;
+               } 
+               else{
+                for (var j=0;j< itemGroupLength;j++) {
+                  var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
+                  var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
+                  var currentItem = {};
+                  currentItem.orderNumber = orderNumber;
+                  currentItem.itemGroupKey = itemGroupKey;
+                  currentItem.itemGroupLength = itemGroupLength;
+                  app_itemGroupMap[itemKey] = currentItem;
+                  debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
+                }
+              }
+                break;
             }
           }	
     }else {
         repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
         repeatMax =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"];
+        var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
+        debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
+        var currentItemGroup = {};
+        currentItemGroup.repeatNumber = repeatNumber;
+        currentItemGroup.repeatMax = repeatMax;
+        currentItemGroup.repeating = repeating;
+        currentItemGroup.name = itemGroupName;
+        currentItemGroup.groupHeader = groupHeader;
+        app_itemGroupDefs[itemGroupKey] = currentItemGroup;
+        var itemGroupLength = itemGroupDef["ItemRef"].length;
+       if(!itemGroupLength){
+      	 var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
+      	 var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
+      	 var currentItem = {};
+      	 currentItem.orderNumber = orderNumber;
+           currentItem.itemGroupKey = itemGroupKey;
+           currentItem.itemGroupLength = 1;
+           app_itemGroupMap[itemKey] = currentItem;
+       } 
+       else{
+        for (var j=0;j< itemGroupLength;j++) {
+          var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
+          var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
+          var currentItem = {};
+          currentItem.orderNumber = orderNumber;
+          currentItem.itemGroupKey = itemGroupKey;
+          currentItem.itemGroupLength = itemGroupLength;
+          app_itemGroupMap[itemKey] = currentItem;
+          debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
+        }
+      }
       }
     }
         else
