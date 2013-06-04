@@ -312,13 +312,13 @@ function StudyRenderer(json) {
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
         this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
         
-        //this.renderString += "<div class='vertical-spacer-20px'></div>";
+        
         isFirstSection = false;
       }
-      if (repeating == false && itemHeader !== undefined && itemHeader != prevItemHeader) {
+      if (repeating == false && itemHeader !== undefined ) {
         this.renderString += "<div class='header-title'>"+itemHeader+"</div>";
       }
-      if (repeating == false && itemSubHeader !== undefined && itemSubHeader != prevItemSubHeader) {
+      if (repeating == false && itemSubHeader !== undefined) {
         this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
       }
       
