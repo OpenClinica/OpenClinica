@@ -216,7 +216,7 @@ function StudyRenderer(json) {
       this.renderPrintableEventCRFs(renderMode, eventDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
-      this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, '');
+      this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
       this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -304,7 +304,7 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == false) {
-          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, '');
+          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
         }
         this.renderString += "<div class='vertical-spacer-30px'></div>";
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+"&nbsp;"+sectionTitle+"</div>" : "";
@@ -407,6 +407,7 @@ function StudyRenderer(json) {
       prevItemHeader = itemHeader;
     }
   }
+  
   
   /* renderPageHeader()
    */
