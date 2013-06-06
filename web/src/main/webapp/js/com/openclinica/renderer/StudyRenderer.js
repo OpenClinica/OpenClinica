@@ -284,6 +284,7 @@ function StudyRenderer(json) {
       var rightItem =itemDetails["OpenClinica:RightItemText"]; 
       var columnNumber = itemDetails["@ColumnNumber"];
       var columns = itemDetails["OpenClinica:Layout"] ? itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
+      var lastItemInRepeatingRow = false;
       debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
       var repeatNumber = 1;
@@ -333,6 +334,7 @@ function StudyRenderer(json) {
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         var nextItemOID = nextItemDef["@OID"];
+        var nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
@@ -349,6 +351,9 @@ function StudyRenderer(json) {
           isFirstRepeatingItem = true;
         }
       
+        if(nextGroupOID!=currentItemGroupOID ){
+        	lastItemInRepeatingRow = true;
+        }
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
@@ -381,7 +386,7 @@ function StudyRenderer(json) {
         }
          
         // in last item in repeating group
-        if (i == lastRepeatingOrderInFormNumber) {
+        if (lastItemInRepeatingRow) {
           repeatingRowString += "</tr>";
           repeatingHeaderString += "</tr>";
           for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
