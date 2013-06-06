@@ -1469,16 +1469,9 @@ public class OdmExtractDAO extends DatasetDAO {
             }
 
             if(formDetails.containsKey(cvOID)) {
-            }else {
-                FormDetailsBean formDetail = new FormDetailsBean();
-                formDetail.setOid(cvOID);
-                formDetail.setRevisionNotes(notes);
-                formDetail.setParentFormOid(cOID);
-                formDetail.setVersionDescription(cvDesc);
-                //ArrayList sectionBeansRows = this.select(this.getSectionDetails(cvOID),cvId);
-               formDetail =  setSectionBean(formDetail,cvId);
-                
-                PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
+          
+            	FormDetailsBean formDetail = formDetails.get(cvOID);
+            	PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
                 p.setStudyEventOid(sedOID);
                 p.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
                 p.setHideCrf(hideCrf==false?"No":"Yes");
@@ -1487,6 +1480,24 @@ public class OdmExtractDAO extends DatasetDAO {
                 p.setPasswordRequired(pwdRequired==false?"No":"Yes");
                 p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
                 formDetail.getPresentInEventDefinitions().add(p);
+            }else {
+                FormDetailsBean formDetail = new FormDetailsBean();
+                formDetail.setOid(cvOID);
+                formDetail.setRevisionNotes(notes);
+                formDetail.setParentFormOid(cOID);
+                formDetail.setVersionDescription(cvDesc);
+                //ArrayList sectionBeansRows = this.select(this.getSectionDetails(cvOID),cvId);
+               formDetail =  setSectionBean(formDetail,cvId);
+               PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
+               p.setStudyEventOid(sedOID);
+               p.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
+               p.setHideCrf(hideCrf==false?"No":"Yes");
+               p.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
+               p.setNullValues(nullValue);
+               p.setPasswordRequired(pwdRequired==false?"No":"Yes");
+               p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
+               formDetail.getPresentInEventDefinitions().add(p);
+       
                 formDetails.put(cvOID, formDetail);
             }
         }
