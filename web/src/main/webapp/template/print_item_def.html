@@ -11,30 +11,30 @@
   <td>  <input type='text'/> </td>
   {{else responseType == 'radio'}}
   <td>
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
+  <div class='item_def_control ${isInline}'> 
+    <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
-        <div class='select-option'><input type='radio'/> {{html label}}</div>
+        <div class='select-option ${isInline}'><input type='radio'/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
   </td>
   {{else responseType == 'single-select'}}
   <td>
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
+  <div class='item_def_control ${isInline}'> 
+    <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
-        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+        <div class='select-option ${isInline}'><input type='checkbox'/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
   </td>
  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
   <td>
-  <div class='item_def_control'> 
-    <div class='checkbox_control'>
+  <div class='item_def_control ${isInline}'> 
+    <div class='checkbox_control ${isInline}'>
       {{each multiSelectOptionNames}}
-        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+        <div class='select-option ${isInline}'><input type='checkbox'/> {{html label}}</div>
       {{/each}}
     </div>
   </div>

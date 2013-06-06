@@ -136,6 +136,10 @@ span.item_def_control{
   font-size: 0.7em;
 }
 
+div.inline {
+  display: inline;
+}
+
 .checkbox_control{
   font-size: 0.6em;
 }
@@ -184,6 +188,8 @@ span.item_def_control{
 .select-option { 
   display: block;
   padding-top:1px;
+  padding-right:2px;
+  padding-bottom:2px;
 }
 
 .header-text {

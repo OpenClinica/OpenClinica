@@ -6,6 +6,7 @@ function ItemDefRenderer(json, itemDetails) {
   this.dataType = json["@DataType"];
   this.responseType = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseType"];
   this.responseLayout = this.itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
+  this.isInline = this.responseLayout == "Horizontal" ? "inline" : "";
   this.OID = json["@OID"];
   this.itemNumber = json["Question"] && json["Question"]["@OpenClinica:QuestionNumber"] ? json["Question"]["@OpenClinica:QuestionNumber"] : "";
   this.unitLabel = json["MeasurementUnitRef"] ? "("+app_basicDefinitions[json["MeasurementUnitRef"]["@MeasurementUnitOID"]]+")" : "";
@@ -20,8 +21,9 @@ function ItemDefRenderer(json, itemDetails) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
     var s = RenderUtil.render(RenderUtil.get(template), 
-                       {itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, unitLabel:this.unitLabel, 
-                        optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], columns:this.columns});
+       {itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, unitLabel:this.unitLabel, 
+        optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], columns:this.columns,
+        responseLayout:this.responseLayout, isInline: this.isInline});
     return s[0].outerHTML;
   }
   
