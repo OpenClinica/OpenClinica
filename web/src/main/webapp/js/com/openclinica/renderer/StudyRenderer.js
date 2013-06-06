@@ -292,7 +292,7 @@ function StudyRenderer(json) {
       var repeatMax = undefined; 
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
-      
+      var nextGroupOID = undefined;
      if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey])
       {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
@@ -334,7 +334,7 @@ function StudyRenderer(json) {
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         var nextItemOID = nextItemDef["@OID"];
-        var nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
+         nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
