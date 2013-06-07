@@ -330,7 +330,8 @@ function StudyRenderer(json) {
       debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
       var repeatNumber = 1;
-      var repeating = false;
+    var repeating = false;
+      var manditory = false;
       var repeatMax = undefined; 
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
@@ -338,6 +339,7 @@ function StudyRenderer(json) {
      if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey])
       {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
+        mandatory = app_itemGroupMap[itemOID].mandatory;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
@@ -354,8 +356,6 @@ function StudyRenderer(json) {
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
         this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
-        
-        
         isFirstSection = false;
       }
       if (repeating == false && itemHeader !== undefined ) {
@@ -376,11 +376,11 @@ function StudyRenderer(json) {
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         var nextItemOID = nextItemDef["@OID"];
-         nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
+        nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
-      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
@@ -394,7 +394,7 @@ function StudyRenderer(json) {
         }
       
         if(nextGroupOID!=currentItemGroupOID ){
-        	lastItemInRepeatingRow = true;
+          lastItemInRepeatingRow = true;
         }
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
