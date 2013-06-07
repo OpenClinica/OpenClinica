@@ -125,42 +125,42 @@ function StudyRenderer(json) {
       var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
       if(presentInEventDef.length!=undefined)
       {
-    	 for(var l=0;l<presentInEventDef.length;l++){
-    		 var inEventDef = presentInEventDef[l];
-    		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-    			  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-    		      for (var j=0;j< app_studyEventDefs.length;j++) {
-    		          var eventDef = app_studyEventDefs[j];
-    		          var formFound = false;
-    		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-    		          {
-    		        		  str += "<td style='text-align:center'>X</td>";
-    		        		  formFound = true; 
-    		          }
-    		          if (formFound == false) {
-    		            str += "<td></td>";
-    		          }
-    		        }
-    		 }
-    	 }
+       for(var l=0;l<presentInEventDef.length;l++){
+         var inEventDef = presentInEventDef[l];
+         if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
+            str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+              for (var j=0;j< app_studyEventDefs.length;j++) {
+                  var eventDef = app_studyEventDefs[j];
+                  var formFound = false;
+                  if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
+                  {
+                      str += "<td style='text-align:center'>X</td>";
+                      formFound = true; 
+                  }
+                  if (formFound == false) {
+                    str += "<td></td>";
+                  }
+                }
+         }
+       }
       }
       else{
-   		 var inEventDef = presentInEventDef;
-		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-			  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-		      for (var j=0;j< app_studyEventDefs.length;j++) {
-		          var eventDef = app_studyEventDefs[j];
-		          var formFound = false;
-		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-		          {
-		        		  str += "<td style='text-align:center'>X</td>";
-		        		  formFound = true; 
-		          }
-		          if (formFound == false) {
-		            str += "<td></td>";
-		          }
-		        }
-		 }
+        var inEventDef = presentInEventDef;
+     if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
+        str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+          for (var j=0;j< app_studyEventDefs.length;j++) {
+              var eventDef = app_studyEventDefs[j];
+              var formFound = false;
+              if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
+              {
+                  str += "<td style='text-align:center'>X</td>";
+                  formFound = true; 
+              }
+              if (formFound == false) {
+                str += "<td></td>";
+              }
+            }
+     }
       }
       str += "</tr>";
     }
@@ -193,24 +193,24 @@ function StudyRenderer(json) {
         
           if(presentInEventDef.length!=undefined)
           {
-        	
-        	  
-        	  for(var l=0;l<presentInEventDef.length;l++){
-         		 var inEventDef = presentInEventDef[l];
-         		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-         			 this.renderPrintableFormDef(formDef, pageBreak);
-         	         defaultDisplayed = true;
-         			 break;	
-         		 }
-         		 }
+          
+            
+            for(var l=0;l<presentInEventDef.length;l++){
+              var inEventDef = presentInEventDef[l];
+              if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
+                this.renderPrintableFormDef(formDef, pageBreak);
+                    defaultDisplayed = true;
+                break;  
+              }
+              }
           }
           else{
-        	  var inEventDef = presentInEventDef;
-        	  if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-      			 this.renderPrintableFormDef(formDef, pageBreak);
-      	         defaultDisplayed = true;
-      			 break;	
-      		 }
+            var inEventDef = presentInEventDef;
+            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
+             this.renderPrintableFormDef(formDef, pageBreak);
+                 defaultDisplayed = true;
+             break;  
+           }
           }
           /*if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" ||
           formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
@@ -330,7 +330,7 @@ function StudyRenderer(json) {
       debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
       var repeatNumber = 1;
-    var repeating = false;
+      var repeating = false;
       var manditory = false;
       var repeatMax = undefined; 
       var itemGroupHeader = undefined;
@@ -358,13 +358,6 @@ function StudyRenderer(json) {
         this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
         isFirstSection = false;
       }
-      if (repeating == false && itemHeader !== undefined ) {
-        this.renderString += "<div class='header-title'>"+itemHeader+"</div>";
-      }
-      if (repeating == false && itemSubHeader !== undefined) {
-        this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
-      }
-      
       this.renderString += "<div class='vertical-spacer-20px'></div>";
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
@@ -441,6 +434,8 @@ function StudyRenderer(json) {
       // standard non-repeating items
       else if (repeating == false) { 
         if (columnNumber === undefined || columnNumber == 1) {
+          this.renderString += itemHeader !== undefined ? "<div class='header-title'>"+itemHeader+"</div>" : "";
+          this.renderString += itemSubHeader !== undefined ? "<div class='header-title'>"+itemSubHeader+"</div>" : "";
           this.renderString += "<table class='item-row'>";
         }
         this.renderString += itemDefRenderer.renderPrintableItem(repeating);
