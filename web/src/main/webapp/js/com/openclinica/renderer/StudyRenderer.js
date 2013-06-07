@@ -361,7 +361,8 @@ function StudyRenderer(json) {
       this.renderString += "<div class='vertical-spacer-20px'></div>";
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
-      
+     
+      // inpect the next ItemDef for look-ahead purposes.
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
@@ -439,7 +440,7 @@ function StudyRenderer(json) {
           this.renderString += "<table class='item-row'>";
         }
         this.renderString += itemDefRenderer.renderPrintableItem(repeating);
-        if (columns == columnNumber || nextColumnNumber == 1) {
+        if (columns == columnNumber || nextColumnNumber == 1 || i+1 == orderedItems.length) {
           this.renderString += "</table>";
         }
       }
