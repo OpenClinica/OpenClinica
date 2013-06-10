@@ -35,16 +35,8 @@
     {{else collectSubjectDOB == 2}}
       <div class='header-text'>{{html app_studySubjectBirthYearLabel}}:___________</div>  
     {{/if}}
-    {{if interviewerNameRequired == true}}
-      <div class='header-text'>Interviewer:___________</div>  
-    {{else interviewerNameRequired == false}}
-      <div class='header-text'>Interviewer:___________</div>  
-    {{/if}}
-    {{if interviewDateRequired == true}}
-      <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
-    {{else interviewDateRequired == false}}
-      <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
-    {{/if}}
+    <div class='header-text'>{{html app_interviewerLabel}}:___________</div>  
+    <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
   </div>
 </td>
 </tr>
