@@ -118,52 +118,77 @@ function StudyRenderer(json) {
       str +="<td style='padding:10px'>" + eventDef["@Name"] + "</td>";
     }  
     str += "</tr>";
+    var formFound = false;
     //iterate over each of the formDefs in the study    
     for (var i=0;i< app_formDefs.length;i++) {
       var formDef = app_formDefs[i];
+      var formVersionPrinted = false;
       
       var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
       if(presentInEventDef.length!=undefined)
       {
+    	  var initEventCNTR = 0;
+    	 
     	 for(var l=0;l<presentInEventDef.length;l++){
-    		 var inEventDef = presentInEventDef[l];
+    	      formFound = false;
+    	      var inEventDef = presentInEventDef[l];
+    		 
     		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-    			  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-    		      for (var j=0;j< app_studyEventDefs.length;j++) {
+    			  if(!formVersionPrinted)str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+    		      formVersionPrinted = true;
+    		
+    		      for (var j=initEventCNTR;j< app_studyEventDefs.length&&!formFound;j++) {
     		          var eventDef = app_studyEventDefs[j];
-    		          var formFound = false;
+    		         
     		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
     		          {
     		        		  str += "<td style='text-align:center'>X</td>";
     		        		  formFound = true; 
+    		        		  initEventCNTR = j+1 ;
+    		        		 
     		          }
-    		          if (formFound == false) {
+    		          if(!formFound) {
     		            str += "<td></td>";
     		          }
     		        }
+    		      if(!formFound) {
+  		            str += "<td></td>";
+  		          } 
     		 }
     	 }
+    	 if(initEventCNTR<app_studyEventDefs.length)
+    		 for(var c = initEventCNTR;c< app_studyEventDefs.length;c++){
+    			 str += "<td></td>";
+    		 }
+    	  
       }
       else{
    		 var inEventDef = presentInEventDef;
-		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-			  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-		      for (var j=0;j< app_studyEventDefs.length;j++) {
-		          var eventDef = app_studyEventDefs[j];
-		          var formFound = false;
+   	
+	          
+   		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
+   			if(!formVersionPrinted)  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+   			formVersionPrinted = true;
+   		
+   			for (var j=0;j< app_studyEventDefs.length;j++) {
+  	          var eventDef = app_studyEventDefs[j];	
+  	        formFound = false;
 		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
 		          {
 		        		  str += "<td style='text-align:center'>X</td>";
 		        		  formFound = true; 
 		          }
-		          if (formFound == false) {
+		          else {
 		            str += "<td></td>";
 		          }
 		        }
+   		
 		 }
+   		 
       }
       str += "</tr>";
     }
+    
     str += "</table>";
     return str;
   }
