@@ -83,18 +83,36 @@ function StudyRenderer(json) {
   this.createStudyEventCoverPage = function (eventDef) {
     var str = "<h3>" + eventDef["@Name"] + ":</h3>";
     var studyEventFormRefs =  eventDef["FormRef"];
+   
     for (var i=0;i< studyEventFormRefs.length;i++) {
       var formRef = studyEventFormRefs[i];
-      for (var j=0;j< app_formDefs.length;j++) {
-        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
-          var formDef = app_formDefs[j];
-          if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" || 
-              formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
-            continue;
+      var formFound = false;
+      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
+    	  if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+          
+    	  var formDef = app_formDefs[j];
+          var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
+          if(presentInEventDef.length!=undefined)
+          {
+        	 for(var l=0;l<presentInEventDef.length&&!formFound;l++){
+        	      var inEventDef = presentInEventDef[l];
+        		   	if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
+        	      		str += "<div>" + formDef["@Name"] + "</div>";
+        	      		formFound = true;
+        	      	}
+        	 	}
           }
-          str += "<div>" + formDef["@Name"] + "</div>";
-        }
+          else{
+        	  var inEventDef = presentInEventDef;
+        	  if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
+  	      		str += "<div>" + formDef["@Name"] + "</div>";
+  	      		formFound = true;
+  	      	}
+        	  
+        	  
+          }
       }
+    }
     }
     str += "<div class='investigator-text'>";
     str += app_investigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
