@@ -483,7 +483,7 @@ function StudyRenderer(json) {
           this.renderString += "<table class='item-row'>";
         }
         this.renderString += itemDefRenderer.renderPrintableItem(repeating);
-        if (columns == columnNumber || nextColumnNumber == 1 || i+1 == orderedItems.length) {
+        if (columns == columnNumber || nextColumnNumber == 1 || nextColumnNumber === undefined || i+1 == orderedItems.length) {
           this.renderString += "</table>";
         }
       }
