@@ -174,7 +174,7 @@ function StudyRenderer(json) {
   		          } 
     		 }
     	 }
-    	 if(initEventCNTR<app_studyEventDefs.length)
+    	 if(initEventCNTR<app_studyEventDefs.length && formVersionPrinted)
     		 for(var c = initEventCNTR;c< app_studyEventDefs.length;c++){
     			 str += "<td></td>";
     		 }
@@ -204,7 +204,7 @@ function StudyRenderer(json) {
      }
    		 
       }
-      str += "</tr>";
+     str += "</tr>";
     }
     
     str += "</table>";
