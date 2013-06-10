@@ -129,28 +129,28 @@ function StudyRenderer(json) {
       {
     	  var initEventCNTR = 0;
     	 
-    	 for(var l=0;l<presentInEventDef.length;l++){
+       for(var l=0;l<presentInEventDef.length;l++){
     	      formFound = false;
     	      var inEventDef = presentInEventDef[l];
     		 
-    		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
+         if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
     			  if(!formVersionPrinted)str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
     		      formVersionPrinted = true;
     		
     		      for (var j=initEventCNTR;j< app_studyEventDefs.length&&!formFound;j++) {
-    		          var eventDef = app_studyEventDefs[j];
+                  var eventDef = app_studyEventDefs[j];
     		         
-    		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-    		          {
-    		        		  str += "<td style='text-align:center'>X</td>";
-    		        		  formFound = true; 
+                  if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
+                  {
+                      str += "<td style='text-align:center'>X</td>";
+                      formFound = true; 
     		        		  initEventCNTR = j+1 ;
     		        		 
-    		          }
+                  }
     		          if(!formFound) {
-    		            str += "<td></td>";
-    		          }
-    		        }
+                    str += "<td></td>";
+                  }
+                }
     		      if(!formFound) {
   		            str += "<td></td>";
   		          } 
@@ -163,7 +163,7 @@ function StudyRenderer(json) {
     	  
       }
       else{
-   		 var inEventDef = presentInEventDef;
+        var inEventDef = presentInEventDef;
    	
 	          
    		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
@@ -173,17 +173,17 @@ function StudyRenderer(json) {
    			for (var j=0;j< app_studyEventDefs.length;j++) {
   	          var eventDef = app_studyEventDefs[j];	
   	        formFound = false;
-		          if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-		          {
-		        		  str += "<td style='text-align:center'>X</td>";
-		        		  formFound = true; 
-		          }
+              if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
+              {
+                  str += "<td style='text-align:center'>X</td>";
+                  formFound = true; 
+              }
 		          else {
-		            str += "<td></td>";
-		          }
-		        }
+                str += "<td></td>";
+              }
+            }
    		
-		 }
+     }
    		 
       }
       str += "</tr>";
@@ -218,24 +218,24 @@ function StudyRenderer(json) {
         
           if(presentInEventDef.length!=undefined)
           {
-        	
-        	  
-        	  for(var l=0;l<presentInEventDef.length;l++){
-         		 var inEventDef = presentInEventDef[l];
-         		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-         			 this.renderPrintableFormDef(formDef, pageBreak);
-         	         defaultDisplayed = true;
-         			 break;	
-         		 }
-         		 }
+          
+            
+            for(var l=0;l<presentInEventDef.length;l++){
+              var inEventDef = presentInEventDef[l];
+              if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
+                this.renderPrintableFormDef(formDef, pageBreak);
+                    defaultDisplayed = true;
+                break;  
+              }
+              }
           }
           else{
-        	  var inEventDef = presentInEventDef;
-        	  if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-      			 this.renderPrintableFormDef(formDef, pageBreak);
-      	         defaultDisplayed = true;
-      			 break;	
-      		 }
+            var inEventDef = presentInEventDef;
+            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
+             this.renderPrintableFormDef(formDef, pageBreak);
+                 defaultDisplayed = true;
+             break;  
+           }
           }
           /*if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" ||
           formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
@@ -356,6 +356,7 @@ function StudyRenderer(json) {
       
       var repeatNumber = 1;
       var repeating = false;
+      var manditory = false;
       var repeatMax = undefined; 
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
@@ -363,6 +364,7 @@ function StudyRenderer(json) {
      if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey])
       {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
+        mandatory = app_itemGroupMap[itemOID].mandatory;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
@@ -379,21 +381,13 @@ function StudyRenderer(json) {
         this.renderString += sectionSubTitle != '' ? "<div class='section-info'>"+app_sectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>" : "";
         this.renderString += sectionInstructions ? "<div class='section-info'>"+app_sectionInstructions+"&nbsp;"+sectionInstructions+"</div>" : "";
         this.renderString += sectionPageNumber ? "<div class='section-info'>"+app_sectionPage+"&nbsp;"+sectionPageNumber+"</div>" : "";
-        
-        
         isFirstSection = false;
       }
-      if (repeating == false && itemHeader !== undefined ) {
-        this.renderString += "<div class='header-title'>"+itemHeader+"</div>";
-      }
-      if (repeating == false && itemSubHeader !== undefined) {
-        this.renderString += "<div class='header-title'>"+itemSubHeader+"</div>";
-      }
-      
       this.renderString += "<div class='vertical-spacer-20px'></div>";
       
       debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
-      
+     
+      // inpect the next ItemDef for look-ahead purposes.
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
       if (i+1 < orderedItems.length) {
@@ -401,11 +395,11 @@ function StudyRenderer(json) {
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         var nextItemOID = nextItemDef["@OID"];
-         nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
+        nextGroupOID = app_itemGroupMap[nextItemOID].itemGroupKey;
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
-      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
@@ -419,7 +413,7 @@ function StudyRenderer(json) {
         }
       
         if(nextGroupOID!=currentItemGroupOID ){
-        	lastItemInRepeatingRow = true;
+          lastItemInRepeatingRow = true;
         }
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
@@ -466,10 +460,12 @@ function StudyRenderer(json) {
       // standard non-repeating items
       else if (repeating == false) { 
         if (columnNumber === undefined || columnNumber == 1) {
+          this.renderString += itemHeader !== undefined ? "<div class='header-title'>"+itemHeader+"</div>" : "";
+          this.renderString += itemSubHeader !== undefined ? "<div class='header-title'>"+itemSubHeader+"</div>" : "";
           this.renderString += "<table class='item-row'>";
         }
         this.renderString += itemDefRenderer.renderPrintableItem(repeating);
-        if (columns == columnNumber || nextColumnNumber == 1) {
+        if (columns == columnNumber || nextColumnNumber == 1 || i+1 == orderedItems.length) {
           this.renderString += "</table>";
         }
       }

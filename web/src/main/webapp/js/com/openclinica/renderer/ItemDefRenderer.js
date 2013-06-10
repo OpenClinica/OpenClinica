@@ -1,6 +1,7 @@
-function ItemDefRenderer(json, itemDetails) {
+function ItemDefRenderer(json, itemDetails, mandatory) {
   this.json = json;
   this.itemDetails = itemDetails;
+  this.mandatory = mandatory;
   this.name = this.itemDetails["OpenClinica:LeftItemText"];
   this.rightItemText = this.itemDetails["OpenClinica:RightItemText"];
   this.dataType = json["@DataType"];
@@ -23,7 +24,7 @@ function ItemDefRenderer(json, itemDetails) {
     var s = RenderUtil.render(RenderUtil.get(template), 
        {itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, unitLabel:this.unitLabel, 
         optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], columns:this.columns,
-        responseLayout:this.responseLayout, isInline: this.isInline});
+        responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory});
     return s[0].outerHTML;
   }
   
