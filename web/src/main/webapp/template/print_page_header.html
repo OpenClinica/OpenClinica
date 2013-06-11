@@ -22,9 +22,7 @@
   <div class='right-header'>
     <div class='header-text'>{{html app_studySubjectIDLabel}}:___________</div>  
     
-    {{if showPersonID == 'true' && (app_personIDRequired != 'not_used' || app_personIDRequired != 'not used')}}
-      <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
-    {{else showPersonID == 'true' && (app_personIDRequired != 'not_used' || app_personIDRequired != 'not used')}}
+    {{if showPersonID == 'true' && app_personIDRequired != 'not_used' && app_personIDRequired != 'not used'}}
       <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
     {{/if}}
     
