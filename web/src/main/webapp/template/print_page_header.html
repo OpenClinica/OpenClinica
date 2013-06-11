@@ -21,12 +21,11 @@
 <td>
   <div class='right-header'>
     <div class='header-text'>{{html app_studySubjectIDLabel}}:___________</div>  
-    {{if showPersonID == true && personIDRequired == 'required'}}
-    <div class='header-text'>{{html app_eventLocationLabel}}:___________</div>  
-    {{else showPersonID == true && personIDRequired == 'optional'}}
-    <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
+    
+    {{if showPersonID == 'true' && app_personIDRequired != 'not_used' && app_personIDRequired != 'not used'}}
+      <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
     {{/if}}
-    <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
+    
     {{if app_secondaryLabelViewable == 'true'}}
       <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: ___________________</div>  
     {{/if}}
@@ -35,14 +34,10 @@
     {{else collectSubjectDOB == 2}}
       <div class='header-text'>{{html app_studySubjectBirthYearLabel}}:___________</div>  
     {{/if}}
-    {{if interviewerNameRequired == true}}
-      <div class='header-text'>Interviewer:___________</div>  
-    {{else interviewerNameRequired == false}}
-      <div class='header-text'>Interviewer:___________</div>  
+    {{if app_interviewerNameRequired != "not_used"}}
+      <div class='header-text'>{{html app_interviewerLabel}}:___________</div>  
     {{/if}}
-    {{if interviewDateRequired == true}}
-      <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
-    {{else interviewDateRequired == false}}
+    {{if app_interviewDateRequired != "not_used"}}
       <div class='header-text'>{{html app_interviewDateLabel}}:___________</div>  
     {{/if}}
   </div>

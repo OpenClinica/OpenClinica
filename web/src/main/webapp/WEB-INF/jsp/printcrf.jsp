@@ -27,6 +27,7 @@
   var app_eventLocationLabel = '<fmt:message key="event_location" bundle="${resword}"/>'; 
   var app_eventNameLabel = '<fmt:message key="event_name" bundle="${resword}"/>'; 
   var app_personIDLabel = '<fmt:message key="person_ID" bundle="${resword}"/>'; 
+  var app_interviewerLabel = '<fmt:message key="interviewer" bundle="${resword}"/>'; 
   var app_interviewDateLabel = '<fmt:message key="interview_date" bundle="${resword}"/>'; 
   var app_secondaryLabel = '<fmt:message key="secondary_label" bundle="${resword}"/>'; 
   var app_studySubjectDOBLabel = '<fmt:message key="study_subject_dob" bundle="${resword}"/>'; 
