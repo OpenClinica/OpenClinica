@@ -3,14 +3,13 @@
   <table border="0">
   <tr>
   <td valign='top'> 
-  <span class='item_def_number'>{{html itemNumber}}</span>
-  <span class='item_def_title'>{{html name}}</span>
+    <span class='item_def_number'>{{html itemNumber}}</span>
+    <span class='item_def_title'>{{html name}} {{if mandatory == true}} * {{/if}}</span>
   </td>
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td td valign="top">  
     <input type='text'/> 
-    {{if mandatory == true}} * {{/if}}
   </td>
   {{else responseType == 'radio'}}
   <td valign="top">
@@ -22,7 +21,6 @@
     </div>
   </div>
   </td>
-  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
   {{else responseType == 'single-select'}}
   <td valign="top">
   <div class='item_def_control ${isInline}'> 
@@ -33,7 +31,6 @@
     </div>
   </div>
   </td>
-  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
   <td valign='top'>
   <div class='item_def_control ${isInline}'> 
@@ -44,11 +41,9 @@
     </div>
   </div>
   </td>
-  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
   {{else responseType == 'textarea'}}
   <td>
  <span><textarea cols="40" rows="5"></textarea></span>
- {{if mandatory == true}} * {{/if}}
   </td>
   {{else}}
     [item]

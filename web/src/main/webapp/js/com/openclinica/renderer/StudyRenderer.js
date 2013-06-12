@@ -461,7 +461,7 @@ function StudyRenderer(json) {
           repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'><table>" + itemNameRow + optionsRow + "</table></td>";
         }
         else {
-          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + "</td>";
+          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + (mandatory == true ? " *" : "") + "</td>";
         }
          
         // in last item in repeating group
