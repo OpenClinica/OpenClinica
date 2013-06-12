@@ -211,6 +211,7 @@ div.inline {
 }
 
 .repeating_item_group {
+  vertical-align:top;
 }
 .repeating_item_option_names {
   font-weight: bold;
