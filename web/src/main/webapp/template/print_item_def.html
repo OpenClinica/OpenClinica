@@ -2,13 +2,16 @@
 <div class='item_def_wrapper'>
   <table border="0">
   <tr>
-  <td> 
+  <td valign='top'> 
   <span class='item_def_number'>{{html itemNumber}}</span>
   <span class='item_def_title'>{{html name}}</span>
   </td>
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-  <td>  <input type='text'/> </td>
+  <td>  
+    <input type='text'/> 
+    {{if mandatory == true}} * {{/if}}
+  </td>
   {{else responseType == 'radio'}}
   <td>
   <div class='item_def_control ${isInline}'> 
@@ -19,8 +22,9 @@
     </div>
   </div>
   </td>
+  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
   {{else responseType == 'single-select'}}
-  <td>
+  <td valign="top">
   <div class='item_def_control ${isInline}'> 
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
@@ -29,8 +33,9 @@
     </div>
   </div>
   </td>
+  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
-  <td>
+  <td valign='top'>
   <div class='item_def_control ${isInline}'> 
     <div class='checkbox_control ${isInline}'>
       {{each multiSelectOptionNames}}
@@ -39,15 +44,16 @@
     </div>
   </div>
   </td>
+  <td valign="top" width="5">{{if mandatory == true}} * {{/if}}</td>
   {{else responseType == 'textarea'}}
   <td>
  <span><textarea cols="40" rows="5"></textarea></span>
+ {{if mandatory == true}} * {{/if}}
   </td>
   {{else}}
     [item]
   {{/if}}
-  <td>
-  {{if mandatory == true}} * {{/if}}
+  <td align="left">
   <span class="item_def_format_label">{{html unitLabel}}</span> 
   </td>
   <td>
