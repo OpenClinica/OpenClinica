@@ -1,7 +1,7 @@
 <td class='repeating_item_group'>
   <table border="0">
   <tr>
-  <td>
+  <td valign="top">
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
    <input type='text' style='margin-left:3px'/>
@@ -34,10 +34,8 @@
   {{else}}
     [item]
   {{/if}}
-   </td> 
-   <td>
-  {{if mandatory == true}} * {{/if}}
-  <span class="item_def_format_label">{{html unitLabel}}</span> 
+  </td>
+  <td valign="top" width="5"><span class="item_def_format_label">{{html unitLabel}}</span></td>
   </td>
   </tr>
   </table> 
