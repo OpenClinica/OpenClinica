@@ -1205,8 +1205,20 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 idef.setSignificantDigits(sig > 0 ? sig : MetadataUnit.getSignificantDigits(datatype, codes.keySet(), hasCode));
                 itemDefs.add(idef);
+            }//This piece of code is added to show multiselect ref tag in cases where item response set has been changed between versions
+            else{
+            	  for(ItemDefBean itemdefBean:itemDefs){
+            		  if(itemdefBean.getOid().equals(itOID)){
+            			  itemdefBean.setCodeListOID(hasCode ? "CL_" + rsId : "");
+                if (hasMultiSelect) {
+                    ElementRefBean multiSelectListRef = new ElementRefBean();
+                    multiSelectListRef.setElementDefOID("MSL_" + rsId);
+                    itemdefBean.setMultiSelectListRef(multiSelectListRef);
+                }
+            	  }
+            	  }
             }
-
+            	  
             if (hasCode && !clset.contains(rsId)) {
                 clset.add(rsId);
                 CodeListBean cl = new CodeListBean();
@@ -1673,6 +1685,12 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
     }
+    /**
+     * Used in Global CRFs
+     * @param metadata
+     * @param cvIds
+     * @param odmVersion
+     */
 private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, String odmVersion)
 
 {
