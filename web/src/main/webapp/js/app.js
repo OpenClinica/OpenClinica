@@ -47,7 +47,6 @@ $(document).ready(function() {
   if (INITIALIZED == false) {
     INITIALIZED = true;
     RenderUtil.loadTemplates(app_templateNames, function() {
-      Backbone.history.start();
       getPrintableContent();
     });
   }
