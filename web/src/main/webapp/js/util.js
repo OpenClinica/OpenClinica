@@ -7,6 +7,26 @@ var debug = function (logText, logLevel) {
   }
 }
 
+/* util_ensureArray(jsonObjectToTest)
+ * A kind of factory function for the different study
+ * rendering scenarios.
+ * @param jsonObjectToTest: The passed in json object
+ * @return a json object, json array, or undefined
+ */ 
+function util_ensureArray(jsonObjectToTest) {
+  if (jsonObjectToTest == undefined) { 
+    return jsonObjectToTest;	
+  }
+  if (jsonObjectToTest[0] == undefined) { 
+    var jsonArray = new Array();
+    jsonArray.push(jsonObjectToTest);
+  }
+  else {
+	jsonArray = jsonObjectToTest;
+  }
+  return jsonArray;
+}
+
 function checkRegexp(s, regexp) {
   return regexp.test(s);
 }

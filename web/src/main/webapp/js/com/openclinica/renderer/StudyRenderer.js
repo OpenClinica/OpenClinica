@@ -88,31 +88,18 @@ function StudyRenderer(json) {
       var formRef = studyEventFormRefs[i];
       var formFound = false;
       for (var j=0;j< app_formDefs.length&&!formFound;j++) {
-    	  if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
-          
-    	  var formDef = app_formDefs[j];
-          var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
-          if(presentInEventDef.length!=undefined)
-          {
-        	 for(var l=0;l<presentInEventDef.length&&!formFound;l++){
-        	      var inEventDef = presentInEventDef[l];
-        		   	if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
-        	      		str += "<div>" + formDef["@Name"] + "</div>";
-        	      		formFound = true;
-        	      	}
-        	 	}
+        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+          var formDef = app_formDefs[j];
+          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
+            var inEventDef = presentInEventDef[l];
+            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
+              str += "<div>" + formDef["@Name"] + "</div>";
+              formFound = true;
+            }
           }
-          else{
-        	  var inEventDef = presentInEventDef;
-        	  if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
-  	      		str += "<div>" + formDef["@Name"] + "</div>";
-  	      		formFound = true;
-  	      	}
-        	  
-        	  
-          }
+        }
       }
-    }
     }
     str += "<div class='investigator-text'>";
     str += app_investigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -142,71 +129,39 @@ function StudyRenderer(json) {
       var formDef = app_formDefs[i];
       var formVersionPrinted = false;
       
-      var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
-      if(presentInEventDef.length!=undefined)
-      {
-    	  var initEventCNTR = 0;
-    	 
-       for(var l=0;l<presentInEventDef.length;l++){
-    	      formFound = false;
-    	      var inEventDef = presentInEventDef[l];
-    		 
-         if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-    			  if(!formVersionPrinted)str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-    		      formVersionPrinted = true;
-    		
-    		      for (var j=initEventCNTR;j< app_studyEventDefs.length&&!formFound;j++) {
-                  var eventDef = app_studyEventDefs[j];
-    		         
-                  if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-                  {
-                      str += "<td style='text-align:center'>X</td>";
-                      formFound = true; 
-    		        		  initEventCNTR = j+1 ;
-    		        		 
-                  }
-    		          if(!formFound) {
-                    str += "<td></td>";
-                  }
-                }
-    		      if(!formFound) {
-  		            str += "<td></td>";
-  		          } 
-    		 }
-    	 }
-    	 if(initEventCNTR<app_studyEventDefs.length && formVersionPrinted)
-    		 for(var c = initEventCNTR;c< app_studyEventDefs.length;c++){
-    			 str += "<td></td>";
-    		 }
-    	  
-      }
-      else{
-        var inEventDef = presentInEventDef;
-   	
-	          
-   		 if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No"){
-   			if(!formVersionPrinted)  str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
-   			formVersionPrinted = true;
-   		
-   			for (var j=0;j< app_studyEventDefs.length;j++) {
-  	          var eventDef = app_studyEventDefs[j];	
-  	        formFound = false;
-              if(eventDef["@OID"]==inEventDef["@StudyEventOID"])
-              {
-                  str += "<td style='text-align:center'>X</td>";
-                  formFound = true; 
-              }
-		          else {
-                str += "<td></td>";
-              }
+      var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+      var initEventCNTR = 0;
+      for (var l=0;l<presentInEventDef.length;l++) {
+        formFound = false;
+        var inEventDef = presentInEventDef[l];
+         
+        if (inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No") {
+          if(!formVersionPrinted) str +="<tr><td style='padding:10px'>" + formDef["@Name"] + "</td>";
+          formVersionPrinted = true;
+        
+          for (var j=initEventCNTR;j< app_studyEventDefs.length&&!formFound;j++) {
+            var eventDef = app_studyEventDefs[j];
+            if(eventDef["@OID"]==inEventDef["@StudyEventOID"]) {
+              str += "<td style='text-align:center'>X</td>";
+              formFound = true; 
+              initEventCNTR = j+1;
             }
-   		
-     }
-   		 
+            if(!formFound) {
+              str += "<td></td>";
+            }
+          }
+          if(!formFound) {
+            str += "<td></td>";
+          } 
+        }
       }
-     str += "</tr>";
+      if (initEventCNTR < app_studyEventDefs.length && formVersionPrinted) {
+        for(var c = initEventCNTR; c < app_studyEventDefs.length;c++){
+          str += "<td></td>";
+        }
+      }
+      str += "</tr>";
     }
-    
     str += "</table>";
     return str;
   }
@@ -232,35 +187,15 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length && !defaultDisplayed;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
-          var presentInEventDef = formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"];
-        
-          if(presentInEventDef.length!=undefined)
-          {
-          
-            
-            for(var l=0;l<presentInEventDef.length;l++){
-              var inEventDef = presentInEventDef[l];
-              if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-                this.renderPrintableFormDef(formDef, pageBreak);
-                    defaultDisplayed = true;
-                break;  
-              }
-              }
+          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+          for(var l=0;l<presentInEventDef.length;l++){
+            var inEventDef = presentInEventDef[l];
+            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]) {
+              this.renderPrintableFormDef(formDef, pageBreak);
+              defaultDisplayed = true;
+              break;  
+            }
           }
-          else{
-            var inEventDef = presentInEventDef;
-            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]){
-             this.renderPrintableFormDef(formDef, pageBreak);
-                 defaultDisplayed = true;
-             break;  
-           }
-          }
-          /*if (formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@IsDefaultVersion"] != "Yes" ||
-          formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]["@HideCRF"] != "No") {
-            continue;
-          }
-          this.renderPrintableFormDef(formDef, pageBreak);
-          break;*/
         }
       }
     }
@@ -487,7 +422,6 @@ function StudyRenderer(json) {
           this.renderString += "</table>";
         }
       }
-      
       previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;

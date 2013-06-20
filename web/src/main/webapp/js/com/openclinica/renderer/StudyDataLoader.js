@@ -66,25 +66,12 @@ function StudyDataLoader(study) {
    */
   this.loadCodeLists = function() {
     app_codeLists = {};
-    if (this.study["MetaDataVersion"]["CodeList"] == undefined) {
-      return; 
-    }
-    var codeLists = this.study["MetaDataVersion"]["CodeList"];
     debug("loading code lists", util_logDebug );
-  if(!codeLists.length)
-    {
-    var codeListKey = codeLists["@OID"]; 
-      var currentCodeList = [];
-      var codeListItems = codeLists["CodeListItem"];
-      
-      for (var j=0;j< codeListItems.length;j++) {
-        var currentCodeListItem = {};
-        currentCodeListItem.id = codeListItems[j]["@CodedValue"]; 
-        currentCodeListItem.label = codeListItems[j]["Decode"]["TranslatedText"]; 
-        currentCodeList.push(currentCodeListItem);
-      }
-      app_codeLists[codeListKey] = currentCodeList;
+    var codeLists = util_ensureArray(this.study["MetaDataVersion"]["CodeList"]);
+    if (codeLists == undefined) { 
+      return;	
     }
+    
     for (var i=0;i< codeLists.length;i++) {
       var codeListKey = codeLists[i]["@OID"]; 
       var currentCodeList = [];
@@ -106,24 +93,12 @@ function StudyDataLoader(study) {
    */
   this.loadMultiSelectLists = function() {
     app_multiSelectLists = {};
-    if (this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"] == undefined) {
-      return; 
-    }
-    var multiSelectLists = this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"];
     debug("loading multi select lists", util_logDebug );
-   if(!multiSelectLists.length){
-     var multiSelectListKey = multiSelectLists["@ID"]; 
-        var currentMultiSelectList = [];
-        var multiSelectListItems = multiSelectLists["OpenClinica:MultiSelectListItem"];
-        for (var j=0;j< multiSelectListItems.length;j++) {
-          var currentMultiSelectListItem = {};
-          currentMultiSelectListItem.id = multiSelectListItems[j]["@CodedOptionValue"]; 
-          currentMultiSelectListItem.label = multiSelectListItems[j]["Decode"]["TranslatedText"]; 
-          currentMultiSelectList.push(currentMultiSelectListItem);
-        }
-        app_multiSelectLists[multiSelectListKey] = currentMultiSelectList;
-   }
-   else{
+    var multiSelectLists = util_ensureArray(this.study["MetaDataVersion"]["OpenClinica:MultiSelectList"]);
+    if (multiSelectLists == undefined) { 
+      return;	
+    }
+  
     for (var i=0;i< multiSelectLists.length;i++) {
       var multiSelectListKey = multiSelectLists[i]["@ID"]; 
       var currentMultiSelectList = [];
@@ -137,209 +112,69 @@ function StudyDataLoader(study) {
       app_multiSelectLists[multiSelectListKey] = currentMultiSelectList;
     }
   }
-  }
   
   
- /* loadItemGroupDefs(formDef)
-  * Associate all Items with their ItemGroups
-  */  
+  
+  /* loadItemGroupDefs(formDef)
+   * Associate all Items with their ItemGroups
+   */  
   this.loadItemGroupDefs = function(formDef) {
-    var itemGroupDefs = this.study["MetaDataVersion"]["ItemGroupDef"];
     debug("loading item groups", util_logDebug );
     app_itemGroupDefs = {};
     app_itemGroupMap = {};
-    
-    if(!itemGroupDefs.length){
-      var itemGroupDef = itemGroupDefs;
-        var itemGroupKey = itemGroupDef["@OID"]; 
-        var itemGroupName = itemGroupDef["@Name"]; 
-        var repeatNumber = 1; 
-        var repeatMax = 1; 
-        var groupHeader = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupHeader"];
-        
-        if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
-          var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
-        
-          for (var j=0;j< presentInForm.length;j++) {
-            if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
-               repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
-               repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
-               var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-               debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
-               var currentItemGroup = {};
-               currentItemGroup.repeatNumber = repeatNumber;
-               currentItemGroup.repeatMax = repeatMax;
-               currentItemGroup.repeating = repeating;
-               currentItemGroup.name = itemGroupName;
-               currentItemGroup.groupHeader = groupHeader;
-               app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-               var itemGroupLength = itemGroupDef["ItemRef"].length;
-               if(!itemGroupLength){
-                 var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
-                 var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
-                 var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"]["@Mandatory"]);
-                 var currentItem = {};
-                 currentItem.orderNumber = orderNumber;
-                 currentItem.mandatory = mandatory;
-                 currentItem.itemGroupKey = itemGroupKey;
-                 currentItem.itemGroupLength = 1;
-                 app_itemGroupMap[itemKey] = currentItem;
-               } 
-               else{
-                for (var j=0;j< itemGroupLength;j++) {
-                  var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-                  var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
-                  var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"][j]["@Mandatory"]);
-                  var currentItem = {};
-                  currentItem.mandatory = mandatory;
-                  currentItem.orderNumber = orderNumber;
-                  currentItem.itemGroupKey = itemGroupKey;
-                  currentItem.itemGroupLength = itemGroupLength;
-                  app_itemGroupMap[itemKey] = currentItem;
-                  debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
-                }
-              }
-                break;
-            }
-          }  
-    }else {
-        repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-        repeatMax =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"];
-        var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-        debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
-        var currentItemGroup = {};
-        currentItemGroup.repeatNumber = repeatNumber;
-        currentItemGroup.repeatMax = repeatMax;
-        currentItemGroup.repeating = repeating;
-        currentItemGroup.name = itemGroupName;
-        currentItemGroup.groupHeader = groupHeader;
-        app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-        var itemGroupLength = itemGroupDef["ItemRef"].length;
-       if(!itemGroupLength){
-         var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
-         var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
-         var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"]["@Mandatory"]);
-         var currentItem = {};
-         currentItem.orderNumber = orderNumber;
-         currentItem.mandatory = mandatory;
-         currentItem.itemGroupKey = itemGroupKey;
-         currentItem.itemGroupLength = 1;
-         app_itemGroupMap[itemKey] = currentItem;
-       } 
-       else{
-        for (var j=0;j< itemGroupLength;j++) {
-          var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-          var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
-          var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"][j]["@Mandatory"]);
-          var currentItem = {};
-          currentItem.orderNumber = orderNumber;
-          currentItem.mandatory = mandatory;
-          currentItem.itemGroupKey = itemGroupKey;
-          currentItem.itemGroupLength = itemGroupLength;
-          app_itemGroupMap[itemKey] = currentItem;
-          debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
-        }
-      }
-      }
+    var itemGroupDefs = util_ensureArray(this.study["MetaDataVersion"]["ItemGroupDef"]);
+    if (itemGroupDefs == undefined) { 
+      return;	
     }
-    else
-      for (var i=0;i< itemGroupDefs.length;i++) {
+    
+    for (var i=0;i< itemGroupDefs.length;i++) {
       var itemGroupDef = itemGroupDefs[i];
       var itemGroupKey = itemGroupDef["@OID"]; 
       var itemGroupName = itemGroupDef["@Name"]; 
       var repeatNumber = 1; 
       var repeatMax = 1; 
       var groupHeader = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupHeader"];
-      
-      if (itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"][1] != undefined) {
-        var presentInForm = itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"];
-      
-        for (var j=0;j< presentInForm.length;j++) {
-          if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
-           repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
-           repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
-           var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-           debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
-           var currentItemGroup = {};
-           currentItemGroup.repeatNumber = repeatNumber;
-           currentItemGroup.repeatMax = repeatMax;
-           currentItemGroup.repeating = repeating;
-           currentItemGroup.name = itemGroupName;
-           currentItemGroup.groupHeader = groupHeader;
-           app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-           var itemGroupLength = itemGroupDef["ItemRef"].length;
-          if(!itemGroupLength){
-            var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
-            var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
-            var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"]["@Mandatory"]);
+      var presentInForm = util_ensureArray(itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]);
+  
+      for (var j=0;j< presentInForm.length;j++) {
+        if (presentInForm[j]["@FormOID"] == formDef["@OID"]) {
+          repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
+          repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
+          var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
+          debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
+          var currentItemGroup = {};
+          currentItemGroup.repeatNumber = repeatNumber;
+          currentItemGroup.repeatMax = repeatMax;
+          currentItemGroup.repeating = repeating;
+          currentItemGroup.name = itemGroupName;
+          currentItemGroup.groupHeader = groupHeader;
+          app_itemGroupDefs[itemGroupKey] = currentItemGroup;
+          
+          var itemRefs = itemGroupDef["ItemRef"];
+          if (itemRefs[0] == undefined) { 
+            itemRefs = new Array();
+            itemRefs.push(itemGroupDef["ItemRef"]);
+          }
+            
+          for (var j=0;j<itemRefs.length;j++) {
+            var itemKey = itemRefs[j]["@ItemOID"]; 
+            var orderNumber = itemRefs[j]["@OrderNumber"]; 
+            var mandatory = ParseUtil.parseYesNo(itemRefs[j]["@Mandatory"]);
             var currentItem = {};
             currentItem.orderNumber = orderNumber;
-             currentItem.mandatory = mandatory;
-             currentItem.itemGroupKey = itemGroupKey;
-             currentItem.itemGroupLength = 1;
-             app_itemGroupMap[itemKey] = currentItem;
-          } 
-          else{
-           for (var j=0;j< itemGroupLength;j++) {
-             var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-             var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
-             var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"][j]["@Mandatory"]);
-             var currentItem = {};
-             currentItem.orderNumber = orderNumber;
-             currentItem.mandatory = mandatory;
-             currentItem.itemGroupKey = itemGroupKey;
-             currentItem.itemGroupLength = itemGroupLength;
-             app_itemGroupMap[itemKey] = currentItem;
-             debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
-           }
-         }
-           break;
+            currentItem.mandatory = mandatory;
+            currentItem.itemGroupKey = itemGroupKey;
+            currentItem.itemGroupLength = itemRefs.length;
+            app_itemGroupMap[itemKey] = currentItem;
+            debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemRefs.length + "]", util_logDebug);
           }
+          break;
         }
       }
-      else {
-        repeatNumber =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"];
-        repeatMax =  itemGroupDef["OpenClinica:ItemGroupDetails"]["OpenClinica:PresentInForm"]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"];
-        var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
-        debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
-        var currentItemGroup = {};
-        currentItemGroup.repeatNumber = repeatNumber;
-        currentItemGroup.repeatMax = repeatMax;
-        currentItemGroup.repeating = repeating;
-        currentItemGroup.name = itemGroupName;
-        currentItemGroup.groupHeader = groupHeader;
-        app_itemGroupDefs[itemGroupKey] = currentItemGroup;
-        var itemGroupLength = itemGroupDef["ItemRef"].length;
-       if(!itemGroupLength){
-         var itemKey = itemGroupDef["ItemRef"]["@ItemOID"];
-         var orderNumber = itemGroupDef["ItemRef"]["@OrderNumber"];
-         var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"]["@Mandatory"]);
-         var currentItem = {};
-         currentItem.orderNumber = orderNumber;
-         currentItem.mandatory = mandatory;
-         currentItem.itemGroupKey = itemGroupKey;
-         currentItem.itemGroupLength = 1;
-         currentItem.mandatory = mandatory;
-         app_itemGroupMap[itemKey] = currentItem;
-       } 
-       else{
-        for (var j=0;j< itemGroupLength;j++) {
-          var itemKey = itemGroupDef["ItemRef"][j]["@ItemOID"]; 
-          var orderNumber = itemGroupDef["ItemRef"][j]["@OrderNumber"]; 
-          var mandatory = ParseUtil.parseYesNo(itemGroupDef["ItemRef"][j]["@Mandatory"]);
-          var currentItem = {};
-          currentItem.orderNumber = orderNumber;
-          currentItem.mandatory = mandatory;
-          currentItem.itemGroupKey = itemGroupKey;
-          currentItem.itemGroupLength = itemGroupLength;
-          app_itemGroupMap[itemKey] = currentItem;
-          debug("Attaching " + itemKey + "[" + orderNumber + ", " + itemGroupLength + "]", util_logDebug);
-        }
-      }
-      }
-
     }
   }
+  
+  
   
   /* loadStudyEventDefs()
    * Load all StudyEvents
@@ -392,5 +227,4 @@ function StudyDataLoader(study) {
     this.loadStudyDetails();
   }
 
-  
 }
