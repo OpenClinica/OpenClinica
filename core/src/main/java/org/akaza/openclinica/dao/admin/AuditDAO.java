@@ -397,7 +397,7 @@ public class AuditDAO extends EntityDAO {
         while (it.hasNext()) {
             AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
             //3 6 12 32
-            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 || eb.getAuditEventTypeId()==32){
+            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 ){
                 eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
                 eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
             }
@@ -421,7 +421,7 @@ public class AuditDAO extends EntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
-            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 || eb.getAuditEventTypeId()==32){
+            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12){
                 eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
                 eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
             }
