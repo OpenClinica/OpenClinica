@@ -12,16 +12,22 @@ import net.sf.json.JSONObject;
 
 public class ItemDefRenderer extends JSONRenderer{
 
-  private String OID;
-  private String name;
-  private String dataType;
-  private String itemNumber;
-  private boolean repeating;
-  private String unitLabel;
-  private String responseType;
-  private String codeListOID;
-  private int columns;
   private String template;
+  private JSONObject itemDetails;
+  private boolean mandatory;
+  private String name;
+  private String rightItemText;
+  private String dataType;
+  private String responseType;
+  private String responseLayout;
+  private boolean isInline;
+  private String OID;
+  private String itemName;
+  private String itemNumber;
+  private String unitLabel;
+  private String codeListOID;
+  private String multiSelectListOID;
+  private int columns;
   
   public ItemDefRenderer(JSON json, Configuration cfg, Map templateVars) {
     super(json, cfg, templateVars);
@@ -45,7 +51,6 @@ public class ItemDefRenderer extends JSONRenderer{
     dataType = itemDef.getString("@DataType");
     name = question.getString("OpenClinica:LeftItemText");
     responseType = question.getJSONObject("OpenClinica:ItemResponse").getString("@ResponseType");
-    repeating = question.has("@Repeating") ? ParseUtil.parseYesNo(question.getString("@Repeating")) : false;
     itemNumber = itemDef.getJSONObject("Question").has("@OpenClinica:QuestionNumber") ? itemDef.getJSONObject("Question").getString("@OpenClinica:QuestionNumber") + "." : "";
     unitLabel = itemDef.has("MeasurementUnitRef") ? StudyRenderer.appBasicDefinitions.get(itemDef.getJSONObject("MeasurementUnitRef").getString("@MeasurementUnitOID")) : ""; 
     codeListOID = itemDef.has("CodeListRef") ? itemDef.getJSONObject("CodeListRef").getString("@CodeListOID") : "";
@@ -89,13 +94,6 @@ public class ItemDefRenderer extends JSONRenderer{
   }
   public void setName(String name) {
     this.name = name;
-  }
-
-  public boolean isRepeating() {
-    return repeating;
-  }
-  public void setRepeating(boolean repeating) {
-    this.repeating = repeating;
   }
 
   public String getDataType() {
