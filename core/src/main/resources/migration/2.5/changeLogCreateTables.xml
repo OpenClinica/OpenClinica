@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="pgawade (generated)" id="1235684743487-0">
-   		<preConditions onFail="MARK_RAN">
-   			<dbms type="postgresql" />
-   		</preConditions>
-		<sql splitStatements="false">
-			DROP LANGUAGE IF EXISTS plpgsql;
-			CREATE PROCEDURAL LANGUAGE plpgsql;
-			SET check_function_bodies = false;
-			SET client_min_messages = error;
-			SET default_tablespace = '';
-			SET default_with_oids = true;
-			SET search_path = public, pg_catalog;
-			COMMENT ON SCHEMA public IS 'Standard public schema';
-		</sql>			
-    </changeSet> 
+  
     <changeSet author="pgawade (generated)" id="1235684743487-1">
         <createTable tableName="archived_dataset_file">
             <column autoIncrement="true" name="archived_dataset_file_id" type="int">

@@ -935,7 +935,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                 + " AND CV.CRF_VERSION_ID is not null AND CV.CRF_ID ="
                                 + crfId
                                 + " ) "
-                                + " ORDER BY I.OID DESC LIMIT 1) ";
+                                + " ORDER BY I.OC_ID DESC LIMIT 1) ";
 
                         String selectCorrectItemQueryOracle =
                             " (SELECT MAX(I.ITEM_ID) FROM ITEM I LEFT OUTER JOIN ITEM_FORM_METADATA IFM ON I.ITEM_Id = IFM.ITEM_ID LEFT OUTER JOIN CRF_VERSION CV ON IFM.CRF_VERSION_ID = CV.CRF_VERSION_ID  WHERE "
@@ -1104,7 +1104,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + itemName
                                     + "' "
                                     + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                    + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ",0)";
+                                    + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OC_OID DESC LIMIT 1)," + k + ",0)";
                         }
 
                         queries.add(sqlGroupLabel);

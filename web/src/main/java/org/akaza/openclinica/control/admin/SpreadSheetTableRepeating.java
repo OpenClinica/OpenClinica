@@ -1313,7 +1313,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + " AND CV.CRF_VERSION_ID is not null AND CV.CRF_ID ="
                                 + crfId
                                 + " ) "
-                                + " ORDER BY I.OID DESC LIMIT 1) ";
+                                + " ORDER BY I.OC_OID DESC LIMIT 1) ";
 
                         String selectCorrectItemQueryOracle =
                             " (SELECT MAX(I.ITEM_ID) FROM ITEM I LEFT OUTER JOIN ITEM_FORM_METADATA IFM ON I.ITEM_Id = IFM.ITEM_ID LEFT OUTER JOIN CRF_VERSION CV ON IFM.CRF_VERSION_ID = CV.CRF_VERSION_ID  WHERE "
@@ -1563,7 +1563,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
                                             + crfId
-                                            + " ORDER BY OID DESC LIMIT 1),'"
+                                            + " LIMIT 1),'"
                                             + igMeta.getHeader()
                                             + "', '"
                                             + igMeta.getSubheader()
@@ -1596,7 +1596,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ", "
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OC_OID DESC LIMIT 1)," + k + ", "
                                             + igMeta.isShowGroup() + ", " + igMeta.isRepeatingGroup() + ")";
 
                                 }
@@ -1625,7 +1625,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     "INSERT INTO ITEM_GROUP_METADATA (item_group_id,header,subheader, layout, repeat_number, repeat_max,"
                                         + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId
-                                        + " ORDER BY OID DESC LIMIT 1),'" + "" + "', '" + "" + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,"
+                                        + "  LIMIT 1),'" + "" + "', '" + "" + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,"
                                         + versionIdString + "," + selectCorrectItemQueryPostgres + "," + k + ", false)";
 
                             }
