@@ -1297,7 +1297,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ViewItemAuditLogServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
-       
+       <servlet>
+        <servlet-name>ViewStudySubjectjsp</servlet-name>
+        <display-name>viewStudySubjectjsp</display-name>
+        <jsp-file>/WEB-INF/jsp/manageStudy/viewStudySubject.jsp</jsp-file>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -2132,7 +2136,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>UploadFileServlet</servlet-name>
         <url-pattern>/UploadFile</url-pattern>
     </servlet-mapping>
-   
+    <servlet-mapping>
+        <servlet-name>ViewStudySubjectjsp</servlet-name>
+        <url-pattern>/ViewStudySubject1</url-pattern>
+    </servlet-mapping>
     <!-- just for testing purposes -->
     <servlet-mapping>
         <servlet-name>ManageStudyServlet</servlet-name>
