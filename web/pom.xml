@@ -207,12 +207,13 @@
 			<artifactId>jstl</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
-			<scope>provided</scope>
-		</dependency>
+	<dependency>
+	<groupId>javax.servlet</groupId>
+	<artifactId>javax.servlet-api</artifactId>
+	<version>3.1.0</version>
+	<scope>provided</scope>
+</dependency>
+            
 		<dependency> 
  			<groupId>javax.servlet.jsp</groupId> 
  			<artifactId>jsp-api</artifactId> 
@@ -252,11 +253,10 @@
 		</dependency>
 		<!-- Postgres JDBC driver -->
 		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>8.1-404.jdbc3</version>
-			<scope>runtime</scope>
-		</dependency>
+	<groupId>postgresql</groupId>
+	<artifactId>postgresql</artifactId>
+	<version>9.1-901.jdbc4</version>
+</dependency>
         <!-- Oracle JDBC driver -->
         <dependency>
             <groupId>oracle.ojdbc14</groupId>
@@ -288,8 +288,9 @@
 <dependency>
 	<groupId>xom</groupId>
 	<artifactId>xom</artifactId>
-	<version>1.0</version>
+	<version>1.2.5</version>
 </dependency>
+            
             <dependency>
 	<groupId>net.sf.ezmorph</groupId>
 	<artifactId>ezmorph</artifactId>
