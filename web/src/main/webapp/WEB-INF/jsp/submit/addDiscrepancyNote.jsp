@@ -138,7 +138,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <input type="hidden" name="field" value="<c:out value="${discrepancyNote.field}"/>">
 <input type="hidden" name="writeToDB" value="<c:out value="${writeToDB}" />">
 <input type="hidden" name="monitor" value="<c:out value="${monitor}" />">
-<input type="hidden" name="new" value="<c:out value="${new}" />">
+
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">
 <input type="hidden" name="eventCRFId" value="<c:out value="${eventCRFId}"/>">
 
