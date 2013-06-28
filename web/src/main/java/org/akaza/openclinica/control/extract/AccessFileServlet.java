@@ -104,7 +104,7 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
             // not needed anymore? tbh 10/2010
         }
 
-        logger.debug("just set content type: " + response.getContentType());
+      
         finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
         // }
         // finalTarget.setFileName(asdfBean.getWebPath());
