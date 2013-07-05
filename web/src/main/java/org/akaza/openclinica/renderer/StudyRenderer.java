@@ -34,7 +34,82 @@ public class StudyRenderer extends JSONRenderer{
   public StudyRenderer(JSON json, Configuration cfg, Map templateVars) {
     super(json, cfg, templateVars);
   }
- 
+  
+  
+  
+  
+  /* getSectionDetails(itemDef, formDef) 
+  * A convenience function to get the SectionDetails properties for an Item
+  public JSONObject getSectionDetails(JSONObject itemDetails, JSON formDef) {
+  
+    JSONObject sectionDetails = new JSONObject();              	
+    JSON sections;              	
+    if (formDef instanceof JSONArray ) {
+      //var sections = formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
+      sections = ((JSONArray)formDef).getJSONObject("OpenClinica:FormDetails").getJSONObject("OpenClinica:SectionDetails").getJSONObject("OpenClinica:Section");
+      for (int i=0;i< ((JSONArray)formDef).size();i++) {
+        if ( (((JSONArray)formDef).getJSONObject(i).getString("@SectionLabel")).equals(itemDetails.getString("OpenClinica:SectionLabel"))) {
+          return sections[i];
+          break;
+        }
+      }
+    }
+    else {
+      sectionDetails = ((JSONObject)formDef).getJSONObject("OpenClinica:FormDetails").getJSONObject("OpenClinica:SectionDetails").getJSONObject("OpenClinica:Section");
+    } 
+  
+    return sectionDetails; 
+  }
+  */ 
+  
+  
+  /* getSectionDetails(itemDef, formDef) 
+   * A convenience function to get the SectionDetails properties for an Item
+   this.getSectionDetails = function(itemDetails, formDef) {
+     if (formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"][1] != undefined) { 
+       var sections = formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
+       for (var i=0;i< sections.length;i++) {
+         if (sections[i]["@SectionLabel"] == itemDetails["OpenClinica:SectionLabel"]) {
+           return sections[i];
+         }
+       }
+     } 
+     return formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
+   }
+   
+   
+   this.getItemDetails = function(itemDef, formDef) {
+    if (itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
+      var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+      for (var i=0;i< itemPresentInForm.length;i++) {
+        if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
+           return itemPresentInForm[i]; 
+        }
+      }
+    }
+    return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
+  }
+   */ 
+  
+  
+  /* getItemDetails(itemDef, formDef) 
+  * A convenience function to get the ItemDetails properties for an Item
+  */ 
+  public JSONObject getItemDetails(JSONObject itemDef, JSONObject formDef) {
+    if (itemDef.getJSONObject("OpenClinica:ItemDetails").get("OpenClinica:PresentInForm") instanceof JSONArray) {
+      JSONArray itemPresentInForm = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:PresentInForm"); 
+      for (int i=0;i< itemPresentInForm.size();i++) {
+        if ( (((JSONObject)itemPresentInForm.get(i)).getString("@FormOID")).equals(formDef.getString("@OID"))) {
+          return (JSONObject)itemPresentInForm.get(i);
+        }
+      }
+      return null;
+    }
+    else {
+      return  itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONObject("OpenClinica:PresentInForm");
+    }
+  }
+    
   
   
   private void loadBasicDefinitions(JSON json) {
@@ -76,12 +151,12 @@ public class StudyRenderer extends JSONRenderer{
     for (int i=0;i< itemGroupDefs.size();i++) {
       JSONObject itemGroupDef = itemGroupDefs.getJSONObject(i);
       
-      Object itemRefs = itemGroupDef.get("ItemRef"); 
+      JSON itemRefs = (JSON)itemGroupDef.get("ItemRef"); 
       
       String itemGroupKey = itemGroupDef.getString("@OID");
       JSONObject itemGroupDetails = itemGroupDef.getJSONObject("OpenClinica:ItemGroupDetails"); 
      
-      Object presentInForm = itemGroupDetails.get("OpenClinica:PresentInForm"); 
+     Object presentInForm = itemGroupDetails.get("OpenClinica:PresentInForm"); 
       JSONObject itemGroupRepeat;
       if (presentInForm instanceof JSONArray ) {
         itemGroupRepeat = ((JSONArray)presentInForm).getJSONObject(i).getJSONObject("OpenClinica:ItemGroupRepeat");
@@ -91,6 +166,10 @@ public class StudyRenderer extends JSONRenderer{
       }
       
       int repeatNumber = itemGroupRepeat.getInt("@RepeatNumber");
+      
+      
+      
+      
       boolean repeating = ParseUtil.parseYesNo(itemGroupDef.getString("@Repeating"));
       System.out.println("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
       ItemGroup currentItemGroup = new ItemGroup(repeatNumber, repeating);
