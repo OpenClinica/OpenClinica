@@ -36,62 +36,6 @@ public class StudyRenderer extends JSONRenderer{
   }
   
   
-  
-  
-  /* getSectionDetails(itemDef, formDef) 
-  * A convenience function to get the SectionDetails properties for an Item
-  public JSONObject getSectionDetails(JSONObject itemDetails, JSON formDef) {
-  
-    JSONObject sectionDetails = new JSONObject();              	
-    JSON sections;              	
-    if (formDef instanceof JSONArray ) {
-      //var sections = formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
-      sections = ((JSONArray)formDef).getJSONObject("OpenClinica:FormDetails").getJSONObject("OpenClinica:SectionDetails").getJSONObject("OpenClinica:Section");
-      for (int i=0;i< ((JSONArray)formDef).size();i++) {
-        if ( (((JSONArray)formDef).getJSONObject(i).getString("@SectionLabel")).equals(itemDetails.getString("OpenClinica:SectionLabel"))) {
-          return sections[i];
-          break;
-        }
-      }
-    }
-    else {
-      sectionDetails = ((JSONObject)formDef).getJSONObject("OpenClinica:FormDetails").getJSONObject("OpenClinica:SectionDetails").getJSONObject("OpenClinica:Section");
-    } 
-  
-    return sectionDetails; 
-  }
-  */ 
-  
-  
-  /* getSectionDetails(itemDef, formDef) 
-   * A convenience function to get the SectionDetails properties for an Item
-   this.getSectionDetails = function(itemDetails, formDef) {
-     if (formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"][1] != undefined) { 
-       var sections = formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
-       for (var i=0;i< sections.length;i++) {
-         if (sections[i]["@SectionLabel"] == itemDetails["OpenClinica:SectionLabel"]) {
-           return sections[i];
-         }
-       }
-     } 
-     return formDef["OpenClinica:FormDetails"]["OpenClinica:SectionDetails"]["OpenClinica:Section"];
-   }
-   
-   
-   this.getItemDetails = function(itemDef, formDef) {
-    if (itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"][1] != undefined) { 
-      var itemPresentInForm = itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-      for (var i=0;i< itemPresentInForm.length;i++) {
-        if (itemPresentInForm[i]["@FormOID"] == formDef["@OID"]) {
-           return itemPresentInForm[i]; 
-        }
-      }
-    }
-    return itemDef["OpenClinica:ItemDetails"]["OpenClinica:ItemPresentInForm"];
-  }
-   */ 
-  
-  
   /* getItemDetails(itemDef, formDef) 
   * A convenience function to get the ItemDetails properties for an Item
   */ 
@@ -99,8 +43,8 @@ public class StudyRenderer extends JSONRenderer{
     if (itemDef.getJSONObject("OpenClinica:ItemDetails").get("OpenClinica:PresentInForm") instanceof JSONArray) {
       JSONArray itemPresentInForm = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:PresentInForm"); 
       for (int i=0;i< itemPresentInForm.size();i++) {
-        if ( (((JSONObject)itemPresentInForm.get(i)).getString("@FormOID")).equals(formDef.getString("@OID"))) {
-          return (JSONObject)itemPresentInForm.get(i);
+        if ((itemPresentInForm.getJSONObject(i).getString("@FormOID")).equals(formDef.getString("@OID"))) {
+          return itemPresentInForm.getJSONObject(i);
         }
       }
       return null;
@@ -109,7 +53,27 @@ public class StudyRenderer extends JSONRenderer{
       return  itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONObject("OpenClinica:PresentInForm");
     }
   }
-    
+  
+  
+  
+  /* getSectionDetails(itemDetails, formDef) 
+  * A convenience function to get the SectionDetails properties for an Item
+  */ 
+  public JSONObject getSectionDetails(JSONObject itemDetails, JSONObject formDef) {
+	Object sectionObject = formDef.getJSONObject("OpenClinica:FormDetails").getJSONObject("OpenClinica:SectionDetails").get("OpenClinica:Section");  
+    if (sectionObject instanceof JSONArray) {
+      JSONArray sections = (JSONArray)sectionObject; 
+      for (int i=0;i< sections.size();i++) {
+        if ( (sections.getJSONObject(i).getString("@SectionLabel").equals(itemDetails.getString("OpenClinica:SectionLabel")))) {
+          return sections.getJSONObject(i);
+        }
+      }
+      return null; 
+    }
+    else {
+      return (JSONObject)sectionObject;
+    }
+  }
   
   
   private void loadBasicDefinitions(JSON json) {

@@ -21,7 +21,7 @@ function StudyRenderer(json) {
   var pageHeaderRenderer;
   
   
- /* getSectionDetails(itemDef, formDef) 
+ /* getSectionDetails(itemDetails, formDef) 
   * A convenience function to get the SectionDetails properties for an Item
   */ 
   this.getSectionDetails = function(itemDetails, formDef) {
