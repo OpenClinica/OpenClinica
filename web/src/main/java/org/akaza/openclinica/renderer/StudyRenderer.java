@@ -16,13 +16,8 @@ public class StudyRenderer extends JSONRenderer{
 
 
   private String OID;
-  private String renderString = "";
-  private FormDefRenderer formDefRenderer;
-  private ItemDefRenderer itemDefRenderer;
-  private StudyDataLoader studyDataLoader;
-  private PageHeaderRenderer pageHeaderRenderer;
-  public  static Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
-  public  static Map<String, List> appCodeLists = new TreeMap<String,List>();
+  public  Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
+  public  Map<String, List> appCodeLists = new TreeMap<String,List>();
   private  Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
   private  Map<String, String> appItemGroupMap = new TreeMap<String,String>();
   
@@ -227,7 +222,7 @@ public class StudyRenderer extends JSONRenderer{
         repeatingRenderString = "<div class='blocking'>\n";
       }
       
-      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(json, cfg, templateVars);
+      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(json, cfg, templateVars, appItemGroupDefs, appItemGroupMap, appBasicDefinitions, appCodeLists);
       repeatingRenderString += itemDefRenderer.render(itemDef);
       if (columns == columnNumber) {
         repeatingRenderString += "</div>";
