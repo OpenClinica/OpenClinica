@@ -15,19 +15,33 @@ import net.sf.json.JSONArray;
 public class StudyRenderer extends JSONRenderer{
 
 
-  private String OID;
-  public  Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
-  public  Map<String, List> appCodeLists = new TreeMap<String,List>();
-  private  Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
-  private  Map<String, String> appItemGroupMap = new TreeMap<String,String>();
+  public String OID;
+  public JSONObject study;
+  public Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
+  public Map<String, List> appCodeLists = new TreeMap<String,List>();
+  public Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
+  public Map<String, String> appItemGroupMap = new TreeMap<String,String>();
+  
+  
   
   public static final int DEFAULT_MAX_REPEAT = 40; 
   public static final boolean NO_PAGE_BREAK = false; 
   public static final boolean PAGE_BREAK = true; 
   
+  public JSONObject app_studyDetails;
+  public String app_collectSubjectDOB;
+  public String app_personIDRequired;
+  public String app_showPersonID;
+  public String app_interviewerNameRequired;
+  public String app_interviewDateRequired;
+  public String app_secondaryLabelViewable;
+  public String app_eventLocationRequired;
+  public String app_secondaryIDs;
+  
   
   public StudyRenderer(JSON json, Configuration cfg, Map templateVars) {
     super(json, cfg, templateVars);
+    this.study = (JSONObject)json;
   }
   
   
@@ -71,36 +85,10 @@ public class StudyRenderer extends JSONRenderer{
   }
   
   
-  private void loadBasicDefinitions(JSON json) {
-    JSONObject jsonObject = (JSONObject)json;
-    JSONArray basicDefinitions = jsonObject.getJSONObject("BasicDefinitions").getJSONArray("MeasurementUnit");
-    System.out.println("loading basic definitions");
-    for (int i=0;i< basicDefinitions.size();i++) {
-      String key = basicDefinitions.getJSONObject(i).getString("@OID");
-      String value = basicDefinitions.getJSONObject(i).getString("@Name");
-      appBasicDefinitions.put(key, value);
-    }
-  }
+
   
   
-  private void loadCodeLists(JSON json) {
-    JSONObject jsonObject = (JSONObject)json;
-    JSONArray codeLists = jsonObject.getJSONObject("MetaDataVersion").getJSONArray("CodeList");
-    System.out.println("loading code lists");
-    for (int i=0;i< codeLists.size();i++) {
-      String codeListKey = codeLists.getJSONObject(i).getString("@OID");
-      List currentCodeList = new ArrayList();
-      JSONArray codeListItems = codeLists.getJSONObject(i).getJSONArray("CodeListItem");
-      for (int j=0;j< codeListItems.size();j++) {
-        JSONObject codeListItem = codeListItems.getJSONObject(j);
-        String id = codeListItem.getString("@CodedValue");
-        String label = codeListItem.getJSONObject("Decode").getString("TranslatedText");
-        CodeListItem currentCodeListItem = new CodeListItem(id,label);
-        currentCodeList.add(currentCodeListItem);
-      }
-      appCodeLists.put(codeListKey, currentCodeList);
-    }
-  }
+
   
   
   private void loadItemGroupDefs(JSON json) {
@@ -159,8 +147,8 @@ public class StudyRenderer extends JSONRenderer{
     
     JSONObject formDef = jsonObject.getJSONObject("MetaDataVersion").getJSONObject("FormDef");
     
-    loadBasicDefinitions(json);
-    loadCodeLists(json);
+    //loadBasicDefinitions(json);
+    //loadCodeLists(json);
     loadItemGroupDefs(json);
     
     // Get Form Wrapper
