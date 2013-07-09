@@ -19,8 +19,9 @@ public class StudyRenderer extends JSONRenderer{
   public JSONObject study;
   public Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
   public Map<String, List> appCodeLists = new TreeMap<String,List>();
+  public Map<String, List> appMultiSelectLists = new TreeMap<String,List>();
   public Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
-  public Map<String, String> appItemGroupMap = new TreeMap<String,String>();
+  public Map<String, Item> appItemGroupMap = new TreeMap<String,Item>();
   
   
   
@@ -87,53 +88,7 @@ public class StudyRenderer extends JSONRenderer{
   
 
   
-  
 
-  
-  
-  private void loadItemGroupDefs(JSON json) {
-    JSONObject jsonObject = (JSONObject)json;
-    JSONArray itemGroupDefs = jsonObject.getJSONObject("MetaDataVersion").getJSONArray("ItemGroupDef");
-    System.out.println("loading item groups");
-    for (int i=0;i< itemGroupDefs.size();i++) {
-      JSONObject itemGroupDef = itemGroupDefs.getJSONObject(i);
-      
-      JSON itemRefs = (JSON)itemGroupDef.get("ItemRef"); 
-      
-      String itemGroupKey = itemGroupDef.getString("@OID");
-      JSONObject itemGroupDetails = itemGroupDef.getJSONObject("OpenClinica:ItemGroupDetails"); 
-     
-     Object presentInForm = itemGroupDetails.get("OpenClinica:PresentInForm"); 
-      JSONObject itemGroupRepeat;
-      if (presentInForm instanceof JSONArray ) {
-        itemGroupRepeat = ((JSONArray)presentInForm).getJSONObject(i).getJSONObject("OpenClinica:ItemGroupRepeat");
-      }
-      else {
-        itemGroupRepeat = ((JSONObject)presentInForm).getJSONObject("OpenClinica:ItemGroupRepeat");
-      }
-      
-      int repeatNumber = itemGroupRepeat.getInt("@RepeatNumber");
-      
-      
-      
-      
-      boolean repeating = ParseUtil.parseYesNo(itemGroupDef.getString("@Repeating"));
-      System.out.println("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber);
-      ItemGroup currentItemGroup = new ItemGroup(repeatNumber, repeating);
-      appItemGroupDefs.put(itemGroupKey, currentItemGroup); 
-      String itemKey = "";
-      if (itemRefs instanceof JSONArray ) {
-        for (int j=0;j< ((JSONArray)itemRefs).size();j++) {
-          itemKey = ((JSONArray)itemRefs).getJSONObject(j).getString("@ItemOID");
-          appItemGroupMap.put(itemKey, itemGroupKey);
-        }
-      }
-      else {
-         itemKey = ((JSONObject)itemRefs).getString("@ItemOID");
-         appItemGroupMap.put(itemKey, itemGroupKey);
-      }
-    }
-  }
   
   
   public String parse(JSON json)  {
@@ -149,7 +104,7 @@ public class StudyRenderer extends JSONRenderer{
     
     //loadBasicDefinitions(json);
     //loadCodeLists(json);
-    loadItemGroupDefs(json);
+    //loadItemGroupDefs(json);
     
     // Get Form Wrapper
     FormDefRenderer formDefRenderer = new FormDefRenderer(formDef, this.cfg, this.templateVars);

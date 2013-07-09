@@ -122,5 +122,75 @@ public class StudyDataLoader {
     }
   }
   
+  
+  /* loadMultiSelectLists()
+   */
+  public void loadMultiSelectLists() {
+    studyRenderer.appMultiSelectLists = new TreeMap<String,List>();
+    JSONArray multiSelectLists = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("OpenClinica:MultiSelectList")); 
+    if (multiSelectLists == null) {
+      return;
+    } 
+    for (int i=0;i< multiSelectLists.size();i++) {
+      List currentMultiSelectList = new ArrayList();
+      String multiSelectListKey = multiSelectLists.getJSONObject(i).getString("@ID"); 
+      JSONArray multiSelectListItems = multiSelectLists.getJSONObject(i).getJSONArray("OpenClinica:MultiSelectListItem");
+      for (int j=0;j< multiSelectListItems.size();j++) {
+        JSONObject multiSelectListItem = multiSelectListItems.getJSONObject(j);
+        String id = multiSelectListItem.getString("@CodedOptionValue");
+        String label = multiSelectListItem.getJSONObject("Decode").getString("TranslatedText");
+        CodeListItem currentMultiSelectListItem = new CodeListItem(id,label);
+        currentMultiSelectList.add(currentMultiSelectListItem);
+      }
+      studyRenderer.appMultiSelectLists.put(multiSelectListKey, currentMultiSelectList);
+    }
+  }
+  
+  
+  /* loadItemGroupDefs(formDef)
+   * Associate all Items with their ItemGroups
+   */
+  private void loadItemGroupDefs(JSONObject formDef) {
+  
+    studyRenderer.appItemGroupDefs = new TreeMap<String,ItemGroup>();
+    studyRenderer.appItemGroupMap = new TreeMap<String,Item>();
+    JSONArray itemGroupDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("ItemGroupDef")); 
+    if (itemGroupDefs == null) {
+      return;
+    } 
+    
+    for (int i=0;i< itemGroupDefs.size();i++) {
+      JSONObject itemGroupDef = itemGroupDefs.getJSONObject(i);
+      String itemGroupKey = itemGroupDef.getString("@OID");
+      String itemGroupName = itemGroupDef.getString("@Name");
+      JSONObject itemGroupDetails = itemGroupDef.getJSONObject("OpenClinica:ItemGroupDetails"); 
+      int repeatNumber = 1;
+      int repeatMax = 1;
+      String groupHeader = itemGroupDetails.getJSONObject("OpenClinica:PresentInForm").getString("OpenClinica:ItemGroupHeader"); 
+      JSONArray presentInForm = StudyDataLoader.ensureArray(itemGroupDetails.getJSONArray("OpenClinica:PresentInForm")); 
+      for (int j=0;j< presentInForm.size();j++) {
+        if ((presentInForm.getJSONObject(j).getString("@FormOID")).equals(formDef.getString("@OID"))) {
+          repeatNumber = presentInForm.getJSONObject(j).getJSONObject("OpenClinica:ItemGroupRepeat").getInt("@RepeatNumber");
+          repeatMax = presentInForm.getJSONObject(j).getJSONObject("OpenClinica:ItemGroupRepeat").getInt("@RepeatMax");
+          boolean repeating = ParseUtil.parseYesNo(itemGroupDef.getString("@Repeating"));
+          ItemGroup currentItemGroup = new ItemGroup(repeatNumber, repeating, repeatMax, itemGroupName, groupHeader);
+          studyRenderer.appItemGroupDefs.put(itemGroupKey, currentItemGroup); 
+          JSONArray itemRefs = StudyDataLoader.ensureArray(itemGroupDef.getJSONArray("ItemRef")); 
+          
+          for (int k=0;k< itemRefs.size();k++) {
+            String itemKey = itemRefs.getJSONObject(k).getString("@ItemOID");
+            int orderNumber = itemRefs.getJSONObject(k).getInt("@OrderNumber");
+            boolean mandatory = ParseUtil.parseYesNo(itemRefs.getJSONObject(k).getString("@Mandatory"));
+            Item currentItem = new Item(orderNumber, mandatory, itemGroupKey, itemRefs.size());
+            studyRenderer.appItemGroupMap.put(itemKey, currentItem); 
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  
+  
 
 }
