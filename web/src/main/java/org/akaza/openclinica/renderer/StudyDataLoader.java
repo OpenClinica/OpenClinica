@@ -84,7 +84,7 @@ public class StudyDataLoader {
   
   /* loadBasicDefinitions()
   */
-  public void loadBasicDefinitiions() {
+  public void loadBasicDefinitions() {
     if (studyRenderer.study.getJSONObject("BasicDefinitions") == null) {
       return;
     }
@@ -150,7 +150,7 @@ public class StudyDataLoader {
   /* loadItemGroupDefs(formDef)
    * Associate all Items with their ItemGroups
    */
-  private void loadItemGroupDefs(JSONObject formDef) {
+  public void loadItemGroupDefs(JSONObject formDef) {
   
     studyRenderer.appItemGroupDefs = new TreeMap<String,ItemGroup>();
     studyRenderer.appItemGroupMap = new TreeMap<String,Item>();
@@ -191,6 +191,44 @@ public class StudyDataLoader {
   }
 
   
+    
+  /* loadStudyEventDefs()
+   * Load all StudyEvents
+   */ 
+  public void loadStudyEventDefs() {
+    studyRenderer.appStudyEventDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("StudyEventDef")); 
+  }
+   
+   
+  /* loadItemDefs()
+   * Load all ItemDefs
+   */
+  public void loadItemDefs() {
+    studyRenderer.appItemDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("ItemDef")); 
+  }
   
+  
+  /* loadFormDefs()
+   * Load all FormDefs
+   */
+  public void loadFormDefs() {
+    studyRenderer.appFormDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("FormDef")); 
+  }
+   
+   
+  
+  
+  /* loadStudyLists()
+  */
+  public void loadStudyLists() {
+    loadBasicDefinitions();
+    loadCodeLists();
+    loadMultiSelectLists();
+    loadItemDefs();
+    loadFormDefs();
+    loadStudyEventDefs();
+    loadStudyDetails();
+  }
+
 
 }

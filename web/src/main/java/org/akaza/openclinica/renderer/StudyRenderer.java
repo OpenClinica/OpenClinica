@@ -22,6 +22,9 @@ public class StudyRenderer extends JSONRenderer{
   public Map<String, List> appMultiSelectLists = new TreeMap<String,List>();
   public Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
   public Map<String, Item> appItemGroupMap = new TreeMap<String,Item>();
+  public JSONArray appStudyEventDefs = new JSONArray();
+  public JSONArray appItemDefs = new JSONArray();
+  public JSONArray appFormDefs = new JSONArray();
   
   
   
