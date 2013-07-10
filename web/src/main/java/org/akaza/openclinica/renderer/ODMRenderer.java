@@ -37,7 +37,7 @@ public class ODMRenderer extends JSONRenderer{
   public String render(JSON json)  {
     JSONObject jsonObject = (JSONObject)json;
     parse(json);
-    studyRenderer = new StudyRenderer(this.json, this.cfg, this.templateVars);
+    studyRenderer = new StudyRenderer(jsonObject, this.cfg, this.templateVars);
     return studyRenderer.render(jsonObject.getJSONObject("Study"));
   }
 

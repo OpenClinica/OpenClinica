@@ -14,7 +14,6 @@ import net.sf.json.JSONArray;
 
 public class StudyRenderer extends JSONRenderer{
 
-
   public String OID;
   public JSONObject study;
   public Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
@@ -26,11 +25,13 @@ public class StudyRenderer extends JSONRenderer{
   public JSONArray appItemDefs = new JSONArray();
   public JSONArray appFormDefs = new JSONArray();
   
-  
-  
   public static final int DEFAULT_MAX_REPEAT = 40; 
   public static final boolean NO_PAGE_BREAK = false; 
   public static final boolean PAGE_BREAK = true; 
+  public static final String UNPOPULATED_FORM_CRF = "unpopulatedFormCrf"; 
+  public static final String UNPOPULATED_EVENT_CRFS = "unpopulatedEventCrfs"; 
+  public static final String UNPOPULATED_STUDY_CRFS = "unpopulatedStudyCrfs"; 
+  public static final String UNPOPULATED_GLOBAL_CRF = "unpopulatedGlobalCrf"; 
   
   public JSONObject app_studyDetails;
   public String app_collectSubjectDOB;
@@ -41,11 +42,17 @@ public class StudyRenderer extends JSONRenderer{
   public String app_secondaryLabelViewable;
   public String app_eventLocationRequired;
   public String app_secondaryIDs;
+  public String appStudyName;
+  public String appSiteName;
+  public String appProtocolName;
+  public String appInvestigatorNameLabel;
+  public String appInvestigatorSignatureLabel;
+  public String appIateLabel;
   
   
-  public StudyRenderer(JSON json, Configuration cfg, Map templateVars) {
+  public StudyRenderer(JSONObject json, Configuration cfg, Map templateVars) {
     super(json, cfg, templateVars);
-    this.study = (JSONObject)json;
+    this.study = (JSONObject) (json.get("Study") instanceof JSONObject ? json.getJSONObject("Study") : json.getJSONArray("Study").get(0));
   }
   
   
@@ -89,9 +96,112 @@ public class StudyRenderer extends JSONRenderer{
   }
   
   
-
+ /* setStudy(renderMode)
+  * Set the current study being rendered
+  */
+  public void setStudy(String renderMode) {
+    if (renderMode == UNPOPULATED_FORM_CRF || renderMode == UNPOPULATED_EVENT_CRFS || renderMode == UNPOPULATED_STUDY_CRFS) {
+      appStudyName = this.study.getJSONObject("GlobalVariables").getString("StudyName"); 
+      appSiteName = this.study.getJSONObject("MetaDataVersion").getJSONObject("OpenClinica:StudyDetails").getString("@SiteName"); 
+      appProtocolName = this.study.getJSONObject("GlobalVariables").getString("ProtocolName"); 
+    }
+    else if (renderMode == UNPOPULATED_GLOBAL_CRF) {
+      appStudyName = "";
+      appSiteName = "";
+      appProtocolName = "";
+    }
+  } 
   
-
+  /* createStudyEventCoverPage()
+   */
+  public String createStudyEventCoverPage(JSONObject eventDef) {
+    String str = "<h3>" + eventDef.getString("@Name") + ":</h3>";
+    JSONArray studyEventFormRefs =  StudyDataLoader.ensureArray(eventDef.getJSONArray("StudyEventDef")); 
+    
+    for (int i=0;i< studyEventFormRefs.size();i++) {
+      JSONObject formRef = studyEventFormRefs.getJSONObject(i);
+      boolean formFound = false;
+      for (int j=0;j< appFormDefs.size() && !formFound;j++) {
+        if (appFormDefs.getJSONObject(j).getString("@OID").equals(formRef.getString("@FormOID"))) {
+          JSONObject formDef = appFormDefs.getJSONObject(j);
+          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+          for (int k=0;k< presentInEventDef.size() && !formFound;k++) {
+            JSONObject inEventDef = presentInEventDef.getJSONObject(k);            
+            if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No") && 
+                                      inEventDef.getString("@OID").equals(inEventDef.getString("StudyEvent@OID"))) {
+              str += "<div>" + formDef.getString("@Name") + "</div>";
+              formFound = true;
+            }
+            
+          }
+        }
+      }
+    }
+    str += "<div class='investigator-text'>";
+    str += appInvestigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
+    str += appInvestigatorSignatureLabel +": ___________________&nbsp;&nbsp;&nbsp;&nbsp";
+    str += appIateLabel +": ___________________";
+    str += "</div>";
+    return str;
+  }
+  
+  
+    
+  /* createStudyCoverPage()
+   */
+  public String createStudyCoverPage() {
+    String str = "<table border='1' style='margin-top:50px'>";
+    // create header row of Study Events
+    str += "<tr><td style='width:200px'></td>";
+    // iterate over study event defs and examine each event
+    for (int i=0;i< appStudyEventDefs.size();i++) {
+      JSONObject eventDef = appStudyEventDefs.getJSONObject(i);
+      // load event name into column header
+      str +="<td style='padding:10px'>" + eventDef.getString("@Name") + "</td>";
+    }
+    str += "</tr>";
+    boolean formFound = false;
+    //iterate over each of the formDefs in the study    
+    for (int i=0;i< appFormDefs.size();i++) {
+      JSONObject formDef = appFormDefs.getJSONObject(i);
+      boolean formVersionPrinted = false;
+      JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+      int initEventCNTR = 0;
+      for (int j=0;j< presentInEventDef.size() && !formFound;j++) {
+        formFound = false;
+        JSONObject inEventDef = presentInEventDef.getJSONObject(j);            
+        if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No")) {
+          if (formVersionPrinted == false) {
+            str +="<tr><td style='padding:10px'>" + formDef.getString("@Name") + "</td>";
+          }
+          formVersionPrinted = true;
+          for (int k=initEventCNTR;k< appStudyEventDefs.size() && !formFound;k++) {
+            JSONObject eventDef = appStudyEventDefs.getJSONObject(k);            
+            if (eventDef.getString("@OID").equals(inEventDef.getString("@StudyEventOID"))) {
+              str += "<td style='text-align:center'>X</td>";
+              formFound = true; 
+              initEventCNTR = j+1;
+            }
+            if(formFound == false) {
+              str += "<td></td>";
+            }
+          }
+          if(formFound == false) {
+            str += "<td></td>";
+          }
+        }
+      }
+      
+      if (initEventCNTR < appStudyEventDefs.size() && formVersionPrinted) {
+        for(int c = initEventCNTR; c < appStudyEventDefs.size();c++){
+          str += "<td></td>";
+        }
+      }
+      str += "</tr>";
+    }
+    str += "</table>";
+    return str;
+  }
   
   
   public String parse(JSON json)  {
