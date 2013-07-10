@@ -15,6 +15,7 @@ import net.sf.json.JSONArray;
 public class StudyRenderer extends JSONRenderer{
 
   public String OID;
+  public String renderString = "";
   public JSONObject study;
   public Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
   public Map<String, List> appCodeLists = new TreeMap<String,List>();
@@ -24,6 +25,8 @@ public class StudyRenderer extends JSONRenderer{
   public JSONArray appStudyEventDefs = new JSONArray();
   public JSONArray appItemDefs = new JSONArray();
   public JSONArray appFormDefs = new JSONArray();
+  public PageHeaderRenderer pageHeaderRenderer;
+  public StudyDataLoader studyDataLoader;
   
   public static final int DEFAULT_MAX_REPEAT = 40; 
   public static final boolean NO_PAGE_BREAK = false; 
@@ -47,7 +50,13 @@ public class StudyRenderer extends JSONRenderer{
   public String appProtocolName;
   public String appInvestigatorNameLabel;
   public String appInvestigatorSignatureLabel;
-  public String appIateLabel;
+  public String appDateLabel;
+  public String appFormVersionOID;
+  public String appEventOID;
+  public String appPrintTime; 
+  public String appStudyCoverPageType; 
+  public String appEventName;
+  public String appStudyEventCoverPageType;
   
   
   public StudyRenderer(JSONObject json, Configuration cfg, Map templateVars) {
@@ -140,7 +149,7 @@ public class StudyRenderer extends JSONRenderer{
     str += "<div class='investigator-text'>";
     str += appInvestigatorNameLabel + ": ___________________&nbsp;&nbsp;&nbsp;&nbsp;";
     str += appInvestigatorSignatureLabel +": ___________________&nbsp;&nbsp;&nbsp;&nbsp";
-    str += appIateLabel +": ___________________";
+    str += appDateLabel +": ___________________";
     str += "</div>";
     return str;
   }
@@ -202,6 +211,87 @@ public class StudyRenderer extends JSONRenderer{
     str += "</table>";
     return str;
   }
+  
+  
+  
+    
+  /* renderPrintableEventCRFs(renderMode, eventDef, pageBreak)
+   * Render all CRFS associated with a StudyEvent
+   */
+  public void renderPrintableEventCRFs(String renderMode, JSONObject eventDef, boolean pageBreak) {
+    appEventName = eventDef.getString("@Name");
+    renderPageHeader(pageBreak, appPrintTime, appStudyEventCoverPageType, appEventName);
+    renderString += this.createStudyEventCoverPage(eventDef);
+    // select all CRFs from StudyEvent
+    JSONArray studyEventFormRefs = StudyDataLoader.ensureArray(eventDef.getJSONArray("FormDef"));
+    
+    for (int i=0;i< studyEventFormRefs.size();i++) {
+      pageBreak = this.PAGE_BREAK;
+      boolean defaultDisplayed = false;
+      JSONObject formRef = studyEventFormRefs.getJSONObject(i);
+      for (int j=0;j< appFormDefs.size() && !defaultDisplayed;j++) {
+        if (appFormDefs.getJSONObject(j).getString("@OID").equals(formRef.getString("@FormOID"))) {
+          JSONObject formDef = appFormDefs.getJSONObject(j);
+          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+          for(int k=0;k<presentInEventDef.size();k++){
+            JSONObject inEventDef = presentInEventDef.getJSONObject(k);
+            if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No") && 
+                                     inEventDef.getString("@OID").equals(inEventDef.getString("StudyEvent@OID"))) {
+              //renderPrintableFormDef(formDef, pageBreak);
+              defaultDisplayed = true;
+              break;  
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  
+  /* renderPrintableStudy(renderMode)
+   * A kind of factory function for the different study
+   * rendering scenarios.
+   */
+  public String renderPrintableStudy(String renderMode) {
+    pageHeaderRenderer = new PageHeaderRenderer(this.study, this.cfg, this.templateVars);
+    setStudy(renderMode);  
+    studyDataLoader = new StudyDataLoader(this); 
+    studyDataLoader.loadStudyLists();   
+    JSONObject formDef = null;
+    JSONObject eventDef = null;
+    
+    if (renderMode.equals(UNPOPULATED_FORM_CRF) || renderMode.equals(UNPOPULATED_GLOBAL_CRF)) {
+      // select CRF by OID
+      for (int i=0;i< appFormDefs.size();i++) {
+        if (appFormDefs.getJSONObject(i).getString("@OID").equals(appFormVersionOID)) {
+          formDef = appFormDefs.getJSONObject(i);
+          break; 
+        }
+      }
+      //renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
+    }
+    else if (renderMode.equals(UNPOPULATED_EVENT_CRFS)) {
+      // select StudyEvent by OID
+      for (int i=0;i< appStudyEventDefs.size();i++) {
+        if (appStudyEventDefs.getJSONObject(i).getString("@OID").equals(appEventOID)) {
+          eventDef = appStudyEventDefs.getJSONObject(i);
+          break;
+        }
+      }
+      renderPrintableEventCRFs(renderMode, eventDef, this.NO_PAGE_BREAK);
+    }
+    else if (renderMode.equals(UNPOPULATED_STUDY_CRFS)) {
+      this.renderPageHeader(this.NO_PAGE_BREAK, appPrintTime, appStudyCoverPageType, appEventName);
+      this.renderString += this.createStudyCoverPage();
+      // select all CRFs from study
+      for (int i=0;i< appStudyEventDefs.size();i++) {
+        eventDef = appStudyEventDefs.getJSONObject(i);
+        renderPrintableEventCRFs(renderMode, eventDef, this.PAGE_BREAK);
+      }
+    }
+    return this.renderString;
+  }
+  
   
   
   public String parse(JSON json)  {
@@ -291,6 +381,17 @@ public class StudyRenderer extends JSONRenderer{
       prevItemHeader = itemHeader;
     } 
     return renderString;
+  }
+  
+  
+  /* renderPageHeader()
+   */
+  public void renderPageHeader (boolean pageBreak, String printTime, String currentPageType, String currentPageEventName) {
+    if (pageBreak == true) {
+      renderString += "<div class='page-break-screen'><hr/></div>";
+      renderString += "<div class='page-break'></div>";
+    }
+    //renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   
 
