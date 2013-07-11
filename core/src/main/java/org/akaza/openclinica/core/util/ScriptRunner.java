@@ -218,14 +218,15 @@ public class ScriptRunner {
 			e.fillInStackTrace();
 			printlnError("Error executing: " + command);
 			printlnError(e);
+			conn.rollback(); 
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
 			printlnError("Error executing: " + command);
 			printlnError(e);
+			conn.rollback();
 			throw e;
 		} finally {
-			conn.rollback();
 			flush();
 		}
 	}
