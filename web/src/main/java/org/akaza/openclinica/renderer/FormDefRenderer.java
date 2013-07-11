@@ -23,15 +23,14 @@ public class FormDefRenderer extends JSONRenderer{
   }
   
   
-  public String parse(JSON json)  {
-    JSONObject jsonObject = (JSONObject)json;
-    OID = jsonObject.getString("@OID");
-    name = jsonObject.getString("@Name");
-    repeating = ParseUtil.parseYesNo(jsonObject.getString("@Repeating"));
+  public String parse(JSONObject formDef)  {
+    OID = formDef.getString("@OID");
+    name = formDef.getString("@Name");
+    repeating = ParseUtil.parseYesNo(formDef.getString("@Repeating"));
     return "";
   }
 
-  public String render(JSON json)  {
+  public String renderPrintableForm(JSON json)  {
     parse(json);
     JSONObject jsonObject = (JSONObject)json;
     try {

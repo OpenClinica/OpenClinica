@@ -13,7 +13,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class ItemDefRenderer extends JSONRenderer{
-
+  public JSONObject itemDef;
   private String template;
   private JSONObject itemDetails;
   private boolean mandatory;
@@ -35,10 +35,11 @@ public class ItemDefRenderer extends JSONRenderer{
   private  Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
   private  Map<String, List> appCodeLists = new TreeMap<String,List>();
   
-  public ItemDefRenderer(JSON json, Configuration cfg, Map templateVars, 
+  public ItemDefRenderer(JSONObject itemDef, Configuration cfg, Map templateVars, 
                          Map appItemGroupDefs, Map appItemGroupMap,
                          Map appBasicDefinitions, Map appCodeLists) {
-    super(json, cfg, templateVars);
+    super(itemDef, cfg, templateVars);
+    this.itemDef = itemDef;
     this.appItemGroupDefs = appItemGroupDefs;
     this.appItemGroupMap = appItemGroupMap;
     this.appBasicDefinitions = appBasicDefinitions;
@@ -46,19 +47,10 @@ public class ItemDefRenderer extends JSONRenderer{
   }
   
   
-  public String parse(JSON json)  {
-    JSONObject itemDef = (JSONObject)json;
-    //JSONObject question = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm").getJSONObject(1);
+  public String parse(JSONObject itemDef)  {
     itemDetails = itemDef.getJSONObject("OpenClinica:ItemDetails");
-    Object presentInForm = itemDetails.get("OpenClinica:ItemPresentInForm"); 
-    JSONObject question;
-    
-    if (presentInForm instanceof JSONArray) {
-      question = ((JSONArray)presentInForm).getJSONObject(1);
-    }
-    else {
-      question = (JSONObject)presentInForm;
-    }
+    JSONArray presentInForm = StudyDataLoader.ensureArray(itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm"));
+    JSONObject question = ((JSONArray)presentInForm).getJSONObject(1);
     OID = itemDef.getString("@OID");
     dataType = itemDef.getString("@DataType");
     name = question.getString("OpenClinica:LeftItemText");
@@ -78,8 +70,8 @@ public class ItemDefRenderer extends JSONRenderer{
    return "";
   }
 
-  public String render(JSON json, boolean isRepeating)  {
-    parse(json);
+  public String renderPrintableItem(boolean isRepeating)  {
+    parse(this.itemDef);
     String  template = "item_def.ftl";
     
     if (isRepeating == true) {

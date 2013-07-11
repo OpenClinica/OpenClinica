@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import freemarker.template.Configuration;
-
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
@@ -54,9 +53,16 @@ public class StudyRenderer extends JSONRenderer{
   public String appFormVersionOID;
   public String appEventOID;
   public String appPrintTime; 
-  public String appStudyCoverPageType; 
   public String appEventName;
+  
   public String appStudyEventCoverPageType;
+  public String appStudyCoverPageType; 
+  public String appStudyContentPageType; 
+  public String appCrfHeader; 
+  public String appSectionTitle; 
+  public String appSectionSubtitle; 
+  public String appSectionInstructions; 
+  public String appSectionPage; 
   
   
   public StudyRenderer(JSONObject json, Configuration cfg, Map templateVars) {
@@ -237,7 +243,7 @@ public class StudyRenderer extends JSONRenderer{
             JSONObject inEventDef = presentInEventDef.getJSONObject(k);
             if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No") && 
                                      inEventDef.getString("@OID").equals(inEventDef.getString("StudyEvent@OID"))) {
-              //renderPrintableFormDef(formDef, pageBreak);
+              renderPrintableFormDef(formDef, pageBreak);
               defaultDisplayed = true;
               break;  
             }
@@ -268,7 +274,7 @@ public class StudyRenderer extends JSONRenderer{
           break; 
         }
       }
-      //renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
+      renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode.equals(UNPOPULATED_EVENT_CRFS)) {
       // select StudyEvent by OID
@@ -297,92 +303,200 @@ public class StudyRenderer extends JSONRenderer{
   public String parse(JSON json)  {
     return super.parse(json);
   }
-
-  public String render(JSON json)  {
-    JSONObject jsonObject = (JSONObject)json;
-    JSONObject metaDataVersion = jsonObject.getJSONObject("MetaDataVersion");
-    JSONArray itemDefs = metaDataVersion.getJSONArray("ItemDef");
+  
+  
     
-    JSONObject formDef = jsonObject.getJSONObject("MetaDataVersion").getJSONObject("FormDef");
-    
-    //loadBasicDefinitions(json);
-    //loadCodeLists(json);
-    //loadItemGroupDefs(json);
+  /* renderPrintableFormDef(formDef, pageBreak)
+   * The heart of StudyRenderer: render the CRF
+   */
+  public void renderPrintableFormDef(JSONObject formDef, boolean pageBreak) {
+   
+    renderPageHeader(pageBreak, appPrintTime, appStudyContentPageType, appEventName);
+    List orderedItems = new ArrayList();
+    studyDataLoader.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
-    FormDefRenderer formDefRenderer = new FormDefRenderer(formDef, this.cfg, this.templateVars);
-    String renderString = formDefRenderer.render(formDef);
-    String repeatingRenderString = "";
-    
+    FormDefRenderer formDefRenderer = new FormDefRenderer(this.study, this.cfg, this.templateVars);
+    this.renderString += appCrfHeader = formDefRenderer.renderPrintableForm(formDef);
+    String repeatingHeaderString = "";
+    String repeatingRowString = "";
+    String currentItemGroupOID = "";
+    String previousItemGroupOID = "";
+    boolean isFirstRepeatingItem = true;
+    int lastRepeatingOrderInFormNumber;
+ 
     // Get Form Items
     String prevSectionLabel = "";
-    String prevItemHeader = null;
-    String prevItemSubHeader = null;
+    String prevItemHeader = "";
+    String prevItemSubHeader = "";
     boolean isFirstSection = true;
     
-    for (int i=0;i< itemDefs.size();i++) {
-      JSONObject itemDef = itemDefs.getJSONObject(i);
+    // Sort itemDefs by OrderInForm property
+    for (int i=0;i< appItemDefs.size();i++) {
+      JSONObject itemDef = appItemDefs.getJSONObject(i);
+      JSONObject itemDetails = getItemDetails(itemDef, formDef);
+      if (itemDetails.getString("@FormOID").equals(formDef.getString("@OID"))) {
+        int orderInForm = itemDetails.getInt("@OrderInForm");
+        orderedItems.add(orderInForm-1, itemDef);
+      }
+    }
+    
+    for (int i=0;i< orderedItems.size();i++) {
+      String repeatingRows = "";
+      JSONObject itemDef = (JSONObject)orderedItems.get(i);
       String itemOID = itemDef.getString("@OID");
-      
-      JSONObject itemDetails = itemDef.getJSONObject("OpenClinica:ItemDetails");
-      Object presentInForm = itemDetails.get("OpenClinica:ItemPresentInForm"); 
-      JSONObject question;
-      
-      if (presentInForm instanceof JSONArray) {
-        question = ((JSONArray)presentInForm).getJSONObject(1);
-      }
-      else {
-        question = (JSONObject)presentInForm;
+      String itemNumber = "";
+      if (itemDef.has("Question") && itemDef.getJSONObject("Question").has("@OpenClinica:QuestionNumber")) {
+        itemNumber = itemDef.getJSONObject("Question").getString("@OpenClinica:QuestionNumber");
       }
       
-      String itemNumber = itemDef.getJSONObject("Question").has("@OpenClinica:QuestionNumber") ? itemDef.getJSONObject("Question").getString("@OpenClinica:QuestionNumber") : "";
-      String sectionLabel = question.getString("OpenClinica:SectionLabel");
-      String itemHeader = question.has("OpenClinica:ItemHeader") ? question.getString("OpenClinica:ItemHeader") : null;
-      String itemSubHeader = question.has("OpenClinica:ItemSubHeader")  ? question.getString("OpenClinica:ItemSubHeader") : null;
-      String name = question.getString("OpenClinica:LeftItemText");
-      int columnNumber = question.has("@ColumnNumber") ? question.getInt("@ColumnNumber") : 1;
-      int columns = question.has("OpenClinica:Layout") ? question.getJSONObject("OpenClinica:Layout").getInt("@Columns") : 2; 
-      System.out.println("#"+itemNumber+" column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader);
+      JSONObject itemDetails = this.getItemDetails(itemDef, formDef);
+      JSONObject sectionDetails = this.getSectionDetails(itemDetails, formDef);
+      String sectionTitle = sectionDetails.getString("@SectionTitle");
+      String sectionSubTitle = sectionDetails.getString("@SectionSubtitle");
+      String sectionInstructions = sectionDetails.getString("@SectionInstructions");
+      String sectionPageNumber = sectionDetails.getString("@SectionPageNumber");
+      String sectionLabel = itemDetails.getString("OpenClinica:SectionLabel");
+      String itemHeader = itemDetails.getString("OpenClinica:ItemHeader");
+      String itemSubHeader = itemDetails.getString("OpenClinica:ItemSubHeader");
+      String name = itemDetails.getString("OpenClinica:LeftItemText");
+      String rightItem = itemDetails.getString("OpenClinica:RightItemText"); 
+      int columnNumber = itemDetails.getInt("@ColumnNumber");
+      int columns = 0;
+      if (itemDetails.has("OpenClinica:Layout")) {
+        columns = itemDetails.getJSONObject("OpenClinica:Layout").getInt("@Columns");
+      }
+      boolean lastItemInRepeatingRow = false;
+      int repeatNumber = 1;
+      boolean repeating = false;
+      boolean mandatory = false;
+      int repeatMax = this.DEFAULT_MAX_REPEAT; 
+      String itemGroupHeader;
+      String itemGroupName;
+      String nextGroupOID = "";
+      
+     if (appItemGroupMap.get(itemOID) != null && appItemGroupDefs.get( appItemGroupMap.get(itemOID).itemGroupKey) != null) {
+        currentItemGroupOID = appItemGroupMap.get(itemOID).itemGroupKey;
+        mandatory = appItemGroupMap.get(itemOID).mandatory;
+        ItemGroup itemGroup = appItemGroupDefs.get( appItemGroupMap.get(itemOID).itemGroupKey);
+        repeatNumber = itemGroup.repeatNumber;
+        repeating = itemGroup.repeating;
+        repeatMax = itemGroup.repeatMax;
+        itemGroupName = itemGroup.name;
+        itemGroupHeader = itemGroup.groupHeader;
+      }
       
       if (sectionLabel.equals(prevSectionLabel) == false) {
-        if (isFirstSection == true) {
-          renderString += "<div class='blocking gray_bg'><h2>"+sectionLabel+"</h2></div>\n"; 
+        if (isFirstSection == false) {
+          renderPageHeader(this.PAGE_BREAK, appPrintTime, appStudyContentPageType, appEventName);
         }
-        else {
-          renderString += "<div class='blocking non-first_section_header gray_bg'><h2>"+sectionLabel+"</h2></div>\n"; 
-        }
+        this.renderString += "<div class='vertical-spacer-30px'></div>";
+        this.renderString += "<div class='section-title'>"+appSectionTitle+"&nbsp;"+sectionTitle+"</div>";
+        this.renderString += "<div class='section-info'>"+appSectionSubtitle+"&nbsp;"+sectionSubTitle+"</div>";
+        this.renderString += "<div class='section-info'>"+appSectionInstructions+"&nbsp;"+sectionInstructions+"</div>";
+        this.renderString += "<div class='section-info'>"+appSectionPage+"&nbsp;"+sectionPageNumber+"</div>";
         isFirstSection = false;
       }
-      if (itemHeader != null && itemHeader.equals(prevItemHeader) == false) {
-        renderString += "<div class='blocking gray_bg'><h3>"+itemHeader+"</h3></div>\n"; 
-      }
-      if (itemSubHeader != null && itemSubHeader.equals(prevItemSubHeader) == false) {
-        renderString += "<div class='blocking gray_bg'><h4>"+itemSubHeader+"</h4></div>\n"; 
-      }
-      int repeatNumber = appItemGroupMap.get(itemOID) != null ? ((ItemGroup)(appItemGroupDefs.get(appItemGroupMap.get(itemOID)))).repeatNumber : 1;
-      boolean repeating = appItemGroupMap.get(itemOID) != null ? ((ItemGroup)(appItemGroupDefs.get(appItemGroupMap.get(itemOID)))).repeating : false;
+      this.renderString += "<div class='vertical-spacer-20px'></div>";
       
-      System.out.println("REPEATING:" + repeating+" REPEATNUMBER: " + repeatNumber);
      
-      if (columnNumber == 1) {
-        repeatingRenderString = "<div class='blocking'>\n";
+      // inpect the next ItemDef for look-ahead purposes.
+      JSONObject nextItemDef;
+      int nextColumnNumber = 0;
+      if (i+1 < orderedItems.size()) {
+        nextItemDef = (JSONObject)orderedItems.get(i+1);
+        JSONObject nextItemDetails = getItemDetails(nextItemDef, formDef);
+        nextColumnNumber = nextItemDetails.getInt("@ColumnNumber");
+        String nextItemOID = nextItemDef.getString("@OID");
+        nextGroupOID = appItemGroupMap.get(nextItemOID).itemGroupKey;
+      }       
+      
+      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(this.study, this.cfg, this.templateVars,appItemGroupDefs, appItemGroupMap, appBasicDefinitions, appCodeLists);
+      
+      String codeListOID = "";
+      if (itemDef.has("CodeLisRef")) {
+        codeListOID = itemDef.getJSONObject("CodeListRef").getString("@CodeListOID");
+      } 
+      String multiSelectListOID = "";
+      if (itemDef.has("OpenClinica:MultiSelectListRef")) {
+        multiSelectListOID = itemDef.getJSONObject("OpenClinica:MultiSelectListRef").getString("@MultiSelectListID");
       }
       
-      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(json, cfg, templateVars, appItemGroupDefs, appItemGroupMap, appBasicDefinitions, appCodeLists);
-      repeatingRenderString += itemDefRenderer.render(itemDef);
-      if (columns == columnNumber) {
-        repeatingRenderString += "</div>";
-        for (int repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-          renderString += repeatingRenderString;
+      // process repeating group of items 
+      if (repeating == true) {
+        if (currentItemGroupOID.equals(previousItemGroupOID) == false) {
+          isFirstRepeatingItem = true;
+        }
+        if(nextGroupOID.equals(currentItemGroupOID) == false ){
+          lastItemInRepeatingRow = true;
+        }
+        int orderNumber = appItemGroupMap.get(itemOID).orderNumber;
+        int itemGroupLength = appItemGroupMap.get(itemOID).itemGroupLength;
+       
+        // in first item in repeating group
+        if (isFirstRepeatingItem == true) {
+          repeatingRowString = "<tr class='repeating_item_group'>";
+          repeatingHeaderString = "<tr class='repeating_item_group'>";
+          isFirstRepeatingItem = false;
+          lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
+       }
+        
+        repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
+        String responseLayout = itemDetails.getJSONObject("OpenClinica:ItemResponse").getString("@ResponseLayout");
+        String responseType = itemDetails.getJSONObject("OpenClinica:ItemResponse").getString("@ResponseType");
+        
+        if (responseLayout.equals("Horizontal")) {
+          List options;
+          if (responseType.equals("multi-select") || responseType.equals("checkbox")) {
+            options = appMultiSelectLists.get(multiSelectListOID);
+          }
+          else {
+            options = appCodeLists.get(codeListOID);
+          }
+          int optionsLength = 0; 
+          if (options != null) {
+            optionsLength = options.size();
+          }
+          String itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
+          String optionsRow = "<tr class='repeating_item_group'>";
+          for (int j=0;j< optionsLength;j++) {
+            optionsRow += "<td valign='bottom' align='center' class='repeating_item_group'>" + ((Map)options.get(j)).get("label") + "</td>";
+          }
+          optionsRow += "</tr>";
+          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'><table>" + itemNameRow + optionsRow + "</table></td>";
+        }
+        else {
+          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + (mandatory == true ? " *" : "") + "</td>";
+        }
+         
+        // in last item in repeating group
+        if (lastItemInRepeatingRow) {
+          repeatingRowString += "</tr>";
+          repeatingHeaderString += "</tr>";
+          for (int repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
+            repeatingRows += repeatingRowString;
+          }
+          //this.renderString += RenderUtil.render(RenderUtil.get( "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows});
         }
       }
-     
+      // standard non-repeating items
+      else if (repeating == false) { 
+        if ( columnNumber == 1) {
+          this.renderString += itemHeader != null ? "<div class='header-title'>"+itemHeader+"</div>" : "";
+          this.renderString += itemSubHeader != null ? "<div class='header-title'>"+itemSubHeader+"</div>" : "";
+          this.renderString += "<table class='item-row'>";
+        }
+        this.renderString += itemDefRenderer.renderPrintableItem(repeating);
+        if (columns == columnNumber || nextColumnNumber == 1 || i+1 == orderedItems.size()) {
+          this.renderString += "</table>";
+        }
+      }
+      previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
-    } 
-    return renderString;
+    }
   }
-  
+
   
   /* renderPageHeader()
    */
@@ -391,8 +505,10 @@ public class StudyRenderer extends JSONRenderer{
       renderString += "<div class='page-break-screen'><hr/></div>";
       renderString += "<div class='page-break'></div>";
     }
-    //renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
+    renderString += pageHeaderRenderer.render(json, printTime, currentPageType, currentPageEventName, currentPageEventName, 
+    currentPageEventName, currentPageEventName, pageBreak, pageBreak, pageBreak, pageBreak, pageBreak, pageBreak);
   }
+
   
 
   public String getOID() {
