@@ -303,7 +303,7 @@
 								       
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
 								       <!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/pring/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
 								       -->
 								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
 								       

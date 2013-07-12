@@ -1211,6 +1211,11 @@ function openPrintCRFWindow(inURL) {
         'print');
 }
 
+
+function processPrintCRFRequest(url) {
+  openPrintCRFWindow(url);
+}
+
 //-------------------------------------------------------------------------
 // Function: openNewWindow
 //
