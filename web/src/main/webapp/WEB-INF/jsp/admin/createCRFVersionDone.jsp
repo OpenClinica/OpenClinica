@@ -60,7 +60,7 @@
 <div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
 <p>
 <div class="homebox_bullets">
-    <a href="ViewCRFVersion?id=<%=request.getAttribute("crfVersionId")%>">CRF Version Metada</a>
+    <a href="ViewCRFVersion?id=<%=request.getAttribute("crfVersionId")%>"><fmt:message key="crf_version_metadata" bundle="${resword}"/></a>
 </div>
 <%--<c:forEach var="query" items="${queries}">
 <c:out value="${query}"/></br>
