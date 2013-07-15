@@ -14,7 +14,7 @@ function StudyDataLoader(study) {
   this.study = study;
   
   
- /* getStudyParamValue(itemDef, formDef) 
+ /* getStudyParamValue(studyParamList, listId) 
   * A convenience function to get the study detail parameter value
   */ 
   this.getStudyParamValue = function(studyParamList, listId) {

@@ -2,7 +2,9 @@ package org.akaza.openclinica.renderer;
 
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -11,7 +13,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class ItemDefRenderer extends JSONRenderer{
-
+  public JSONObject itemDef;
   private String template;
   private JSONObject itemDetails;
   private boolean mandatory;
@@ -28,25 +30,27 @@ public class ItemDefRenderer extends JSONRenderer{
   private String codeListOID;
   private String multiSelectListOID;
   private int columns;
+  private  Map<String, ItemGroup> appItemGroupDefs = new TreeMap<String,ItemGroup>();
+  private  Map<String, String> appItemGroupMap = new TreeMap<String,String>();
+  private  Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
+  private  Map<String, List> appCodeLists = new TreeMap<String,List>();
   
-  public ItemDefRenderer(JSON json, Configuration cfg, Map templateVars) {
-    super(json, cfg, templateVars);
+  public ItemDefRenderer(JSONObject itemDef, Configuration cfg, Map templateVars, 
+                         Map appItemGroupDefs, Map appItemGroupMap,
+                         Map appBasicDefinitions, Map appCodeLists) {
+    super(itemDef, cfg, templateVars);
+    this.itemDef = itemDef;
+    this.appItemGroupDefs = appItemGroupDefs;
+    this.appItemGroupMap = appItemGroupMap;
+    this.appBasicDefinitions = appBasicDefinitions;
+    this.appCodeLists = appCodeLists;
   }
   
   
-  public String parse(JSON json)  {
-    JSONObject itemDef = (JSONObject)json;
-    //JSONObject question = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm").getJSONObject(1);
+  public String parse(JSONObject itemDef)  {
     itemDetails = itemDef.getJSONObject("OpenClinica:ItemDetails");
-    Object presentInForm = itemDetails.get("OpenClinica:ItemPresentInForm"); 
-    JSONObject question;
-    
-    if (presentInForm instanceof JSONArray) {
-      question = ((JSONArray)presentInForm).getJSONObject(1);
-    }
-    else {
-      question = (JSONObject)presentInForm;
-    }
+    JSONArray presentInForm = StudyDataLoader.ensureArray(itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm"));
+    JSONObject question = ((JSONArray)presentInForm).getJSONObject(1);
     OID = itemDef.getString("@OID");
     dataType = itemDef.getString("@DataType");
     name = question.getString("OpenClinica:LeftItemText");
@@ -58,7 +62,7 @@ public class ItemDefRenderer extends JSONRenderer{
       isInline = false;
     }  
     itemNumber = itemDef.getJSONObject("Question").has("@OpenClinica:QuestionNumber") ? itemDef.getJSONObject("Question").getString("@OpenClinica:QuestionNumber") + "." : "";
-    unitLabel = itemDef.has("MeasurementUnitRef") ? StudyRenderer.appBasicDefinitions.get(itemDef.getJSONObject("MeasurementUnitRef").getString("@MeasurementUnitOID")) : ""; 
+    unitLabel = itemDef.has("MeasurementUnitRef") ? appBasicDefinitions.get(itemDef.getJSONObject("MeasurementUnitRef").getString("@MeasurementUnitOID")) : ""; 
     codeListOID = itemDef.has("CodeListRef") ? itemDef.getJSONObject("CodeListRef").getString("@CodeListOID") : "";
     codeListOID = itemDef.has("MultiSelectListRef") ? itemDef.getJSONObject("MultiSelectListRef").getString("@MultiSelectListOID") : "";
     columns = question.has("OpenClinica:Layout") ? question.getJSONObject("OpenClinica:Layout").getInt("@Columns") : 2; 
@@ -66,8 +70,8 @@ public class ItemDefRenderer extends JSONRenderer{
    return "";
   }
 
-  public String render(JSON json, boolean isRepeating)  {
-    parse(json);
+  public String renderPrintableItem(boolean isRepeating)  {
+    parse(this.itemDef);
     String  template = "item_def.ftl";
     
     if (isRepeating == true) {
@@ -83,7 +87,7 @@ public class ItemDefRenderer extends JSONRenderer{
       templateVars.put("rightItemText", rightItemText);
       templateVars.put("responseType", responseType);
       templateVars.put("unitLabel", unitLabel);
-      templateVars.put("optionNames", StudyRenderer.appCodeLists.get(codeListOID));
+      templateVars.put("optionNames", appCodeLists.get(codeListOID));
       //templateVars.put("multiSelectOptionNames", StudyRenderer.multiSelectLists.get(multiSelectListOID));
       templateVars.put("columns", columns);
       templateVars.put("responseLayout", responseLayout);
