@@ -24,17 +24,14 @@
 <!-- Head Anchor-->
 <a name="root"></a>
 
+<form action="ExportExcelStudySubjectAuditLog">
+<input type="hidden" value="<c:out value="${id}"/>" name="id"/><br>    
+
 <h1><span class="title_manage">
     <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
+    <input type="image" src="images/bt_Download.gif"  border="0" width="24 " height="15" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>"/><br>   
 </h1>
-
-
-<!-- Excel Export Button -->
-<form action="ExportExcelStudySubjectAuditLog">
-    <input type="hidden" value="<c:out value="${id}"/>" name="id"/><br>
-    <input type="submit" value="Export to Excel" class="button_xlong"/><br>
-   </form>
-<!-- End Excel Export Button -->
+</form>
 
 <%-- Subject Summary --%>
 <table border="0" cellpadding="0" cellspacing="0" width="650" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
@@ -378,7 +375,7 @@
     </td>
     </tr>
 	<!-- Return to Root -->
-    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root">Return to Top</a>&nbsp;</td></tr>
+    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
 	
 
 </c:forEach>
