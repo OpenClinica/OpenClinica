@@ -1,9 +1,12 @@
+
+
 package org.akaza.openclinica.web.filter;
 
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
@@ -11,6 +14,8 @@ import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -40,7 +45,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
      *            the combined array of authorities from all the authority loading queries.
      * @return the final UserDetails which should be used in the system.
      */
-    protected UserDetails createUserDetails(String username, UserDetails userFromUserQuery, GrantedAuthority[] combinedAuthorities) {
+    protected UserDetails createUserDetails(String username, UserDetails userFromUserQuery, Collection<? extends GrantedAuthority>combinedAuthorities) {
         String returnUsername = userFromUserQuery.getUsername();
 
         if (!isUsernameBasedPrimaryKey()) {
@@ -67,7 +72,9 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             String password = rs.getString(2);
             boolean enabled = rs.getBoolean(3);
             boolean nonLocked = rs.getBoolean(4);
-            UserDetails user = new User(username, password, enabled, true, true, nonLocked, new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") });
+            List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>(1);
+            authList.add(new SimpleGrantedAuthority("HOLDER"));
+            UserDetails user = new User(username, password, enabled, true, true, nonLocked, authList);
 
             return user;
         }
