@@ -4,15 +4,15 @@
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:security="http://www.springframework.org/schema/security"
- 	xmlns:oauth="http://spring-security-oauth.codehaus.org/3.0"
-
+ 	xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.2.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.1.xsd
-                             http://spring-security-oauth.codehaus.org/3.0 http://spring-security-oauth.codehaus.org/schema/spring-security-oauth-3.0.xsd">
+                           http://www.springframework.org/schema/security/spring-security.xsd
+                             http://www.springframework.org/schema/security/oauth2 
+                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
 
 
@@ -119,28 +119,18 @@
         </constructor-arg> 
         <property name="supportRefreshToken" value="true"/>
     </bean>
-<!--
-<oauth:authorization-server client-details-service-ref = "clientDetails" token-services-ref="tokenServices" user-approval-page="/oauth/confirm_access">
 
-</oauth:authorization-server>
 
- <oauth:client-details-service id="clientDetails">
-
-        <oauth:client client-id="my-trusted-client" authorized-grant-types="password,authorization_code,refresh_token"/>
-        <oauth:client  client-id="my-less-trusted-client" authorized-grant-types="authorization_code"/>
-        <oauth:client  client-id="designer" authorized-grant-types="authorization_code,refresh_token"/>
-    </oauth:client-details-service>
-    -->
 	
-   
-    <oauth:provider consumer-details-service-ref="clientDetails" token-services-ref="tokenServices" 
-	 authentication-failed-url="/oauth/confirm_access"/>
+    <oauth:provider client-details-service-ref="clientDetails" token-services-ref="tokenServices" >
+        <oauth:verification-code user-approval-page="/oauth/confirm_access"/>
+    </oauth:provider>
 
-      <oauth:consumer-details-service id="clientDetails">
-        <oauth:consumer key="my-trusted-client" authorities="password,authorization_code,refresh_token" secret="sssshhhh!"/>
-        <oauth:consumer key="my-less-trusted-client" authorities="authorization_code" secret="sssshhh!"/>
-        <oauth:consumer key="designer" authorities="authorization_code,refresh_token" secret="sssshhh!"/>
-    </oauth:consumer-details-service>
+      <oauth:client-details-service id="clientDetails">
+        <oauth:client clientId="my-trusted-client" authorizedGrantTypes="password,authorization_code,refresh_token"/>
+        <oauth:client clientId="my-less-trusted-client" authorizedGrantTypes="authorization_code"/>
+        <oauth:client clientId="designer" authorizedGrantTypes="authorization_code,refresh_token"/>
+    </oauth:client-details-service>
     
     
     	<bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">

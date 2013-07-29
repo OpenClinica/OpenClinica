@@ -371,18 +371,19 @@
             <artifactId>spring-oxm</artifactId>
             <version>${spring.version}</version>
         </dependency>
-<dependency>
-	<groupId>org.codehaus.spring-security-oauth</groupId>
-	<artifactId>spring-security-oauth</artifactId>
-	<version>3.19.SS3</version>
-</dependency>
-            
-	<!--		
+
+		
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
-			<version>1.0.0.M6</version>
-		</dependency -->
+			<version>1.0.0.M5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>1.0.0.M2</version>
+		</dependency
 		<!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
