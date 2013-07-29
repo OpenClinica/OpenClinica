@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javax.annotation.Resources;
+
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
@@ -90,19 +92,20 @@ public class CoreResources implements ResourceLoaderAware {
         try {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
-            setODM_MAPPING_DIR();
+
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
 
             String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for instance
-            // setDataInfoPath();
+           
             EXTRACTINFO = extractInfo;
 
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
+            setODM_MAPPING_DIR();
             if(extractInfo!=null)
             {copyBaseToDest(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
@@ -410,24 +413,37 @@ public class CoreResources implements ResourceLoaderAware {
     private void copyImportRulesFiles() throws IOException
     {
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
         String[] fileNames =       { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
-        listSrcFiles[0] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[0]).getInputStream();
-        listSrcFiles[1] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
-        listSrcFiles[2] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
+        Resource[] resources = null;
+        FileOutputStream out =null;
+        
+       
+        
+        resources = resolver.getResources("classpath*:properties/rules_template*.xml");
+        
+       
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
                 throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
             }
         }
-        for (int i = 0; i < listSrcFiles.length; i++) {
-            File dest1 = new File(dest, fileNames[i]);
-            // File src1 = listSrcFiles[i];
-            if (listSrcFiles[i] != null)
-                copyFiles(listSrcFiles[i], dest1);
-        }
+        for (Resource r: resources) {
+    		File f = new File(dest, r.getFilename());
+    		
+    			 out = new FileOutputStream(f);
+    			IOUtils.copy(r.getInputStream(), out);
+    			out.close();
 
-
+    		
+    	}
+        Resource[] r1 =  resolver.getResources("classpath*:properties/"+ fileNames[0]);
+        File f1 = new File(dest,r1[0].getFilename());
+        out = new FileOutputStream(f1);
+        IOUtils.copy(r1[0].getInputStream(), out);
+		out.close();
+        
     }
 
 
@@ -482,21 +498,13 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
-    /**
-     * @pgawade 18-April-2011 - Fix for issue 8394 Copy
-     *          core\resources\properties\cd_odm_mapping.xml to web application
-     *          resources outside the core jar file Reason - During CRF data
-     *          import, Castor API is not able to load this mapping xml file
-     *          from core jar file
-     */
+
     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
-
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+    	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
         String[] fileNames = { "cd_odm_mapping.xml" };
+        Resource[] resources;
         try {
-            listSrcFiles[0] =
-                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "cd_odm_mapping.xml").getInputStream();
-
+        	 resources = resolver.getResources("classpath*:properties/cd_odm_mapping.xml");
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
             oe.initCause(ioe);
@@ -507,18 +515,16 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-            // File placeholder_file = new
-            // File(resourceLoader.getResource("classpath:properties" +
-            // File.separator + "placeholder.properties").getURL().getFile());
-            File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
-
-            String placeholder_file_path = placeholder_file.getPath();
-
-            // String tmp1 = placeholder_file_path.substring(6);
-            // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
-            String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
-            String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
-            dest = new File(tmp3 + File.separator + "odm_mapping");
+              	 dest = new File(getField("filePath") );
+            if (!dest.exists()) {
+                if (!dest.mkdirs()) {
+                    throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+                }
+            }
+            File f = new File(dest, resources[0].getFilename());
+            FileOutputStream out = new FileOutputStream(f);
+    		IOUtils.copy(resources[0].getInputStream(), out);
+    		out.close();
 
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
@@ -527,19 +533,9 @@ public class CoreResources implements ResourceLoaderAware {
             throw oe;
         }
 
-        if (!dest.exists()) {
-            if (!dest.mkdirs()) {
-                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
-            }
-        }
+      
 
-        for (int i = 0; i < fileNames.length; i++) {
-            File dest1 = new File(dest, fileNames[i]);
-            // File src1 = listSrcFiles[i];
-            if (listSrcFiles[i] != null)
-                copyFiles(listSrcFiles[i], dest1);
-        }
-
+     
     }
 
 
@@ -762,7 +758,8 @@ public class CoreResources implements ResourceLoaderAware {
         try {
 
             absolutePath = scr.getFile().getAbsolutePath();
-            ODM_MAPPING_DIR = absolutePath.replaceAll("datainfo.properties", "") + "odm_mapping";
+        
+                 ODM_MAPPING_DIR = getField("filePath");
             //System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
         } catch (IOException e) {
             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
