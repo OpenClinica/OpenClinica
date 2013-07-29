@@ -2,11 +2,9 @@ package org.akaza.openclinica.domain.enumsupport;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
-//import org.hibernate.util.ReflectHelper;
+import org.hibernate.util.ReflectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +37,7 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
     public void setParameterValues(Properties parameters) {
         String enumClassName = parameters.getProperty("enumClassname");
         try {
-            enumClass = org.hibernate.internal.util.ReflectHelper.classForName(enumClassName);
+            enumClass = ReflectHelper.classForName(enumClassName);
         } catch (ClassNotFoundException cnfe) {
             throw new HibernateException("Enum class not found", cnfe);
         }
@@ -59,7 +57,7 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
      * 
      */
     public int[] sqlTypes() {
-        return new int[] { StandardBasicTypes.INTEGER.sqlType() };
+        return new int[] { Hibernate.INTEGER.sqlType() };
     }
 
     /* 
@@ -141,7 +139,7 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
      */
     public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
         if (value == null) {
-            st.setNull(index, StandardBasicTypes.INTEGER.sqlType());
+            st.setNull(index, Hibernate.INTEGER.sqlType());
         } else {
             Integer code = getCode(value);
             logger.debug("Binding '{}' to parameter: {}", code, index);
@@ -181,20 +179,5 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
         }
         return value;
     }
-
-	@Override
-	public Object nullSafeGet(ResultSet rs, String[] names,
-			SessionImplementor session, Object owner)
-			throws HibernateException, SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void nullSafeSet(PreparedStatement st, Object value, int index,
-			SessionImplementor session) throws HibernateException, SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
