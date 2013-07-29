@@ -1292,7 +1292,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             } else {
                                 parentItemString =
                                     "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId
-                                        + " ORDER BY OID DESC LIMIT 1)";
+                                        + " ORDER BY OC_OID DESC LIMIT 1)";
                             }
                         }
 

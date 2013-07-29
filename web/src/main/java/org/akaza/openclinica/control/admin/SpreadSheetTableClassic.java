@@ -914,7 +914,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             } else {
                                 parentItemString =
                                     "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId
-                                        + " ORDER BY OID DESC LIMIT 1)";
+                                        + " ORDER BY OC_OID DESC LIMIT 1)";
                             }
                         }
 
@@ -1084,7 +1084,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, borders) VALUES ("
                                     + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = "
                                     + crfId
-                                    + " ORDER BY OID DESC LIMIT 1),'"
+                                    + " ORDER BY oc_oid DESC LIMIT 1),'"
                                     + ""
                                     + "', '"
                                     + ""
