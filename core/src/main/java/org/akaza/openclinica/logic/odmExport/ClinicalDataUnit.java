@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -50,6 +51,7 @@ public class ClinicalDataUnit extends OdmUnit {
 
     public void collectOdmClinicalData() {
         StudyBean study = studyBase.getStudy();
+        GenerateClinicalDataService clinicalDataSrvc = new Gen
         String studyOID = study.getOid();
         if (studyOID == null || studyOID.length() <= 0) {
             logger.info("Constructed studyOID using study_id because oc_oid is missing from the table - study.");
@@ -76,9 +78,17 @@ public class ClinicalDataUnit extends OdmUnit {
                 odmClinicalData.setMetaDataVersionOID("v1.0.0");
             }
         }
-        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
+        //oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
+        
     }
+    
+    
 
+    public void collectOdmClinicalData(String crfId){
+    
+    }
+  
+    
     public OdmClinicalDataBean getOdmClinicalData() {
         return odmClinicalData;
     }
