@@ -13,9 +13,11 @@ import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 
@@ -34,6 +36,20 @@ public class MetadataCollectorResource {
 private RuleSetRuleDao ruleSetRuleDao;	
 
 private CoreResources coreResources;
+//Testing purposes TODO:remove me for now
+private StudyDao studyDaoHib;
+
+	public StudyDao getStudyDaoHib() {
+	return studyDaoHib;
+}
+
+
+
+public void setStudyDaoHib(StudyDao studyDaoHib) {
+	this.studyDaoHib = studyDaoHib;
+}
+
+
 
 	public CoreResources getCoreResources() {
 	return coreResources;
@@ -118,7 +134,9 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion("oc1.3");
         report.createStudyMetaOdmXml(Boolean.FALSE);
-		return report.getXmlOutput().toString().trim();
+		
+        return report.getXmlOutput().toString().trim();
+		
 	}
 	
 	
@@ -169,6 +187,8 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion("oc1.3");
         report.createStudyMetaOdmXml(Boolean.FALSE);
+       Study  study=  getStudyDaoHib().findByOcOID(studyOID);
+       System.out.println("Study name"+study.getStudyId());
 		return report.getXmlOutput().toString().trim();
 	}
 

@@ -40,22 +40,7 @@
     <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
     
   </security:http>  
-    <!-- 
-    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
-        <property name="defaultTargetUrl" value="/MainMenu"/>
-        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
-        <property name="configurationDao" ref="configurationDao"/>
-        <property name="dataSource" ref="dataSource"/>
-        <property name="exceptionMappings">
-            <props>
-                <prop key="org.springframework.security.LockedException">/pages/login/login?action=errorLocked</prop>
-            </props>
-        </property>
-        <security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER"/>
-    </bean>
-    -->
+ 
 
     <bean id="authenticationProcessingFilterEntryPoint"
           class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
@@ -120,23 +105,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
     
-    <!-- 
-     <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
-        <constructor-arg value="/MainMenu"></constructor-arg>
-        <constructor-arg>
-            <list>
-               <ref bean="openClinicaLogoutHandler"/>
-            </list>
-        </constructor-arg>
-        <property name="filterProcessesUrl" value="/j_spring_security_logout" />
-    </bean>
-     -->	
-    <!--<security:global-method-security secured-annotations="enabled">
-        <security:protect-pointcut
-            expression="execution(* com.springsource..*Service.*(..))"
-            access="ROLE_USER" />
-    </security:global-method-security>
-    -->
+   
     
     <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
         <property name="supportRefreshToken" value="true"/>
@@ -163,6 +132,7 @@
 <property name="dataSource" ref="dataSource"></property>
 <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
 <property name="coreResources" ref="coreResources"/>
+<property name = "studyDaoHib" ref = "studyDaoDomain"/>
 </bean>
 <bean id="odmMetadataRestResource" class="org.akaza.openclinica.web.restful.ODMMetadataRestResource">
 	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>

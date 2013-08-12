@@ -24,6 +24,15 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         q.setInteger("id", id);
         return (T) q.uniqueResult();
     }
+    
+    @SuppressWarnings("unchecked")
+	public T findByOcOID(String OCOID){
+    	 getSessionFactory().getStatistics().logSummary();
+         String query = "from " + getDomainClassName() + " do  where do.oc_oid = :OCOID";
+         org.hibernate.Query q = getCurrentSession().createQuery(query);
+         q.setString("oc_oid", OCOID);
+         return (T) q.uniqueResult();
+    }
 
     @Transactional
     public T saveOrUpdate(T domainObject) {
@@ -43,7 +52,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     /**
      * @return Session Object
      */
-    protected Session getCurrentSession() {
+    public Session getCurrentSession() {
         return getSessionFactory().getCurrentSession();
     }
 

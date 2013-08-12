@@ -78,24 +78,16 @@
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-   <!--
-    <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-
-    <bean id="databaseCctsService" class="org.akaza.openclinica.ws.logic.DatabaseCctsService">
-        <property name="subjectService" ref="subjectService"/>
-        <property name="waitBeforeCommit" value="s[ccts.waitBeforeCommit]"/>
-    </bean>
-     -->
+  
 
     <bean id="viewNotesService" class="org.akaza.openclinica.service.managestudy.ViewNotesServiceImpl">
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
     
     <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
-
+<bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataService">
+	<property name="studyDao" ref="studyDaoDomain"></property>
+</bean>
 
 
 </beans>
