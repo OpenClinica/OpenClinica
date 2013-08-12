@@ -70,6 +70,7 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author krikor
@@ -114,7 +115,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return persistentRuleSetBean;
     }
 
-
+ @Transactional
     public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
     	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
         for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
