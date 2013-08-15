@@ -480,7 +480,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         } else {
             String expression =
                 getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
-            if(expression != null) {
+            if(expression != null && !expression.isEmpty()) {
                 ItemBean itemBean = getExpressionService().getItemBeanFromExpression(expression);
                 String itemGroupBOrdinal = getExpressionService().getGroupOrdninalCurated(expression);
                 ItemDataBean itemData =
