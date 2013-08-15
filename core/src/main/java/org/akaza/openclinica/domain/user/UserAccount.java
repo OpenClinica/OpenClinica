@@ -476,7 +476,7 @@ public class UserAccount  implements MutableDomainObject {
 		this.eventDefinitionCrfs = eventDefinitionCrfs;
 	}
 
-//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<StudyGroupClass> getStudyGroupClasses() {
 		return this.studyGroupClasses;
 	}
@@ -503,14 +503,14 @@ public class UserAccount  implements MutableDomainObject {
 		this.subjects = subjects;
 	}
 
-	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<SubjectGroupMap> getSubjectGroupMaps() {
 		return this.subjectGroupMaps;
 	}
 
 	public void setSubjectGroupMaps(List<SubjectGroupMap> subjectGroupMaps) {
 		this.subjectGroupMaps = subjectGroupMaps;
-	}
+	}*/
 
 	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List getAuditUserLogins() {
@@ -530,14 +530,14 @@ public class UserAccount  implements MutableDomainObject {
 		this.discrepancyNotesForOwnerId = discrepancyNotesForOwnerId;
 	}*/
 
-	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+	/*//@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<StudyUserRole> getStudyUserRoles() {
 		return this.studyUserRoles;
 	}
 
 	public void setStudyUserRoles(List<StudyUserRole> studyUserRoles) {
 		this.studyUserRoles = studyUserRoles;
-	}
+	}*/
 
 	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List getDecisionConditions() {

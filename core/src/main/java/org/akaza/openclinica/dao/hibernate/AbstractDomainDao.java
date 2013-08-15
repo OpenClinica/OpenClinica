@@ -41,6 +41,15 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         return domainObject;
     }
 
+    
+    @Transactional
+    public T findByColumnName(Object id,String key) {
+    String query = "from " + getDomainClassName() + " do where do."+key +"= ?";
+    org.hibernate.Query q = getCurrentSession().createQuery(query);
+    q.setParameter(0, id);
+    return (T) q.uniqueResult();
+    } 
+    
     public Long count() {
         return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
     }

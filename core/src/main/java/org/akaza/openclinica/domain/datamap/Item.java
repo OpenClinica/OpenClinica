@@ -50,12 +50,12 @@ public class Item  extends DataMapDomainObject{
 	private String ocOid;
 	private List<ItemFormMetadata> itemFormMetadatas;
 	private List<ItemData> itemDatas;
-	private Set dcSummaryItemMaps = new HashSet(0);
+	//private Set dcSummaryItemMaps = new HashSet(0);
 	private List<VersioningMap> versioningMaps ;
-	private Set dcSubstitutionEvents;
+	//private Set dcSubstitutionEvents;
 	private List<ItemGroupMetadata> itemGroupMetadatas ;
-	private Set dcPrimitivesForItemId ;
-	private Set dcPrimitivesForDynamicValueItemId ;
+	//private Set dcPrimitivesForItemId ;
+	//private Set dcPrimitivesForDynamicValueItemId ;
 
 	public Item() {
 	}
@@ -70,10 +70,10 @@ public class Item  extends DataMapDomainObject{
 			ItemDataType itemDataType, String name, String description,
 			String units, Boolean phiStatus, Date dateCreated,
 			Date dateUpdated, Integer updateId, String ocOid,
-			List<ItemFormMetadata> itemFormMetadatas, List<ItemData>  itemDatas, Set dcSummaryItemMaps,
-			List<VersioningMap>  versioningMaps, Set dcSubstitutionEvents,
-			 List<ItemGroupMetadata> itemGroupMetadatas, Set dcPrimitivesForItemId,
-			Set dcPrimitivesForDynamicValueItemId) {
+			List<ItemFormMetadata> itemFormMetadatas, List<ItemData>  itemDatas, /*Set dcSummaryItemMaps,*/
+//			List<VersioningMap>  versioningMaps, Set dcSubstitutionEvents,
+			 List<ItemGroupMetadata> itemGroupMetadatas/*, Set dcPrimitivesForItemId,
+			Set dcPrimitivesForDynamicValueItemId*/) {
 		this.itemId = itemId;
 		this.userAccount = userAccount;
 		this.itemReferenceType = itemReferenceType;
@@ -89,12 +89,12 @@ public class Item  extends DataMapDomainObject{
 		this.ocOid = ocOid;
 		this.itemFormMetadatas = itemFormMetadatas;
 		this.itemDatas = itemDatas;
-		this.dcSummaryItemMaps = dcSummaryItemMaps;
+		//this.dcSummaryItemMaps = dcSummaryItemMaps;
 		this.versioningMaps = versioningMaps;
-		this.dcSubstitutionEvents = dcSubstitutionEvents;
+		//this.dcSubstitutionEvents = dcSubstitutionEvents;
 		this.itemGroupMetadatas = itemGroupMetadatas;
-		this.dcPrimitivesForItemId = dcPrimitivesForItemId;
-		this.dcPrimitivesForDynamicValueItemId = dcPrimitivesForDynamicValueItemId;
+		//this.dcPrimitivesForItemId = dcPrimitivesForItemId;
+		//this.dcPrimitivesForDynamicValueItemId = dcPrimitivesForDynamicValueItemId;
 	}
 
 	@Id
@@ -276,14 +276,14 @@ public class Item  extends DataMapDomainObject{
 		return this.itemGroupMetadatas;
 	}
 
-	public void setItemGroupMetadatas( List<ItemGroupMetadata> itemGroupMetadatas) {
+public void setItemGroupMetadatas( List<ItemGroupMetadata> itemGroupMetadatas) {
 		this.itemGroupMetadatas = itemGroupMetadatas;
 	}
 
-	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "itemByItemId")
+/*		//@OneToMany(fetch = FetchType.LAZY, mappedBy = "itemByItemId")
 	public Set getDcPrimitivesForItemId() {
 		return this.dcPrimitivesForItemId;
-	}
+	}*/
 
 //	public void setDcPrimitivesForItemId(Set dcPrimitivesForItemId) {
 //		this.dcPrimitivesForItemId = dcPrimitivesForItemId;
@@ -294,10 +294,10 @@ public class Item  extends DataMapDomainObject{
 //		return this.dcPrimitivesForDynamicValueItemId;
 //	}
 
-	public void setDcPrimitivesForDynamicValueItemId(
+/*	public void setDcPrimitivesForDynamicValueItemId(
 			Set dcPrimitivesForDynamicValueItemId) {
 		this.dcPrimitivesForDynamicValueItemId = dcPrimitivesForDynamicValueItemId;
-	}
+	}*/
 
 
 

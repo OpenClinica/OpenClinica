@@ -108,8 +108,8 @@ public class CrfVersion extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	  @Type(type = "status")
-	@JoinColumn(name = "status_id")
+	 @Type(type = "status")
+	 @Column(name = "status_id")
 	public Status getStatus() {
 		return this.status;
 	}

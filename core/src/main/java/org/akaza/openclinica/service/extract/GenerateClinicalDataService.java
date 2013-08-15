@@ -28,7 +28,7 @@ public class GenerateClinicalDataService {
 	 
 	 public void getClinicalData(String studyOID){
 		 Study study = new Study();
-		 study.setOc_Oid(studyOID);
+		 study.setOc_oid(studyOID);
 		 studyDao.findByOcOID(studyOID);
 		 
 	 }

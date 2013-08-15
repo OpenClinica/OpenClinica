@@ -223,14 +223,14 @@ public class Study   extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	@JoinColumn(name = "type_id")
-	public StudyType getStudyType() {
-		return this.studyType;
-	}
-
-	public void setStudyType(StudyType studyType) {
-		this.studyType = studyType;
-	}
+//	@JoinColumn(name = "type_id")
+//	public StudyType getStudyType() {
+//		return this.studyType;
+//	}
+//
+//	public void setStudyType(StudyType studyType) {
+//		this.studyType = studyType;
+//	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_study_id")
@@ -243,7 +243,7 @@ public class Study   extends DataMapDomainObject {
 	}
 
 	 @Type(type = "status")
-	@JoinColumn(name = "status_id")
+	  @Column(name = "status_id")
 	public Status getStatus() {
 		return this.status;
 	}
@@ -699,11 +699,11 @@ public class Study   extends DataMapDomainObject {
 	}
 	
 	@Column(name = "oc_oid", unique = true, nullable = false, length = 40)
-	public String getOc_Oid() {
+	public String getOc_oid() {
 		return this.oc_oid;
 	}
 
-	public void setOc_Oid(String ocOid) {
+	public void setOc_oid(String ocOid) {
 		this.oc_oid = ocOid;
 	}
 
@@ -744,13 +744,13 @@ public class Study   extends DataMapDomainObject {
 	}
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
-	public List<StudyUserRole> getStudyUserRoles() {
-		return this.studyUserRoles;
-	}
-
-	public void setStudyUserRoles(List<StudyUserRole> studyUserRoles) {
-		this.studyUserRoles = studyUserRoles;
-	}
+//	public List<StudyUserRole> getStudyUserRoles() {
+//		return this.studyUserRoles;
+//	}
+//
+//	public void setStudyUserRoles(List<StudyUserRole> studyUserRoles) {
+//		this.studyUserRoles = studyUserRoles;
+//	}
 
 	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
 	public Set getDatasets() {
@@ -762,13 +762,13 @@ public class Study   extends DataMapDomainObject {
 	}*/
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
-	public List<StudyParameterValue> getStudyParameterValues() {
+/*	public List<StudyParameterValue> getStudyParameterValues() {
 		return this.studyParameterValues;
 	}
 
 	public void setStudyParameterValues(List<StudyParameterValue> studyParameterValues) {
 		this.studyParameterValues = studyParameterValues;
-	}
+	}*/
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
 	public List<StudySubject> getStudySubjects() {
@@ -798,13 +798,13 @@ public class Study   extends DataMapDomainObject {
 	}
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
-	public List<StudyModuleStatus> getStudyModuleStatuses() {
+	/*public List<StudyModuleStatus> getStudyModuleStatuses() {
 		return this.studyModuleStatuses;
 	}
 
 	public void setStudyModuleStatuses(List<StudyModuleStatus> studyModuleStatuses) {
 		this.studyModuleStatuses = studyModuleStatuses;
-	}
+	}*/
 
 	
 }

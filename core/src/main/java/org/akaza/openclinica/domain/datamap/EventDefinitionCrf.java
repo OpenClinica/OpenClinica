@@ -299,13 +299,13 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 	}
 
 //	@OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")
-	public Set getDatasetCrfVersionMaps() {
-		return this.datasetCrfVersionMaps;
-	}
-
-	public void setDatasetCrfVersionMaps(Set datasetCrfVersionMaps) {
-		this.datasetCrfVersionMaps = datasetCrfVersionMaps;
-	}
+//	public Set getDatasetCrfVersionMaps() {
+//		return this.datasetCrfVersionMaps;
+//	}
+//
+//	public void setDatasetCrfVersionMaps(Set datasetCrfVersionMaps) {
+//		this.datasetCrfVersionMaps = datasetCrfVersionMaps;
+//	}
 
 	
 

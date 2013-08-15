@@ -52,54 +52,54 @@
                 <value>org.akaza.openclinica.domain.OpenClinicaVersionBean</value>
  
  <!-- The following beans are coded for data maping, currently they are partially working, to resume the work uncomment it -->
-<!--  <value>org.akaza.openclinica.domain.datamap.Study</value>  -->
-<!--   <value>org.akaza.openclinica.domain.user.UserAccount</value> -->
-<!--   <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>   -->
-<!--  <value>org.akaza.openclinica.domain.datamap.CompletionStatus     </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.CrfVersion           </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>   -->
-<!--  <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnItemDataMap   </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnItemDataMapId </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnStudyEventMap      </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnStudySubjectMap                 </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnSubjectMap                 </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.DnStudyEventMapId    </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.VersioningMap    </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.VersioningMapId    </value> -->
-<!-- <value>org.akaza.openclinica.domain.datamap.EventCrf             </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.Item                 </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemData             </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.ResponseType          </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.Section               </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>   -->
+ <value>org.akaza.openclinica.domain.datamap.Study</value> 
+  <value>org.akaza.openclinica.domain.user.UserAccount</value>
+  <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
+ <value>org.akaza.openclinica.domain.datamap.CompletionStatus     </value>  
+<value>org.akaza.openclinica.domain.datamap.CrfVersion           </value>  
+<value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>  
+<value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>  
+ <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value>
+<value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value>
+<value>org.akaza.openclinica.domain.datamap.DnItemDataMap   </value>
+<value>org.akaza.openclinica.domain.datamap.DnItemDataMapId </value>
+<value>org.akaza.openclinica.domain.datamap.DnStudyEventMap      </value>
+<value>org.akaza.openclinica.domain.datamap.DnStudySubjectMap                 </value>
+<value>org.akaza.openclinica.domain.datamap.DnSubjectMap                 </value>
+<value>org.akaza.openclinica.domain.datamap.DnStudyEventMapId    </value>
+<value>org.akaza.openclinica.domain.datamap.VersioningMap    </value>
+<value>org.akaza.openclinica.domain.datamap.VersioningMapId    </value>
+<value>org.akaza.openclinica.domain.datamap.EventCrf             </value>  
+<value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>  
+<value>org.akaza.openclinica.domain.datamap.Item                 </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemData             </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>  
+<value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>  
+<value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>  
+<value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>  
+<value>org.akaza.openclinica.domain.datamap.ResponseType          </value>  
+<value>org.akaza.openclinica.domain.datamap.Section               </value>  
+<value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>  
+<value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>  
 
-<!-- <value>org.akaza.openclinica.domain.datamap.StudySubject</value>   -->
+<value>org.akaza.openclinica.domain.datamap.StudySubject</value>  
 
-<!-- <value>org.akaza.openclinica.domain.datamap.Subject</value>   -->
+<value>org.akaza.openclinica.domain.datamap.Subject</value>  
         
 <!-- the following were not tested, to be remain commented as of now -->         
 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
 <!-- <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>    -->
 <!-- <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>   -->
 <!-- to be remain commented for now -->
-<!-- <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>   -->
+<value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>  
 <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.NullValueType         </value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.OpenclinicaVersion    </value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>   -->
+<value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>   -->
