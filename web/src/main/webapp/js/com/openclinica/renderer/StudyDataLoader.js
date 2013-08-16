@@ -13,7 +13,7 @@
 function StudyDataLoader(study) {
   this.study = study;
   
-  
+	  
  /* getStudyParamValue(studyParamList, listId) 
   * A convenience function to get the study detail parameter value
   */ 
@@ -75,7 +75,7 @@ function StudyDataLoader(study) {
     for (var i=0;i< codeLists.length;i++) {
       var codeListKey = codeLists[i]["@OID"]; 
       var currentCodeList = [];
-      var codeListItems = codeLists[i]["CodeListItem"];
+      var codeListItems = util_ensureArray(codeLists[i]["CodeListItem"]);
       
       for (var j=0;j< codeListItems.length;j++) {
         var currentCodeListItem = {};
@@ -102,7 +102,7 @@ function StudyDataLoader(study) {
     for (var i=0;i< multiSelectLists.length;i++) {
       var multiSelectListKey = multiSelectLists[i]["@ID"]; 
       var currentMultiSelectList = [];
-      var multiSelectListItems = multiSelectLists[i]["OpenClinica:MultiSelectListItem"];
+      var multiSelectListItems = util_ensureArray(multiSelectLists[i]["OpenClinica:MultiSelectListItem"]);
       for (var j=0;j< multiSelectListItems.length;j++) {
         var currentMultiSelectListItem = {};
         currentMultiSelectListItem.id = multiSelectListItems[j]["@CodedOptionValue"]; 
