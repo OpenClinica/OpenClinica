@@ -184,4 +184,7 @@
   
   <bean id="studyDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyDao" parent="abstractDomainDao" autowire="byName">
   </bean>
+  
+  <bean id="studySubjectDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDao" parent="abstractDomainDao" autowire="byName">
+  </bean>
 </beans>

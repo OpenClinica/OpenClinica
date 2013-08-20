@@ -36,7 +36,7 @@ public class MetadataCollectorResource {
 private RuleSetRuleDao ruleSetRuleDao;	
 
 private CoreResources coreResources;
-//Testing purposes TODO:remove me for now
+//Testing purposes TODO:remove me 
 private StudyDao studyDaoHib;
 
 	public StudyDao getStudyDaoHib() {
@@ -188,10 +188,7 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         report.setODMVersion("oc1.3");
         report.createStudyMetaOdmXml(Boolean.FALSE);
      
-      //  Study  study=  getStudyDaoHib().findById(studyBean.getId());
-        //Study study = getStudyDaoHib().findByColumnName(studyOID, "oc_oid");
-       //System.out.println("Study name"+study.getStudyId());
-      // System.out.println(study.getStudies().get(0).getStudy().getEventDefinitionCrfs().get(0).getCrfVersion().getName());
+     
 		return report.getXmlOutput().toString().trim();
 	}
 

@@ -137,4 +137,10 @@
 <bean id="odmMetadataRestResource" class="org.akaza.openclinica.web.restful.ODMMetadataRestResource">
 	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
 </bean>
+<bean id="clinicalDataCollectorResource" class="org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
+<property name = "generateClinicalDataService" ref = "generateClinicalDataService"></property>
+</bean>
+<bean id="odmClinicalDataRestResource" class="org.akaza.openclinica.web.restful.ODMClinicaDataResource">
+	<property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
+</bean>
 </beans>
