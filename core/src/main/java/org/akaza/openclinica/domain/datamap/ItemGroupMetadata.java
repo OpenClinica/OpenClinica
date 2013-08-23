@@ -23,6 +23,28 @@ import org.hibernate.annotations.Parameter;
 
 public class ItemGroupMetadata  extends DataMapDomainObject {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + itemGroupMetadataId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemGroupMetadata other = (ItemGroupMetadata) obj;
+		if (itemGroupMetadataId != other.itemGroupMetadataId)
+			return false;
+		return true;
+	}
+
 	private int itemGroupMetadataId;
 	private CrfVersion crfVersion;
 	private Item item;

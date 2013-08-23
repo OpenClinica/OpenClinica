@@ -50,7 +50,7 @@ public class CrfVersion extends DataMapDomainObject {
 	private List<Section> sections ;
 	private List<EventDefinitionCrf> eventDefinitionCrfs;
 	private Set decisionConditions = new HashSet(0);
-	private List<ItemGroupMetadata> itemGroupMetadatas ;;
+	private Set<ItemGroupMetadata> itemGroupMetadatas ;;
 
 	public CrfVersion() {
 	}
@@ -66,7 +66,7 @@ public class CrfVersion extends DataMapDomainObject {
 			Date dateCreated, Date dateUpdated, Integer updateId, String ocOid,
 			Set filterCrfVersionMaps,List<VersioningMap> versioningMaps, List<EventCrf> eventCrfs,
 			List<Section> sections, List<EventDefinitionCrf> eventDefinitionCrfs, Set decisionConditions,
-			List<ItemGroupMetadata> itemGroupMetadatas) {
+			Set<ItemGroupMetadata> itemGroupMetadatas) {
 		this.crfVersionId = crfVersionId;
 		this.userAccount = userAccount;
 		this.status = status;
@@ -248,11 +248,11 @@ public class CrfVersion extends DataMapDomainObject {
 	}
 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
-	public List<ItemGroupMetadata> getItemGroupMetadatas() {
+	public Set<ItemGroupMetadata> getItemGroupMetadatas() {
 		return this.itemGroupMetadatas;
 	}
 
-	public void setItemGroupMetadatas(List<ItemGroupMetadata> itemGroupMetadatas) {
+	public void setItemGroupMetadatas(Set<ItemGroupMetadata> itemGroupMetadatas) {
 		this.itemGroupMetadatas = itemGroupMetadatas;
 	}
 

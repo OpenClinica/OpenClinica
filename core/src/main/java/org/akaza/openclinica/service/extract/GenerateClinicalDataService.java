@@ -2,6 +2,7 @@ package org.akaza.openclinica.service.extract;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
@@ -20,6 +21,7 @@ import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,38 +161,65 @@ public class GenerateClinicalDataService {
 	
 	
 	private ArrayList<ImportItemGroupDataBean> getItemData(
-			List<ItemGroupMetadata> itemGroupMetadatas) {
+			Set<ItemGroupMetadata> set) {
 		ArrayList<ImportItemGroupDataBean> iigDataBean =new ArrayList<ImportItemGroupDataBean>();
-		for(ItemGroupMetadata igMetadata:itemGroupMetadatas){
-			ImportItemGroupDataBean importIDBean = new ImportItemGroupDataBean();
+		ImportItemGroupDataBean importIDBean = new ImportItemGroupDataBean();
+		String itemGroupOID = null;
+		for(ItemGroupMetadata igMetadata:set){
+	    
+			
+			importIDBean = checkIfGroupOIDExists(iigDataBean,igMetadata.getItemGroup().getOcOid());
+			//Only if every groupOID is not created go ahead and create, the items get iterated in 
+			if(importIDBean.getItemGroupOID()==null || importIDBean.getItemGroupOID().isEmpty()){
+			ImportItemDataBean iiDataBean = new ImportItemDataBean();
+			if(igMetadata.getItemGroup().getOcOid()!=null && !igMetadata.getItemGroup().getOcOid().isEmpty())
+				itemGroupOID = igMetadata.getItemGroup().getOcOid();
 			importIDBean.setItemGroupOID(igMetadata.getItemGroup().getOcOid());
-			setItemDataValues(importIDBean,igMetadata.getItem());
+			setItemDataValues(importIDBean,igMetadata.getCrfVersion().getVersioningMaps(),iiDataBean,itemGroupOID);
 			iigDataBean.add(importIDBean);
+			}
+			
 		}
 		return iigDataBean;
 	}
-	private void setItemDataValues(ImportItemGroupDataBean importIDBean,
-			Item item) {
+	private ImportItemGroupDataBean checkIfGroupOIDExists(
+			ArrayList<ImportItemGroupDataBean> iigDataBean, String ocOid) {
+		ImportItemGroupDataBean iiGrpDataBean = new ImportItemGroupDataBean();
 		
-		for(ItemData id :item.getItemDatas()){
-			ImportItemDataBean iiDataBean = new ImportItemDataBean();
-			iiDataBean.setValue(id.getValue());
-			iiDataBean.setItemOID(id.getItem().getOcOid());
-			importIDBean.getItemData().add(iiDataBean);
+		for(ImportItemGroupDataBean databean:iigDataBean ){
+			if(databean.getItemGroupOID()!=null && databean.getItemGroupOID().equals(ocOid)){
+				iiGrpDataBean =  databean;
+				break;
+			}
+		}
+		return iiGrpDataBean;
+		
+	}
+	//fetches the item data values 
+	private void setItemDataValues(ImportItemGroupDataBean importIDBean,
+			List<VersioningMap>vm,ImportItemDataBean iiDataBean,String groupOID) {
+		
+		ItemData id = new ItemData();
+		for(VersioningMap vm1:vm){
+			 iiDataBean = new ImportItemDataBean();
+			Item item= vm1.getItem();
+			List<ItemGroupMetadata> itGrpMetas = item.getItemGroupMetadatas();
+			
+			if(item.getItemDatas().size()>0)
+			{
+				for(ItemGroupMetadata itmGrpMeta:itGrpMetas)
+				{
+					if(itmGrpMeta.getItemGroup().getOcOid().equals(groupOID) ){
+					id = item.getItemDatas().get(item.getItemDatas().size()-1);
+					iiDataBean.setValue(id.getValue());
+					iiDataBean.setItemOID(id.getItem().getOcOid());
+					if(!importIDBean.getItemData().contains(iiDataBean))
+					importIDBean.getItemData().add(iiDataBean);
+					}
+				}
+			}
 		}
 		
 	}
-//	private ArrayList<ImportItemGroupDataBean> getItemData(EventCrf ecrf) {
-//		ArrayList<ImportItemGroupDataBean> iigDataBean =new ArrayList<ImportItemGroupDataBean>();
-//		for(ItemData itemData:ecrf.getItemDatas()){
-//			ImportItemGroupDataBean importGroupData = new ImportItemGroupDataBean();
-//			
-//			importGroupData.setItemGroupOID(itemData.getItem().getItemGroupMetadatas().)
-//			itemData.get
-//		}
-//		
-//		return null;
-//	}
-//	
 	
 }
