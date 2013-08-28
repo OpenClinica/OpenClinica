@@ -230,7 +230,10 @@ public class StudySubjectEndpoint {
             }
             SubjectBean subjectBean = (SubjectBean) getSubjectDao().findByPK(studySubjectBean.getSubjectId());
             subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
-            subjectType.setGender(GenderType.fromValue(String.valueOf(subjectBean.getGender())));
+            String genderStr = String.valueOf(subjectBean.getGender());
+            if (!"".equals(genderStr.trim())){
+            	subjectType.setGender(GenderType.fromValue(genderStr));
+            }
             if ( subjectBean.getDateOfBirth() != null){
             	subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
             }

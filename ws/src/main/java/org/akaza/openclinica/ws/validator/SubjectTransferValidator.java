@@ -221,7 +221,7 @@ public class SubjectTransferValidator implements Validator {
         }
 // verify that personId is unique 
          if (subjectTransferBean.getPersonId() != null && subjectTransferBean.getPersonId().length()>0){
-	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifier( subjectTransferBean.getPersonId());
+	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifierAndStudy( subjectTransferBean.getPersonId(), study.getId());
 	   	 
 		   	 if ( subjectWithSamePersonId.getId() !=0 )
 		   	 {
@@ -231,32 +231,29 @@ public class SubjectTransferValidator implements Validator {
 		   	 }
          }
         
-        String idSetting = "";
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
-        idSetting = subjectIdGenerationParameter.getValue();
-        if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-            subjectTransferBean.setStudySubjectId(new Integer(nextLabel).toString());
-        }
-        String studySubjectId = subjectTransferBean.getStudySubjectId();
-        if (studySubjectId == null || studySubjectId.length() < 1) {
-            e.reject("subjectTransferValidator.studySubjectId_required");
-            return;
-        } else if (studySubjectId.length() > 30) {
-            e.reject("subjectTransferValidator.studySubjectId_invalid_length", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
-                + " cannot be longer than 30 characters.");
-            return;
-        } else    
-        {  // checks whether there is a subject with same id inside current study
-        	StudySubjectBean subjectWithSame = getStudySubjectDAO().findByLabelAndStudy(studySubjectId, study);
-        	 
-        	 if ( subjectWithSame.getLabel().equals(studySubjectId) )
-        	 {
-        		 e.reject("subjectTransferValidator.subject_duplicated_label", new Object[] { studySubjectId, study.getIdentifier() }, 
-        				 "studySubjectId: " + studySubjectId
-        	                + " already exists for "+study.getIdentifier() +" study .");
-        	            return;
-        	 }
+        String idSetting = subjectIdGenerationParameter.getValue();
+        if (!(idSetting.equals("auto editable") || idSetting.equals("auto non-editable"))) {
+        	String studySubjectId = subjectTransferBean.getStudySubjectId();
+            if (studySubjectId == null || studySubjectId.length() < 1) {
+                e.reject("subjectTransferValidator.studySubjectId_required");
+                return;
+            } else if (studySubjectId.length() > 30) {
+                e.reject("subjectTransferValidator.studySubjectId_invalid_length", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
+                    + " cannot be longer than 30 characters.");
+                return;
+            } else    
+            {  // checks whether there is a subject with same id inside current study
+            	StudySubjectBean subjectWithSame = getStudySubjectDAO().findByLabelAndStudy(studySubjectId, study);
+            	 
+            	 if ( subjectWithSame.getLabel().equals(studySubjectId) )
+            	 {
+            		 e.reject("subjectTransferValidator.subject_duplicated_label", new Object[] { studySubjectId, study.getIdentifier() }, 
+            				 "studySubjectId: " + studySubjectId
+            	                + " already exists for "+study.getIdentifier() +" study .");
+            	            return;
+            	 }
+            }
         }
 
         String secondaryId = subjectTransferBean.getSecondaryId();
@@ -265,7 +262,7 @@ public class SubjectTransferValidator implements Validator {
                 + " cannot be longer than 30 characters.");
             return;
         }
-        String gender = subjectTransferBean.getGender() + "";
+        String gender = String.valueOf(subjectTransferBean.getGender());
         studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "genderRequired");
         if ("true".equals(studyParameter.getValue()) ) {
         	if(gender == null || gender.length() < 1) {
@@ -278,7 +275,7 @@ public class SubjectTransferValidator implements Validator {
             } 
 	    }
         else{
-        	if (gender.length() > 0 && !("m".equals(gender) || "f".equals(gender))) {
+        	if (gender.trim().length() > 0 && !("m".equals(gender) || "f".equals(gender))) {
                 e.reject("subjectTransferValidator.gender_is_m_or_f");
                 return;
             } 
