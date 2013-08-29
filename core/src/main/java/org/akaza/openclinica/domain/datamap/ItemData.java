@@ -42,7 +42,6 @@ public class ItemData  extends DataMapDomainObject {
 	private Date dateUpdated;
 	private Integer updateId;
 	private Integer ordinal;
-	private Integer codingStatusId;
 	private List<DnItemDataMap> dnItemDataMaps;
 
 	public ItemData() {
@@ -56,7 +55,7 @@ public class ItemData  extends DataMapDomainObject {
 	public ItemData(int itemDataId, UserAccount userAccount, EventCrf eventCrf,
 			Item item, Status status, String value, Date dateCreated,
 			Date dateUpdated, Integer updateId, Integer ordinal,
-			Integer codingStatusId,  List<DnItemDataMap> dnItemDataMaps) {
+			 List<DnItemDataMap> dnItemDataMaps) {
 		this.itemDataId = itemDataId;
 		this.userAccount = userAccount;
 		this.eventCrf = eventCrf;
@@ -67,7 +66,7 @@ public class ItemData  extends DataMapDomainObject {
 		this.dateUpdated = dateUpdated;
 		this.updateId = updateId;
 		this.ordinal = ordinal;
-		this.codingStatusId = codingStatusId;
+		
 		this.dnItemDataMaps = dnItemDataMaps;
 	}
 
@@ -172,15 +171,7 @@ public class ItemData  extends DataMapDomainObject {
 		this.ordinal = ordinal;
 	}
 
-	@Column(name = "coding_status_id")
-	public Integer getCodingStatusId() {
-		return this.codingStatusId;
-	}
-
-	public void setCodingStatusId(Integer codingStatusId) {
-		this.codingStatusId = codingStatusId;
-	}
-
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "itemData")
 	public List<DnItemDataMap> getDnItemDataMaps() {
 		return this.dnItemDataMaps;
