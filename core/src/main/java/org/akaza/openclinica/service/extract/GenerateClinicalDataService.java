@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.extract;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +10,6 @@ import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 public class GenerateClinicalDataService {
 	 protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.service.extract.GenerateClinicalDataService");
+	 protected final static String DELIMITER = ",";
+	 private final static String GROUPOID_ORDINAL_DELIM = ":";
 	 
 	 private StudyDao studyDao;
 	 
@@ -89,6 +91,7 @@ public class GenerateClinicalDataService {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 		
 		ExportSubjectDataBean expSubjectBean = setExportSubjectDataBean(studySubj);
+		
 		
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>(); 
 		exportSubjDataBeanList.add(expSubjectBean);
@@ -148,7 +151,7 @@ public class GenerateClinicalDataService {
 			ExportFormDataBean dataBean = new ExportFormDataBean();
 			//dataBean.setDiscrepancyNotes(ecrf)
 			//dataBean.setItemGroupData(getItemData(ecrf));
-			dataBean.setItemGroupData(getItemData(ecrf.getCrfVersion().getItemGroupMetadatas()));
+			dataBean.setItemGroupData(fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(),ecrf.getEventCrfId(),ecrf.getCrfVersion().getVersioningMaps()));
 			dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
 			dataBean.setInterviewDate(ecrf.getDateInterviewed()+"");
 			dataBean.setInterviewerName(ecrf.getInterviewerName());
@@ -159,62 +162,182 @@ public class GenerateClinicalDataService {
 		return (ArrayList<ExportFormDataBean>) formDataBean;
 	}
 	
+	private ArrayList<ImportItemGroupDataBean> fetchItemData(Set<ItemGroupMetadata> set,int eventCrfId,List<VersioningMap>vms){
+		String groupOID,itemOID;
+		Integer groupID;
+		String itemValue;
+		
+		
+		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
+		
+		//For each metadata get the group, and then get list of all items in that group.so we can a data structure of groupOID and list of itemOIDs with corresponding values will be created.
+		
+		for(ItemGroupMetadata igGrpMetadata:set){
+			groupOID = igGrpMetadata.getItemGroup().getOcOid();
+			int defaultOrdinal = 1;
+		
+			//This logic here is default ordinal for ungrouped items and repeating groups is 1; This needs to be handled differently either here or in populateItemGrpBean to not show this information in case of ungrouped items
+			
+			if(!oidMap.containsKey(groupOID)){		
+				String groupOIDOrdnl = groupOID;
+			groupID = igGrpMetadata.getItemGroup().getId();
+			ArrayList<String> itemsValues = new ArrayList<String>();
+			//itemOID = igGrpMetadata.getItem().getOcOid();
+			List<ItemGroupMetadata>allItemsInAGroup = igGrpMetadata.getItemGroup().getItemGroupMetadatas();
+			
+			for(ItemGroupMetadata itemGrpMetada:allItemsInAGroup){
+				itemOID = itemGrpMetada.getItem().getOcOid();
+				itemsValues = new ArrayList<String>();
+				List<ItemData> itds =  itemGrpMetada.getItem().getItemDatas();
+				
+				//TODO: Only one item data value should be present not several of them, this should not be a list
+				// There also needs to be the response option value populated here depending on what the response type is.
+				if(!igGrpMetadata.isRepeatingGroup())
+				for(ItemData itemData:itds){
+					itemValue = itemOID +DELIMITER+itemData.getValue();
+					itemsValues.add(itemValue);
+					groupOIDOrdnl = groupOID+GROUPOID_ORDINAL_DELIM+itemData.getOrdinal();
+				}
+				else{//if the group is a repeating group, look for the key of same group and ordinal and add this item to that hashmap
+					for(ItemData itemData:itds){
+						itemsValues = new ArrayList<String>(); 
+						itemValue = itemOID +DELIMITER+itemData.getValue();
+						itemsValues.add(itemValue);
+						groupOIDOrdnl = groupOID+GROUPOID_ORDINAL_DELIM+itemData.getOrdinal();
+						if(oidMap.containsKey(groupOIDOrdnl))
+						{
+							
+							ArrayList<String>itemgrps = oidMap.get(groupOIDOrdnl);
+							itemgrps.add(itemValue);
+							oidMap.remove(groupOIDOrdnl);
+							oidMap.put(groupOIDOrdnl,itemgrps);
+						}
+						else
+						{
+							oidMap.put(groupOIDOrdnl, itemsValues);
+						}
+					}
+				}
+				
+			
+			}
+			if(!igGrpMetadata.isRepeatingGroup())
+			oidMap.put(groupOIDOrdnl,itemsValues);
+		}
+		}
+		
+		return populateImportItemGrpBean(oidMap);
+	}
 	
-	private ArrayList<ImportItemGroupDataBean> getItemData(
-			Set<ItemGroupMetadata> set) {
+private ArrayList<ImportItemGroupDataBean> populateImportItemGrpBean(
+			HashMap<String, ArrayList<String>> oidMap) {
+		Set<String> keysGrpOIDs = oidMap.keySet();
+		ArrayList<ImportItemGroupDataBean> iigDataBean =new ArrayList<ImportItemGroupDataBean>();
+		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
+		for(String grpOID:keysGrpOIDs){
+			ArrayList<String> vals = oidMap.get(grpOID);
+			importItemGrpDataBean = new ImportItemGroupDataBean();
+			int groupIdx = grpOID.indexOf(GROUPOID_ORDINAL_DELIM);
+			
+			importItemGrpDataBean.setItemGroupOID(grpOID.substring(0,groupIdx));
+			importItemGrpDataBean.setItemGroupRepeatKey(grpOID.substring(groupIdx+1,grpOID.length()));
+			ArrayList<ImportItemDataBean> iiDList = new ArrayList<ImportItemDataBean>();
+			
+			for(String value :vals){
+				ImportItemDataBean iiDataBean = new ImportItemDataBean();
+				int index = value.indexOf(DELIMITER);
+				if(!value.trim().equalsIgnoreCase(DELIMITER))
+				{
+					iiDataBean.setItemOID(value.substring(0,index));
+					iiDataBean.setValue(value.substring(index+1, value.length()));
+					iiDList.add(iiDataBean);
+					
+				}
+			}
+			importItemGrpDataBean.setItemData(iiDList);
+			iigDataBean.add(importItemGrpDataBean);
+		}
+		return iigDataBean;
+	}
+	/*	private ArrayList<ImportItemGroupDataBean> fetchItemData(
+			Set<ItemGroupMetadata> set,int eventCrfId,List<VersioningMap>vms) {
 		ArrayList<ImportItemGroupDataBean> iigDataBean =new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importIDBean = new ImportItemGroupDataBean();
 		String itemGroupOID = null;
 		for(ItemGroupMetadata igMetadata:set){
-	    
-			
+	    for(VersioningMap vm:vms){
+	    	if(vm.getItem().equals(igMetadata.getItem()))
+			{
+	    	if(!igMetadata.isRepeatingGroup())
 			importIDBean = checkIfGroupOIDExists(iigDataBean,igMetadata.getItemGroup().getOcOid());
-			//Only if every groupOID is not created go ahead and create, the items get iterated in 
-			if(importIDBean.getItemGroupOID()==null || importIDBean.getItemGroupOID().isEmpty()){
+			//Only if every groupOID is not created go ahead and create, the items get iterated in for non-repeating groups.
+		//	if(importIDBean.getItemGroupOID()==null || importIDBean.getItemGroupOID().isEmpty()){
 			ImportItemDataBean iiDataBean = new ImportItemDataBean();
+			//}
 			if(igMetadata.getItemGroup().getOcOid()!=null && !igMetadata.getItemGroup().getOcOid().isEmpty())
 				itemGroupOID = igMetadata.getItemGroup().getOcOid();
-			importIDBean.setItemGroupOID(igMetadata.getItemGroup().getOcOid());
-			setItemDataValues(importIDBean,igMetadata.getCrfVersion().getVersioningMaps(),iiDataBean,itemGroupOID);
-			iigDataBean.add(importIDBean);
+			//importIDBean.setItemGroupOID(igMetadata.getItemGroup().getOcOid());
+			List<ItemData>itemDatas = vm.getItem().getItemDatas();
+			for(ItemData itemData :itemDatas){
+				{
+					iiDataBean.setValue(itemData.getValue());
+					iiDataBean.setItemOID(itemData.getItem().getOcOid());
+					importIDBean.setItemGroupRepeatKey(itemData.getOrdinal()+"");
+					importIDBean.setItemGroupOID(igMetadata.getItemGroup().getOcOid());
+					if(!importIDBean.getItemData().contains(iiDataBean))
+					importIDBean.getItemData().add(iiDataBean);
+				}
+			}
+			
+			}//setItemDataValues(importIDBean,igMetadata.getCrfVersion().getVersioningMaps(),iiDataBean,itemGroupOID,eventCrfId);
+	    	
 			}
 			
 		}
 		return iigDataBean;
-	}
+	}*/
 	private ImportItemGroupDataBean checkIfGroupOIDExists(
 			ArrayList<ImportItemGroupDataBean> iigDataBean, String ocOid) {
 		ImportItemGroupDataBean iiGrpDataBean = new ImportItemGroupDataBean();
 		
-		for(ImportItemGroupDataBean databean:iigDataBean ){
+		/*for(ImportItemGroupDataBean databean:iigDataBean ){
 			if(databean.getItemGroupOID()!=null && databean.getItemGroupOID().equals(ocOid)){
 				iiGrpDataBean =  databean;
 				break;
 			}
-		}
+		}*/
+		
 		return iiGrpDataBean;
 		
 	}
 	//fetches the item data values 
 	private void setItemDataValues(ImportItemGroupDataBean importIDBean,
-			List<VersioningMap>vm,ImportItemDataBean iiDataBean,String groupOID) {
+			List<VersioningMap>vm,ImportItemDataBean iiDataBean,String groupOID,int eventCrfId) {
 		
-		ItemData id = new ItemData();
+	//	ItemData id = new ItemData();
 		for(VersioningMap vm1:vm){
 			 iiDataBean = new ImportItemDataBean();
 			Item item= vm1.getItem();
 			List<ItemGroupMetadata> itGrpMetas = item.getItemGroupMetadatas();
-			
-			if(item.getItemDatas().size()>0)
+			List<ItemData>itemDatas = item.getItemDatas();
+			if(itemDatas.size()>0)
 			{
 				for(ItemGroupMetadata itmGrpMeta:itGrpMetas)
 				{
-					if(itmGrpMeta.getItemGroup().getOcOid().equals(groupOID) ){
-					id = item.getItemDatas().get(item.getItemDatas().size()-1);
+					if(itmGrpMeta.getItemGroup().getOcOid().equals(groupOID)  )
+					{
+					//id = item.getItemDatas().get(item.getItemDatas().size()-1);
+					for(ItemData id :itemDatas)	{
+					if(id.getEventCrf().getEventCrfId()==eventCrfId)
+					{				
 					iiDataBean.setValue(id.getValue());
 					iiDataBean.setItemOID(id.getItem().getOcOid());
+					importIDBean.setItemGroupRepeatKey(id.getOrdinal()+"");
+					importIDBean.setItemGroupOID(itmGrpMeta.getItemGroup().getOcOid());
 					if(!importIDBean.getItemData().contains(iiDataBean))
 					importIDBean.getItemData().add(iiDataBean);
+					}
+					}
 					}
 				}
 			}
