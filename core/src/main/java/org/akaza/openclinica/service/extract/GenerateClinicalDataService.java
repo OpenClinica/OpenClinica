@@ -63,11 +63,6 @@ public class GenerateClinicalDataService {
 		study.setOc_oid(studyOID);
 		study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 
-		// Study study= getStudyDaoHib().findById(studyBean.getId());
-		// Study study = getStudyDaoHib().findByColumnName(studyOID, "oc_oid");
-		// System.out.println("Study name"+study.getStudyId());
-		// System.out.println(study.getStudies().get(0).getStudy().getEventDefinitionCrfs().get(0).getCrfVersion().getName());
-
 	}
 
 	public String getClinicalData(String studyOID, String studySubjectOID) {
@@ -123,8 +118,6 @@ public class GenerateClinicalDataService {
 				.setExportStudyEventData(setExportStudyEventDataBean(studySubj));
 
 		exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
-		// exportSubjectDataBean.setStudyEventData(studyEventData)
-		// exportSubjectDataBean.setDiscrepancyNotes(studySubj.getSubject().getDnStudySubjectMaps());
 		return exportSubjectDataBean;
 
 	}
@@ -163,6 +156,7 @@ public class GenerateClinicalDataService {
 			dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
 			dataBean.setInterviewerName(ecrf.getInterviewerName());
 			dataBean.setStatus(ecrf.getStatus() + "");
+			
 			formDataBean.add(dataBean);
 
 		}
@@ -187,7 +181,7 @@ public class GenerateClinicalDataService {
 			if (!oidMap.containsKey(groupOID)) {
 				String groupOIDOrdnl = groupOID;
 				ArrayList<String> itemsValues = new ArrayList<String>();
-				
+
 				List<ItemGroupMetadata> allItemsInAGroup = igGrpMetadata
 						.getItemGroup().getItemGroupMetadatas();
 
@@ -203,36 +197,37 @@ public class GenerateClinicalDataService {
 					// populated here depending on what the response type is.
 					if (!igGrpMetadata.isRepeatingGroup())
 						for (ItemData itemData : itds) {
-							itemValue = itemOID + DELIMITER	+ itemData.getValue();
+							itemValue = itemOID + DELIMITER
+									+ itemData.getValue();
 							itemsValues.add(itemValue);
-							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM+ itemData.getOrdinal();
+							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
+									+ itemData.getOrdinal();
 						}
 					else {// if the group is a repeating group, look for the key
 							// of same group and ordinal and add this item to
 							// that hashmap
 						for (ItemData itemData : itds) {
 							itemsValues = new ArrayList<String>();
-							itemValue = itemOID + DELIMITER	+ itemData.getValue();
+							itemValue = itemOID + DELIMITER
+									+ itemData.getValue();
 							itemsValues.add(itemValue);
-							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM+ itemData.getOrdinal();
-							if(itemData.getEventCrf().getEventCrfId()==eventCrfId){
-							
-							if (oidMap.containsKey(groupOIDOrdnl))
-							{
+							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
+									+ itemData.getOrdinal();
+							if (itemData.getEventCrf().getEventCrfId() == eventCrfId) {
 
-								ArrayList<String> itemgrps = oidMap
-										.get(groupOIDOrdnl);
-								if(!itemgrps.contains(itemValue)){
-								itemgrps.add(itemValue);
-								oidMap.remove(groupOIDOrdnl);
+								if (oidMap.containsKey(groupOIDOrdnl)) {
+
+									ArrayList<String> itemgrps = oidMap
+											.get(groupOIDOrdnl);
+									if (!itemgrps.contains(itemValue)) {
+										itemgrps.add(itemValue);
+										oidMap.remove(groupOIDOrdnl);
+									}
+									oidMap.put(groupOIDOrdnl, itemgrps);
+								} else {
+									oidMap.put(groupOIDOrdnl, itemsValues);
 								}
-							//itemOIDs.add(itemOID+"+"+itemData.getOrdinal());
-								oidMap.put(groupOIDOrdnl, itemgrps);
-							} else {
-								oidMap.put(groupOIDOrdnl, itemsValues);
-							//	itemOIDs.add(itemOID+"+"+itemData.getOrdinal());
 							}
-						}
 						}
 					}
 
@@ -254,8 +249,8 @@ public class GenerateClinicalDataService {
 			ArrayList<String> vals = oidMap.get(grpOID);
 			importItemGrpDataBean = new ImportItemGroupDataBean();
 			int groupIdx = grpOID.indexOf(GROUPOID_ORDINAL_DELIM);
-
-			importItemGrpDataBean
+			if(groupIdx!=-1)
+			{			importItemGrpDataBean
 					.setItemGroupOID(grpOID.substring(0, groupIdx));
 			importItemGrpDataBean.setItemGroupRepeatKey(grpOID.substring(
 					groupIdx + 1, grpOID.length()));
@@ -274,7 +269,9 @@ public class GenerateClinicalDataService {
 			}
 			importItemGrpDataBean.setItemData(iiDList);
 			iigDataBean.add(importItemGrpDataBean);
-		}
+			}
+			}
+			
 		return iigDataBean;
 	}
 
