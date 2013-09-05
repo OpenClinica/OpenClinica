@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.extract;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
@@ -38,6 +40,7 @@ public class GenerateClinicalDataService {
 	protected final static String DELIMITER = ",";
 	private final static String GROUPOID_ORDINAL_DELIM = ":";
 
+	private final static String EMPTY_STRING ="";
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
@@ -132,8 +135,10 @@ public class GenerateClinicalDataService {
 			expSEBean.setEndDate(se.getDateEnd() + "");
 			expSEBean.setStartDate(expSEBean.getStartDate() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOcOid());
-			expSEBean.setStudyEventRepeatKey(se.getStudyEventDefinition()
-					.getOrdinal().toString());
+			if(se.getStudyEventDefinition().getRepeating())
+			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			else
+				expSEBean.setStudyEventRepeatKey(EMPTY_STRING);
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se));
 
 			al.add(expSEBean);
@@ -167,6 +172,7 @@ public class GenerateClinicalDataService {
 			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms) {
 		String groupOID, itemOID;
 		String itemValue;
+		String itemDataValue;
 		ArrayList<String> itemOIDs = new ArrayList();
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
 		// For each metadata get the group, and then get list of all items in
@@ -197,19 +203,24 @@ public class GenerateClinicalDataService {
 					// populated here depending on what the response type is.
 					if (!igGrpMetadata.isRepeatingGroup())
 						for (ItemData itemData : itds) {
+							itemDataValue = fetchItemDataValue(itemData,itemGrpMetada.getItem());
 							itemValue = itemOID + DELIMITER
-									+ itemData.getValue();
+									+ itemDataValue;
+							
 							itemsValues.add(itemValue);
 							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
 									+ itemData.getOrdinal();
+							if (itemData.getEventCrf().getEventCrfId() == eventCrfId)
+							oidMap.put(groupOIDOrdnl, itemsValues);
 						}
 					else {// if the group is a repeating group, look for the key
 							// of same group and ordinal and add this item to
 							// that hashmap
 						for (ItemData itemData : itds) {
 							itemsValues = new ArrayList<String>();
+							itemDataValue = fetchItemDataValue(itemData,itemGrpMetada.getItem());
 							itemValue = itemOID + DELIMITER
-									+ itemData.getValue();
+									+ itemDataValue;
 							itemsValues.add(itemValue);
 							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
 									+ itemData.getOrdinal();
@@ -232,12 +243,38 @@ public class GenerateClinicalDataService {
 					}
 
 				}
-				if (!igGrpMetadata.isRepeatingGroup())
-					oidMap.put(groupOIDOrdnl, itemsValues);
+				
+					
 			}
 		}
 
 		return populateImportItemGrpBean(oidMap);
+	}
+
+	private String fetchItemDataValue(ItemData itemData, Item item) {
+		List<ItemFormMetadata> ifMetas = item.getItemFormMetadatas();
+		List<String> optionsText = null;
+		List<String> optionsVals = null;
+		String idValue = itemData.getValue();
+		if(!idValue.isEmpty())
+		for(ItemFormMetadata ifMeta:ifMetas){
+			
+			if(ifMeta.getCrfVersionId()==itemData.getEventCrf().getCrfVersion().getCrfVersionId() && item.getItemId()==itemData.getItem().getItemId()){
+				if(ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 3||ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 5||ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 6
+						|| ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 7)
+				{
+					optionsText = Arrays.asList(ifMeta.getResponseSet().getOptionsText().split("\\s*,\\s*"));
+					optionsVals =  Arrays.asList(ifMeta.getResponseSet().getOptionsValues().split("\\s*,\\s*"));
+				idValue = 	optionsText.get(optionsVals.indexOf(idValue));
+					
+					
+				}
+				
+			}
+				
+		}
+		return idValue;
+		
 	}
 
 	private ArrayList<ImportItemGroupDataBean> populateImportItemGrpBean(
