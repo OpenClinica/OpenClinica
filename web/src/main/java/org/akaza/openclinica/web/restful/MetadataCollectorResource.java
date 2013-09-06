@@ -149,7 +149,13 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 
 
 	
-	public String collectODMMetadataJson(String studyOID,String formVersionOID){
+	public JSON collectODMMetadataJson(String studyOID,String formVersionOID){
+		net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
+		JSON json = xmlserializer.read(collectODMMetadataForForm(studyOID,formVersionOID));
+		return json;
+	}
+	
+	public String collectODMMetadataJsonString(String studyOID,String formVersionOID){
 		net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
 		JSON json = xmlserializer.read(collectODMMetadataForForm(studyOID,formVersionOID));
 		return json.toString(INDENT_LEVEL);

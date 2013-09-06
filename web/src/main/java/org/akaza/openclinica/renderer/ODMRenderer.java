@@ -9,8 +9,6 @@ import net.sf.json.JSONObject;
 
 public class ODMRenderer extends JSONRenderer{
 
-
-  
   private String fileOID;
   private String description;
   private String creationDateTime;
@@ -34,11 +32,11 @@ public class ODMRenderer extends JSONRenderer{
     return super.parse(json);
   }
 
-  public String render(JSON json)  {
+  public String render(JSON json, String studyOID, String eventOID, String formVersionOID)  {
     JSONObject jsonObject = (JSONObject)json;
     parse(json);
     studyRenderer = new StudyRenderer(jsonObject, this.cfg, this.templateVars);
-    return studyRenderer.render(jsonObject.getJSONObject("Study"));
+    return studyRenderer.renderPrintableStudy(jsonObject.getJSONObject("Study"), studyOID, eventOID, formVersionOID);
   }
 
   public String getFileOID() {

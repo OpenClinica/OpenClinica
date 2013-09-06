@@ -16,6 +16,17 @@ function ItemDefRenderer(json, itemDetails, mandatory) {
   this.multiSelectListOID = json["OpenClinica:MultiSelectListRef"] ? json["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : "";
   debug("In ItemDefRenderer: " + this.OID + "  multiSelectListOID: " + this.multiSelectListOID, util_logDebug);
   this.columns = this.itemDetails["OpenClinica:Layout"] ? this.itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
+  this.itemValue = undefined;
+
+  if (app_formData != undefined) {
+    var itemsData = util_ensureArray(app_formData["ItemGroupData"]["ItemData"]);
+    for (var i=0;i<itemsData.length;i++) {
+     if(itemsData[i]["@ItemOID"] == this.OID) { 
+        this.itemValue = itemsData[i]["@Value"];
+        break;
+      }
+    }
+  }
   
   this.renderPrintableItem = function(isRepeating) { 
     var template = "print_item_def";
@@ -26,7 +37,7 @@ function ItemDefRenderer(json, itemDetails, mandatory) {
        {itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, unitLabel:this.unitLabel, 
         optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], columns:this.columns,
         responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
-        itemName:this.itemName});
+        itemName:this.itemName, itemValue:this.itemValue});
     return s[0].outerHTML;
   }
   

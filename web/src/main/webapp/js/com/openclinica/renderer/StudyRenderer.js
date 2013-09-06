@@ -210,7 +210,7 @@ function StudyRenderer(json) {
     
     pageHeaderRenderer = new PageHeaderRenderer();
     this.setStudy(renderMode);  
-    this.studyDataLoader = new StudyDataLoader(this.study); 
+    this.studyDataLoader = new StudyDataLoader(this.study, this.json); 
     this.studyDataLoader.loadStudyLists();   
     var formDef = undefined;
     
@@ -314,8 +314,8 @@ function StudyRenderer(json) {
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
       var nextGroupOID = undefined;
-     if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey])
-      {
+      
+      if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         mandatory = app_itemGroupMap[itemOID].mandatory;
         repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;

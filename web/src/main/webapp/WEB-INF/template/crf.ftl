@@ -385,6 +385,7 @@ table {
 
 body {
   font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+  font-size: 12px;
 }
 
 div.blocking {
@@ -419,7 +420,7 @@ p.link_title {
   bottom: 8px;
   margin: 0;
   color: white;
-  font-size: 1.3em;
+  font-size: 12px;
 }
 
 
@@ -429,7 +430,7 @@ h3.link_title {
   bottom: 20px;
   margin: 0;
   color: white;
-  font-size: 1.6em;
+  font-size: 14px;
   font-weight:normal;
 }
 
@@ -444,20 +445,28 @@ h3.link_title {
   height: 835px;
 }
 
+#tabs {
+  min-height:1000px;
+  padding:0px 0px 0px 0px;
+  margin-top: 20px;
+}
+
+#source_tab {
+  font-size: 12px;
+}
 
 
-#form_wrapper{
+.form_wrapper{
   width:940px;
-  /* min-height:1000px;*/
   padding:15px 15px 15px 15px;
-  margin-top:50px;
+  margin-top:20px;
   margin-bottom:50px;
-  display: block;
+    display: none;
 }
 
 .item_def_wrapper{
   display:inline-block;
-  width:430px;
+  width:450px;
   height:50px;
   margin-top:20px;
   margin-bottom:20px;
@@ -476,7 +485,7 @@ h3.link_title {
 .item_def_number{
   vertical-align: top;
   display: inline-block;
-  font-size: 0.9em;
+  font-size: 12px;
   font-weight: bold;
 }
 
@@ -484,7 +493,7 @@ h3.link_title {
   vertical-align: top;
   display: inline-block;
   width:170px;
-  font-size: 0.9em;
+  font-size: 12px;
   font-weight: bold;
 }
 
@@ -492,16 +501,15 @@ div.item_def_control{
   vertical-align: bottom;
   display: block;
   height: 100px;
-  width:140px;
+  width:100px;
 }
 
 span.item_def_control{
   vertical-align: bottom;
   display: inline-block;
   height: 20px;
-  width:140px;
+  width:100px;
 }
-
 
 span.item_def_control_3col{
   vertical-align: bottom;
@@ -513,11 +521,12 @@ span.item_def_control_3col{
 .item_def_format_label{
   display: inline-block;
   vertical-align: bottom;
-  font-size: 0.8em;
+  font-size: 12px;
 }
 
 .checkbox_control{
-  font-size: 0.7em;
+  font-size: 12px;
+  width:140px;
 }
 
 .gray_bg {

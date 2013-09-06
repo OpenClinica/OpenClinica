@@ -11,6 +11,7 @@
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
   var app_studyOID = '${studyOID}';
+  var app_studySubjectOID = '${studySubjectOID}';
   var app_siteOID = '${studyOID}';
   var app_eventOID = '${eventOID}';
   var app_formVersionOID = '${formVersionOID}';

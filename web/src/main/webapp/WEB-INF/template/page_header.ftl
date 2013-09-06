@@ -2,42 +2,42 @@
 <tr>
 <td>
   <div class='left-header'>
-    <div class='header-text text-left-aligned'>${app_protocolIDLabel}: ${protocolName ? protocolName : '___________________'}</div>  
-    <div class='header-text text-left-aligned'>${app_studyNameLabel}: ${studyName ? studyName : '___________________'}</div>  
-    <div class='header-text text-left-aligned'>${app_siteNameLabel}: ${siteName ? siteName : '___________________'}</div> 
-    <#if pageType != app_studyCoverPageType>
-      <div class='header-text text-left-aligned'>${app_eventNameLabel}: ${eventName ? eventName : '___________________'}</div>  
+    <div class='header-text text-left-aligned'>${protocolIdLabel}: ${protocolName!"___________________"}</div>  
+    <div class='header-text text-left-aligned'>${studyNameLabel}: ${studyName!"___________________"}</div>  
+    <div class='header-text text-left-aligned'>${siteNameLabel}: ${siteName!"___________________"}</div> 
+    <#if pageType != studyCoverPageType>
+      <div class='header-text text-left-aligned'>$eventNameLabel}: ${eventName!"___________________"}</div>  
     </#if>
-    <#if app_eventLocationRequired == 'required'>
-      <div class='header-text text-left-aligned'>${app_eventLocationLabel}: ${app_eventLocation ? app_eventLocation : '___________________'}</div>  
-    <#elseif app_eventLocationRequired == 'optional'>
-      <div class='header-text text-left-aligned'>${app_eventLocationLabel}: ${app_eventLocation ? app_eventLocation : '___________________'}</div>  
+    <#if eventLocationRequired == "required">
+      <div class='header-text text-left-aligned'>${eventLocationLabel}: ${eventLocation!"___________________"}</div>  
+    <#elseif app_eventLocationRequired == "optional">
+      <div class='header-text text-left-aligned'>${eventLocationLabel}: ${eventLocation!"___________________"}</div>  
     </#if>
-    <#if pageType != app_studyCoverPageType>
-      <div class='header-text text-left-aligned'>${app_eventDateLabel}: ___________________</div>  
+    <#if pageType != studyCoverPageType>
+      <div class='header-text text-left-aligned'>${eventDateLabel}: ___________________</div>  
     </#if>
   </div> 
 </td>
 <td>
   <div class='right-header'>
-    <div class='header-text'>${app_studySubjectIDLabel}:___________</div>  
+    <div class='header-text'>${studySubjectIdLabel}:___________</div>  
     
-    <#if showPersonID == 'true' && app_personIDRequired != 'not_used' && app_personIDRequired != 'not used'>
-      <div class='header-text'>${app_personIDLabel}:___________</div>  
+    <#if showPersonId == "true" && personIdRequired != "not_used" && personIdRequired != "not used">
+      <div class='header-text'>${personIdLabel}:___________</div>  
     </#if>
-    
-    <#if app_secondaryLabelViewable == 'true'>
-      <div class='header-text text-left-aligned'>${app_secondaryLabel}: ___________________</div>  
+    <#if secondaryLabelViewable == "true">
+      <div class='header-text text-left-aligned'>${secondaryLabel}: ___________________</div>  
     </#if>
     <#if collectSubjectDOB == 1>
-      <div class='header-text'>${app_studySubjectDOBLabel}:___________</div>  
+      <div class='header-text'>${studySubjectDOBLabel}:___________</div>  
     <#elseif collectSubjectDOB == 2>
-      <div class='header-text'>${app_studySubjectBirthYearLabel}:___________</div>  
+      <div class='header-text'>${studySubjectBirthYearLabel}:___________</div>  
     </#if>
-    <#if app_interviewerNameRequired != "not_used">
-      <div class='header-text'>${app_interviewerLabel}:___________</div>  
-    <#if app_interviewDateRequired != "not_used">
-      <div class='header-text'>${app_interviewDateLabel}:___________</div>  
+    <#if interviewerNameRequired != "not_used">
+      <div class='header-text'>${interviewerLabel}:___________</div>  
+    </#if>
+    <#if interviewDateRequired != "not_used">
+      <div class='header-text'>${interviewDateLabel}:___________</div>  
     </#if>
   </div>
 </td>

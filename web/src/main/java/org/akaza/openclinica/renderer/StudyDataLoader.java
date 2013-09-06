@@ -35,17 +35,17 @@ public class StudyDataLoader {
   * @param jsonObjectToTest: The passed in json object
   * @return a json object, json array, or undefined
   */ 
-  public static JSONArray ensureArray(JSON jsonToTest) {
-    JSONArray jsonArray;
-    if (jsonToTest == null) {
+  public static JSONArray ensureArray(JSONObject jsonToTest, String jsonKeyToTest) {
+    JSONArray jsonArray = null;
+    if (jsonToTest.isNullObject()) {
       return null;
     }
-    if (jsonToTest instanceof JSONObject) {
+    if (jsonToTest.get(jsonKeyToTest) instanceof JSONObject) {
       jsonArray = new JSONArray();
-      jsonArray.add(jsonToTest);
+      jsonArray.add(jsonToTest.getJSONObject(jsonKeyToTest));
     }
-    else {
-      jsonArray = (JSONArray)jsonToTest; 
+    else if (jsonToTest.get(jsonKeyToTest) instanceof JSONArray) {
+      jsonArray = (JSONArray)jsonToTest.getJSONArray(jsonKeyToTest); 
     }
     return jsonArray;
   } 
@@ -67,9 +67,19 @@ public class StudyDataLoader {
    */
   public void loadStudyDetails() {
     studyRenderer.app_studyDetails = studyRenderer.study.getJSONObject("MetaDataVersion").getJSONObject("OpenClinica:StudyDetails");
-    if (studyRenderer.app_studyDetails == null) {
+    
+    if (studyRenderer.app_studyDetails.isNullObject()) {
       return;
     }
+    if (studyRenderer.app_studyDetails.getJSONObject("OpenClinica:StudyParameterConfiguration").isNullObject()) {
+      return;
+    }
+    if ((studyRenderer.app_studyDetails.getJSONObject("OpenClinica:StudyParameterConfiguration").getJSONArray("OpenClinica:StudyDetails")).isEmpty()) {
+      return;
+    }
+    
+    
+    
     JSONArray studyParamList = studyRenderer.app_studyDetails.getJSONObject("OpenClinica:StudyParameterConfiguration").getJSONArray("OpenClinica:StudyDetails"); 
     studyRenderer.app_collectSubjectDOB = getStudyParamValue(studyParamList, "SPL_collectDob");
     studyRenderer.app_personIDRequired = getStudyParamValue(studyParamList, "SPL_collectDob");;
@@ -85,10 +95,10 @@ public class StudyDataLoader {
   /* loadBasicDefinitions()
   */
   public void loadBasicDefinitions() {
-    if (studyRenderer.study.getJSONObject("BasicDefinitions") == null) {
+    studyRenderer.appBasicDefinitions =  new TreeMap<String,String>();
+    if (studyRenderer.study.getJSONObject("BasicDefinitions") == null || studyRenderer.study.getJSONObject("BasicDefinitions").getJSONArray("MeasurementUnit") == null) {
       return;
     }
-    studyRenderer.appBasicDefinitions =  new TreeMap<String,String>();
     JSONArray basicDefinitions = studyRenderer.study.getJSONObject("BasicDefinitions").getJSONArray("MeasurementUnit");
     
     for (int i=0;i< basicDefinitions.size();i++) {
@@ -103,14 +113,14 @@ public class StudyDataLoader {
    */
   public void loadCodeLists() {
     studyRenderer.appCodeLists = new TreeMap<String,List>();
-    JSONArray codeLists = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("CodeList")); 
+    JSONArray codeLists = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "CodeList"); 
     if (codeLists == null) {
       return;
     } 
     for (int i=0;i< codeLists.size();i++) {
       List currentCodeList = new ArrayList();
       String codeListKey = codeLists.getJSONObject(i).getString("@OID"); 
-      JSONArray codeListItems = codeLists.getJSONObject(i).getJSONArray("CodeListItem");
+      JSONArray codeListItems = StudyDataLoader.ensureArray(codeLists.getJSONObject(i), "CodeListItem");
       for (int j=0;j< codeListItems.size();j++) {
         JSONObject codeListItem = codeListItems.getJSONObject(j);
         String id = codeListItem.getString("@CodedValue");
@@ -127,14 +137,14 @@ public class StudyDataLoader {
    */
   public void loadMultiSelectLists() {
     studyRenderer.appMultiSelectLists = new TreeMap<String,List>();
-    JSONArray multiSelectLists = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("OpenClinica:MultiSelectList")); 
+    JSONArray multiSelectLists = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "OpenClinica:MultiSelectList"); 
     if (multiSelectLists == null) {
       return;
     } 
     for (int i=0;i< multiSelectLists.size();i++) {
       List currentMultiSelectList = new ArrayList();
       String multiSelectListKey = multiSelectLists.getJSONObject(i).getString("@ID"); 
-      JSONArray multiSelectListItems = multiSelectLists.getJSONObject(i).getJSONArray("OpenClinica:MultiSelectListItem");
+      JSONArray multiSelectListItems = StudyDataLoader.ensureArray(multiSelectLists.getJSONObject(i), "OpenClinica:MultiSelectListItem");
       for (int j=0;j< multiSelectListItems.size();j++) {
         JSONObject multiSelectListItem = multiSelectListItems.getJSONObject(j);
         String id = multiSelectListItem.getString("@CodedOptionValue");
@@ -154,7 +164,7 @@ public class StudyDataLoader {
   
     studyRenderer.appItemGroupDefs = new TreeMap<String,ItemGroup>();
     studyRenderer.appItemGroupMap = new TreeMap<String,Item>();
-    JSONArray itemGroupDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("ItemGroupDef")); 
+    JSONArray itemGroupDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "ItemGroupDef"); 
     if (itemGroupDefs == null) {
       return;
     } 
@@ -166,8 +176,9 @@ public class StudyDataLoader {
       JSONObject itemGroupDetails = itemGroupDef.getJSONObject("OpenClinica:ItemGroupDetails"); 
       int repeatNumber = 1;
       int repeatMax = 1;
-      String groupHeader = itemGroupDetails.getJSONObject("OpenClinica:PresentInForm").getString("OpenClinica:ItemGroupHeader"); 
-      JSONArray presentInForm = StudyDataLoader.ensureArray(itemGroupDetails.getJSONArray("OpenClinica:PresentInForm")); 
+      String groupHeader = "";
+      //String groupHeader = itemGroupDetails.getJSONObject("OpenClinica:PresentInForm").getString("OpenClinica:ItemGroupHeader"); 
+      JSONArray presentInForm = StudyDataLoader.ensureArray(itemGroupDetails, "OpenClinica:PresentInForm"); 
       for (int j=0;j< presentInForm.size();j++) {
         if ((presentInForm.getJSONObject(j).getString("@FormOID")).equals(formDef.getString("@OID"))) {
           repeatNumber = presentInForm.getJSONObject(j).getJSONObject("OpenClinica:ItemGroupRepeat").getInt("@RepeatNumber");
@@ -175,7 +186,7 @@ public class StudyDataLoader {
           boolean repeating = ParseUtil.parseYesNo(itemGroupDef.getString("@Repeating"));
           ItemGroup currentItemGroup = new ItemGroup(repeatNumber, repeating, repeatMax, itemGroupName, groupHeader);
           studyRenderer.appItemGroupDefs.put(itemGroupKey, currentItemGroup); 
-          JSONArray itemRefs = StudyDataLoader.ensureArray(itemGroupDef.getJSONArray("ItemRef")); 
+          JSONArray itemRefs = StudyDataLoader.ensureArray(itemGroupDef, "ItemRef"); 
           
           for (int k=0;k< itemRefs.size();k++) {
             String itemKey = itemRefs.getJSONObject(k).getString("@ItemOID");
@@ -196,7 +207,7 @@ public class StudyDataLoader {
    * Load all StudyEvents
    */ 
   public void loadStudyEventDefs() {
-    studyRenderer.appStudyEventDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("StudyEventDef")); 
+    studyRenderer.appStudyEventDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "StudyEventDef"); 
   }
    
    
@@ -204,7 +215,7 @@ public class StudyDataLoader {
    * Load all ItemDefs
    */
   public void loadItemDefs() {
-    studyRenderer.appItemDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("ItemDef")); 
+    studyRenderer.appItemDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "ItemDef"); 
   }
   
   
@@ -212,7 +223,7 @@ public class StudyDataLoader {
    * Load all FormDefs
    */
   public void loadFormDefs() {
-    studyRenderer.appFormDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion").getJSONArray("FormDef")); 
+    studyRenderer.appFormDefs = StudyDataLoader.ensureArray(studyRenderer.study.getJSONObject("MetaDataVersion"), "FormDef"); 
   }
    
    

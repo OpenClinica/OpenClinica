@@ -14,15 +14,15 @@ import net.sf.json.JSONObject;
 
 public class ItemDefRenderer extends JSONRenderer{
   public JSONObject itemDef;
-  private String template;
   private JSONObject itemDetails;
   private boolean mandatory;
+  private String template;
   private String name;
   private String rightItemText;
   private String dataType;
   private String responseType;
   private String responseLayout;
-  private boolean isInline;
+  private String isInline;
   private String OID;
   private String itemName;
   private String itemNumber;
@@ -34,38 +34,38 @@ public class ItemDefRenderer extends JSONRenderer{
   private  Map<String, String> appItemGroupMap = new TreeMap<String,String>();
   private  Map<String, String> appBasicDefinitions = new TreeMap<String,String>();
   private  Map<String, List> appCodeLists = new TreeMap<String,List>();
+  private  Map<String, List> appMultiSelectLists = new TreeMap<String,List>();
   
   public ItemDefRenderer(JSONObject itemDef, Configuration cfg, Map templateVars, 
                          Map appItemGroupDefs, Map appItemGroupMap,
-                         Map appBasicDefinitions, Map appCodeLists) {
+                         Map appBasicDefinitions, Map appCodeLists, Map appMultiSelectLists) {
     super(itemDef, cfg, templateVars);
     this.itemDef = itemDef;
     this.appItemGroupDefs = appItemGroupDefs;
     this.appItemGroupMap = appItemGroupMap;
     this.appBasicDefinitions = appBasicDefinitions;
     this.appCodeLists = appCodeLists;
+    this.appMultiSelectLists = appMultiSelectLists;
   }
   
   
   public String parse(JSONObject itemDef)  {
     itemDetails = itemDef.getJSONObject("OpenClinica:ItemDetails");
-    JSONArray presentInForm = StudyDataLoader.ensureArray(itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm"));
-    JSONObject question = ((JSONArray)presentInForm).getJSONObject(1);
-    OID = itemDef.getString("@OID");
-    dataType = itemDef.getString("@DataType");
-    name = question.getString("OpenClinica:LeftItemText");
-    itemName = question.getString("@Name");
-    responseType = question.getJSONObject("OpenClinica:ItemResponse").getString("@ResponseType");
-    responseType = question.getJSONObject("OpenClinica:ItemResponse").getString("@ResponseLayout");
-    isInline = true;
-    if (responseLayout.equals("Horizontal")) {
-      isInline = false;
-    }  
+    JSONArray presentInForm = StudyDataLoader.ensureArray(itemDef.getJSONObject("OpenClinica:ItemDetails"), "OpenClinica:ItemPresentInForm");
+    OID = itemDef.optString("@OID");
+    dataType = itemDef.optString("@DataType");
+    name = itemDetails.optString("OpenClinica:LeftItemText");
+    itemName = itemDetails.optString("@Name");
+    responseType = itemDetails.getJSONObject("OpenClinica:ItemPresentInForm").getJSONObject("OpenClinica:ItemResponse").optString("@ResponseType");
+    responseLayout = itemDetails.getJSONObject("OpenClinica:ItemPresentInForm").getJSONObject("OpenClinica:ItemResponse").optString("@ResponseLayout");
+    isInline = responseLayout == "Horizontal" ? "inline" : "";
+    rightItemText = itemDetails.optString("OpenClinica:RightItemText");
     itemNumber = itemDef.getJSONObject("Question").has("@OpenClinica:QuestionNumber") ? itemDef.getJSONObject("Question").getString("@OpenClinica:QuestionNumber") + "." : "";
     unitLabel = itemDef.has("MeasurementUnitRef") ? appBasicDefinitions.get(itemDef.getJSONObject("MeasurementUnitRef").getString("@MeasurementUnitOID")) : ""; 
     codeListOID = itemDef.has("CodeListRef") ? itemDef.getJSONObject("CodeListRef").getString("@CodeListOID") : "";
-    codeListOID = itemDef.has("MultiSelectListRef") ? itemDef.getJSONObject("MultiSelectListRef").getString("@MultiSelectListOID") : "";
-    columns = question.has("OpenClinica:Layout") ? question.getJSONObject("OpenClinica:Layout").getInt("@Columns") : 2; 
+    multiSelectListOID = itemDef.has("MultiSelectListRef") ? itemDef.getJSONObject("MultiSelectListRef").getString("@MultiSelectListOID") : "";
+    //JSONObject question = ((JSONArray)presentInForm).getJSONObject(1);
+    //columns = question.has("OpenClinica:Layout") ? question.getJSONObject("OpenClinica:Layout").getInt("@Columns") : 2; 
     
    return "";
   }
@@ -88,7 +88,7 @@ public class ItemDefRenderer extends JSONRenderer{
       templateVars.put("responseType", responseType);
       templateVars.put("unitLabel", unitLabel);
       templateVars.put("optionNames", appCodeLists.get(codeListOID));
-      //templateVars.put("multiSelectOptionNames", StudyRenderer.multiSelectLists.get(multiSelectListOID));
+      templateVars.put("multiSelectOptionNames", appMultiSelectLists.get(multiSelectListOID));
       templateVars.put("columns", columns);
       templateVars.put("responseLayout", responseLayout);
       templateVars.put("isInline", isInline);
@@ -143,8 +143,8 @@ public class ItemDefRenderer extends JSONRenderer{
   public String getResponseLayout() { return responseLayout; }
   public void setResponseLayout(String responseLayout) { this.responseLayout = responseLayout; }
 
-  public boolean isInline() { return isInline; }
-  public void setInline(boolean isInline) { this.isInline = isInline; }
+  public String isInline() { return isInline; }
+  public void setInline(String isInline) { this.isInline = isInline; }
 
   public String getItemName() { return itemName; }
   public void setItemName(String itemName) { this.itemName = itemName; }
