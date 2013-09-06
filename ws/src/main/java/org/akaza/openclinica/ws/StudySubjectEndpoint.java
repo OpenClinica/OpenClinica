@@ -350,7 +350,7 @@ public class StudySubjectEndpoint {
         Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
 
         String personIdValue = personIdElement == null ? "" : DomUtils.getTextValue(personIdElement).trim();
-        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
+        String studySubjectIdValue = studySubjectIdElement == null ? "" : DomUtils.getTextValue(studySubjectIdElement).trim();
         String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement).trim();
         String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement).trim();
         String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement).trim();
