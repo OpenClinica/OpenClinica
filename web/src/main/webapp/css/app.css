@@ -252,6 +252,7 @@ input[type="text"], textarea {
   width: 70%;
   margin-top:3px;
   margin-bottom:3px;
+  text-align: center;
 }
 
 

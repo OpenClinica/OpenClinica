@@ -345,7 +345,8 @@
 		 </td>
 		 <td>
 		 <!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.id}"/>/<c:out value="${dec.eventCRF.id}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/S_R0112345/SS_SCRC003/SE_REGISTRATIONVISIT/F_PHYSICALEXAM_ENGLISH')"
 		 -->
 		 <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"

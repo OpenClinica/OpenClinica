@@ -1214,6 +1214,8 @@ function openPrintCRFWindow(inURL) {
 
 function processPrintCRFRequest(url) {
   openPrintCRFWindow(url);
+  //var pdfUrl = url.replace("/html/print/", "/pdf/print/");	
+  //openPrintCRFWindow(pdfUrl);
 }
 
 //-------------------------------------------------------------------------

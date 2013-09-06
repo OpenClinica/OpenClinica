@@ -4,12 +4,12 @@
   <td valign="top">
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-   <input type='text' style='margin-left:3px'/>
+   <input type='text' style='margin-left:3px' value="${itemValue}"/>
   {{else responseType == 'radio'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
-        <div class='select-option'><input type='radio'/> {{html label}}</div>
+        <div class='select-option'><input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
@@ -17,7 +17,7 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
-        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+        <div class='select-option'><input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
@@ -25,12 +25,12 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each multiSelectOptionNames}}
-        <div class='select-option'><input type='checkbox'/> {{html label}}</div>
+        <div class='select-option'><input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
       {{/each}}
     </div>
   </div>
     {{else responseType == 'textarea'}}
- <span><textarea cols="40" rows="5"></textarea></span>
+ <span><textarea cols="40" rows="5">${itemValue}</textarea></span>
   {{else}}
     [item]
   {{/if}}

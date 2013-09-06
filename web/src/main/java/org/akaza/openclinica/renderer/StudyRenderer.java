@@ -50,7 +50,6 @@ public class StudyRenderer extends JSONRenderer{
   public String appInvestigatorNameLabel;
   public String appInvestigatorSignatureLabel;
   public String appDateLabel;
-  public String appFormVersionOID;
   public String appEventOID;
   public String appPrintTime; 
   public String appEventName;
@@ -71,12 +70,33 @@ public class StudyRenderer extends JSONRenderer{
   }
   
   
+  
+   
+  /* setRenderMode(studyOID, eventOID, formVersionOID) 
+  * A convenience function to set the render mode of a study
+  */ 
+  public String setRenderMode(String studyOID, String eventOID, String formVersionOID) {
+    String renderMode = UNPOPULATED_FORM_CRF; 
+    if (!studyOID.equals("*") && eventOID.equals("*") && formVersionOID.equals("*")) {
+      renderMode = UNPOPULATED_STUDY_CRFS;
+    }
+    else if (!eventOID.equals("*") && formVersionOID.equals("*")) {
+      renderMode = UNPOPULATED_EVENT_CRFS;
+    }
+    else if (studyOID.equals("*") && eventOID.equals("*") && !formVersionOID.equals("*")) {
+      renderMode = UNPOPULATED_GLOBAL_CRF;
+    }
+    return renderMode;
+  }
+  
+  
+  
   /* getItemDetails(itemDef, formDef) 
   * A convenience function to get the ItemDetails properties for an Item
   */ 
   public JSONObject getItemDetails(JSONObject itemDef, JSONObject formDef) {
-    if (itemDef.getJSONObject("OpenClinica:ItemDetails").get("OpenClinica:PresentInForm") instanceof JSONArray) {
-      JSONArray itemPresentInForm = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:PresentInForm"); 
+    if (itemDef.getJSONObject("OpenClinica:ItemDetails").get("OpenClinica:ItemPresentInForm") instanceof JSONArray) {
+      JSONArray itemPresentInForm = itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONArray("OpenClinica:ItemPresentInForm"); 
       for (int i=0;i< itemPresentInForm.size();i++) {
         if ((itemPresentInForm.getJSONObject(i).getString("@FormOID")).equals(formDef.getString("@OID"))) {
           return itemPresentInForm.getJSONObject(i);
@@ -85,7 +105,7 @@ public class StudyRenderer extends JSONRenderer{
       return null;
     }
     else {
-      return  itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONObject("OpenClinica:PresentInForm");
+      return  itemDef.getJSONObject("OpenClinica:ItemDetails").getJSONObject("OpenClinica:ItemPresentInForm");
     }
   }
   
@@ -111,10 +131,10 @@ public class StudyRenderer extends JSONRenderer{
   }
   
   
- /* setStudy(renderMode)
+ /* setStudyTitles(renderMode)
   * Set the current study being rendered
   */
-  public void setStudy(String renderMode) {
+  public void setStudyTitles(String renderMode) {
     if (renderMode == UNPOPULATED_FORM_CRF || renderMode == UNPOPULATED_EVENT_CRFS || renderMode == UNPOPULATED_STUDY_CRFS) {
       appStudyName = this.study.getJSONObject("GlobalVariables").getString("StudyName"); 
       appSiteName = this.study.getJSONObject("MetaDataVersion").getJSONObject("OpenClinica:StudyDetails").getString("@SiteName"); 
@@ -131,7 +151,7 @@ public class StudyRenderer extends JSONRenderer{
    */
   public String createStudyEventCoverPage(JSONObject eventDef) {
     String str = "<h3>" + eventDef.getString("@Name") + ":</h3>";
-    JSONArray studyEventFormRefs =  StudyDataLoader.ensureArray(eventDef.getJSONArray("StudyEventDef")); 
+    JSONArray studyEventFormRefs =  StudyDataLoader.ensureArray(eventDef, "StudyEventDef"); 
     
     for (int i=0;i< studyEventFormRefs.size();i++) {
       JSONObject formRef = studyEventFormRefs.getJSONObject(i);
@@ -139,7 +159,7 @@ public class StudyRenderer extends JSONRenderer{
       for (int j=0;j< appFormDefs.size() && !formFound;j++) {
         if (appFormDefs.getJSONObject(j).getString("@OID").equals(formRef.getString("@FormOID"))) {
           JSONObject formDef = appFormDefs.getJSONObject(j);
-          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails"), "OpenClinica:PresentInEventDefinition");
           for (int k=0;k< presentInEventDef.size() && !formFound;k++) {
             JSONObject inEventDef = presentInEventDef.getJSONObject(k);            
             if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No") && 
@@ -180,7 +200,7 @@ public class StudyRenderer extends JSONRenderer{
     for (int i=0;i< appFormDefs.size();i++) {
       JSONObject formDef = appFormDefs.getJSONObject(i);
       boolean formVersionPrinted = false;
-      JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+      JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails"), "OpenClinica:PresentInEventDefinition");
       int initEventCNTR = 0;
       for (int j=0;j< presentInEventDef.size() && !formFound;j++) {
         formFound = false;
@@ -226,10 +246,41 @@ public class StudyRenderer extends JSONRenderer{
    */
   public void renderPrintableEventCRFs(String renderMode, JSONObject eventDef, boolean pageBreak) {
     appEventName = eventDef.getString("@Name");
-    renderPageHeader(pageBreak, appPrintTime, appStudyEventCoverPageType, appEventName);
+    /*
+    renderPageHeader(pageBreak,        
+       protocolIdLabel,
+       studyNameLabel,
+       siteNameLabel,
+       printTime,
+       pageType,
+       studyName,
+       siteName,
+       protocolName,
+       eventName,
+       collectSubjectDOB,
+       personIdRequired,
+       studySubjectIdLabel,
+       eventDateLabel,
+       eventNameLabel,
+       eventLocation,
+       eventLocationLabel,
+       studyCoverPageType,
+       personIdLabel,
+       studySubjectDOBLabel,
+       studySubjectBirthYearLabel,
+       interviewerNameRequired,
+       interviewerLabel,
+       interviewDateRequired,
+       interviewDateLabel,
+       secondaryLabel,
+       secondaryLabelViewable,
+       eventLocationRequired,
+       showPersonId,
+       eventLocationDateRequired );
+       */
     renderString += this.createStudyEventCoverPage(eventDef);
     // select all CRFs from StudyEvent
-    JSONArray studyEventFormRefs = StudyDataLoader.ensureArray(eventDef.getJSONArray("FormDef"));
+    JSONArray studyEventFormRefs = StudyDataLoader.ensureArray(eventDef, "FormDef");
     
     for (int i=0;i< studyEventFormRefs.size();i++) {
       pageBreak = this.PAGE_BREAK;
@@ -238,7 +289,7 @@ public class StudyRenderer extends JSONRenderer{
       for (int j=0;j< appFormDefs.size() && !defaultDisplayed;j++) {
         if (appFormDefs.getJSONObject(j).getString("@OID").equals(formRef.getString("@FormOID"))) {
           JSONObject formDef = appFormDefs.getJSONObject(j);
-          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails").getJSONArray("OpenClinica:PresentInEventDefinition"));
+          JSONArray presentInEventDef = StudyDataLoader.ensureArray(formDef.getJSONObject("OpenClinica:FormDetails"), "OpenClinica:PresentInEventDefinition");
           for(int k=0;k<presentInEventDef.size();k++){
             JSONObject inEventDef = presentInEventDef.getJSONObject(k);
             if (inEventDef.getString("@IsDefaultVersion").equals("Yes") && inEventDef.getString("@HideCRF").equals("No") && 
@@ -258,9 +309,10 @@ public class StudyRenderer extends JSONRenderer{
    * A kind of factory function for the different study
    * rendering scenarios.
    */
-  public String renderPrintableStudy(String renderMode) {
+  public String renderPrintableStudy(JSONObject study, String studyOID, String eventOID, String formVersionOID) {
+    String renderMode = setRenderMode(studyOID, eventOID, formVersionOID);
     pageHeaderRenderer = new PageHeaderRenderer(this.study, this.cfg, this.templateVars);
-    setStudy(renderMode);  
+    setStudyTitles(renderMode);  
     studyDataLoader = new StudyDataLoader(this); 
     studyDataLoader.loadStudyLists();   
     JSONObject formDef = null;
@@ -269,7 +321,7 @@ public class StudyRenderer extends JSONRenderer{
     if (renderMode.equals(UNPOPULATED_FORM_CRF) || renderMode.equals(UNPOPULATED_GLOBAL_CRF)) {
       // select CRF by OID
       for (int i=0;i< appFormDefs.size();i++) {
-        if (appFormDefs.getJSONObject(i).getString("@OID").equals(appFormVersionOID)) {
+        if (appFormDefs.getJSONObject(i).getString("@OID").equals(formVersionOID)) {
           formDef = appFormDefs.getJSONObject(i);
           break; 
         }
@@ -287,7 +339,39 @@ public class StudyRenderer extends JSONRenderer{
       renderPrintableEventCRFs(renderMode, eventDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode.equals(UNPOPULATED_STUDY_CRFS)) {
-      this.renderPageHeader(this.NO_PAGE_BREAK, appPrintTime, appStudyCoverPageType, appEventName);
+      /* 
+      renderPageHeader(this.NO_PAGE_BREAK, 
+             protocolIdLabel,
+       studyNameLabel,
+       siteNameLabel,
+       printTime,
+       pageType,
+       studyName,
+       siteName,
+       protocolName,
+       eventName,
+       collectSubjectDOB,
+       personIdRequired,
+       studySubjectIdLabel,
+       eventDateLabel,
+       eventNameLabel,
+       eventLocation,
+       eventLocationLabel,
+       studyCoverPageType,
+       personIdLabel,
+       studySubjectDOBLabel,
+       studySubjectBirthYearLabel,
+       interviewerNameRequired,
+       interviewerLabel,
+       interviewDateRequired,
+       interviewDateLabel,
+       secondaryLabel,
+       secondaryLabelViewable,
+       eventLocationRequired,
+       showPersonId,
+       eventLocationDateRequired 
+       );
+       */
       this.renderString += this.createStudyCoverPage();
       // select all CRFs from study
       for (int i=0;i< appStudyEventDefs.size();i++) {
@@ -310,13 +394,44 @@ public class StudyRenderer extends JSONRenderer{
    * The heart of StudyRenderer: render the CRF
    */
   public void renderPrintableFormDef(JSONObject formDef, boolean pageBreak) {
-   
-    renderPageHeader(pageBreak, appPrintTime, appStudyContentPageType, appEventName);
+  /* 
+    renderPageHeader(pageBreak,
+       protocolIdLabel,
+       studyNameLabel,
+       siteNameLabel,
+       printTime,
+       pageType,
+       studyName,
+       siteName,
+       protocolName,
+       eventName,
+       collectSubjectDOB,
+       personIdRequired,
+       studySubjectIdLabel,
+       eventDateLabel,
+       eventNameLabel,
+       eventLocation,
+       eventLocationLabel,
+       studyCoverPageType,
+       personIdLabel,
+       studySubjectDOBLabel,
+       studySubjectBirthYearLabel,
+       interviewerNameRequired,
+       interviewerLabel,
+       interviewDateRequired,
+       interviewDateLabel,
+       secondaryLabel,
+       secondaryLabelViewable,
+       eventLocationRequired,
+       showPersonId,
+       eventLocationDateRequired ); 
+       */
     List orderedItems = new ArrayList();
     studyDataLoader.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
     FormDefRenderer formDefRenderer = new FormDefRenderer(this.study, this.cfg, this.templateVars);
+    formDefRenderer.parse(formDef);
     this.renderString += appCrfHeader = formDefRenderer.renderPrintableForm(formDef);
     String repeatingHeaderString = "";
     String repeatingRowString = "";
@@ -352,16 +467,16 @@ public class StudyRenderer extends JSONRenderer{
       
       JSONObject itemDetails = this.getItemDetails(itemDef, formDef);
       JSONObject sectionDetails = this.getSectionDetails(itemDetails, formDef);
-      String sectionTitle = sectionDetails.getString("@SectionTitle");
-      String sectionSubTitle = sectionDetails.getString("@SectionSubtitle");
-      String sectionInstructions = sectionDetails.getString("@SectionInstructions");
-      String sectionPageNumber = sectionDetails.getString("@SectionPageNumber");
-      String sectionLabel = itemDetails.getString("OpenClinica:SectionLabel");
-      String itemHeader = itemDetails.getString("OpenClinica:ItemHeader");
-      String itemSubHeader = itemDetails.getString("OpenClinica:ItemSubHeader");
-      String name = itemDetails.getString("OpenClinica:LeftItemText");
-      String rightItem = itemDetails.getString("OpenClinica:RightItemText"); 
-      int columnNumber = itemDetails.getInt("@ColumnNumber");
+      String sectionTitle = sectionDetails.optString("@SectionTitle");
+      String sectionSubTitle = sectionDetails.optString("@SectionSubtitle");
+      String sectionInstructions = sectionDetails.optString("@SectionInstructions");
+      String sectionPageNumber = sectionDetails.optString("@SectionPageNumber");
+      String sectionLabel = itemDetails.optString("OpenClinica:SectionLabel");
+      String itemHeader = itemDetails.optString("OpenClinica:ItemHeader");
+      String itemSubHeader = itemDetails.optString("OpenClinica:ItemSubHeader");
+      String name = itemDetails.optString("OpenClinica:LeftItemText");
+      String rightItem = itemDetails.optString("OpenClinica:RightItemText"); 
+      int columnNumber = itemDetails.optInt("@ColumnNumber");
       int columns = 0;
       if (itemDetails.has("OpenClinica:Layout")) {
         columns = itemDetails.getJSONObject("OpenClinica:Layout").getInt("@Columns");
@@ -388,7 +503,38 @@ public class StudyRenderer extends JSONRenderer{
       
       if (sectionLabel.equals(prevSectionLabel) == false) {
         if (isFirstSection == false) {
-          renderPageHeader(this.PAGE_BREAK, appPrintTime, appStudyContentPageType, appEventName);
+        /*
+       renderPageHeader(this.PAGE_BREAK, 
+       protocolIdLabel,
+       studyNameLabel,
+       siteNameLabel,
+       printTime,
+       pageType,
+       studyName,
+       siteName,
+       protocolName,
+       eventName,
+       collectSubjectDOB,
+       personIdRequired,
+       studySubjectIdLabel,
+       eventDateLabel,
+       eventNameLabel,
+       eventLocation,
+       eventLocationLabel,
+       studyCoverPageType,
+       personIdLabel,
+       studySubjectDOBLabel,
+       studySubjectBirthYearLabel,
+       interviewerNameRequired,
+       interviewerLabel,
+       interviewDateRequired,
+       interviewDateLabel,
+       secondaryLabel,
+       secondaryLabelViewable,
+       eventLocationRequired,
+       showPersonId,
+       eventLocationDateRequired );
+       */
         }
         this.renderString += "<div class='vertical-spacer-30px'></div>";
         this.renderString += "<div class='section-title'>"+appSectionTitle+"&nbsp;"+sectionTitle+"</div>";
@@ -411,7 +557,7 @@ public class StudyRenderer extends JSONRenderer{
         nextGroupOID = appItemGroupMap.get(nextItemOID).itemGroupKey;
       }       
       
-      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(this.study, this.cfg, this.templateVars,appItemGroupDefs, appItemGroupMap, appBasicDefinitions, appCodeLists);
+      ItemDefRenderer itemDefRenderer = new ItemDefRenderer(itemDef, this.cfg, this.templateVars,appItemGroupDefs, appItemGroupMap, appBasicDefinitions, appCodeLists, appMultiSelectLists);
       
       String codeListOID = "";
       if (itemDef.has("CodeLisRef")) {
@@ -500,13 +646,75 @@ public class StudyRenderer extends JSONRenderer{
   
   /* renderPageHeader()
    */
-  public void renderPageHeader (boolean pageBreak, String printTime, String currentPageType, String currentPageEventName) {
+  public void renderPageHeader (
+    boolean pageBreak, 
+    String protocolIdLabel,
+    String studyNameLabel,
+    String siteNameLabel,
+    String printTime,
+    String pageType,
+    String studyName,
+    String siteName,
+    String protocolName,
+    String eventName,
+    String collectSubjectDOB,
+    String personIdRequired,
+    String studySubjectIdLabel,
+    String eventDateLabel,
+    String eventNameLabel,
+    String eventLocation,
+    String eventLocationLabel,
+    String studyCoverPageType,
+    String personIdLabel,
+    String studySubjectDOBLabel,
+    String studySubjectBirthYearLabel,
+    String interviewerNameRequired,
+    String interviewerLabel,
+    String interviewDateRequired,
+    String interviewDateLabel,
+    String secondaryLabel,
+    String secondaryLabelViewable,
+    String eventLocationRequired,
+    String showPersonId,
+    String eventLocationDateRequired) {
+  
     if (pageBreak == true) {
       renderString += "<div class='page-break-screen'><hr/></div>";
       renderString += "<div class='page-break'></div>";
     }
-    renderString += pageHeaderRenderer.render(json, printTime, currentPageType, currentPageEventName, currentPageEventName, 
-    currentPageEventName, currentPageEventName, pageBreak, pageBreak, pageBreak, pageBreak, pageBreak, pageBreak);
+    renderString += pageHeaderRenderer.render(
+       json, 
+       protocolIdLabel,
+       studyNameLabel,
+       siteNameLabel,
+       printTime,
+       pageType,
+       studyName,
+       siteName,
+       protocolName,
+       eventName,
+       collectSubjectDOB,
+       personIdRequired,
+       studySubjectIdLabel,
+       eventDateLabel,
+       eventNameLabel,
+       eventLocation,
+       eventLocationLabel,
+       studyCoverPageType,
+       personIdLabel,
+       studySubjectDOBLabel,
+       studySubjectBirthYearLabel,
+       interviewerNameRequired,
+       interviewerLabel,
+       interviewDateRequired,
+       interviewDateLabel,
+       secondaryLabel,
+       secondaryLabelViewable,
+       eventLocationRequired,
+       showPersonId,
+       eventLocationDateRequired    
+     );
+    
   }
 
   

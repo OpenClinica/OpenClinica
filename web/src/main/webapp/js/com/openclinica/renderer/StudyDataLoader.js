@@ -10,8 +10,9 @@
 /* StudyDataLoader
  * This class contains all of the data loading functions for a study
  */
-function StudyDataLoader(study) {
+function StudyDataLoader(study, json) {
   this.study = study;
+  this.json = json;
   
 	  
  /* getStudyParamValue(studyParamList, listId) 
@@ -214,6 +215,47 @@ function StudyDataLoader(study) {
     }
   }
   
+  /* loadSubjectData()
+   */
+  this.loadSubjectData = function (json) {
+    debug("loading subject data", util_logDebug );
+    if (app_studySubjectOID.length == 0) {
+      return;
+    }
+    var subjectData = undefined;
+    var studyEventData = undefined;
+    var clinicalData = this.json["ClinicalData"];
+    var subjectsData = util_ensureArray(clinicalData["SubjectData"]);
+    
+    for (var i=0;i<subjectsData.length;i++) {
+      if(subjectsData[i]["@SubjectKey"] == app_studySubjectOID) { 
+        subjectData = subjectsData[i];
+        break;
+      }
+    }
+    
+    app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
+    
+    var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
+    for (var i=0;i<studyEventsData.length;i++) {
+     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID) { 
+        studyEventData = studyEventsData[i];
+        break;
+      }
+    }
+    
+    app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
+    
+    var formsData = util_ensureArray(studyEventData["FormData"]);
+    for (var i=0;i<formsData.length;i++) {
+     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
+        app_formData = formsData[i];
+        break;
+      }
+    }
+    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
+  }
+  
   
   /* loadStudyLists()
    */
@@ -225,6 +267,7 @@ function StudyDataLoader(study) {
     this.loadFormDefs();
     this.loadStudyEventDefs();
     this.loadStudyDetails();
+    this.loadSubjectData();
   }
 
 }

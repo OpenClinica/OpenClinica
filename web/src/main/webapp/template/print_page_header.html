@@ -20,7 +20,7 @@
 </td>
 <td>
   <div class='right-header'>
-    <div class='header-text'>{{html app_studySubjectIDLabel}}:___________</div>  
+    <div class='header-text'>{{html app_studySubjectIDLabel}}: ${app_studySubjectOID ? app_studySubjectOID : '___________________'}</div>  
     
     {{if showPersonID == 'true' && app_personIDRequired != 'not_used' && app_personIDRequired != 'not used'}}
       <div class='header-text'>{{html app_personIDLabel}}:___________</div>  
@@ -30,7 +30,9 @@
       <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}: ___________________</div>  
     {{/if}}
     {{if collectSubjectDOB == 1}}
-      <div class='header-text'>{{html app_studySubjectDOBLabel}}:___________</div>  
+      <div class='header-text'>{{html app_studySubjectDOBLabel}}: ${app_studySubjectDOB ? app_studySubjectDOB : '___________________'}</div>  
+      <div class='header-text'>{{html app_studySubjectStartDateLabel}}: ${app_studySubjectStartDate ? app_studySubjectStartDate : '___________________'}</div>  
+      <div class='header-text'>{{html app_studySubjectStatusLabel}}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
     {{else collectSubjectDOB == 2}}
       <div class='header-text'>{{html app_studySubjectBirthYearLabel}}:___________</div>  
     {{/if}}
