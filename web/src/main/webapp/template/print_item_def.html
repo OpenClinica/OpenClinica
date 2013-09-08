@@ -9,7 +9,7 @@
   {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td td valign="top">  
-    <input type='text' value="${itemValue}"/> 
+    <input id="${formOID}-${OID}" type='text' value="${itemValue}"/> 
   </td>
   {{else responseType == 'radio'}}
   <td valign="top">
@@ -17,7 +17,7 @@
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
         <div class='select-option ${isInline}'>
-          <input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
@@ -29,7 +29,7 @@
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
         <div class='select-option ${isInline}'>
-          <input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
@@ -41,7 +41,7 @@
     <div class='checkbox_control ${isInline}'>
       {{each multiSelectOptionNames}}
         <div class='select-option ${isInline}'>
-          <input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
@@ -49,7 +49,7 @@
   </td>
   {{else responseType == 'textarea'}}
   <td>
- <span><textarea cols="40" rows="5">${itemValue}</textarea></span>
+ <span><textarea  id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
   </td>
   {{else}}
     [item]

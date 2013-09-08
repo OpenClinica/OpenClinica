@@ -65,7 +65,9 @@ function StudyRenderer(json) {
       case 'UNPOPULATED_STUDY_CRFS':
         app_studyName = this.study["GlobalVariables"]["StudyName"];
         app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
-        if(app_siteName)app_studyName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@ParentStudyName"];
+        if(app_siteName) {
+          app_studyName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@ParentStudyName"];
+        }
         app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
       break;  
       case 'UNPOPULATED_GLOBAL_CRF':
@@ -352,7 +354,7 @@ function StudyRenderer(json) {
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
-      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"]);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
