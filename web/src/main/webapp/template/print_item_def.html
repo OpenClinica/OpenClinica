@@ -16,7 +16,9 @@
   <div class='item_def_control ${isInline}'> 
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
-        <div class='select-option ${isInline}'><input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option ${isInline}'>
+          <input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>
@@ -26,7 +28,9 @@
   <div class='item_def_control ${isInline}'> 
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
-        <div class='select-option ${isInline}'><input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option ${isInline}'>
+          <input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>
@@ -36,7 +40,9 @@
   <div class='item_def_control ${isInline}'> 
     <div class='checkbox_control ${isInline}'>
       {{each multiSelectOptionNames}}
-        <div class='select-option ${isInline}'><input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option ${isInline}'>
+          <input type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>

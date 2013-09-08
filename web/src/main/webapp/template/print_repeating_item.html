@@ -9,7 +9,9 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
-        <div class='select-option'><input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option'>
+          <input type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>
@@ -17,7 +19,9 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each optionNames}}
-        <div class='select-option'><input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option'>
+          <input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>
@@ -25,7 +29,9 @@
   <div class='item_def_control'> 
     <div class='checkbox_control'>
       {{each multiSelectOptionNames}}
-        <div class='select-option'><input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}</div>
+        <div class='select-option'>
+          <input type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+        </div>
       {{/each}}
     </div>
   </div>
