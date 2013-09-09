@@ -265,8 +265,10 @@ public class GenerateClinicalDataService {
 				{
 					optionsText = Arrays.asList(ifMeta.getResponseSet().getOptionsText().split("\\s*,\\s*"));
 					optionsVals =  Arrays.asList(ifMeta.getResponseSet().getOptionsValues().split("\\s*,\\s*"));
-				idValue = 	optionsText.get(optionsVals.indexOf(idValue));
-					
+					if(optionsVals.indexOf(idValue)>0)// there is no validation on the UI to ensure the response options=response text in earlier versions of OpenClinica..check to avoid arrays out of bound
+						{
+							idValue = 	optionsText.get(optionsVals.indexOf(idValue));
+						}
 					
 				}
 				
