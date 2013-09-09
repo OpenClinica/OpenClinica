@@ -1,4 +1,4 @@
-function ItemDefRenderer(json, itemDetails, mandatory) {
+function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
   this.json = json;
   this.itemDetails = itemDetails;
   this.mandatory = mandatory;
@@ -34,9 +34,9 @@ function ItemDefRenderer(json, itemDetails, mandatory) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
     var s = RenderUtil.render(RenderUtil.get(template), 
-       {itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, unitLabel:this.unitLabel, 
-        optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], columns:this.columns,
-        responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
+       {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
+        unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
+        columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
         itemName:this.itemName, itemValue:this.itemValue});
     return s[0].outerHTML;
   }
