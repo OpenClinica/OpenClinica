@@ -39,7 +39,7 @@ public class GenerateClinicalDataService {
 			.getLogger("org.akaza.openclinica.service.extract.GenerateClinicalDataService");
 	protected final static String DELIMITER = ",";
 	private final static String GROUPOID_ORDINAL_DELIM = ":";
-
+	private final static String INDICATE_ALL="*";
 	private final static String EMPTY_STRING ="";
 	private StudyDao studyDao;
 
@@ -75,7 +75,11 @@ public class GenerateClinicalDataService {
 		return constructClinicalData(study, studySubj);
 		// return null;
 	}
-
+	/*private String getClinicalData(String studyOID,String studySubj,String studyEventOID,String formVersionOID){
+		if(!studyOID.equals(INDICATE_ALL)&& !studySubj.equals(INDICATE_ALL)&& !studyEventOID.equals(INDICATE_ALL)&&!formVersionOID.equals(INDICATE_ALL))
+		
+		return constructClinicalDataStudy();
+	}*/
 	public StudyDao getStudyDao() {
 		return studyDao;
 	}
@@ -88,6 +92,7 @@ public class GenerateClinicalDataService {
 
 		return constructClinicalDataStudy(studySubj);
 	}
+
 
 	private String constructClinicalDataStudy(StudySubject studySubj) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
@@ -105,6 +110,10 @@ public class GenerateClinicalDataService {
 		// return null;
 	}
 
+	/*private String constructClinicaDataStudy(){
+
+	}*/
+	
 	private ExportSubjectDataBean setExportSubjectDataBean(
 			StudySubject studySubj) {
 
@@ -135,10 +144,10 @@ public class GenerateClinicalDataService {
 			expSEBean.setEndDate(se.getDateEnd() + "");
 			expSEBean.setStartDate(expSEBean.getStartDate() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOcOid());
-			if(se.getStudyEventDefinition().getRepeating())
+			//if(se.getStudyEventDefinition().getRepeating())
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
-			else
-				expSEBean.setStudyEventRepeatKey(EMPTY_STRING);
+			//else
+				//expSEBean.setStudyEventRepeatKey(EMPTY_STRING);
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se));
 
 			al.add(expSEBean);
@@ -171,7 +180,7 @@ public class GenerateClinicalDataService {
 	private ArrayList<ImportItemGroupDataBean> fetchItemData(
 			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms) {
 		String groupOID, itemOID;
-		String itemValue;
+		String itemValue = null;
 		String itemDataValue;
 		ArrayList<String> itemOIDs = new ArrayList();
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
@@ -202,16 +211,33 @@ public class GenerateClinicalDataService {
 					// There also needs to be the response option value
 					// populated here depending on what the response type is.
 					if (!igGrpMetadata.isRepeatingGroup())
+						{
 						for (ItemData itemData : itds) {
+						
 							itemDataValue = fetchItemDataValue(itemData,itemGrpMetada.getItem());
 							itemValue = itemOID + DELIMITER
 									+ itemDataValue;
-							
+							if (itemData.getEventCrf().getEventCrfId() == eventCrfId)
+							{
 							itemsValues.add(itemValue);
 							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
-									+ itemData.getOrdinal();
-							if (itemData.getEventCrf().getEventCrfId() == eventCrfId)
-							oidMap.put(groupOIDOrdnl, itemsValues);
+									;
+							if(oidMap.containsKey(groupOIDOrdnl))
+							{
+								itemsValues = oidMap.get(groupOIDOrdnl);
+								if(!itemsValues.contains(itemValue)){
+								itemsValues.add(itemValue);
+								oidMap.remove(groupOIDOrdnl);
+								}
+								oidMap.put(groupOIDOrdnl, itemsValues);
+							}
+							else
+								oidMap.put(groupOIDOrdnl, itemsValues);
+							}
+							
+						}
+						
+						
 						}
 					else {// if the group is a repeating group, look for the key
 							// of same group and ordinal and add this item to
