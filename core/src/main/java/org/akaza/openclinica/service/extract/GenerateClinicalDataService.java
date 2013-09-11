@@ -192,7 +192,7 @@ public class GenerateClinicalDataService {
 			StudyEvent se) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		for (EventCrf ecrf : se.getEventCrfs()) {
-			if (ecrf.getItemDatas().size() > 0) {
+			
 				ExportFormDataBean dataBean = new ExportFormDataBean();
 				dataBean.setItemGroupData(fetchItemData(ecrf.getCrfVersion()
 						.getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf
@@ -205,7 +205,6 @@ public class GenerateClinicalDataService {
 				formDataBean.add(dataBean);
 			}
 
-		}
 		return (ArrayList<ExportFormDataBean>) formDataBean;
 	}
 
