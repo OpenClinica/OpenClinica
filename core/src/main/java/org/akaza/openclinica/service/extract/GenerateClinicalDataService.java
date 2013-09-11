@@ -91,18 +91,19 @@ public class GenerateClinicalDataService {
 
 	private String constructClinicalData(Study study, StudySubject studySubj) {
 
-		return constructClinicalDataStudy(studySubj);
+		
+		return constructClinicalDataStudy(studySubj, study);
 	}
 
-	private String constructClinicalDataStudy(StudySubject studySubj) {
+	private String constructClinicalDataStudy(StudySubject studySubj, Study study) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 
-		ExportSubjectDataBean expSubjectBean = setExportSubjectDataBean(studySubj);
+		ExportSubjectDataBean expSubjectBean = setExportSubjectDataBean(studySubj, study);
 
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		exportSubjDataBeanList.add(expSubjectBean);
 		odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
-		odmClinicalDataBean.setStudyOID(studySubj.getStudy().getOc_oid());
+		odmClinicalDataBean.setStudyOID(study.getOc_oid());
 		FullReportBean report = new FullReportBean();
 		report.setClinicalData(odmClinicalDataBean);
 		report.createChunkedOdmXml(Boolean.TRUE, true, true);
@@ -117,9 +118,12 @@ public class GenerateClinicalDataService {
 	 */
 
 	private ExportSubjectDataBean setExportSubjectDataBean(
-			StudySubject studySubj) {
+			StudySubject studySubj, Study study) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
+		
+		if(subjectBelongsToStudy(study,studySubj)){
+		
 		// exportSubjectDataBean.setAuditLogs(studySubj.getA)
 		exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
 				.getDateOfBirth() + "");
@@ -132,8 +136,34 @@ public class GenerateClinicalDataService {
 				.setExportStudyEventData(setExportStudyEventDataBean(studySubj));
 
 		exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
+		}
 		return exportSubjectDataBean;
 
+	}
+
+	private boolean subjectBelongsToStudy(Study study, StudySubject studySubj) {
+		boolean subjectBelongs = false;
+		if(studySubj.getStudy().getOc_oid().equals(study.getOc_oid())){
+			subjectBelongs = true;
+		}
+		else{
+			List<Study> studies = studySubj.getStudy().getStudies();
+			
+			if(studies.size()>0)
+				
+			for(Study subjectStdy:studies){
+				if(study.getOc_oid().equals(subjectStdy.getOc_oid())){
+					subjectBelongs=true;
+				}
+			}
+			else
+				if(studySubj.getStudy().getStudy().getOc_oid().equals(study.getOc_oid()))
+					subjectBelongs=true;
+			
+		}
+		
+		
+		return subjectBelongs;
 	}
 
 	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(
