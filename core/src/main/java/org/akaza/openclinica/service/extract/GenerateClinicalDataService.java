@@ -160,6 +160,7 @@ public class GenerateClinicalDataService {
 			StudyEvent se) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		for (EventCrf ecrf : se.getEventCrfs()) {
+			if(ecrf.getItemDatas().size()>0){
 			ExportFormDataBean dataBean = new ExportFormDataBean();
 			// dataBean.setDiscrepancyNotes(ecrf)
 			// dataBean.setItemGroupData(getItemData(ecrf));
@@ -172,6 +173,7 @@ public class GenerateClinicalDataService {
 			dataBean.setStatus(ecrf.getStatus() + "");
 			
 			formDataBean.add(dataBean);
+			}
 
 		}
 		return (ArrayList<ExportFormDataBean>) formDataBean;
@@ -210,36 +212,9 @@ public class GenerateClinicalDataService {
 					// several of them, this should not be a list
 					// There also needs to be the response option value
 					// populated here depending on what the response type is.
-					if (!igGrpMetadata.isRepeatingGroup())
-						{
-						for (ItemData itemData : itds) {
-						
-							itemDataValue = fetchItemDataValue(itemData,itemGrpMetada.getItem());
-							itemValue = itemOID + DELIMITER
-									+ itemDataValue;
-							if (itemData.getEventCrf().getEventCrfId() == eventCrfId)
-							{
-							itemsValues.add(itemValue);
-							groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
-									;
-							if(oidMap.containsKey(groupOIDOrdnl))
-							{
-								itemsValues = oidMap.get(groupOIDOrdnl);
-								if(!itemsValues.contains(itemValue)){
-								itemsValues.add(itemValue);
-								oidMap.remove(groupOIDOrdnl);
-								}
-								oidMap.put(groupOIDOrdnl, itemsValues);
-							}
-							else
-								oidMap.put(groupOIDOrdnl, itemsValues);
-							}
-							
-						}
-						
-						
-						}
-					else {// if the group is a repeating group, look for the key
+				
+				
+					// look for the key
 							// of same group and ordinal and add this item to
 							// that hashmap
 						for (ItemData itemData : itds) {
@@ -266,7 +241,7 @@ public class GenerateClinicalDataService {
 								}
 							}
 						}
-					}
+					
 
 				}
 				
@@ -282,25 +257,7 @@ public class GenerateClinicalDataService {
 		List<String> optionsText = null;
 		List<String> optionsVals = null;
 		String idValue = itemData.getValue();
-		if(!idValue.isEmpty())
-		for(ItemFormMetadata ifMeta:ifMetas){
-			
-			if(ifMeta.getCrfVersionId()==itemData.getEventCrf().getCrfVersion().getCrfVersionId() && item.getItemId()==itemData.getItem().getItemId()){
-				if(ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 3||ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 5||ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 6
-						|| ifMeta.getResponseSet().getResponseType().getResponseTypeId()== 7)
-				{
-					optionsText = Arrays.asList(ifMeta.getResponseSet().getOptionsText().split("\\s*,\\s*"));
-					optionsVals =  Arrays.asList(ifMeta.getResponseSet().getOptionsValues().split("\\s*,\\s*"));
-					if(optionsVals.indexOf(idValue)>0)// there is no validation on the UI to ensure the response options=response text in earlier versions of OpenClinica..check to avoid arrays out of bound
-						{
-							idValue = 	optionsText.get(optionsVals.indexOf(idValue));
-						}
-					
-				}
-				
-			}
-				
-		}
+		
 		return idValue;
 		
 	}
