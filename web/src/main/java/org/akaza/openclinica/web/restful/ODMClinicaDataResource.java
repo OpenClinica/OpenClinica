@@ -75,9 +75,9 @@ public class ODMClinicaDataResource {
 	@GET
 	@Path("/xml/view/{studyOID}/{studySubjectOID}/{studyEventOID}/{formVersionOID}")
 	@Produces(MediaType.TEXT_XML)
-	public String getODMMetadata(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,@PathParam("studySubjectOID") String studySubjOID){
+	public String getODMMetadata(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,@PathParam("studySubjectOID") String studySubjOID,@PathParam("studyEventOID") String studyEventOID){
 		LOGGER.debug("Requesting clinical data resource");
-		return getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID);
+		return getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID);
 	}
 	
 	
