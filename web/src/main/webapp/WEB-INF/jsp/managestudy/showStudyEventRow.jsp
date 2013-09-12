@@ -344,11 +344,7 @@
 
 		 </td>
 		 <td>
-		 <!--
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.id}"/>/<c:out value="${dec.eventCRF.id}"/>')"
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/S_R0112345/SS_SCRC003/SE_REGISTRATIONVISIT/F_PHYSICALEXAM_ENGLISH')"
-		 -->
-		 <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
