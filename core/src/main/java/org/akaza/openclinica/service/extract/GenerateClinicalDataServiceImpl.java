@@ -145,20 +145,13 @@ return null;
 
 	private boolean subjectBelongsToStudy(Study study, StudySubject studySubj) {
 		boolean subjectBelongs = false;
+		String parentOID = null;
+		
 		if(studySubj.getStudy().getOc_oid().equals(study.getOc_oid())){
 			subjectBelongs = true;
 		}
 		else{
-			List<Study> studies = studySubj.getStudy().getStudies();
 			
-			if(studies.size()>0)
-				
-			for(Study subjectStdy:studies){
-				if(study.getOc_oid().equals(subjectStdy.getOc_oid())){
-					subjectBelongs=true;
-				}
-			}
-			else
 				if(studySubj.getStudy().getStudy().getOc_oid().equals(study.getOc_oid()))
 					subjectBelongs=true;
 			
