@@ -1,15 +1,19 @@
 package org.akaza.openclinica.web.restful;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import javax.sql.DataSource;
 
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 
+import org.akaza.openclinica.bean.extract.odm.ClinicalDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
@@ -199,7 +203,48 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 	}
 
 
+	public FullReportBean collectODMMetadataForClinicalData(String studyOID,String formVersionOID, OdmClinicalDataBean odmClinicalDataBean)
+	{
+		StudyBean studyBean = getStudyDao().findByOid(studyOID);
+		if(studyBean!=null)
+			studyBean  = populateStudyBean(studyBean);
+		    MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean,getRuleSetRuleDao());
+	        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+	        MetaDataCollector.setTextLength(200);
 
+	        ODMBean odmb = mdc.getODMBean();
+	        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+	        ArrayList<String> xmlnsList = new ArrayList<String>();
+	        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+	        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+	        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+	        xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+	        odmb.setXmlnsList(xmlnsList);
+	        odmb.setODMVersion("oc1.3");
+	        mdc.setODMBean(odmb);
+	        adc.setOdmbean(odmb);
+	        if(studyBean==null)
+	        mdc.collectFileData(formVersionOID);
+	        else
+	        	mdc.collectFileData();
+	        adc.collectFileData();
+	        
+	        LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
+	        clinicalDataMap.put(studyOID, odmClinicalDataBean);
+	        
+	        FullReportBean report = new FullReportBean();
+	        report.setAdminDataMap(adc.getOdmAdminDataMap());
+	        report.setOdmStudyMap(mdc.getOdmStudyMap());
+	        report.setCoreResources(getCoreResources());
+	        report.setOdmBean(mdc.getODMBean());
+	        report.setClinicalData(odmClinicalDataBean);
+
+			report.setClinicalDataMap(clinicalDataMap);
+	        report.setODMVersion("oc1.3");
+	       
+	     
+	        return report;
+	}
 	private StudyBean populateStudyBean(StudyBean studyBean) {
 		 StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.dataSource);
 		  @SuppressWarnings("rawtypes")

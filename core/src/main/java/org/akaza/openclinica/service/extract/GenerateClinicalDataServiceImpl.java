@@ -59,14 +59,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	}
 
-	public String getClinicalData(String studyOID) {
+	public OdmClinicalDataBean getClinicalData(String studyOID) {
 		Study study = new Study();
 		study.setOc_oid(studyOID);
 		study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 return null;
 	}
 
-	public String getClinicalData(String studyOID, String studySubjectOID) {
+	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID) {
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		StudySubject studySubj = getStudySubjectDao().findByColumnName(
 				studySubjectOID, "ocOid");
@@ -91,13 +91,13 @@ return null;
 		this.studyDao = studyDao;
 	}
 
-	private String constructClinicalData(Study study, StudySubject studySubj) {
+	private OdmClinicalDataBean constructClinicalData(Study study, StudySubject studySubj) {
 
 		
 		return constructClinicalDataStudy(studySubj, study);
 	}
 
-	private String constructClinicalDataStudy(StudySubject studySubj, Study study) {
+	private OdmClinicalDataBean constructClinicalDataStudy(StudySubject studySubj, Study study) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 
 		ExportSubjectDataBean expSubjectBean = setExportSubjectDataBean(studySubj, study);
@@ -106,10 +106,10 @@ return null;
 		exportSubjDataBeanList.add(expSubjectBean);
 		odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
 		odmClinicalDataBean.setStudyOID(study.getOc_oid());
-		FullReportBean report = new FullReportBean();
+		/*FullReportBean report = new FullReportBean();
 		report.setClinicalData(odmClinicalDataBean);
-		report.createChunkedOdmXml(Boolean.TRUE, true, true);
-		return report.getXmlOutput().toString();
+		report.createChunkedOdmXml(Boolean.TRUE, true, true);*/
+		return odmClinicalDataBean;
 		// return null;
 	}
 
@@ -314,7 +314,7 @@ return null;
 	}
 
 	@Override
-	public String getClinicalData(String studyOID, String studySubjectOID,
+	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,
 			String studyEventOID, String formVersionOID) {
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID, studySubjectOID);

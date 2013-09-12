@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.restful;
 
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 
 /**
@@ -10,7 +11,7 @@ import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 public class ClinicalDataCollectorResource {
 	private GenerateClinicalDataService generateClinicalDataService;
 	
-	public String generateClinicalData(String studyOID,String studySubjOID,String studyEventOID,String formVersionOID){
+	public OdmClinicalDataBean generateClinicalData(String studyOID,String studySubjOID,String studyEventOID,String formVersionOID){
 	
 	return getGenerateClinicalDataService().getClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID);
 		

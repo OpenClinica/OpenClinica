@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 
+import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -43,7 +44,18 @@ public class ODMClinicaDataResource {
 
 	private ClinicalDataCollectorResource clinicalDataCollectorResource;
 	
+	private MetadataCollectorResource metadataCollectorResource;
 	
+	
+	public MetadataCollectorResource getMetadataCollectorResource() {
+		return metadataCollectorResource;
+	}
+
+	public void setMetadataCollectorResource(
+			MetadataCollectorResource metadataCollectorResource) {
+		this.metadataCollectorResource = metadataCollectorResource;
+	}
+
 	@GET
 	@Path("/json/view/{studyOID}/{studySubjectOID}/{studyEventOID}/{formVersionOID}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -77,7 +89,15 @@ public class ODMClinicaDataResource {
 	@Produces(MediaType.TEXT_XML)
 	public String getODMMetadata(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,@PathParam("studySubjectOID") String studySubjOID,@PathParam("studyEventOID") String studyEventOID){
 		LOGGER.debug("Requesting clinical data resource");
-		return getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID);
+	
+		FullReportBean report =  getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,formVersionOID,getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID));
+		
+		//report.createChunkedOdmXml(Boolean.TRUE, true, true);
+	//report.createStudyMetaOdmXml(Boolean.TRUE);
+	report.createOdmXml(true);
+		System.out.println(report.getXmlOutput().toString().trim());
+		
+		return report.getXmlOutput().toString().trim();
 	}
 	
 	
