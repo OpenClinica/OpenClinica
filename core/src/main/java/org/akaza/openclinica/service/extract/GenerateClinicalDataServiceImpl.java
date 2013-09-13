@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
@@ -33,15 +34,25 @@ import org.slf4j.LoggerFactory;
  */
 
 public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataService {
-	protected final static Logger logger = LoggerFactory
-			.getLogger("org.akaza.openclinica.service.extract.GenerateClinicalDataService");
+	protected final static Logger LOGGER = LoggerFactory
+			.getLogger("org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl");
 	protected final static String DELIMITER = ",";
 	private final static String GROUPOID_ORDINAL_DELIM = ":";
 	private final static String INDICATE_ALL="*";
-	
+	private final static String OPEN_ORDINAL_DELIMITER = "[";
+	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
+	private StudyEventDefinitionDao studyEventDefDao;
+
+	public StudyEventDefinitionDao getStudyEventDefDao() {
+		return studyEventDefDao;
+	}
+
+	public void setStudyEventDefDao(StudyEventDefinitionDao studyEventDefDao) {
+		this.studyEventDefDao = studyEventDefDao;
+	}
 
 	public StudySubjectDao getStudySubjectDao() {
 		return studySubjectDao;
@@ -63,26 +74,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		Study study = new Study();
 		study.setOc_oid(studyOID);
 		study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-return null;
+		
+		List<StudySubject>studySubjs = study.getStudySubjects();
+		return  constructClinicalData(study, studySubjs);
+	}
+	private List<StudySubject> listStudySubjects(String studySubjectOID){
+		ArrayList<StudySubject>studySubjs = new ArrayList<StudySubject>();
+		StudySubject studySubj = getStudySubjectDao().findByColumnName(
+				studySubjectOID, "ocOid");
+		
+		studySubjs.add(studySubj);
+		return studySubjs;
 	}
 
 	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID) {
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-		StudySubject studySubj = getStudySubjectDao().findByColumnName(
-				studySubjectOID, "ocOid");
-		return constructClinicalData(study, studySubj);
-		// return null;
+		
+
+		return constructClinicalData(study,listStudySubjects(studySubjectOID));
 	}
 
-	/*
-	 * private String getClinicalData(String studyOID,String studySubj,String
-	 * studyEventOID,String formVersionOID){ if(!studyOID.equals(INDICATE_ALL)&&
-	 * !studySubj.equals(INDICATE_ALL)&&
-	 * !studyEventOID.equals(INDICATE_ALL)&&!formVersionOID
-	 * .equals(INDICATE_ALL))
-	 * 
-	 * return constructClinicalDataStudy(); }
-	 */
 	public StudyDao getStudyDao() {
 		return studyDao;
 	}
@@ -91,36 +102,37 @@ return null;
 		this.studyDao = studyDao;
 	}
 
-	private OdmClinicalDataBean constructClinicalData(Study study, StudySubject studySubj) {
+	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs) {
 
+		List<StudyEvent>ses = new ArrayList<StudyEvent>();
 		
-		return constructClinicalDataStudy(studySubj, study);
+		return constructClinicalDataStudy(studySubjs, study,ses);
 	}
 
-	private OdmClinicalDataBean constructClinicalDataStudy(StudySubject studySubj, Study study) {
+	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study,List<StudyEvent>studyEvents) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
-
-		ExportSubjectDataBean expSubjectBean = setExportSubjectDataBean(studySubj, study);
-
+		ExportSubjectDataBean expSubjectBean;
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
+		for(StudySubject studySubj:studySubjs)
+		{
+		if(studyEvents.size()==0)
+			expSubjectBean = setExportSubjectDataBean(studySubj, study,studySubj.getStudyEvents());
+		else
+			 expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents);
 		exportSubjDataBeanList.add(expSubjectBean);
+		
 		odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
 		odmClinicalDataBean.setStudyOID(study.getOc_oid());
-		/*FullReportBean report = new FullReportBean();
-		report.setClinicalData(odmClinicalDataBean);
-		report.createChunkedOdmXml(Boolean.TRUE, true, true);*/
+		}
+		
 		return odmClinicalDataBean;
 		// return null;
 	}
 
-	/*
-	 * private String constructClinicaDataStudy(){
-	 * 
-	 * }
-	 */
+
 
 	private ExportSubjectDataBean setExportSubjectDataBean(
-			StudySubject studySubj, Study study) {
+			StudySubject studySubj, Study study,List<StudyEvent> studyEvents) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
 		
@@ -135,7 +147,7 @@ return null;
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
 
 		exportSubjectDataBean
-				.setExportStudyEventData(setExportStudyEventDataBean(studySubj));
+				.setExportStudyEventData(setExportStudyEventDataBean(studySubj,studyEvents));
 
 		exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 		}
@@ -145,7 +157,6 @@ return null;
 
 	private boolean subjectBelongsToStudy(Study study, StudySubject studySubj) {
 		boolean subjectBelongs = false;
-		String parentOID = null;
 		
 		if(studySubj.getStudy().getOc_oid().equals(study.getOc_oid())){
 			subjectBelongs = true;
@@ -162,19 +173,16 @@ return null;
 	}
 
 	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(
-			StudySubject ss) {
+			StudySubject ss,List<StudyEvent>studyEvents) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
-		for (StudyEvent se : ss.getStudyEvents()) {
+		for (StudyEvent se : studyEvents) {
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			expSEBean.setLocation(se.getLocation());
 			expSEBean.setEndDate(se.getDateEnd() + "");
 			expSEBean.setStartDate(expSEBean.getStartDate() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOcOid());
-			// if(se.getStudyEventDefinition().getRepeating())
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
-			// else
-			// expSEBean.setStudyEventRepeatKey(EMPTY_STRING);
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se));
 
 			al.add(expSEBean);
@@ -321,12 +329,47 @@ return null;
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID);
 		else if(!studyEventOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL) &&  formVersionOID.equals(INDICATE_ALL))
-				return null;
+				return getClinicalData(studyOID,studySubjectOID,studyEventOID);
 		else if(!studyEventOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL) &&  !formVersionOID.equals(INDICATE_ALL))
 			return null;
 
 		
 		return null;
+	}
+
+	private OdmClinicalDataBean getClinicalData(String studyOID,
+			String studySubjectOID, String studyEventOID) {
+		int seOrdinal = 0;
+		
+		List<StudyEvent>studyEvents = new ArrayList<StudyEvent>();
+		
+		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
+		
+		int idx = studyEventOID.indexOf("[");
+		if(idx>0)
+			{
+			studyEventOID=  studyEventOID.substring(0,idx-1);
+			seOrdinal = new Integer(studyEventOID.substring(idx, studyEventOID.indexOf("]"))).intValue();
+			}
+		
+		if(seOrdinal>0)
+			studyEvents = fetchSE(seOrdinal,getStudyEventDefDao().findByColumnName(studyEventOID, "ocOid").getStudyEvents());
+		else
+			studyEvents = getStudyEventDefDao().findByColumnName(studyEventOID, "ocOid").getStudyEvents();
+			
+		return constructClinicalDataStudy(listStudySubjects(studySubjectOID),study,studyEvents)		;
+	}
+
+	private List<StudyEvent>  fetchSE(int seOrdinal, List<StudyEvent> studyEvents) {
+		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
+		for(StudyEvent se:studyEvents){
+			if(se.getSampleOrdinal()==seOrdinal)
+				{
+				sEs.add(se);
+				
+				}
+		}
+	return sEs;
 	}
 
 }

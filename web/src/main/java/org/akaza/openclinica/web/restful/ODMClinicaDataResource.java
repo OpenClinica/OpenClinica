@@ -95,7 +95,7 @@ public class ODMClinicaDataResource {
 		//report.createChunkedOdmXml(Boolean.TRUE, true, true);
 	//report.createStudyMetaOdmXml(Boolean.TRUE);
 	report.createOdmXml(true);
-		System.out.println(report.getXmlOutput().toString().trim());
+		LOGGER.debug(report.getXmlOutput().toString().trim());
 		
 		return report.getXmlOutput().toString().trim();
 	}

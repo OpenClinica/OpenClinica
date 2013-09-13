@@ -88,6 +88,8 @@
 <bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl">
 	<property name="studyDao" ref="studyDaoDomain"></property>
 	<property name="studySubjectDao" ref="studySubjectDaoDomain"/>
+	<property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
+	
 </bean>
 
 
