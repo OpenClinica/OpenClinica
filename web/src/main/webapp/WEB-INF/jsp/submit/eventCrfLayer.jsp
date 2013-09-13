@@ -11,9 +11,9 @@
 <c:set var="eventId" value="${param.eventId}" />
 <c:set var="eventCrfId" value="${param.crfId}" />
 <c:set var="subjectId" value="${param.subjectId}" />
-<c:set var="studySubject_subjectId" value="${param.studySubject_subjectId}" />
-<c:set var="studySubjectId" value="${param.studySubjectId}"/>
-<c:set var="studySubjectStatusId" value="${param.studySubjectStatusId}" />
+<c:set var="studySubjectject_subjectId" value="${param.studySubjectject_subjectId}" />
+<c:set var="studySubjectjectId" value="${param.studySubjectjectId}"/>
+<c:set var="studySubjectjectStatusId" value="${param.studySubjectjectStatusId}" />
 <c:set var="crfVersionId" value="${param.crfVersionId}" />
 <c:set var="edcId" value="${param.edcId}" />
 <c:set var="crfStatus" value="${param.crfStatus}" />
@@ -28,7 +28,7 @@
 <c:set var="lockedi18n"><fmt:message key="locked" bundle="${resterm}"/></c:set>
 
 
-<c:if test="${studySubjectStatusId == 5 || studySubjectStatusId == 7}">
+<c:if test="${studySubjectjectStatusId == 5 || studySubjectjectStatusId == 7}">
 	<c:set var="crfStatus" value="invalid"/>
 </c:if>
 <div id="Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>" style="position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;">
@@ -232,16 +232,10 @@
 						    	      <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							          <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								      <tr valign="top"><td class="table_cell_left">
-								      <!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-								      -->
-								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 								      
 								      <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
-								      <!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-								      -->
-								      <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 								      
 								      <fmt:message key="print" bundle="${resword}"/></a></td></tr>
                                     <!-- New Statement for locked or frozen study -->
@@ -253,8 +247,8 @@
 						        		   <tr valign="top"><td class="table_cell_left"><a href="">
         								   <img src="images/bt_Lock.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="">Lock</a></td></tr>
 		        						   -->
-				        				   <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>">
-						        		   <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+				        				   <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
+						        		   <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 	    							    </c:if>
                                         <c:if test="${userBean.sysAdmin && (study.status.available)}">
 			        					   <tr valign="top"><td class="table_cell_left">
@@ -271,47 +265,37 @@
 								  
 									<tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
 							        <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
-							          <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+							          <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	        </c:if>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus ==no_startedi18n }">
 						 	            <c:if test="${eventId>0 && !userRole.monitor && study.status.available}">
-										      <tr valign="top"><td class="table_cell_left"><a href="InitialDataEntry?<c:out value="eventDefinitionCRFId=${edcId}&studyEventId=${eventId}&subjectId=${studySubject_subjectId}&eventCRFId=${eventCrfId}&crfVersionId=${crfVersionId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="InitialDataEntry?<c:out value="eventDefinitionCRFId=${edcId}&studyEventId=${eventId}&subjectId=${studySubject_subjectId}&eventCRFId=${eventCrfId}&crfVersionId=${crfVersionId}"/>"><fmt:message key="enter_data" bundle="${resword}"/></a></td></tr>
+										      <tr valign="top"><td class="table_cell_left"><a href="InitialDataEntry?<c:out value="eventDefinitionCRFId=${edcId}&studyEventId=${eventId}&subjectId=${studySubjectject_subjectId}&eventCRFId=${eventCrfId}&crfVersionId=${crfVersionId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="InitialDataEntry?<c:out value="eventDefinitionCRFId=${edcId}&studyEventId=${eventId}&subjectId=${studySubjectject_subjectId}&eventCRFId=${eventCrfId}&crfVersionId=${crfVersionId}"/>"><fmt:message key="enter_data" bundle="${resword}"/></a></td></tr>
 						 	    		</c:if>
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
-								       <!--
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.id}"/>')"
-								       -->
-								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								       <!--
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/eventCrfLayer.jsp/<c:out value="${version.id}"/>')"
-								       -->
-								       <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${crfVersionId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus =='invalid' }">
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
-<!--								       
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-								       -->
-								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+								       
 								       
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
-								       <!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-								       -->
-								       <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+								       
 								       
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
-								    <c:if test="${studySubjectStatusId != 5 && studySubjectStatusId != 7}">
+								    <c:if test="${studySubjectjectStatusId != 5 && studySubjectjectStatusId != 7}">
 									    <c:if test="${userRole.director || userBean.sysAdmin}">
-										<tr valign="top"><td class="table_cell_left"><a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${studySubjectId}"/>">
-										<img src="images/bt_Restore.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${studySubjectId}"/>"><fmt:message key="restore" bundle="${resword}"/></a></td></tr>
+										<tr valign="top"><td class="table_cell_left"><a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${studySubjectjectId}"/>">
+										<img src="images/bt_Restore.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${studySubjectjectId}"/>"><fmt:message key="restore" bundle="${resword}"/></a></td></tr>
 									   </c:if>
 								   </c:if>
 						 	    </c:when>
@@ -341,22 +325,16 @@
 							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								  
 									<tr valign="top"><td class="table_cell_left">
-									<!--
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-									-->
-									<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 									
 									<img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								<!--	
-     <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${dec.eventCRF.id}"/>/*')"
-     -->
-									<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${eventCrfId}"/>')">
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
 									
 									<fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								  
 								   <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
-									<tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>">
-									<img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+									<tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
+									<img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 								   </c:if>
 								   
 								   <c:if test="${userBean.sysAdmin && (study.status.available)}">
