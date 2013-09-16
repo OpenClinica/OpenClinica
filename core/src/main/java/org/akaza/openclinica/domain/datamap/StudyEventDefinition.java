@@ -44,7 +44,7 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 	private Date dateUpdated;
 	private Integer updateId;
 	private Integer ordinal;
-	private String ocOid;
+	private String oc_oid;
 	private List<EventDefinitionCrf> eventDefinitionCrfs ;
 	private List<StudyEvent> studyEvents ;
 	public StudyEventDefinition() {
@@ -52,7 +52,7 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 
 	public StudyEventDefinition(int studyEventDefinitionId, String ocOid) {
 		this.studyEventDefinitionId = studyEventDefinitionId;
-		this.ocOid = ocOid;
+		this.oc_oid = ocOid;
 	}
 
 	public StudyEventDefinition(int studyEventDefinitionId,
@@ -61,6 +61,7 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 			String category, Date dateCreated, Date dateUpdated,
 			Integer updateId, Integer ordinal, String ocOid,
 			List<EventDefinitionCrf> eventDefinitionCrfs, List<StudyEvent> studyEvents) {
+		
 		this.studyEventDefinitionId = studyEventDefinitionId;
 		this.userAccount = userAccount;
 		this.study = study;
@@ -74,7 +75,7 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 		this.dateUpdated = dateUpdated;
 		this.updateId = updateId;
 		this.ordinal = ordinal;
-		this.ocOid = ocOid;
+		this.oc_oid = ocOid;
 		this.eventDefinitionCrfs = eventDefinitionCrfs;
 		this.studyEvents = studyEvents;
 	}
@@ -208,12 +209,12 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 	}
 
 	@Column(name = "oc_oid", unique = true, nullable = false, length = 40)
-	public String getOcOid() {
-		return this.ocOid;
+	public String getOc_oid() {
+		return this.oc_oid;
 	}
 
-	public void setOcOid(String ocOid) {
-		this.ocOid = ocOid;
+	public void setOc_oid(String ocOid) {
+		this.oc_oid = ocOid;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEventDefinition")
