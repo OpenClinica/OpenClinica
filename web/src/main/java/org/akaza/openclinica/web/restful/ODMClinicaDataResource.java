@@ -59,11 +59,14 @@ public class ODMClinicaDataResource {
 	@GET
 	@Path("/json/view/{studyOID}/{studySubjectOID}/{studyEventOID}/{formVersionOID}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getODMClinicaldata(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,
+	public String getODMClinicaldata(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,@PathParam("studyEventOID") String studyEventOID,
 	                                 @PathParam("studySubjectOID") String studySubjOID){
       LOGGER.debug("Requesting clinical data resource");
       XMLSerializer xmlSerializer = new XMLSerializer();
-      JSON json = xmlSerializer.readFromFile( "clinical2.xml");
+      FullReportBean report =  getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,formVersionOID,getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID));
+	  report.createOdmXml(true);
+	  JSON json =  xmlSerializer.read(report.getXmlOutput().toString().trim());
+      
       return json.toString(INDENT_LEVEL);
 	}
 	
@@ -92,8 +95,6 @@ public class ODMClinicaDataResource {
 	
 		FullReportBean report =  getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,formVersionOID,getClinicalDataCollectorResource().generateClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID));
 		
-		//report.createChunkedOdmXml(Boolean.TRUE, true, true);
-	//report.createStudyMetaOdmXml(Boolean.TRUE);
 	report.createOdmXml(true);
 		LOGGER.debug(report.getXmlOutput().toString().trim());
 		
