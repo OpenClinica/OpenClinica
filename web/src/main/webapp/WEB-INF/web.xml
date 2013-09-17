@@ -2190,7 +2190,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <location>/WEB-INF/jsp/403.jsp</location>
     
     </error-page>
-
+    <error-page>
+    <error-code>500</error-code>
+    <location>/WEB-INF/jsp/error.jsp</location>
+    
+    </error-page>
  
  <servlet>
     <servlet-name>OpenClinicaJersey</servlet-name>
