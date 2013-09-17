@@ -215,7 +215,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				dataBean.setStatus(ecrf.getStatus() + "");
 
 				formDataBean.add(dataBean);
-				formCheck=false;
+				if(formVersionOID!=null)formCheck=false;
 				}
 			}
 
