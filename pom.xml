@@ -3,7 +3,7 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
     <packaging>pom</packaging>
-  <version>3.1.5</version>
+  <version>3.1-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica 3.1-SNAPSHOT</description>
 
@@ -506,7 +506,7 @@
     <scm>
 		<connection>scm:hg:${hg.url}</connection>
 		<developerConnection>scm:hg:${hg.url}</developerConnection>
-	<tag>OpenClinica-3.1.5</tag>
+	<tag>HEAD</tag>
   </scm>
 
     <repositories>
