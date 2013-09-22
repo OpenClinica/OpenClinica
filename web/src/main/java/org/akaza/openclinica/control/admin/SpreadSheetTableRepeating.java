@@ -1254,7 +1254,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         } else {
                             sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
-                                    + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "','" + stripQuotes(resValues) + "',"
+                                    + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "', E'" + stripQuotes(resValues) + "',"
                                     + "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='" + stripQuotes(responseType.toLowerCase()) + "'),"
                                     + versionIdString + ")";
                         }
