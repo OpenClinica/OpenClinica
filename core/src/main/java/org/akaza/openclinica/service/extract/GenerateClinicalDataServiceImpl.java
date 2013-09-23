@@ -180,7 +180,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			expSEBean.setLocation(se.getLocation());
 			expSEBean.setEndDate(se.getDateEnd() + "");
-			expSEBean.setStartDate(expSEBean.getStartDate() + "");
+			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
@@ -353,27 +353,38 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		int seOrdinal = 0;
 		String temp = studyEventOID;
 		List<StudyEvent>studyEvents = new ArrayList<StudyEvent>();
-		
+		StudyEventDefinition sed = null ;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-		
+		List<StudySubject> ss = listStudySubjects(studySubjectOID);
 		int idx = studyEventOID.indexOf("[");
 		if(idx>0)
 			{
 			studyEventOID=  studyEventOID.substring(0,idx);
 			seOrdinal = new Integer(temp.substring(idx+1, temp.indexOf("]"))).intValue();
 			}
-		
+		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
 		if(seOrdinal>0)
 			{
-			StudyEventDefinition sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
 			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
 			}
+		else if(sed.getRepeating())
+			{
+				studyEvents = sed.getStudyEvents();
+				
+			}
 		else
-			studyEvents = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid").getStudyEvents();
+		{
+			seOrdinal = 1;
+			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
 			
-		return constructClinicalDataStudy(listStudySubjects(studySubjectOID),study,studyEvents,formVersionOID)		;
+		}
+			
+		return constructClinicalDataStudy(ss,study,studyEvents,formVersionOID)		;
 	}
 
+	
+	
+	
 	private List<StudyEvent>  fetchSE(int seOrdinal, List<StudyEvent> studyEvents,String ssOID) {
 		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
 		for(StudyEvent se:studyEvents){
