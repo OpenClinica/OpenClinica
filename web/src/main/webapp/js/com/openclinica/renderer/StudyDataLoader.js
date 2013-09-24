@@ -245,8 +245,11 @@ function StudyDataLoader(study, json) {
     }
     
     app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
-    
     var formsData = util_ensureArray(studyEventData["FormData"]);
+    
+    if (formsData == undefined) {
+      return;
+    }
     for (var i=0;i<formsData.length;i++) {
      if(formsData[i]["@FormOID"] == app_formVersionOID) { 
         app_formData = formsData[i];
