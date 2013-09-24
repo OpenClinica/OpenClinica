@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * To generate CDISC-ODM clinical data without data set.
+ * Generate CDISC-ODM clinical data without data set.
  * 
  * @author jnyayapathi
  * 
@@ -233,10 +233,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		// itemOIDs with corresponding values will be created.
 		for (ItemGroupMetadata igGrpMetadata : set) {
 			groupOID = igGrpMetadata.getItemGroup().getOcOid();
-			// This logic here is default ordinal for ungrouped items and
-			// repeating groups is 1; This needs to be handled differently
-			// either here or in populateItemGrpBean to not show this
-			// information in case of ungrouped items
+			
 			if (!oidMap.containsKey(groupOID)) {
 				String groupOIDOrdnl = groupOID;
 				ArrayList<String> itemsValues = new ArrayList<String>();
@@ -250,11 +247,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					List<ItemData> itds = itemGrpMetada.getItem()
 							.getItemDatas();
 
-					// TODO: Only one item data value should be present not
-					// several of them, this should not be a list
-					// There also needs to be the response option value
-					// populated here depending on what the response type is.
-
+		
 					// look for the key
 					// of same group and ordinal and add this item to
 					// that hashmap
@@ -356,26 +349,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		StudyEventDefinition sed = null ;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> ss = listStudySubjects(studySubjectOID);
-		int idx = studyEventOID.indexOf("[");
+		int idx = studyEventOID.indexOf(OPEN_ORDINAL_DELIMITER);
 		if(idx>0)
 			{
 			studyEventOID=  studyEventOID.substring(0,idx);
-			seOrdinal = new Integer(temp.substring(idx+1, temp.indexOf("]"))).intValue();
+			seOrdinal = new Integer(temp.substring(idx+1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
 			}
 		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
 		if(seOrdinal>0)
 			{
 			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
 			}
-		else if(sed.getRepeating())
-			{
-				studyEvents = sed.getStudyEvents();
-				
-			}
+	
 		else
 		{
-			seOrdinal = 1;
-			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
+			
+			studyEvents = fetchSE(sed.getStudyEvents(),studySubjectOID);
 			
 		}
 			
@@ -397,4 +386,15 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	return sEs;
 	}
 
+	private List<StudyEvent>  fetchSE( List<StudyEvent> studyEvents,String ssOID) {
+		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
+		for(StudyEvent se:studyEvents){
+			if(se.getStudySubject().getOcOid().equals(ssOID))
+				{
+				sEs.add(se);
+				
+				}
+		}
+	return sEs;
+	}
 }
