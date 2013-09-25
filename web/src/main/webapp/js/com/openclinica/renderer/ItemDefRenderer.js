@@ -19,11 +19,17 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
   this.itemValue = undefined;
 
   if (app_formData != undefined) {
-    var itemsData = util_ensureArray(app_formData["ItemGroupData"]["ItemData"]);
-    for (var i=0;i<itemsData.length;i++) {
-     if(itemsData[i]["@ItemOID"] == this.OID) { 
-        this.itemValue = itemsData[i]["@Value"];
-        break;
+    
+    var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+    for (var i=0;i<itemGroupData.length;i++) {
+      var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
+      if (itemsData != undefined) {
+        for (var j=0;j<itemsData.length;j++) {
+         if(itemsData[j]["@ItemOID"] == this.OID) { 
+            this.itemValue = itemsData[j]["@Value"];
+            break;
+          }
+        }
       }
     }
   }
