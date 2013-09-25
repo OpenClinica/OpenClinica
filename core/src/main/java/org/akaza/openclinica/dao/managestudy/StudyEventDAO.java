@@ -484,7 +484,6 @@ public class StudyEventDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
         variables.put(Integer.valueOf(3), sb.getLocation());
         variables.put(Integer.valueOf(4), Integer.valueOf(sb.getSampleOrdinal()));
-        nullVars.put(3, TypeNames.STRING);
         if (sb.getDateStarted() == null) {
             // YW 08-16-2007 << data type changed from DATE to TIMESTAMP
             nullVars.put(Integer.valueOf(5), Integer.valueOf(TypeNames.TIMESTAMP));
