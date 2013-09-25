@@ -14,8 +14,6 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 
 import javax.sql.DataSource;
 
@@ -26,7 +24,6 @@ public class StudyEventTransferValidator implements Validator {
     StudySubjectDAO studySubjectDAO;
     StudyEventDefinitionDAO studyEventDefinitionDAO;
     BaseVSValidatorImplementation helper;
-    private StudyParameterValueDAO studyParameterValueDAO;
     
     public StudyEventTransferValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -135,9 +132,7 @@ public class StudyEventTransferValidator implements Validator {
             e.reject("studyEventTransferValidator.startDateTime_required");
             return;
         }
-        StudyParameterValueBean eventLocationRequiredSetting = getStudyParameterValueDAO().findByHandleAndStudy(studyEventTransferBean.getStudy().getId(), "eventLocationRequired");
-        
-        if ("true".equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
+        if (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1) {
             e.reject("studyEventTransferValidator.location_required");
             return;
         }
@@ -174,8 +169,4 @@ public class StudyEventTransferValidator implements Validator {
         return this.studyEventDefinitionDAO != null ? studyEventDefinitionDAO : new StudyEventDefinitionDAO(dataSource);
     }
 
-    public StudyParameterValueDAO getStudyParameterValueDAO() {
-    	        return this.studyParameterValueDAO != null ? studyParameterValueDAO : new StudyParameterValueDAO(dataSource);
-    	 }
-    	
 }
