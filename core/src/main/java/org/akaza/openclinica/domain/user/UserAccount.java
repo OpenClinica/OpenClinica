@@ -602,6 +602,7 @@ public class UserAccount  implements MutableDomainObject {
 		this.studyEvents = studyEvents;
 	}
 
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<CrfVersion> getCrfVersions() {
 		return this.crfVersions;

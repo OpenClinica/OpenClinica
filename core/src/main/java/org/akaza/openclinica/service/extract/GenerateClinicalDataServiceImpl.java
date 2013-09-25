@@ -327,7 +327,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	@Override
 	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,
-			String studyEventOID, String formVersionOID) {
+			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit) {
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID, studySubjectOID);
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
