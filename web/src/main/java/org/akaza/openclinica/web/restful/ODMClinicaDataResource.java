@@ -78,7 +78,7 @@ public class ODMClinicaDataResource {
 								.generateClinicalData(studyOID, studySubjOID,
 										studyEventOID, formVersionOID));
 		report.createOdmXml(true);
-		xmlSerializer.setForceTopLevelObject(true);
+		//xmlSerializer.setForceTopLevelObject(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
 		return json.toString(INDENT_LEVEL);
