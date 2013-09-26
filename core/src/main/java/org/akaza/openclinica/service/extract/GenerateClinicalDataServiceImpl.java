@@ -104,9 +104,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs) {
 
-		List<StudyEvent>ses = new ArrayList<StudyEvent>();
 		
-		return constructClinicalDataStudy(studySubjs, study,ses, null);
+		return constructClinicalDataStudy(studySubjs, study,null, null);
 	}
 
 	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study,List<StudyEvent>studyEvents,String formVersionOID) {
@@ -115,7 +114,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		for(StudySubject studySubj:studySubjs)
 		{
-		if(studyEvents.size()==0)
+		if(studyEvents==null)
 			expSubjectBean = setExportSubjectDataBean(studySubj, study,studySubj.getStudyEvents(),formVersionOID);
 		else
 			 expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents,formVersionOID);
