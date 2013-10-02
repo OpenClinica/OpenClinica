@@ -32,9 +32,15 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
         	 this.itemValue = itemsData[j]["@Value"];
         	 if(this.responseType!=undefined)
         	 if(this.responseType=='file'){
-        		 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
-        		 
+        		 if(this.itemValue.indexOf("/")==0)
+        			 {
+        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
+        			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
+        			 }
+        		 else
+        		 {this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
         		 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        		 }
         	 }	
             break;
           }
