@@ -2,7 +2,7 @@
   <table class='repeating-horiz-items' width='100%' height='100%'>
   <tr class="repeating_item_option_names">
   
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
+  {{if responseType == 'text' || responseType == 'calculation' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td align='center' valign='center'> <input id="${formOID}-${OID}" type='text' value="${itemValue}"/></td>
   {{else responseType == 'radio'}}
@@ -27,6 +27,11 @@
  <td align='center' valign='center' class='repeating_item_group'>
    <span><textarea id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
  </td>
+ {{else responseType == 'file'}}
+   <td valign="top">
+  <div class='item_def_control ${isInline}'> 
+ <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
+  </td>
   {{else}}
     [item]
   {{/if}}

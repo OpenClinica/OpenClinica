@@ -6,7 +6,7 @@
     <span class='item_def_number'>{{html itemNumber}}</span>
     <span class='item_def_title'>{{html name}} {{if mandatory == true}} * {{/if}}</span>
   </td>
-  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'file' || 
+  {{if responseType == 'text' || responseType == 'calculation' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td td valign="top">  
     <input id="${formOID}-${OID}" type='text' value="${itemValue}"/> 
@@ -50,6 +50,11 @@
   {{else responseType == 'textarea'}}
   <td>
  <span><textarea  id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
+ 
+ {{else responseType == 'file'}}
+   <td valign="top">
+  <div class='item_def_control ${isInline}'> 
+ <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   </td>
   {{else}}
     [item]

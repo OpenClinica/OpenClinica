@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -74,7 +75,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
     private ConfigurationDao configurationDao;
     private UserAccountDAO userAccountDao;
     private DataSource dataSource;
-    private org.akaza.openclinica.core.CRFLocker crfLocker;
+    private org.akaza.openclinica.core.CRFLocker crfLocker; 
 
     //~ Constructors ===================================================================================================
 
@@ -133,6 +134,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
             authentication = this.getAuthenticationManager().authenticate(authRequest);
             auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
+            request.getSession().setAttribute(SecureController.USER_BEAN_NAME, userAccountBean);
             //To remove the locking of Event CRFs previusly locked by this user.
             crfLocker.unlockAllForUser(userAccountBean.getId());
         } catch (LockedException le) {

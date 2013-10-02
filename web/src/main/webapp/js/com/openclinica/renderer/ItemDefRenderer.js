@@ -17,7 +17,8 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
   debug("In ItemDefRenderer: " + this.OID + "  multiSelectListOID: " + this.multiSelectListOID, util_logDebug);
   this.columns = this.itemDetails["OpenClinica:Layout"] ? this.itemDetails["OpenClinica:Layout"]["@Columns"] : undefined;
   this.itemValue = undefined;
-
+  this.file = undefined;
+  this.fileDownloadLink=undefined;
   if (app_formData != undefined) {
     
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
@@ -26,7 +27,15 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
       if (itemsData != undefined) {
         for (var j=0;j<itemsData.length;j++) {
          if(itemsData[j]["@ItemOID"] == this.OID) { 
-            this.itemValue = itemsData[j]["@Value"];
+        	 
+        		 
+        	 this.itemValue = itemsData[j]["@Value"];
+        	 if(this.responseType!=undefined)
+        	 if(this.responseType=='file'){
+        		 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
+        		 
+        		 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        	 }	
             break;
           }
         }
@@ -43,7 +52,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
        {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
         unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
         columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
-        itemName:this.itemName, itemValue:this.itemValue});
+        itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
     return s[0].outerHTML;
   }
   
