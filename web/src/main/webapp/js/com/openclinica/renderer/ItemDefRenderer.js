@@ -19,6 +19,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
   this.itemValue = undefined;
   this.file = undefined;
   this.fileDownloadLink=undefined;
+  this.itemTemp= undefined;
   if (app_formData != undefined) {
     
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
@@ -34,12 +35,16 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
         	 if(this.responseType=='file'){
         		 if(this.itemValue.indexOf("/")==0)
         			 {
-        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue);
+        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
         			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
+        			
+        			 this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
         			 }
         		 else
-        		 {this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue.replace(/\\/g,"//"));
-        		 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        		 {
+        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
+        			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        			 this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
         		 }
         	 }	
             break;
