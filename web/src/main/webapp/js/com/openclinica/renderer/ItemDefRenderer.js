@@ -34,11 +34,11 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
         	 if(this.responseType=='file'){
         		 if(this.itemValue.indexOf("/")==0)
         			 {
-        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
+        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue);
         			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
         			 }
         		 else
-        		 {this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
+        		 {this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue.replace(/\\/g,"//"));
         		 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
         		 }
         	 }	
