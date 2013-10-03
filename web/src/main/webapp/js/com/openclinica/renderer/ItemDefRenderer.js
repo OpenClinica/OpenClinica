@@ -1,4 +1,4 @@
-function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
+function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber) {
   this.json = json;
   this.itemDetails = itemDetails;
   this.mandatory = mandatory;
@@ -19,36 +19,34 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
   this.itemValue = undefined;
   this.file = undefined;
   this.fileDownloadLink=undefined;
+  
   if (app_formData != undefined) {
-    
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
     for (var i=0;i<itemGroupData.length;i++) {
       var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
       if (itemsData != undefined) {
         for (var j=0;j<itemsData.length;j++) {
-         if(itemsData[j]["@ItemOID"] == this.OID) { 
-        	 
-        		 
+           if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
         	 this.itemValue = itemsData[j]["@Value"];
-        	 if(this.responseType!=undefined)
-        	 if(this.responseType=='file'){
-        		 if(this.itemValue.indexOf("/")==0)
-        			 {
-        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue);
-        			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
+        	 if (this.responseType != undefined)
+        	   if (this.responseType == 'file') {
+        		   if(this.itemValue.indexOf("/") == 0) {
+        			   this.fileDownloadLink = app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue);
+        			   this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
         			 }
-        		 else
-        		 {this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue.replace(/\\/g,"//"));
-        		 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
-        		 }
-        	 }	
-            break;
-          }
-        }
-      }
+        		   else {
+        		     this.fileDownloadLink = app_contextPath+"/DownloadAttachedFile?fileName="+encodeURI(this.itemValue.replace(/\\/g,"//"));
+        		     this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        		   }
+        	   }	
+             break;
+           }
+         }
+       }
     }
   }
   
+
   this.renderPrintableItem = function(isRepeating) { 
     var template = "print_item_def";
     if (isRepeating == true) {

@@ -269,7 +269,6 @@ function StudyRenderer(json) {
     var currentItemGroupOID = "";
     var previousItemGroupOID = "";
     var isFirstRepeatingItem = true;
-    var lastRepeatingOrderInFormNumber;
  
     // Get Form Items
     var prevSectionLabel = undefined;
@@ -287,9 +286,12 @@ function StudyRenderer(json) {
       }
     }
     
-    for (var i=0;i< orderedItems.length;i++) {
+    var repeatRowNumber = 1;
+    var totalRepeatingRows = 1;
+    
+    for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++) {
       var repeatingRows = "";
-      var itemDef = orderedItems[i];
+      var itemDef = orderedItems[orderedItemIndex];
       var itemOID = itemDef["@OID"];
       
       var itemNumber = itemDef["Question"] && itemDef["Question"]["@OpenClinica:QuestionNumber"] ? itemDef["Question"]["@OpenClinica:QuestionNumber"] : "";
@@ -309,7 +311,6 @@ function StudyRenderer(json) {
       var lastItemInRepeatingRow = false;
       debug("#"+itemNumber+"column/columns: "+columnNumber+"/"+columns+ ", name: "+name+", section: "+sectionLabel+", header: "+itemHeader, util_logDebug );
       
-      var repeatNumber = 1;
       var repeating = false;
       var manditory = false;
       var repeatMax = undefined; 
@@ -320,7 +321,7 @@ function StudyRenderer(json) {
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         mandatory = app_itemGroupMap[itemOID].mandatory;
-        repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? repeatNumber = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
+        totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
         itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
@@ -340,13 +341,13 @@ function StudyRenderer(json) {
       }
       this.renderString += "<div class='vertical-spacer-20px'></div>";
       
-      debug(name + " - repeating: " + repeating + ", repeatNumber: " + repeatNumber + ", repeatMax: " + repeatMax, util_logDebug);
+      debug(name + " - repeating: " + repeating + ", totalRepeatingRows: " + totalRepeatingRows + ", repeatMax: " + repeatMax, util_logInfo);
      
-      // inpect the next ItemDef for look-ahead purposes.
+      // inspect the next ItemDef for look-ahead purposes.
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
-      if (i+1 < orderedItems.length) {
-        nextItemDef = orderedItems[i+1];
+      if (orderedItemIndex+1 < orderedItems.length) {
+        nextItemDef = orderedItems[orderedItemIndex+1];
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
         nextColumnNumber = nextItemDetails["@ColumnNumber"];
         var nextItemOID = nextItemDef["@OID"];
@@ -354,20 +355,21 @@ function StudyRenderer(json) {
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
-      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"]);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
       
+      /*******************  REPEATING GROUP **********************************/
       // process repeating group of items 
       if (repeating == true) {
-        debug("REPEATING current: " + currentItemGroupOID + ", previous: " + previousItemGroupOID + " i: " + i + ", limit: " + lastRepeatingOrderInFormNumber, util_logDebug);
-     
+        
         if (currentItemGroupOID != previousItemGroupOID) {
+          repeatRowNumber = 1;
           isFirstRepeatingItem = true;
         }
       
-        if(nextGroupOID!=currentItemGroupOID ){
+        if (nextGroupOID != currentItemGroupOID) {
           lastItemInRepeatingRow = true;
         }
         var orderNumber = app_itemGroupMap[itemOID].orderNumber;
@@ -377,10 +379,14 @@ function StudyRenderer(json) {
         // in first item in repeating group
         if (isFirstRepeatingItem == true) {
           repeatingRowString = "<tr class='repeating_item_group'>";
-          repeatingHeaderString = "<tr class='repeating_item_group'>";
+          if (repeatRowNumber == 1) { 
+            repeatingHeaderString = "<tr class='repeating_item_group'>";
+          }
           isFirstRepeatingItem = false;
-          lastRepeatingOrderInFormNumber = i + itemGroupLength - 1;
        }
+        
+        debug("REPEATING current: " + currentItemGroupOID + ", previous: " + previousItemGroupOID + " orderedItemIndex: " + 
+               orderedItemIndex + ", limit: " + totalRepeatingRows + ", OID: " + itemOID, util_logInfo);
         
         repeatingRowString += itemDefRenderer.renderPrintableItem(repeating);
         var responseLayout = itemDetails["OpenClinica:ItemResponse"]["@ResponseLayout"];
@@ -395,23 +401,38 @@ function StudyRenderer(json) {
             optionsRow += "<td valign='bottom' align='center' class='repeating_item_group'>" + options[j].label + "</td>";
           }
           optionsRow += "</tr>";
-          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'><table>" + itemNameRow + optionsRow + "</table></td>";
+          
+          if (repeatRowNumber == 1) { 
+            repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'><table>" + itemNameRow + optionsRow + "</table></td>";
+          } 
         }
         else {
-          repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + (mandatory == true ? " *" : "") + "</td>";
+          if (repeatRowNumber == 1) { 
+            repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + (mandatory == true ? " *" : "") + "</td>";
+          }
         }
          
         // in last item in repeating group
         if (lastItemInRepeatingRow) {
           repeatingRowString += "</tr>";
-          repeatingHeaderString += "</tr>";
-          for (var repeatCounter=0;repeatCounter<repeatNumber;repeatCounter++) {
-            repeatingRows += repeatingRowString;
+          repeatingRows += repeatingRowString;
+          if (repeatRowNumber == 1) { 
+            repeatingHeaderString += "</tr>";
           }
-           this.renderString += RenderUtil.render(RenderUtil.get(
-           "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+          if (repeatRowNumber == totalRepeatingRows) { 
+            this.renderString += RenderUtil.render(RenderUtil.get(
+            "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+          } 
+          else {
+            repeatRowNumber++;
+            orderedItemIndex = orderedItemIndex - itemGroupLength;
+          }
         }
       }
+      /*******************  REPEATING GROUP **********************************/
+      
+      
+
       // standard non-repeating items
       else if (repeating == false) { 
         if (columnNumber === undefined || columnNumber == 1) {
