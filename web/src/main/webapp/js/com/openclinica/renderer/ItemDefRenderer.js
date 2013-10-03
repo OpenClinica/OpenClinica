@@ -1,4 +1,4 @@
-function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
+function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber) {
   this.json = json;
   this.itemDetails = itemDetails;
   this.mandatory = mandatory;
@@ -27,7 +27,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID) {
       var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
       if (itemsData != undefined) {
         for (var j=0;j<itemsData.length;j++) {
-         if(itemsData[j]["@ItemOID"] == this.OID) { 
+         if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
         	 
         		 
         	 this.itemValue = itemsData[j]["@Value"];
