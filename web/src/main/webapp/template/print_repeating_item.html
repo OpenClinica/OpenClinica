@@ -37,14 +37,15 @@
   </div>
     {{else responseType == 'textarea'}}
  <span><textarea id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
+   {{else responseType == 'file'}}
+    <div class='item_def_control ${isInline}'> 
+     <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
+  
+  </td>
   {{else}}
     [item]
   {{/if}}
-  {{else responseType == 'file'}}
-    <div class='item_def_control ${isInline}'> 
-	 <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
-  
-  </td>
+
   <td valign="top" width="5"><span class="item_def_format_label">{{html unitLabel}}</span></td>
   </td>
   </tr>
