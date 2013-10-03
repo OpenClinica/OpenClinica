@@ -36,7 +36,7 @@
     </div>
   </div>
     {{else responseType == 'textarea'}}
- <span><textarea id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
+  <div id="${formOID}-${OID}">${itemValue}</div>
    {{else responseType == 'file'}}
     <div class='item_def_control ${isInline}'> 
      <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>

@@ -25,7 +25,7 @@
     {{/each}}
    {{else responseType == 'textarea'}}
  <td align='center' valign='center' class='repeating_item_group'>
-   <span><textarea id="${formOID}-${OID}" cols="40" rows="5">${itemValue}</textarea></span>
+  <div id="${formOID}-${OID}">${itemValue}</div>
  </td>
  {{else responseType == 'file'}}
    <td valign="top">
