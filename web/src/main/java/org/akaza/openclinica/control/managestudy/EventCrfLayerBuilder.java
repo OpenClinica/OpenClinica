@@ -434,14 +434,14 @@ public class EventCrfLayerBuilder {
     }
 
     private void printCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf) {
-        String href = "javascript:openDocWindow('PrintCRF?id=" + eventDefinitionCrf.getDefaultVersionId() + "')";
+        String href = "javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/" + eventDefinitionCrf.getDefaultVersionName() + "')";
         builder.a().href(href).close();
         builder.img().src("images/bt_Print.gif").border("0").align("left").close();
         builder.aEnd();
     }
 
     private void printCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, String link) {
-        String href = "javascript:openDocWindow('PrintCRF?id=" + eventDefinitionCrf.getDefaultVersionId() + "')";
+        String href = "javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/" + eventDefinitionCrf.getDefaultVersionName() + "')";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();
