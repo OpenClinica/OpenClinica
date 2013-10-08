@@ -9,7 +9,7 @@
   {{if responseType == 'text' || responseType == 'calculation' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
   <td td valign="top">  
-    <input id="${formOID}-${OID}" type='text' value="${itemValue}"/> 
+    <div id="${formOID}-${OID}">${itemValue}</div>
   </td>
   {{else responseType == 'radio'}}
   <td valign="top">
