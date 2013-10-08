@@ -176,7 +176,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				+ "");
 		exportSubjectDataBean.setSecondaryId(studySubj.getSecondaryLabel());
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
-
+		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject"));
 		exportSubjectDataBean
 				.setExportStudyEventData(setExportStudyEventDataBean(studySubj,studyEvents,formVersionOID));
 
@@ -214,6 +214,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event"));
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
 
 			al.add(expSEBean);
@@ -362,21 +363,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return iigDataBean;
 	}
 
-	private AuditLogsBean fetchAuditLogs(int itemDataId,
+	private AuditLogsBean fetchAuditLogs(int entityID,
 			String itemDataAuditTable) {
 	
 		AuditLogsBean auditLogsBean = new AuditLogsBean();
 	
+		if(isCollectAudits()){
 		AuditLogEvent auditLog = new AuditLogEvent();
-		auditLog.setEntityId(new Integer(itemDataId));
-		auditLog.setAuditTable(itemDataAuditTable);
+		auditLog.setEntityId(new Integer(entityID));
+	
 		
 		auditLogsBean.setEntityID(auditLog.getEntityId()+"");
 		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog));
 		
 		
 		auditLogsBean= fetchODMAuditBean(auditLogEvent,auditLogsBean);
-		
+		}
 		return auditLogsBean;
 	}
 
@@ -386,9 +388,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		AuditLogBean auditBean = new AuditLogBean();
 		auditBean.setOid("AL_"+auditLogEvent.getAuditId());
 		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
-		auditBean.setNewValue(auditLogEvent.getNewValue());
+		auditBean.setNewValue(auditLogEvent.getNewValue()==null?"":auditLogEvent.getNewValue());
 		auditBean.setOldValue(auditLogEvent.getOldValue()==null?"":auditLogEvent.getOldValue());
-		auditBean.setReasonForChange(auditLogEvent.getReasonForChange());
+		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventTypeId()+"");
 		auditBean.setUserId("USR_"+auditLogEvent.getUserId());
 		auditLogsBean.getAuditLogs().add(auditBean);

@@ -67,8 +67,14 @@ public class ODMClinicaDataResource {
 	public String getODMClinicaldata(@PathParam("studyOID") String studyOID,
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studyEventOID") String studyEventOID,
-			@PathParam("studySubjectOID") String studySubjOID) {
+			@PathParam("studySubjectOID") String studySubjOID,
+			@DefaultValue("y") @QueryParam("includeDns") String includeDns,
+			@DefaultValue("y") @QueryParam("includeAudits") String includeAudits) {
 		LOGGER.debug("Requesting clinical data resource");
+		boolean includeDN=true;
+		boolean includeAudit= true;
+		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
+		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
 		XMLSerializer xmlSerializer = new XMLSerializer();
 		FullReportBean report = getMetadataCollectorResource()
 				.collectODMMetadataForClinicalData(
@@ -76,7 +82,7 @@ public class ODMClinicaDataResource {
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID));
+										studyEventOID, formVersionOID,includeDN,includeAudit));
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
