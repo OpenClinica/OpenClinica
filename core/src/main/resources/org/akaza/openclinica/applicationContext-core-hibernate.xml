@@ -91,7 +91,7 @@
         
 <!-- the following were not tested, to be remain commented as of now -->         
 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
-<!-- <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>    -->
+<value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>   
 <!-- <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>   -->
 <!-- to be remain commented for now -->
 <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>  
@@ -188,5 +188,7 @@
   <bean id="studySubjectDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDao" parent="abstractDomainDao" autowire="byName">
   </bean>
    <bean id="studyEventDefDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao" parent="abstractDomainDao" autowire="byName">
+  </bean>
+   <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
   </bean>
 </beans>

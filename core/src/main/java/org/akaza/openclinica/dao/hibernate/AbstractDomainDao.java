@@ -42,6 +42,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     }
 
     
+
     @Transactional
     public T findByColumnName(Object id,String key) {
     String query = "from " + getDomainClassName() + " do where do."+key +"= ?";

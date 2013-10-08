@@ -5,15 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -41,10 +45,38 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String INDICATE_ALL="*";
 	private final static String OPEN_ORDINAL_DELIMITER = "[";
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
+	private static final String ITEM_DATA_AUDIT_TABLE = null;
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
 	private StudyEventDefinitionDao studyEventDefDao;
+
+	private boolean collectDns=true;
+	private boolean collectAudits=true;
+	private AuditLogEventDao auditEventDAO;
+	
+	public AuditLogEventDao getAuditEventDAO() {
+		return auditEventDAO;
+	}
+
+	public void setAuditEventDAO(AuditLogEventDao auditEventDAO) {
+		this.auditEventDAO = auditEventDAO;
+	}
+
+	public boolean isCollectDns() {
+		return collectDns;
+	}
+
+	public void setCollectDns(boolean collectDns) {
+		this.collectDns = collectDns;
+	}
+	public boolean isCollectAudits() {
+		return collectAudits;
+	}
+
+	public void setCollectAudits(boolean collectAudits) {
+		this.collectAudits = collectAudits;
+	}
 
 	public StudyEventDefinitionDao getStudyEventDefDao() {
 		return studyEventDefDao;
@@ -227,6 +259,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		String itemValue = null;
 		String itemDataValue;
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
+		HashMap<String, ItemData> oidDNAuditMap = new HashMap<String, ItemData>();
 		// For each metadata get the group, and then get list of all items in
 		// that group.so we can a data structure of groupOID and list of
 		// itemOIDs with corresponding values will be created.
@@ -269,9 +302,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 									oidMap.remove(groupOIDOrdnl);
 								}
 								oidMap.put(groupOIDOrdnl, itemgrps);
+								oidDNAuditMap.put(groupOIDOrdnl,itemData);
 							} else {
 								oidMap.put(groupOIDOrdnl, itemsValues);
+								oidDNAuditMap.put(groupOIDOrdnl,itemData);
 							}
+							
 						}
 					}
 
@@ -280,7 +316,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			}
 		}
 
-		return populateImportItemGrpBean(oidMap);
+		return populateImportItemGrpBean(oidMap,oidDNAuditMap);
 	}
 
 	private String fetchItemDataValue(ItemData itemData, Item item) {
@@ -290,7 +326,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private ArrayList<ImportItemGroupDataBean> populateImportItemGrpBean(
-			HashMap<String, ArrayList<String>> oidMap) {
+			HashMap<String, ArrayList<String>> oidMap, HashMap<String, ItemData> oidDNAuditMap) {
 		Set<String> keysGrpOIDs = oidMap.keySet();
 		ArrayList<ImportItemGroupDataBean> iigDataBean = new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
@@ -312,6 +348,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						iiDataBean.setItemOID(value.substring(0, index));
 						iiDataBean.setValue(value.substring(index + 1,
 								value.length()));
+						if(isCollectAudits())iiDataBean.setAuditLogs(fetchAuditLogs(oidDNAuditMap.get(grpOID).getItemDataId(),ITEM_DATA_AUDIT_TABLE));
+						
 						iiDList.add(iiDataBean);
 
 					}
@@ -324,9 +362,45 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return iigDataBean;
 	}
 
+	private AuditLogsBean fetchAuditLogs(int itemDataId,
+			String itemDataAuditTable) {
+	
+		AuditLogsBean auditLogsBean = new AuditLogsBean();
+	
+		AuditLogEvent auditLog = new AuditLogEvent();
+		auditLog.setEntityId(new Integer(itemDataId));
+		auditLog.setAuditTable(itemDataAuditTable);
+		
+		auditLogsBean.setEntityID(auditLog.getEntityId()+"");
+		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog));
+		
+		
+		auditLogsBean= fetchODMAuditBean(auditLogEvent,auditLogsBean);
+		
+		return auditLogsBean;
+	}
+
+	private AuditLogsBean fetchODMAuditBean(ArrayList<AuditLogEvent> auditLogEvents,AuditLogsBean auditLogsBean ) {
+	
+		for(AuditLogEvent auditLogEvent:auditLogEvents){
+		AuditLogBean auditBean = new AuditLogBean();
+		auditBean.setOid("AL_"+auditLogEvent.getAuditId());
+		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
+		auditBean.setNewValue(auditLogEvent.getNewValue());
+		auditBean.setOldValue(auditLogEvent.getOldValue()==null?"":auditLogEvent.getOldValue());
+		auditBean.setReasonForChange(auditLogEvent.getReasonForChange());
+		auditBean.setType(auditLogEvent.getAuditLogEventTypeId()+"");
+		auditBean.setUserId("USR_"+auditLogEvent.getUserId());
+		auditLogsBean.getAuditLogs().add(auditBean);
+		}
+		return auditLogsBean;
+	}
+
 	@Override
 	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,
 			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit) {
+		setCollectDns(collectDNs);
+		setCollectAudits(collectAudit);
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID, studySubjectOID);
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
@@ -396,4 +470,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 	return sEs;
 	}
+
+	
 }
