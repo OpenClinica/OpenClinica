@@ -68,13 +68,15 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studyEventOID") String studyEventOID,
 			@PathParam("studySubjectOID") String studySubjOID,
-			@DefaultValue("y") @QueryParam("includeDns") String includeDns,
-			@DefaultValue("y") @QueryParam("includeAudits") String includeAudits) {
+			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits) {
 		LOGGER.debug("Requesting clinical data resource");
-		boolean includeDN=true;
-		boolean includeAudit= true;
+		boolean includeDN=false;
+		boolean includeAudit= false;
 		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
 		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
+		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
+		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
 		XMLSerializer xmlSerializer = new XMLSerializer();
 		FullReportBean report = getMetadataCollectorResource()
 				.collectODMMetadataForClinicalData(
@@ -113,14 +115,15 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studySubjectOID") String studySubjOID,
 			@PathParam("studyEventOID") String studyEventOID,
-			@DefaultValue("y") @QueryParam("includeDns") String includeDns,
-			@DefaultValue("y") @QueryParam("includeAudits") String includeAudits) {
+			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits) {
 		LOGGER.debug("Requesting clinical data resource");
-		boolean includeDN=true;
-		boolean includeAudit= true;
+		boolean includeDN=false;
+		boolean includeAudit= false;
 		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
 		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
-		
+		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
+		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
 		FullReportBean report = getMetadataCollectorResource()
 				.collectODMMetadataForClinicalData(
 						studyOID,
