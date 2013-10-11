@@ -5,7 +5,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,13 +36,15 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	private Integer entityId;
 	private String entityName;
 	private String reasonForChange;
-	private Integer auditLogEventTypeId;
+	//private Integer auditLogEventTypeId;
 	private String oldValue;
 	private String newValue;
 	private Integer eventCrfId;
 	private Integer studyEventId;
 	private Integer eventCrfVersionId;
-
+	
+	private AuditLogEventType auditLogEventType;
+	
 	public AuditLogEvent() {
 	}
 
@@ -51,7 +56,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 
 	public AuditLogEvent(int auditId, Date auditDate, String auditTable,
 			Integer userId, Integer entityId, String entityName,
-			String reasonForChange, Integer auditLogEventTypeId,
+			String reasonForChange, /*Integer auditLogEventTypeId,*/
 			String oldValue, String newValue, Integer eventCrfId,
 			Integer studyEventId, Integer eventCrfVersionId) {
 		this.auditId = auditId;
@@ -61,7 +66,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.reasonForChange = reasonForChange;
-		this.auditLogEventTypeId = auditLogEventTypeId;
+	//	this.auditLogEventTypeId = auditLogEventTypeId;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 		this.eventCrfId = eventCrfId;
@@ -134,14 +139,14 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.reasonForChange = reasonForChange;
 	}
 
-	@Column(name = "audit_log_event_type_id")
+	/*@Column(name = "audit_log_event_type_id")
 	public Integer getAuditLogEventTypeId() {
 		return this.auditLogEventTypeId;
 	}
 
 	public void setAuditLogEventTypeId(Integer auditLogEventTypeId) {
 		this.auditLogEventTypeId = auditLogEventTypeId;
-	}
+	}*/
 
 	@Column(name = "old_value", length = 4000)
 	public String getOldValue() {
@@ -186,6 +191,16 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 
 	public void setEventCrfVersionId(Integer eventCrfVersionId) {
 		this.eventCrfVersionId = eventCrfVersionId;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "audit_log_event_type_id", nullable = false)
+	public AuditLogEventType getAuditLogEventType() {
+		return auditLogEventType;
+	}
+
+	public void setAuditLogEventType(AuditLogEventType auditLogEventType) {
+		this.auditLogEventType = auditLogEventType;
 	}
 
 }

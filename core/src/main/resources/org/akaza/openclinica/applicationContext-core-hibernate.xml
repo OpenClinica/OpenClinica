@@ -92,7 +92,7 @@
 <!-- the following were not tested, to be remain commented as of now -->         
 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
 <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>   
-<!-- <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>   -->
+<value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>  
 <!-- to be remain commented for now -->
 <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>  
 <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
