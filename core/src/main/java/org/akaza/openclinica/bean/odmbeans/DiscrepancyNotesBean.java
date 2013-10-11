@@ -30,7 +30,7 @@ public class DiscrepancyNotesBean {
     public ArrayList<DiscrepancyNoteBean> getDiscrepancyNotes() {
         return dns;
     }
-    public void setAuditLogs(ArrayList<DiscrepancyNoteBean> dns) {
+    public void setDiscrepancyNotes(ArrayList<DiscrepancyNoteBean> dns) {
         this.dns = dns;
     }
 }

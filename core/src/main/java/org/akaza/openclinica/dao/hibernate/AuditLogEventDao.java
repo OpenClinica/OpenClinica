@@ -16,18 +16,19 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		   getSessionFactory().getStatistics().logSummary();
 		   String query = "from " + getDomainClassName();
 		   String buildQuery = "";
-	       if(auditLogEvent.getEntityId()!=null)
-	    	   buildQuery+= "do.entityId =:entity_id ";
-	       else if(auditLogEvent.getAuditTable()!=null)
-	    	   buildQuery+= "do.auditTable =:audit_table";
+	       if(auditLogEvent.getEntityId()!=null && auditLogEvent.getAuditTable()!=null)
+	       {	   buildQuery+= "do.entityId =:entity_id ";
+	         	   buildQuery+= " and  do.auditTable =:audit_table";
+	       }
 	       if(!buildQuery.isEmpty())
-		    query = "from " + getDomainClassName() + " do  where "+buildQuery;
-	     
+		    query = "from " + getDomainClassName() +  " do  where "+buildQuery;
+	       else
+	    	   query = "from " + getDomainClassName() ;
 	       org.hibernate.Query q = getCurrentSession().createQuery(query);
-	       if(auditLogEvent.getEntityId()!=null)
-	    	   q.setInteger("entity_id", auditLogEvent.getEntityId());
-	       else if(auditLogEvent.getAuditTable()!=null)
-	    	   q.setString("audit_table", auditLogEvent.getAuditTable());
-	        return (T) q.list();
+	       if(auditLogEvent.getEntityId()!=null && auditLogEvent.getAuditTable()!=null)
+	       {  q.setInteger("entity_id", auditLogEvent.getEntityId());
+	        	   q.setString("audit_table", auditLogEvent.getAuditTable());
+	       }
+	        	   return (T) q.list();
 	 }
 }

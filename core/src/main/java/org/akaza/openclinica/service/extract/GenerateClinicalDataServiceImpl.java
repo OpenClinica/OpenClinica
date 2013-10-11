@@ -7,6 +7,10 @@ import java.util.Set;
 
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
@@ -18,6 +22,8 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -260,7 +266,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		String itemValue = null;
 		String itemDataValue;
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
-		HashMap<String, ItemData> oidDNAuditMap = new HashMap<String, ItemData>();
+		HashMap<String, List<ItemData>> oidDNAuditMap = new HashMap<String, List<ItemData>>();
+		
 		// For each metadata get the group, and then get list of all items in
 		// that group.so we can a data structure of groupOID and list of
 		// itemOIDs with corresponding values will be created.
@@ -270,7 +277,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (!oidMap.containsKey(groupOID)) {
 				String groupOIDOrdnl = groupOID;
 				ArrayList<String> itemsValues = new ArrayList<String>();
-
+				ArrayList<ItemData> itemDatas = new ArrayList<ItemData>();
 				List<ItemGroupMetadata> allItemsInAGroup = igGrpMetadata
 						.getItemGroup().getItemGroupMetadatas();
 
@@ -288,25 +295,32 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						itemsValues = new ArrayList<String>();
 						itemDataValue = fetchItemDataValue(itemData,
 								itemGrpMetada.getItem());
+						itemDatas =  new ArrayList<ItemData>();
 						itemValue = itemOID + DELIMITER + itemDataValue;
 						itemsValues.add(itemValue);
 						groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
 								+ itemData.getOrdinal();
+						
 						if (itemData.getEventCrf().getEventCrfId() == eventCrfId) {
 
 							if (oidMap.containsKey(groupOIDOrdnl)) {
 
 								ArrayList<String> itemgrps = oidMap
 										.get(groupOIDOrdnl);
+							List<ItemData>itemDataTemps = oidDNAuditMap.get(groupOIDOrdnl);
 								if (!itemgrps.contains(itemValue)) {
 									itemgrps.add(itemValue);
 									oidMap.remove(groupOIDOrdnl);
+									itemDataTemps.add(itemData);
+									oidDNAuditMap.remove(groupOIDOrdnl);
 								}
 								oidMap.put(groupOIDOrdnl, itemgrps);
-								oidDNAuditMap.put(groupOIDOrdnl,itemData);
+								oidDNAuditMap.put(groupOIDOrdnl, itemDataTemps);
+								
 							} else {
 								oidMap.put(groupOIDOrdnl, itemsValues);
-								oidDNAuditMap.put(groupOIDOrdnl,itemData);
+								itemDatas.add(itemData);
+								oidDNAuditMap.put(groupOIDOrdnl, itemDatas);
 							}
 							
 						}
@@ -327,7 +341,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private ArrayList<ImportItemGroupDataBean> populateImportItemGrpBean(
-			HashMap<String, ArrayList<String>> oidMap, HashMap<String, ItemData> oidDNAuditMap) {
+			HashMap<String, ArrayList<String>> oidMap, HashMap<String, List<ItemData>> oidDNAuditMap) {
 		Set<String> keysGrpOIDs = oidMap.keySet();
 		ArrayList<ImportItemGroupDataBean> iigDataBean = new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
@@ -349,8 +363,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						iiDataBean.setItemOID(value.substring(0, index));
 						iiDataBean.setValue(value.substring(index + 1,
 								value.length()));
-						if(isCollectAudits())iiDataBean.setAuditLogs(fetchAuditLogs(oidDNAuditMap.get(grpOID).getItemDataId(),ITEM_DATA_AUDIT_TABLE));
-						
+						if(isCollectAudits()){
+							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID),iiDataBean);
+						}
+//						if(isCollectDns())
+//							iiDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(oidDNAuditMap.get(grpOID)));
 						iiDList.add(iiDataBean);
 
 					}
@@ -363,6 +380,57 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return iigDataBean;
 	}
 
+	private ImportItemDataBean fetchItemDataAuditValue(List<ItemData> list,
+			ImportItemDataBean iiDataBean) {
+		for(ItemData id:list){
+			if(id.getItem().getOcOid().equals(iiDataBean.getItemOID())){
+				iiDataBean.setAuditLogs(fetchAuditLogs(id.getItemDataId(),"item_data"));
+				return iiDataBean;
+			}
+		}
+		
+		
+		return iiDataBean;
+	}
+
+	private DiscrepancyNotesBean fetchDiscrepancyNotes(ItemData itemData) {
+		List<DnItemDataMap> dnItemDataMaps  = itemData.getDnItemDataMaps();
+		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
+		
+		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
+		boolean addDN = true;
+		for(DnItemDataMap dnItemDataMap:dnItemDataMaps){
+			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
+			addDN=true;
+			{
+			if(dn.getParentDnId()!=null && dn.getParentDnId()>0){
+				ChildNoteBean childNoteBean = new ChildNoteBean();
+				ElementRefBean userRef =  new ElementRefBean();
+				childNoteBean.setDescription(dn.getDescription());
+				childNoteBean.setStatus(dn.getResolutionStatus().getDescription());
+				childNoteBean.setDetailedNote(dn.getDetailedNotes());
+				childNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
+				//userRef.setElementDefOID("USR_"+(dn.getUserAccountByOwnerId()==null ?"":dn.getUserAccountByOwnerId()));
+				userRef.setElementDefOID("USR_");
+				childNoteBean.setUserRef(userRef);
+				dnNoteBean.getChildNotes().add(childNoteBean);
+			}
+			else{
+				dnNoteBean = new DiscrepancyNoteBean();
+				addDN=false;
+				dnNoteBean.setStatus(dn.getResolutionStatus().getDescription());
+				dnNoteBean.setNoteType(dn.getEntityType());
+			}
+			if(addDN)
+				dnNotes.add(dnNoteBean);
+			}
+		}
+		dnNotesBean.setDiscrepancyNotes(dnNotes);
+		return dnNotesBean;
+		
+	}
+
 	private AuditLogsBean fetchAuditLogs(int entityID,
 			String itemDataAuditTable) {
 	
@@ -371,7 +439,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if(isCollectAudits()){
 		AuditLogEvent auditLog = new AuditLogEvent();
 		auditLog.setEntityId(new Integer(entityID));
-	
+		auditLog.setAuditTable(itemDataAuditTable);
 		
 		auditLogsBean.setEntityID(auditLog.getEntityId()+"");
 		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog));
