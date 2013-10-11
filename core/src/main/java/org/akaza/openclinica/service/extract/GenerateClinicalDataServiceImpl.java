@@ -363,7 +363,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						iiDataBean.setItemOID(value.substring(0, index));
 						iiDataBean.setValue(value.substring(index + 1,
 								value.length()));
-						if(isCollectAudits()){
+						if(isCollectAudits()||isCollectDns()){
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID),iiDataBean);
 						}
 //						if(isCollectDns())
@@ -384,7 +384,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			ImportItemDataBean iiDataBean) {
 		for(ItemData id:list){
 			if(id.getItem().getOcOid().equals(iiDataBean.getItemOID())){
+				if(isCollectAudits())
 				iiDataBean.setAuditLogs(fetchAuditLogs(id.getItemDataId(),"item_data"));
+				if(isCollectDns())
+					iiDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(id));
 				return iiDataBean;
 			}
 		}

@@ -17,10 +17,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.akaza.openclinica.domain.MutableDomainObject;
+import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.Item;
@@ -47,7 +48,7 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "user_account", schema = "public")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "user_account_user_id_seq") })
 
-public class UserAccount  implements MutableDomainObject {
+public class UserAccount extends DataMapDomainObject {
 
 	/**
 	 * 
@@ -82,7 +83,7 @@ public class UserAccount  implements MutableDomainObject {
 	private List<ItemGroup> itemGroups;
 	private List<CrfBean> crfs;
 	private List<UserAccount> userAccounts;
-	//private List discrepancyNotesForAssignedUserId;
+	private List<DiscrepancyNote> discrepancyNotesForAssignedUserId;
 	private List<StudySubject> studySubjects;
 	private List<EventDefinitionCrf> eventDefinitionCrfs;
 	private List<StudyGroupClass> studyGroupClasses;
@@ -90,7 +91,7 @@ public class UserAccount  implements MutableDomainObject {
 	private List<Subject> subjects;
 	private List<SubjectGroupMap> subjectGroupMaps;
 	private List<AuditUserLoginBean> auditUserLogins;
-	private List discrepancyNotesForOwnerId;
+	private List<DiscrepancyNote> discrepancyNotesForOwnerId;
 	private List<StudyUserRole> studyUserRoles ;
 	private List decisionConditions;
 	private List<ItemData> itemDatas ;
@@ -448,15 +449,15 @@ public class UserAccount  implements MutableDomainObject {
 		this.userAccounts = userAccounts;
 	}
 
-/*	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccountByAssignedUserId")
-	public List getDiscrepancyNotesForAssignedUserId() {
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccountByAssignedUserId")
+	public List<DiscrepancyNote> getDiscrepancyNotesForAssignedUserId() {
 		return this.discrepancyNotesForAssignedUserId;
 	}
 
 	public void setDiscrepancyNotesForAssignedUserId(
 			List discrepancyNotesForAssignedUserId) {
 		this.discrepancyNotesForAssignedUserId = discrepancyNotesForAssignedUserId;
-	}*/
+	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<StudySubject> getStudySubjects() {
@@ -520,15 +521,15 @@ public class UserAccount  implements MutableDomainObject {
 	public void setAuditUserLogins(List auditUserLogins) {
 		this.auditUserLogins = auditUserLogins;
 	}*/
-/*
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccountByOwnerId")
-	public List getDiscrepancyNotesForOwnerId() {
+	public List<DiscrepancyNote> getDiscrepancyNotesForOwnerId() {
 		return this.discrepancyNotesForOwnerId;
 	}
 
-	public void setDiscrepancyNotesForOwnerId(List discrepancyNotesForOwnerId) {
+	public void setDiscrepancyNotesForOwnerId(List<DiscrepancyNote> discrepancyNotesForOwnerId) {
 		this.discrepancyNotesForOwnerId = discrepancyNotesForOwnerId;
-	}*/
+	}
 
 	/*//@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<StudyUserRole> getStudyUserRoles() {

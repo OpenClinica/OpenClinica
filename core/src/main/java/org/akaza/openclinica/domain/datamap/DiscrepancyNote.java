@@ -109,7 +109,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.discrepancyNoteType = discrepancyNoteType;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assigned_user_id")
 	public UserAccount getUserAccountByAssignedUserId() {
 		return this.userAccountByAssignedUserId;
