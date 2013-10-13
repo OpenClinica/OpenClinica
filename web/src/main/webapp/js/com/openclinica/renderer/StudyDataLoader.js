@@ -244,6 +244,10 @@ function StudyDataLoader(study, json) {
       }
     }
     
+    if (studyEventData == undefined) {
+      return;
+    }
+    
     app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
     var formsData = util_ensureArray(studyEventData["FormData"]);
     
