@@ -260,6 +260,17 @@ function StudyDataLoader(study, json) {
         break;
       }
     }
+    
+   // determine repeating group row lengths 
+   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+   for (var i=0;i<itemGroupData.length;i++) {
+     var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
+     var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
+     if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || app_itemGroupRepeatLengthMap[itemGroupOID] < repeatKey) {
+       app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
+     }
+   }
+   
     app_studySubjectStatus = app_formData["@OpenClinica:Status"];
   }
   
