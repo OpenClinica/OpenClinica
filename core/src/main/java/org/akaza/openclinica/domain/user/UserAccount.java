@@ -449,7 +449,7 @@ public class UserAccount extends DataMapDomainObject {
 		this.userAccounts = userAccounts;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccountByAssignedUserId")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<DiscrepancyNote> getDiscrepancyNotesForAssignedUserId() {
 		return this.discrepancyNotesForAssignedUserId;
 	}
