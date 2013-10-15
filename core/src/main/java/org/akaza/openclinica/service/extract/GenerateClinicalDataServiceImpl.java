@@ -24,7 +24,10 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.DnEventCrfMap;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
+import org.akaza.openclinica.domain.datamap.DnStudyEventMap;
+import org.akaza.openclinica.domain.datamap.DnStudySubjectMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -180,11 +183,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		// exportSubjectDataBean.setAuditLogs(studySubj.getA)
 		exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
 				.getDateOfBirth() + "");
-		exportSubjectDataBean.setStudySubjectId(studySubj.getStudySubjectId()
-				+ "");
+		exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender()+"");
+		exportSubjectDataBean.setStudySubjectId(
+				studySubj.getLabel());
+		if(studySubj.getSubject().getUniqueIdentifier()!=null)exportSubjectDataBean.setUniqueIdentifier(studySubj.getSubject().getUniqueIdentifier());
 		exportSubjectDataBean.setSecondaryId(studySubj.getSecondaryLabel());
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
+		if(isCollectAudits())
 		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid()));
+		if(isCollectDns())
+			exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
+		
 		exportSubjectDataBean
 				.setExportStudyEventData(setExportStudyEventDataBean(studySubj,studyEvents,formVersionOID));
 
@@ -222,7 +231,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			if(collectAudits)
 			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid()));
+			if(collectDns)
+				expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
+			
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
 
 			al.add(expSEBean);
@@ -253,7 +266,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
 				dataBean.setStatus(ecrf.getStatus() + "");
+				if(collectAudits)
 				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID));
+				if(collectDns)
+					dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
+				
 				formDataBean.add(dataBean);
 				if(formVersionOID!=null)formCheck=false;
 				}
@@ -401,41 +418,99 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private DiscrepancyNotesBean fetchDiscrepancyNotes(ItemData itemData) {
 		List<DnItemDataMap> dnItemDataMaps  = itemData.getDnItemDataMaps();
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
-		
+		dnNotesBean.setEntityID(itemData.getItem().getOcOid());
+		if(isCollectDns())
+		{
 		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		
 		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
 		boolean addDN = true;
 		for(DnItemDataMap dnItemDataMap:dnItemDataMaps){
 			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
 			addDN=true;
-			{
-			if(dn.getParentDnId()!=null && dn.getParentDnId()>0){
-				ChildNoteBean childNoteBean = new ChildNoteBean();
-				ElementRefBean userRef =  new ElementRefBean();
-				childNoteBean.setDescription(dn.getDescription());
-				childNoteBean.setStatus(dn.getResolutionStatus().getDescription());
-				childNoteBean.setDetailedNote(dn.getDetailedNotes());
-				childNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
-				if(dn.getUserAccount()!=null)
-				userRef.setElementDefOID("USR_"+dn.getUserAccount().getUserId());
-				else
-					userRef.setElementDefOID("");	
-				childNoteBean.setUserRef(userRef);
-				dnNoteBean.getChildNotes().add(childNoteBean);
-			}
-			else{
-				dnNoteBean = new DiscrepancyNoteBean();
-				addDN=false;
-				dnNoteBean.setStatus(dn.getResolutionStatus().getDescription());
-				dnNoteBean.setNoteType(dn.getEntityType());
-			}
-			if(addDN)
-				dnNotes.add(dnNoteBean);
-			}
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+		}
+		dnNotesBean.setDiscrepancyNotes(dnNotes);
+		}
+		return dnNotesBean;
+		
+	}
+	
+	private DiscrepancyNotesBean fetchDiscrepancyNotes(EventCrf eventCrf) {
+		List<DnEventCrfMap> dnEventCrfMaps  = eventCrf.getDnEventCrfMaps();
+		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
+		dnNotesBean.setEntityID(eventCrf.getCrfVersion().getOcOid());
+		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
+		boolean addDN = true;
+		for(DnEventCrfMap dnItemDataMap:dnEventCrfMaps){
+			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
+			addDN=true;
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		return dnNotesBean;
 		
+	} 
+	private DiscrepancyNotesBean fetchDiscrepancyNotes(StudySubject studySubj) {
+		List<DnStudySubjectMap> dnMaps  = studySubj.getDnStudySubjectMaps();
+		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
+		dnNotesBean.setEntityID(studySubj.getOcOid());
+		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
+		boolean addDN = true;
+		for(DnStudySubjectMap dnMap:dnMaps){
+			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
+			addDN=true;
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+		}
+		dnNotesBean.setDiscrepancyNotes(dnNotes);
+		return dnNotesBean;
+		
+	} 
+	private DiscrepancyNotesBean fetchDiscrepancyNotes(StudyEvent studyEvent) {
+		List<DnStudyEventMap> dnMaps  = studyEvent.getDnStudyEventMaps();
+		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
+		dnNotesBean.setEntityID(studyEvent.getStudyEventDefinition().getOc_oid());
+		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
+		boolean addDN = true;
+		for(DnStudyEventMap dnMap:dnMaps){
+			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
+			addDN=true;
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+		}
+		dnNotesBean.setDiscrepancyNotes(dnNotes);
+		return dnNotesBean;
+		
+	} 
+	private void fillDNObject(DiscrepancyNoteBean dnNoteBean,
+			ArrayList<DiscrepancyNoteBean> dnNotes, boolean addDN,
+			DiscrepancyNote dn) {
+		{
+		if(dn.getParentDnId()!=null && dn.getParentDnId()>0){
+			ChildNoteBean childNoteBean = new ChildNoteBean();
+			ElementRefBean userRef =  new ElementRefBean();
+			childNoteBean.setDescription(dn.getDescription());
+			childNoteBean.setStatus(dn.getResolutionStatus().getDescription());
+			childNoteBean.setDetailedNote(dn.getDetailedNotes());
+			childNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
+			if(dn.getUserAccount()!=null)
+			userRef.setElementDefOID("USR_"+dn.getUserAccount().getUserId());
+			else
+				userRef.setElementDefOID("");	
+			childNoteBean.setUserRef(userRef);
+			dnNoteBean.getChildNotes().add(childNoteBean);
+		}
+		else{
+			dnNoteBean = new DiscrepancyNoteBean();
+			addDN=false;
+			dnNoteBean.setStatus(dn.getResolutionStatus().getDescription());
+			dnNoteBean.setNoteType(dn.getEntityType());
+		}
+		if(addDN)
+			dnNotes.add(dnNoteBean);
+		}
 	}
 
 	private AuditLogsBean fetchAuditLogs(int entityID,
