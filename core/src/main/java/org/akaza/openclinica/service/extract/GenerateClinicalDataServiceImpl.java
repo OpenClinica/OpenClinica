@@ -227,6 +227,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for (StudyEvent se : studyEvents) {
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			expSEBean.setLocation(se.getLocation());
+			if(se.getDateEnd()!=null)
 			expSEBean.setEndDate(se.getDateEnd() + "");
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
