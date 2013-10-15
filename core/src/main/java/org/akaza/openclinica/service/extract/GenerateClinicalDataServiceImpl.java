@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
@@ -52,6 +53,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String OPEN_ORDINAL_DELIMITER = "[";
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private static final String ITEM_DATA_AUDIT_TABLE = null;
+	private static final Object STATUS = "Status";
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
@@ -414,7 +416,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				childNoteBean.setStatus(dn.getResolutionStatus().getDescription());
 				childNoteBean.setDetailedNote(dn.getDetailedNotes());
 				childNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
-				userRef.setElementDefOID("USR_"/*+(dn.getUserAccountByOwnerId()==null ?"":dn.getUserAccountByOwnerId())*/);
+				if(dn.getUserAccount()!=null)
+				userRef.setElementDefOID("USR_"+dn.getUserAccount().getUserId());
+				else
+					userRef.setElementDefOID("");	
 				childNoteBean.setUserRef(userRef);
 				dnNoteBean.getChildNotes().add(childNoteBean);
 			}
@@ -458,8 +463,15 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		AuditLogBean auditBean = new AuditLogBean();
 		auditBean.setOid("AL_"+auditLogEvent.getAuditId());
 		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
+		if(auditLogEvent.getEntityName()!=null && auditLogEvent.getEntityName().equals(STATUS))
+		{
+			auditBean.setNewValue(Status.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getName());
+			auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getName());	
+		}
+		else{
 		auditBean.setNewValue(auditLogEvent.getNewValue()==null?"":auditLogEvent.getNewValue());
 		auditBean.setOldValue(auditLogEvent.getOldValue()==null?"":auditLogEvent.getOldValue());
+		}
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
 		auditBean.setUserId("USR_"+auditLogEvent.getUserId());

@@ -137,6 +137,7 @@
                             <span style="float:left">
                                 <c:out value="${eventLocation}"/>
                             </span>
+                            <%-- CreateDiscrepancyNote?id=392&name=studyEvent&field=location&column=location&strErrMsg=--%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasLocationNote eq 'yes' ? 0 : 1}"/>
                                 <c:choose>
@@ -268,12 +269,16 @@
 <c:forEach var="dedc" items="${uncompletedEventDefinitionCRFs}">
 <c:choose>
 <c:when test="${dedc.status.name=='locked'}">
+    <%--<c:when test="${studyEvent.subjectEventStatus.name=='locked'}">--%>
     <%-- nothing for right now --%>&nbsp;
 </c:when>
 <c:otherwise>
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
+    <%--
+                 <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
+                 --%>
 <td class="table_cell">
     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
         <c:choose>
@@ -287,7 +292,7 @@
         </c:otherwise>
         </c:choose>
 
-            
+            <%--<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">--%>
             <c:set var="versionCount" value="0"/>
         <c:forEach var="version" items="${dedc.edc.versions}">
             <c:set var="versionCount" value="${versionCount+1}"/>
@@ -298,12 +303,12 @@
         <c:when test="${versionCount<=1}">
 
         <c:forEach var="version" items="${dedc.edc.versions}">
-           <c:out value="${version.name}"/>
-           <c:set var="crfVersionOID" value="${version.oid}"/>
+            <c:out value="${version.name}"/>
         </c:forEach>
 
         </c:when>
 
+            <%--<c:otherwise>--%>
         <c:when test="${dedc.eventCRF.id == 0}">
 
         <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
@@ -337,6 +342,7 @@
             }
         </SCRIPT>
 
+            <%--</c:otherwise>--%>
         </c:when>
 
         <c:otherwise>
@@ -387,6 +393,7 @@
             <c:choose>
 
                 <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+                    <%--<c:when test="${dedc.status.name=='locked'}">--%>
                     &nbsp;
                 </c:when>
 
@@ -407,7 +414,11 @@
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
             </td><td >
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}/${crfVersionOID}')"
+            
+<!--            
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+-->
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
             
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
