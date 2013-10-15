@@ -322,6 +322,12 @@ function StudyRenderer(json) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         mandatory = app_itemGroupMap[itemOID].mandatory;
         totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
+        // adjust totalRepeatingRows to number of data rows in a populated form
+        var totalRepeatingDataRows = app_itemGroupRepeatLengthMap[app_itemGroupMap[itemOID].itemGroupKey];
+          
+        if (totalRepeatingDataRows > totalRepeatingRows) {
+          totalRepeatingRows = totalRepeatingDataRows;
+        }
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
         itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;

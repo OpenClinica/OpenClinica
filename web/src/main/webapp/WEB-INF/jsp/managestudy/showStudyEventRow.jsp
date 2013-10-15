@@ -223,7 +223,10 @@
                  </td>
 
 		         <td>
-                 <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+		         <!--
+                  <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/><c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>]</c:if>/F_AGENTADMINIS_V10')"
+                 -->
+                 <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/><c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>]</c:if>/<c:out value="${dedc.eventCRF.id}"/>')"
 			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
