@@ -234,7 +234,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("CRF Status");
             writer.append(",");
-            writer.append("Group Name");
+            writer.append("Group Label");
             writer.append(",");
             writer.append("Group Ordinal");
             writer.append(",");
