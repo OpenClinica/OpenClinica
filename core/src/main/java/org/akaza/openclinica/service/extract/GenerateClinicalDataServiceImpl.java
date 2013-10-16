@@ -21,6 +21,8 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.SubjectEventStatusDao;
+import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
@@ -36,6 +38,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +60,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private static final String ITEM_DATA_AUDIT_TABLE = null;
 	private static final Object STATUS = "Status";
+	private static final Object EVENT_CRF = "event_crf";
+	private static final Object STUDY_EVENT = "study_event";
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
 	private StudyEventDefinitionDao studyEventDefDao;
-
+	private SubjectEventStatusDao subjectEventStatusDao;
+	
 	private boolean collectDns=true;
 	private boolean collectAudits=true;
 	private AuditLogEventDao auditEventDAO;
@@ -143,6 +149,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setStudyDao(StudyDao studyDao) {
 		this.studyDao = studyDao;
+	}
+
+	public SubjectEventStatusDao getSubjectEventStatusDao() {
+		return subjectEventStatusDao;
+	}
+
+	public void setSubjectEventStatusDao(SubjectEventStatusDao subjectEventStatusDao) {
+		this.subjectEventStatusDao = subjectEventStatusDao;
 	}
 
 	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs) {
@@ -541,9 +555,21 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
 		if(auditLogEvent.getEntityName()!=null && auditLogEvent.getEntityName().equals(STATUS))
 		{
+			if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
+				auditBean.setNewValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getName());
+				auditBean.setOldValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getName());
+			}
+			else if(auditLogEvent.getAuditTable().equals(STUDY_EVENT)){
+				auditBean.setNewValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getNewValue())));
+				auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
+			}
+			else{
 			auditBean.setNewValue(Status.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getName());
 			auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getName());	
+			}
+		
 		}
+		
 		else{
 		auditBean.setNewValue(auditLogEvent.getNewValue()==null?"":auditLogEvent.getNewValue());
 		auditBean.setOldValue(auditLogEvent.getOldValue()==null?"":auditLogEvent.getOldValue());
@@ -554,6 +580,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		auditLogsBean.getAuditLogs().add(auditBean);
 		}
 		return auditLogsBean;
+	}
+
+	private String fetchStudyEventStatus(Integer valueOf) {
+		SubjectEventStatus subjEventStatus = getSubjectEventStatusDao().findById(valueOf);
+		if(subjEventStatus!=null)
+		return subjEventStatus.getName();
+		else
+			return valueOf.toString();
 	}
 
 	@Override

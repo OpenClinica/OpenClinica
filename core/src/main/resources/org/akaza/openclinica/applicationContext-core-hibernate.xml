@@ -107,7 +107,7 @@
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.SubjectEventStatus</value>   -->
+<value>org.akaza.openclinica.domain.datamap.SubjectEventStatus</value>  
 <!-- <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>   -->
 
        
@@ -190,5 +190,7 @@
    <bean id="studyEventDefDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao" parent="abstractDomainDao" autowire="byName">
   </bean>
    <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
+  </bean>
+    <bean id="subjectEventStatusDaoDomain" class="org.akaza.openclinica.dao.hibernate.SubjectEventStatusDao" parent="abstractDomainDao" autowire="byName">
   </bean>
 </beans>
