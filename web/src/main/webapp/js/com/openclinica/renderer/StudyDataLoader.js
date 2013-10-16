@@ -238,7 +238,7 @@ function StudyDataLoader(study, json) {
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
     for (var i=0;i<studyEventsData.length;i++) {
-     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID) { 
+     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
         studyEventData = studyEventsData[i];
         break;
       }
