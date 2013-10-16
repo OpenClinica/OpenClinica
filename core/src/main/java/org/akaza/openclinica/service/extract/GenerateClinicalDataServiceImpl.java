@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.extract;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
@@ -246,6 +247,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			expSEBean.setStatus(fetchStudyEventStatus(se.getStatus().getCode()));
 			if(collectAudits)
 			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid()));
 			if(collectDns)
@@ -280,7 +282,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
-				dataBean.setStatus(ecrf.getStatus() + "");
+				dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(Locale.US));
+				
+				dataBean.setCrfVersion(ecrf.getVersion()+"");
 				if(collectAudits)
 				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID));
 				if(collectDns)
@@ -555,11 +559,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
 		if(auditLogEvent.getEntityName()!=null && auditLogEvent.getEntityName().equals(STATUS))
 		{
-			if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
-				auditBean.setNewValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getName());
-				auditBean.setOldValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getName());
+		/*	if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
+				auditBean.setNewValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getDescription());
+				auditBean.setOldValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getDescription());
 			}
-			else if(auditLogEvent.getAuditTable().equals(STUDY_EVENT)){
+			else */
+				if(auditLogEvent.getAuditTable().equals(STUDY_EVENT)){
 				auditBean.setNewValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getNewValue())));
 				auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
 			}
