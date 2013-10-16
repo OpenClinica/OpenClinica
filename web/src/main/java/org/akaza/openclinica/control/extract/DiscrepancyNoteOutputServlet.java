@@ -26,11 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -42,10 +38,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
@@ -272,6 +265,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+        ItemGroupMetadataDAO<String, ArrayList> igmdao = new ItemGroupMetadataDAO<String, ArrayList>(sm.getDataSource());
+        ItemGroupDAO<String, ArrayList> igdao = new ItemGroupDAO<String, ArrayList>(sm.getDataSource());
 
         ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 
@@ -353,6 +348,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     }
                 } else if (entityType.equalsIgnoreCase("eventCRF")) {
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
+                    StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
 
                     EventCRFBean ecb = (EventCRFBean) aeb;
                     CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
@@ -392,6 +388,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                             dnb.setEntityName(resword.getString("interviewer_name"));
                         }
                     }
+                    dnb.setEvent(se);
+                    dnb.setStudyEventDefinitionBean(sedb);
                     // }
                 } else if (entityType.equalsIgnoreCase("studyEvent")) {
 //                    allNotes.add(dnb);
@@ -421,6 +419,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                             dnb.setEntityName(resword.getString("location"));
                         }
                     }
+                    dnb.setEvent(se);
+                    dnb.setStudyEventDefinitionBean(sedb);
                 } else if (entityType.equalsIgnoreCase("itemData")) {
                     ItemDataBean idb = (ItemDataBean) iddao.findByPK(dnb.getEntityId());
                     ItemBean ib = (ItemBean) idao.findByPK(idb.getItemId());
@@ -429,6 +429,15 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
                     CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
                     CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
+
+                    ItemGroupMetadataBean itemGroupMetadataBean =
+                            (ItemGroupMetadataBean)igmdao.findByItemAndCrfVersion(ib.getId(), cvb.getId());
+                    Boolean isRepeatForSure = itemGroupMetadataBean.isRepeatingGroup();
+                    if (isRepeatForSure){
+                        ItemGroupBean ig = (ItemGroupBean)igdao.findByPK(itemGroupMetadataBean.getItemGroupId());
+                        dnb.setItemDataOrdinal(idb.getOrdinal());
+                        dnb.setItemGroupName(ig.getName());
+                    }
 
 //                    allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
@@ -454,6 +463,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         crfStatus = "Complete";
                     }
                     dnb.setCrfStatus(crfStatus);
+                    dnb.setEvent(se);
+                    dnb.setStudyEventDefinitionBean(sedb);
 
                 }
             }
