@@ -228,9 +228,15 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Event Name");
             writer.append(",");
+            writer.append("Event Occurrence");
+            writer.append(",");
             writer.append("CRF Name");
             writer.append(",");
             writer.append("CRF Status");
+            writer.append(",");
+            writer.append("Group Name");
+            writer.append(",");
+            writer.append("Group Ordinal");
             writer.append(",");
             writer.append("Entity name");
             writer.append(",");
@@ -296,10 +302,26 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
         writer.append(",");
 
+        String eventOccurrence = null != discNoteBean.getStudyEventDefinitionBean()
+                && discNoteBean.getStudyEventDefinitionBean().isRepeating()
+                ? String.valueOf(discNoteBean.getEvent().getSampleOrdinal()) : "";
+        writer.append(escapeQuotesInCSV(eventOccurrence));
+        writer.append(",");
+
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
+        writer.append(",");
+
+        String itemGroupName = discNoteBean.getItemGroupName() == null
+                ? "" : String.valueOf(discNoteBean.getItemGroupName());
+        writer.append(escapeQuotesInCSV(itemGroupName));
+        writer.append(",");
+
+        String itemDataOccurence = discNoteBean.getItemDataOrdinal() == null
+                ? "" : String.valueOf(discNoteBean.getItemDataOrdinal());
+        writer.append(escapeQuotesInCSV(itemDataOccurence));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityName()));

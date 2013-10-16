@@ -57,7 +57,6 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String entityValue = "";
     private boolean isSaved = true;
 
-    private StudyEventBean event = new StudyEventBean();
     private StudySubjectBean studySub = new StudySubjectBean();
 
     private int subjectId = 0;
@@ -79,6 +78,12 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     private Integer days;
     private Integer age;
+
+    //Non Persistent Beans - The downstream implementations eg.DiscrepancyNoteOutputServlet make you do this...
+    private StudyEventBean event = new StudyEventBean();
+    private StudyEventDefinitionBean studyEventDefinitionBean = new StudyEventDefinitionBean();
+    private Integer itemDataOrdinal;
+    private String itemGroupName;
 
 
     private StudyBean study = new StudyBean();
@@ -588,5 +593,29 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setSiteId(String siteId) {
         this.siteId = siteId;
+    }
+
+    public StudyEventDefinitionBean getStudyEventDefinitionBean() {
+        return studyEventDefinitionBean;
+    }
+
+    public void setStudyEventDefinitionBean(StudyEventDefinitionBean studyEventDefinitionBean) {
+        this.studyEventDefinitionBean = studyEventDefinitionBean;
+    }
+
+    public Integer getItemDataOrdinal() {
+        return itemDataOrdinal;
+    }
+
+    public void setItemDataOrdinal(Integer itemDataOrdinal) {
+        this.itemDataOrdinal = itemDataOrdinal;
+    }
+
+    public String getItemGroupName() {
+        return itemGroupName;
+    }
+
+    public void setItemGroupName(String itemGroupName) {
+        this.itemGroupName = itemGroupName;
     }
 }
