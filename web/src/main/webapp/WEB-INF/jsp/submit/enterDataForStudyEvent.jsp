@@ -407,7 +407,7 @@
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
             </td><td >
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}/${crfVersionOID}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
             
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
@@ -518,7 +518,7 @@
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></a>
 </td><td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
             
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
@@ -539,7 +539,7 @@
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
               ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
 </td><td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
@@ -587,7 +587,7 @@
               </td>
 
            <td> 
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
            
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
