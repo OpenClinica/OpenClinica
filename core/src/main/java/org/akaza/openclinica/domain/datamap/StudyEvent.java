@@ -36,7 +36,8 @@ public class StudyEvent extends DataMapDomainObject {
 	private UserAccount userAccount;
 	private StudyEventDefinition studyEventDefinition;
 	private StudySubject studySubject;
-	private Status status;
+	//private Status status;
+	private Integer statusId;
 	private String location;
 	private Integer sampleOrdinal;
 	private Date dateStart;
@@ -67,7 +68,7 @@ public class StudyEvent extends DataMapDomainObject {
 		this.userAccount = userAccount;
 		this.studyEventDefinition = studyEventDefinition;
 		this.studySubject = studySubject;
-		this.status = status;
+		
 		this.location = location;
 		this.sampleOrdinal = sampleOrdinal;
 		this.dateStart = dateStart;
@@ -124,7 +125,7 @@ public class StudyEvent extends DataMapDomainObject {
 		this.studySubject = studySubject;
 	}
 
-	@Type(type = "status")
+	/*@Type(type = "status")
     @Column(name = "status_id")
     public Status getStatus() {
         if (status != null) {
@@ -134,7 +135,7 @@ public class StudyEvent extends DataMapDomainObject {
     }
 	public void setStatus(Status status) {
 		this.status = status;
-	}
+	}*/
 
 	@Column(name = "location", length = 2000)
 	public String getLocation() {
@@ -246,6 +247,14 @@ public class StudyEvent extends DataMapDomainObject {
 
 	public void setEventCrfs(List<EventCrf> eventCrfs) {
 		this.eventCrfs = eventCrfs;
+	}
+	 @Column(name = "status_id")
+	public Integer getStatusId() {
+		return statusId;
+	}
+
+	public void setStatusId(Integer statusId) {
+		this.statusId = statusId;
 	}
 
 	

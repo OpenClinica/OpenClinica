@@ -196,7 +196,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if(subjectBelongsToStudy(study,studySubj)){
 		
 		// exportSubjectDataBean.setAuditLogs(studySubj.getA)
-		exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
+		if(studySubj.getSubject()
+				.getDateOfBirth()!=null)
+			exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
 				.getDateOfBirth() + "");
 		exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender()+"");
 		exportSubjectDataBean.setStudySubjectId(
@@ -247,7 +249,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
-			expSEBean.setStatus(fetchStudyEventStatus(se.getStatus().getCode()));
+			expSEBean.setStatus(fetchStudyEventStatus(se.getStatusId()));
 			if(collectAudits)
 			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid()));
 			if(collectDns)
@@ -280,11 +282,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						.getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf
 						.getCrfVersion().getVersioningMaps()));
 				dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
+				if(ecrf.getDateInterviewed()!=null)
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
+				if(ecrf.getInterviewerName()!=null)
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
 				dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(Locale.US));
-				
-				dataBean.setCrfVersion(ecrf.getVersion()+"");
+				if(ecrf.getCrfVersion().getName()!=null)
+				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
 				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID));
 				if(collectDns)
