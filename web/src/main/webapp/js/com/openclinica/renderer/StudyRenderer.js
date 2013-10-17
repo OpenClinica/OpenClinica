@@ -361,6 +361,13 @@ function StudyRenderer(json) {
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
+      
+      if (currentItemGroupOID != previousItemGroupOID) {
+        repeatRowNumber = 1;
+        isFirstRepeatingItem = true;
+      }
+      
+      
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
@@ -370,11 +377,6 @@ function StudyRenderer(json) {
       // process repeating group of items 
       if (repeating == true) {
         
-        if (currentItemGroupOID != previousItemGroupOID) {
-          repeatRowNumber = 1;
-          isFirstRepeatingItem = true;
-        }
-      
         if (nextGroupOID != currentItemGroupOID) {
           lastItemInRepeatingRow = true;
         }
