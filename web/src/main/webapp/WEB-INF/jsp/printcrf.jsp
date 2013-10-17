@@ -15,7 +15,7 @@
   var app_siteOID = '${studyOID}';
   
   var app_eventOID = '${eventOID}';
-  var app_eventOrdinal;
+  var app_eventOrdinal = 1;
   if ('${eventOID}'.indexOf('[') != -1) {
     app_eventOID = '${eventOID}'.substring(0,'${eventOID}'.indexOf('['));
     app_eventOrdinal = '${eventOID}'.substring('${eventOID}'.indexOf('[')+1, '${eventOID}'.indexOf(']'));
