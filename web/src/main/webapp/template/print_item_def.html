@@ -41,7 +41,7 @@
     <div class='checkbox_control ${isInline}'>
       {{each multiSelectOptionNames}}
         <div class='select-option ${isInline}'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if id.split(",").indexOf(itemValue) != -1}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
