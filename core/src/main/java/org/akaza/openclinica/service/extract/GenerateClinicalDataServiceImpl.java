@@ -72,6 +72,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private boolean collectDns=true;
 	private boolean collectAudits=true;
 	private AuditLogEventDao auditEventDAO;
+	private Locale locale;
 	
 	public AuditLogEventDao getAuditEventDAO() {
 		return auditEventDAO;
@@ -286,7 +287,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
 				if(ecrf.getInterviewerName()!=null)
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
-				dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(Locale.US));
+				dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
 				if(ecrf.getCrfVersion().getName()!=null)
 				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
@@ -601,9 +602,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	@Override
 	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,
-			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit) {
+			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit, Locale locale) {
+		setLocale(locale);
 		setCollectDns(collectDNs);
 		setCollectAudits(collectAudit);
+		
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID, studySubjectOID);
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
@@ -615,6 +618,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		
 		return null;
+	}
+
+	private void setLocale(Locale locale) {
+		this.locale=locale;
+	}
+	private Locale getLocale(){
+		return locale;
 	}
 
 	private OdmClinicalDataBean getClinicalDatas(String studyOID,

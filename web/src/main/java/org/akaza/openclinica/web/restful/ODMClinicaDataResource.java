@@ -69,7 +69,7 @@ public class ODMClinicaDataResource {
 			@PathParam("studyEventOID") String studyEventOID,
 			@PathParam("studySubjectOID") String studySubjOID,
 			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
-			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits) {
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN=false;
 		boolean includeAudit= false;
@@ -84,7 +84,7 @@ public class ODMClinicaDataResource {
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID,includeDN,includeAudit));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -116,7 +116,7 @@ public class ODMClinicaDataResource {
 			@PathParam("studySubjectOID") String studySubjOID,
 			@PathParam("studyEventOID") String studyEventOID,
 			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
-			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits) {
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN=false;
 		boolean includeAudit= false;
@@ -130,7 +130,7 @@ public class ODMClinicaDataResource {
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID,includeDN,includeAudit));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
 
 		report.createOdmXml(true);
 		LOGGER.debug(report.getXmlOutput().toString().trim());
