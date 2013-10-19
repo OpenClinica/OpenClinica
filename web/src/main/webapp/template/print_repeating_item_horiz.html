@@ -21,7 +21,7 @@
     {{each multiSelectOptionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
         <div class='select-option'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>
+          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>
         </div>
       </td>
     {{/each}}
