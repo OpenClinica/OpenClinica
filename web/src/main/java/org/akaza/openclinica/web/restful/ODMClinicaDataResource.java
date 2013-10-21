@@ -68,7 +68,7 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studyEventOID") String studyEventOID,
 			@PathParam("studySubjectOID") String studySubjOID,
-			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
+			@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
 			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN=false;
@@ -115,7 +115,7 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studySubjectOID") String studySubjOID,
 			@PathParam("studyEventOID") String studyEventOID,
-			@DefaultValue("n") @QueryParam("includeDns") String includeDns,
+			@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
 			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN=false;
