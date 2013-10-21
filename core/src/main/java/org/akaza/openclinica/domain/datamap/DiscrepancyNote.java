@@ -48,6 +48,8 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	private List<DnItemDataMap> dnItemDataMaps;
 	private List<DnStudySubjectMap> dnStudySubjectMaps;
 	private List<DnSubjectMap> dnSubjectMaps ;
+	private DiscrepancyNote parentDiscrepancyNote;
+	private List<DiscrepancyNote> childDiscrepancyNotes;
 
 	public DiscrepancyNote() {
 	}
@@ -171,7 +173,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-
+/*
 	@Column(name = "parent_dn_id")
 	public Integer getParentDnId() {
 		return this.parentDnId;
@@ -180,7 +182,9 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	public void setParentDnId(Integer parentDnId) {
 		this.parentDnId = parentDnId;
 	}
-
+*/
+	
+	
 	@Column(name = "entity_type", length = 30)
 	public String getEntityType() {
 		return this.entityType;
@@ -190,6 +194,26 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.entityType = entityType;
 	}
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_dn_id")
+	public DiscrepancyNote getParentDiscrepancyNote(){
+		return this.parentDiscrepancyNote;
+	}
+	
+	public void setParentDiscrepancyNote(DiscrepancyNote parentDiscrepancyNote){
+		this.parentDiscrepancyNote = parentDiscrepancyNote;
+	}
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentDiscrepancyNote")
+	public List<DiscrepancyNote> getChildDiscrepancyNotes(){
+		return this.childDiscrepancyNotes;
+	}
+	
+	public void setChildDiscrepancyNotes(List<DiscrepancyNote> childDiscrepancyNotes){
+		this.childDiscrepancyNotes = childDiscrepancyNotes;
+	}
+	
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "discrepancyNote")
 	public List<DnStudyEventMap> getDnStudyEventMaps() {
 		return this.dnStudyEventMaps;

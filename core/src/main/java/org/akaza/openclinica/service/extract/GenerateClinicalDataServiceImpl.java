@@ -480,6 +480,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<DnStudySubjectMap> dnMaps  = studySubj.getDnStudySubjectMaps();
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
 		dnNotesBean.setEntityID(studySubj.getOcOid());
+		
 		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
 		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
 		boolean addDN = true;
@@ -511,30 +512,44 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private void fillDNObject(DiscrepancyNoteBean dnNoteBean,
 			ArrayList<DiscrepancyNoteBean> dnNotes, boolean addDN,
 			DiscrepancyNote dn) {
-		{
-		if(dn.getParentDnId()!=null && dn.getParentDnId()>0){
+		
+		if(dn.getParentDiscrepancyNote()!=null){
+			
+		}
+		else{
+			dnNoteBean = new DiscrepancyNoteBean();
+			dnNoteBean.setNumberOfChildNotes(dnNoteBean.getChildNotes().size());
+			dnNoteBean.setStatus(dn.getResolutionStatus().getName());
+			dnNoteBean.setNoteType(dn.getEntityType());
+			dnNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
+			dnNoteBean.setNoteType(dn.getDiscrepancyNoteType().getName());
+			dnNoteBean.setDateUpdated(dn.getDateCreated());
+			;
+		for(DiscrepancyNote childDN:dn.getChildDiscrepancyNotes()){
 			ChildNoteBean childNoteBean = new ChildNoteBean();
+			childNoteBean.setOid("DN_"+childDN.getDiscrepancyNoteId());
 			ElementRefBean userRef =  new ElementRefBean();
-			childNoteBean.setDescription(dn.getDescription());
-			childNoteBean.setStatus(dn.getResolutionStatus().getDescription());
-			childNoteBean.setDetailedNote(dn.getDetailedNotes());
-			childNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
+			childNoteBean.setDescription(childDN.getDescription());
+			childNoteBean.setStatus(childDN.getResolutionStatus().getName());
+			childNoteBean.setDetailedNote(childDN.getDetailedNotes());
+			
+			childNoteBean.setDateCreated(childDN.getDateCreated());
+			
 			if(dn.getUserAccount()!=null)
-			userRef.setElementDefOID("USR_"+dn.getUserAccount().getUserId());
+			userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
 			else
 				userRef.setElementDefOID("");	
 			childNoteBean.setUserRef(userRef);
 			dnNoteBean.getChildNotes().add(childNoteBean);
 		}
-		else{
-			dnNoteBean = new DiscrepancyNoteBean();
 			addDN=false;
-			dnNoteBean.setStatus(dn.getResolutionStatus().getDescription());
-			dnNoteBean.setNoteType(dn.getEntityType());
-		}
-		if(addDN)
+			
+			if(!dnNotes.contains(dnNoteBean))
+			{
 			dnNotes.add(dnNoteBean);
+			}
 		}
+		
 	}
 
 	private AuditLogsBean fetchAuditLogs(int entityID,
