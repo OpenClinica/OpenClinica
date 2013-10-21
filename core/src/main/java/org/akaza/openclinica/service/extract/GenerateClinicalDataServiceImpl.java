@@ -208,7 +208,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		exportSubjectDataBean.setSecondaryId(studySubj.getSecondaryLabel());
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
 		if(isCollectAudits())
-		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid()));
+		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid(), "subject"));
 		if(isCollectDns())
 			exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 		
@@ -252,7 +252,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
 			expSEBean.setStatus(fetchStudyEventStatus(se.getSubjectEventStatusId()));
 			if(collectAudits)
-			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid()));
+			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid(), null));
 			if(collectDns)
 				expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 			
@@ -291,7 +291,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if(ecrf.getCrfVersion().getName()!=null)
 				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
-				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID));
+				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID, null));
 				if(collectDns)
 					dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
 				
@@ -428,7 +428,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(ItemData id:list){
 			if(id.getItem().getOcOid().equals(iiDataBean.getItemOID())){
 				if(isCollectAudits())
-				iiDataBean.setAuditLogs(fetchAuditLogs(id.getItemDataId(),"item_data", iiDataBean.getItemOID()));
+				iiDataBean.setAuditLogs(fetchAuditLogs(id.getItemDataId(),"item_data", iiDataBean.getItemOID(), null));
 				if(isCollectDns())
 					iiDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(id));
 				return iiDataBean;
@@ -553,7 +553,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private AuditLogsBean fetchAuditLogs(int entityID,
-			String itemDataAuditTable, String entityValue) {
+			String itemDataAuditTable, String entityValue, String anotherAuditLog) {
 	
 		AuditLogsBean auditLogsBean = new AuditLogsBean();
 	
@@ -563,7 +563,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		auditLog.setAuditTable(itemDataAuditTable);
 		
 		auditLogsBean.setEntityID(entityValue);
-		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog));
+		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog, anotherAuditLog));
 		
 		
 		auditLogsBean= fetchODMAuditBean(auditLogEvent,auditLogsBean);
