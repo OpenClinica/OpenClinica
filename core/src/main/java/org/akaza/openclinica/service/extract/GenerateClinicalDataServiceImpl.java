@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.datamap.DnEventCrfMap;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.DnStudyEventMap;
 import org.akaza.openclinica.domain.datamap.DnStudySubjectMap;
+import org.akaza.openclinica.domain.datamap.DnSubjectMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -478,10 +479,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	} 
 	private DiscrepancyNotesBean fetchDiscrepancyNotes(StudySubject studySubj) {
 		List<DnStudySubjectMap> dnMaps  = studySubj.getDnStudySubjectMaps();
+		
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
 		dnNotesBean.setEntityID(studySubj.getOcOid());
 		
 		DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
+		DiscrepancyNoteBean dnSubjBean = new DiscrepancyNoteBean();
 		ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
 		boolean addDN = true;
 		for(DnStudySubjectMap dnMap:dnMaps){
@@ -490,6 +493,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
+		List<DnSubjectMap> dnSubjMaps = studySubj.getSubject().getDnSubjectMaps();
+		ArrayList<DiscrepancyNoteBean> dnSubjs = new ArrayList<DiscrepancyNoteBean>();
+		
+		for(DnSubjectMap dnMap:dnSubjMaps){
+			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
+			addDN=true;
+			fillDNObject(dnSubjBean, dnSubjs, addDN, dn);
+		}
+		
+		for(DiscrepancyNoteBean dnSubjMap:dnSubjs)
+		dnNotesBean.getDiscrepancyNotes().add(dnSubjMap);
 		return dnNotesBean;
 		
 	} 
