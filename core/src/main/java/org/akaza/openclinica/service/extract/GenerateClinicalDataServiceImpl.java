@@ -532,7 +532,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		else{
 			dnNoteBean = new DiscrepancyNoteBean();
-			dnNoteBean.setNumberOfChildNotes(dnNoteBean.getChildNotes().size());
+			
 			dnNoteBean.setStatus(dn.getResolutionStatus().getName());
 			dnNoteBean.setNoteType(dn.getEntityType());
 			dnNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
@@ -541,7 +541,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			;
 		for(DiscrepancyNote childDN:dn.getChildDiscrepancyNotes()){
 			ChildNoteBean childNoteBean = new ChildNoteBean();
-			childNoteBean.setOid("DN_"+childDN.getDiscrepancyNoteId());
+			childNoteBean.setOid("CDN_"+childDN.getDiscrepancyNoteId());
 			ElementRefBean userRef =  new ElementRefBean();
 			childNoteBean.setDescription(childDN.getDescription());
 			childNoteBean.setStatus(childDN.getResolutionStatus().getName());
@@ -556,7 +556,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			childNoteBean.setUserRef(userRef);
 			dnNoteBean.getChildNotes().add(childNoteBean);
 		}
-			addDN=false;
+		dnNoteBean.setNumberOfChildNotes(dnNoteBean.getChildNotes().size());
 			
 			if(!dnNotes.contains(dnNoteBean))
 			{
