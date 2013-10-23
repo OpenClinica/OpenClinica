@@ -4,6 +4,7 @@ package org.akaza.openclinica.domain.datamap;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -172,7 +173,7 @@ public class ItemData  extends DataMapDomainObject {
 	}
 
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "itemData")
+	@OneToMany(fetch = FetchType.EAGER,cascade = {CascadeType.ALL}, mappedBy = "itemData")
 	public List<DnItemDataMap> getDnItemDataMaps() {
 		return this.dnItemDataMaps;
 	}

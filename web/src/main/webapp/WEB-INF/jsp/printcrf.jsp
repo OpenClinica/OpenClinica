@@ -13,7 +13,14 @@
   var app_studyOID = '${studyOID}';
   var app_studySubjectOID = '${studySubjectOID}';
   var app_siteOID = '${studyOID}';
+  
   var app_eventOID = '${eventOID}';
+  var app_eventOrdinal = 1;
+  if ('${eventOID}'.indexOf('[') != -1) {
+    app_eventOID = '${eventOID}'.substring(0,'${eventOID}'.indexOf('['));
+    app_eventOrdinal = '${eventOID}'.substring('${eventOID}'.indexOf('[')+1, '${eventOID}'.indexOf(']'));
+  } 
+  
   var app_formVersionOID = '${formVersionOID}';
   var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>'
   var app_siteNameLabel = '<fmt:message key="site_name" bundle="${resword}"/>'

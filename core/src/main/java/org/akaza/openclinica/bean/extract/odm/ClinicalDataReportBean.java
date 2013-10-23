@@ -418,6 +418,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         if (dn.getChildNotes() != null && dn.getChildNotes().size() > 0) {
             for (ChildNoteBean cn : dn.getChildNotes()) {
                 xml.append(currentIndent + indent + "<OpenClinica:ChildNote ");
+
+                if (cn.getOid() != null) {
+                    String s = cn.getOid();
+                    if (s.length() > 0) {
+                        xml.append("ID=\"" + s + "\" ");
+                    }
+                }
                 if (cn.getStatus() != null) {
                     String s = cn.getStatus();
                     if (s.length() > 0) {

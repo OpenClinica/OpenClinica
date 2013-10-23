@@ -67,8 +67,16 @@ public class ODMClinicaDataResource {
 	public String getODMClinicaldata(@PathParam("studyOID") String studyOID,
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studyEventOID") String studyEventOID,
-			@PathParam("studySubjectOID") String studySubjOID) {
+			@PathParam("studySubjectOID") String studySubjOID,
+			@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
+		boolean includeDN=false;
+		boolean includeAudit= false;
+		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
+		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
+		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
+		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
 		XMLSerializer xmlSerializer = new XMLSerializer();
 		FullReportBean report = getMetadataCollectorResource()
 				.collectODMMetadataForClinicalData(
@@ -76,7 +84,7 @@ public class ODMClinicaDataResource {
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -107,17 +115,22 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,
 			@PathParam("studySubjectOID") String studySubjOID,
 			@PathParam("studyEventOID") String studyEventOID,
-			@DefaultValue("None") @QueryParam("DNType") String dnType,
-			@DefaultValue("None") @QueryParam("AuditLogs") String auditLogs) {
+			@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
 		LOGGER.debug("Requesting clinical data resource");
-		
+		boolean includeDN=false;
+		boolean includeAudit= false;
+		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
+		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
+		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
+		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
 		FullReportBean report = getMetadataCollectorResource()
 				.collectODMMetadataForClinicalData(
 						studyOID,
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
 
 		report.createOdmXml(true);
 		LOGGER.debug(report.getXmlOutput().toString().trim());

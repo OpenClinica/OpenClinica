@@ -1,10 +1,10 @@
 <td class='repeating_item_group' valign='center'>
   <table class='repeating-horiz-items' width='100%' height='100%'>
-  <tr class="repeating_item_option_names">
+  <tr>
   
   {{if responseType == 'text' || responseType == 'calculation' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-  <td align='center' valign='center'> <input id="${formOID}-${OID}" type='text' value="${itemValue}"/></td>
+    <div id="${formOID}-${OID}">${itemValue}</div>
   {{else responseType == 'radio'}}
     {{each optionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
@@ -20,7 +20,9 @@
   {{else responseType == 'multi-select' || responseType == 'checkbox'}}
     {{each multiSelectOptionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
-        <div class='select-option'><input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue == id}}checked{{/if}}/></div>
+        <div class='select-option'>
+          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>
+        </div>
       </td>
     {{/each}}
    {{else responseType == 'textarea'}}

@@ -28,10 +28,14 @@ import org.hibernate.annotations.Parameter;
 
 public class DiscrepancyNote  extends DataMapDomainObject {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int discrepancyNoteId;
 	private UserAccount userAccountByOwnerId;
 	private DiscrepancyNoteType discrepancyNoteType;
-	private UserAccount userAccountByAssignedUserId;
+	private UserAccount userAccount;
 	private Study study;
 	private ResolutionStatus resolutionStatus;
 	private String description;
@@ -44,6 +48,8 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	private List<DnItemDataMap> dnItemDataMaps;
 	private List<DnStudySubjectMap> dnStudySubjectMaps;
 	private List<DnSubjectMap> dnSubjectMaps ;
+	private DiscrepancyNote parentDiscrepancyNote;
+	private List<DiscrepancyNote> childDiscrepancyNotes;
 
 	public DiscrepancyNote() {
 	}
@@ -55,7 +61,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	public DiscrepancyNote(int discrepancyNoteId,
 			UserAccount userAccountByOwnerId,
 			DiscrepancyNoteType discrepancyNoteType,
-			UserAccount userAccountByAssignedUserId, Study study,
+			UserAccount userAccount, Study study,
 			ResolutionStatus resolutionStatus, String description,
 			String detailedNotes, Date dateCreated, Integer parentDnId,
 			String entityType, List<DnStudyEventMap> dnStudyEventMaps, List<DnEventCrfMap> dnEventCrfMaps,
@@ -63,7 +69,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.discrepancyNoteId = discrepancyNoteId;
 		this.userAccountByOwnerId = userAccountByOwnerId;
 		this.discrepancyNoteType = discrepancyNoteType;
-		this.userAccountByAssignedUserId = userAccountByAssignedUserId;
+		this.userAccount = userAccount;
 		this.study = study;
 		this.resolutionStatus = resolutionStatus;
 		this.description = description;
@@ -100,7 +106,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "discrepancy_note_type_id")
+	@JoinColumn(name = "discrepancy_note_type_id" )
 	public DiscrepancyNoteType getDiscrepancyNoteType() {
 		return this.discrepancyNoteType;
 	}
@@ -109,15 +115,15 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.discrepancyNoteType = discrepancyNoteType;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY )
 	@JoinColumn(name = "assigned_user_id")
-	public UserAccount getUserAccountByAssignedUserId() {
-		return this.userAccountByAssignedUserId;
+	public UserAccount getUserAccount() {
+		return this.userAccount;
 	}
 
-	public void setUserAccountByAssignedUserId(
-			UserAccount userAccountByAssignedUserId) {
-		this.userAccountByAssignedUserId = userAccountByAssignedUserId;
+	public void setUserAccount(
+			UserAccount userAccount) {
+		this.userAccount = userAccount;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -167,7 +173,7 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-
+/*
 	@Column(name = "parent_dn_id")
 	public Integer getParentDnId() {
 		return this.parentDnId;
@@ -176,7 +182,9 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	public void setParentDnId(Integer parentDnId) {
 		this.parentDnId = parentDnId;
 	}
-
+*/
+	
+	
 	@Column(name = "entity_type", length = 30)
 	public String getEntityType() {
 		return this.entityType;
@@ -186,6 +194,26 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.entityType = entityType;
 	}
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_dn_id")
+	public DiscrepancyNote getParentDiscrepancyNote(){
+		return this.parentDiscrepancyNote;
+	}
+	
+	public void setParentDiscrepancyNote(DiscrepancyNote parentDiscrepancyNote){
+		this.parentDiscrepancyNote = parentDiscrepancyNote;
+	}
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentDiscrepancyNote")
+	public List<DiscrepancyNote> getChildDiscrepancyNotes(){
+		return this.childDiscrepancyNotes;
+	}
+	
+	public void setChildDiscrepancyNotes(List<DiscrepancyNote> childDiscrepancyNotes){
+		this.childDiscrepancyNotes = childDiscrepancyNotes;
+	}
+	
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "discrepancyNote")
 	public List<DnStudyEventMap> getDnStudyEventMaps() {
 		return this.dnStudyEventMaps;

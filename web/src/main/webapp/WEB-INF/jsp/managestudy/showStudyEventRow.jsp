@@ -113,6 +113,7 @@
 
 				  <c:set var="versionCount" value="0"/>
 				  <c:forEach var="version" items="${dedc.edc.versions}">
+                    <c:set var="crfVersionOID" value="${version.oid}"/>
 				    <c:set var="versionCount" value="${versionCount+1}"/>
 				  </c:forEach>
 
@@ -223,10 +224,7 @@
                  </td>
 
 		         <td>
-		         <!--
-  <a href="javascript:openPrintCRFWindow('rest/metadata/html/print/<c:out value="${study.oid}"/>/<c:out value="${currRow.bean.studyEvent.id}"/>/<c:out value="${dedc.edc.crf.id}"/>')"
-		         -->
-		         <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${dedc.edc.defaultVersionId}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
 			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
@@ -344,7 +342,7 @@
 
 		 </td>
 		 <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySub.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/><c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>]</c:if>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>

@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.restful;
 
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 
@@ -11,9 +13,9 @@ import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 public class ClinicalDataCollectorResource {
 	private GenerateClinicalDataService generateClinicalDataService;
 	
-	public OdmClinicalDataBean generateClinicalData(String studyOID,String studySubjOID,String studyEventOID,String formVersionOID){
+	public OdmClinicalDataBean generateClinicalData(String studyOID,String studySubjOID,String studyEventOID,String formVersionOID,boolean includeDNs,boolean includeAudits,Locale locale){
 	
-	return getGenerateClinicalDataService().getClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID,null,null);
+	return getGenerateClinicalDataService().getClinicalData(studyOID, studySubjOID,studyEventOID,formVersionOID,includeDNs,includeAudits,locale);
 		
 		
 	}

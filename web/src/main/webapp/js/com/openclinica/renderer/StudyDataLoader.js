@@ -238,10 +238,14 @@ function StudyDataLoader(study, json) {
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
     for (var i=0;i<studyEventsData.length;i++) {
-     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID) { 
+     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
         studyEventData = studyEventsData[i];
         break;
       }
+    }
+    
+    if (studyEventData == undefined) {
+      return;
     }
     
     app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
@@ -256,6 +260,19 @@ function StudyDataLoader(study, json) {
         break;
       }
     }
+    
+   // determine repeating group row lengths 
+   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+   if (itemGroupData) {
+     for (var i=0;i<itemGroupData.length;i++) {
+       var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
+       var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
+       if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || app_itemGroupRepeatLengthMap[itemGroupOID] < repeatKey) {
+         app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
+       }
+     }
+   }
+   
     app_studySubjectStatus = app_formData["@OpenClinica:Status"];
   }
   

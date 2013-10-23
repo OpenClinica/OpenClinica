@@ -89,7 +89,8 @@
 	<property name="studyDao" ref="studyDaoDomain"></property>
 	<property name="studySubjectDao" ref="studySubjectDaoDomain"/>
 	<property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
-	
+	<property name="auditEventDAO" ref="auditLogEventDaoDomain"/>
+	<property name="subjectEventStatusDao" ref="subjectEventStatusDaoDomain"/>
 </bean>
 
 

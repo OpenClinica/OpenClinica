@@ -322,6 +322,12 @@ function StudyRenderer(json) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
         mandatory = app_itemGroupMap[itemOID].mandatory;
         totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber ? totalRepeatingRows = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatNumber : 1;
+        // adjust totalRepeatingRows to number of data rows in a populated form
+        var totalRepeatingDataRows = app_itemGroupRepeatLengthMap[app_itemGroupMap[itemOID].itemGroupKey];
+          
+        if (totalRepeatingDataRows > totalRepeatingRows) {
+          totalRepeatingRows = totalRepeatingDataRows;
+        }
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
         repeatMax = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax ? app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeatMax : this.DEFAULT_MAX_REPEAT;
         itemGroupName = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
@@ -355,6 +361,13 @@ function StudyRenderer(json) {
         debug("next item column number: " + nextColumnNumber, util_logDebug);
       }       
       
+      
+      if (currentItemGroupOID != previousItemGroupOID) {
+        repeatRowNumber = 1;
+        isFirstRepeatingItem = true;
+      }
+      
+      
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
@@ -364,11 +377,6 @@ function StudyRenderer(json) {
       // process repeating group of items 
       if (repeating == true) {
         
-        if (currentItemGroupOID != previousItemGroupOID) {
-          repeatRowNumber = 1;
-          isFirstRepeatingItem = true;
-        }
-      
         if (nextGroupOID != currentItemGroupOID) {
           lastItemInRepeatingRow = true;
         }
@@ -395,7 +403,7 @@ function StudyRenderer(json) {
         if (responseLayout == "Horizontal") {
           var options = (responseType == 'multi-select' || responseType == 'checkbox') ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
-          var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center'>" + itemNumber + " " + name + "</td></tr>";
+          var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + itemNumber + " " + name + "</td></tr>";
           var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
             optionsRow += "<td valign='bottom' align='center' class='repeating_item_group'>" + options[j].label + "</td>";

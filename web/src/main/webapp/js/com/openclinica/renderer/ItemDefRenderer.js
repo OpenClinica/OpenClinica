@@ -23,11 +23,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   if (app_formData != undefined) {
     
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-    for (var i=0;i<itemGroupData.length;i++) {
-      var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
-      if (itemsData != undefined) {
-        for (var j=0;j<itemsData.length;j++) {
-         if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
+    if (itemGroupData) {
+      for (var i=0;i<itemGroupData.length;i++) {
+        var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
+        if (itemsData != undefined) {
+          for (var j=0;j<itemsData.length;j++) {
+           if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
         	 
         		 
         	 this.itemValue = itemsData[j]["@Value"];
@@ -46,8 +47,9 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
         			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
         			 this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
         		 }
-        	 }	
-            break;
+            	 }	
+              break;
+            }
           }
         }
       }
