@@ -223,8 +223,9 @@ public class SubjectTransferValidator implements Validator {
          if (subjectTransferBean.getPersonId() != null && subjectTransferBean.getPersonId().length()>0){
 	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifierAndStudy( subjectTransferBean.getPersonId(), study.getId());
 	   	 
-		   	 if ( subjectWithSamePersonId.getId() !=0 )
-		   	 {
+		   	 //if ( subjectWithSamePersonId.getId() !=0 ) {            // Commented out the following line    
+             if (subjectWithSamePersonId.isActive()) {                 //   Added the following line 
+		   	 
 		   		 e.reject("subjectTransferValidator.personId_duplicated", new Object[] { personId }, 
 		   				 "A subject with the Person ID: "+personId+" is already enrolled in this study. ");
 		   	     return;
