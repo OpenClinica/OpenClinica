@@ -168,7 +168,7 @@ public class EventEndpoint {
     String eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement).trim();
     String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement).trim();
     String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
-    String location = DomUtils.getTextValue(locationElement).trim();
+    String location = locationElement == null ? null : DomUtils.getTextValue(locationElement).trim();
     String startDate = DomUtils.getTextValue(startDateElement).trim();
     String startTime = startTimeElement == null ? null : DomUtils.getTextValue(startTimeElement).trim();
     String endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement).trim();

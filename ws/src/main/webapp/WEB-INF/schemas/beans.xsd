@@ -7,7 +7,7 @@
             <element name="studySubjectRef" type="beans:studySubjectRefType"/>
             <element name="studyRef" type="beans:studyRefType"/>
             <element name="eventDefinitionOID" type="beans:customStringType"/>
-            <element name="location" type="beans:customStringType"/>
+            <element name="location" type="beans:customStringType" minOccurs="0"/>
             <element name="startDate" type="date"/>
             <element name="startTime" type="time" minOccurs="0"/>
             <element name="endDate" type="date" minOccurs="0"/>
