@@ -457,6 +457,17 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
+    if(app_displayAudits)//TODO: add flag for discrepancy notes as  a or clause 
+    	{
+    	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
+        	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+
+    		var itemDef = orderedItems[orderedItemIndex];
+    		 this.renderString+=this.renderItemFormMetadata(itemDef,formDef);
+    	}
+    	this.renderAudits();
+    	}
+    
   }
   
   
@@ -470,6 +481,26 @@ function StudyRenderer(json) {
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
   }
   
+  
+  
+  this.renderItemFormMetadata = function(itemDef,formDef){
+	  var name = itemDef["@Name"];
+	  var itemDetails = this.getItemDetails(itemDef, formDef);
+	  var leftItemText = itemDetails["OpenClinica:LeftItemText"];
+	  var template = "print_item_metadata_info";
+	  var s = RenderUtil.render(RenderUtil.get(template), 
+		       {itemName:name,leftItemText:leftItemText});
+		    return s[0].outerHTML;
+		    
+	 
+	  
+  }
+
+	  this.renderAudits = function(){
+		    
+		  this.renderString+="<b>AUDITS</b>";
+  }
+
   
   /* renderStudy()
    * When this is implemented it will render the web form
