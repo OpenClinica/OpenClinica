@@ -1,23 +1,38 @@
 <td valign='center'>
+
   <table>
   <tr>
-  <td><a id="${itemName}"></a>${itemName}:</td>
-  
+  <td><a id="${itemName}"></a>${itemName}</td>
   </tr>
   <tr><td>${itemName} :Metadata</td>
- 
   </tr>
   </table>
-  <table border="1>
+  <table border="1" width="100%" >
   <tr>
-  {{if leftItemText}}
+  
   <td>Left Item Text</td>
-  {{/if}}
+ <td>Units</td>
+ <td>Response Options Text</td>
+ <td>Response Options Values</td>
   </tr>
   <tr>
-   {{if leftItemText}}
-  <td>${leftItemText}</td>
-  {{/if}}
+  <td> {{html leftItemText}} </td>
+  <td>{{html units}}</td>
+ <td>
+   {{each responseOptions}}
+        
+         {{html label}}
+        
+      {{/each}}
+      </td>
+      <td>
+   {{each responseOptions}}
+        
+         {{html id}}
+        
+      {{/each}}
+      </td>
+      
   </tr>
   </table>
   </td>

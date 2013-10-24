@@ -20,6 +20,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.file = undefined;
   this.fileDownloadLink=undefined;
   this.itemTemp= undefined;
+  
   if (app_formData != undefined) {
     
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
@@ -67,6 +68,16 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
         columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
         itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
     return s[0].outerHTML;
+  }
+  
+  
+  this.renderItemFormMetadata = function(){
+	  var template = "print_item_metadata_info";
+	  var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
+	  var s = RenderUtil.render(RenderUtil.get(template), 
+		       {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+		    return s[0].outerHTML;
+		    
   }
   
 }
