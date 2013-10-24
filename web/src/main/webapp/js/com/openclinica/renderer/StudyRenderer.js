@@ -481,7 +481,6 @@ function StudyRenderer(json) {
 				itemsOids.push(itemDef["ItemOID"]);
     			}
     		}
-    	    this.renderString+=this.renderAudits();
     	}
     	
     	}
