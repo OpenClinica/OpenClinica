@@ -47,8 +47,8 @@
   var app_sectionSubtitle = '<fmt:message key="subtitle" bundle="${resword}"/>'+":";
   var app_sectionInstructions = '<fmt:message key="instructions" bundle="${resword}"/>'+":";
   var app_sectionPage = '<fmt:message key="page" bundle="${resword}"/>'+":";
-  
-</script>
+  var app_displayAudits='${includeAudits}';
+  </script>
 
 <html>
  <head>

@@ -457,30 +457,45 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    if(app_displayAudits)//TODO: add flag for discrepancy notes as  a or clause 
+    if(app_displayAudits)
+    if(app_displayAudits=='y')//TODO: add flag for discrepancy notes as  a or clause 
     	{
     	var itemsOids = new Array();
     	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
         	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
         	var itemDef = orderedItems[orderedItemIndex];
         	var itemDetails = this.getItemDetails(itemDef, formDef);
-        	
+      	
     		  itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
     		  this.renderString+="<div align='center'>"+formDef["@Name"]+"</div>";
-    		if(typeof itemOids==='undefined')
+    		if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["ItemOID"])<1)
     		{
-    			
     				this.renderString+=itemDefRenderer.renderItemFormMetadata();
     				itemsOids.push(itemDef["ItemOID"]);
-    			
+    				  if(app_displayAudits=='y' && itemDefRenderer.audits){
+    					  var auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
+    					  if(auditLog){
+    		    		 
+    						  var currentAuditLogs = [];
+    						  auditLog = util_ensureArray(auditLog);
+    		    		  for(var i=0;i<auditLog.length;i++){
+    		    			  var thisAuditLog = {};
+    		    			 
+    		    			  var audits = auditLog[i];
+    		    			  thisAuditLog.auditType = audits["@AuditType"];
+    		    			  thisAuditLog.user = audits["@UserId"];
+    		    			  thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
+    		    			  thisAuditLog.oldValue = audits["@OldValue"];
+    		    			  thisAuditLog.newValue = audits["@NewValue"];
+    		    			  currentAuditLogs.push(thisAuditLog);
+
+    		    		  } 
+    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs)
+    					 
+    					  }
+    				  }
     		}
-    		else{
-    			if( itemOids.indexOf(itemDef["ItemOID"])<1){
-    				
-    			this.renderString+=itemDefRenderer.renderItemFormMetadata();
-				itemsOids.push(itemDef["ItemOID"]);
-    			}
-    		}
+    		
     	}
     	
     	}
