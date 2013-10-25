@@ -63,6 +63,19 @@
           AND st.study_id=?
         </sql>
 	</query>
+	
+		<query>
+		<name>findByUniqueIdentifierAndAnyStudy</name>
+		<sql>
+          SELECT  s.* FROM study_subject ss 
+          JOIN subject s on s.subject_id=ss.subject_id
+          JOIN study st on st.study_id= ss.study_id
+          WHERE 
+          s.unique_identifier=? AND (st.parent_study_id=? OR st.study_id=?)
+        </sql>
+	</query>
+	
+	
     <query>
 		<name>findByUniqueIdentifierAndParentStudy</name>
 		<sql>

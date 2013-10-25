@@ -308,6 +308,29 @@ public class SubjectDAO extends AuditableEntityDAO {
      * @param studyId
      * @return
      */
+
+    public SubjectBean findByUniqueIdentifierAndAnyStudy(String uniqueIdentifier, int studyId) {
+        SubjectBean answer = new SubjectBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), uniqueIdentifier);
+        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(new Integer(3), new Integer(studyId));
+
+        String sql = digester.getQuery("findByUniqueIdentifierAndAnyStudy");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            answer = (SubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return answer;
+
+    }
+
+    
     public SubjectBean findByUniqueIdentifierAndStudy(String uniqueIdentifier, int studyId) {
         SubjectBean answer = new SubjectBean();
         this.setTypesExpected();
