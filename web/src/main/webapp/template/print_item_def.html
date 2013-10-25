@@ -29,7 +29,7 @@
     <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
         <div class='select-option ${isInline}'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='radio'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>

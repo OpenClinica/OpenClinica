@@ -20,7 +20,7 @@
     <div class='checkbox_control'>
       {{each optionNames}}
         <div class='select-option'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>

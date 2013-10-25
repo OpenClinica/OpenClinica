@@ -14,7 +14,7 @@
   {{else responseType == 'single-select'}}
     {{each optionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
-        <div class='select-option'><input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue == id}}checked{{/if}}/></div>
+        <div class='select-option'><input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/></div>
       </td>
     {{/each}}
   {{else responseType == 'multi-select' || responseType == 'checkbox'}}

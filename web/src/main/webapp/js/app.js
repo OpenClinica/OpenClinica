@@ -46,7 +46,7 @@ var app_studySubjectStartDate = undefined;
 var app_studyEventCoverPageType = "study_event_cover_page_type";
 var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
-var app_displayAudits=false;
+var app_displayAudits=true;
 debug("console debugging enabled.", util_logDebug);
 
 /***********      @JQUERY INIT    *******************/
