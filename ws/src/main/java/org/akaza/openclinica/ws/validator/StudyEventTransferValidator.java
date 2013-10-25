@@ -27,9 +27,12 @@ public class StudyEventTransferValidator implements Validator {
     StudyEventDefinitionDAO studyEventDefinitionDAO;
     BaseVSValidatorImplementation helper;
     private StudyParameterValueDAO studyParameterValueDAO;
-    
+    private static String TRUE ="true";    
+    private static String REQUIRED ="requires";
     public StudyEventTransferValidator(DataSource dataSource) {
-        this.dataSource = dataSource;
+
+    	
+    	this.dataSource = dataSource;
         helper = new BaseVSValidatorImplementation();
     }
 
@@ -137,7 +140,8 @@ public class StudyEventTransferValidator implements Validator {
         }
         StudyParameterValueBean eventLocationRequiredSetting = getStudyParameterValueDAO().findByHandleAndStudy(studyEventTransferBean.getStudy().getId(), "eventLocationRequired");
         
-        if ("true".equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
+//        if ("true".equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
+        if (REQUIRED.equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
             e.reject("studyEventTransferValidator.location_required");
             return;
         }

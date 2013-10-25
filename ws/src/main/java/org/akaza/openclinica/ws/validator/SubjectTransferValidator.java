@@ -55,6 +55,7 @@ public class SubjectTransferValidator implements Validator {
         if (study == null) return;
         subjectStudyBean.setStudy(study);
         StudyBean site = null;int site_id = -1;
+        
         if (subjectStudyBean.getSiteUniqueId() != null) {
         	site = helper.verifySite(getStudyDAO(), subjectStudyBean.getStudyUniqueId(), subjectStudyBean.getSiteUniqueId(), included_status, e);
             if (site == null) { return;	        }
@@ -137,9 +138,9 @@ public class SubjectTransferValidator implements Validator {
         if (study == null) return;
         StudyBean site = null;int site_id = -1;
         subjectTransferBean.setStudy(study);
+    
         if (subjectTransferBean.getSiteIdentifier() != null) {
-        	site = helper.verifySite(getStudyDAO(), subjectTransferBean.getStudyOid(), 
-        			subjectTransferBean.getSiteIdentifier(), included_status, e);
+        	site = helper.verifySite(getStudyDAO(), subjectTransferBean.getStudyOid(),subjectTransferBean.getSiteIdentifier(), included_status, e);
             if (site == null) { return;	        }
             site_id = site.getId();
             subjectTransferBean.setStudy(site);
@@ -221,15 +222,16 @@ public class SubjectTransferValidator implements Validator {
         }
 // verify that personId is unique 
          if (subjectTransferBean.getPersonId() != null && subjectTransferBean.getPersonId().length()>0){
-	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifierAndStudy( subjectTransferBean.getPersonId(), study.getId());
-	   	 
-		   	 //if ( subjectWithSamePersonId.getId() !=0 ) {            // Commented out the following line    
-             if (subjectWithSamePersonId.isActive()) {                 //   Added the following line 
+//	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifierAndStudy( subjectTransferBean.getPersonId(), study.getId());
+	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifierAndAnyStudy( subjectTransferBean.getPersonId(), study.getId());
+        		
+		   if ( subjectWithSamePersonId.getId() !=0 ) {              
 		   	 
 		   		 e.reject("subjectTransferValidator.personId_duplicated", new Object[] { personId }, 
 		   				 "A subject with the Person ID: "+personId+" is already enrolled in this study. ");
 		   	     return;
 		   	 }
+         
          }
         
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
@@ -322,6 +324,8 @@ public class SubjectTransferValidator implements Validator {
         }
     }
 
+    
+    
     public StudyDAO getStudyDAO() {
         return this.studyDAO != null ? studyDAO : new StudyDAO(dataSource);
     }
