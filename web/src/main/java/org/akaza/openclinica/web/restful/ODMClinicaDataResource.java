@@ -87,6 +87,7 @@ public class ODMClinicaDataResource {
 										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
+		xmlSerializer.setTypeHintsEnabled(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
 		return json.toString(INDENT_LEVEL);
@@ -99,12 +100,14 @@ public class ODMClinicaDataResource {
 			@PathParam("studyOID") String studyOID,
 			@PathParam("studySubjectOID") String studySubjectOID,
 			@PathParam("eventOID") String eventOID,
-			@PathParam("formVersionOID") String formVersionOID)
+			@PathParam("formVersionOID") String formVersionOID,	@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
 			throws Exception {
 		request.setAttribute("studyOID", studyOID);
 		request.setAttribute("studySubjectOID", studySubjectOID);
 		request.setAttribute("eventOID", eventOID);
 		request.setAttribute("formVersionOID", formVersionOID);
+		request.setAttribute("includeAudits", includeAudits);
 		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
 	}
 

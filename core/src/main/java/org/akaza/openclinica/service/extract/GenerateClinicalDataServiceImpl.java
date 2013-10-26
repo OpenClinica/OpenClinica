@@ -575,7 +575,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		AuditLogEvent auditLog = new AuditLogEvent();
 		auditLog.setEntityId(new Integer(entityID));
 		auditLog.setAuditTable(itemDataAuditTable);
-		
 		auditLogsBean.setEntityID(entityValue);
 		ArrayList<AuditLogEvent> auditLogEvent = (getAuditEventDAO().findByParam(auditLog, anotherAuditLog));
 		
@@ -616,7 +615,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
 		auditBean.setUserId("USR_"+auditLogEvent.getUserId());
+		
 		auditLogsBean.getAuditLogs().add(auditBean);
+		
 		}
 		return auditLogsBean;
 	}

@@ -337,7 +337,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (t.length() > 0) {
                     xml.append(nls);
-                    xml.append(currentIndent + "                      Type=\"" + t + "\" ");
+                    xml.append(currentIndent + "                      AuditType=\"" + t + "\" ");
                 }
                 if (r.length() > 0) {
                     xml.append(nls);

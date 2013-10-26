@@ -20,7 +20,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.file = undefined;
   this.fileDownloadLink=undefined;
   this.itemTemp= undefined;
-  
+  this.audits = undefined;
   if (app_formData != undefined) {
     
     var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
@@ -30,9 +30,13 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
         if (itemsData != undefined) {
           for (var j=0;j<itemsData.length;j++) {
            if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
-        	 
-        		 
         	 this.itemValue = itemsData[j]["@Value"];
+        	 if(app_displayAudits=='y')
+        		 {
+        		 this.audits = itemsData[j]["OpenClinica:AuditLogs"];
+        		
+        		 
+        		 }
         	 if(this.responseType!=undefined)
         	 if(this.responseType=='file'){
         		 if(this.itemValue.indexOf("/")==0)
@@ -78,6 +82,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
 		       {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
 		    return s[0].outerHTML;
 		    
+  }
+  this.renderAuditLogs = function(auditLogs){
+	  var template="print_audits";
+	 // var s = RenderUtil.render(RenderUtil.get(template),{auditEvent:auditEvent,user:userId,dateTime:date,oldVal:oldVal,newVal:newVal,value:this.itemName});
+	  var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName});
+	  return s[0].outerHTML;
   }
   
 }
