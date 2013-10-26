@@ -107,7 +107,7 @@ a:link {
 .item_def_title{
   vertical-align: top;
   display: inline-block;
-  min-width:170px;
+  width:200px;
   font-size: 0.8em;
   font-weight: normal;
 }
