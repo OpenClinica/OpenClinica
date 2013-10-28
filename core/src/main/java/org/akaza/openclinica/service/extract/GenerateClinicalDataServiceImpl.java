@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -288,7 +289,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
 				if(ecrf.getInterviewerName()!=null)
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
-				dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
+				//dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
+				dataBean.setStatus(fetchEventCRFStatus(ecrf));
 				if(ecrf.getCrfVersion().getName()!=null)
 				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
@@ -302,6 +304,44 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			}
 
 		return (ArrayList<ExportFormDataBean>) formDataBean;
+	}
+
+	
+	// This logic is taken from eventCRFBean. 
+	private String fetchEventCRFStatus(EventCrf ecrf) {
+		String stage = null;
+		Status status = ecrf.getStatus();
+		 
+        if (ecrf==null ) {
+            stage =EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
+        }
+
+        else if (ecrf.getEventCrfId()<=0 || status.getCode()<=0) {
+	            stage =EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
+	        }
+
+	        if (status.equals(Status.AVAILABLE)) {
+	            stage = EventCRFStatus.INITIAL_DATA_ENTRY.getI18nDescription(getLocale());
+	        }
+
+	        if (status.equals(Status.PENDING)) {
+	            if (ecrf.getValidatorId()!= 0) {
+	                stage = EventCRFStatus.DOUBLE_DATA_ENTRY.getI18nDescription(getLocale());
+	            } else {
+	                stage = EventCRFStatus.INITIAL_DATA_ENTRY_COMPLETE.getI18nDescription(getLocale());
+	            }
+	        }
+
+	        if (status.equals(Status.UNAVAILABLE)) {
+	            stage = EventCRFStatus.DOUBLE_DATA_ENTRY_COMPLETE.getI18nDescription(getLocale());
+	        }
+
+	        if (status.equals(Status.LOCKED)) {
+	            stage = EventCRFStatus.LOCKED.getI18nDescription(getLocale());
+	        }
+
+	        return stage;
+		
 	}
 
 	private ArrayList<ImportItemGroupDataBean> fetchItemData(
