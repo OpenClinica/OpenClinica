@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -312,11 +311,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		String stage = null;
 		Status status = ecrf.getStatus();
 		 
-        if (ecrf==null ) {
-            stage =EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
-        }
-
-        else if (ecrf.getEventCrfId()<=0 || status.getCode()<=0) {
+      if (ecrf.getEventCrfId()<=0 || status.getCode()<=0) {
 	            stage =EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
 	        }
 
