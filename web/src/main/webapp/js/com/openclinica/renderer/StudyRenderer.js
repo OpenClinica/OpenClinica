@@ -465,11 +465,13 @@ function StudyRenderer(json) {
         	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
         	var itemDef = orderedItems[orderedItemIndex];
         	var itemDetails = this.getItemDetails(itemDef, formDef);
+        	 var itemGroupHeader = undefined;
       	
     		  itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
     		  this.renderString+="<div align='center'>"+formDef["@Name"]+"</div>";
     		if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["ItemOID"])<1)
     		{
+    			itemGroupHeader = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
     				this.renderString+=itemDefRenderer.renderItemFormMetadata();
     				itemsOids.push(itemDef["ItemOID"]);
     				  if(app_displayAudits=='y' && itemDefRenderer.audits){
@@ -490,7 +492,7 @@ function StudyRenderer(json) {
     		    			  currentAuditLogs.push(thisAuditLog);
 
     		    		  } 
-    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs)
+    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs,itemGroupHeader)
     					 
     					  }
     				  }

@@ -83,10 +83,10 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
 		    return s[0].outerHTML;
 		    
   }
-  this.renderAuditLogs = function(auditLogs){
+  this.renderAuditLogs = function(auditLogs,itemGroupLabel){
 	  var template="print_audits";
 	 // var s = RenderUtil.render(RenderUtil.get(template),{auditEvent:auditEvent,user:userId,dateTime:date,oldVal:oldVal,newVal:newVal,value:this.itemName});
-	  var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName});
+	  var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,itemgroupHeader:itemGroupLabel});
 	  return s[0].outerHTML;
   }
   
