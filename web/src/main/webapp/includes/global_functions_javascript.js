@@ -1205,7 +1205,8 @@ function openDocWindow(inURL) {
 //-------------------------------------------------------------------------
 
 function openPrintCRFWindow(inURL) {
-  openNewWindow(inURL,
+	inURL = encodeURI(inURL);
+	openNewWindow(inURL,
    		'',
         'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
         'print');
