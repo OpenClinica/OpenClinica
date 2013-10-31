@@ -288,6 +288,7 @@ function StudyRenderer(json) {
     
     var repeatRowNumber = 1;
     var totalRepeatingRows = 1;
+    var idxForFirstItem = undefined;
     
     for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++) {
       var repeatingRows = "";
@@ -317,6 +318,7 @@ function StudyRenderer(json) {
       var itemGroupHeader = undefined;
       var itemGroupName = undefined; 
       var nextGroupOID = undefined;
+      
       
       if (app_itemGroupMap[itemOID] && app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey]) {
         currentItemGroupOID = app_itemGroupMap[itemOID].itemGroupKey;
@@ -365,8 +367,8 @@ function StudyRenderer(json) {
       if (currentItemGroupOID != previousItemGroupOID) {
         repeatRowNumber = 1;
         isFirstRepeatingItem = true;
+        idxForFirstItem =itemDetails["@OrderInForm"]; // this will be the first item in a grid.
       }
-      
       
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
@@ -433,7 +435,8 @@ function StudyRenderer(json) {
           } 
           else {
             repeatRowNumber++;
-            orderedItemIndex = orderedItemIndex - itemGroupLength;
+            orderedItemIndex = idxForFirstItem-2;// here we are offsetting by 2. This indicates the repeating grid needs to continue;
+            
           }
         }
       }
