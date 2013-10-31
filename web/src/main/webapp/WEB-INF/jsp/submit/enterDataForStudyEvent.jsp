@@ -274,8 +274,11 @@
 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
+
 <td class="table_cell">
     <form name="startForm<c:out value="${dedc.edc.crf.id}"/>" action="InitialDataEntry?<c:out value="${getQuery}"/>" method="POST">
+	<c:set var="defaultVersionOID"/>
+	<c:set var="cvOID"/>
         <c:choose>
         <c:when test="${dedc.eventCRF.id > 0}">
         <!-- found an event crf id -->
@@ -298,14 +301,16 @@
         <c:when test="${versionCount<=1}">
 
         <c:forEach var="version" items="${dedc.edc.versions}">
+        
            <c:out value="${version.name}"/>
            <c:set var="crfVersionOID" value="${version.oid}"/>
+          
         </c:forEach>
 
         </c:when>
-
         <c:when test="${dedc.eventCRF.id == 0}">
-
+        
+		<c:set var= "cvOID" value="${defaultVersionOID}"/>
         <select name="versionId<c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${dedc.edc.crf.id}"/>();">
 
             <c:forEach var="version" items="${dedc.edc.versions}">
@@ -316,6 +321,7 @@
                     <c:when test="${dedc.edc.defaultVersionId==version.id}">
                         <option value="<c:out value="${version.id}"/>" selected>
                             <c:out value="${version.name}"/>
+                               <c:set var="crfVersionOID" value="${version.oid}"/>
                         </option>
                     </c:when>
                     <c:otherwise>
@@ -340,7 +346,8 @@
         </c:when>
 
         <c:otherwise>
-            <c:out value="${dedc.eventCRF.crfVersion.name}"/>
+        <c:out value="${dedc.eventCRF.crfVersion.name}"/>
+            <c:set var="crfVersionOID" value="${dedc.eventCRF.crfVersion.oid}"/>
         </c:otherwise>
 
         </c:choose>
@@ -518,7 +525,7 @@
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
               ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></a>
 </td><td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
             
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
