@@ -1,5 +1,9 @@
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -8,14 +12,13 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
-
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class EventCrfLayerBuilder {
 
@@ -31,12 +34,13 @@ public class EventCrfLayerBuilder {
     UserAccountBean currentUser;
     EventDefinitionCRFBean eventDefinitionCrf;
     CRFBean crf;
+    StudyEventDefinitionBean studyEventDefinition;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private ResourceBundle restexts = ResourceBundleProvider.getTextsBundle();
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
             EventCRFBean eventCrfBean, StudySubjectBean studySubject, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
-            EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf) {
+            EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf,StudyEventDefinitionBean studyEventDefinition) {
         super();
         this.html = new HtmlBuilder();
         this.subject = subject;
@@ -50,6 +54,7 @@ public class EventCrfLayerBuilder {
         this.currentUser = currentUser;
         this.eventDefinitionCrf = eventDefinitionCrf;
         this.crf = crf;
+        this.studyEventDefinition = studyEventDefinition;
     }
 
     StudyEventBean getStudyEvent() {
@@ -347,7 +352,26 @@ public class EventCrfLayerBuilder {
 
     }
 
-    void buildEnd() {
+    private StudyEventBean getStudyEventForThisEventCRF() {
+    	List<StudyEventBean> ses = this.studyEvents;
+    	for(StudyEventBean studyEvent:ses){
+    	if(studyEvent.getId() ==    eventCrfBean.getStudyEventId())
+    		studyEvent.setStudyEventDefinition(this.studyEventDefinition);
+    		return studyEvent;
+    	}
+    	return null;
+	}
+    private String getCRFVersionOID(){
+    	
+    	for(CRFVersionBean crfV:(ArrayList<CRFVersionBean>)this.crf.getVersions()){
+    		if(crfV.getId()==eventCrfBean.getCRFVersionId()){
+    			return crfV.getOid();
+    		}
+    	}
+    	return null;
+    }
+
+	void buildEnd() {
 
         String studySubjectLabel = studySubject.getLabel();
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
@@ -420,14 +444,18 @@ public class EventCrfLayerBuilder {
     }
 
     private void printDataEntry(HtmlBuilder builder, EventCRFBean eventCrf) {
-        String href = "javascript:openDocWindow('PrintDataEntry?ecId=" + eventCrf.getId() + "')";
+//        String href = "javascript:openPrintWindow('/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.getStudyEvent().getStudyEventDefinition().getOid()+"["+this.getStudyEvent().getSampleOrdinal()+"]"+this.eventCrfBean.getCrfVersion().getOid() + "')";
+        String href = "javascript:processPrintCRFRequest('/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.getStudyEventForThisEventCRF().getStudyEventDefinition().getOid()+"["+this.getStudyEventForThisEventCRF().getSampleOrdinal()+"]/"+getCRFVersionOID() + "')";
+
         builder.a().href(href).close();
         builder.img().src("images/bt_Print.gif").border("0").align("left").close();
         builder.aEnd();
     }
 
     private void printDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link) {
-        String href = "javascript:openDocWindow('PrintDataEntry?ecId=" + eventCrf.getId() + "')";
+      //  String href = "javascript:openDocWindow('PrintDataEntry?ecId=" + eventCrf.getId() + "')";
+        String href = "javascript:processPrintCRFRequest('/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.getStudyEventForThisEventCRF().getStudyEventDefinition().getOid()+"["+this.getStudyEventForThisEventCRF().getSampleOrdinal()+"]/"+getCRFVersionOID()  + "')";
+
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();

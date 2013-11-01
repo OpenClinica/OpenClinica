@@ -1214,6 +1214,7 @@ function openPrintCRFWindow(inURL) {
 
 
 function processPrintCRFRequest(url) {
+	url = encodeURI(url);
   openPrintCRFWindow(url);
   //var pdfUrl = url.replace("/html/print/", "/pdf/print/");	
   //openPrintCRFWindow(pdfUrl);

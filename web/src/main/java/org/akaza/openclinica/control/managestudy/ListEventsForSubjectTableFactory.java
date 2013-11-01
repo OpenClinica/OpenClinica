@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -72,7 +74,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private CRFDAO crfDAO;
-    private StudyBean studyBean;
+    private CRFVersionDAO crfVersionDAO;
+    public CRFVersionDAO getCrfVersionDAO() {
+		return crfVersionDAO;
+	}
+
+	public void setCrfVersionDAO(CRFVersionDAO crfVersionDAO) {
+		this.crfVersionDAO = crfVersionDAO;
+	}
+
+	private StudyBean studyBean;
     private String[] columnNames = new String[] {};
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private ArrayList<CRFBean> crfBeans;
@@ -379,6 +390,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             for (EventDefinitionCRFBean eventDefinitionCrf : (List<EventDefinitionCRFBean>) getEventDefintionCRFDAO().findAllActiveByEventDefinitionId(
                     eventDefinition.getId())) {
                 CRFBean crfBean = (CRFBean) getCrfDAO().findByPK(eventDefinitionCrf.getCrfId());
+                ArrayList<CRFVersionBean> crfVersions = (ArrayList<CRFVersionBean>)getCrfVersionDAO().findAllByCRFId(eventDefinitionCrf.getCrfId());
+                crfBean.setVersions(crfVersions);
                 if (eventDefinitionCrf.getParentId() == 0) {
                     crfBeans.add(crfBean);
                     eventDefinitionCrfs.add(eventDefinitionCrf);
@@ -745,7 +758,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
                 EventCrfLayerBuilder eventCrfLayerBuilder =
                     new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, dataEntryStage, eventCrf, studySubjectBean,
-                            studyBean, currentRole, currentUser, eventDefintionCrf, crf);
+                            studyBean, currentRole, currentUser, eventDefintionCrf, crf,studyEventDefinition);
 
                 url.append(eventCrfLayerBuilder.buid());
                 url.append("<img src='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");

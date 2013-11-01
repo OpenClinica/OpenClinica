@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -50,6 +51,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private CRFDAO crfDAO;
     Locale locale;
     private boolean showMoreLink;
+	private Object crfVersionDAO;
     /*
      * (non-Javadoc)
      *
@@ -116,6 +118,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setCrfDAO(getCrfDAO());
+        factory.setCrfVersionDAO(getCRFVersionDAO());
         factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(definitionId));
         String listEventsForSubjectsHtml = factory.createTable(request, response).render();
         request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
@@ -181,6 +184,10 @@ public class ListEventsForSubjectsServlet extends SecureController {
         return crfDAO;
     }
 
+    public CRFVersionDAO getCRFVersionDAO(){
+    	CRFVersionDAO	crfVersionDAO =new CRFVersionDAO(sm.getDataSource());
+    	return crfVersionDAO;
+    	}
     public StudyGroupDAO getStudyGroupDAO() {
         studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
         return studyGroupDAO;
