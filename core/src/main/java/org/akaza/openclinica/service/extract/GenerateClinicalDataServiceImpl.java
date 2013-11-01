@@ -334,6 +334,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	        if (status.equals(Status.LOCKED)) {
 	            stage = EventCRFStatus.LOCKED.getI18nDescription(getLocale());
 	        }
+	        else
+	        	stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
 
 	        return stage;
 		
