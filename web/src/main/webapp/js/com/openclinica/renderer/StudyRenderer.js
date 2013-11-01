@@ -429,7 +429,7 @@ function StudyRenderer(json) {
           if (repeatRowNumber == 1) { 
             repeatingHeaderString += "</tr>";
           }
-          if (repeatRowNumber == repeatMax) { 
+          if (repeatRowNumber == totalRepeatingRows) { 
             this.renderString += RenderUtil.render(RenderUtil.get(
             "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
           } 
