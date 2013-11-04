@@ -20,9 +20,9 @@ public class Status extends Term implements Comparable {
     // waiting for the db to come in sync with our set of terms...
     public static final Status INVALID = new Status(0, "invalid");
     public static final Status AVAILABLE = new Status(1, "available");
-    public static final Status PENDING = new Status(4, "pending");
-    public static final Status PRIVATE = new Status(3, "private");
     public static final Status UNAVAILABLE = new Status(2, "unavailable");
+    public static final Status PRIVATE = new Status(3, "private");
+    public static final Status PENDING = new Status(4, "pending");
     public static final Status DELETED = new Status(5, "removed");
     public static final Status LOCKED = new Status(6, "locked");
     public static final Status AUTO_DELETED = new Status(7, "auto-removed");

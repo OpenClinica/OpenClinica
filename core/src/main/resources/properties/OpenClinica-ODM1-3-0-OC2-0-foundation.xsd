@@ -579,7 +579,7 @@
 		<xs:attribute name="ID" type="odm:oid"/>
 		<xs:attribute name="UserID" type="odm:oidref"/>
 		<xs:attribute name="DateTimeStamp" type="odm:datetime"/>
-		<xs:attribute name="Type" type="odm:text"/>
+		<xs:attribute name="AuditType" type="odm:text"/>
 		<xs:attribute name="ReasonForChange" type="odm:text"/>
 		<xs:attribute name="OldValue" type="odm:text"/>
 		<xs:attribute name="NewValue" type="odm:text"/>
