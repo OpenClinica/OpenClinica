@@ -639,8 +639,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
 			}
 			else{
-			auditBean.setNewValue(Status.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getName());
-			auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getName());	
+			auditBean.setNewValue(Status.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getI18nDescription(getLocale()));
+			auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getI18nDescription(getLocale()));
 			}
 		
 		}
