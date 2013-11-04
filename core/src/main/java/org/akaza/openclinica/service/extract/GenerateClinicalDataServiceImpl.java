@@ -272,7 +272,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		boolean formCheck = true;
 		if(formVersionOID!=null)formCheck = false;
 		for (EventCrf ecrf : se.getEventCrfs()) {
-			
+			//This logic is to use the same method for both S_OID/SS_OID/*/* and full path
 			if(!formCheck)
 				{	if(ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
 						formCheck=true;
@@ -294,7 +294,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if(ecrf.getCrfVersion().getName()!=null)
 				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
-				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", formVersionOID, null));
+				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", ecrf.getCrfVersion().getOcOid(), null));
 				if(collectDns)
 					dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
 				
