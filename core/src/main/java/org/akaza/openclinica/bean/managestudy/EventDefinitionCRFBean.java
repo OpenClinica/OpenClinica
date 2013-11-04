@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 /**
@@ -252,6 +253,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
     private String selectedVersionNames = "";// not in DB
     private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not
+    
+    private CRFVersionBean defaultCRF;
+    
 
     // in
     // DB
@@ -570,4 +574,12 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+
+	public CRFVersionBean getDefaultCRF() {
+		return defaultCRF;
+	}
+
+	public void setDefaultCRF(CRFVersionBean defaultCRF) {
+		this.defaultCRF = defaultCRF;
+	}
 }

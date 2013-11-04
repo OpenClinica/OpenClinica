@@ -130,6 +130,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
         resword = ResourceBundleProvider.getWordsBundle(locale);
         resformat = ResourceBundleProvider.getFormatBundle(locale);
+      
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
@@ -296,6 +297,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             theItem.put("events", events);
             theItem.put("event.status", "");
             theItem.put("studySubject.createdDate", "");
+            theItem.put("webappContext", tableFacade.getWebContext().getContextPath());
             theItems.add(theItem);
         }
 
@@ -310,6 +312,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         if (eventDefinitionCrf.getId() == 0) {
             eventDefinitionCrf = getEventDefintionCRFDAO().findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfBean.getId());
         }
+        CRFVersionBean defaultVersion = (CRFVersionBean) getCrfVersionDAO().findByPK(eventDefinitionCrf.getDefaultVersionId());
+        eventDefinitionCrf.setDefaultCRF(defaultVersion);
         return eventDefinitionCrf;
     }
 
@@ -740,7 +744,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             subject = (SubjectBean) ((HashMap<Object, Object>) item).get("subject");
             studyEventDefinition = selectedStudyEventDefinition;
             List<StudyEventBean> studyEvents;
-
+            String path = (String)((HashMap<Object, Object>) item).get("webappContext"); 
             StringBuilder url = new StringBuilder();
             for (int i = 0; i < events.size(); i++) {
 
@@ -752,13 +756,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 subjectEventStatus = (SubjectEventStatus) display.getProps().get("event.status");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
                 studyEvents = new ArrayList<StudyEventBean>();
+               
                 if (studyEvent != null) {
                     studyEvents.add(studyEvent);
                 }
 
                 EventCrfLayerBuilder eventCrfLayerBuilder =
                     new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, dataEntryStage, eventCrf, studySubjectBean,
-                            studyBean, currentRole, currentUser, eventDefintionCrf, crf,studyEventDefinition);
+                            studyBean, currentRole, currentUser, eventDefintionCrf, crf,studyEventDefinition,path);
 
                 url.append(eventCrfLayerBuilder.buid());
                 url.append("<img src='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");
