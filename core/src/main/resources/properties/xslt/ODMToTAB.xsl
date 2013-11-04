@@ -416,7 +416,7 @@
 		<xsl:variable name="crfPositionCalc" select="number($crfPosition)-number($eventDefCount)-1"/>	-->	
 		
 		<xsl:apply-templates
-			select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',$FormOID)[1])  and ../@StudyEventOID = $eventOID]"
+            select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',$FormOID)[1])]"
 			mode="CrfInfo">
 			<xsl:with-param name="oid" select="$FormOID" />
 			<xsl:with-param name="formName" select="$formName" />
