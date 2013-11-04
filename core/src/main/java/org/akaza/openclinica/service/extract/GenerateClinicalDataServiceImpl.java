@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -334,8 +335,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	        if (status.equals(Status.LOCKED)) {
 	            stage = EventCRFStatus.LOCKED.getI18nDescription(getLocale());
 	        }
-	        else
-	        	stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
+	        
+	        if (status.equals(Status.DELETED)) {
+	            stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
+	            		
+	        }
+
+	        if (status.equals(Status.AUTO_DELETED)) {
+	            stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
+	        }
+
 
 	        return stage;
 		
