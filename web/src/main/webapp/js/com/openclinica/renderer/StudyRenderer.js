@@ -327,7 +327,7 @@ function StudyRenderer(json) {
         // adjust totalRepeatingRows to number of data rows in a populated form
         var totalRepeatingDataRows = app_itemGroupRepeatLengthMap[app_itemGroupMap[itemOID].itemGroupKey];
           
-        if (totalRepeatingDataRows > totalRepeatingRows) {
+        if (parseInt(totalRepeatingDataRows) > parseInt(totalRepeatingRows)) {
           totalRepeatingRows = totalRepeatingDataRows;
         }
         repeating = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].repeating;
@@ -464,8 +464,9 @@ function StudyRenderer(json) {
     if(app_displayAudits=='y')//TODO: add flag for discrepancy notes as  a or clause 
     	{
     	var itemsOids = new Array();
+    	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
     	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
-        	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+        	
         	var itemDef = orderedItems[orderedItemIndex];
         	var itemDetails = this.getItemDetails(itemDef, formDef);
         	 var itemGroupHeader = undefined;

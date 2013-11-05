@@ -267,7 +267,7 @@ function StudyDataLoader(study, json) {
      for (var i=0;i<itemGroupData.length;i++) {
        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
        var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
-       if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || app_itemGroupRepeatLengthMap[itemGroupOID] < repeatKey) {
+       if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
          app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
        }
      }
