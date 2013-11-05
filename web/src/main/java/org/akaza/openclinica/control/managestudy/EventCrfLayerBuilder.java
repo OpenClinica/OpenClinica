@@ -472,8 +472,13 @@ public class EventCrfLayerBuilder {
 
     private void printCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf) {
        // String href = "javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/" + eventDefinitionCrf.getDefaultVersionName() + "')";
+    	int sampleOrdinal =1;
+    	if(getStudyEvent()!=null)
+    	{
+    		sampleOrdinal = getStudyEvent().getSampleOrdinal();//this covers the events 
+    	}
         String href = this.contextPath+"" +
-        		"/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.studyEventDefinition.getOid()+"%5b"+getStudyEvent().getSampleOrdinal()+"%5d/"+this.eventDefinitionCrf.getDefaultCRF().getOid() ;
+        		"/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.studyEventDefinition.getOid()+"%5b"+sampleOrdinal+"%5d/"+this.eventDefinitionCrf.getDefaultCRF().getOid() ;
 
         builder.a().href(href).close();
         builder.img().src("images/bt_Print.gif").border("0").align("left").close();
@@ -482,8 +487,13 @@ public class EventCrfLayerBuilder {
 
     private void printCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, String link) {
       //  String href = "javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/" + eventDefinitionCrf.getDefaultVersionName() + "')";
-        String href = this.contextPath+"" +
-        		"/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.studyEventDefinition.getOid()+"%5b"+getStudyEvent().getSampleOrdinal()+"%5d/"+this.eventDefinitionCrf.getDefaultCRF().getOid() ;
+    	int sampleOrdinal =1;
+    	if(getStudyEvent()!=null)
+    	{
+    		sampleOrdinal = getStudyEvent().getSampleOrdinal();//this covers the events 
+    	}
+    	String href = this.contextPath+"" +
+        		"/rest/clinicaldata/html/print/" + this.currentStudy.getOid()+"/"+this.studySubject.getOid()+"/"+this.studyEventDefinition.getOid()+"%5b"+sampleOrdinal+"%5d/"+this.eventDefinitionCrf.getDefaultCRF().getOid() ;
 
         builder.a().href(href).close();
         builder.append(link);
