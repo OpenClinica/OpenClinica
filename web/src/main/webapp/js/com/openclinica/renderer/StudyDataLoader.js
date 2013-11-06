@@ -237,9 +237,7 @@ function StudyDataLoader(study, json) {
     app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
-    if (studyEventData == undefined) {
-        return;
-      }
+    if(studyEventsData)
     for (var i=0;i<studyEventsData.length;i++) {
      if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
         studyEventData = studyEventsData[i];
@@ -247,7 +245,9 @@ function StudyDataLoader(study, json) {
       }
     }
     
-    
+    if (studyEventData == undefined) {
+      return;
+    }
     
     app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
     var formsData = util_ensureArray(studyEventData["FormData"]);
