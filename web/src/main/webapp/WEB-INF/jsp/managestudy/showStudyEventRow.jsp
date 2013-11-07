@@ -142,6 +142,7 @@
                   <c:otherwise>
                     <option value="<c:out value="${version.id}"/>">
 						<c:out value="${version.name}"/>
+						 <c:set var="crfVersionOID" value="${version.oid}"/>
 					</option>
                   </c:otherwise>
                   </c:choose>

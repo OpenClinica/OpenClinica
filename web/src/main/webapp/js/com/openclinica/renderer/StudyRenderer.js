@@ -224,6 +224,10 @@ function StudyRenderer(json) {
           break; 
         }
       }
+      if(formDef== undefined){
+    	  alert("This Case Report Form has been removed, please restore it to continue with Print functionaility");
+    	  return;
+      }
       this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS") {

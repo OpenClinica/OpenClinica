@@ -145,7 +145,7 @@
     <query>
         <name>buildCrfVersionById</name>
         <sql>select * from crf_version where crf_version_id in (
-        select distinct crf_version_id from event_crf where study_subject_id = ?)</sql>
+        select distinct crf_version_id from event_crf where study_subject_id = ?) and status_id=1</sql>
     </query>
 	
 </queries>
