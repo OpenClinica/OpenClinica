@@ -31,7 +31,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   }
   
   if (this.responseType!=undefined) {
-    if (this.responseType=='file' == this.itemValue) {
+    if (this.responseType=='file' && this.itemValue) {
       if (this.itemValue.indexOf("/")==0) {
         this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
         this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
