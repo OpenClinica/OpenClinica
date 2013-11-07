@@ -21,45 +21,29 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.fileDownloadLink=undefined;
   this.itemTemp= undefined;
   this.audits = undefined;
-  if (app_formData != undefined) {
-    
-    var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-    if (itemGroupData) {
-      for (var i=0;i<itemGroupData.length;i++) {
-        var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
-        if (itemsData != undefined) {
-          for (var j=0;j<itemsData.length;j++) {
-           if(itemsData[j]["@ItemOID"] == this.OID && itemGroupData[i]["@ItemGroupRepeatKey"] == repeatRowNumber) { 
-        	 this.itemValue = itemsData[j]["@Value"];
-        	 if(app_displayAudits=='y')
-        		 {
-        		 this.audits = itemsData[j]["OpenClinica:AuditLogs"];
-        		
-        		 
-        		 }
-        	 if(this.responseType!=undefined)
-        	 if(this.responseType=='file'){
-        		 if(this.itemValue.indexOf("/")==0)
-        			 {
-        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
-        			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
-        			
-        			 this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
-        			 }
-        		 else
-        		 {
-        			 this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
-        			 this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
-        			 this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
-        		 }
-            	 }	
-              break;
-            }
-          }
-        }
+  
+  if (app_itemValuesMap[this.OID]) { 
+    this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
+  }
+  
+  if(app_displayAudits=='y') {
+    this.audits = itemsData[j]["OpenClinica:AuditLogs"];
+  }
+  
+  if (this.responseType!=undefined) {
+    if (this.responseType=='file' && this.itemValue) {
+      if (this.itemValue.indexOf("/")==0) {
+        this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue;
+        this.file = this.itemValue.substring(this.itemValue.lastIndexOf('/')+1);
+        this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
+      }
+      else {
+        this.fileDownloadLink=app_contextPath+"/DownloadAttachedFile?fileName="+this.itemValue.replace(/\\/g,"//");
+        this.file = this.itemValue.substring(this.itemValue.lastIndexOf('\\')+1);
+        this.fileDownloadLink = this.fileDownloadLink.replace(this.file,  encodeURIComponent(this.file));
       }
     }
-  }
+ }  
   
   this.renderPrintableItem = function(isRepeating) { 
     var template = "print_item_def";
@@ -76,18 +60,17 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   
   
   this.renderItemFormMetadata = function(){
-	  var template = "print_item_metadata_info";
-	  var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
-	  var s = RenderUtil.render(RenderUtil.get(template), 
-		       {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
-		    return s[0].outerHTML;
-		    
+    var template = "print_item_metadata_info";
+    var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
+    var s = RenderUtil.render(RenderUtil.get(template), 
+           {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+        return s[0].outerHTML;
+        
   }
   this.renderAuditLogs = function(auditLogs,itemGroupLabel){
-	  var template="print_audits";
-	 // var s = RenderUtil.render(RenderUtil.get(template),{auditEvent:auditEvent,user:userId,dateTime:date,oldVal:oldVal,newVal:newVal,value:this.itemName});
-	  var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,itemgroupHeader:itemGroupLabel});
-	  return s[0].outerHTML;
+    var template="print_audits";
+    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,itemgroupHeader:itemGroupLabel});
+    return s[0].outerHTML;
   }
   
 }

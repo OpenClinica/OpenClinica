@@ -262,7 +262,7 @@ function StudyDataLoader(study, json) {
       }
     }
     
-   // determine repeating group row lengths 
+   // load itemGroupData into a hash map and determine repeating group row lengths 
    var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
    if (itemGroupData) {
      for (var i=0;i<itemGroupData.length;i++) {
@@ -271,9 +271,18 @@ function StudyDataLoader(study, json) {
        if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
          app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
        }
+       
+       var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
+       for (var j=0;j<itemsData.length;j++) {
+         var itemValue = itemsData[j]["@Value"];
+         var itemOID = itemsData[j]["@ItemOID"];
+         if (itemOID in app_itemValuesMap == false){
+           app_itemValuesMap[itemOID] = {}; 
+         }
+         app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+       }
      }
    }
-   
     app_studySubjectStatus = app_formData["@OpenClinica:Status"];
   }
   
