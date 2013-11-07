@@ -48,6 +48,7 @@
   var app_sectionInstructions = '<fmt:message key="instructions" bundle="${resword}"/>'+":";
   var app_sectionPage = '<fmt:message key="page" bundle="${resword}"/>'+":";
   var app_displayAudits='${includeAudits}';
+var removed_crfVersionMessage='<fmt:message key="removed_crf_version" bundle="${resword}"/>'+":";
   </script>
 
 <html>
