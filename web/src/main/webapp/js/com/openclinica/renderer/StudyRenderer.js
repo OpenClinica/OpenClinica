@@ -226,6 +226,8 @@ function StudyRenderer(json) {
       }
       if(formDef== undefined){
     	  alert("This Case Report Form has been removed, please restore it to continue with Print functionaility");
+    	  window.history.back();
+    	  window.close();
     	  return;
       }
       this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
