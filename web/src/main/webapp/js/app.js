@@ -2,6 +2,7 @@ var INITIALIZED = false;
 
 var app_itemGroupRepeatLengthMap = {};
 var app_itemValuesMap = {};
+var app_audits={};
 var app_maxPixelHeight = 610;
 var app_maxLandscapePixelHeight = 400;
 var app_maxPixelWidth = 850;

@@ -264,6 +264,7 @@ function StudyDataLoader(study, json) {
     
    // load itemGroupData into a hash map and determine repeating group row lengths 
    var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+   
    if (itemGroupData) {
      for (var i=0;i<itemGroupData.length;i++) {
        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
@@ -278,8 +279,10 @@ function StudyDataLoader(study, json) {
          var itemOID = itemsData[j]["@ItemOID"];
          if (itemOID in app_itemValuesMap == false){
            app_itemValuesMap[itemOID] = {}; 
+           app_audits[itemOID]={};
          }
          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+         app_audits[itemOID][repeatKey] = itemsData;
        }
      }
    }

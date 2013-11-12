@@ -24,11 +24,11 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
+    if(app_displayAudits=='y')
+    this.audits = app_audits[this.OID]["OpenClinica:AuditLogs"];
   }
   
-  if(app_displayAudits=='y') {
-    this.audits = itemsData[j]["OpenClinica:AuditLogs"];
-  }
+  
   
   if (this.responseType!=undefined) {
     if (this.responseType=='file' && this.itemValue) {
