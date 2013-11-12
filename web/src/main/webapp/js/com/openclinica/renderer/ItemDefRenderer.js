@@ -25,7 +25,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
-    this.audits = app_audits[this.OID]["OpenClinica:AuditLogs"];
+    this.audits = app_audits[this.OID][repeatRowNumber];
   }
   
   

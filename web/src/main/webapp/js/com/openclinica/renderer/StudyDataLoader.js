@@ -282,7 +282,7 @@ function StudyDataLoader(study, json) {
            app_audits[itemOID]={};
          }
          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
-         app_audits[itemOID][repeatKey] = itemsData;
+         app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
        }
      }
    }
