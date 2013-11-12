@@ -217,6 +217,10 @@ div.inline {
   font-weight: bold;
 }
 
+tr.min-height-20 {
+  min-height: 20px;	
+}
+
 td.item-def-cell {
   vertical-align: top;  
 }
