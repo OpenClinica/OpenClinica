@@ -210,7 +210,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		
 		for(SubjectGroupMap subjGrpMap: studySubj.getSubjectGroupMaps()){
 		SubjectGroupDataBean subjGrpDataBean = new SubjectGroupDataBean();
-		subjGrpDataBean.setStudyGroupClassId(subjGrpMap.getStudyGroupClass().getStudyGroupClassId()+"");
+		subjGrpDataBean.setStudyGroupClassId("SGC_"+subjGrpMap.getStudyGroupClass().getStudyGroupClassId());
 		subjGrpDataBean.setStudyGroupClassName(subjGrpMap.getStudyGroup().getStudyGroupClass().getName());
 		subjGrpDataBean.setStudyGroupName(subjGrpMap.getStudyGroup().getName());
 		exportSubjectDataBean.getSubjectGroupData().add(subjGrpDataBean);
