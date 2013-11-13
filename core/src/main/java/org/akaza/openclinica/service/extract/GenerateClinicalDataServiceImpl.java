@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -19,6 +20,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -42,6 +44,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,6 +207,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			exportSubjectDataBean.setDateOfBirth(studySubj.getSubject()
 				.getDateOfBirth() + "");
 		exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender()+"");
+		
+		for(SubjectGroupMap subjGrpMap: studySubj.getSubjectGroupMaps()){
+		SubjectGroupDataBean subjGrpDataBean = new SubjectGroupDataBean();
+		subjGrpDataBean.setStudyGroupClassId(subjGrpMap.getStudyGroupClass().getStudyGroupClassId()+"");
+		subjGrpDataBean.setStudyGroupClassName(subjGrpMap.getStudyGroup().getStudyGroupClass().getName());
+		subjGrpDataBean.setStudyGroupName(subjGrpMap.getStudyGroup().getName());
+		exportSubjectDataBean.getSubjectGroupData().add(subjGrpDataBean);
+		}
 		exportSubjectDataBean.setStudySubjectId(
 				studySubj.getLabel());
 		if(studySubj.getSubject().getUniqueIdentifier()!=null)exportSubjectDataBean.setUniqueIdentifier(studySubj.getSubject().getUniqueIdentifier());
@@ -252,6 +263,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			expSEBean.setAgeAtEvent(Utils.getAge(se.getStudySubject().getSubject().getDateOfBirth(), se.getDateStart()));
+			
 			expSEBean.setStatus(fetchStudyEventStatus(se.getSubjectEventStatusId()));
 			if(collectAudits)
 			expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(),"study_event",se.getStudyEventDefinition().getOc_oid(), null));

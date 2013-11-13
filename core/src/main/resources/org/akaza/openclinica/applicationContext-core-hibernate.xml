@@ -98,7 +98,7 @@
 <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.NullValueType         </value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.OpenclinicaVersion    </value>   -->
-<!-- <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>   -->
+<value>org.akaza.openclinica.domain.datamap.StudyGroup</value>  
 <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>   -->
@@ -108,7 +108,7 @@
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>   -->
 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>   -->
 <value>org.akaza.openclinica.domain.datamap.SubjectEventStatus</value>  
-<!-- <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>   -->
+<value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>  
 
        
                 

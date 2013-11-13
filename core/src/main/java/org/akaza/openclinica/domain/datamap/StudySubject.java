@@ -203,14 +203,14 @@ public class StudySubject  extends DataMapDomainObject {
 		this.ocOid = ocOid;
 	}
 
-	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "studySubject")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studySubject")
 	public List<SubjectGroupMap> getSubjectGroupMaps() {
 		return this.subjectGroupMaps;
 	}
 
 	public void setSubjectGroupMaps(List<SubjectGroupMap> subjectGroupMaps) {
 		this.subjectGroupMaps = subjectGroupMaps;
-	}*/
+	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studySubject")
 	public List<DnStudySubjectMap> getDnStudySubjectMaps() {
