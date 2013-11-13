@@ -263,6 +263,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
+			if(se.getStudySubject().getSubject().getDateOfBirth()!=null && se.getDateStart()!=null)
 			expSEBean.setAgeAtEvent(Utils.getAge(se.getStudySubject().getSubject().getDateOfBirth(), se.getDateStart()));
 			
 			expSEBean.setStatus(fetchStudyEventStatus(se.getSubjectEventStatusId()));
