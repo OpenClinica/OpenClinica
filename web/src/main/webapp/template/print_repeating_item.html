@@ -4,7 +4,7 @@
   <td valign="top">
   {{if responseType == 'text' || responseType == 'calculation'  || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-    <div class='item_def_control ${isInline}' id="${formOID}-${OID}">${itemValue}</div>
+    <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
   {{else responseType == 'radio'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
@@ -36,9 +36,9 @@
     </div>
   </div>
     {{else responseType == 'textarea'}}
-  <div class='item_def_control ${isInline}' id="${formOID}-${OID}">${itemValue}</div>
+  <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
    {{else responseType == 'file'}}
-    <div class='item_def_control ${isInline}'> 
+    <div class='item_def_control'> 
      <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   
   </td>
