@@ -414,7 +414,8 @@ function StudyRenderer(json) {
           var optionsLength = options == undefined ? 0 : options.length;
   
             var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + 
-  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + name + "</td></tr>";
+//  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + name + "</td></tr>";
+  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + "</td></tr>";
 
           var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
@@ -431,7 +432,8 @@ function StudyRenderer(json) {
  
 
                    repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + 
-  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + name + (mandatory == true ? " *" : "")  + "</td>";
+// 	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + name + (mandatory == true ? " *" : "")  + "</td>";
+  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + (mandatory == true ? " *" : "")  + "</td>";
 
 			
           }
