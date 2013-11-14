@@ -25,6 +25,20 @@ h4 {
   font-size: 9px;
 }
 
+a:link {
+  color: blue;
+}
+a:visited {
+  color: green;
+}
+a:hover {
+  color: red;
+}
+a:active {
+  color: yellow;
+}
+
+
 .page-header {
   padding-top:15px;
   margin-bottom:30px;
@@ -52,9 +66,6 @@ h4 {
   margin-left: -259px;
 }
 
-a:link {
-  color: black;
-}
 
 .with_border {
   border:1px solid black;
@@ -96,6 +107,9 @@ a:link {
   margin-right:10px;
   padding-left: 5px;
 }
+
+ 
+   
 
 .item_def_number{
   vertical-align: top;
