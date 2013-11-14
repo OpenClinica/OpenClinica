@@ -21,6 +21,8 @@ import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
 /**
@@ -28,6 +30,8 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "study_group_class", schema = "public")
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_group_class_study_group_class_id_seq") })
+
 public class StudyGroupClass  extends DataMapDomainObject {
 
 	private int studyGroupClassId;
@@ -103,7 +107,7 @@ public class StudyGroupClass  extends DataMapDomainObject {
 	}
 
 
-	 @Type(type = "status")
+	/* @Type(type = "status")
 	@JoinColumn(name = "status_id")
 	public Status getStatus() {
 		return this.status;
@@ -111,7 +115,7 @@ public class StudyGroupClass  extends DataMapDomainObject {
 
 	public void setStatus(Status status) {
 		this.status = status;
-	}
+	}*/
 
 
 	@Column(name = "name", length = 30)

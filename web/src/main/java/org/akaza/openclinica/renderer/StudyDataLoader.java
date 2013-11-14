@@ -230,6 +230,7 @@ public class StudyDataLoader {
   
   
   /* loadStudyLists()
+   * 
   */
   public void loadStudyLists() {
     loadBasicDefinitions();
