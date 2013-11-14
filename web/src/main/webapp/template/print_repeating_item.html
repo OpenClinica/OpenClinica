@@ -1,10 +1,10 @@
 <td class='repeating_item_group'>
   <table border="0">
-  <tr class="min-height-20">
+  <tr class='min-height-20'>
   <td valign="top">
   {{if responseType == 'text' || responseType == 'calculation'  || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-    <div id="${formOID}-${OID}">${itemValue}</div>
+    <div class='item_def_control ${isInline}' id="${formOID}-${OID}">${itemValue}</div>
   {{else responseType == 'radio'}}
   <div class='item_def_control'> 
     <div class='checkbox_control'>
@@ -36,7 +36,7 @@
     </div>
   </div>
     {{else responseType == 'textarea'}}
-  <div id="${formOID}-${OID}">${itemValue}</div>
+  <div class='item_def_control ${isInline}' id="${formOID}-${OID}">${itemValue}</div>
    {{else responseType == 'file'}}
     <div class='item_def_control ${isInline}'> 
      <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
@@ -46,8 +46,9 @@
     [item]
   {{/if}}
 
-  <td valign="top" width="5"><span class="item_def_format_label">{{html unitLabel}}</span></td>
-  </td>
+  <!--<td valign="top" width="5"><span class="item_def_format_label">{{html unitLabel}}</span></td> </td>  -->
+  <div  align="right" class="item_def_format_label">{{html unitLabel}}</div> 
+  
   </tr>
   </table> 
 </td>
