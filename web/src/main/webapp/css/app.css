@@ -26,16 +26,16 @@ h4 {
 }
 
 a:link {
-  color: blue;
-}
-a:visited {
-  color: green;
-}
-a:hover {
   color: red;
 }
+a:visited {
+  color: purple;
+}
+a:hover {
+  color: blue;
+}
 a:active {
-  color: yellow;
+  color: red;
 }
 
 
@@ -175,7 +175,7 @@ div.inline {
 .section-title {
   background-color: #B5B5B5;
   border: thin solid #999999;
-  font-size: 11px;
+  font-size: 1em;
   font-weight:bold;
   padding-top: 3px;
   padding-left: 6px;
@@ -188,7 +188,7 @@ div.inline {
 .section-info {
   background-color: #B5B5B5;
   border: thin solid #999999;
-  font-size: 11px;
+  font-size: 1em;
    padding-top: 3px;
   padding-left: 6px;
   padding-right: 6px;
@@ -231,10 +231,13 @@ div.inline {
 }
 .repeating_item_option_names {
   font-weight: bold;
+  padding-right: 10px;
+  text-align: left;
 }
 
 tr.min-height-20 {
   min-height: 20px;	
+  font-size : 0.9em
 }
 
 td.item-def-cell {
@@ -242,7 +245,8 @@ td.item-def-cell {
 }
 
 .repeating_item_group_header{
-  font-size: 11px;
+  font-size: 0.9em;
+  padding-left: 5px;
   line-height: 15px;
   color: #4D4D4D;
 }
@@ -297,3 +301,6 @@ input[type="text"], textarea {
 }
 
 
+td {
+	vertical-align: top;
+}
