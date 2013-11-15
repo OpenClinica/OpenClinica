@@ -50,11 +50,19 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     if (isRepeating == true) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
-    var s = RenderUtil.render(RenderUtil.get(template), 
-       {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
-        unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
-        columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
-        itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
+    if(app_displayAudits=='y'){
+        var s = RenderUtil.render(RenderUtil.get(template), 
+           {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
+            unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
+            columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
+            itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
+          }else{
+        var s = RenderUtil.render(RenderUtil.get(template), 
+           {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
+            unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
+            columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
+            itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
+    }	
     return s[0].outerHTML;
   }
   

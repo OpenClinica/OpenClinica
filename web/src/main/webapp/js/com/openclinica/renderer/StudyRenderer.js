@@ -420,8 +420,11 @@ function StudyRenderer(json) {
         if (responseLayout == "Horizontal") {
           var options = (responseType == 'multi-select' || responseType == 'checkbox') ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
-          var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + 
-                            itemNumber + " " + name + "<br>" + itemName + "</td></tr>";
+  
+            var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + 
+//  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + name + "</td></tr>";
+  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + "</td></tr>";
+
           var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
             optionsRow += "<td valign='bottom' align='center' class='repeating_item_group'>" + options[j].label + "</td>";
@@ -434,7 +437,13 @@ function StudyRenderer(json) {
         }
         else {
           if (repeatRowNumber == 1) { 
-            repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + itemNumber + " " + name + (mandatory == true ? " *" : "") +  "<br>" + itemName + "</td>";
+ 
+
+                   repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + 
+// 	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + name + (mandatory == true ? " *" : "")  + "</td>";
+  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + (mandatory == true ? " *" : "")  + "</td>";
+
+			
           }
         }
          

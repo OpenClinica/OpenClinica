@@ -1,9 +1,10 @@
 <td class='repeating_item_group' valign='center'>
   <table class='repeating-horiz-items' width='100%' height='100%'>
-  <tr class="min-height-20">
+  <tr class='min-height-20'>
   {{if responseType == 'text' || responseType == 'calculation' || 
        responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-    <div id="${formOID}-${OID}">${itemValue}</div>
+    <div  class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
+  
   {{else responseType == 'radio'}}
     {{each optionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
@@ -26,13 +27,15 @@
     {{/each}}
    {{else responseType == 'textarea'}}
  <td class='repeating_item_group'>
-  <div id="${formOID}-${OID}">${itemValue}</div>
+  <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
  </td>
  {{else responseType == 'file'}}
+
    <td valign="top">
-  <div class='item_def_control ${isInline}'> 
+  <div class='item_def_control'>
  <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   </td>
+
   {{else}}
     [item]
   {{/if}}

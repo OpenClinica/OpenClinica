@@ -25,6 +25,20 @@ h4 {
   font-size: 9px;
 }
 
+a:link {
+  color: red;
+}
+a:visited {
+  color: purple;
+}
+a:hover {
+  color: blue;
+}
+a:active {
+  color: red;
+}
+
+
 .page-header {
   padding-top:15px;
   margin-bottom:30px;
@@ -52,9 +66,6 @@ h4 {
   margin-left: -259px;
 }
 
-a:link {
-  color: black;
-}
 
 .with_border {
   border:1px solid black;
@@ -104,6 +115,9 @@ a:link {
   padding-left: 5px;
 }
 
+ 
+   
+
 .item_def_number{
   vertical-align: top;
   display: inline-block;
@@ -126,6 +140,7 @@ div.item_def_control{
   padding-bottom:0;
   margin-top:0;
   margin-bottom:0;
+  min-height:20px
 }
 
 span.item_def_control{
@@ -167,7 +182,7 @@ div.inline {
 .section-title {
   background-color: #B5B5B5;
   border: thin solid #999999;
-  font-size: 11px;
+  font-size: 1em;
   font-weight:bold;
   padding-top: 3px;
   padding-left: 6px;
@@ -180,7 +195,7 @@ div.inline {
 .section-info {
   background-color: #B5B5B5;
   border: thin solid #999999;
-  font-size: 11px;
+  font-size: 1em;
    padding-top: 3px;
   padding-left: 6px;
   padding-right: 6px;
@@ -197,6 +212,7 @@ div.inline {
   padding-top:1px;
   padding-right:2px;
   padding-bottom:2px;
+  min-height:20px;
 }
 
 .header-text {
@@ -222,10 +238,13 @@ div.inline {
 }
 .repeating_item_option_names {
   font-weight: bold;
+  padding-right: 10px;
+  text-align: left;
 }
 
 tr.min-height-20 {
   min-height: 20px;	
+  font-size : 0.9em
 }
 
 td.item-def-cell {
@@ -233,7 +252,8 @@ td.item-def-cell {
 }
 
 .repeating_item_group_header{
-  font-size: 11px;
+  font-size: 0.9em;
+  padding-left: 5px;
   line-height: 15px;
   color: #4D4D4D;
 }
@@ -288,3 +308,6 @@ input[type="text"], textarea {
 }
 
 
+td {
+	vertical-align: top;
+}
