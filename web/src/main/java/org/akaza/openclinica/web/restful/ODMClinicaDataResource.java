@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -89,6 +90,9 @@ public class ODMClinicaDataResource {
 		//xmlSerializer.setForceTopLevelObject(true);
 		xmlSerializer.setTypeHintsEnabled(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
+
+        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
+        processor.process((JSONObject) json);
 
 		return json.toString(INDENT_LEVEL);
 	}
