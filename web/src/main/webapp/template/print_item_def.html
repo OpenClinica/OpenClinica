@@ -1,77 +1,94 @@
 <td class='item-def-cell'>
 <div class='item_def_wrapper'>
   <table border="0">
-  <tr class="min-height-20">
-  <td valign='top'> 
-    {{if itemName}}
-	  {{if itemName !=undefined}}
-	    	 <a  href='#${itemName}'> {{html itemName}}</a> <br/>
-	  {{/if}}
-    {{/if}}
+  <tr class="min-height">
+  
+  <td> 
+    {{if itemName}}	  {{if itemName !=undefined}}	   <a class='item_def_name' href='#${itemName}'> {{html itemName}}</a> <br/>  {{/if}}   {{/if}}
+	{{if itemNumber}}	  {{if itemNumber !=undefined}}	   <span class='item_def_number'>{{html itemNumber}}</span>	  {{/if}}    {{/if}}
 	
-    <span class='item_def_number'>{{html itemNumber}}</span>
     <span class='item_def_title'>{{html name}} {{if mandatory == true}} * {{/if}}</span>
   </td>
-  {{if responseType == 'text' || responseType == 'calculation' || 
-       responseType == 'instant-calculation' || responseType == 'group-calculation'}}
-  <td td valign="top">  
-    <div id="${formOID}-${OID}">${itemValue}</div>
+  
+  
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'instant-calculation' || responseType == 'group-calculation'}}
+  <td>  
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+  	<div id="${formOID}-${OID}">${itemValue}</div>
   </td>
+  
   {{else responseType == 'radio'}}
-  <td valign="top">
-  <div class='item_def_control ${isInline}'> 
-    <div class='checkbox_control ${isInline}'>
+  <td>
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+     <div class='item_def_control ${isInline}'> 
       {{each optionNames}}
         <div class='select-option ${isInline}'>
           <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
-  </div>
   </td>
+  
   {{else responseType == 'single-select'}}
-  <td valign="top">
+  <td >
+      {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
   <div class='item_def_control ${isInline}'> 
-    <div class='checkbox_control ${isInline}'>
       {{each optionNames}}
         <div class='select-option ${isInline}'>
           <input id="${formOID}-${OID}-${id}" type='radio'  {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
-  </div>
   </td>
- {{else responseType == 'multi-select' || responseType == 'checkbox'}}
-  <td valign='top'>
-  <div class='item_def_control ${isInline}'> 
-    <div class='checkbox_control ${isInline}'>
+
+  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+  <td >
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+	<div class='item_def_control ${isInline}'> 
       {{each multiSelectOptionNames}}
         <div class='select-option ${isInline}'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/> {{html label}}
+          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").toString().indexOf(id) != -1}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
     </div>
-  </div>
   </td>
+
   {{else responseType == 'textarea'}}
-  <td>
- <div id="${formOID}-${OID}">${itemValue}</div>
- 
+  <td >
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+  <div id="${formOID}-${OID}">${itemValue}</div>
+ </td>
+
  {{else responseType == 'file'}}
-   <td valign="top">
-  <div class='item_def_control ${isInline}'> 
- <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
+   <td 
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+  <div>  <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   </td>
+
   {{else}}
+   <td 
+   {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}  
     [item]
-  {{/if}}
+   </td>
+
+   {{/if}}
+
+
+
+
+
+   
   <td align="left">
-  <span class="item_def_format_label">{{html unitLabel}}</span> 
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+  <span class="item_def_format_label">&nbsp;&nbsp; {{html unitLabel}}</span> 
   </td>
+
   <td>
-  <span class='item_def_format_label'>{{html rightItemText}}</span>
+    {{if itemName}}  {{if itemName !=undefined}}    <br/>	  {{/if}}    {{/if}}
+  <span class='item_def_format_label'>&nbsp;&nbsp; {{html rightItemText}}</span>
   </td>
-  </tr>
+
+   </tr>
   </table>
-</div> 
+ </div> 
 </td>

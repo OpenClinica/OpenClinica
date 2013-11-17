@@ -1,8 +1,8 @@
-<td class='repeating_item_group' valign='center'>
+<td class='repeating_item_group'>
   <table class='repeating-horiz-items' width='100%' height='100%'>
-  <tr class='min-height-20'>
-  {{if responseType == 'text' || responseType == 'calculation' || 
-       responseType == 'instant-calculation' || responseType == 'group-calculation'}}
+   <tr class='min-height'>
+
+  {{if responseType == 'text' || responseType == 'calculation' || responseType == 'instant-calculation' || responseType == 'group-calculation'}}
     <div  class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
   
   {{else responseType == 'radio'}}
@@ -11,38 +11,41 @@
         <div class='select-option'><input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/></div>
       </td>
     {{/each}}
-  {{else responseType == 'single-select'}}
+ 
+ {{else responseType == 'single-select'}}
     {{each optionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
         <div class='select-option'><input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/></div>
       </td>
     {{/each}}
-  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+ 
+ {{else responseType == 'multi-select' || responseType == 'checkbox'}}
     {{each multiSelectOptionNames}}
       <td align='center' valign='center' class='repeating_item_group'>
         <div class='select-option'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>
-        </div>
+           <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>         </div>
       </td>
     {{/each}}
-   {{else responseType == 'textarea'}}
- <td class='repeating_item_group'>
-  <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
- </td>
+  
+	{{else responseType == 'textarea'}}
+   <td class='repeating_item_group'>
+      <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
+   </td>
+ 
  {{else responseType == 'file'}}
 
-   <td valign="top">
+   <td>
   <div class='item_def_control'>
- <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
+     <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   </td>
 
   {{else}}
     [item]
   {{/if}}
   
-  <div  align="right" class="item_def_format_label">{{html unitLabel}}</div> 
   
-  </tr>
+   </tr>
   </table>
+  <div  align="right" class="item_def_format_label"> &nbsp;&nbsp;{{html unitLabel}}</div> 
 </td>
 

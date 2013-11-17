@@ -1,55 +1,56 @@
 <td class='repeating_item_group'>
   <table border="0">
-  <tr class='min-height-20'>
-  <td valign="top">
-  {{if responseType == 'text' || responseType == 'calculation'  || 
-       responseType == 'instant-calculation' || responseType == 'group-calculation'}}
+  <tr class='min-height'>
+   <td>
+
+  {{if responseType == 'text' || responseType == 'calculation'  ||  responseType == 'instant-calculation' || responseType == 'group-calculation'}}
     <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
-  {{else responseType == 'radio'}}
+
+	{{else responseType == 'radio'}}
   <div class='item_def_control'> 
-    <div class='checkbox_control'>
       {{each optionNames}}
         <div class='select-option'>
           <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
-    </div>
   </div>
+
   {{else responseType == 'single-select'}}
   <div class='item_def_control'> 
-    <div class='checkbox_control'>
       {{each optionNames}}
         <div class='select-option'>
-          <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
+           <input id="${formOID}-${OID}-${id}" type='radio' {{if itemValue == id}}checked{{/if}}/> {{html label}}
         </div>
       {{/each}}
-    </div>
   </div>
- {{else responseType == 'multi-select' || responseType == 'checkbox'}}
+
+  {{else responseType == 'multi-select' || responseType == 'checkbox'}}
   <div class='item_def_control'> 
-    <div class='checkbox_control'>
       {{each multiSelectOptionNames}}
         <div class='select-option'>
-          <input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/> {{html label}}
+<input id="${formOID}-${OID}-${id}" type='checkbox' {{if itemValue && itemValue.split(",").indexOf(id) != -1}}checked{{/if}}/>  {{html label}} 
         </div>
       {{/each}}
-    </div>
   </div>
-    {{else responseType == 'textarea'}}
+
+  
+  {{else responseType == 'textarea'}}
   <div class='item_def_control' id="${formOID}-${OID}">${itemValue}</div>
-   {{else responseType == 'file'}}
+
+  {{else responseType == 'file'}}
     <div class='item_def_control'> 
      <a href="${fileDownloadLink}"  title="${file}" >{{html file}}</a></div>
   
   </td>
+
   {{else}}
     [item]
-  {{/if}}
 
-  <!--<td valign="top" width="5"><span class="item_def_format_label">{{html unitLabel}}</span></td> </td>  -->
-  <div  align="right" class="item_def_format_label">{{html unitLabel}}</div> 
+	{{/if}}
+
+      <div align="right" class="item_def_format_label">&nbsp;&nbsp; {{html unitLabel}}</div> 
   
-  </tr>
+   </tr>
   </table> 
 </td>
 

@@ -108,13 +108,15 @@ a:active {
   padding-left: 5px;
 }
 
- 
-   
+.item_def_name{
+  vertical-align: top;
+  display: inline-block;
+  font-weight: normal;
+}
 
 .item_def_number{
   vertical-align: top;
   display: inline-block;
-  font-size: 0.8em;
   font-weight: normal;
 }
 
@@ -122,7 +124,6 @@ a:active {
   vertical-align: top;
   display: inline-block;
   width:200px;
-  font-size: 0.8em;
   font-weight: normal;
 }
 
@@ -147,16 +148,15 @@ span.item_def_control{
 }
 
 .item_def_format_label{
-  vertical-align: middle;
-  font-size: 0.7em;
-}
+  vertical-align: top;
+  color:  gray;
+  }
 
 div.inline {
   display: inline;
 }
 
 .checkbox_control{
-  font-size: 0.6em;
 }
 
 .item_def_repeating_unit {
@@ -235,10 +235,16 @@ div.inline {
   text-align: left;
 }
 
+tr.min-height {
+  min-height: 18px;	
+  font-size : 0.8em
+}
+
 tr.min-height-20 {
   min-height: 20px;	
   font-size : 0.9em
 }
+
 
 td.item-def-cell {
   vertical-align: top;  
