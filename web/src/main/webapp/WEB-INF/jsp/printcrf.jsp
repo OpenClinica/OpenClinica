@@ -31,7 +31,7 @@
   var app_timeAndEventsLabel = '<fmt:message key="time_and_events" bundle="${resword}"/>';
   var app_investigatorNameLabel = '<fmt:message key="investigator_name" bundle="${resword}"/>';
   var app_investigatorSignatureLabel = '<fmt:message key="investigator_signature" bundle="${resword}"/>'; 
-  var app_eventDateLabel = '<fmt:message key="event_date" bundle="${resword}"/>'; 
+  var app_eventDateLabel = '<fmt:message key="end_date1" bundle="${resword}"/>'; 
   var app_eventLocationLabel = '<fmt:message key="event_location" bundle="${resword}"/>'; 
   var app_eventNameLabel = '<fmt:message key="event_name" bundle="${resword}"/>'; 
   var app_personIDLabel = '<fmt:message key="person_ID" bundle="${resword}"/>'; 
@@ -49,6 +49,13 @@
   var app_sectionPage = '<fmt:message key="page" bundle="${resword}"/>'+":";
   var app_displayAudits='${includeAudits}';
 var removed_crfVersionMessage='<fmt:message key="removed_crf_version" bundle="${resword}"/>'+":";
+
+var app_subjectAgeAtEvent='<fmt:message key="subject_age_at_event" bundle="${resword}"/>';
+var app_eventStatus='<fmt:message key="event_status" bundle="${resword}"/>';
+var app_groupName='<fmt:message key="group_name" bundle="${resword}"/>';
+var app_groupClassName='<fmt:message key="group_class_name" bundle="${resword}"/>';
+var app_subjectStatus='<fmt:message key="subject_status" bundle="${resword}"/>';
+
   </script>
 
 <html>

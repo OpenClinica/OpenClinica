@@ -1,5 +1,7 @@
 function PageHeaderRenderer() {
-  this.render = function(printTime, pageType, eventName) { 
+  this.render = function(printTime, pageType, eventName,eventLocation) { 
+	  var eventLocation= app_thisStudyEvent?app_thisStudyEvent["@OpenClinica:StudyEventLocation"]:"";
+	  var eventEndDate =  app_thisStudyEvent?app_thisStudyEvent["@OpenClinica:EndDate"]:"";
     return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
       pageType: pageType,
@@ -13,7 +15,7 @@ function PageHeaderRenderer() {
       interviewerNameRequired: app_interviewerNameRequired,
       interviewDateRequired: app_interviewDateRequired,
       secondaryLabelViewable: app_secondaryLabelViewable,
-      eventLocationRequired: app_eventLocationRequired
+      eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation
     });
   }
 }

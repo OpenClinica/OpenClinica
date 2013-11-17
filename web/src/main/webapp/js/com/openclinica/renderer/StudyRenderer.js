@@ -193,7 +193,7 @@ function StudyRenderer(json) {
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
             if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]) {
-              this.renderPrintableFormDef(formDef, pageBreak);
+              this.renderPrintableFormDef(formDef, pageBreak,eventDef);
               defaultDisplayed = true;
               break;  
             }
@@ -215,7 +215,7 @@ function StudyRenderer(json) {
     this.studyDataLoader = new StudyDataLoader(this.study, this.json); 
     this.studyDataLoader.loadStudyLists();   
     var formDef = undefined;
-    
+    var eventDef = undefined;
     if (renderMode == "UNPOPULATED_FORM_CRF" || renderMode == "UNPOPULATED_GLOBAL_CRF") {
       // select CRF by OID
       for (var i=0;i< app_formDefs.length;i++) {
@@ -230,10 +230,18 @@ function StudyRenderer(json) {
     	  window.close();
     	  return;
       }
-      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK);
+      if(renderMode=='UNPOPULATED_FORM_CRF'){
+    	  for (var i=0;i< app_studyEventDefs.length;i++) {
+    	        if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
+    	          eventDef = app_studyEventDefs[i];
+    	          break;
+    	        }
+    	      }  
+      }
+      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK,eventDef);
     }
-    else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
-      var eventDef = undefined;
+    else if (renderMode == "UNPOPULATED_EVENT_CRFS" ) {
+       eventDef = undefined;
       // select StudyEvent by OID
       for (var i=0;i< app_studyEventDefs.length;i++) {
         if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
@@ -259,9 +267,9 @@ function StudyRenderer(json) {
   /* renderPrintableFormDef(formDef, pageBreak)
    * The heart of StudyRenderer: render the CRF
    */
-  this.renderPrintableFormDef = function(formDef, pageBreak) {
+  this.renderPrintableFormDef = function(formDef, pageBreak,eventDef) {
   
-    this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, app_eventName);
+    this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, eventDef);
     
     var orderedItems = new Array();
     
@@ -345,7 +353,7 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == false) {
-          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+          this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, eventDef);
         }
         this.renderString += "<div class='vertical-spacer-30px'></div>";
         this.renderString += sectionTitle != '' ? "<div class='section-title'>"+app_sectionTitle+"&nbsp;"+sectionTitle+"</div>" : "";
@@ -481,7 +489,7 @@ function StudyRenderer(json) {
     if(app_displayAudits=='y')//TODO: add flag for discrepancy notes as  a or clause 
     	{
     	var itemsOids = new Array();
-    	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, app_eventName);
+    	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, eventDef);
     	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
         	
         	var itemDef = orderedItems[orderedItemIndex];
@@ -528,23 +536,22 @@ function StudyRenderer(json) {
   
   /* renderPageHeader()
    */
-  this.renderPageHeader = function(pageBreak, printTime, currentPageType, currentPageEventName) {
+  this.renderPageHeader = function(pageBreak, printTime, currentPageType, currentPageEvent) {
     if (pageBreak == true) {
       this.renderString += "<div class='page-break-screen'><hr/></div>";
       this.renderString += "<div class='page-break'></div>";
     }
-    this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEventName)[0].outerHTML;
+    var eventLocation = "";
+    if(app_thisStudyEvent!=undefined)
+    	eventLocation = app_thisStudyEvent["@OpenClinica:StudyEventLocation"];
+    this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEvent["@Name"],app_thisStudyEvent)[0].outerHTML;
   }
   
   
   
   
 
-	  this.renderAudits = function(){
-		    
-		  this.renderString+="<b>AUDITS</b>";
-  }
-
+	
   
   /* renderStudy()
    * When this is implemented it will render the web form

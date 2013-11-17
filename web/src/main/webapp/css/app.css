@@ -53,7 +53,7 @@ a:active {
 
 .right-header{
   display: inline-block;
-  width: 300px; 
+  width: 500px; 
   vertical-align: top;
 }
 
@@ -89,7 +89,14 @@ a:active {
   text-align: left; 
 }
 
-
+.text-left-aligned-bold {
+  text-align: left; 
+  font-weight:bold;
+}
+.text-right-aligned-bold {
+  text-align: right; 
+  font-weight:bold;
+}
 .repeating_item_wrapper{
   display:inline-block;
   margin-top:0px;

@@ -142,6 +142,7 @@ function StudyDataLoader(study, json) {
           repeatNumber = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatNumber"]; 
           repeatMax = presentInForm[j]["OpenClinica:ItemGroupRepeat"]["@RepeatMax"]; 
           var repeating = ParseUtil.parseYesNo(itemGroupDef["@Repeating"]);
+           groupHeader = presentInForm[j]["OpenClinica:ItemGroupHeader"];
           debug("Item Group " +itemGroupKey+ " repeating? "+repeating+", repeat number: "+ repeatNumber + ", repeatMax: " + repeatMax, util_logDebug );
           var currentItemGroup = {};
           currentItemGroup.repeatNumber = repeatNumber;
@@ -248,7 +249,9 @@ function StudyDataLoader(study, json) {
     if (studyEventData == undefined) {
       return;
     }
-    
+    else
+    	app_thisStudyEvent = studyEventData;
+ 
     app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
     var formsData = util_ensureArray(studyEventData["FormData"]);
     
