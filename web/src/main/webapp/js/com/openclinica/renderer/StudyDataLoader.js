@@ -235,6 +235,7 @@ function StudyDataLoader(study, json) {
       }
     }
     
+    app_thisSubjectsData = subjectData;
     app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);

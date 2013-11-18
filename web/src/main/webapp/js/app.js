@@ -45,11 +45,12 @@ var app_studySubjectStartDateLabel = "Start Date";
 var app_studySubjectStatusLabel = "Status";
 var app_studySubjectStatus = undefined;
 var app_studySubjectStartDate = undefined;
+
 var app_studyEventCoverPageType = "study_event_cover_page_type";
 var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
 var app_thisStudyEvent = undefined;
-
+var app_thisSubjectsData = undefined;
 debug("console debugging enabled.", util_logDebug);
 
 /***********      @JQUERY INIT    *******************/

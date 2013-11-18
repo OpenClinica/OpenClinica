@@ -42,6 +42,7 @@ a:active {
 .page-header {
   padding-top:15px;
   margin-bottom:30px;
+  
 }
 
 .left-header {
@@ -49,6 +50,7 @@ a:active {
   width: 500px; 
   padding-right:200px;
   vertical-align: top;
+
 }
 
 .right-header{
@@ -92,6 +94,7 @@ a:active {
 .text-left-aligned-bold {
   text-align: left; 
   font-weight:bold;
+ 
 }
 .text-right-aligned-bold {
   text-align: right; 
@@ -216,9 +219,13 @@ div.inline {
 }
 
 .header-text {
-  color: #333333;
-  font-size: 13px;
-  padding-bottom: 7px;
+color: #333333;
+font-size: 13px;
+padding-bottom: 7px;
+border-left-style: solid;
+border-left-width: thin;
+padding-left: 2px;
+border-left-color: lightgray;
 }
 
 .investigator-text {
