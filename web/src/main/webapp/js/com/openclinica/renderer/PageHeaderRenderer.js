@@ -11,17 +11,22 @@ function PageHeaderRenderer() {
 	  var subjectStatus = app_thisSubjectsData["@OpenClinica:Status"]?app_thisSubjectsData["@OpenClinica:Status"]:"";
 	  var subjectBday =app_thisSubjectsData?( app_thisSubjectsData["@OpenClinica:DateOfBirth"]?app_thisSubjectsData["@OpenClinica:DateOfBirth"]:""):"";
 	  var groupClassInfo="";
+	  var groupName="";
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
-		  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]["@OpenClinica:StudyGroupClassName"]?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]["@OpenClinica:StudyGroupClassName"]:''
+		  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]:'';  
+		
+		  groupName = app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"]?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"]:"";
 		  
-		  +'-'+app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"]?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"]:"";
+		 groupClassInfo =  groupClassInfo.concat("---");
+		 groupClassInfo = groupClassInfo.concat(groupName);
 	  }
 	  
 	  var interviewerName = app_formData?(app_formData["@OpenClinica:InterviewerName"]?app_formData["@OpenClinica:InterviewerName"]:""):"";
 	  var interviewDate = app_formData?(app_formData["@OpenClinica:InterviewDate"]?app_formData["@OpenClinica:InterviewDate"]:""):"";
 	  var gender = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:Sex"]?app_thisSubjectsData["@OpenClinica:Sex"]:""):"";
+	  var ssID = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:StudySubjectID"]?app_thisSubjectsData["@OpenClinica:StudySubjectID"]:""):"";
 	  return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
       pageType: pageType,
@@ -37,7 +42,7 @@ function PageHeaderRenderer() {
       secondaryLabelViewable: app_secondaryLabelViewable,
       eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation,eventEndDate:eventEndDate,ageAtEnrollment:ageAtEnrollment,
       studyEventStatus:studyEventStatus,personId:personId,secondaryId:secondaryId,subjectBday:subjectBday,subjectStatus:subjectStatus,groupClassInfo:groupClassInfo,interviewerName:interviewerName,
-      interviewDate:interviewDate,gender:gender
+      interviewDate:interviewDate,gender:gender,ssID:ssID
       
     });
   }

@@ -1,44 +1,54 @@
 <table  class="page-header">
 <tr>
 <td class='left-header'>
- 	<div  class='header-text text-left-aligned-bold'> ${app_studyLabel}: </div>
-    <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}:
+<!-- commenting it out,needs clean up before release -->
+<!--  	<div  class='header-text text-left-aligned-bold'> ${app_studyLabel}: </div> -->
+   <!--  <div class='header-text text-left-aligned'>{{html app_protocolIDLabel}}:
     {{if protocolName}}
    ${protocolName}
     {{else}}
     '___________________'
     
 {{/if}}    
-     </div>  
-    <div class='header-text text-left-aligned'>{{html app_studyNameLabel}}:
+     </div>  -->
+    <div class='header-text text-left-aligned'>
     {{if studyName}}
-    <b>${studyName}</b>
+    <b>${studyName}(${protocolName})</b>
     {{else}}
      '___________________'
      {{/if}}
     </div>  
-    <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}: ${siteName ? siteName : '___________________'}</div>  
+    <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}:
+    {{if siteName}}
+    <b>${siteName}(${protocolName})</b>
+    {{else}}
+    '___________________'
+    {{/if}}
+    
+      </div>  
       {{if pageType != app_studyCoverPageType}}
-    <div class='header-text text-left-aligned-bold'>${app_studyEventLabel}:</div>
-      <div class='header-text text-left-aligned'>{{html app_eventNameLabel}}:
+      <div class='header-text text-left-aligned'>
       {{if eventName}}
-       <b>${eventName}</b>
+       <b>${eventName}</b>(
+       ${app_studySubjectStartDate ? app_studySubjectStartDate : '___________________'}
+       --${eventEndDate?eventEndDate: '___________________'}
+       )
        {{else}}   
             '___________________'
            {{/if}}
            </div>  
  
     {{/if}}
-    {{if app_eventLocationRequired == 'required'}}
-      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>  
-    {{else app_eventLocationRequired == 'optional'}}
-      <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>  
-    {{/if}}
-          <div class='header-text'>{{html app_studySubjectStartDateLabel}}: ${app_studySubjectStartDate ? app_studySubjectStartDate : '___________________'}</div>
+<!--     {{if app_eventLocationRequired == 'required'}} -->
+<!--       <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>   -->
+<!--     {{else app_eventLocationRequired == 'optional'}} -->
+<!--       <div class='header-text text-left-aligned'>{{html app_eventLocationLabel}}: ${eventLocation ? eventLocation : '___________________'}</div>   -->
+<!--     {{/if}} -->
+          <!-- <div class='header-text'>{{html app_studySubjectStartDateLabel}}: ${app_studySubjectStartDate ? app_studySubjectStartDate : '___________________'}</div>
         {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>{{html app_eventDateLabel}}:${eventEndDate?eventEndDate: '___________________'}</div>  
-    {{/if}}
-      <div class='header-text text-left-aligned'>${app_subjectAgeAtEvent}:${ageAtEnrollment?ageAtEnrollment:' ___________________'}</div>  
+    {{/if}}  -->
+<!--       <div class='header-text text-left-aligned'>${app_subjectAgeAtEvent}:${ageAtEnrollment?ageAtEnrollment:' ___________________'}</div>   -->
             <div class='header-text text-left-aligned'>${app_eventStatus}: ${studyEventStatus?studyEventStatus:'___________________'}</div>  
 
     
@@ -46,11 +56,11 @@
 </td>
 <!-- study subject block -->
 <td class='right-header'>
-  <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div>
-    <div class='header-text text-left-aligned'>{{html app_studySubjectIDLabel}}: 
+<!--   <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div> -->
+    <div class='header-text text-left-aligned'>
     
-    {{if app_studySubjectOID }}
-    <b>${app_studySubjectOID}</b>
+    {{if ssID }}
+    <b>${ssID}</b>
 {{else}}
 '___________________'
     {{/if}}
@@ -74,8 +84,7 @@
   {{/if}}
   <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
     
-    <div class='header-text text-left-aligned-bold'>${app_groupLabel}:</div>
-    <div class='header-text text-left-aligned'>${app_groupName}-${app_groupClassName}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>
+    <div class='header-text text-left-aligned'>${app_groupLabel}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>
     
     
     <div class='header-text text-left-aligned-bold'>${app_crfLabel}:</div>

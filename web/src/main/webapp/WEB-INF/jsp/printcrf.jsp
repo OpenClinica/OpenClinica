@@ -52,12 +52,12 @@ var removed_crfVersionMessage='<fmt:message key="removed_crf_version" bundle="${
 
 var app_subjectAgeAtEvent='<fmt:message key="subject_age_at_event" bundle="${resword}"/>';
 var app_eventStatus='<fmt:message key="event_status" bundle="${resword}"/>';
-var app_groupName='<fmt:message key="group_name" bundle="${resword}"/>';
-var app_groupClassName='<fmt:message key="group_class_name" bundle="${resword}"/>';
+//var app_groupName='<fmt:message key="group_name" bundle="${resword}"/>';
+//var app_groupClassName='<fmt:message key="group_class_name" bundle="${resword}"/>';
 var app_subjectStatus='<fmt:message key="subject_status" bundle="${resword}"/>';
 var app_studyLabel='<fmt:message key="study" bundle="${resword}"/>';
-var app_studyEventLabel='<fmt:message key="SE" bundle="${resword}"/>';
-var app_subjectLabel='<fmt:message key="subject" bundle="${resword}"/>';
+// var app_studyEventLabel='<fmt:message key="SE" bundle="${resword}"/>';
+//var app_subjectLabel='<fmt:message key="subject" bundle="${resword}"/>';
 var app_groupLabel='<fmt:message key="group" bundle="${resword}"/>';
 var app_crfLabel='<fmt:message key="CRF" bundle="${resword}"/>';
 var genderLabel='<fmt:message key="gender" bundle="${resword}"/>';
