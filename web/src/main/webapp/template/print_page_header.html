@@ -66,12 +66,13 @@
       <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}:${secondaryId?secondaryId:' ___________________'}</div>  
     {{/if}}
     {{if collectSubjectDOB != 3}}
-      <div class='header-text'>{{html app_studySubjectDOBLabel}}: ${subjectBday ? subjectBday : '___________________'}</div>  
+      <div class='header-text text-left-aligned'>{{html app_studySubjectDOBLabel}}: ${subjectBday ? subjectBday : '___________________'}</div>  
+  {{/if}}
+  {{if app_genderRequired=='true'}}
+  	  <div class='header-text text-left-aligned'>{{html genderLabel}}: ${gender ? gender : '___________________'}</div>
   
-  <!--   {{else collectSubjectDOB == 2}}
-      <div class='header-text'>{{html app_studySubjectBirthYearLabel}}:___________</div>  
-    {{/if}}
- -->    <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
+  {{/if}}
+  <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
     
     <div class='header-text text-left-aligned-bold'>${app_groupLabel}:</div>
     <div class='header-text text-left-aligned'>${app_groupName}-${app_groupClassName}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>

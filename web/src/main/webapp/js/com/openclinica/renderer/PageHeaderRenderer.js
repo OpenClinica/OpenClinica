@@ -11,6 +11,7 @@ function PageHeaderRenderer() {
 	  var groupClassInfo  =app_thisSubjectsData?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]+'-'+app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"]:"";
 	  var interviewerName = app_formData?app_formData["@OpenClinica:InterviewerName"]:"";
 	  var interviewDate = app_formData?app_formData["@OpenClinica:InterviewDate"]:"";
+	  var gender = app_thisSubjectsData?app_thisSubjectsData["@OpenClinica:Sex"]:"";
 	  return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
       pageType: pageType,
@@ -26,7 +27,7 @@ function PageHeaderRenderer() {
       secondaryLabelViewable: app_secondaryLabelViewable,
       eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation,eventEndDate:eventEndDate,ageAtEnrollment:ageAtEnrollment,
       studyEventStatus:studyEventStatus,personId:personId,secondaryId:secondaryId,subjectBday:subjectBday,subjectStatus:subjectStatus,groupClassInfo:groupClassInfo,interviewerName:interviewerName,
-      interviewDate:interviewDate
+      interviewDate:interviewDate,gender:gender
       
     });
   }
