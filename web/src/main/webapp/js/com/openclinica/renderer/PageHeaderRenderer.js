@@ -11,7 +11,7 @@ function PageHeaderRenderer() {
 	  var subjectStatus = app_thisSubjectsData["@OpenClinica:Status"]?app_thisSubjectsData["@OpenClinica:Status"]:"";
 	  var subjectBday =app_thisSubjectsData?( app_thisSubjectsData["@OpenClinica:DateOfBirth"]?app_thisSubjectsData["@OpenClinica:DateOfBirth"]:""):"";
 	  var groupClassInfo="";
-	  if(app_thisSubjectsData && app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
+	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"] && app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
 		  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]["@OpenClinica:StudyGroupClassName"]?app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"]["@OpenClinica:StudyGroupClassName"]:''
 		  
