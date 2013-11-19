@@ -496,7 +496,7 @@ function StudyRenderer(json) {
         	var itemDetails = this.getItemDetails(itemDef, formDef);
         	 var itemGroupHeader = undefined;
       	
-    		 // itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
+    		 itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
     		  this.renderString+="<div align='center'>"+formDef["@Name"]+"</div>";
     		if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["ItemOID"])<1)
     		{
