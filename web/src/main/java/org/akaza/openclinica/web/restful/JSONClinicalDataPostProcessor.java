@@ -3,6 +3,7 @@ package org.akaza.openclinica.web.restful;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /**
@@ -22,19 +24,26 @@ public class JSONClinicalDataPostProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JSONClinicalDataPostProcessor.class);
 
-    private static final DateFormat SHORT_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat DATE_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static final DateFormat LONG_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+    private static final DateFormat DATE_TIME_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
-    private static final Pattern SHORT_DATE = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
+    private static final String DATE_FORMAT_KEY = "date_format_string";
 
-    private static final Pattern LONG_DATE =
+    private static final String DATE_TIME_FORMAT_KEY = "date_time_format_string";
+
+    private static final Pattern DATE_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
+
+    private static final Pattern DATE_TIME_PATTERN =
             Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]");
 
     private final Locale locale;
 
+    private final ResourceBundle formatResourceBundle;
+
     public JSONClinicalDataPostProcessor(Locale locale) {
         this.locale = locale;
+        this.formatResourceBundle = ResourceBundleProvider.getFormatBundle(locale);
     }
 
     /**
@@ -91,8 +100,8 @@ public class JSONClinicalDataPostProcessor {
         2011-05-17 00:00:00.0
         */
 
-        boolean isShort = SHORT_DATE.matcher(elem).matches();
-        boolean isLong = LONG_DATE.matcher(elem).matches();
+        boolean isShort = DATE_PATTERN.matcher(elem).matches();
+        boolean isLong = DATE_TIME_PATTERN.matcher(elem).matches();
 
         if (isShort || isLong) {
             try {
@@ -100,18 +109,14 @@ public class JSONClinicalDataPostProcessor {
                 DateFormat formatter;
 
                 if (isShort) {
-                    date = SHORT_FORMAT.parse(elem);
-                    formatter = DateFormat.getDateInstance(DateFormat.LONG, locale);
+                    date = DATE_INTERNAL_FORMAT.parse(elem);
+                    formatter = new SimpleDateFormat(formatResourceBundle.getString(DATE_FORMAT_KEY), locale);
                 } else {
-                    date = LONG_FORMAT.parse(elem);
-                    formatter = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+                    date = DATE_TIME_INTERNAL_FORMAT.parse(elem);
+                    formatter = new SimpleDateFormat(formatResourceBundle.getString(DATE_TIME_FORMAT_KEY), locale);
                 }
 
-                String formattedDate = formatter.format(date);
-
-                //LOG.debug("Replacing '{}' by formatted date '{}'", elem, formattedDate);
-                return formattedDate;
-
+                return formatter.format(date);
 
             } catch (ParseException e) {
                 LOG.warn("Could not parse date from ODM element '" + elem + "'", e);

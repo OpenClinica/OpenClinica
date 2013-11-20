@@ -16,6 +16,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -91,8 +92,8 @@ public class ODMClinicaDataResource {
 		xmlSerializer.setTypeHintsEnabled(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
-        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
-        processor.process((JSONObject) json);
+        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
+        processor.process(json);
 
 		return json.toString(INDENT_LEVEL);
 	}
