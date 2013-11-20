@@ -69,9 +69,11 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   
   this.renderItemFormMetadata = function(){
     var template = "print_item_metadata_info";
+    var subjectOID = app_thisSubjectsData["@SubjectKey"];
+    var itemRefName = subjectOID+this.itemName;
     var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+           {itemRefName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
         return s[0].outerHTML;
         
   }

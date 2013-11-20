@@ -544,7 +544,12 @@ function StudyRenderer(json) {
     var eventLocation = "";
     if(app_thisStudyEvent!=undefined)
     	eventLocation = app_thisStudyEvent["@OpenClinica:StudyEventLocation"];
+    if(currentPageEvent!=undefined)
     this.renderString += pageHeaderRenderer.render(printTime, currentPageType, currentPageEvent["@Name"],app_thisStudyEvent)[0].outerHTML;
+    else
+    	
+        this.renderString += pageHeaderRenderer.render(printTime, currentPageType, "",app_thisStudyEvent)[0].outerHTML;
+
   }
   
   

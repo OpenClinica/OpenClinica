@@ -14,15 +14,12 @@
     <div class='header-text text-left-aligned'>
     {{if studyName}}
     <b>${studyName}(${protocolName})</b>
-    {{else}}
-     '___________________'
+   
      {{/if}}
     </div>  
     <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}:
     {{if siteName}}
     <b>${siteName}(${protocolName})</b>
-    {{else}}
-    '___________________'
     {{/if}}
     
       </div>  
@@ -78,9 +75,11 @@
     {{if collectSubjectDOB != 3}}
       <div class='header-text text-left-aligned'>{{html app_studySubjectDOBLabel}}: ${subjectBday ? subjectBday : '___________________'}</div>  
   {{/if}}
+  {{if app_genderRequired}}
   {{if app_genderRequired=='true'}}
   	  <div class='header-text text-left-aligned'>{{html genderLabel}}: ${gender ? gender : '___________________'}</div>
   
+  {{/if}}
   {{/if}}
   <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
     

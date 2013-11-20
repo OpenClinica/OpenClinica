@@ -29,7 +29,7 @@ var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
 ['print_page_header','print_form_def','print_item_def','print_repeating_item_group',
- 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits'];
+ 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits','print_page_header_global'];
 var renderMode;
 var app_collectSubjectDOB;
 var app_personIDRequired;
@@ -51,6 +51,7 @@ var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
 var app_thisStudyEvent = undefined;
 var app_thisSubjectsData = undefined;
+var app_renderMode=undefined;
 debug("console debugging enabled.", util_logDebug);
 
 /***********      @JQUERY INIT    *******************/
@@ -74,8 +75,10 @@ function getPrintableContent() {
     $('.spinner').css({display: "none"});
     app_pagesArray = new Array();
     setRenderMode();
+    app_renderMode = renderMode;
     app_odmRenderer = new ODMRenderer(data);
     var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+    
     $('body').html(renderString);
    });
 }
@@ -91,4 +94,5 @@ function setRenderMode() {
   else if (app_studyOID == "*" && app_eventOID == "*" && app_formVersionOID != "*") {
     renderMode = 'UNPOPULATED_GLOBAL_CRF';
   }
+  
 }
