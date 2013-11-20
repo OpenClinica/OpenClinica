@@ -23,7 +23,7 @@
   
   var app_formVersionOID = '${formVersionOID}';
   var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>'
-  var app_siteNameLabel = '<fmt:message key="site_name" bundle="${resword}"/>'
+  var app_siteNameLabel = '<fmt:message key="site" bundle="${resword}"/>'
   var app_studyNameLabel = '<fmt:message key="study_name" bundle="${resword}"/>'
   var app_studySubjectIDLabel = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'
   var app_pageNumberLabel = '<fmt:message key="page_x_de_y" bundle="${resword}"/>'.replace(/[{}]/g, '');
