@@ -3,6 +3,7 @@ var INITIALIZED = false;
 var app_itemGroupRepeatLengthMap = {};
 var app_itemValuesMap = {};
 var app_audits={};
+var app_dns={}
 var app_maxPixelHeight = 610;
 var app_maxLandscapePixelHeight = 400;
 var app_maxPixelWidth = 850;
@@ -29,7 +30,7 @@ var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
 ['print_page_header','print_form_def','print_item_def','print_repeating_item_group',
- 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits'];
+ 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits','print_dns'];
 var renderMode;
 var app_collectSubjectDOB;
 var app_personIDRequired;
@@ -45,7 +46,6 @@ var app_studySubjectStartDateLabel = "Start Date";
 var app_studySubjectStatusLabel = "Status";
 var app_studySubjectStatus = undefined;
 var app_studySubjectStartDate = undefined;
-
 var app_studyEventCoverPageType = "study_event_cover_page_type";
 var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
@@ -68,8 +68,9 @@ function getPrintableContent() {
   $('.spinner').css({display: "block"});
   var url = app_contextPath + '/rest/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID;
   if (app_studySubjectOID.length > 0) {
-    url = app_contextPath + '/rest/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID+'?includeAudits='+app_displayAudits;
+    url = app_contextPath + '/rest/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID+'?includeDNs='+app_displayDNs + '&includeAudits='+app_displayAudits
   }
+  
   $.get(url, {}, function(data) {
     $('.spinner').css({display: "none"});
     app_pagesArray = new Array();

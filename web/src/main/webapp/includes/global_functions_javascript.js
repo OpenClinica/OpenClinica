@@ -1208,7 +1208,7 @@ function openPrintCRFWindow(inURL) {
 	inURL = encodeURI(inURL);
 	openNewWindow(inURL,
    		'',
-        'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
+        'directories=no,location=yes,menubar=yes,scrollbars=yes,toolbar=yes,status=yes,resizable=yes',
         'print');
 }
 

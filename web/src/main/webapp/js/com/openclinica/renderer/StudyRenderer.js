@@ -422,8 +422,7 @@ function StudyRenderer(json) {
           var optionsLength = options == undefined ? 0 : options.length;
   
             var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + 
-//  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + name + "</td></tr>";
-  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + "</td></tr>";
+  	  (app_displayAudits=='y' || app_displayDNs=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + "</td></tr>";
 
           var optionsRow = "<tr class='repeating_item_group'>";
           for (var j=0;j< optionsLength;j++) {
@@ -440,8 +439,7 @@ function StudyRenderer(json) {
  
 
                    repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + 
-// 	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + name + (mandatory == true ? " *" : "")  + "</td>";
-  	  (app_displayAudits=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + (mandatory == true ? " *" : "")  + "</td>";
+  	  (app_displayAudits=='y'  || app_displayDNs=='y' ? " <a  href='#" +itemName + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + (mandatory == true ? " *" : "")  + "</td>";
 
 			
           }
@@ -485,9 +483,9 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    if(app_displayAudits)
-    if(app_displayAudits=='y')//TODO: add flag for discrepancy notes as  a or clause 
-    	{
+    if(app_displayAudits || app_displayDNs)
+    if(app_displayAudits=='y' || app_displayDNs=='y')//TODO: add flag for discrepancy notes as  a or clause 
+     	{
     	var itemsOids = new Array();
     	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, eventDef);
     	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
@@ -503,7 +501,8 @@ function StudyRenderer(json) {
     			itemGroupHeader = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
     				this.renderString+=itemDefRenderer.renderItemFormMetadata();
     				itemsOids.push(itemDef["ItemOID"]);
-    				  if(app_displayAudits=='y' && itemDefRenderer.audits){
+
+					if(app_displayAudits=='y' && itemDefRenderer.audits){
     					  var auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
     					  if(auditLog){
     		    		 
@@ -525,8 +524,55 @@ function StudyRenderer(json) {
     					 
     					  }
     				  }
-    		}
-    		
+
+
+  					if(app_displayDNs=='y' && itemDefRenderer.dns ){
+        		      		var discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
+                            var childNote = discrepancyNote["OpenClinica:ChildNote"] ;          			
+
+					if(discrepancyNote && childNote){
+
+							    discrepancyNote = util_ensureArray(discrepancyNote);
+   		        			    childNote = util_ensureArray(childNote);
+  		 					    var currentDiscrepancyNotes = [];
+            				  
+                	  var thisDiscrepancyNote = {};
+    		  		  for(var i=0;i<discrepancyNote.length;i++){
+               		   var dns = discrepancyNote[i]
+    	    
+     				   for(var k=0;k<childNote.length;k++){
+        
+          	     			   var cn = childNote[k]
+  		   	 				   var description = cn["OpenClinica:Description"] 
+   	                           var detailedNote = cn["OpenClinica:DetailedNote"] 
+  	                           var userRef = cn["UserRef"] 
+			    			  thisDiscrepancyNote.parent_id = dns["@ID"];
+    		    			  thisDiscrepancyNote.parent_status = dns["@Status"];
+    		    			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
+    		    			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
+    		    			  thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
+ 							  
+							  thisDiscrepancyNote.child_id = cn["@ID"];
+			 	              thisDiscrepancyNote.child_status = cn["@Status"];
+			 	              thisDiscrepancyNote.child_dateCreated = cn["@DateCreated"];
+							  thisDiscrepancyNote.child_description  = description;
+							  if (detailedNote)  thisDiscrepancyNote.child_detailedNote = detailedNote;
+			 	              if (userRef) thisDiscrepancyNote.child_UserRef = userRef["@UserOID"];
+							  
+				              currentDiscrepancyNotes.push(thisDiscrepancyNote);
+    
+				
+	   					      }	 
+							  }
+							  
+							  
+    		    		  this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes)
+    					 
+    					  }
+    				  }
+
+
+					  }
     	}
     	
     	}

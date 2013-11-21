@@ -21,11 +21,14 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.fileDownloadLink=undefined;
   this.itemTemp= undefined;
   this.audits = undefined;
+  this.dns = undefined;
   
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
     this.audits = app_audits[this.OID][repeatRowNumber];
+    if(app_displayDNs=='y')
+    this.dns = app_dns[this.OID];
   }
   
   
@@ -50,8 +53,8 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     if (isRepeating == true) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
-    if(app_displayAudits=='y'){
-        var s = RenderUtil.render(RenderUtil.get(template), 
+ if(app_displayAudits=='y' || app_displayDNs=='y' ){
+           var s = RenderUtil.render(RenderUtil.get(template), 
            {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
             unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
             columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
@@ -80,5 +83,11 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,itemgroupHeader:itemGroupLabel});
     return s[0].outerHTML;
   }
-  
+   
+this.renderDiscrepancyNotes = function(discrepancyNotes){
+    var template="print_dns";
+    var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes,value:this.itemName});
+    return s[0].outerHTML;
+  }
+ 
 }
