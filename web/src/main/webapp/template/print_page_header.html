@@ -1,6 +1,10 @@
 <table  class="page-header">
 <tr>
-<td class='left-header' width='50%'>
+
+<td>
+ 
+<table class='left-header' width='50%'>
+
 
     <div class='header-text text-left-aligned'>
     {{if studyName}}
@@ -29,10 +33,11 @@
     {{/if}}
             <div class='header-text text-left-aligned'>${app_eventStatus}: ${studyEventStatus}</div>  
 
-    
+   </table> 
 </td>
 <!-- study subject block -->
-<td class='right-header' width='50%'>
+<td>
+<table class='right-header' width='50%'>
 <!--   <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div> -->
     <div class='header-text text-left-aligned'>
     
@@ -74,7 +79,9 @@
       <div class='header-text'>{{html app_interviewDateLabel}}: ${interviewDate?interviewDate:'_______________________'}</div>  
     {{/if}}
  
+</table>
 </td>
+
 </tr>
 
 
