@@ -1,6 +1,6 @@
 <table  class="page-header">
 <tr>
-<td class='left-header' width=50%>
+<td class='left-header' width='50%'>
 
     <div class='header-text text-left-aligned'>
     {{if studyName}}
@@ -32,7 +32,7 @@
     
 </td>
 <!-- study subject block -->
-<td class='right-header' width="50%">
+<td class='right-header' width='50%'>
 <!--   <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div> -->
     <div class='header-text text-left-aligned'>
     
@@ -56,14 +56,15 @@
   {{/if}}
   {{if app_genderRequired}}
   {{if app_genderRequired=='true'}}
+  {{if gender}}
   	  <div class='header-text text-left-aligned'>{{html genderLabel}}: ${gender!='' ? gender : '___________________'}</div>
-  
+  {{/if}}
   {{/if}}
   {{/if}}
   <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
-    
+    {{if groupClassInfo}}
     <div class='header-text text-left-aligned'>${app_groupLabel}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>
-
+	{{/if}}
       <div class='header-text'>${app_crfLabel} {{html app_studySubjectStatusLabel}}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
 
 {{if app_interviewerNameRequired != "no"}}
