@@ -113,6 +113,7 @@ public class ODMClinicaDataResource {
 		request.setAttribute("eventOID", eventOID);
 		request.setAttribute("formVersionOID", formVersionOID);
 		request.setAttribute("includeAudits", includeAudits);
+		request.setAttribute("includeDNs", includeDns);
 		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
 	}
 
