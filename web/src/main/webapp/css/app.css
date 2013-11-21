@@ -47,7 +47,6 @@ a:active {
 
 .left-header {
   display: inline-block;
-  width: 500px; 
   padding-right:200px;
   vertical-align: top;
 
@@ -55,7 +54,6 @@ a:active {
 
 .right-header{
   display: inline-block;
-  width: 500px; 
   vertical-align: top;
 }
 

@@ -1,6 +1,10 @@
-<table  class="page-header">
+<table  class="page-header" width='100%'>
 <tr>
-<td class='left-header' width=50%>
+
+<td>
+ 
+<table class='left-header' >
+
 
     <div class='header-text text-left-aligned'>
     {{if studyName}}
@@ -8,8 +12,9 @@
    
      {{/if}}
     </div>  
+        {{if siteName}}
     <div class='header-text text-left-aligned'>{{html app_siteNameLabel}}:&nbsp;
-    {{if siteName}}
+
     <b>${siteName}(${protocolName})</b>
     {{/if}}
     
@@ -28,10 +33,11 @@
     {{/if}}
             <div class='header-text text-left-aligned'>${app_eventStatus}: ${studyEventStatus}</div>  
 
-    
+   </table> 
 </td>
 <!-- study subject block -->
-<td class='right-header' width="50%">
+<td>
+<table class='right-header' width='50%'>
 <!--   <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div> -->
     <div class='header-text text-left-aligned'>
     
@@ -55,14 +61,15 @@
   {{/if}}
   {{if app_genderRequired}}
   {{if app_genderRequired=='true'}}
+  {{if gender}}
   	  <div class='header-text text-left-aligned'>{{html genderLabel}}: ${gender!='' ? gender : '___________________'}</div>
-  
+  {{/if}}
   {{/if}}
   {{/if}}
   <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
-    
+    {{if groupClassInfo}}
     <div class='header-text text-left-aligned'>${app_groupLabel}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>
-
+	{{/if}}
       <div class='header-text'>${app_crfLabel} {{html app_studySubjectStatusLabel}}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
 
 {{if app_interviewerNameRequired != "no"}}
@@ -72,7 +79,9 @@
       <div class='header-text'>{{html app_interviewDateLabel}}: ${interviewDate?interviewDate:'_______________________'}</div>  
     {{/if}}
  
+</table>
 </td>
+
 </tr>
 
 
