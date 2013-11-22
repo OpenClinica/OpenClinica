@@ -59,6 +59,17 @@ a:active {
   padding: 20px;
 }
 
+.DNBackgroundColorForHeaders{
+   background-color : lightgrey;
+}
+.MetadataBackgroundColorForHeaders{
+   background-color : lightblue;
+}
+.ALBackgroundColorForHeaders{
+   background-color : lightgreen;
+}
+
+
 
 .spinner {
   display: none;

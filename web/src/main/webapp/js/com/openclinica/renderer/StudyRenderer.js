@@ -527,30 +527,35 @@ function StudyRenderer(json) {
 
 
   					if(app_displayDNs=='y' && itemDefRenderer.dns ){
-        		      		var discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
-                            var childNote = discrepancyNote["OpenClinica:ChildNote"] ;          			
+							 var discrepancyNote=[];
+							discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
 
-					if(discrepancyNote && childNote){
+					if(discrepancyNote ){
 
 							    discrepancyNote = util_ensureArray(discrepancyNote);
-   		        			    childNote = util_ensureArray(childNote);
   		 					    var currentDiscrepancyNotes = [];
-            				  
-                	  var thisDiscrepancyNote = {};
-    		  		  for(var i=0;i<discrepancyNote.length;i++){
-               		   var dns = discrepancyNote[i]
+            			        var thisDiscrepancyNote = {};
+    						 var childNote=[];
+			  		  	  
+                	  for(var i=0;i<discrepancyNote.length;i++){
+                 		   var dns = discrepancyNote[i];
     	    
-     				   for(var k=0;k<childNote.length;k++){
-        
-          	     			   var cn = childNote[k]
-  		   	 				   var description = cn["OpenClinica:Description"] 
-   	                           var detailedNote = cn["OpenClinica:DetailedNote"] 
-  	                           var userRef = cn["UserRef"] 
 			    			  thisDiscrepancyNote.parent_id = dns["@ID"];
     		    			  thisDiscrepancyNote.parent_status = dns["@Status"];
     		    			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
     		    			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
     		    			  thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
+
+							  childNote = dns["OpenClinica:ChildNote"] ;          			
+		         		    childNote = util_ensureArray(childNote);
+
+
+						for(var j=0;j<childNote.length;j++){
+        
+          	     			   var cn = childNote[j]
+  		   	 				   var description = cn["OpenClinica:Description"]; 
+   	                           var detailedNote = cn["OpenClinica:DetailedNote"]; 
+  	                           var userRef = cn["UserRef"] 
  							  
 							  thisDiscrepancyNote.child_id = cn["@ID"];
 			 	              thisDiscrepancyNote.child_status = cn["@Status"];
@@ -560,13 +565,16 @@ function StudyRenderer(json) {
 			 	              if (userRef) thisDiscrepancyNote.child_UserRef = userRef["@UserOID"];
 							  
 				              currentDiscrepancyNotes.push(thisDiscrepancyNote);
-    
+    		                  thisDiscrepancyNote = {};
+    			
 				
 	   					      }	 
+    		    		  this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes)
+							  currentDiscrepancyNotes = [];
+            			      
 							  }
 							  
 							  
-    		    		  this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes)
     					 
     					  }
     				  }
