@@ -1,0 +1,53 @@
+<td valign='center'>
+
+  <table>
+  <tr>&nbsp;</tr>
+  <tr><td>${value}:Discrepancy Notes </td>
+  </tr>
+  </table>
+  <table border="1" width="100%" >
+ 
+   <tr  class='DNBackgroundColorForHeaders'>
+  
+  <td>Parent_id</td>
+  <td>Status</td>
+  <td>Note Type</td>
+  <td>Date Updated</td>
+  <td>Number Of Children</td>
+
+  <td>Child_id</td>
+  <td>Status</td>
+  <td>Date Created</td>
+  <td>Description</td>
+  <td>Detailed Note</td>
+  <td>User Ref</td>
+  
+  </tr>
+ 
+ {{each discrepancyNotes}}
+ 
+  
+  <tr>
+  <td>{{html parent_id}} </td>
+  <td>{{html parent_status}}</td>
+  <td>{{html parent_noteType}}</td>
+  <td>{{html parent_dateUpdated}}</td>
+  <td>{{html numberOfChildNotes}}</td>
+
+  <td>{{html child_id}}</td>
+  <td>{{html child_status}}</td>
+  <td>{{html child_dateCreated}}</td>
+  <td>{{html child_description}}</td>
+  <td>{{html child_detailedNote}}</td>
+  <td>{{html child_UserRef}}</td>
+
+
+  </tr>
+  
+  {{/each}}
+  </table>
+  </td>
+  
+  
+
+
