@@ -48,15 +48,14 @@ a:active {
   margin-bottom: 100px;
 }
 
-#page-header td.left-header {
+
+#page-header td.left-header, td.right-header {
   vertical-align: top;
-  padding: 20px;
-  width: 60%;
+  padding-top: 10px;
 }
 
-#page-header td.right-header {
-  vertical-align: top;
-  padding: 20px;
+#page-header td.left-header {
+  width: 60%;
 }
 
 .DNBackgroundColorForHeaders{
