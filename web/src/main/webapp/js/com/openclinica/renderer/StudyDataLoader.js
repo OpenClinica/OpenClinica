@@ -285,9 +285,11 @@ function StudyDataLoader(study, json) {
          if (itemOID in app_itemValuesMap == false){
            app_itemValuesMap[itemOID] = {}; 
            app_audits[itemOID]={};
+           app_dns[itemOID]={};
          }
          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
          app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
+         app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
        }
      }
    }

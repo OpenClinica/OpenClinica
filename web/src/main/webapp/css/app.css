@@ -29,7 +29,7 @@ a:link {
   color: red;
 }
 a:visited {
-  color: purple;
+  color: red;
 }
 a:hover {
   color: blue;
@@ -39,22 +39,37 @@ a:active {
 }
 
 
-.page-header {
-  padding-top:15px;
-  margin-bottom:30px;
-  
+
+
+#page-header {
+  table-layout:fixed;
+  width: 100%;
+  padding:20px;
+  margin-bottom: 100px;
 }
 
-.left-header {
-  display: inline-block;
+#page-header td.left-header {
   vertical-align: top;
-
+  padding: 20px;
+  width: 60%;
 }
 
-.right-header{
-  display: inline-block;
+#page-header td.right-header {
   vertical-align: top;
+  padding: 20px;
 }
+
+.DNBackgroundColorForHeaders{
+   background-color : lightgrey;
+}
+.MetadataBackgroundColorForHeaders{
+   background-color : lightblue;
+}
+.ALBackgroundColorForHeaders{
+   background-color : lightgreen;
+}
+
+
 
 .spinner {
   display: none;
