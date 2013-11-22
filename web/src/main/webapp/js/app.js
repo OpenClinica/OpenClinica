@@ -70,7 +70,7 @@ function getPrintableContent() {
   $('.spinner').css({display: "block"});
   var url = app_contextPath + '/rest/metadata/json/view/' + app_studyOID + '/*/' + app_formVersionOID;
   if (app_studySubjectOID.length > 0) {
-    url = app_contextPath + '/rest/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID+'?includeAudits='+app_displayAudits;
+    url = app_contextPath + '/rest/clinicaldata/json/view/' + app_studyOID + '/' + app_studySubjectOID + '/' + app_eventOID + '/' + app_formVersionOID+'?includeAudits='+app_displayAudits+'&includeDNs='+app_displayDNs;
   }
   $.get(url, {}, function(data) {
     $('.spinner').css({display: "none"});
