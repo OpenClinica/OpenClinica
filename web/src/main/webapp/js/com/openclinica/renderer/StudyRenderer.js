@@ -420,8 +420,13 @@ function StudyRenderer(json) {
         if (responseLayout == "Horizontal") {
           var options = (responseType == 'multi-select' || responseType == 'checkbox') ? app_multiSelectLists[multiSelectListOID] : app_codeLists[codeListOID]; 
           var optionsLength = options == undefined ? 0 : options.length;
-var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;
-  
+
+		  if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
+    	  var itemNameLink = itemDefRenderer.itemName
+	      }else{
+	      var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;
+	     }
+
             var itemNameRow = "<tr class='repeating_item_option_names'><td colspan='" + optionsLength + "' align='center' class='repeating_item_option_names'>" + 
   	  (app_displayAudits=='y' || app_displayDNs=='y' ? " <a  href='#" +itemNameLink + "'>"+itemName+"</a><br/>" : "")+  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + "</td></tr>";
 
@@ -438,8 +443,11 @@ var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@
         else {
           if (repeatRowNumber == 1) { 
 
-		  var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;
- 
+		  if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
+    	  var itemNameLink = itemDefRenderer.itemName
+	      }else{
+	      var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;
+	     }
 
                    repeatingHeaderString += "<td class='repeating_item_header' valign='bottom'>" + 
   	  (app_displayAudits=='y'  || app_displayDNs=='y' ? " <a  href='#" +itemNameLink + "'>"+itemName+"</a><br/>" : "") +  itemNumber + " " + (itemHeader!=undefined ? itemHeader : (name!=undefined ? name :"")) + (mandatory == true ? " *" : "")  + "</td>";
