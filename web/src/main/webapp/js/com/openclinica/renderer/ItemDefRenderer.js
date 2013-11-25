@@ -26,11 +26,10 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
-    this.audits = app_audits[this.OID][repeatRowNumber];
+    this.audits = app_audits[this.OID];
     if(app_displayDNs=='y')
     this.dns = app_dns[this.OID];
   }
-  
   
   
   if (this.responseType!=undefined) {
@@ -73,9 +72,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.renderItemFormMetadata = function(){
     var template = "print_item_metadata_info";
     var subjectOID = app_thisSubjectsData["@SubjectKey"];
+    var studyEventOID = app_thisStudyEvent["@StudyEventOID"];
+    var formOID = app_formData["@FormOID"];
+    var url = subjectOID+studyEventOID+formOID+this.itemName;
     var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+           {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,url:url});
         return s[0].outerHTML;
         
   }

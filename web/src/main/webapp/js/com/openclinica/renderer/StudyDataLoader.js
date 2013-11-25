@@ -242,60 +242,81 @@ function StudyDataLoader(study, json) {
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
     if(studyEventsData)
     for (var i=0;i<studyEventsData.length;i++) {
-     if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
-        studyEventData = studyEventsData[i];
-        break;
+    	 studyEventData = studyEventsData[i];
+    	if(app_eventOID!="*")
+    	{
+    		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
+    	       app_thisStudyEvent = studyEventData;
+    	       app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
+    	       var formsData = util_ensureArray(studyEventData["FormData"]);
+    	       this.loadFormsData(formsData);
+    	       break;
       }
     }
-    
-    if (studyEventData == undefined) {
-      return;
-    }
-    else
-    	app_thisStudyEvent = studyEventData;
- 
-    app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
-    var formsData = util_ensureArray(studyEventData["FormData"]);
-    
-    if (formsData == undefined) {
-      return;
-    }
-    for (var i=0;i<formsData.length;i++) {
-     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
-        app_formData = formsData[i];
-        break;
-      }
-    }
-    
-   // load itemGroupData into a hash map and determine repeating group row lengths 
-   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-   
-   if (itemGroupData) {
-     for (var i=0;i<itemGroupData.length;i++) {
-       var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
-       var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
-       if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
-         app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
-       }
-       
-       var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
-       for (var j=0;j<itemsData.length;j++) {
-         var itemValue = itemsData[j]["@Value"];
-         var itemOID = itemsData[j]["@ItemOID"];
-         if (itemOID in app_itemValuesMap == false){
-           app_itemValuesMap[itemOID] = {}; 
-           app_audits[itemOID]={};
-           app_dns[itemOID]={};
-         }
-         app_itemValuesMap[itemOID][repeatKey] = itemValue; 
-         app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
-         app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
-       }
+     else{
+    	 app_thisStudyEvent = studyEventData;
+         app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
+         var formsData = util_ensureArray(studyEventData["FormData"]);
+         this.loadFormsData(formsData);
      }
-   }
-    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
+    }
+  }
+ 
+  
+  this.loadFormsData = function(formsData){
+	  if (formsData == undefined) {
+	      return;
+	    }
+	    if(app_formVersionOID!="*")
+	    {
+	    	for (var i=0;i<formsData.length;i++) {
+	     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
+	        app_formData = formsData[i];
+	        break;
+	      }
+	    }
+	   // load itemGroupData into a hash map and determine repeating group row lengths 
+	   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+	   if (itemGroupData) {
+		   this.loadItemGroupData(itemGroupData);
+	   }
+	   }
+	    else{
+	    	for(var i=0;i<formsData.length;i++){
+	    		app_formData= formsData[i];
+	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+	    		if (itemGroupData) {
+	    			   this.loadItemGroupData(itemGroupData);
+	    		   }
+	    	}
+	    }
+	    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
   }
   
+  
+  this.loadItemGroupData = function(itemGroupData){
+	    for (var i=0;i<itemGroupData.length;i++) {
+	        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
+	        var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
+	        if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
+	          app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
+	        }
+	        
+	        var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
+	        for (var j=0;j<itemsData.length;j++) {
+	          var itemValue = itemsData[j]["@Value"];
+	          var itemOID = itemsData[j]["@ItemOID"];
+	          if (itemOID in app_itemValuesMap == false){
+	            app_itemValuesMap[itemOID] = {}; 
+	            app_audits[itemOID]={};
+	            app_dns[itemOID]={};
+	          }
+	          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+	          app_audits[itemOID]= itemsData[j]["OpenClinica:AuditLogs"];
+	          app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
+	        }
+	      }
+  }
   
   /* loadStudyLists()
    */

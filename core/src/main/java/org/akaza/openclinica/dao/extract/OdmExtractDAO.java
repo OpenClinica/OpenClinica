@@ -3668,7 +3668,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             + " and idata.item_data_id in (" + idataIds + ") and idata.item_id in ("
             + " select distinct ifm.item_id from item_form_metadata ifm where ifm.response_set_id in ("
             + " select rs.response_set_id from response_set rs where rs.response_type_id in (8,9))"
-            + "      and ifm.item_id in " + itemIds + ")";
+            + "      and ifm.item_id in " + itemIds + " limit 999)";
     }
 	
     
