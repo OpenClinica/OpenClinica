@@ -263,6 +263,7 @@ function StudyDataLoader(study, json) {
     for (var i=0;i<formsData.length;i++) {
      if(formsData[i]["@FormOID"] == app_formVersionOID) { 
         app_formData = formsData[i];
+        app_thisFormData = app_formData;
         break;
       }
     }
@@ -277,7 +278,6 @@ function StudyDataLoader(study, json) {
        if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
          app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
        }
-       
        var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
        for (var j=0;j<itemsData.length;j++) {
          var itemValue = itemsData[j]["@Value"];
@@ -288,7 +288,7 @@ function StudyDataLoader(study, json) {
            app_dns[itemOID]={};
          }
          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
-         app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
+	     app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
          app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
        }
      }

@@ -53,12 +53,14 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     if (isRepeating == true) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
- if(app_displayAudits=='y' || app_displayDNs=='y' ){
+    var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+this.OID;
+
+    if(app_displayAudits=='y' || app_displayDNs=='y' ){
            var s = RenderUtil.render(RenderUtil.get(template), 
            {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
             unitLabel:this.unitLabel, optionNames: app_codeLists[this.codeListOID], multiSelectOptionNames: app_multiSelectLists[this.multiSelectListOID], 
             columns:this.columns, responseLayout:this.responseLayout, isInline: this.isInline, mandatory: this.mandatory,
-            itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
+            itemNameLink:itemNameLink, itemName:this.itemName, itemValue:this.itemValue,file:this.file,fileDownloadLink:this.fileDownloadLink});
           }else{
         var s = RenderUtil.render(RenderUtil.get(template), 
            {OID:this.OID, formOID:formOID, itemNumber:this.itemNumber, name:this.name, rightItemText:this.rightItemText, responseType:this.responseType, 
@@ -74,8 +76,10 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     var template = "print_item_metadata_info";
     var subjectOID = app_thisSubjectsData["@SubjectKey"];
     var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
+	var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+this.OID;
+
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
         return s[0].outerHTML;
         
   }
