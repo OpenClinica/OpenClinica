@@ -52,6 +52,8 @@ var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
 var app_thisStudyEvent = undefined;
 var app_thisSubjectsData = undefined;
+var app_thisFormData = undefined;
+
 var app_renderMode=undefined;
 debug("console debugging enabled.", util_logDebug);
 
