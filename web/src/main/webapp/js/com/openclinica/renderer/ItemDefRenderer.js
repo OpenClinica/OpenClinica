@@ -22,6 +22,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.itemTemp= undefined;
   this.audits = undefined;
   this.dns = undefined;
+  this.itemNameLink = undefined;
   
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
@@ -53,7 +54,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     if (isRepeating == true) {
       template = this.responseLayout == "Horizontal" ? "print_repeating_item_horiz" : "print_repeating_item";
     }
-    var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+this.OID;
+    
+		  if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
+	var itemNameLink = this.itemName
+	}else{
+	var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+this.OID;
+	}
 
     if(app_displayAudits=='y' || app_displayDNs=='y' ){
            var s = RenderUtil.render(RenderUtil.get(template), 
@@ -76,7 +82,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     var template = "print_item_metadata_info";
     var subjectOID = app_thisSubjectsData["@SubjectKey"];
     var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
+
+    if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
+	var itemNameLink =this.itemName
+	}else{
 	var itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+this.OID;
+	}
 
     var s = RenderUtil.render(RenderUtil.get(template), 
            {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
