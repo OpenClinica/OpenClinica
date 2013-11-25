@@ -251,8 +251,8 @@ function StudyDataLoader(study, json) {
     	       var formsData = util_ensureArray(studyEventData["FormData"]);
     	       this.loadFormsData(formsData);
     	       break;
-      }
-    }
+    		}
+    	}
      else{
     	 app_thisStudyEvent = studyEventData;
          app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
@@ -285,11 +285,17 @@ function StudyDataLoader(study, json) {
 	    else{
 	    	for(var i=0;i<formsData.length;i++){
 	    		app_formData= formsData[i];
-	    		app_thisFormData = app_formData;
+	    		
 	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	    		if (itemGroupData) {
-	    			   this.loadItemGroupData(itemGroupData);
+	    			 app_thisFormData = app_formData;  
+	    			this.loadItemGroupData(itemGroupData);
+	    			  
 	    		   }
+	    		else{
+	    			app_thisFormData=undefined;
+	    			return;
+	    		}
 	    	}
 	    }
 	    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
