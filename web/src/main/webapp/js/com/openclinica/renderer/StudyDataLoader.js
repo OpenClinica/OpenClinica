@@ -272,6 +272,7 @@ function StudyDataLoader(study, json) {
 	    	for (var i=0;i<formsData.length;i++) {
 	     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
 	        app_formData = formsData[i];
+	        app_thisFormData = app_formData;
 	        break;
 	      }
 	    }
@@ -284,6 +285,7 @@ function StudyDataLoader(study, json) {
 	    else{
 	    	for(var i=0;i<formsData.length;i++){
 	    		app_formData= formsData[i];
+	    		app_thisFormData = app_formData;
 	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	    		if (itemGroupData) {
 	    			   this.loadItemGroupData(itemGroupData);
