@@ -4,7 +4,7 @@
 <td class='left-header'>
 
 
-    <div class='header-text text-left-aligned'>
+    <div class='header-text-plus text-left-aligned'>
     {{if studyName}}
     <b>${studyName}&nbsp;(${protocolName})</b>
    
@@ -21,8 +21,8 @@
       <div class='header-text text-left-aligned'>
       {{if eventName}}
        <b>${eventName}&nbsp;</b>(
-       ${ app_studySubjectStartDate}
-       --${eventEndDate}
+       ${ eventStartDate}
+          ${eventEndDate}
        )
        
           {{/if}}
@@ -36,38 +36,17 @@
 <!-- study subject block -->
 <td class='right-header'>
 
-<!--   <div class='header-text text-left-aligned-bold'>${app_subjectLabel}:</div> -->
-    <div class='header-text text-left-aligned'>
+<!--   <div class='header-text-plus text-left-aligned-bold'>${app_subjectLabel}:</div> -->
+    <div class='header-text-plus text-left-aligned'>
     
     {{if ssID }}
     <b>${ssID}</b>
-
     {{/if}}
     
     
     </div>  
     
-    {{if showPersonID == 'true' &&  app_personIDRequired != 'not used'}}
-      <div class='header-text text-left-aligned'>{{html app_personIDLabel}}:${personId?personId:'_______________________'}</div>  
-    {{/if}}
     
-    {{if app_secondaryLabelViewable == 'true'}}
-      <div class='header-text text-left-aligned'>{{html app_secondaryLabel}}:${secondaryId?secondaryId:' ___________________'}</div>  
-    {{/if}}
-    {{if collectSubjectDOB != 3}}
-      <div class='header-text text-left-aligned'>{{html app_studySubjectDOBLabel}}: ${subjectBday ? subjectBday : '___________________'}</div>  
-  {{/if}}
-  {{if app_genderRequired}}
-  {{if app_genderRequired=='true'}}
-  {{if gender}}
-  	  <div class='header-text text-left-aligned'>{{html genderLabel}}: ${gender!='' ? gender : '___________________'}</div>
-  {{/if}}
-  {{/if}}
-  {{/if}}
-  <div class='header-text'>${app_subjectStatus}: ${subjectStatus? subjectStatus:'__________________________________'}</div>
-    {{if groupClassInfo}}
-    <div class='header-text text-left-aligned'>${app_groupLabel}:${groupClassInfo?groupClassInfo:'__________________________________'}</div>
-	{{/if}}
       <div class='header-text'>${app_crfLabel} {{html app_studySubjectStatusLabel}}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
 
 {{if app_interviewerNameRequired != "no"}}

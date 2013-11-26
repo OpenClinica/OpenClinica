@@ -239,6 +239,16 @@ padding-left: 2px;
 border-left-color: lightgray;
 }
 
+.header-text-plus- {
+color: #333333;
+font-size: 14px;
+font-weight:bold;
+padding-bottom: 7px;
+border-left-style: solid;
+border-left-width: thin;
+padding-left: 2px;
+border-left-color: lightgray;
+}
 .investigator-text {
   color: #333333;
   padding-top: 100px;
