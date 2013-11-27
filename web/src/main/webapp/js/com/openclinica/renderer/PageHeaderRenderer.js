@@ -88,6 +88,6 @@ function PageHeaderRenderer() {
 				  }
 				  
 		  }
-		 return eventStartDate;
+		 return eventStartDate.trim();
 	} 
 }
