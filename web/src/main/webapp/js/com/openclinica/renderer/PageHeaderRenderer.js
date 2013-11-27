@@ -33,9 +33,8 @@ function PageHeaderRenderer() {
 	  var subjectBday =app_thisSubjectsData?( app_thisSubjectsData["@OpenClinica:DateOfBirth"]?app_thisSubjectsData["@OpenClinica:DateOfBirth"]:""):"";
 	  var groupClassInfo="";
 	  var groupName="";
-	  if(eventStartDate){
-		  if(eventStartDate.indexOf("00:00:00")>1) eventStartDate = eventStartDate.substring(0,eventStartDate.indexOf("00:00:00"));
-	  }
+	 eventStartDate = this.cleanDate(eventStartDate);
+	 eventEndDate = this.cleanDate(eventEndDate);
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
@@ -73,4 +72,19 @@ function PageHeaderRenderer() {
       
     });
   }
+	this.cleanDate = function(eventStartDate){
+		 if(eventStartDate){
+			  if(eventStartDate.indexOf("00:00:00")>1) {
+				  eventStartDate = eventStartDate.substring(0,eventStartDate.indexOf("00:00:00"));
+			  }
+			  else
+				  {
+				  if(eventStartDate.lastIndexOf(":00")){
+					  eventStartDate = eventStartDate.substring(0,eventStartDate.lastIndexOf(":00"));
+				  }
+				  }
+				  
+		  }
+		 return eventStartDate;
+	} 
 }

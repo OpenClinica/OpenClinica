@@ -20,12 +20,7 @@
       {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>
       {{if eventName}}
-       ${eventName}&nbsp;(
-       ${ eventStartDate}
-          ${eventEndDate}
-       )
-       
-          {{/if}}
+       ${eventName}&nbsp;(${eventStartDate}{{if eventEndDate}}-- ${eventEndDate}{{/if}}){{/if}}
            </div>  
  
     {{/if}}
