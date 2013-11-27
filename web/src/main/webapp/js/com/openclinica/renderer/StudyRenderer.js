@@ -121,6 +121,7 @@ function StudyRenderer(json) {
     // iterate over study event defs and examine each event
     for (var i=0;i< app_studyEventDefs.length;i++) {
       var eventDef = app_studyEventDefs[i];
+ 
       // load event name into column header
       str +="<td style='padding:10px'>" + eventDef["@Name"] + "</td>";
     }  
@@ -234,6 +235,7 @@ function StudyRenderer(json) {
     	  for (var i=0;i< app_studyEventDefs.length;i++) {
     	        if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
     	          eventDef = app_studyEventDefs[i];
+    	          
     	          break;
     	        }
     	      }  
@@ -563,7 +565,7 @@ function StudyRenderer(json) {
 
 						for(var j=0;j<childNote.length;j++){
         
-          	     			   var cn = childNote[j]
+          	     			   var cn = childNote[j];
   		   	 				   var description = cn["OpenClinica:Description"]; 
    	                           var detailedNote = cn["OpenClinica:DetailedNote"]; 
   	                           var userRef = cn["UserRef"] 
@@ -606,7 +608,7 @@ function StudyRenderer(json) {
       this.renderString += "<div class='page-break-screen'><hr/></div>";
       this.renderString += "<div class='page-break'></div>";
     }
-    var eventLocation = "";
+  
     if(app_thisStudyEvent!=undefined)
     	eventLocation = app_thisStudyEvent["@OpenClinica:StudyEventLocation"];
     if(currentPageEvent!=undefined)

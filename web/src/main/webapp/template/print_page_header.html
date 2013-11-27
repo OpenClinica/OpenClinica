@@ -19,8 +19,8 @@
       </div>  
       {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>
-      {{if eventName}}
-       ${eventName}&nbsp;(${eventStartDate}{{if eventEndDate}}-- ${eventEndDate}{{/if}}){{/if}}
+      {{if eventName}}${eventName}{{if repeating}}{{if repeating == 'Yes'}}[${repeatOrdinal}]{{/if}}{{/if}}
+       (${eventStartDate}{{if eventEndDate}}-${eventEndDate}{{/if}}){{/if}}
            </div>  
  
     {{/if}}
@@ -44,10 +44,10 @@
     
       <div class='header-text'>${app_crfLabel} {{html app_studySubjectStatusLabel}}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
 
-{{if app_interviewerNameRequired != "no"}}
+{{if app_interviewerNameRequired != "not_used"}}
       <div class='header-text'>{{html app_interviewerLabel}}: ${interviewerName?interviewerName:'_____________________________'}</div>  
     {{/if}}
-    {{if app_interviewDateRequired != "no"}}
+    {{if app_interviewDateRequired != "not_used"}}
       <div class='header-text'>{{html app_interviewDateLabel}}: ${interviewDate?interviewDate:'_______________________'}</div>  
     {{/if}}
  

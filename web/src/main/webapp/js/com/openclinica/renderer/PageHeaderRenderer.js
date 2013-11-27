@@ -24,6 +24,7 @@ function PageHeaderRenderer() {
 	  
 	  var eventLocation= app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:StudyEventLocation"]?app_thisStudyEvent["@OpenClinica:StudyEventLocation"]:""):"";
 	  var eventStartDate = app_thisStudyEvent?( app_thisStudyEvent["@OpenClinica:StartDate"]?app_thisStudyEvent["@OpenClinica:StartDate"]:""):"";
+	  var repeatOrdinal = app_thisStudyEvent?(app_thisStudyEvent["@StudyEventRepeatKey"]?app_thisStudyEvent["@StudyEventRepeatKey"]:""):"";
 	  var eventEndDate = app_thisStudyEvent?( app_thisStudyEvent["@OpenClinica:EndDate"]?app_thisStudyEvent["@OpenClinica:EndDate"]:""):"";
 	  var ageAtEnrollment = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]?app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]:""):"";
 	  var studyEventStatus = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:Status"]?app_thisStudyEvent["@OpenClinica:Status"]:""):"";
@@ -35,6 +36,8 @@ function PageHeaderRenderer() {
 	  var groupName="";
 	 eventStartDate = this.cleanDate(eventStartDate);
 	 eventEndDate = this.cleanDate(eventEndDate);
+	 var thisStudyEventDef = app_studyEventDefMap[app_thisStudyEvent["@StudyEventOID"]];
+	 var repeating = thisStudyEventDef["@Repeating"];
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
@@ -68,7 +71,7 @@ function PageHeaderRenderer() {
       secondaryLabelViewable: app_secondaryLabelViewable,
       eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation,eventEndDate:eventEndDate,ageAtEnrollment:ageAtEnrollment,
       studyEventStatus:studyEventStatus,personId:personId,secondaryId:secondaryId,subjectBday:subjectBday,subjectStatus:subjectStatus,groupClassInfo:groupClassInfo,interviewerName:interviewerName,
-      interviewDate:interviewDate,eventStartDate:eventStartDate,ssID:ssID
+      interviewDate:interviewDate,eventStartDate:eventStartDate,ssID:ssID,repeating:repeating,repeatOrdinal:repeatOrdinal
       
     });
   }

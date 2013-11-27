@@ -188,6 +188,12 @@ function StudyDataLoader(study, json) {
     if (app_studyEventDefs[0] == undefined) { 
       app_studyEventDefs = new Array();
       app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
+     
+    }
+    for (var i=0;i< app_studyEventDefs.length;i++) {
+        var eventDef = app_studyEventDefs[i];
+        var eventOID = eventDef["@OID"];
+        app_studyEventDefMap[eventOID]=eventDef;
     }
   }
  
@@ -285,17 +291,11 @@ function StudyDataLoader(study, json) {
 	    else{
 	    	for(var i=0;i<formsData.length;i++){
 	    		app_formData= formsData[i];
-	    		
+	    		app_thisFormData = app_formData;
 	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	    		if (itemGroupData) {
-	    			 app_thisFormData = app_formData;  
-	    			this.loadItemGroupData(itemGroupData);
-	    			  
+	    			   this.loadItemGroupData(itemGroupData);
 	    		   }
-	    		else{
-	    			app_thisFormData=undefined;
-	    			return;
-	    		}
 	    	}
 	    }
 	    app_studySubjectStatus = app_formData["@OpenClinica:Status"];
