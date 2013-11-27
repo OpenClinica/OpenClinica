@@ -319,9 +319,9 @@ function StudyDataLoader(study, json) {
 	            app_audits[itemOID]={};
 	            app_dns[itemOID]={};
 	          }
-	          app_itemValuesMap[itemOID][repeatKey] = itemValue; 
-	          app_audits[itemOID]= itemsData[j]["OpenClinica:AuditLogs"];
-	          app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
+	                        app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+if (app_displayAudits =='y')app_audits[itemOID]= itemsData[j]["OpenClinica:AuditLogs"];
+if (app_displayDNs =='y')   app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
 	        }
 	      }
   }

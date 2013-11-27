@@ -609,7 +609,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			
 			childNoteBean.setDateCreated(childDN.getDateCreated());
 			
-			if(dn.getUserAccount()!=null)
+			if(childDN.getUserAccount()!=null)
 			userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
 			else
 				userRef.setElementDefOID("");	
