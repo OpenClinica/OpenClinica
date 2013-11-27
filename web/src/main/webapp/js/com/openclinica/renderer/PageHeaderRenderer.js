@@ -23,6 +23,7 @@ function PageHeaderRenderer() {
 	 
 	  
 	  var eventLocation= app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:StudyEventLocation"]?app_thisStudyEvent["@OpenClinica:StudyEventLocation"]:""):"";
+	  var eventStartDate = app_thisStudyEvent?( app_thisStudyEvent["@OpenClinica:StartDate"]?app_thisStudyEvent["@OpenClinica:StartDate"]:""):"";
 	  var eventEndDate = app_thisStudyEvent?( app_thisStudyEvent["@OpenClinica:EndDate"]?app_thisStudyEvent["@OpenClinica:EndDate"]:""):"";
 	  var ageAtEnrollment = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]?app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]:""):"";
 	  var studyEventStatus = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:Status"]?app_thisStudyEvent["@OpenClinica:Status"]:""):"";
@@ -32,6 +33,8 @@ function PageHeaderRenderer() {
 	  var subjectBday =app_thisSubjectsData?( app_thisSubjectsData["@OpenClinica:DateOfBirth"]?app_thisSubjectsData["@OpenClinica:DateOfBirth"]:""):"";
 	  var groupClassInfo="";
 	  var groupName="";
+	 eventStartDate = this.cleanDate(eventStartDate);
+	 eventEndDate = this.cleanDate(eventEndDate);
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
@@ -65,8 +68,23 @@ function PageHeaderRenderer() {
       secondaryLabelViewable: app_secondaryLabelViewable,
       eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation,eventEndDate:eventEndDate,ageAtEnrollment:ageAtEnrollment,
       studyEventStatus:studyEventStatus,personId:personId,secondaryId:secondaryId,subjectBday:subjectBday,subjectStatus:subjectStatus,groupClassInfo:groupClassInfo,interviewerName:interviewerName,
-      interviewDate:interviewDate,gender:gender,ssID:ssID
+      interviewDate:interviewDate,eventStartDate:eventStartDate,ssID:ssID
       
     });
   }
+	this.cleanDate = function(eventStartDate){
+		 if(eventStartDate){
+			  if(eventStartDate.indexOf("00:00:00")>1) {
+				  eventStartDate = eventStartDate.substring(0,eventStartDate.indexOf("00:00:00"));
+			  }
+			  else
+				  {
+				  if(eventStartDate.lastIndexOf(":00")){
+					  eventStartDate = eventStartDate.substring(0,eventStartDate.lastIndexOf(":00"));
+				  }
+				  }
+				  
+		  }
+		 return eventStartDate;
+	} 
 }
