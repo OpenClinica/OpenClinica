@@ -31,7 +31,7 @@
   var app_timeAndEventsLabel = '<fmt:message key="time_and_events" bundle="${resword}"/>';
   var app_investigatorNameLabel = '<fmt:message key="investigator_name" bundle="${resword}"/>';
   var app_investigatorSignatureLabel = '<fmt:message key="investigator_signature" bundle="${resword}"/>'; 
-  var app_eventDateLabel = '<fmt:message key="end_date1" bundle="${resword}"/>'; 
+  var app_eventDateLabel = '<fmt:message key="event_date" bundle="${resword}"/>'; 
   var app_eventLocationLabel = '<fmt:message key="event_location" bundle="${resword}"/>'; 
   var app_eventNameLabel = '<fmt:message key="event_name" bundle="${resword}"/>'; 
   var app_personIDLabel = '<fmt:message key="person_ID" bundle="${resword}"/>'; 
