@@ -563,7 +563,7 @@ function StudyRenderer(json) {
 
 						for(var j=0;j<childNote.length;j++){
         
-          	     			   var cn = childNote[j]
+          	     			   var cn = childNote[j] ;
   		   	 				   var description = cn["OpenClinica:Description"]; 
    	                           var detailedNote = cn["OpenClinica:DetailedNote"]; 
   	                           var userRef = cn["UserRef"] 
