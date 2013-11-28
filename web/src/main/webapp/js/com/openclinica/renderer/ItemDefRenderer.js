@@ -90,7 +90,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
 	}
 
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions});
+           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,dataType:this.dataType});
         return s[0].outerHTML;
         
   }
