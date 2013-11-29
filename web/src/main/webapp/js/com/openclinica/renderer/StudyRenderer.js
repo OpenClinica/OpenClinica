@@ -305,7 +305,9 @@ function StudyRenderer(json) {
     var repeatRowNumber = 1;
     var totalRepeatingRows = 1;
     var idxForFirstItem = undefined;
-    
+    var currentAttributes = [];
+    var repeat =undefined;
+	
     for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++) {
       var repeatingRows = "";
       var itemDef = orderedItems[orderedItemIndex];
@@ -495,65 +497,86 @@ function StudyRenderer(json) {
       previousItemGroupOID = currentItemGroupOID;
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
-    }
-    if(app_displayAudits || app_displayDNs)
-    if(app_displayAudits=='y' || app_displayDNs=='y')//TODO: add flag for discrepancy notes as  a or clause 
-     	{
-    	var itemsOids = new Array();
-    	this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, eventDef);
-    	for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++){
-        	
-        	var itemDef = orderedItems[orderedItemIndex];
-        	var itemDetails = this.getItemDetails(itemDef, formDef);
-        	 var itemGroupHeader = undefined;
-      	
-    		 itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
-    		  this.renderString+="<div align='center'>"+formDef["@Name"]+"</div>";
-    		if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["ItemOID"])<1)
-    		{
-    			itemGroupHeader = app_itemGroupDefs[app_itemGroupMap[itemOID].itemGroupKey].name;
-    				this.renderString+=itemDefRenderer.renderItemFormMetadata();
-    				itemsOids.push(itemDef["ItemOID"]);
+  //  }
+     		// Metadata Report
+					if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
+                           
+	
+    					    var thisMetadata = {};
+		                  thisMetadata.MDitemName = itemDefRenderer.itemName;
+   
+      	if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
+	   thisMetadata.itemNameLink =itemDefRenderer.itemName;
+	   }else{
+	   thisMetadata.itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;}
 
+							
+			    			  repeating == true ?  thisMetadata.MDrepeat = repeatRowNumber :thisMetadata.MDrepeat = "";
+    		    			  
+							  thisMetadata.leftItemText = itemDefRenderer.name;
+							  thisMetadata.units = itemDefRenderer.unitLabel;
+							  thisMetadata.dataType = itemDefRenderer.dataType;
+
+							  
+    		    			  currentAttributes.push(thisMetadata);
+                              thisMetadata = {};
+			
+    				  
+			}
+			
+			
+			// Audit Log Report
 					if(app_displayAudits=='y' && itemDefRenderer.audits){
-    					  var auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
+    					  var auditLog =[];
+						  auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
+
     					  if(auditLog){
-    		    		 
-    						  var currentAuditLogs = [];
     						  auditLog = util_ensureArray(auditLog);
-    		    		  for(var i=0;i<auditLog.length;i++){
-    		    			  var thisAuditLog = {};
-    		    			 
+//    						  var currentAuditLogs = [];
+        	    			  var thisAuditLog = {};
+			                    thisAuditLog.ALitemName = itemDefRenderer.itemName;
+    	 
+							  for(var i=0;i<auditLog.length;i++){
     		    			  var audits = auditLog[i];
+
+			    			  repeating == true ?  thisAuditLog.ALrepeat = repeatRowNumber :thisAuditLog.ALrepeat = "";
+    		    			  thisAuditLog.audit_id = audits["@ID"];
     		    			  thisAuditLog.auditType = audits["@AuditType"];
     		    			  thisAuditLog.user = audits["@UserId"];
     		    			  thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
     		    			  thisAuditLog.oldValue = audits["@OldValue"];
     		    			  thisAuditLog.newValue = audits["@NewValue"];
-    		    			  currentAuditLogs.push(thisAuditLog);
+                              thisAuditLog.reasonForChange = audits["@ReasonForChange"];
 
+    		    			  currentAttributes.push(thisAuditLog);
+                              thisAuditLog = {};
+			
     		    		  } 
-    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs,itemGroupHeader)
+//    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs,itemGroupHeader)
     					 
     					  }
     				  }
 
 
-  					if(app_displayDNs=='y' && itemDefRenderer.dns ){
-							 var discrepancyNote=[];
-							discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
 
+                 // Discrepancy Notes Report
+  					if(app_displayDNs=='y' && itemDefRenderer.dns ){
+							var discrepancyNote=[];
+							discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
+                         	 
 					if(discrepancyNote ){
 
 							    discrepancyNote = util_ensureArray(discrepancyNote);
-  		 					    var currentDiscrepancyNotes = [];
+  	//	 					    var currentDiscrepancyNotes = [];
             			        var thisDiscrepancyNote = {};
-    						 var childNote=[];
-			  		  	  
+    						    var childNote=[];
+			                    thisDiscrepancyNote.DNitemName = itemDefRenderer.itemName;
+    		    			  		  	  
                 	  for(var i=0;i<discrepancyNote.length;i++){
                  		   var dns = discrepancyNote[i];
     	    
 			    			  thisDiscrepancyNote.parent_id = dns["@ID"];
+			    			  repeating == true ?  thisDiscrepancyNote.DNrepeat = repeatRowNumber :thisDiscrepancyNote.DNrepeat = "";
     		    			  thisDiscrepancyNote.parent_status = dns["@Status"];
     		    			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
     		    			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
@@ -577,28 +600,18 @@ function StudyRenderer(json) {
 							  if (detailedNote)  thisDiscrepancyNote.child_detailedNote = detailedNote;
 			 	              if (userRef) thisDiscrepancyNote.child_UserRef = userRef["@UserOID"];
 							  
-				              currentDiscrepancyNotes.push(thisDiscrepancyNote);
+				              currentAttributes.push(thisDiscrepancyNote);
     		                  thisDiscrepancyNote = {};
-    			
 				
-	   					      }	 
-    		    		  this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes)
-							  currentDiscrepancyNotes = [];
-            			      
-							  }
-							  
-							  
-    					 
-    					  }
-    				  }
+	    					      }	 
+    						  }
+                         }					 
+          			  }
+           	   }
 
-
-					  }
-    	}
-    	
-    	}
-    
-  }
+		   this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentAttributes)
+ 
+ }
   
   
   /* renderPageHeader()

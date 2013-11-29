@@ -320,8 +320,8 @@ function StudyDataLoader(study, json) {
 	            app_dns[itemOID]={};
 	          }
 	                        app_itemValuesMap[itemOID][repeatKey] = itemValue; 
-if (app_displayAudits =='y')app_audits[itemOID]= itemsData[j]["OpenClinica:AuditLogs"];
-if (app_displayDNs =='y')   app_dns[itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
+if (app_displayAudits =='y')app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
+if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
 	        }
 	      }
   }

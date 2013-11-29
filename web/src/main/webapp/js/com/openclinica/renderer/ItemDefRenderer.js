@@ -24,13 +24,14 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.dns = undefined;
   this.itemNameLink = undefined;
   
+  
   if (app_itemValuesMap[this.OID]) { 
     this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
-    this.audits = app_audits[this.OID];
+    this.audits = app_audits[this.OID][repeatRowNumber];
     if(app_displayDNs=='y')
-    this.dns = app_dns[this.OID];
-  }
+    this.dns = app_dns[this.OID][repeatRowNumber];
+    }
   
   
   
@@ -100,9 +101,9 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     return s[0].outerHTML;
   }
    
-this.renderDiscrepancyNotes = function(discrepancyNotes){
+this.renderDiscrepancyNotes = function(currentAttributes){
     var template="print_dns";
-    var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes,value:this.itemName});
+    var s = RenderUtil.render(RenderUtil.get(template),{Attributes:currentAttributes, displayDNs:app_displayDNs,displayAudits:app_displayAudits});
     return s[0].outerHTML;
   }
  

@@ -1,14 +1,116 @@
 <td valign='center'>
 
-  <table>
+ 
+<table> 
+
+   
+
+ {{each Attributes }}
+ 
+
+
+{{if displayAudits || displayDNs}}   {{if displayAudits == 'y' || displayDNs == 'y' }} 
+{{if MDitemName }}  {{if MDitemName!='' }}
+
+<table >
   <tr>&nbsp;</tr>
-  <tr><td>${value}:Discrepancy Notes </td>
-  </tr>
-  </table>
+   {{if MDrepeat!='' }}   <tr><td><a id="${itemNameLink}"></a> {{html MDitemName}} ({{html MDrepeat}}) :Metadata </td> </tr>
+  {{else}}  <tr><td> <a id="${itemNameLink}"></a> {{html MDitemName}} :Metadata </td> </tr>   {{/if}}
+</table>
+  
+  
+  
+  
   <table border="1" width="100%" >
  
-   <tr  class='DNBackgroundColorForHeaders'>
+  <tr  class='MetadataBackgroundColorForHeaders'>
+
+  <td>Left Item Text</td>
+  <td>Units</td>
+  <td>Data Type</td>
+  <td>Response Option Text</td>
+  <td>Response Option Value</td>
+  </tr>
+ 
+ {{/if}} {{/if}}
+
+ {{if dataType }}  {{if dataType!='' }}
+<tr>  
+  <td>{{html leftItemText}} </td>
+  <td>{{html units}}</td>
+  <td>{{html dataType}}</td>
   
+  
+  </tr>
+
+{{/if}} {{/if}}
+{{/if}} {{/if}} 
+
+
+
+ 
+ 
+
+
+ 
+ 
+ {{if displayAudits }}   {{if displayAudits == 'y' }} {{if audit_id }}  {{if audit_id!='' }}
+ {{if ALitemName }}  {{if ALitemName!='' }}
+<table >
+  <tr>&nbsp;</tr>
+   {{if ALrepeat!='' }}   <tr><td>{{html ALitemName}} ({{html ALrepeat}}) :Audit Logs </td> </tr>
+  {{else}}  <tr><td>{{html ALitemName}} :Audit Logs </td> </tr>   {{/if}}
+</table>
+  
+  <table border="1" width="100%" >
+ 
+  <tr  class='ALBackgroundColorForHeaders'>
+
+  <td>Audit_id</td>
+  <td>Audit Type</td>
+  <td>User</td>
+  <td>Date Time Stamp</td>
+  <td>Old Value</td>
+  <td>New Value</td>
+  <td>Reason For Change</td>
+  </tr>
+ 
+ {{/if}} {{/if}} {{/if}} {{/if}}
+
+ {{if audit_id }}  {{if audit_id!='' }}
+<tr>  
+  <td>{{html audit_id}} </td>
+  <td>{{html auditType}}</td>
+  <td>{{html user}}</td>
+  <td>{{html dateTimeStamp}}</td>
+  <td>{{html oldValue}}</td>
+  <td>{{html newValue}}</td>
+  <td>{{html reasonForChange}}</td>
+  </tr>
+
+{{/if}} {{/if}}
+{{/if}} {{/if}} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ {{if displayDNs }}   {{if displayDNs == 'y' }} {{if parent_id }}  {{if parent_id!='' }}
+ {{if DNitemName }}  {{if DNitemName!='' }}
+ <table>
+  <tr>&nbsp;</tr>
+    {{if DNrepeat!='' }}   <tr><td>{{html DNitemName}} ({{html DNrepeat}}) :Discrepancy Notes </td> </tr>
+    {{else}}  <tr><td>{{html DNitemName}} :Discrepancy Notes </td> </tr>   {{/if}}
+ </table>
+  <table border="1" width="100%" >
+  {{/if}} {{/if}} {{/if}}{{/if}} 
+
+ 
+ {{if parent_id }}  {{if parent_id!='' }}
+  <tr  class='DNBackgroundColorForHeaders'>
+
   <td>Parent_id</td>
   <td>Status</td>
   <td>Note Type</td>
@@ -21,13 +123,12 @@
   <td>Description</td>
   <td>Detailed Note</td>
   <td>User Ref</td>
-  
   </tr>
+  {{/if}} {{/if}}
  
- {{each discrepancyNotes}}
+ {{if child_id }}  {{if child_id!='' }}
  
-  
-  <tr>
+<tr>  
   <td>{{html parent_id}} </td>
   <td>{{html parent_status}}</td>
   <td>{{html parent_noteType}}</td>
@@ -40,11 +141,14 @@
   <td>{{html child_description}}</td>
   <td>{{html child_detailedNote}}</td>
   <td>{{html child_UserRef}}</td>
+</tr>
+{{/if}} {{/if}}
 
-
-  </tr>
+{{/if}} {{/if}}
+ 
   
   {{/each}}
+  
   </table>
   </td>
   
