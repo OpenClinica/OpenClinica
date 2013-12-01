@@ -1095,12 +1095,12 @@ function openDNWindow(inURL, spanID,strErrMsg) {
         // encode it using 'escape'
         if (inURL.match(/\?/)) {
             if (inURL.match(/\?$/)) {
-                newURL = inURL + 'strErrMsg=' + escape(strErrMsg);
+                newURL = inURL + 'strErrMsg=' + encodeURIComponent(strErrMsg);
             } else {
-                newURL = inURL + '&strErrMsg=' + escape(strErrMsg);
+                newURL = inURL + '&strErrMsg=' + encodeURIComponent(strErrMsg);
             }
         } else {
-            newURL = inURL + '?strErrMsg=' + escape(strErrMsg);
+            newURL = inURL + '?strErrMsg=' + encodeURIComponent(strErrMsg);
         }
     } else {
         newURL = inURL;
