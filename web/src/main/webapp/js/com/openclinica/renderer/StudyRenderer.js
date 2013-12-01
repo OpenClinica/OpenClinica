@@ -373,6 +373,7 @@ function StudyRenderer(json) {
       // inspect the next ItemDef for look-ahead purposes.
       var nextItemDef = undefined;
       var nextColumnNumber = undefined;
+
       if (orderedItemIndex+1 < orderedItems.length) {
         nextItemDef = orderedItems[orderedItemIndex+1];
         var nextItemDetails = this.getItemDetails(nextItemDef, formDef);
@@ -400,8 +401,10 @@ function StudyRenderer(json) {
         
         if (nextGroupOID != currentItemGroupOID) {
           lastItemInRepeatingRow = true;
-        }
-        var orderNumber = app_itemGroupMap[itemOID].orderNumber;
+
+		  }
+        
+		var orderNumber = app_itemGroupMap[itemOID].orderNumber;
         var itemGroupLength = app_itemGroupMap[itemOID].itemGroupLength;
         debug("repeating group: item " + orderNumber + " of " + itemGroupLength, util_logDebug);
        
@@ -470,6 +473,7 @@ function StudyRenderer(json) {
           if (repeatRowNumber == totalRepeatingRows) { 
             this.renderString += RenderUtil.render(RenderUtil.get(
             "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
+             repeatRowNumber++;
           } 
           else {
             repeatRowNumber++;
@@ -498,10 +502,11 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
   //  }
-     		// Metadata Report
+     		
+			
+			// Metadata Report
 					if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
                            
-	
     					    var thisMetadata = {};
 		                  thisMetadata.MDitemName = itemDefRenderer.itemName;
    
@@ -510,9 +515,11 @@ function StudyRenderer(json) {
 	   }else{
 	   thisMetadata.itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;}
 
-							
-			    			  repeating == true ?  thisMetadata.MDrepeat = repeatRowNumber :thisMetadata.MDrepeat = "";
-    		    			  
+		             var rowNumber = repeatRowNumber ;
+				      
+    				(lastItemInRepeatingRow) ? rowNumber-- : rowNumber ; 
+              		repeating == true ?  thisMetadata.MDrepeat = rowNumber :thisMetadata.MDrepeat = "";
+    	
 							  thisMetadata.leftItemText = itemDefRenderer.name;
 							  thisMetadata.units = itemDefRenderer.unitLabel;
 							  thisMetadata.dataType = itemDefRenderer.dataType;
@@ -539,7 +546,7 @@ function StudyRenderer(json) {
 							  for(var i=0;i<auditLog.length;i++){
     		    			  var audits = auditLog[i];
 
-			    			  repeating == true ?  thisAuditLog.ALrepeat = repeatRowNumber :thisAuditLog.ALrepeat = "";
+			    			  repeating == true ?  thisAuditLog.ALrepeat = rowNumber :thisAuditLog.ALrepeat = "";
     		    			  thisAuditLog.audit_id = audits["@ID"];
     		    			  thisAuditLog.auditType = audits["@AuditType"];
     		    			  thisAuditLog.user = audits["@UserId"];
@@ -576,8 +583,10 @@ function StudyRenderer(json) {
                  		   var dns = discrepancyNote[i];
     	    
 			    			  thisDiscrepancyNote.parent_id = dns["@ID"];
-			    			  repeating == true ?  thisDiscrepancyNote.DNrepeat = repeatRowNumber :thisDiscrepancyNote.DNrepeat = "";
-    		    			  thisDiscrepancyNote.parent_status = dns["@Status"];
+
+ 			    			  repeating == true ?  thisDiscrepancyNote.DNrepeat = rowNumber :thisDiscrepancyNote.DNrepeat = "";
+    		
+                    			thisDiscrepancyNote.parent_status = dns["@Status"];
     		    			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
     		    			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
     		    			  thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
