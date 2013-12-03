@@ -25,6 +25,7 @@
   var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>'
   var app_siteNameLabel = '<fmt:message key="site" bundle="${resword}"/>'
   var app_studyNameLabel = '<fmt:message key="study_name" bundle="${resword}"/>'
+  var app_studySubjectLabel = '<fmt:message key="study_subject" bundle="${resword}"/>'
   var app_studySubjectIDLabel = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'
   var app_pageNumberLabel = '<fmt:message key="page_x_de_y" bundle="${resword}"/>'.replace(/[{}]/g, '');
   var app_investigatorLabel = '<fmt:message key="investigator" bundle="${resterm}"/>';
@@ -36,6 +37,7 @@
   var app_eventNameLabel = '<fmt:message key="event_name" bundle="${resword}"/>'; 
   var app_personIDLabel = '<fmt:message key="person_ID" bundle="${resword}"/>'; 
   var app_interviewerLabel = '<fmt:message key="interviewer" bundle="${resword}"/>'; 
+  var app_interviewerName = '<fmt:message key="interviewer_name" bundle="${resword}"/>'; 
   var app_interviewDateLabel = '<fmt:message key="interview_date" bundle="${resword}"/>'; 
   var app_secondaryLabel = '<fmt:message key="secondary_label" bundle="${resword}"/>'; 
   var app_studySubjectDOBLabel = '<fmt:message key="study_subject_dob" bundle="${resword}"/>'; 

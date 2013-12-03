@@ -108,6 +108,7 @@ public class ODMClinicaDataResource {
 			@PathParam("formVersionOID") String formVersionOID,	@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
 			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
 			throws Exception {
+		request.setCharacterEncoding("UTF-8");
 		request.setAttribute("studyOID", studyOID);
 		request.setAttribute("studySubjectOID", studySubjectOID);
 		request.setAttribute("eventOID", eventOID);
