@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -37,7 +38,7 @@ import com.lowagie.text.pdf.PdfWriter;
  *
  */
 public class DownloadDiscrepancyNote implements DownLoadBean{
-    public static String CSV ="text/plain";
+    public static String CSV ="text/plain; charset=UTF-8";
     public static String PDF = "application/pdf";
     public static String COMMA = ",";
     public static Map<Integer,String> RESOLUTION_STATUS_MAP = new HashMap<Integer,String> ();
@@ -514,7 +515,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
     public void downLoadThreadedDiscBeans(List<DiscrepancyNoteThread> listOfThreadedBeans,
                                           String format,
-                                          OutputStream stream, String studyIdentifier) {
+                                          HttpServletResponse response, String studyIdentifier) throws Exception {
 
         if (listOfThreadedBeans == null ) {
             return;
@@ -538,15 +539,18 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         }
 
         //This must be a ServletOutputStream for our purposes
-        ServletOutputStream servletStream = (ServletOutputStream) stream;
+        ServletOutputStream servletStream = null;
 
         try{
             if(CSV.equalsIgnoreCase(format))  {
-                servletStream.print(allContent.toString());
+                String result  = StringEscapeUtils.unescapeJava(allContent.toString());
+                response.getWriter().print(result);
+                //servletStream.print(allContent.toString());
             } else {
 
                 //Create PDF version
                 //this.serializeListToPDF(listOfBeans,servletStream, studyIdentifier);
+                servletStream = (ServletOutputStream) response.getOutputStream();
                 this.serializeThreadsToPDF(listOfThreadedBeans,servletStream, studyIdentifier);
 
 
