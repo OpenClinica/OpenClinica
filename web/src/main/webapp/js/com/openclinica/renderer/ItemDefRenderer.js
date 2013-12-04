@@ -82,7 +82,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.renderItemFormMetadata = function(){
     var template = "print_item_metadata_info";
     var subjectOID = app_thisSubjectsData["@SubjectKey"];
-    var responseOptions =  this.responseType== "single-select"?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
+    var responseOptions =  app_codeLists[this.codeListOID]?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
 
     if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
 	var itemNameLink =this.itemName
@@ -97,7 +97,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   }
   this.renderAuditLogs = function(auditLogs,itemGroupLabel){
     var template="print_audits";
-    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,itemgroupHeader:itemGroupLabel});
+    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName});
     return s[0].outerHTML;
   }
    
