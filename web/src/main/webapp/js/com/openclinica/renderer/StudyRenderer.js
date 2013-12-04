@@ -513,7 +513,7 @@ function StudyRenderer(json) {
     	  }
     	  if(app_displayDNs=='y')
     	  {
-    		  logs+=printDiscrepancies(itemDefRenderer);
+    		  logs+=printDiscrepancies(itemDefRenderer,repeatRowNumber,repeating);
     	  }
       }
       
@@ -561,19 +561,19 @@ function StudyRenderer(json) {
 	  return this.auditLogs;
   }
   
-  printDiscrepancies = function(itemDefRenderer){
+  printDiscrepancies = function(itemDefRenderer,repeatRowNumber,repeating){
 this.discrepancyNotesLog="";
 		if(app_displayDNs=='y' && itemDefRenderer.dns ){
 				 var discrepancyNote=[];
 				discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
-		if(discrepancyNote ){
+		if(discrepancyNote){
 				    discrepancyNote = util_ensureArray(discrepancyNote);
 					    var currentDiscrepancyNotes = [];
 			        var thisDiscrepancyNote = {};
 				 var childNote=[];
   	  for(var i=0;i<discrepancyNote.length;i++){
    		   var dns = discrepancyNote[i];
-  			  thisDiscrepancyNote.parent_id = dns["@ID"];
+			  thisDiscrepancyNote.parent_id = dns["@ID"];
   			  thisDiscrepancyNote.parent_status = dns["@Status"];
   			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
   			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
@@ -594,7 +594,8 @@ this.discrepancyNotesLog="";
 	              currentDiscrepancyNotes.push(thisDiscrepancyNote);
                 thisDiscrepancyNote = {};
 				      }	 
-			this.discrepancyNotesLog+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes);
+ //                      (repeating) ?   rowNumber = repeatRowNumber : rowNumber = "";
+				 this.discrepancyNotesLog+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes,repeatRowNumber,repeating);
 				  currentDiscrepancyNotes = [];
 				  }
 				  

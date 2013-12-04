@@ -101,9 +101,9 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     return s[0].outerHTML;
   }
    
-this.renderDiscrepancyNotes = function(currentAttributes){
+this.renderDiscrepancyNotes = function(discrepancyNotesLog,repeatRowNumber,repeating){
     var template="print_dns";
-    var s = RenderUtil.render(RenderUtil.get(template),{Attributes:currentAttributes, displayDNs:app_displayDNs,displayAudits:app_displayAudits});
+    var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotesLog,value:this.itemName,repeatRow:repeatRowNumber, repeating:repeating});
     return s[0].outerHTML;
   }
  
