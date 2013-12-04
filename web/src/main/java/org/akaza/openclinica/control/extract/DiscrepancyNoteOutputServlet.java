@@ -149,13 +149,13 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response.getOutputStream(), null);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null);
         } else {
             response.setHeader("Pragma", "public");
             /*downLoader.downLoadDiscBeans(allDiscNotes,
               DownloadDiscrepancyNote.PDF,
               response.getOutputStream(), studyIdentifier);*/
-            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response.getOutputStream(), studyIdentifier);
+            downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier);
         }
     }
 

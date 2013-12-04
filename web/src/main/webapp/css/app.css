@@ -238,6 +238,15 @@ padding-left: 2px;
 
 }
 
+.header-text-plus-not-bold {
+color: #333333;
+font-size: 14px;
+padding-bottom: 7px;
+
+padding-left: 2px;
+}
+
+
 .header-text-plus {
 color: #333333;
 font-size: 14px;
