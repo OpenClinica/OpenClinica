@@ -91,9 +91,12 @@ public class ODMClinicaDataResource {
 		//xmlSerializer.setForceTopLevelObject(true);
 		xmlSerializer.setTypeHintsEnabled(true);
 		JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
+  
+		JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
+        processor.process((JSONObject) json);
 
-        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
-        processor.process(json);
+//        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
+//        processor.process(json);
 
 		return json.toString(INDENT_LEVEL);
 	}
