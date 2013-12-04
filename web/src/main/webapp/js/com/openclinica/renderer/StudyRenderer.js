@@ -502,7 +502,7 @@ function StudyRenderer(json) {
       
       
       if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-    	  if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
+    	 //if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
     	  {
     		  logs+=printItemMetadata(orderedItems,itemDefRenderer,itemDef,itemDetails,formDef,itemOID);
     		  itemOids.push(itemOID);
@@ -532,7 +532,7 @@ function StudyRenderer(json) {
 		return this.itemMetadataPrint;
   }
   
-  printItemAudits = function(itemDefRenderer){
+  printItemAudits = function(itemDefRenderer,repeatRowNumber){
 	  this.auditLogs = "";
 	  
 		  
@@ -554,11 +554,11 @@ function StudyRenderer(json) {
 	    			  currentAuditLogs.push(thisAuditLog);
 
 	    		  } 
-	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs)
+	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs,repeatRowNumber);
 				 
 				  }
 			  }
-	  return auditLogs;
+	  return this.auditLogs;
   }
   
   printDiscrepancies = function(itemDefRenderer){

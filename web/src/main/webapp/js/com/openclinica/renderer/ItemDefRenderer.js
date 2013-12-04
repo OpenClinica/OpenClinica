@@ -95,9 +95,9 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
         return s[0].outerHTML;
         
   }
-  this.renderAuditLogs = function(auditLogs,itemGroupLabel){
+  this.renderAuditLogs = function(auditLogs,repeatRowNumber){
     var template="print_audits";
-    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName});
+    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,repeatRow:repeatRowNumber});
     return s[0].outerHTML;
   }
    
