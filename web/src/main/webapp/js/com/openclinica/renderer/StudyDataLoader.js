@@ -318,13 +318,19 @@ function StudyDataLoader(study, json) {
 	            app_itemValuesMap[itemOID] = {}; 
 	            app_audits[itemOID]={};
 	            app_dns[itemOID]={};
+	            app_itemDataMap[itemOID]={};
 	          }
 	                        app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+	                        app_itemDataMap[itemOID][repeatKey]=itemsData[j];
+	                        
 if (app_displayAudits =='y')app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
 if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
 	        }
 	      }
+	    
+	   
   }
+
   
   /* loadStudyLists()
    */

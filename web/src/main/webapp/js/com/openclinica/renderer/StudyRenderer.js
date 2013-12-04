@@ -308,7 +308,7 @@ function StudyRenderer(json) {
     var itemOids = new Array();
     var currentAttributes = [];
     var repeat =undefined;
-	
+	var saveForAuditsIndex = 0;
     for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++) {
       var repeatingRows = "";
       var itemDef = orderedItems[orderedItemIndex];
@@ -399,7 +399,7 @@ function StudyRenderer(json) {
       /*******************  REPEATING GROUP **********************************/
       // process repeating group of items 
       if (repeating == true) {
-        
+    	  saveForAuditsIndex = repeatRowNumber;
         if (nextGroupOID != currentItemGroupOID) {
           lastItemInRepeatingRow = true;
 
@@ -474,11 +474,14 @@ function StudyRenderer(json) {
           if (repeatRowNumber == totalRepeatingRows) { 
             this.renderString += RenderUtil.render(RenderUtil.get(
             "print_repeating_item_group"), {headerColspan:itemGroupLength, name:itemGroupHeader, tableHeader:repeatingHeaderString, tableBody:repeatingRows})[0].outerHTML; 
-             repeatRowNumber++;
+            saveForAuditsIndex = repeatRowNumber;
+            repeatRowNumber++;
           } 
           else {
-            repeatRowNumber++;
-            orderedItemIndex = idxForFirstItem-2;// here we are offsetting by 2. This indicates the repeating grid needs to continue;
+            saveForAuditsIndex = repeatRowNumber;
+        	  repeatRowNumber++;
+            
+            orderedItemIndex = idxForFirstItem-2;// here we are offsetting by 2. This indicates the repeating grid needs to continue and go back to first column of the next row;
             
           }
         }
@@ -502,18 +505,20 @@ function StudyRenderer(json) {
       
       
       if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-    	 //if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
+    	 if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
     	  {
     		  logs+=printItemMetadata(orderedItems,itemDefRenderer,itemDef,itemDetails,formDef,itemOID);
-    		  itemOids.push(itemOID);
-    	  }
+    		  
+    	 
     	   if(app_displayAudits=='y')
     	  {
-    		 logs+= printItemAudits(itemDefRenderer,repeatRowNumber);
+    		 logs+= printItemAudits(itemDefRenderer,saveForAuditsIndex);
     	  }
     	  if(app_displayDNs=='y')
     	  {
     		  logs+=printDiscrepancies(itemDefRenderer);
+    	  }
+    	  itemOids.push(itemOID);
     	  }
       }
       
@@ -537,11 +542,12 @@ function StudyRenderer(json) {
 	  
 		  
 			if(app_displayAudits=='y' && itemDefRenderer.audits){
-				  var auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
-				  if(auditLog){
-	    		 
-					  var currentAuditLogs = [];
-					  auditLog = util_ensureArray(auditLog);
+				  var auditLogs = itemDefRenderer.audits;
+				  for(var key in auditLogs){
+				 
+					  if(auditLogs[key]!=undefined){	
+	    		 	  var currentAuditLogs = [];
+					  var auditLog = util_ensureArray(auditLogs[key]["OpenClinica:AuditLog"]);
 	    		  for(var i=0;i<auditLog.length;i++){
 	    			  var thisAuditLog = {};
 	    			 
@@ -554,8 +560,9 @@ function StudyRenderer(json) {
 	    			  currentAuditLogs.push(thisAuditLog);
 
 	    		  } 
-	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs,repeatRowNumber);
+	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs,key);
 				 
+				  }
 				  }
 			  }
 	  return this.auditLogs;
