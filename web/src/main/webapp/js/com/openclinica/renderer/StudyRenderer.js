@@ -512,7 +512,7 @@ function StudyRenderer(json) {
     	 
     	   if(app_displayAudits=='y')
     	  {
-    		 logs+= printItemAudits(itemDefRenderer,saveForAuditsIndex);
+    		 logs+= printItemAudits(itemDefRenderer,saveForAuditsIndex,repeating);
     	  }
     	  if(app_displayDNs=='y')
     	  {
@@ -532,12 +532,12 @@ function StudyRenderer(json) {
      		
   printItemMetadata = function(orderedItems,itemDefRenderer,formDef,itemOID){
       this.itemMetadataPrint = "";
-	  this.itemMetadataPrint+="<div align='center'>"+formDef["@Name"]+"</div>";
+//	  this.itemMetadataPrint+="<div align='center'>"+formDef["@Name"]+"</div>";
 	   this.itemMetadataPrint+=itemDefRenderer.renderItemFormMetadata();
 		return this.itemMetadataPrint;
   }
   
-  printItemAudits = function(itemDefRenderer,repeatRowNumber){
+  printItemAudits = function(itemDefRenderer,repeatRowNumber,repeating){
 	  this.auditLogs = "";
 	  
 		  
@@ -560,7 +560,7 @@ function StudyRenderer(json) {
 	    			  currentAuditLogs.push(thisAuditLog);
 
 	    		  } 
-	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs,key);
+	    		  this.auditLogs+=itemDefRenderer.renderAuditLogs(currentAuditLogs,key,repeating);
 				 
 				  }
 				  }
@@ -569,12 +569,15 @@ function StudyRenderer(json) {
   }
   
   printDiscrepancies = function(itemDefRenderer,repeatRowNumber,repeating){
-this.discrepancyNotesLog="";
+this.discrepancyNotes="";
 		if(app_displayDNs=='y' && itemDefRenderer.dns ){
-				 var discrepancyNote=[];
-				discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
-		if(discrepancyNote){
-				    discrepancyNote = util_ensureArray(discrepancyNote);
+ 				  var discrepancyNotes = itemDefRenderer.dns;
+				  for(var key in discrepancyNotes){
+					  if(discrepancyNotes[key]!=undefined){	
+					  var discrepancyNote = util_ensureArray(discrepancyNotes[key]["OpenClinica:DiscrepancyNote"]);
+
+				  
+//		var discrepancyNote=[];
 					    var currentDiscrepancyNotes = [];
 			        var thisDiscrepancyNote = {};
 				 var childNote=[];
@@ -602,15 +605,15 @@ this.discrepancyNotesLog="";
                 thisDiscrepancyNote = {};
 				      }	 
  //                      (repeating) ?   rowNumber = repeatRowNumber : rowNumber = "";
-				 this.discrepancyNotesLog+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes,repeatRowNumber,repeating);
-				  currentDiscrepancyNotes = [];
 				  }
+				 this.discrepancyNotes+=itemDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes,key,repeating);
+				  currentDiscrepancyNotes = [];
 				  
 				  
-			 
+		}	 
 			  }
 		  }
-		return this.discrepancyNotesLog;
+		return this.discrepancyNotes;
   }
   
   

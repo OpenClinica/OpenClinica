@@ -1,15 +1,14 @@
 <td valign='center'>
 
   <table>
-
+<tr>&nbsp;</tr>
+  
 {{if repeating}}  
-  <tr>&nbsp;</tr>
-  <tr><td>${value}(${repeatRow}): Discrepancy Notes Repeating</td>
+  <tr><td>${value}(${repeatRow}): Discrepancy Notes  </td>
  {{/if}}
 
   
  {{if !repeating}}
-<tr>&nbsp;</tr>
   <tr><td>${value}: Discrepancy Notes </td>
   {{/if}}
 
@@ -35,6 +34,7 @@
   <td>User Ref</td>
   
   </tr>
+ 
  
  {{each discrepancyNotes}}
  

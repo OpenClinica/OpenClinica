@@ -30,7 +30,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
     if(app_displayAudits=='y')
     this.audits = app_audits[this.OID];
     if(app_displayDNs=='y')
-    this.dns = app_dns[this.OID][repeatRowNumber];
+    this.dns = app_dns[this.OID];
     }
   
   
@@ -95,15 +95,15 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
         return s[0].outerHTML;
         
   }
-  this.renderAuditLogs = function(auditLogs,repeatRowNumber){
+  this.renderAuditLogs = function(auditLogs,repeatRowNumber,repeating){
     var template="print_audits";
-    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,repeatRow:repeatRowNumber});
+    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs,value:this.itemName,repeatRow:repeatRowNumber,repeating:repeating});
     return s[0].outerHTML;
   }
    
-this.renderDiscrepancyNotes = function(discrepancyNotesLog,repeatRowNumber,repeating){
+this.renderDiscrepancyNotes = function(discrepancyNotes,repeatRowNumber,repeating){
     var template="print_dns";
-    var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotesLog,value:this.itemName,repeatRow:repeatRowNumber, repeating:repeating});
+    var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes,value:this.itemName,repeatRow:repeatRowNumber, repeating:repeating});
     return s[0].outerHTML;
   }
  

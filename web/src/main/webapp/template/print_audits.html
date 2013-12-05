@@ -1,8 +1,19 @@
 <td valign='center'>
 
   <table>
+
   <tr>&nbsp;</tr>
-  <tr><td>${value}(${repeatRow}):Audit History </td>
+{{if repeating}}  
+  <tr><td>${value}(${repeatRow}): Audit History </td>
+ {{/if}}
+
+  
+ {{if !repeating}}
+  <tr><td>${value}: Audit History </td>
+  {{/if}}
+
+
+
   </tr>
   </table>
   <table border="1" width="100%" >
