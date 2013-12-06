@@ -59,6 +59,15 @@ a:active {
 }
 
 .DNBackgroundColorForHeaders{
+   background-color : black;
+   color : white;
+ text-decoration:underline;
+
+}
+
+
+
+.DNParentRowColor{
    background-color : lightgrey;
 }
 .MetadataBackgroundColorForHeaders{
