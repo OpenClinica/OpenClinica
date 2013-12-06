@@ -19,8 +19,8 @@
       </div>  
       {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>
-      {{if eventName}}${eventName}{{if repeating}}{{if repeating == 'Yes'}}(${repeatOrdinal}):{{/if}}{{/if}}
-       ${eventStartDate}{{if eventEndDate}}&nbsp;-&nbsp;${eventEndDate}{{/if}}{{/if}}
+      {{if eventName}}${eventName}{{if repeating}}{{if repeating == 'Yes'}} (${repeatOrdinal}){{/if}}{{/if}}:
+      ${eventStartDate}{{if eventEndDate}}&nbsp;-&nbsp;${eventEndDate}{{/if}}{{/if}}
            </div>  
  
     {{/if}}
