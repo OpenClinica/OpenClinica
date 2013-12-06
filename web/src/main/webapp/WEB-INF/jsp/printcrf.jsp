@@ -62,7 +62,7 @@ var app_studyLabel='<fmt:message key="study" bundle="${resword}"/>';
 // var app_studyEventLabel='<fmt:message key="SE" bundle="${resword}"/>';
 //var app_subjectLabel='<fmt:message key="subject" bundle="${resword}"/>';
 var app_groupLabel='<fmt:message key="group" bundle="${resword}"/>';
-var app_crfLabel='<fmt:message key="CRF" bundle="${resword}"/>';
+var app_crfLabel='<fmt:message key="CRF_status" bundle="${resword}"/>';
 var genderLabel='<fmt:message key="gender" bundle="${resword}"/>';
 
   </script>
