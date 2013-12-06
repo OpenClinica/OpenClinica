@@ -506,7 +506,7 @@ function StudyRenderer(json) {
       
       if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
     	 if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
-    	  {
+     	  {
     		  logs+=printItemMetadata(orderedItems,itemDefRenderer,itemDef,itemDetails,formDef,itemOID);
     		  
     	 
@@ -527,9 +527,14 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-    this.renderString+=logs;
+    this.renderPageHeader(this.pageBreak, app_printTime, app_studyContentPageType, eventDef);
+    this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+	
+	this.renderString+=logs;
+	
   }
-     		
+   
+     
   printItemMetadata = function(orderedItems,itemDefRenderer,formDef,itemOID){
       this.itemMetadataPrint = "";
 //	  this.itemMetadataPrint+="<div align='center'>"+formDef["@Name"]+"</div>";
@@ -626,124 +631,7 @@ this.discrepancyNotes="";
   
   
   
-			/*
-			// Metadata Report
-					if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-                           
-    					    var thisMetadata = {};
-		                  thisMetadata.MDitemName = itemDefRenderer.itemName;
-   
-      	if (app_thisFormData == undefined || app_thisStudyEvent==undefined ||app_thisSubjectsData==undefined) {
-	   thisMetadata.itemNameLink =itemDefRenderer.itemName;
-	   }else{
-	   thisMetadata.itemNameLink = app_thisSubjectsData["@SubjectKey"]+"/"+app_thisStudyEvent["@StudyEventOID"]+"["+app_thisStudyEvent["@StudyEventRepeatKey"]+"]/"+ app_thisFormData["@FormOID"]+"/"+itemDefRenderer.OID;}
-
-		             var rowNumber = repeatRowNumber ;
-				      
-    				(lastItemInRepeatingRow) ? rowNumber-- : rowNumber ; 
-              		repeating == true ?  thisMetadata.MDrepeat = rowNumber :thisMetadata.MDrepeat = "";
-    	
-							  thisMetadata.leftItemText = itemDefRenderer.name;
-							  thisMetadata.units = itemDefRenderer.unitLabel;
-							  thisMetadata.dataType = itemDefRenderer.dataType;
-
-							  
-    		    			  currentAttributes.push(thisMetadata);
-                              thisMetadata = {};
-			
-    				  
-			}
-			
-			
-			// Audit Log Report
-					if(app_displayAudits=='y' && itemDefRenderer.audits){
-    					  var auditLog =[];
-						  auditLog = itemDefRenderer.audits["OpenClinica:AuditLog"];
-
-    					  if(auditLog){
-    						  auditLog = util_ensureArray(auditLog);
-//    						  var currentAuditLogs = [];
-        	    			  var thisAuditLog = {};
-			                    thisAuditLog.ALitemName = itemDefRenderer.itemName;
-    	 
-							  for(var i=0;i<auditLog.length;i++){
-    		    			  var audits = auditLog[i];
-
-			    			  repeating == true ?  thisAuditLog.ALrepeat = rowNumber :thisAuditLog.ALrepeat = "";
-    		    			  thisAuditLog.audit_id = audits["@ID"];
-    		    			  thisAuditLog.auditType = audits["@AuditType"];
-    		    			  thisAuditLog.user = audits["@UserId"];
-    		    			  thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
-    		    			  thisAuditLog.oldValue = audits["@OldValue"];
-    		    			  thisAuditLog.newValue = audits["@NewValue"];
-                              thisAuditLog.reasonForChange = audits["@ReasonForChange"];
-
-    		    			  currentAttributes.push(thisAuditLog);
-                              thisAuditLog = {};
-			
-    		    		  } 
-//    		    		  this.renderString+=itemDefRenderer.renderAuditLogs(currentAuditLogs,itemGroupHeader)
-    					 
-    					  }
-    				  }
-
-
-
-                 // Discrepancy Notes Report
-  					if(app_displayDNs=='y' && itemDefRenderer.dns ){
-							var discrepancyNote=[];
-							discrepancyNote = itemDefRenderer.dns["OpenClinica:DiscrepancyNote"];
-                         	 
-					if(discrepancyNote ){
-
-							    discrepancyNote = util_ensureArray(discrepancyNote);
-  	//	 					    var currentDiscrepancyNotes = [];
-            			        var thisDiscrepancyNote = {};
-    						    var childNote=[];
-			                    thisDiscrepancyNote.DNitemName = itemDefRenderer.itemName;
-    		    			  		  	  
-                	  for(var i=0;i<discrepancyNote.length;i++){
-                 		   var dns = discrepancyNote[i];
-    	    
-			    			  thisDiscrepancyNote.parent_id = dns["@ID"];
-
- 			    			  repeating == true ?  thisDiscrepancyNote.DNrepeat = rowNumber :thisDiscrepancyNote.DNrepeat = "";
-    		
-                    			thisDiscrepancyNote.parent_status = dns["@Status"];
-    		    			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
-    		    			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
-    		    			  thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
-
-							  childNote = dns["OpenClinica:ChildNote"] ;          			
-		         		    childNote = util_ensureArray(childNote);
-
-
-						for(var j=0;j<childNote.length;j++){
-        
-          	     			   var cn = childNote[j];
-  		   	 				   var description = cn["OpenClinica:Description"]; 
-   	                           var detailedNote = cn["OpenClinica:DetailedNote"]; 
-  	                           var userRef = cn["UserRef"] 
- 							  
-							  thisDiscrepancyNote.child_id = cn["@ID"];
-			 	              thisDiscrepancyNote.child_status = cn["@Status"];
-			 	              thisDiscrepancyNote.child_dateCreated = cn["@DateCreated"];
-							  thisDiscrepancyNote.child_description  = description;
-							  if (detailedNote)  thisDiscrepancyNote.child_detailedNote = detailedNote;
-			 	              if (userRef) thisDiscrepancyNote.child_UserRef = userRef["@UserOID"];
-							  
-				              currentAttributes.push(thisDiscrepancyNote);
-    		                  thisDiscrepancyNote = {};
-				
-	    					      }	 
-    						  }
-                         }					 
-          			  }
-           	   }
-
-		   this.renderString+=itemDefRenderer.renderDiscrepancyNotes(currentAttributes)
-*/ 
- //}
+	
   
   
   /* renderPageHeader()
