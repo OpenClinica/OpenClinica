@@ -583,24 +583,32 @@ this.discrepancyNotes="";
 				 var childNote=[];
   	  for(var i=0;i<discrepancyNote.length;i++){
    		   var dns = discrepancyNote[i];
-			  thisDiscrepancyNote.parent_id = dns["@ID"];
-  			  thisDiscrepancyNote.parent_status = dns["@Status"];
+			  
+			  thisDiscrepancyNote.description = "";
+  			  thisDiscrepancyNote.id = dns["@ID"].substring(3);
   			  thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
-  			  thisDiscrepancyNote.parent_dateUpdated = dns["@DateUpdated"];
+  			  thisDiscrepancyNote.status = dns["@Status"];
   			  thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
+			  thisDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
+              
+			  
 			  childNote = dns["OpenClinica:ChildNote"] ;          			
    		      childNote = util_ensureArray(childNote);
-			for(var j=0;j<childNote.length;j++){
+		            currentDiscrepancyNotes.push(thisDiscrepancyNote);
+                thisDiscrepancyNote = {};
+					
+      	for(var j=0;j<childNote.length;j++){
      			   var cn = childNote[j] ;
 	 			   var description = cn["OpenClinica:Description"]; 
                     var detailedNote = cn["OpenClinica:DetailedNote"]; 
                    var userRef = cn["UserRef"] 
-				  thisDiscrepancyNote.child_id = cn["@ID"];
-	              thisDiscrepancyNote.child_status = cn["@Status"];
-	              thisDiscrepancyNote.child_dateCreated = cn["@DateCreated"];
-				  thisDiscrepancyNote.child_description  = description;
-				  if (detailedNote)  thisDiscrepancyNote.child_detailedNote = detailedNote;
-	              if (userRef) thisDiscrepancyNote.child_UserRef = userRef["@UserOID"];
+				  thisDiscrepancyNote.description  = description;
+				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
+	              if (userRef) thisDiscrepancyNote.UserRef = userRef["@UserOID"];
+				  thisDiscrepancyNote.id = cn["@ID"].substring(4);
+	              thisDiscrepancyNote.status = cn["@Status"];
+	              thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
+
 	              currentDiscrepancyNotes.push(thisDiscrepancyNote);
                 thisDiscrepancyNote = {};
 				      }	 
