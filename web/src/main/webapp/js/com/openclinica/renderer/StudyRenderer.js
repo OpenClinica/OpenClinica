@@ -529,7 +529,7 @@ function StudyRenderer(json) {
     }
   	 
     if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-       this.renderPageHeader(this.pageBreak, app_printTime, app_studyContentPageType, eventDef);
+       this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
        this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
   	 }
   	 
