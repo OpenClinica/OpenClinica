@@ -4,6 +4,10 @@ var app_itemGroupRepeatLengthMap = {};
 var app_itemValuesMap = {};
 var app_audits={};
 var app_dns={};
+var app_eventCRFdns={};
+var app_eventCRFaudits={};
+
+
 var app_itemDataMap={};
 var app_maxPixelHeight = 610;
 var app_maxLandscapePixelHeight = 400;
@@ -31,7 +35,7 @@ var app_crfHeader;
 var app_crfPageNumber = 0;
 var app_templateNames = 
 ['print_page_header','print_form_def','print_item_def','print_repeating_item_group',
- 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits','print_dns','print_page_header_global'];
+ 'print_repeating_item','print_repeating_item_horiz','print_item_metadata_info','print_audits','print_dns','print_page_header_global','print_eventCRFdns' ,'print_eventCRFaudits'];
 var renderMode;
 var app_collectSubjectDOB;
 var app_personIDRequired;
@@ -57,6 +61,9 @@ var app_thisFormData = undefined;
 var app_studyEventDefMap = {};
 var app_renderMode=undefined;
 debug("console debugging enabled.", util_logDebug);
+var app_userOID = undefined;
+var app_userName =undefined;
+var usersData ={};
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
