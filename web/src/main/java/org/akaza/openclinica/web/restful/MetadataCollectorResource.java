@@ -203,7 +203,7 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 	}
 
 
-	public FullReportBean collectODMMetadataForClinicalData(String studyOID,String formVersionOID, OdmClinicalDataBean odmClinicalDataBean)
+	public FullReportBean collectODMMetadataForClinicalData(String studyOID,String formVersionOID, LinkedHashMap<String,OdmClinicalDataBean> clinicalDataMap)
 	{
 		StudyBean studyBean = getStudyDao().findByOid(studyOID);
 		if(studyBean!=null)
@@ -229,15 +229,13 @@ public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
 	        	mdc.collectFileData();
 	        adc.collectFileData();
 	        
-	        LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
-	        clinicalDataMap.put(studyOID, odmClinicalDataBean);
 	        
 	        FullReportBean report = new FullReportBean();
 	        report.setAdminDataMap(adc.getOdmAdminDataMap());
 	        report.setOdmStudyMap(mdc.getOdmStudyMap());
 	        report.setCoreResources(getCoreResources());
 	        report.setOdmBean(mdc.getODMBean());
-	        report.setClinicalData(odmClinicalDataBean);
+	        //report.setClinicalData(odmClinicalDataBean);
 
 			report.setClinicalDataMap(clinicalDataMap);
 	        report.setODMVersion("oc1.3");
