@@ -1,39 +1,38 @@
 <td valign='center'>
 
-  <table class='DNBackgroundColorForHeaders' border="1" width="100%" >
-  <tr>&nbsp;</tr>
+<br />
+
+  <table border="1" width="100%" >
 
   <tr>
-  <td><a id="${itemNameLink}"></a>${itemName} : Metadata</td>
+  <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName} : Metadata</td>
   </tr>
-  </table>
-  <table border="1" width="100%" >
 <!--  <tr  class='MetadataBackgroundColorForHeaders'>  -->
- <tr>  
+ <tr>
   <td>Left Item Text</td>
  <td>Units</td>
  <td>Data Type</td>
- 
+
  <td>Response Options Text</td>
  <td>Response Options Values</td>
   </tr>
-  
+
   <tr>
   <td> {{html leftItemText}} </td>
   <td>{{html units}}</td>
  <td> {{html dataType}} </td>
  <td>
    {{each responseOptions}}
-        
+
          {{html label}}
-        
+
       {{/each}}
       </td>
       <td>
    {{each responseOptions}}
-        
+
          {{html id}}
-        
+
       {{/each}}
       </td>
   </tr>
