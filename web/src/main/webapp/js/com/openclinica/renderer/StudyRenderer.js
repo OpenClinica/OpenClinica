@@ -529,7 +529,7 @@ function StudyRenderer(json) {
       if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
     	 if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
      	  {
-    		logs+=this.printItemMetadata(orderedItems,itemDefRenderer,itemDef,itemDetails,formDef,itemOID);
+    		logs+=this.printItemMetadata(itemGroupName);
     		  
     	 
     	  if(app_displayDNs=='y')
@@ -557,10 +557,10 @@ function StudyRenderer(json) {
   }
    
      
-  this.printItemMetadata = function(orderedItems,itemDefRenderer,formDef,itemOID){
+  this.printItemMetadata = function(itemGroupName){
       this.itemMetadataPrint = "";
 //	  this.itemMetadataPrint+="<div align='center'>"+formDef["@Name"]+"</div>";
-	   this.itemMetadataPrint+=itemDefRenderer.renderItemFormMetadata();
+	   this.itemMetadataPrint+=itemDefRenderer.renderItemFormMetadata(itemGroupName);
 		return this.itemMetadataPrint;
   }
   

@@ -80,7 +80,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   }
   
   
-  this.renderItemFormMetadata = function(){
+  this.renderItemFormMetadata = function(groupLabel){
     var template = "print_item_metadata_info";
     var subjectOID = app_thisSubjectsData["@SubjectKey"];
     var responseOptions =  app_codeLists[this.codeListOID]?app_codeLists[this.codeListOID]:app_multiSelectLists[this.multiSelectListOID];
@@ -92,7 +92,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
 	}
 
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,dataType:this.dataType ,description:this.description});
+           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,dataType:this.dataType ,description:this.description,groupLabel:groupLabel});
         return s[0].outerHTML;
         
   }
