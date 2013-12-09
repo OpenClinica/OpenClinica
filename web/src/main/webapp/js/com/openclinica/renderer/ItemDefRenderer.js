@@ -10,6 +10,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.isInline = this.responseLayout == "Horizontal" ? "inline" : "";
   this.OID = json["@OID"];
   this.itemName = json["@Name"];
+  this.description=json["@Comment"]; 
   this.itemNumber = json["Question"] && json["Question"]["@OpenClinica:QuestionNumber"] ? json["Question"]["@OpenClinica:QuestionNumber"] : "";
   this.unitLabel = json["MeasurementUnitRef"] ? "("+app_basicDefinitions[json["MeasurementUnitRef"]["@MeasurementUnitOID"]]+")" : "";
   this.codeListOID = json["CodeListRef"] ? json["CodeListRef"]["@CodeListOID"] : "";
@@ -91,7 +92,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
 	}
 
     var s = RenderUtil.render(RenderUtil.get(template), 
-           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,dataType:this.dataType});
+           {itemNameLink:itemNameLink, itemName:this.itemName,leftItemText:this.name,units:this.unitLabel,responseOptions:responseOptions,dataType:this.dataType ,description:this.description});
         return s[0].outerHTML;
         
   }
@@ -106,5 +107,6 @@ this.renderDiscrepancyNotes = function(discrepancyNotes,repeatRowNumber,repeatin
     var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes,value:this.itemName,repeatRow:repeatRowNumber, repeating:repeating});
     return s[0].outerHTML;
   }
- 
+
+   
 }

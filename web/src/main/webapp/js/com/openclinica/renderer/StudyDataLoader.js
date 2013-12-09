@@ -14,7 +14,9 @@ function StudyDataLoader(study, json) {
   this.study = study;
   this.json = json;
   
-	  
+
+
+  
  /* getStudyParamValue(studyParamList, listId) 
   * A convenience function to get the study detail parameter value
   */ 
@@ -50,6 +52,7 @@ function StudyDataLoader(study, json) {
  
   /* loadBasicDefinitions()
    */
+  
   this.loadBasicDefinitions = function() {
     app_basicDefinitions = {};
     if (this.study["BasicDefinitions"] == undefined) {
@@ -223,6 +226,29 @@ function StudyDataLoader(study, json) {
     }
   }
   
+  
+  // LoadAdminData
+  this.loadAdminData=function(json){
+    var adminData = this.json["AdminData"];
+    var usersData = util_ensureArray(adminData["User"]);
+    var userData = undefined;
+	
+    for (var i=0; i<usersData.length;i++) {
+     // if(usersData[i]["@OID"] == app_userOID) { 
+        userData["@OID"] = usersData[i];
+        //break;
+      //}
+    }
+	
+   if (userData) {
+   app_userName= userData["FullName"];
+   }else{
+   app_userName= "111";
+   }
+   
+  }
+
+  
   /* loadSubjectData()
    */
   this.loadSubjectData = function (json) {
@@ -277,9 +303,12 @@ function StudyDataLoader(study, json) {
 	    {
 	    	for (var i=0;i<formsData.length;i++) {
 	     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
-	        app_formData = formsData[i];
+       var formOID = formsData[i]["@FormOID"];
+       app_formData = formsData[i];
 	        app_thisFormData = app_formData;
-	        break;
+         if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
+         if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
+	//        break;
 	      }
 	    }
 	   // load itemGroupData into a hash map and determine repeating group row lengths 
@@ -343,6 +372,7 @@ if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClin
     this.loadStudyEventDefs();
     this.loadStudyDetails();
     this.loadSubjectData();
-  }
+    //this.loadAdminData(); 
+ }
 
 }
