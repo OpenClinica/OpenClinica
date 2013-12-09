@@ -2,6 +2,7 @@ package org.akaza.openclinica.service.extract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -126,13 +127,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	}
 
-	public OdmClinicalDataBean getClinicalData(String studyOID) {
+	public LinkedHashMap<String,OdmClinicalDataBean> getClinicalData(String studyOID) {
+		LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String,OdmClinicalDataBean>();
 		Study study = new Study();
 		study.setOc_oid(studyOID);
 		study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-		
-		List<StudySubject>studySubjs = study.getStudySubjects();
-		return  constructClinicalData(study, studySubjs);
+				List<StudySubject>studySubjs = study.getStudySubjects();
+		if(study.getStudies().size()<1)
+		{
+			hm.put(studyOID, constructClinicalData(study,studySubjs));
+		}
+		//return odmClinicalDataBean;
+		else{
+			hm.put(studyOID,constructClinicalData(study,studySubjs));//at study level
+		for(Study s:study.getStudies()){//all the sites
+			hm.put(s.getOc_oid(),constructClinicalData(s, s.getStudySubjects()));
+		}
+		}
+
+			return hm;
+		//	return  constructClinicalData(study, studySubjs);
 	}
 	private List<StudySubject> listStudySubjects(String studySubjectOID){
 		ArrayList<StudySubject>studySubjs = new ArrayList<StudySubject>();
@@ -693,20 +707,37 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	@Override
-	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID,
 			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit, Locale locale) {
 		setLocale(locale);
 		setCollectDns(collectDNs);
 		setCollectAudits(collectAudit);
-		
+		LinkedHashMap<String,OdmClinicalDataBean> clinicalDataHash = new LinkedHashMap<String, OdmClinicalDataBean>();
+		if(!studySubjectOID.equals(INDICATE_ALL) )
+		{
+		StudySubjectDao ssdao =getStudySubjectDao();
+		StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(
+					studySubjectOID, "ocOid");
+		studyOID = ss.getStudy().getOc_oid();
+		}
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
-			return getClinicalData(studyOID, studySubjectOID);
+		{
+			clinicalDataHash.put(studyOID,  getClinicalData(studyOID, studySubjectOID));
+			return clinicalDataHash;
+		}
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 			return getClinicalData(studyOID);
 		else if(!studyEventOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL) &&  formVersionOID.equals(INDICATE_ALL))
-				return getClinicalDatas(studyOID,studySubjectOID,studyEventOID,null);
+				 {
+				clinicalDataHash.put(studyOID, getClinicalDatas(studyOID,studySubjectOID,studyEventOID,null));
+				return clinicalDataHash;
+				 }
+		
 		else if(!studyEventOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL) &&  !formVersionOID.equals(INDICATE_ALL))
-			return getClinicalDatas(studyOID,studySubjectOID,studyEventOID,formVersionOID);
+			{
+			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID,studySubjectOID,studyEventOID,formVersionOID));
+			return clinicalDataHash;
+			}
 
 		
 		return null;
