@@ -61,14 +61,20 @@ a:active {
 .DNBackgroundColorForHeaders{
    background-color : black;
    color : white;
- text-decoration:underline;
-
+   text-decoration:underline;
 }
 
-
+.AL_DNBackgroundColorForHeaders{
+	background-color : #999;
+	text-decoration:underline;
+	border-bottom-width: thick;
+	border-bottom-style: solid;
+	border-bottom-color: black;
+	width: 100%;
+}
 
 .DNParentRowColor{
-   background-color : lightgrey;
+	background-color : #CCC;
 }
 .MetadataBackgroundColorForHeaders{
    background-color : lightblue;
@@ -100,24 +106,24 @@ a:active {
 }
 
 .text_centered {
-  text-align: center; 
+  text-align: center;
 }
 
 .text-right-aligned {
-  text-align: right; 
+  text-align: right;
 }
 
 .text-left-aligned {
-  text-align: left; 
+  text-align: left;
 }
 
 .text-left-aligned-bold {
-  text-align: left; 
+  text-align: left;
   font-weight:bold;
- 
+
 }
 .text-right-aligned-bold {
-  text-align: right; 
+  text-align: right;
   font-weight:bold;
 }
 .repeating_item_wrapper{
@@ -129,7 +135,7 @@ a:active {
 
 
 .item_def_wrapper{
-  min-width:400px; 
+  min-width:400px;
   padding-top:0px;
   padding-bottom:0px;
   margin-top:0px;
@@ -226,11 +232,11 @@ div.inline {
   vertical-align: top;
 }
 
-.title_manage { 
+.title_manage {
   color: #D4A718;
 }
 
-.select-option { 
+.select-option {
   display: block;
   padding-top:1px;
   padding-right:2px;
@@ -270,7 +276,7 @@ padding-left: 2px;
 }
 
 .repeating_item_header {
-  border:1px solid;  
+  border:1px solid;
   font-size: 13px;
   font-weight: bold;
   background-color: #DDDDDD;
@@ -286,18 +292,18 @@ padding-left: 2px;
 }
 
 tr.min-height {
-  min-height: 18px;	
+  min-height: 18px;
   font-size : 0.8em
 }
 
 tr.min-height-20 {
-  min-height: 20px;	
+  min-height: 20px;
   font-size : 0.9em
 }
 
 
 td.item-def-cell {
-  vertical-align: top;  
+  vertical-align: top;
 }
 
 .repeating_item_group_header{
@@ -308,7 +314,7 @@ td.item-def-cell {
 }
 
 .page-break-screen {
-  display: block; 
+  display: block;
   margin-top: 300px;
   margin-bottom:50px;
 }
@@ -327,7 +333,7 @@ table.repeating-horiz-items td, th {
 
 input[type="text"], textarea {
   display: inline-block;
-  background-color : #EEEEEE; 
+  background-color : #EEEEEE;
   border: none;
   width: 70%;
   margin-top:3px;
@@ -342,17 +348,17 @@ input[type="text"], textarea {
 
 @media print {
   .page-break { display: block; page-break-before: always; }
-  
+
   body {
     background-color: white;
   }
-  
+
   .no_print {
-    display: none; 
+    display: none;
   }
-  
+
   .page-break-screen {
-    display: none; 
+    display: none;
   }
 }
 

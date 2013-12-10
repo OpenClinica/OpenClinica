@@ -77,17 +77,24 @@ function PageHeaderRenderer() {
   }
 	this.cleanDate = function(eventStartDate){
 		 if(eventStartDate){
-			  if(eventStartDate.indexOf("00:00:00")>1) {
-				  eventStartDate = eventStartDate.substring(0,eventStartDate.indexOf("00:00:00"));
+			  if(eventStartDate.toString().indexOf("00:00:00")>1) {
+				  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().indexOf("00:00:00"));
 			  }
 			  else
 				  {
-				  if(eventStartDate.lastIndexOf(":00")){
-					  eventStartDate = eventStartDate.substring(0,eventStartDate.lastIndexOf(":00"));
+				  if(eventStartDate.toString().lastIndexOf(":00")){
+				  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().lastIndexOf(":00"));
 				  }
 				  }
 				  
 		  }
+		  
+          //  This function is a workaround to display a page with .trim() ( where IE 8 does not support .trim() method)
+		  if(typeof String.prototype.trim !== 'function') {
+            String.prototype.trim = function() {
+                 return this.replace(/^\s+|\s+$/g, ''); 
+                   }
+                }
 		 return eventStartDate.trim();
 	} 
 }

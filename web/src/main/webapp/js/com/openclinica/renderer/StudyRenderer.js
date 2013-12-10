@@ -517,7 +517,7 @@ function StudyRenderer(json) {
     // this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
       // this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
 		
-      if(typeof formOids==='undefined' || formOids.indexOf(formDef["@OID"])<0)	{    	
+      if(typeof formOids==='undefined' || formOids.toString().indexOf(formDef["@OID"])<0)	{    	
 	
    if(app_displayDNs=='y') 	  {	logs+=this.printEventCRFDiscrepancies(formDefRenderer) }
    if(app_displayDNs=='y') 	  { logs+=this.printEventCRFAudits(formDefRenderer)}
@@ -531,7 +531,7 @@ function StudyRenderer(json) {
 	  
       
       if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-    	 if(typeof itemOids==='undefined' || itemOids.indexOf(itemDef["@OID"])<0)	
+    	 if(typeof itemOids==='undefined' || itemOids.toString().indexOf(itemDef["@OID"])<0)	
      	  {
     		logs+=this.printItemMetadata(itemGroupName);
     		  
@@ -636,12 +636,10 @@ function StudyRenderer(json) {
                    var userRef = cn["UserRef"] 
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
- 
- 
-              
-	              if (userRef) thisDiscrepancyNote.UserRef = userRef["@UserOID"];
-     
-
+	//		  thisDiscrepancyNote.UserRef = app_user["@FullName"];
+              if (userRef) thisDiscrepancyNote.UserRef = userRef["@UserOID"];
+		            
+   
 
         	 thisDiscrepancyNote.id = cn["@ID"].substring(4);
 	              thisDiscrepancyNote.status = cn["@Status"];
