@@ -215,6 +215,10 @@ function StudyRenderer(json) {
     this.setStudy(renderMode);  
     this.studyDataLoader = new StudyDataLoader(this.study, this.json); 
     this.studyDataLoader.loadStudyLists();   
+    if(app_thisClinicalData){
+    var studyOid =	app_thisClinicalData["@StudyOID"];
+    app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]?app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]:app_siteName;
+    }
     var formDef = undefined;
     var eventDef = undefined;
     if (renderMode == "UNPOPULATED_FORM_CRF" || renderMode == "UNPOPULATED_GLOBAL_CRF") {

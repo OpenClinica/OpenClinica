@@ -6,7 +6,7 @@ var app_audits={};
 var app_dns={};
 var app_eventCRFdns={};
 var app_eventCRFaudits={};
-
+var app_globalStudy={};
 
 var app_itemDataMap={};
 var app_maxPixelHeight = 610;
@@ -55,6 +55,7 @@ var app_studySubjectStartDate = undefined;
 var app_studyEventCoverPageType = "study_event_cover_page_type";
 var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
+var app_thisClinicalData = undefined;
 var app_thisStudyEvent = undefined;
 var app_thisSubjectsData = undefined;
 var app_thisFormData = undefined;

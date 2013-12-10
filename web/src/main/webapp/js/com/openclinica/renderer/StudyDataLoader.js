@@ -226,7 +226,15 @@ function StudyDataLoader(study, json) {
     }
   }
   
-  
+  this.loadGlobalStudyDef = function(json) {
+	  app_globalStudy ={};
+	  var studies = util_ensureArray(this.json["Study"]);
+	  for(var i=0;i<studies.length;i++){
+		  var localOID = studies[i]["@OID"];
+		  app_globalStudy[localOID] = studies[i];
+	  }
+	  }
+ 
   // LoadAdminData
   this.loadAdminData=function(json){
     var adminData = this.json["AdminData"];
@@ -267,7 +275,7 @@ function StudyDataLoader(study, json) {
         break;
       }
     }
-    
+    app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
     app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
@@ -364,7 +372,9 @@ if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClin
   /* loadStudyLists()
    */
   this.loadStudyLists = function () {
-    this.loadBasicDefinitions();
+    this.loadGlobalStudyDef();
+	  this.loadBasicDefinitions();
+    
     this.loadCodeLists();
     this.loadMultiSelectLists();
     this.loadItemDefs();
