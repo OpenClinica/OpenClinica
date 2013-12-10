@@ -584,8 +584,9 @@ function StudyRenderer(json) {
 	    			 
 	    			  var audits = auditLog[i];
 	    			  thisAuditLog.auditType = audits["@AuditType"];
-	    			  thisAuditLog.user = audits["@UserID"];
-	    			  thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
+	    			  var userid = audits["@UserID"];
+	    			  thisAuditLog.userName = app_userData[userid]?app_userData[userid]["FullName"]:userid;
+	    			  thisAuditLog.dateTime = audits["@DateTimeStamp"];
 	    			  thisAuditLog.oldValue = audits["@OldValue"];
 	    			  thisAuditLog.newValue = audits["@NewValue"];
 	    			  currentAuditLogs.push(thisAuditLog);
@@ -636,11 +637,9 @@ function StudyRenderer(json) {
                    var userRef = cn["UserRef"] 
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
-	//		  thisDiscrepancyNote.UserRef = app_user["@FullName"];
-              if (userRef) thisDiscrepancyNote.UserRef = userRef["@UserOID"];
-		            
-   
-
+				  
+				 // thisDiscrepancyNote.UserRef = app_userData[userRef]?app_userData[userRef]["FullName"]:userRef;
+				  thisDiscrepancyNote.UserRef = userRef;
         	 thisDiscrepancyNote.id = cn["@ID"].substring(4);
 	              thisDiscrepancyNote.status = cn["@Status"];
 	              thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
@@ -678,7 +677,8 @@ function StudyRenderer(json) {
 	    			 
 	    			  var audits = auditLog[i];
 	    			  thisAuditLog.auditType = audits["@AuditType"];
-	    			  thisAuditLog.user = audits["@UserID"];
+	    			  var userid = audits["@UserID"];
+	    			  thisAuditLog.user =app_userData[userid]?app_userData[userid]["FullName"]:userid;
 	    			  thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
 	    			  thisAuditLog.oldValue = audits["@OldValue"];
 	    			  thisAuditLog.newValue = audits["@NewValue"];
@@ -727,14 +727,14 @@ function StudyRenderer(json) {
      			   var cn = childNote[j] ;
 	 			   var description = cn["OpenClinica:Description"]; 
                     var detailedNote = cn["OpenClinica:DetailedNote"]; 
-                   var userRef = cn["UserRef"] 
+                   var userRef = cn["UserRef"] ;
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
  
- 
+				
               
-	              if (userRef) thisDiscrepancyNote.UserRef = userRef["@UserOID"];
-
+	              // thisDiscrepancyNote.UserRef =  app_userData[userRef]?app_userData[userRef]["FullName"]:userRef;
+				  thisDiscrepancyNote.UserRef = userRef;
 
         	 thisDiscrepancyNote.id = cn["@ID"].substring(4);
 	              thisDiscrepancyNote.status = cn["@Status"];

@@ -237,22 +237,19 @@ function StudyDataLoader(study, json) {
  
   // LoadAdminData
   this.loadAdminData=function(json){
-    var adminData = this.json["AdminData"];
-    var usersData = util_ensureArray(adminData["User"]);
-    var userData = undefined;
+	  app_userData = {};
+	  var adminData = util_ensureArray(this.json["AdminData"]);
+    for(var j=0;j<adminData.length;j++){
+    var usersData = util_ensureArray(adminData[j]["User"]);
+   
 	
     for (var i=0; i<usersData.length;i++) {
-     // if(usersData[i]["@OID"] == app_userOID) { 
-        userData["@OID"] = usersData[i];
-        //break;
-      //}
+    	var userOId = usersData[i]["@OID"];
+    	if(app_userData[userOId]==undefined)
+    	app_userData[userOId] = usersData[i];
     }
-	
-   if (userData) {
-   app_userName= userData["FullName"];
-   }else{
-   app_userName= "111";
-   }
+    }
+
    
   }
 
@@ -373,8 +370,8 @@ if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClin
    */
   this.loadStudyLists = function () {
     this.loadGlobalStudyDef();
-	  this.loadBasicDefinitions();
-    
+	this.loadBasicDefinitions();
+	this.loadAdminData(); 
     this.loadCodeLists();
     this.loadMultiSelectLists();
     this.loadItemDefs();
@@ -382,7 +379,7 @@ if (app_displayDNs =='y')   app_dns[itemOID][repeatKey] = itemsData[j]["OpenClin
     this.loadStudyEventDefs();
     this.loadStudyDetails();
     this.loadSubjectData();
-    //this.loadAdminData(); 
+    
  }
 
 }

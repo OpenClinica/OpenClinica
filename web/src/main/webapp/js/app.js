@@ -64,7 +64,7 @@ var app_renderMode=undefined;
 debug("console debugging enabled.", util_logDebug);
 var app_userOID = undefined;
 var app_userName =undefined;
-var usersData ={};
+var app_userData ={};
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
