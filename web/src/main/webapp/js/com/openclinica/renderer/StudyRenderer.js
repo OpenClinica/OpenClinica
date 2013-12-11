@@ -515,7 +515,7 @@ function StudyRenderer(json) {
       }
     if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
     // this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
-      // this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    // this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
 		
       if(typeof formOids==='undefined' || formOids.toString().indexOf(formDef["@OID"])<0)	{    	
 	
@@ -554,7 +554,10 @@ function StudyRenderer(json) {
       prevSectionLabel = sectionLabel;
       prevItemHeader = itemHeader;
     }
-  	 
+    if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
+     this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
+     this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+     }  	 
       	 
 	this.renderString+=logs;
 	
@@ -634,7 +637,7 @@ function StudyRenderer(json) {
      			   var cn = childNote[j] ;
 	 			   var description = cn["OpenClinica:Description"]; 
                     var detailedNote = cn["OpenClinica:DetailedNote"]; 
-                   var userRef = cn["UserRef"];
+                   var userRef = cn['UserRef'];
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
 				  
