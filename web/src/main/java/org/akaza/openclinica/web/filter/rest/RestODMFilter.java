@@ -114,12 +114,12 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
             if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR )  )) {
                auth = true;
             }
-            else if(userBean.isTechAdmin()||userBean.isSysAdmin())
-            {
+            //else if(userBean.isTechAdmin()||userBean.isSysAdmin())
+            //{
             	if(r!=null && (r.equals(Role.ADMIN)||r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.INVESTIGATOR)||r.equals(Role.MONITOR)||r.equals(Role.RESEARCHASSISTANT) ) ){
             		auth = true;
             	}
-            }
+            //}
         }
 			return auth;
 	}
