@@ -585,7 +585,7 @@ function StudyRenderer(json) {
 	    			  var audits = auditLog[i];
 	    			  thisAuditLog.auditType = audits["@AuditType"];
 	    			  var userid = audits["@UserID"];
-	    			  thisAuditLog.userName = app_userData[userid]?app_userData[userid]["FullName"]:userid;
+	    			  thisAuditLog.user = app_userData[userid]?app_userData[userid]["FullName"]:userid;
 	    			  thisAuditLog.dateTime = audits["@DateTimeStamp"];
 	    			  thisAuditLog.oldValue = audits["@OldValue"];
 	    			  thisAuditLog.newValue = audits["@NewValue"];
@@ -634,13 +634,16 @@ function StudyRenderer(json) {
      			   var cn = childNote[j] ;
 	 			   var description = cn["OpenClinica:Description"]; 
                     var detailedNote = cn["OpenClinica:DetailedNote"]; 
-                   var userRef = cn["UserRef"] 
+                   var userRef = cn["UserRef"];
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
 				  
-				 // thisDiscrepancyNote.UserRef = app_userData[userRef]?app_userData[userRef]["FullName"]:userRef;
-				  thisDiscrepancyNote.UserRef = userRef;
-        	 thisDiscrepancyNote.id = cn["@ID"].substring(4);
+			if (userRef){	  
+			        var userid= userRef["@UserOID"];
+   				  thisDiscrepancyNote.user = app_userData [userid] ?app_userData[userid]["FullName"]:userid;
+				  }
+				  
+				  thisDiscrepancyNote.id = cn["@ID"].substring(4);
 	              thisDiscrepancyNote.status = cn["@Status"];
 	              thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
 
@@ -731,10 +734,10 @@ function StudyRenderer(json) {
 				  thisDiscrepancyNote.description  = description;
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
  
-				
-              
-	              // thisDiscrepancyNote.UserRef =  app_userData[userRef]?app_userData[userRef]["FullName"]:userRef;
-				  thisDiscrepancyNote.UserRef = userRef;
+			if (userRef){	  
+			        var userid= userRef["@UserOID"];
+   				  thisDiscrepancyNote.user = app_userData [userid] ?app_userData[userid]["FullName"]:userid;
+				  }
 
         	 thisDiscrepancyNote.id = cn["@ID"].substring(4);
 	              thisDiscrepancyNote.status = cn["@Status"];
