@@ -274,7 +274,7 @@ function StudyDataLoader(study, json) {
     }
     app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
-    app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
+    //app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
     if(studyEventsData)

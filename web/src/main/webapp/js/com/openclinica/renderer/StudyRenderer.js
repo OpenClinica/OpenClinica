@@ -519,8 +519,8 @@ function StudyRenderer(json) {
 		
       if(typeof formOids==='undefined' || formOids.toString().indexOf(formDef["@OID"])<0)	{    	
 	
-   if(app_displayDNs=='y') 	  {	logs+=this.printEventCRFDiscrepancies(formDefRenderer) }
-   if(app_displayDNs=='y') 	  { logs+=this.printEventCRFAudits(formDefRenderer)}
+   if(app_displayDNs=='y') 	  {	logs+=this.printEventCRFDiscrepancies(formDefRenderer); }
+   if(app_displayDNs=='y') 	  { logs+=this.printEventCRFAudits(formDefRenderer);}
 
 		formOids.push(formDef["@OID"]);
 		}
@@ -749,7 +749,6 @@ function StudyRenderer(json) {
 	              currentDiscrepancyNotes.push(thisDiscrepancyNote);
                 thisDiscrepancyNote = {};
 				      }	 
- //                      (repeating) ?   rowNumber = repeatRowNumber : rowNumber = "";
 				  }
                   
 				  this.discrepancyNotes+=formDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes);

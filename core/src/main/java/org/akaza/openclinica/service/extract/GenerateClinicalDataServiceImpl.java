@@ -26,7 +26,7 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.SubjectEventStatusDao;
+
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
@@ -73,7 +73,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	private StudySubjectDao studySubjectDao;
 	private StudyEventDefinitionDao studyEventDefDao;
-	private SubjectEventStatusDao subjectEventStatusDao;
 	
 	private boolean collectDns=true;
 	private boolean collectAudits=true;
@@ -170,14 +169,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setStudyDao(StudyDao studyDao) {
 		this.studyDao = studyDao;
-	}
-
-	public SubjectEventStatusDao getSubjectEventStatusDao() {
-		return subjectEventStatusDao;
-	}
-
-	public void setSubjectEventStatusDao(SubjectEventStatusDao subjectEventStatusDao) {
-		this.subjectEventStatusDao = subjectEventStatusDao;
 	}
 
 	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs) {
@@ -699,11 +690,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private String fetchStudyEventStatus(Integer valueOf) {
-		SubjectEventStatus subjEventStatus = getSubjectEventStatusDao().findById(valueOf);
-		if(subjEventStatus!=null)
-		return subjEventStatus.getName();
-		else
-			return valueOf.toString();
+		return SubjectEventStatus.getByCode(valueOf).getI18nDescription(getLocale());
+		
 	}
 
 	@Override
