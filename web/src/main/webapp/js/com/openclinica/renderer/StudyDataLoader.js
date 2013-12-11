@@ -58,7 +58,7 @@ function StudyDataLoader(study, json) {
     if (this.study["BasicDefinitions"] == undefined) {
       return; 
     }
-    var basicDefinitions = this.study["BasicDefinitions"]["MeasurementUnit"];
+    var basicDefinitions = util_ensureArray(this.study["BasicDefinitions"]["MeasurementUnit"]);
     debug("loading basic definitions", util_logDebug );
     for (var i=0;i< basicDefinitions.length;i++) {
       var key = basicDefinitions[i]["@OID"]; 
@@ -239,7 +239,8 @@ function StudyDataLoader(study, json) {
   this.loadAdminData=function(json){
 	  app_userData = {};
 	  var adminData = util_ensureArray(this.json["AdminData"]);
-    for(var j=0;j<adminData.length;j++){
+    if (adminData){
+	for(var j=0;j<adminData.length;j++){
     var usersData = util_ensureArray(adminData[j]["User"]);
    
 	
@@ -250,7 +251,7 @@ function StudyDataLoader(study, json) {
     }
     }
 
-   
+   }
   }
 
   
