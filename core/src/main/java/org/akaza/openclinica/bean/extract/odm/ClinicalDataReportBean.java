@@ -318,6 +318,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String nls = System.getProperty("line.separator");
             String i = audit.getOid();
             String u = audit.getUserId();
+            String userName = audit.getUserName();
+            String name = audit.getName(); 
             Date d = audit.getDatetimeStamp();
             String t = audit.getType();
             String r = audit.getReasonForChange();
@@ -331,6 +333,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (u.length() > 0) {
                     xml.append("UserID=\"" + StringEscapeUtils.escapeXml(u) + "\" ");
+                }
+                if(userName.length()>0){
+               	 xml.append("UserName=\"" + StringEscapeUtils.escapeXml(userName) + "\" ");
+               }
+                if(name.length()>0){
+                 	 xml.append("Name=\"" + StringEscapeUtils.escapeXml(name) + "\" ");
                 }
                 if (d != null) {
                     xml.append("DateTimeStamp=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");

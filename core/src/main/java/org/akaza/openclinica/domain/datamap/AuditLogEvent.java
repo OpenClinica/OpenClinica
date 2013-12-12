@@ -14,6 +14,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -42,6 +43,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	private Integer eventCrfId;
 	private Integer studyEventId;
 	private Integer eventCrfVersionId;
+	private UserAccount userAccount;
 	
 	private AuditLogEventType auditLogEventType;
 	
@@ -103,14 +105,14 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.auditTable = auditTable;
 	}
 
-	@Column(name = "user_id")
+	/*@Column(name = "user_id")
 	public Integer getUserId() {
 		return this.userId;
 	}
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
-	}
+	}*/
 
 	@Column(name = "entity_id")
 	public Integer getEntityId() {
@@ -201,6 +203,17 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 
 	public void setAuditLogEventType(AuditLogEventType auditLogEventType) {
 		this.auditLogEventType = auditLogEventType;
+	}
+
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	public UserAccount getUserAccount() {
+		return userAccount;
+	}
+
+	public void setUserAccount(UserAccount userAccount) {
+		this.userAccount = userAccount;
 	}
 
 }

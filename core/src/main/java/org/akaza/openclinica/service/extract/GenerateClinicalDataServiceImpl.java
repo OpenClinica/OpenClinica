@@ -679,10 +679,18 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
-		if(auditLogEvent.getUserId()!=null)
-		auditBean.setUserId("USR_"+auditLogEvent.getUserId());
+		if(auditLogEvent.getUserAccount()!=null)
+		{
+			auditBean.setUserId("USR_"+auditLogEvent.getUserAccount().getUserId());
+			auditBean.setUserName(auditLogEvent.getUserAccount().getUserName());
+			auditBean.setName(auditLogEvent.getUserAccount().getFirstName()+auditLogEvent.getUserAccount().getLastName());
+		}
 		else
+			{
 			auditBean.setUserId("");
+			auditBean.setUserName("");
+			auditBean.setName("");
+			}
 		auditLogsBean.getAuditLogs().add(auditBean);
 		
 		}
