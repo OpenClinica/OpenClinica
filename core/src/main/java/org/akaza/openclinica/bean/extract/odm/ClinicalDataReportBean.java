@@ -465,8 +465,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (cn.getUserRef() != null) {
                     String uid = cn.getUserRef().getElementDefOID();
+                    String userName = cn.getUserRef().getUserName();
+                    String fullName=cn.getUserRef().getFullName();
+                    String temp="";
+                    if(userName.length()>0){
+                    	temp+=" OpenClinica:UserName=\""+StringEscapeUtils.escapeXml(userName)+"\"";
+                    }
+                    if(fullName.length()>0){
+                    	temp+=" OpenClinica:FullName=\""+StringEscapeUtils.escapeXml(fullName)+"\"";
+                    }
                     if (uid.length() > 0) {
-                        xml.append(currentIndent + indent + indent + "<UserRef UserOID=\"" + StringEscapeUtils.escapeXml(uid) + "\"/>");
+                        xml.append(currentIndent + indent + indent + "<UserRef UserOID=\"" + StringEscapeUtils.escapeXml(uid) 
+                        			  +" \"" +temp+
+                        			  "/>");
                         xml.append(nls);
                     }
                 }

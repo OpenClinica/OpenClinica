@@ -587,8 +587,10 @@ function StudyRenderer(json) {
 	    			 
 	    			  var audits = auditLog[i];
 	    			  thisAuditLog.auditType = audits["@AuditType"];
-	    			  var userid = audits["@UserID"];
-	    			  thisAuditLog.user = app_userData[userid]?app_userData[userid]["FullName"]:userid;
+	    			  var userid = audits["@Name"]?audits["@Name"]:"";
+	    			  userid+=audits["@UserName"]?"("+audits["@UserName"]+")":"";
+	    			  //thisAuditLog.user = app_userData[userid]?app_userData[userid]["FullName"]:userid;
+	    			  thisAuditLog.user= userid;
 	    			  thisAuditLog.dateTime = audits["@DateTimeStamp"];
 	    			  thisAuditLog.oldValue = audits["@OldValue"];
 	    			  thisAuditLog.newValue = audits["@NewValue"];
@@ -642,8 +644,10 @@ function StudyRenderer(json) {
 				  if (detailedNote)  thisDiscrepancyNote.detailedNote = detailedNote;
 				  
 			if (userRef){	  
-			        var userid= userRef["@UserOID"];
-   				  thisDiscrepancyNote.user = app_userData [userid] ?app_userData[userid]["FullName"]:userid;
+				var userid = userRef["@OpenClinica:FullName"]?userRef["@OpenClinica:FullName"]:"";
+				userid+=userRef["@OpenClinica:UserName"]?"("+userRef["@OpenClinica:UserName"]+")":"";
+			        
+   				  thisDiscrepancyNote.user = userid;
 				  }
 				  
 				  thisDiscrepancyNote.id = cn["@ID"].substring(4);

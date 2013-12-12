@@ -615,9 +615,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			childNoteBean.setDateCreated(childDN.getDateCreated());
 			
 			if(childDN.getUserAccount()!=null)
-			userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
+			{
+				userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
+				userRef.setUserName(childDN.getUserAccount().getUserName());
+				userRef.setFullName(childDN.getUserAccount().getFirstName()+" "+childDN.getUserAccount().getLastName());
+			}
 			else
-				userRef.setElementDefOID("");	
+				{
+				userRef.setElementDefOID("");
+				userRef.setUserName("");
+				userRef.setFullName("");
+				}
 			childNoteBean.setUserRef(userRef);
 			dnNoteBean.getChildNotes().add(childNoteBean);
 		}
@@ -683,7 +691,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		{
 			auditBean.setUserId("USR_"+auditLogEvent.getUserAccount().getUserId());
 			auditBean.setUserName(auditLogEvent.getUserAccount().getUserName());
-			auditBean.setName(auditLogEvent.getUserAccount().getFirstName()+auditLogEvent.getUserAccount().getLastName());
+			auditBean.setName(auditLogEvent.getUserAccount().getFirstName()+" "+auditLogEvent.getUserAccount().getLastName());
 		}
 		else
 			{
