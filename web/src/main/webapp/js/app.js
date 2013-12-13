@@ -98,6 +98,7 @@ function getPrintableContent() {
 
 function setRenderMode() {
   renderMode = 'UNPOPULATED_FORM_CRF';
+ if(app_studySubjectOID.length<1){
   if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*") {
     renderMode = 'UNPOPULATED_STUDY_CRFS';
   }
@@ -107,5 +108,13 @@ function setRenderMode() {
   else if (app_studyOID == "*" && app_eventOID == "*" && app_formVersionOID != "*") {
     renderMode = 'UNPOPULATED_GLOBAL_CRF';
   }
+}
+
+else{
+	 if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID!="*") {
+		    renderMode = 'STUDY_SUBJECT_CASE_BOOK';
+		  }
+		  
+}
   
 }

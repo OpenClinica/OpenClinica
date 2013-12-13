@@ -75,6 +75,14 @@ function StudyRenderer(json) {
         app_siteName = "";
         app_protocolName = "";
       break;  
+      case 'STUDY_SUBJECT_CASE_BOOK':
+          app_studyName = this.study["GlobalVariables"]["StudyName"];
+          app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
+          if(app_siteName) {
+            app_studyName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@ParentStudyName"];
+          }
+          app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
+        break;
     }  
   }
  
@@ -184,7 +192,10 @@ function StudyRenderer(json) {
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
     for (var i=0;i< studyEventFormRefs.length;i++) {
-      pageBreak = this.PAGE_BREAK
+    //	var oid = studyEventFormRef[i]["StudyEventOID"];
+   // 	app_thisStudyEvent[oid]["OpenClinica:dns"]
+    //	app_thisStudyEvent[oid]["OpenClinica:dns"]
+    	pageBreak = this.PAGE_BREAK
       var defaultDisplayed = false;
       var formRef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length && !defaultDisplayed;j++) {
@@ -270,6 +281,17 @@ function StudyRenderer(json) {
         this.renderPrintableEventCRFs(renderMode, eventDef, this.PAGE_BREAK);
       }
     }
+    else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
+        this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
+       // this.renderString += this.createStudyCoverPage();// to be replaced by subject table of contents and subject details
+       
+        
+        // select all CRFs from study
+        for (var i=0;i< app_studyEventDefs.length;i++) {
+          eventDef = app_studyEventDefs[i];
+          this.renderPrintableEventCRFs(renderMode, eventDef, this.PAGE_BREAK);
+        }
+      }
     return this.renderString;
   }
  
