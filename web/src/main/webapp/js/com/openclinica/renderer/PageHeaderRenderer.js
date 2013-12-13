@@ -62,6 +62,7 @@ function PageHeaderRenderer() {
       studyName: app_studyName, 
       siteName: app_siteName, 
       protocolName: app_protocolName,
+      siteProtocolName: app_siteProtocolName,
       eventName: eventName,
       collectSubjectDOB: app_collectSubjectDOB, 
       personIDRequired: app_personIDRequired,

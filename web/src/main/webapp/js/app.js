@@ -7,6 +7,7 @@ var app_dns={};
 var app_eventCRFdns={};
 var app_eventCRFaudits={};
 var app_globalStudy={};
+var app_siteProtocolName;
 
 var app_itemDataMap={};
 var app_maxPixelHeight = 610;
