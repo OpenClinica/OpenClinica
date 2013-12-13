@@ -54,6 +54,7 @@
  <!-- The following beans are coded for data maping, currently they are partially working, to resume the work uncomment it -->
  <value>org.akaza.openclinica.domain.datamap.Study</value> 
   <value>org.akaza.openclinica.domain.user.UserAccount</value>
+  <value>org.akaza.openclinica.domain.user.UserType</value>
   <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
  <value>org.akaza.openclinica.domain.datamap.CompletionStatus     </value>  
 <value>org.akaza.openclinica.domain.datamap.CrfVersion           </value>  

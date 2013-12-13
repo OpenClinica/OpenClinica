@@ -615,9 +615,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			childNoteBean.setDateCreated(childDN.getDateCreated());
 			
 			if(childDN.getUserAccount()!=null)
-			userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
+			{
+				userRef.setElementDefOID("USR_"+childDN.getUserAccount().getUserId());
+				userRef.setUserName(childDN.getUserAccount().getUserName());
+				userRef.setFullName(childDN.getUserAccount().getFirstName()+" "+childDN.getUserAccount().getLastName());
+			}
 			else
-				userRef.setElementDefOID("");	
+				{
+				userRef.setElementDefOID("");
+				userRef.setUserName("");
+				userRef.setFullName("");
+				}
 			childNoteBean.setUserRef(userRef);
 			dnNoteBean.getChildNotes().add(childNoteBean);
 		}
@@ -679,10 +687,18 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
-		if(auditLogEvent.getUserId()!=null)
-		auditBean.setUserId("USR_"+auditLogEvent.getUserId());
+		if(auditLogEvent.getUserAccount()!=null)
+		{
+			auditBean.setUserId("USR_"+auditLogEvent.getUserAccount().getUserId());
+			auditBean.setUserName(auditLogEvent.getUserAccount().getUserName());
+			auditBean.setName(auditLogEvent.getUserAccount().getFirstName()+" "+auditLogEvent.getUserAccount().getLastName());
+		}
 		else
+			{
 			auditBean.setUserId("");
+			auditBean.setUserName("");
+			auditBean.setName("");
+			}
 		auditLogsBean.getAuditLogs().add(auditBean);
 		
 		}

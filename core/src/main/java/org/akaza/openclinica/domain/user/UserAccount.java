@@ -39,6 +39,7 @@ import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 
 /**
@@ -200,7 +201,7 @@ public class UserAccount extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	//@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_type_id")
 	public UserType getUserType() {
 		return this.userType;
@@ -210,8 +211,8 @@ public class UserAccount extends DataMapDomainObject {
 		this.userType = userType;
 	}
 
-	//@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "status_id")
+	 @Type(type = "status")
+	  @Column(name = "status_id")
 	public Status getStatus() {
 		return this.status;
 	}
@@ -614,26 +615,6 @@ public class UserAccount extends DataMapDomainObject {
 	}
 
 
-	@Override
 	
-	public Integer getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setId(Integer id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-    @Version
-    public Integer getVersion() {
-		return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
 
 }

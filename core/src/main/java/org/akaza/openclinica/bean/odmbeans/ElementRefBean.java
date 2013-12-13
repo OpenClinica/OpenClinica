@@ -19,7 +19,8 @@ public class ElementRefBean {
     private String elementDefOID;
     private String mandatory;
     private int orderNumber;
-
+    private String userName = "";
+    private String fullName ="";
     public void setElementDefOID(String oid) {
         this.elementDefOID = oid;
     }
@@ -43,4 +44,20 @@ public class ElementRefBean {
     public int getOrderNumber() {
         return this.orderNumber;
     }
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
 }
