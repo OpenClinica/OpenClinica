@@ -185,22 +185,25 @@ function StudyRenderer(json) {
     app_eventName = eventDef["@Name"];
     this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
     this.renderString += this.createStudyEventCoverPage(eventDef);
+  //Joe-- get the dns = app_thisStudyEvent["@OpenClinica:DiscrepancyNotes"]
+    this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
       studyEventFormRefs = new Array();
       studyEventFormRefs.push(eventDef["FormRef"]);
     }
+    
     for (var i=0;i< studyEventFormRefs.length;i++) {
-    //	var oid = studyEventFormRef[i]["StudyEventOID"];
-   // 	app_thisStudyEvent[oid]["OpenClinica:dns"]
-    //	app_thisStudyEvent[oid]["OpenClinica:dns"]
+    	
+    	
     	pageBreak = this.PAGE_BREAK
       var defaultDisplayed = false;
       var formRef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length && !defaultDisplayed;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
+          
           var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
@@ -215,7 +218,10 @@ function StudyRenderer(json) {
     }
   }
   
-  
+  this.renderStudyEventDetails = function(studyEventData,eventDef){
+	  var startDate = studyEventData["@OpenClinica:StartDate"];
+	  
+  }
   /* renderPrintableStudy(renderMode)
    * A kind of factory function for the different study
    * rendering scenarios.
