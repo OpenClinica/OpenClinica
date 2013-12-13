@@ -220,9 +220,6 @@ function StudyRenderer(json) {
     app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]?app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]:app_siteName;
     app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]?app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]:app_siteProtocolName;
 	
-    if (app_protocolName != app_siteProtocolName ){
-       	app_siteProtocolName = app_siteProtocolName.substr(app_protocolName.length + 3);
-    	}
     
     
     }
