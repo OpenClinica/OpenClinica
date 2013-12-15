@@ -1,6 +1,5 @@
 function PageHeaderRenderer() {
-	if(app_renderMode!='UNPOPULATED_FORM_CRF')
-	this.render = function(printTime, pageType, eventName) { 
+if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVENT_CRFS' || app_renderMode =='UNPOPULATED_GLOBAL_CRF' ) {
 	    return RenderUtil.render(RenderUtil.get("print_page_header_global"), {
 	      printTime: printTime,
 	      pageType: pageType,
