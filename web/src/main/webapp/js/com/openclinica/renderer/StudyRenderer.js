@@ -119,6 +119,32 @@ function StudyRenderer(json) {
     return str;
   }
   
+  this.createStudyEventCoverPageForSubjectCaseBook = function (eventDef) {
+	var str = "<h3>" + eventDef["@Name"] + ":</h3>";
+	   str+=this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
+	   str+="</br>"
+	    var studyEventFormRefs =  eventDef["FormRef"];
+	   
+	    for (var i=0;i< studyEventFormRefs.length;i++) {
+	      var formRef = studyEventFormRefs[i];
+	      var formFound = false;
+	      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
+	        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+	          var formDef = app_formDefs[j];
+	          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+	          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
+	            var inEventDef = presentInEventDef[l];
+	            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
+	              str += "<div>" + formDef["@Name"] + "</div>";
+	              formFound = true;
+	            }
+	          }
+	        }
+	      }
+	    }
+	   
+	    return str;
+	  }
   
   /* createStudyCoverPage()
    */ 
@@ -184,10 +210,18 @@ function StudyRenderer(json) {
   this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
     app_eventName = eventDef["@Name"];
     this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
-    this.renderString += this.createStudyEventCoverPage(eventDef);
-  //Joe-- get the dns = app_thisStudyEvent["@OpenClinica:DiscrepancyNotes"]
-    this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
-    // select all CRFs from StudyEvent
+     if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
+   {
+    	  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(eventDef);
+
+	   
+   }
+     else{
+         this.renderString += this.createStudyEventCoverPage(eventDef);
+
+     }
+     
+     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
       studyEventFormRefs = new Array();
@@ -219,7 +253,17 @@ function StudyRenderer(json) {
   }
   
   this.renderStudyEventDetails = function(studyEventData,eventDef){
-	  var startDate = studyEventData["@OpenClinica:StartDate"];
+	 var s = "";
+	  var studyEventName = eventDef["@Name"];
+	  var studyEventLocation = studyEventData["@OpenClinica:StudyEventLocation"];
+	  var startDate = util_cleanDate(studyEventData["@OpenClinica:StartDate"]);
+	  var endDate =util_cleanDate(studyEventData["@OpenClinica:EndDate"]);
+	  var studyEventStatus = studyEventData["@OpenClinica:Status"];
+	  
+	s= RenderUtil.render(RenderUtil.get(
+            "print_study_event_details"),{studyEventName:studyEventName,studyEventLocation:studyEventLocation,studyEventStatus:studyEventStatus,
+            startDate:startDate,endDate:endDate})[0].outerHTML;; 
+            return s;
 	  
   }
   /* renderPrintableStudy(renderMode)
