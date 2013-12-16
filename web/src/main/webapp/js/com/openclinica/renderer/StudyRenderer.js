@@ -119,9 +119,9 @@ function StudyRenderer(json) {
     return str;
   }
   
-  this.createStudyEventCoverPageForSubjectCaseBook = function (eventDef) {
-	var str = "<h3>" + eventDef["@Name"] + ":</h3>";
-	   str+=this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
+  this.createStudyEventCoverPageForSubjectCaseBook = function (studyEvent,eventDef) {
+	var str = "<h3>" + eventDef["@Name"]+"("+studyEvent["@StudyEventRepeatKey"] + "):</h3>";
+	   str+=this.renderStudyEventDetails(studyEvent,eventDef);
 	   str+="</br>"
 	    var studyEventFormRefs =  eventDef["FormRef"];
 	   
@@ -272,9 +272,10 @@ function StudyRenderer(json) {
 		if(eventDef["@OID"]==key){
 		pageBreak = this.PAGE_BREAK;
 		  for(var repeatKey in studyEventDatas){
-	    	  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(eventDef);
-
+	    	 
 			  var studyEvent = studyEventDatas[repeatKey];
+			  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(studyEvent,eventDef);
+
 			 var forms = studyEvent["FormData"];
 			 for(var i=0;i<forms.length;i++){
 			  var formOID = forms[i]["@FormOID"];
