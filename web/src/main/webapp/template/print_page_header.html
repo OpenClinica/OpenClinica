@@ -3,13 +3,15 @@
 
 <td class='left-header'>
 
-
+   
     <div class='header-text-plus text-left-aligned'>
     <b>${siteName}&nbsp;(${siteProtocolName})</b>
    
     
       </div>  
-      {{if pageType != app_studyCoverPageType}}
+{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK"}}  
+  
+  {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>
       {{if eventName}}${eventName}{{if repeating}}{{if repeating == 'Yes'}} (${repeatOrdinal}){{/if}}{{/if}}:
       ${eventStartDate}{{if eventEndDate}}&nbsp;-&nbsp;${eventEndDate}{{/if}}{{/if}}
@@ -18,7 +20,7 @@
     {{/if}}
             <div class='header-text text-left-aligned'>${app_eventStatus}: ${studyEventStatus}</div>  
 
-
+   {{/if}}
 </td>
 <!-- study subject block -->
 <td class='right-header'>
@@ -33,6 +35,7 @@
     
     </div>  
     
+{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK"}}  
     
       <div class='header-text'>${app_crfLabel}: ${app_studySubjectStatus ? app_studySubjectStatus : '___________________'}</div>  
 
@@ -41,6 +44,8 @@
     {{/if}}
     {{if app_interviewDateRequired != "not_used"}}
       <div class='header-text'>{{html app_interviewDateLabel}}: ${interviewDate?interviewDate:'_______________________'}</div>  
+    {{/if}}
+
     {{/if}}
  
 

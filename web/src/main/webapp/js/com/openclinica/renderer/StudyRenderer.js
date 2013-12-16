@@ -10,6 +10,7 @@
 /* StudyRenderer
  * This is the main rendering class where most of the processing occurs.
  */
+
 function StudyRenderer(json) {
   this.DEFAULT_MAX_REPEAT = 40; 
   this.NO_PAGE_BREAK = false; 
@@ -212,7 +213,10 @@ function StudyRenderer(json) {
   this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
     app_eventName = eventDef["@Name"];
     this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
-     if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
+
+	app_renderMode = undefined;
+
+	if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
    {
     	 this.renderStudyEventData(eventDef);
 	   
@@ -248,7 +252,9 @@ function StudyRenderer(json) {
       for (var j=0;j< app_formDefs.length && !defaultDisplayed;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
-          
+ 
+            app_thisFormData ==formDef["@OID"];
+ 
           var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
@@ -373,7 +379,8 @@ function StudyRenderer(json) {
       }
     }
     else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
-        this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
+	   app_renderMode =renderMode;
+       this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
        // this.renderString += this.createStudyCoverPage();// to be replaced by subject table of contents and subject details
        
         
