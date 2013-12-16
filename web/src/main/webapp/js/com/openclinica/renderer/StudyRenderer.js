@@ -131,6 +131,8 @@ function StudyRenderer(json) {
 	      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
 	        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
 	          var formDef = app_formDefs[j];
+	          var formOID = formDef["@OID"];
+	          app_formDefMap[formOID] = formDef; 
 	          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
 	          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
 	            var inEventDef = presentInEventDef[l];
@@ -212,14 +214,13 @@ function StudyRenderer(json) {
     this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
      if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
    {
-    	  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(eventDef);
-
+    	 this.renderStudyEventData(eventDef);
 	   
    }
      else{
          this.renderString += this.createStudyEventCoverPage(eventDef);
 
-     }
+    
      
      // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -250,8 +251,37 @@ function StudyRenderer(json) {
         }
       }
     }
+     }
   }
-  
+  /*
+   * For subject case book the study event date will be iterated and all the forms will be retrieved.
+   */
+  this.renderStudyEventData=function(eventDef){
+	  for(var key in app_thisStudyEventDataMap){
+		var studyEventDatas = app_thisStudyEventDataMap[key];
+		if(eventDef["@OID"]==key){
+		pageBreak = this.PAGE_BREAK;
+		  for(var repeatKey in studyEventDatas){
+	    	  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(eventDef);
+
+			  var studyEvent = studyEventDatas[repeatKey];
+			 var forms = studyEvent["FormData"];
+			 for(var i=0;i<forms.length;i++){
+			  var formOID = forms[i]["@FormOID"];
+			  var formDef = app_formDefMap[formOID];
+			  if(formDef!=undefined)
+			  {
+				  this.renderPrintableFormDef(formDef, pageBreak,eventDef);
+				  break;
+			  }
+			  
+			 }
+			  
+		  }
+		}
+		  
+	  }
+  }
   this.renderStudyEventDetails = function(studyEventData,eventDef){
 	 var s = "";
 	  var studyEventName = eventDef["@Name"];
