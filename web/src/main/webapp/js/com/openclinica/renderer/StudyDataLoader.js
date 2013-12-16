@@ -319,8 +319,8 @@ function StudyDataLoader(study, json) {
        var formOID = formsData[i]["@FormOID"];
        app_formData = formsData[i];
 	        app_thisFormData = app_formData;
-         if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
-         if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
+   //      if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
+    //     if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
 	//        break;
 	      }
 	    }
