@@ -20,6 +20,7 @@ function StudyRenderer(json) {
   this.renderString = "";
   var pageHeaderRenderer;
   
+  
  /* getSectionDetails(itemDetails, formDef) 
   * A convenience function to get the SectionDetails properties for an Item
   */ 
@@ -118,6 +119,32 @@ function StudyRenderer(json) {
     return str;
   }
   
+  this.createStudyEventCoverPageForSubjectCaseBook = function (eventDef) {
+	var str = "<h3>" + eventDef["@Name"] + ":</h3>";
+	   str+=this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
+	   str+="</br>"
+	    var studyEventFormRefs =  eventDef["FormRef"];
+	   
+	    for (var i=0;i< studyEventFormRefs.length;i++) {
+	      var formRef = studyEventFormRefs[i];
+	      var formFound = false;
+	      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
+	        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+	          var formDef = app_formDefs[j];
+	          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+	          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
+	            var inEventDef = presentInEventDef[l];
+	            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
+	              str += "<div>" + formDef["@Name"] + "</div>";
+	              formFound = true;
+	            }
+	          }
+	        }
+	      }
+	    }
+	   
+	    return str;
+	  }
   
   /* createStudyCoverPage()
    */ 
@@ -181,26 +208,20 @@ function StudyRenderer(json) {
    * Render all CRFS associated with a StudyEvent
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
-  
-  
-  app_eventName = eventDef["@Name"];
+    app_eventName = eventDef["@Name"];
     this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
-    this.renderString += this.createStudyEventCoverPage(eventDef);
-  //Joe-- get the dns = app_thisStudyEvent["@OpenClinica:DiscrepancyNotes"]
-//  study event  
+     if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
+   {
+    	  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(eventDef);
 
-  var studyEventDefRenderer = new StudyEventDefRenderer(eventDef);
-      var logs = "";
+	   
+   }
+     else{
+         this.renderString += this.createStudyEventCoverPage(eventDef);
 
-   studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
-   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
-   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
-   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
-
-
-
-  this.renderStudyEventDetails(app_thisStudyEvent,eventDef);
-    // select all CRFs from StudyEvent
+     }
+     
+     // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
       studyEventFormRefs = new Array();
@@ -232,7 +253,17 @@ function StudyRenderer(json) {
   }
   
   this.renderStudyEventDetails = function(studyEventData,eventDef){
-	  var startDate = studyEventData["@OpenClinica:StartDate"];
+	 var s = "";
+	  var studyEventName = eventDef["@Name"];
+	  var studyEventLocation = studyEventData["@OpenClinica:StudyEventLocation"];
+	  var startDate = util_cleanDate(studyEventData["@OpenClinica:StartDate"]);
+	  var endDate =util_cleanDate(studyEventData["@OpenClinica:EndDate"]);
+	  var studyEventStatus = studyEventData["@OpenClinica:Status"];
+	  
+	s= RenderUtil.render(RenderUtil.get(
+            "print_study_event_details"),{studyEventName:studyEventName,studyEventLocation:studyEventLocation,studyEventStatus:studyEventStatus,
+            startDate:startDate,endDate:endDate})[0].outerHTML;; 
+            return s;
 	  
   }
   /* renderPrintableStudy(renderMode)
@@ -329,13 +360,6 @@ function StudyRenderer(json) {
     // Get Form Wrapper
     var formDefRenderer = new FormDefRenderer(formDef);
     this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
-	
-   
-   
-   
-
-
-
     var repeatingHeaderString = "";
     var repeatingRowString = "";
     var currentItemGroupOID = "";
@@ -358,25 +382,9 @@ function StudyRenderer(json) {
       }
     }
 
-   
-   formDefRenderer.eventCRFdns = app_thisFormData["OpenClinica:DiscrepancyNotes"];
-   formDefRenderer.eventCRFaudits = app_thisFormData["OpenClinica:AuditLogs"];
-   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(formDefRenderer,formDefRenderer.eventCRFdns); }
-   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(formDefRenderer,formDefRenderer.eventCRFaudits);}
     
-//  study event  
-//   studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
-//   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
-//   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
-//   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
-  
-
-//  study subject		
-//   studySubjectDefRenderer.studySubjectdns = app_thisStudySubject["OpenClinica:DiscrepancyNotes"];
-//   studySubjectDefRenderer.studySubjectaudits = app_thisStudySubject["OpenClinica:AuditLogs"];
-//   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }
-//   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectaudits);}
-   
+		
+	
 	
     var repeatRowNumber = 1;
     var totalRepeatingRows = 1;
@@ -582,6 +590,18 @@ function StudyRenderer(json) {
         }
       }
     if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
+    // this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
+    // this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+		
+      if(typeof formOids==='undefined' || formOids.toString().indexOf(formDef["@OID"])<0)	{    	
+	
+   if(app_displayDNs=='y') 	  {	logs+=this.printEventCRFDiscrepancies(formDefRenderer); }
+   if(app_displayAudits=='y') 	  { logs+=this.printEventCRFAudits(formDefRenderer);}
+
+		formOids.push(formDef["@OID"]);
+		}
+   
+ 
 	 }
   
 	  
@@ -727,12 +747,12 @@ function StudyRenderer(json) {
   
 
   ///////////////////////
-  this.print_EventCRF_StudyEvent_StudySubject_Audits = function(renderer , adt){
+  this.printEventCRFAudits = function(formDefRenderer){
 	  this.auditLogs = "";
 	  
 		  
-			if(app_displayAudits=='y' && adt){
-				  var auditLogs = adt;
+			if(app_displayAudits=='y' && formDefRenderer.eventCRFaudits){
+				  var auditLogs = formDefRenderer.eventCRFaudits;
 				  //for(var key in auditLogs){
 				 
 					  if(auditLogs!=undefined){	
@@ -757,7 +777,7 @@ function StudyRenderer(json) {
 	    			  currentAuditLogs.push(thisAuditLog);
 
 	    		  } 
-	    		  this.auditLogs+=renderer.renderAuditLogs(currentAuditLogs);
+	    		  this.auditLogs+=formDefRenderer.renderAuditLogs(currentAuditLogs);
 				 
 				  }
 				  }
@@ -767,11 +787,10 @@ function StudyRenderer(json) {
   
   ///////////////////////
 
-//     function(formDefRenderer , formDefRenderer.eventCRFdns) for Event CRF ,Study Event and Study Subject
-   this.print_EventCRF_StudyEvent_StudySubject_Discrepancies = function(renderer,dn){
+    this.printEventCRFDiscrepancies = function(formDefRenderer){
     this.discrepancyNotes="";
-		if(app_displayDNs=='y' && dn ){
- 				  var discrepancyNotes = dn;
+		if(app_displayDNs=='y' && formDefRenderer.eventCRFdns ){
+ 				  var discrepancyNotes = formDefRenderer.eventCRFdns;
 				  //for(var key in discrepancyNotes){
 					  if(discrepancyNotes!=undefined){	
 					  var discrepancyNote = util_ensureArray(discrepancyNotes["OpenClinica:DiscrepancyNote"]);
@@ -820,7 +839,7 @@ function StudyRenderer(json) {
 				      }	 
 				  }
                   
-				  this.discrepancyNotes+=renderer.renderDiscrepancyNotes(currentDiscrepancyNotes);
+				  this.discrepancyNotes+=formDefRenderer.renderDiscrepancyNotes(currentDiscrepancyNotes);
 				  currentDiscrepancyNotes = [];
 				  
 				  

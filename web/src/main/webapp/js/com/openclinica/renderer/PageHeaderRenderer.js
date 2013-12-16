@@ -33,8 +33,8 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
 	  var subjectBday =app_thisSubjectsData?( app_thisSubjectsData["@OpenClinica:DateOfBirth"]?app_thisSubjectsData["@OpenClinica:DateOfBirth"]:""):"";
 	  var groupClassInfo="";
 	  var groupName="";
-	 eventStartDate = this.cleanDate(eventStartDate);
-	 eventEndDate = this.cleanDate(eventEndDate);
+	 eventStartDate = util_cleanDate(eventStartDate);
+	 eventEndDate = util_cleanDate(eventEndDate);
 	 var thisStudyEventDef = app_studyEventDefMap[app_thisStudyEvent["@StudyEventOID"]];
 	 var repeating = thisStudyEventDef["@Repeating"];
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
@@ -75,26 +75,5 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
       
     });
   }
-	this.cleanDate = function(eventStartDate){
-		 if(eventStartDate){
-			  if(eventStartDate.toString().indexOf("00:00:00")>1) {
-				  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().indexOf("00:00:00"));
-			  }
-			  else
-				  {
-				  if(eventStartDate.toString().lastIndexOf(":00")){
-				  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().lastIndexOf(":00"));
-				  }
-				  }
-				  
-		  }
-		  
-          //  This function is a workaround to display a page with .trim() ( where IE 8 does not support .trim() method)
-		  if(typeof String.prototype.trim !== 'function') {
-            String.prototype.trim = function() {
-                 return this.replace(/^\s+|\s+$/g, ''); 
-                   }
-                }
-		 return eventStartDate.trim();
-	} 
+	
 }

@@ -64,7 +64,8 @@ var app_studyLabel='<fmt:message key="study" bundle="${resword}"/>';
 var app_groupLabel='<fmt:message key="group" bundle="${resword}"/>';
 var app_crfLabel='<fmt:message key="CRF_status" bundle="${resword}"/>';
 var genderLabel='<fmt:message key="gender" bundle="${resword}"/>';
-
+var app_eventStartDateLabel = '<fmt:message key="start_date" bundle="${resword}"/>';
+var app_eventEndDateLabel = '<fmt:message key="end_date" bundle="${resword}"/>';
   </script>
 
 <html>
