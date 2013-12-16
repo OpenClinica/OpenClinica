@@ -259,6 +259,7 @@ function StudyDataLoader(study, json) {
    */
   this.loadSubjectData = function (json) {
     debug("loading subject data", util_logDebug );
+    
     if (app_studySubjectOID.length == 0) {
       return;
     }
@@ -285,15 +286,21 @@ function StudyDataLoader(study, json) {
     	{
     		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
     	       app_thisStudyEvent = studyEventData;
-    	       app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
     	       var formsData = util_ensureArray(studyEventData["FormData"]);
     	       this.loadFormsData(formsData);
     	       break;
     		}
     	}
      else{
+    	 if(!app_thisStudyEventDataMap)
+    		 app_thisStudyEventDataMap = {};
+    	 var studyEventrepeatKey = studyEventData["@StudyEventRepeatKey"];
+    	 var studyEventOID = studyEventData["@StudyEventOID"];
+    	 if(studyEventOID in app_thisStudyEventDataMap == false){
+    		 app_thisStudyEventDataMap[studyEventOID]={};
+    	 }
+    	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
     	 app_thisStudyEvent = studyEventData;
-         app_studySubjectStartDate = studyEventData["@OpenClinica:StartDate"];
          var formsData = util_ensureArray(studyEventData["FormData"]);
          this.loadFormsData(formsData);
      }

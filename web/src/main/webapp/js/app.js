@@ -59,6 +59,7 @@ var app_studyCoverPageType = "study_cover_page_type";
 var app_studyContentPageType = "study_content_page_type";
 var app_thisClinicalData = undefined;
 var app_thisStudyEvent = undefined;
+var app_thisStudyEventDataMap = undefined;
 var app_thisSubjectsData = undefined;
 var app_thisFormData = undefined;
 var app_studyEventDefMap = {};
@@ -67,6 +68,7 @@ debug("console debugging enabled.", util_logDebug);
 var app_userOID = undefined;
 var app_userName =undefined;
 var app_userData ={};
+var app_formDefMap = {};
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
