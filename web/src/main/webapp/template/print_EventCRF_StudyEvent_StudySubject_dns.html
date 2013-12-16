@@ -1,0 +1,53 @@
+<td valign='center'>
+
+  <table class='AL_DNBackgroundColorForHeaders' border="1" width="100%" >
+<tr>&nbsp;</tr>
+
+  <tr><td>${title} </td> </tr>
+
+
+
+
+
+  </table>
+  <table border="1" width="100%" >
+
+   <tr>
+
+  <td>Note</td>
+  <td>Assigned to</td>
+  <td>ID</td>
+  <td>Type</td>
+  <td>Current Status</td>
+  <td># of Notes</td>
+  <td>Last Updated </td>
+
+
+  </tr>
+
+
+ {{each discrepancyNotes}}
+
+  {{if description == "" }}  <tr class='DNParentRowColor' > <td>  This is a new thread </td>    {{/if}}
+  {{if description != "" }}  <tr>  <td> {{html description}} &nbsp;&nbsp;{{html detailedNote}}  </td>   {{/if}}
+
+
+  <td>{{html user}}</td>
+  <td>{{html id}} </td>
+  <td>{{html parent_noteType}}</td>
+  <td>{{html status}}</td>
+  <td>{{html numberOfChildNotes}}</td>
+  <td>{{html dateUpdated}}</td>
+
+
+
+
+  </tr>
+
+  {{/each}}
+  </table>
+  </td>
+
+
+
+
