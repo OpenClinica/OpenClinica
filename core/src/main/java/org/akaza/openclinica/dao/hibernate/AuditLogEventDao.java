@@ -18,17 +18,17 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		   String buildQuery = "";
 	       if(auditLogEvent.getEntityId()!=null && auditLogEvent.getAuditTable()!=null && anotherAuditTable==null)
 	       {	   buildQuery+= "do.entityId =:entity_id ";
-	         	   buildQuery+= " and  do.auditTable =:audit_table";
+	         	   buildQuery+= " and  do.auditTable =:audit_table order by do.auditId ";
 	       }
 	       else if(auditLogEvent.getEntityId()!=null && auditLogEvent.getAuditTable()!=null && anotherAuditTable!=null)
 	       {
 	    	   buildQuery+= "do.entityId =:entity_id ";
-         	   buildQuery+= " and ( do.auditTable =:audit_table or do.auditTable =:anotherAuditTable)";
+         	   buildQuery+= " and ( do.auditTable =:audit_table or do.auditTable =:anotherAuditTable) order by do.auditId ";
 	       }
 	       if(!buildQuery.isEmpty())
 		    query = "from " + getDomainClassName() +  " do  where "+buildQuery;
 	       else
-	    	   query = "from " + getDomainClassName() ;
+	    	   query = "from " + getDomainClassName()  ;
 	       org.hibernate.Query q = getCurrentSession().createQuery(query);
 	       if(auditLogEvent.getEntityId()!=null && auditLogEvent.getAuditTable()!=null && anotherAuditTable==null)
 	       {  q.setInteger("entity_id", auditLogEvent.getEntityId());

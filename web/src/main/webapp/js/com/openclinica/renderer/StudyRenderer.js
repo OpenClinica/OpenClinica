@@ -270,7 +270,7 @@ function StudyRenderer(json) {
      }
   }
   /*
-   * For subject case book the study event date will be iterated and all the forms will be retrieved.
+   * For subject case book the study events  will be iterated and all the forms will be retrieved.
    */
   this.renderStudyEventData=function(eventDef){
 	  for(var key in app_thisStudyEventDataMap){
@@ -306,10 +306,24 @@ function StudyRenderer(json) {
 	  var startDate = util_cleanDate(studyEventData["@OpenClinica:StartDate"]);
 	  var endDate =util_cleanDate(studyEventData["@OpenClinica:EndDate"]);
 	  var studyEventStatus = studyEventData["@OpenClinica:Status"];
-	  
+	  var electronicSignature = undefined;
+	  if(app_displayAudits == 'y'){
+		  if(studyEventData["@OpenClinica:Status"]=='signed'){
+			  var audits = studyEventData["OpenClinica:AuditLogs"]["OpenClinica:AuditLog"];
+			  for(var i=0;i<audits.length;i++)
+				  {
+				  	var newVal = audits[i]["@NewValue"];
+				  	if(newVal=='signed')
+				  		{
+				  		electronicSignature=audits[i]["@Name"]+"("+audits[i]["@UserName"]+")";
+				  		}
+				  }
+		  }
+		 // electronicSignature = studyEventData[]
+	  }
 	s= RenderUtil.render(RenderUtil.get(
             "print_study_event_details"),{studyEventName:studyEventName,studyEventLocation:studyEventLocation,studyEventStatus:studyEventStatus,
-            startDate:startDate,endDate:endDate})[0].outerHTML;; 
+            startDate:startDate,endDate:endDate,electronicSig:electronicSignature})[0].outerHTML;; 
             return s;
 	  
   }

@@ -1,5 +1,6 @@
 <td>
 <table width="100%">
+<tr>
 <td width="30%">
 {{html app_eventNameLabel}}: {{html studyEventName}}
 <br/>
@@ -20,5 +21,12 @@
 {{html studyEventStatus}}
 
 </td>
+</tr>
+{{if electronicSig}}
+<tr>
+Electronic Signature: {{html electronicSig}}
+</tr>
+{{/if}}
+
 </table>
 </td>
