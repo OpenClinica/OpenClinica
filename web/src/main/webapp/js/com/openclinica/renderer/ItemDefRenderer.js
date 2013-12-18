@@ -1,4 +1,4 @@
-function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber) {
+function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,studyEventOID,studyEventRepeatKey) {
   this.json = json;
   this.itemDetails = itemDetails;
   this.mandatory = mandatory;
@@ -24,10 +24,12 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber)
   this.audits = undefined;
   this.dns = undefined;
   this.itemNameLink = undefined;
+  this.studyEventOID = studyEventOID;
+  this.studyEventRepeatKey = studyEventRepeatKey;
   
   
-  if (app_itemValuesMap[this.OID]) { 
-    this.itemValue = app_itemValuesMap[this.OID][repeatRowNumber]; 
+  if (app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID]) { 
+    this.itemValue = app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
     this.audits = app_audits[this.OID];
     if(app_displayDNs=='y')

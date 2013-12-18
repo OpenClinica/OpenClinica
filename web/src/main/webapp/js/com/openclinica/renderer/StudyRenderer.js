@@ -250,7 +250,7 @@ function StudyRenderer(json) {
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
             if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]) {
-              this.renderPrintableFormDef(formDef, pageBreak,eventDef);
+              this.renderPrintableFormDef(formDef, pageBreak,eventDef,null);
               defaultDisplayed = true;
               break;  
             }
@@ -282,22 +282,16 @@ function StudyRenderer(json) {
   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
   if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
   if(app_displayAudits=='y') 	  { this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
-
-
-
-
-
-	
-
 			 var forms = studyEvent["FormData"];
 			 if(forms){
 			 for(var i=0;i<forms.length;i++){
+				 app_thisFormData = forms[i];//over writting the global variable to get the exact form data.
 			  var formOID = forms[i]["@FormOID"];
 			  var formDef = app_formDefMap[formOID];
 			  if(formDef!=undefined)
 			  {
-				  this.renderPrintableFormDef(formDef, pageBreak,eventDef);
-				  break;
+				  this.renderPrintableFormDef(formDef, pageBreak,eventDef,studyEvent["@StudyEventRepeatKey"]);
+				  
 			  }
 			  
 			 }
@@ -421,7 +415,7 @@ function StudyRenderer(json) {
   /* renderPrintableFormDef(formDef, pageBreak)
    * The heart of StudyRenderer: render the CRF
    */
-  this.renderPrintableFormDef = function(formDef, pageBreak,eventDef) {
+  this.renderPrintableFormDef = function(formDef, pageBreak,eventDef,studyEventRepeatKey) {
   app_renderMode = undefined;
     this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, eventDef);
     
@@ -455,33 +449,17 @@ function StudyRenderer(json) {
     }
 
     
-    //formDefRenderer.eventCRFdns = app_thisFormData["OpenClinica:DiscrepancyNotes"];
-    //formDefRenderer.eventCRFaudits = app_thisFormData["OpenClinica:AuditLogs"];
-   // if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(formDefRenderer,formDefRenderer.eventCRFdns); }
-    //if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(formDefRenderer,formDefRenderer.eventCRFaudits);}
-     
- //  study event  
- //   studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
- //   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
- //   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
- //   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
+   /*if(app_displayDNs='y') formDefRenderer.eventCRFdns = app_thisFormData[]["OpenClinica:DiscrepancyNotes"];
+    formDefRenderer.eventCRFaudits = app_thisFormData["OpenClinica:AuditLogs"];
+   */ if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(formDefRenderer,formDefRenderer.eventCRFdns); }
+   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(formDefRenderer,formDefRenderer.eventCRFaudits);}
    
-
- //  study subject		
- //   studySubjectDefRenderer.studySubjectdns = app_thisStudySubject["OpenClinica:DiscrepancyNotes"];
- //   studySubjectDefRenderer.studySubjectaudits = app_thisStudySubject["OpenClinica:AuditLogs"];
- //   if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }
- //   if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectaudits);}
-  	
-	
+ 	
 	
     var repeatRowNumber = 1;
     var totalRepeatingRows = 1;
     var idxForFirstItem = undefined;
     var itemOids = new Array();
-	var formOids = new Array();
-    var currentAttributes = [];
-    var repeat =undefined;
 	var saveForAuditsIndex = 0;
  
  for (var orderedItemIndex=0;orderedItemIndex< orderedItems.length;orderedItemIndex++) {
@@ -568,7 +546,7 @@ function StudyRenderer(json) {
         idxForFirstItem =itemDetails["@OrderInForm"]; // this will be the first item in a grid.
       }
       
-      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber);
+      itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber,eventDef["@OID"],studyEventRepeatKey);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       

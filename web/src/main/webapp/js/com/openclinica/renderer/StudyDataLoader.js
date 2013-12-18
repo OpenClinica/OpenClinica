@@ -302,13 +302,13 @@ function StudyDataLoader(study, json) {
     	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
     	 app_thisStudyEvent = studyEventData;
          var formsData = util_ensureArray(studyEventData["FormData"]);
-         this.loadFormsData(formsData);
+         this.loadFormsData(studyEventOID,studyEventrepeatKey,formsData);
      }
     }
   }
  
   
-  this.loadFormsData = function(formsData){
+  this.loadFormsData = function(studyEventOID,studyEventRepeatKey,formsData){
 	  if (formsData == undefined) {
 	      return;
 	    }
@@ -327,7 +327,7 @@ function StudyDataLoader(study, json) {
 	   // load itemGroupData into a hash map and determine repeating group row lengths 
 	   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	   if (itemGroupData) {
-		   this.loadItemGroupData(itemGroupData);
+		   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
 	   }
 	   }
 	    else{
@@ -336,7 +336,7 @@ function StudyDataLoader(study, json) {
 	    		app_thisFormData = app_formData;
 	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	    		if (itemGroupData) {
-	    			   this.loadItemGroupData(itemGroupData);
+	    			   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
 	    		   }
 	    	}
 	    }
@@ -344,7 +344,7 @@ function StudyDataLoader(study, json) {
   }
   
   
-  this.loadItemGroupData = function(itemGroupData){
+  this.loadItemGroupData = function(studyEventOID,studyEventRepeatKey,itemGroupData){
 	    for (var i=0;i<itemGroupData.length;i++) {
 	        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
 	        var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
@@ -357,12 +357,12 @@ function StudyDataLoader(study, json) {
 	          var itemValue = itemsData[j]["@Value"];
 	          var itemOID = itemsData[j]["@ItemOID"];
 	          if (itemOID in app_itemValuesMap == false){
-	            app_itemValuesMap[itemOID] = {}; 
+	        	  app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID] = {}; 
 	            app_audits[itemOID]={};
 	            app_dns[itemOID]={};
 	            app_itemDataMap[itemOID]={};
 	          }
-	                        app_itemValuesMap[itemOID][repeatKey] = itemValue; 
+	                        app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemValue; 
 	                        app_itemDataMap[itemOID][repeatKey]=itemsData[j];
 	                        
 if (app_displayAudits =='y')app_audits[itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
