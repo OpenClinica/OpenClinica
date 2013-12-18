@@ -1,5 +1,6 @@
 function PageHeaderRenderer() {
 if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVENT_CRFS' || app_renderMode =='UNPOPULATED_GLOBAL_CRF' ) {
+	this.render = function(printTime, pageType, eventName,eventLocation) { 
 	    return RenderUtil.render(RenderUtil.get("print_page_header_global"), {
 	      printTime: printTime,
 	      pageType: pageType,
@@ -16,6 +17,7 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
 	      eventLocationRequired: app_eventLocationRequired
 	    });
 	  }
+}
 	
 	else
   this.render = function(printTime, pageType, eventName,eventLocation) { 
