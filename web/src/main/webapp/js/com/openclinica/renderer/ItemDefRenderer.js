@@ -28,7 +28,8 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
   this.studyEventRepeatKey = studyEventRepeatKey;
   
   
-  if (app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID]) { 
+  
+  if (this.studyEventOID!=undefined && app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID]) { 
     this.itemValue = app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID][repeatRowNumber]; 
     if(app_displayAudits=='y')
     this.audits = app_audits[this.OID];

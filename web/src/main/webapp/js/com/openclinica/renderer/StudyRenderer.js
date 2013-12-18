@@ -545,8 +545,11 @@ function StudyRenderer(json) {
         isFirstRepeatingItem = true;
         idxForFirstItem =itemDetails["@OrderInForm"]; // this will be the first item in a grid.
       }
-      
+
+      if(eventDef)
       itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber,eventDef["@OID"],studyEventRepeatKey);
+      else
+    	  itemDefRenderer = new ItemDefRenderer(itemDef, itemDetails, mandatory, formDef["@OID"], repeatRowNumber,undefined,undefined);
       var codeListOID = itemDef["CodeListRef"] ? itemDef["CodeListRef"]["@CodeListOID"] : undefined;
       var multiSelectListOID = itemDef["OpenClinica:MultiSelectListRef"] ? itemDef["OpenClinica:MultiSelectListRef"]["@MultiSelectListID"] : undefined;
       
