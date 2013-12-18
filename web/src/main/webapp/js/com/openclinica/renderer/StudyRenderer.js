@@ -212,7 +212,6 @@ function StudyRenderer(json) {
    */
   this.renderPrintableEventCRFs = function(renderMode, eventDef, pageBreak) {
     app_eventName = eventDef["@Name"];
-    this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
 
 	app_renderMode = undefined;
 
@@ -227,14 +226,6 @@ function StudyRenderer(json) {
     
   
      
-     var studyEventDefRenderer = new StudyEventDefRenderer(eventDef);
-     var logs = "";
-
-  studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
-  studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
-  if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
-  if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
-
      
      // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
@@ -278,9 +269,25 @@ function StudyRenderer(json) {
 		if(eventDef["@OID"]==key){
 		pageBreak = this.PAGE_BREAK;
 		  for(var repeatKey in studyEventDatas){
-	    	 
-			  var studyEvent = studyEventDatas[repeatKey];
+
+	         app_renderMode = renderMode;
+				 this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
+
+		  var studyEvent = studyEventDatas[repeatKey];
 			  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(studyEvent,eventDef);
+	
+  app_thisStudyEvent=studyEvent;
+  var studyEventDefRenderer = new StudyEventDefRenderer(eventDef);
+  studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
+  studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
+  if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
+  if(app_displayAudits=='y') 	  { this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
+
+
+
+
+
+	
 
 			 var forms = studyEvent["FormData"];
 			 for(var i=0;i<forms.length;i++){
@@ -412,7 +419,7 @@ function StudyRenderer(json) {
    * The heart of StudyRenderer: render the CRF
    */
   this.renderPrintableFormDef = function(formDef, pageBreak,eventDef) {
-  
+  app_renderMode = undefined;
     this.renderPageHeader(pageBreak, app_printTime, app_studyContentPageType, eventDef);
     
     var orderedItems = new Array();
@@ -524,6 +531,7 @@ function StudyRenderer(json) {
       
       if (sectionLabel != prevSectionLabel) {
         if (isFirstSection == false) {
+		app_renderMode = undefined;
           this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyContentPageType, eventDef);
         }
         this.renderString += "<div class='vertical-spacer-30px'></div>";
@@ -710,6 +718,7 @@ function StudyRenderer(json) {
       prevItemHeader = itemHeader;
     }
     if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
+	app_renderMode = undefined;
      this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
      this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
      }  	 
