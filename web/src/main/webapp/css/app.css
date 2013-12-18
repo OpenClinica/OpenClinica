@@ -62,6 +62,7 @@ a:active {
    background-color : black;
    color : white;
    text-decoration:underline;
+   font-size: 90%;
 }
 
 .AL_DNBackgroundColorForHeaders{
@@ -71,10 +72,12 @@ a:active {
 	border-bottom-style: solid;
 	border-bottom-color: black;
 	width: 100%;
+   font-size: 90%;
 }
 
 .DNParentRowColor{
 	background-color : #CCC;
+   font-size: 80%;
 }
 .MetadataBackgroundColorForHeaders{
    background-color : lightblue;
@@ -365,4 +368,11 @@ input[type="text"], textarea {
 
 td {
 	vertical-align: top;
+}
+
+
+
+
+.provenance td {
+	font-size: 80%;
 }

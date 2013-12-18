@@ -1,44 +1,32 @@
-<td valign='center'>
 
-<br />
-
+<td valign='center'><br />
   <table border="1" width="100%" >
-
-  <tr>
-  <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName} : Metadata</td>
-  </tr>
-<!--  <tr  class='MetadataBackgroundColorForHeaders'>  -->
- <tr>
-  <td>Left Item Text</td>
- <td>Units</td>
- <td>Data Type</td>
-
- <td>Response Options Text</td>
- <td>Response Options Values</td>
- <td>Group Label</td>
-  </tr>
-
-  <tr>
-  <td> {{html leftItemText}} </td>
-  <td>{{html units}}</td>
- <td> {{html dataType}} </td>
- <td>
-   {{each responseOptions}}
-
-         {{html label}}
-
-      {{/each}}
-      </td>
-      <td>
-   {{each responseOptions}}
-
-         {{html id}}
-
-      {{/each}}
-      </td>
-      <td>
-      {{html groupLabel}}
-      </td>
-  </tr>
-  </table>
-  </td>
+    <tr>
+      <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName} : Metadata</td>
+    </tr>
+    <!--  <tr  class='MetadataBackgroundColorForHeaders'>  -->
+    <tr class="provenance">
+      <td>Left Item Text</td>
+      <td>Units</td>
+      <td>Data Type</td>
+      <td>Response Options Text</td>
+      <td>Response Options Values</td>
+      <td>Group Label</td>
+    </tr>
+    <tr class="provenance">
+      <td> {{html leftItemText}} </td>
+      <td>{{html units}}</td>
+      <td> {{html dataType}} </td>
+      <td> {{each responseOptions}}
+        
+        {{html label}}
+        
+        {{/each}} </td>
+      <td> {{each responseOptions}}
+        
+        {{html id}}
+        
+        {{/each}} </td>
+      <td> {{html groupLabel}} </td>
+    </tr>
+  </table></td>

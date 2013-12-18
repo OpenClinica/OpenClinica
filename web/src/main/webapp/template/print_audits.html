@@ -1,35 +1,34 @@
-<td valign='center'>
 
-<br />
+<td valign='center'><br />
   <table border="1" width="100%" >
-
-{{if repeating}}
-  <tr><td colspan="6" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Audit History </td>
- {{/if}}
-
- {{if !repeating}}
-  <tr><td colspan="6" class="DNBackgroundColorForHeaders">${value}: Audit History </td>
-  {{/if}}
-  </tr>
-
-  <!-- <tr class='ALBackgroundColorForHeaders'> -->
-  <tr>
-  <td>Audit Event</td>
- <td>Date/Time of Server</td> 
- <td>User</td>
- <td>Value Type</td>
-  <td>Old</td>
-  <td>New</td>
-  </tr>
-   {{each auditLogs}}
-  <tr>
-  <td> {{html auditType}} </td>
-   <td>{{html dateTime}}</td> 
-  <td>{{html user}}</td>
-  <td>{{html value}}</td>
-  <td>{{html oldValue}}</td>
-  <td>{{html newValue}}</td>
-  </tr>
-  {{/each}}
-  </table>
-  </td>
+    {{if repeating}}
+    <tr>
+      <td colspan="6" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Audit History </td>
+      {{/if}}
+      
+      {{if !repeating}}
+    
+    <tr>
+      <td colspan="6" class="DNBackgroundColorForHeaders">${value}: Audit History </td>
+      {{/if}} </tr>
+    
+    <!-- <tr class='ALBackgroundColorForHeaders'> -->
+    <tr class="provenance">
+      <td>Audit Event</td>
+      <td>Date/Time of Server</td>
+      <td>User</td>
+      <td>Value Type</td>
+      <td>Old</td>
+      <td>New</td>
+    </tr>
+    {{each auditLogs}}
+    <tr class="provenance">
+      <td> {{html auditType}} </td>
+      <td>{{html dateTime}}</td>
+      <td>{{html user}}</td>
+      <td>{{html value}}</td>
+      <td>{{html oldValue}}</td>
+      <td>{{html newValue}}</td>
+    </tr>
+    {{/each}}
+  </table></td>
