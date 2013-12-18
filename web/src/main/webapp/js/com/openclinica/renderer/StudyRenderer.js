@@ -660,20 +660,7 @@ function StudyRenderer(json) {
           this.renderString += "</table>";
         }
       }
- //   if(app_displayAudits=='y'  ||	app_displayDNs=='y' ){
-    // this.renderPageHeader(true, app_printTime, app_studyContentPageType, eventDef);
-    // this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
-		
- //     if(typeof formOids==='undefined' || formOids.toString().indexOf(formDef["@OID"])<0)	{    	
-	
- //  if(app_displayDNs=='y') 	  {	logs+=this.printEventCRFDiscrepancies(formDefRenderer); }
- //  if(app_displayAudits=='y') 	  { logs+=this.printEventCRFAudits(formDefRenderer);}
 
-//		formOids.push(formDef["@OID"]);
-//		}
-   
- 
-//	 }
   
 	  
       
