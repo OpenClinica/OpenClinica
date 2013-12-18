@@ -449,7 +449,7 @@ function StudyRenderer(json) {
     }
 
     if ( app_thisFormData) {
-   if(app_displayDNs='y' ) formDefRenderer.eventCRFdns = app_thisFormData["OpenClinica:DiscrepancyNotes"];
+   if(app_displayDNs=='y' ) formDefRenderer.eventCRFdns = app_thisFormData["OpenClinica:DiscrepancyNotes"];
    if(app_displayAudits=='y')   formDefRenderer.eventCRFaudits = app_thisFormData["OpenClinica:AuditLogs"];
    if(app_displayDNs=='y') 	  {	logs+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(formDefRenderer,formDefRenderer.eventCRFdns); }
    if(app_displayAudits=='y') 	  { logs+=this.print_EventCRF_StudyEvent_StudySubject_Audits(formDefRenderer,formDefRenderer.eventCRFaudits);}
