@@ -59,7 +59,7 @@ a:active {
 }
 
 .DNBackgroundColorForHeaders{
-   background-color : black;
+   background-color : grey;
    color : white;
    text-decoration:underline;
    font-size: 90%;
