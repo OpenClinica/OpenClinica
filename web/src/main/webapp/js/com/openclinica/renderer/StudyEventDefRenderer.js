@@ -9,15 +9,13 @@ function StudyEventDefRenderer(json) {
   
   this.renderDiscrepancyNotes = function(discrepancyNotes){
     var template="print_EventCRF_StudyEvent_StudySubject_dns";
-    var title = "Study Event Notes & Discrepancies" ;
-	var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes, title:title } );
+	var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes, title:app_SELabel+" "+ app_nav_notes_and_discrepanciesLabel} );
     return s[0].outerHTML;
   }
   
   this.renderAuditLogs = function(auditLogs){
     var template="print_EventCRF_StudyEvent_StudySubject_audits";
-    var title = "Study Event Audit History" ;
-    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs , title:title });
+    var s = RenderUtil.render(RenderUtil.get(template),{auditLogs:auditLogs , title:app_SELabel+" "+app_Audit_HistoryLabel });
     return s[0].outerHTML;
   }
 

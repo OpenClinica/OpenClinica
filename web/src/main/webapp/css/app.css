@@ -81,9 +81,14 @@ a:active {
 }
 .MetadataBackgroundColorForHeaders{
    background-color : lightblue;
+   text-decoration:underline;
+   font-size: 90%;
 }
+
 .ALBackgroundColorForHeaders{
    background-color : lightgreen;
+   text-decoration:underline;
+   font-size: 90%;
 }
 
 

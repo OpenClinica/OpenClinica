@@ -2,17 +2,16 @@
 <td valign='center'><br />
   <table border="1" width="100%" >
     <tr>
-<!--  <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName} : Metadata</td>  -->
-      <td colspan="7" class="MetadataBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName} : Metadata</td>
+<!--  <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName}: ${app_metadataLabel}</td>  -->
+      <td colspan="7" class="MetadataBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName}: ${app_metadataLabel}</td>
     </tr>
     <!--  <tr  class='MetadataBackgroundColorForHeaders'>  -->
     <tr class="provenance">
-      <td>Left Item Text</td>
-      <td>Units</td>
-      <td>Data Type</td>
-      <td>Response Options Text</td>
-      <td>Response Options Values</td>
-      <td>Group Label</td>
+      <td>${app_left_item_textLabel}</td>
+      <td>${app_unitsLabel}</td>
+      <td>${app_data_typeLabel}</td>
+      <td>${app_response_options_textLabel} (${app_response_valuesLabel})</td>
+      <td>${app_rule_group_labelLabel}</td>
     </tr>
     <tr class="provenance">
       <td> {{html leftItemText}} </td>
@@ -20,12 +19,7 @@
       <td> {{html dataType}} </td>
       <td> {{each responseOptions}}
         
-        {{html label}}
-        
-        {{/each}} </td>
-      <td> {{each responseOptions}}
-        
-        {{html id}}
+        {{html label}}({{html id}})&nbsp;,&nbsp; 
         
         {{/each}} </td>
       <td> {{html groupLabel}} </td>

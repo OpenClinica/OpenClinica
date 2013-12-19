@@ -9,6 +9,9 @@ var app_eventCRFaudits={};
 var app_globalStudy={};
 var app_siteProtocolName;
 
+
+
+
 var app_itemDataMap={};
 var app_maxPixelHeight = 610;
 var app_maxLandscapePixelHeight = 400;
