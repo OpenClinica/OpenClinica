@@ -321,7 +321,7 @@ function StudyRenderer(json) {
 				  	var newVal = audits[i]["@NewValue"];
 				  	if(newVal=='signed')
 				  		{
-				  		electronicSignature=audits[i]["@Name"]+"("+audits[i]["@UserName"]+")";
+				  		electronicSignature=audits[i]["@Name"]+"("+audits[i]["@UserName"]+")"+"|"+audits[i]["@DateTimeStamp"];
 				  		
 				  		break;
 				  		}
