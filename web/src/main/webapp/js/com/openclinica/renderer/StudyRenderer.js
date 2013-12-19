@@ -269,14 +269,16 @@ function StudyRenderer(json) {
 		if(eventDef["@OID"]==key){
 		pageBreak = this.PAGE_BREAK;
 		  for(var repeatKey in studyEventDatas){
+			  var studyEvent = studyEventDatas[repeatKey];
+		         app_renderMode = renderMode;
 
-	         app_renderMode = renderMode;
+			  app_thisStudyEvent=studyEvent;
+
 				 this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
 
-		  var studyEvent = studyEventDatas[repeatKey];
+		
 			  this.renderString += this.createStudyEventCoverPageForSubjectCaseBook(studyEvent,eventDef);
 	
-  app_thisStudyEvent=studyEvent;
   var studyEventDefRenderer = new StudyEventDefRenderer(eventDef);
   studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
@@ -310,6 +312,7 @@ function StudyRenderer(json) {
 	  var endDate =util_cleanDate(studyEventData["@OpenClinica:EndDate"]);
 	  var studyEventStatus = studyEventData["@OpenClinica:Status"];
 	  var electronicSignature = undefined;
+	 
 	  if(app_displayAudits == 'y'){
 		  if(studyEventData["@OpenClinica:Status"]=='signed'){
 			  var audits = studyEventData["OpenClinica:AuditLogs"]["OpenClinica:AuditLog"];
@@ -318,7 +321,8 @@ function StudyRenderer(json) {
 				  	var newVal = audits[i]["@NewValue"];
 				  	if(newVal=='signed')
 				  		{
-				  		electronicSignature=audits[i]["@Name"]+"("+audits[i]["@UserName"]+")";
+				  		electronicSignature=audits[i]["@Name"]+"("+audits[i]["@UserName"]+")"+"|"+audits[i]["@DateTimeStamp"];
+				  		
 				  		break;
 				  		}
 				  }
