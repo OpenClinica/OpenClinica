@@ -349,6 +349,7 @@ function StudyDataLoader(study, json) {
 	    for (var i=0;i<itemGroupData.length;i++) {
 	        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
 	        var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
+	      
 	        if (app_itemGroupRepeatLengthMap[itemGroupOID] == undefined || parseInt(app_itemGroupRepeatLengthMap[itemGroupOID]) < parseInt(repeatKey)) {
 	          app_itemGroupRepeatLengthMap[itemGroupOID] = repeatKey;
 	        }
@@ -357,17 +358,19 @@ function StudyDataLoader(study, json) {
 	        for (var j=0;j<itemsData.length;j++) {
 	          var itemValue = itemsData[j]["@Value"];
 	          var itemOID = itemsData[j]["@ItemOID"];
-	          if (itemOID in app_itemValuesMap == false){
-	        	  app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID+repeatKey] = {}; 
-	        	  app_audits[studyEventOID+studyEventRepeatKey+itemOID+repeatKey]={};
-	        	  app_dns[studyEventOID+studyEventRepeatKey+itemOID+repeatKey]={};
-	            app_itemDataMap[itemOID]={};
+	          var key = studyEventOID+studyEventRepeatKey+itemOID;
+	          if (key+repeatKey in app_itemValuesMap == false){
+	        	  app_itemValuesMap[key+repeatKey] = {}; 
+	        	  
 	          }
-	                        app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID+repeatKey] = itemValue; 
-	                        app_itemDataMap[itemOID][repeatKey]=itemsData[j];
-	                        
-if (app_displayAudits =='y')app_audits[studyEventOID+studyEventRepeatKey+itemOID] = itemsData[j]["OpenClinica:AuditLogs"];
-if (app_displayDNs =='y')   app_dns[studyEventOID+studyEventRepeatKey+itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
+	          if(key in app_audits == false && app_displayAudits=='y')
+	        	  app_audits[studyEventOID+studyEventRepeatKey+itemOID]={};
+        	  if(key in app_dns == false && app_displayDNs=='y')
+	          app_dns[studyEventOID+studyEventRepeatKey+itemOID]={};
+
+        	  app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID+repeatKey] = itemValue; 
+if (app_displayAudits =='y')app_audits[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
+if (app_displayDNs =='y')   app_dns[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
 	        }
 	      }
 	    
