@@ -286,6 +286,7 @@ function StudyDataLoader(study, json) {
     	{
     		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
     	       app_thisStudyEvent = studyEventData;
+    	       app_thisStudyEventRepeatKeyForSingleEvents = studyEventData["@StudyEventRepeatKey"];
     	       var formsData = util_ensureArray(studyEventData["FormData"]);
     	       this.loadFormsData(studyEventData["@StudyEventOID"],studyEventData["@StudyEventRepeatKey"],formsData);
     	       break;

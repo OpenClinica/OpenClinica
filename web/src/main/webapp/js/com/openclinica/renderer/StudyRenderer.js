@@ -250,7 +250,7 @@ function StudyRenderer(json) {
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
             if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && inEventDef["@StudyEventOID"]==eventDef["@OID"]) {
-              this.renderPrintableFormDef(formDef, pageBreak,eventDef,null);
+              this.renderPrintableFormDef(formDef, pageBreak,eventDef,app_thisStudyEventRepeatKeyForSingleEvents);
               defaultDisplayed = true;
               break;  
             }
@@ -374,7 +374,7 @@ function StudyRenderer(json) {
     	        }
     	      }  
       }
-      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK,eventDef);
+      this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK,eventDef,app_thisStudyEventRepeatKeyForSingleEvents);
     }
     else if (renderMode == "UNPOPULATED_EVENT_CRFS" ) {
        eventDef = undefined;

@@ -69,6 +69,7 @@ var app_userOID = undefined;
 var app_userName =undefined;
 var app_userData ={};
 var app_formDefMap = {};
+var app_thisStudyEventRepeatKeyForSingleEvents=undefined;
 
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
