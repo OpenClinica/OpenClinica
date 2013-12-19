@@ -358,16 +358,16 @@ function StudyDataLoader(study, json) {
 	          var itemValue = itemsData[j]["@Value"];
 	          var itemOID = itemsData[j]["@ItemOID"];
 	          if (itemOID in app_itemValuesMap == false){
-	        	  app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID] = {}; 
-	        	  app_audits[studyEventOID+studyEventRepeatKey+itemOID]={};
-	        	  app_dns[studyEventOID+studyEventRepeatKey+itemOID]={};
+	        	  app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID+repeatKey] = {}; 
+	        	  app_audits[studyEventOID+studyEventRepeatKey+itemOID+repeatKey]={};
+	        	  app_dns[studyEventOID+studyEventRepeatKey+itemOID+repeatKey]={};
 	            app_itemDataMap[itemOID]={};
 	          }
-	                        app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemValue; 
+	                        app_itemValuesMap[studyEventOID+studyEventRepeatKey+itemOID+repeatKey] = itemValue; 
 	                        app_itemDataMap[itemOID][repeatKey]=itemsData[j];
 	                        
-if (app_displayAudits =='y')app_audits[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemsData[j]["OpenClinica:AuditLogs"];
-if (app_displayDNs =='y')   app_dns[studyEventOID+studyEventRepeatKey+itemOID][repeatKey] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
+if (app_displayAudits =='y')app_audits[studyEventOID+studyEventRepeatKey+itemOID] = itemsData[j]["OpenClinica:AuditLogs"];
+if (app_displayDNs =='y')   app_dns[studyEventOID+studyEventRepeatKey+itemOID] = itemsData[j]["OpenClinica:DiscrepancyNotes"];
 	        }
 	      }
 	    
