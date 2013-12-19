@@ -66,6 +66,8 @@ var app_crfLabel='<fmt:message key="CRF_status" bundle="${resword}"/>';
 var genderLabel='<fmt:message key="gender" bundle="${resword}"/>';
 var app_eventStartDateLabel = '<fmt:message key="start_date" bundle="${resword}"/>';
 var app_eventEndDateLabel = '<fmt:message key="end_date" bundle="${resword}"/>';
+var app_meaning_of_signatureLabel ='<fmt:message key="meaning_of_signature" bundle="${resword}"/>';
+var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="${resword}"/>'+'<fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>';
   </script>
 
 <html>

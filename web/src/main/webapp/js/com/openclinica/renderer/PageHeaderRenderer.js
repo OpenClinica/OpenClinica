@@ -50,8 +50,8 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
 		 groupClassInfo = groupClassInfo.concat(groupName);
 	  }
 	  
-	  var interviewerName = app_formData?(app_formData["@OpenClinica:InterviewerName"]?app_formData["@OpenClinica:InterviewerName"]:""):"";
-	  var interviewDate = app_formData?(app_formData["@OpenClinica:InterviewDate"]?app_formData["@OpenClinica:InterviewDate"]:""):"";
+	  var interviewerName = app_thisFormData?(app_thisFormData["@OpenClinica:InterviewerName"]?app_thisFormData["@OpenClinica:InterviewerName"]:""):"";
+	  var interviewDate = app_thisFormData?(app_thisFormData["@OpenClinica:InterviewDate"]?app_thisFormData["@OpenClinica:InterviewDate"]:""):"";
 	  var gender = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:Sex"]?app_thisSubjectsData["@OpenClinica:Sex"]:""):"";
 	  var ssID = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:StudySubjectID"]?app_thisSubjectsData["@OpenClinica:StudySubjectID"]:""):"";
 		  
