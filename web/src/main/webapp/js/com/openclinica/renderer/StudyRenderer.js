@@ -266,7 +266,7 @@ function StudyRenderer(json) {
      }
   }
   /*
-   * For subject case book the study events  will be iterated and all the forms will be retrieved.
+   * For subject case book the study events  will be iterated and all the forms will be retrieved.                //app_thisSubjectsData
    */
   this.renderStudyEventData=function(eventDef){
 	  for(var key in app_thisStudyEventDataMap){
@@ -409,6 +409,17 @@ function StudyRenderer(json) {
 	   app_renderMode =renderMode;
        this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
        // this.renderString += this.createStudyCoverPage();// to be replaced by subject table of contents and subject details
+       
+       
+       
+//       var str = "</br><h3><center>" + app_thisSubjectsData["@Name"]+ "Details</center></h3></br>";
+       var studySubjectDefRenderer = new StudySubjectDefRenderer();
+       studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
+       studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
+       if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }
+       if(app_displayAudits=='y') 	  { this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectaudits);}
+
+       
        
         
         // select all CRFs from study
