@@ -115,6 +115,8 @@ var app_eventStartDateLabel = '<fmt:message key="start_date" bundle="${resword}"
 var app_eventEndDateLabel = '<fmt:message key="end_date" bundle="${resword}"/>';
 var app_meaning_of_signatureLabel ='<fmt:message key="meaning_of_signature" bundle="${resword}"/>';
 var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="${resword}"/>'+'<fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>';
+var app_formSigned= '<fmt:message key="signed" bundle="${resword}"/>';
+var app_electronicSignatureLabel='<fmt:message key="electronic_signature" bundle="${resword}"/>'; 
   </script>
 
 <html>

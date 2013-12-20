@@ -322,7 +322,7 @@ function StudyRenderer(json) {
 	  var electronicSignature = undefined;
 	 
 	  if(app_displayAudits == 'y'){
-		  if(studyEventData["@OpenClinica:Status"]=='signed'){
+		  if(studyEventData["@OpenClinica:Status"]==app_formSigned){
 			  var audits = studyEventData["OpenClinica:AuditLogs"]["OpenClinica:AuditLog"];
 			  for(var i=0;i<audits.length;i++)
 				  {
