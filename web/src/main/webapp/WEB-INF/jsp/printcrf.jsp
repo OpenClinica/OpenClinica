@@ -21,41 +21,41 @@
     app_eventOrdinal = '${eventOID}'.substring('${eventOID}'.indexOf('[')+1, '${eventOID}'.indexOf(']'));
   } 
 
-      var app_eventCRFLabel = '<fmt:message key="event_CRF" bundle="${resword}"/>'
-      var app_SELabel = '<fmt:message key="SE" bundle="${resword}"/>'
+      var app_eventCRFLabel = '<fmt:message key="event_CRF" bundle="${resword}"/>';
+      var app_SELabel = '<fmt:message key="SE" bundle="${resword}"/>';
   
-      var app_Audit_HistoryLabel = '<fmt:message key="Audit_History" bundle="${resword}"/>'
-      var app_audit_eventLabel = '<fmt:message key="audit_event" bundle="${resword}"/>'
-	  var app_date_time_of_serverLabel = '<fmt:message key="date_time_of_server" bundle="${resword}"/>'
-	  var app_userLabel = '<fmt:message key="user" bundle="${resword}"/>'
-	  var app_value_typeLabel = '<fmt:message key="value_type" bundle="${resword}"/>'
-	  var app_oldLabel = '<fmt:message key="old" bundle="${resword}"/>'
-	  var app_newLabel = '<fmt:message key="new" bundle="${resword}"/>'
+      var app_Audit_HistoryLabel = '<fmt:message key="Audit_History" bundle="${resword}"/>';
+      var app_audit_eventLabel = '<fmt:message key="audit_event" bundle="${resword}"/>';
+	  var app_date_time_of_serverLabel = '<fmt:message key="date_time_of_server" bundle="${resword}"/>';
+	  var app_userLabel = '<fmt:message key="user" bundle="${resword}"/>';
+	  var app_value_typeLabel = '<fmt:message key="value_type" bundle="${resword}"/>';
+	  var app_oldLabel = '<fmt:message key="old" bundle="${resword}"/>';
+	  var app_newLabel = '<fmt:message key="new" bundle="${resword}"/>';
 	 
 	  
 	  
 
 	  
-	  var app_nav_notes_and_discrepanciesLabel = '<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>'
-	  var app_noteLabel = '<fmt:message key="note" bundle="${resword}"/>'
-	  var app_assigned_toLabel = '<fmt:message key="assigned_to" bundle="${resword}"/>'
-	  var app_IDLabel = '<fmt:message key="ID" bundle="${resword}"/>'
-	  var app_typeLabel = '<fmt:message key="type" bundle="${resword}"/>'
-	  var app_current_statusLabel = '<fmt:message key="current_status" bundle="${resword}"/>'
-	  var app_n_of_notesLabel = '<fmt:message key="n_of_notes" bundle="${resword}"/>'
-	  var app_Last_updatedLabel = '<fmt:message key="Last_updated" bundle="${resword}"/>'
-	  var app_this_is_a_new_threadLabel = '<fmt:message key="this_is_a_new_thread" bundle="${resword}"/>'
+	  var app_nav_notes_and_discrepanciesLabel = '<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>';
+	  var app_noteLabel = '<fmt:message key="note" bundle="${resword}"/>';
+	  var app_assigned_toLabel = '<fmt:message key="assigned_to" bundle="${resword}"/>';
+	  var app_IDLabel = '<fmt:message key="ID" bundle="${resword}"/>';
+	  var app_typeLabel = '<fmt:message key="type" bundle="${resword}"/>';
+	  var app_current_statusLabel = '<fmt:message key="current_status" bundle="${resword}"/>';
+	  var app_n_of_notesLabel = '<fmt:message key="n_of_notes" bundle="${resword}"/>';
+	  var app_Last_updatedLabel = '<fmt:message key="Last_updated" bundle="${resword}"/>';
+	  var app_this_is_a_new_threadLabel = '<fmt:message key="this_is_a_new_thread" bundle="${resword}"/>';
 	
 	  
 	  
 	  
-	  var app_metadataLabel = '<fmt:message key="metadata" bundle="${resword}"/>'
-	  var app_left_item_textLabel = '<fmt:message key="left_item_text" bundle="${resword}"/>'
-	  var app_unitsLabel = '<fmt:message key="units" bundle="${resword}"/>'
-	  var app_data_typeLabel = '<fmt:message key="data_type" bundle="${resword}"/>'
-	  var app_response_options_textLabel = '<fmt:message key="response_options_text" bundle="${resword}"/>'
-	  var app_response_valuesLabel = '<fmt:message key="response_values" bundle="${resword}"/>'
-	  var app_rule_group_labelLabel = '<fmt:message key="rule_group_label" bundle="${resword}"/>'
+	  var app_metadataLabel = '<fmt:message key="metadata" bundle="${resword}"/>';
+	  var app_left_item_textLabel = '<fmt:message key="left_item_text" bundle="${resword}"/>';
+	  var app_unitsLabel = '<fmt:message key="units" bundle="${resword}"/>';
+	  var app_data_typeLabel = '<fmt:message key="data_type" bundle="${resword}"/>';
+	  var app_response_options_textLabel = '<fmt:message key="response_options_text" bundle="${resword}"/>';
+	  var app_response_valuesLabel = '<fmt:message key="response_values" bundle="${resword}"/>';
+	  var app_rule_group_labelLabel = '<fmt:message key="rule_group_label" bundle="${resword}"/>';
 								  
 	  
 	  
@@ -69,11 +69,11 @@
   
   
   var app_formVersionOID = '${formVersionOID}';
-  var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>'
-  var app_siteNameLabel = '<fmt:message key="site" bundle="${resword}"/>'
-  var app_studyNameLabel = '<fmt:message key="study_name" bundle="${resword}"/>'
-  var app_studySubjectLabel = '<fmt:message key="study_subject" bundle="${resword}"/>'
-  var app_studySubjectIDLabel = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'
+  var app_protocolIDLabel = '<fmt:message key="protocol_ID" bundle="${resword}"/>';
+  var app_siteNameLabel = '<fmt:message key="site" bundle="${resword}"/>';
+  var app_studyNameLabel = '<fmt:message key="study_name" bundle="${resword}"/>';
+  var app_studySubjectLabel = '<fmt:message key="study_subject" bundle="${resword}"/>';
+  var app_studySubjectIDLabel = '<fmt:message key="study_subject_ID" bundle="${resword}"/>';
   var app_pageNumberLabel = '<fmt:message key="page_x_de_y" bundle="${resword}"/>'.replace(/[{}]/g, '');
   var app_investigatorLabel = '<fmt:message key="investigator" bundle="${resterm}"/>';
   var app_timeAndEventsLabel = '<fmt:message key="time_and_events" bundle="${resword}"/>';
