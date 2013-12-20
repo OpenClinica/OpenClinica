@@ -121,9 +121,13 @@ function StudyRenderer(json) {
   }
   
   this.createStudyEventCoverPageForSubjectCaseBook = function (studyEvent,eventDef) {
-	var str = "<h3>" + eventDef["@Name"]+"("+studyEvent["@StudyEventRepeatKey"] + "):</h3>";
-	   str+=this.renderStudyEventDetails(studyEvent,eventDef);
-	   str+="</br>"
+	
+	if (eventDef["@Repeating"]=="Yes")  var str = "</br><h3><center>" + eventDef["@Name"]+"("+studyEvent["@StudyEventRepeatKey"] + ") Details</center></h3></br>";
+	if (eventDef["@Repeating"]=="No")   var str = "</br><h3><center>" + eventDef["@Name"] + " Details</center></h3></br>";
+	
+	
+	str+=this.renderStudyEventDetails(studyEvent,eventDef);
+    str += "</br></br><div style=text-indent:50px;>" + "Case Report Form:" + "</div>";
 	    var studyEventFormRefs =  eventDef["FormRef"];
 	   
 	    for (var i=0;i< studyEventFormRefs.length;i++) {
@@ -138,14 +142,15 @@ function StudyRenderer(json) {
 	          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
 	            var inEventDef = presentInEventDef[l];
 	            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
-	              str += "<div>" + formDef["@Name"] + "</div>";
+		              str += "<div style=text-indent:100px;>" + formDef["@Name"] + "</div>";
 	              formFound = true;
 	            }
 	          }
 	        }
 	      }
 	    }
-	   
+	    str +="</br></br>";
+
 	    return str;
 	  }
   
