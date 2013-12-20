@@ -1,10 +1,11 @@
-function FormDefRenderer(json) {
+function FormDefRenderer(json,studyEventOID,studyEventRepeatKey) {
   this.json = json;
   this.name = json["@Name"];
   this.OID = json["@OID"];
+  this.eventCRFLink = studyEventOID+"/"+studyEventRepeatKey+"/"+this.OID;
   this.repeating = ParseUtil.parseYesNo(json["@Repeating"]);
-  this.renderPrintableForm = function() { return RenderUtil.render(RenderUtil.get("print_form_def"), {name: this.name});}
-  this.renderInteractiveForm = function() { return RenderUtil.render(RenderUtil.get("e_form_def"), {name: this.name});}
+  this.renderPrintableForm = function() { return RenderUtil.render(RenderUtil.get("print_form_def"), {name: this.name,eventCRFLink:this.eventCRFLink});}
+  this.renderInteractiveForm = function() { return RenderUtil.render(RenderUtil.get("e_form_def"), {name: this.name,eventCRFLink:this.eventCRFLink});}
   this.eventCRFdns=undefined;
   this.eventCRFaudits=undefined;
   

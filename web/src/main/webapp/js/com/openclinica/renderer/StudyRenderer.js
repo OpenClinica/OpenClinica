@@ -129,26 +129,33 @@ function StudyRenderer(json) {
 	str+=this.renderStudyEventDetails(studyEvent,eventDef);
     str += "</br></br><div style=text-indent:50px;>" + "Case Report Form:" + "</div>";
 	    var studyEventFormRefs =  eventDef["FormRef"];
-	   
+	    var forms = util_ensureArray(studyEvent["FormData"]);
 	    for (var i=0;i< studyEventFormRefs.length;i++) {
-	      var formRef = studyEventFormRefs[i];
-	      var formFound = false;
-	      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
-	        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
-	          var formDef = app_formDefs[j];
-	          var formOID = formDef["@OID"];
-	          app_formDefMap[formOID] = formDef; 
-	          var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
-	          for(var l=0;l<presentInEventDef.length&&!formFound;l++) {
-	            var inEventDef = presentInEventDef[l];
-	            if(inEventDef["@IsDefaultVersion"] == "Yes" && inEventDef["@HideCRF"] == "No" && eventDef["@OID"] == inEventDef["@StudyEventOID"]) {
-		              str += "<div style=text-indent:100px;>" + formDef["@Name"] + "</div>";
-	              formFound = true;
-	            }
-	          }
-	        }
-	      }
-	    }
+		      var formRef = studyEventFormRefs[i];
+		      var formFound = false;
+		      for (var j=0;j< app_formDefs.length&&!formFound;j++) {
+		        if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+		          var formDef = app_formDefs[j];
+		          var formOID = formDef["@OID"];
+		          app_formDefMap[formOID] = formDef; 
+		      
+		        }
+		      }
+		    }
+	    
+	    
+	    for(var i=0;i<forms.length;i++){
+		   var formOID = forms[i]["@FormOID"];
+		   var formDef = app_formDefMap[formOID];
+		  if(formDef!=undefined)
+		   {
+			  var link = studyEvent["@StudyEventOID"]+"/"+studyEvent["@StudyEventRepeatKey"]+"/"+formDef["@OID"];
+			  str += "<div style=text-indent:100px;> <a href='#"+link+"'>" + formDef["@Name"] + "</a></div>";
+		   }
+	   }
+	    
+	    
+	  
 	    str +="</br></br>";
 
 	    return str;
@@ -227,11 +234,7 @@ function StudyRenderer(json) {
    }
      else{
          this.renderString += this.createStudyEventCoverPage(eventDef);
-
-    
-  
-     
-     
+   
      // select all CRFs from StudyEvent
     var studyEventFormRefs =  eventDef["FormRef"];
     if (studyEventFormRefs[0] == undefined) { 
@@ -433,7 +436,7 @@ function StudyRenderer(json) {
     this.studyDataLoader.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
-    var formDefRenderer = new FormDefRenderer(formDef);
+    var formDefRenderer = new FormDefRenderer(formDef,eventDef["@OID"],studyEventRepeatKey);
     this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
     var repeatingHeaderString = "";
     var repeatingRowString = "";
