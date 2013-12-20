@@ -44,7 +44,8 @@
 	  var app_current_statusLabel = '<fmt:message key="current_status" bundle="${resword}"/>'
 	  var app_n_of_notesLabel = '<fmt:message key="n_of_notes" bundle="${resword}"/>'
 	  var app_Last_updatedLabel = '<fmt:message key="Last_updated" bundle="${resword}"/>'
-			  
+	  var app_this_is_a_new_threadLabel = '<fmt:message key="this_is_a_new_thread" bundle="${resword}"/>'
+	
 	  
 	  
 	  
