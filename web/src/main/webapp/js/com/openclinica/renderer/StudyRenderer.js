@@ -122,7 +122,7 @@ function StudyRenderer(json) {
   
   this.createStudyEventCoverPageForSubjectCaseBook = function (studyEvent,eventDef) {
 	
-	if (eventDef["@Repeating"]=="Yes")  var str = "</br><h3><center>" + eventDef["@Name"]+"("+studyEvent["@StudyEventRepeatKey"] + ") Details</center></h3></br>";
+	if (eventDef["@Repeating"]=="Yes")  var str = "</br><h3><center>" + eventDef["@Name"]+" ("+studyEvent["@StudyEventRepeatKey"] + ") Details</center></h3></br>";
 	if (eventDef["@Repeating"]=="No")   var str = "</br><h3><center>" + eventDef["@Name"] + " Details</center></h3></br>";
 	
 	
@@ -143,7 +143,6 @@ function StudyRenderer(json) {
 		      }
 		    }
 	    
-	    
 	    for(var i=0;i<forms.length;i++){
 		   var formOID = forms[i]["@FormOID"];
 		   var formDef = app_formDefMap[formOID];
@@ -153,7 +152,6 @@ function StudyRenderer(json) {
 			  str += "<div style=text-indent:100px;> <a href='#"+link+"'>" + formDef["@Name"] + "</a></div>";
 		   }
 	   }
-	    
 	    
 	  
 	    str +="</br></br>";
@@ -337,6 +335,7 @@ function StudyRenderer(json) {
 		  }
 		 // electronicSignature = studyEventData[]
 	  }
+
 	s= RenderUtil.render(RenderUtil.get(
             "print_study_event_details"),{studyEventName:studyEventName,studyEventLocation:studyEventLocation,studyEventStatus:studyEventStatus,
             startDate:startDate,endDate:endDate,electronicSig:electronicSignature})[0].outerHTML;; 
@@ -417,6 +416,7 @@ function StudyRenderer(json) {
        
 //       var str = "</br><h3><center>" + app_thisSubjectsData["@Name"]+ "Details</center></h3></br>";
        var studySubjectDefRenderer = new StudySubjectDefRenderer();
+       this.renderString += studySubjectDefRenderer.renderStudySubjectData(app_thisSubjectsData);
        studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
        studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
        if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }

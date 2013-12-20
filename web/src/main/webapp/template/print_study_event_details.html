@@ -1,43 +1,22 @@
-<td>
-<table width="100%">
-<tr>
-<td width="30%">
-{{html app_eventNameLabel}}: <b>{{html studyEventName}}</b>
-<br/>
-{{html app_eventLocationLabel}}:<b>{{html studyEventLocation}}</b>
-</td>
-<td width="30%">
-
-{{html app_eventStartDateLabel}}:
-<b>{{html startDate}}</b>
-<br/>
-{{html app_eventEndDateLabel}}:
-<b>{{html endDate}}</b>
-
-</td>
-<td width="30%">
-
-{{html app_eventStatus}}:
-<b>{{html studyEventStatus}}</b>
-
-</td>
-</tr>
-{{if electronicSig}}
-
-
-<tr>
-<td>
-Electronic Signature: {{html electronicSig}}
-</td>
-</tr>
-<tr>
-<td>
-{{html app_meaning_of_signatureLabel}}: {{html app_meaning_of_signature}}
-</td>
-</tr>
-
-
-{{/if}}
-
-</table>
-</td>
+<td><table id="page-header">
+    <tr>
+      <td class="box1">{{html app_eventNameLabel}}:<br/>
+        {{html app_eventLocationLabel}}:</td>
+      <td class="box2">{{html studyEventName}}<br />
+        {{html studyEventLocation}}</td>
+      <td class="box3">{{html app_eventStartDateLabel}}:<br/>
+        {{html app_eventEndDateLabel}}:</td>
+      <td class="box4">{{html startDate}}<br />
+        {{html endDate}}</td>
+      <td class="box5">{{html app_eventStatus}}:</td>
+      <td class="box6">{{html studyEventStatus}}</td>
+    </tr>
+    {{if electronicSig}}
+    <tr>
+      <td class="esig" colspan="6"> Electronic Signature: {{html electronicSig}} </td>
+    </tr>
+    <tr>
+      <td class="esig" colspan="6"> {{html app_meaning_of_signatureLabel}}: {{html app_meaning_of_signature}} </td>
+    </tr>
+    {{/if}}
+  </table></td>

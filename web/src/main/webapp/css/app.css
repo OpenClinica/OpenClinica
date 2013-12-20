@@ -49,13 +49,31 @@ a:active {
 }
 
 
-#page-header td.left-header, td.right-header {
+#page-header td.left-header, td.right-header, td.box1, td.box2, td.box3, td.box4, td.box5, td.box6 {
   vertical-align: top;
   padding-top: 10px;
 }
 
 #page-header td.left-header {
-  width: 60%;
+  width: 66%;
+}
+
+#page-header td.box1, td.box3, td.box5 {
+	width: 7%;
+}
+
+#page-header td.box2 {
+	width: 33%;
+	font-weight:bold;
+}
+
+#page-header td.box4 {
+	width: 19%;
+	font-weight:bold;
+}
+
+#page-header td.box6 {
+	font-weight:bold;
 }
 
 .DNBackgroundColorForHeaders{
@@ -381,4 +399,8 @@ td {
 
 .provenance td {
 	font-size: 80%;
+}
+
+.esig {
+	padding-top: 1em;
 }
