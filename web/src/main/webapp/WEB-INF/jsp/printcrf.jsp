@@ -60,7 +60,14 @@
 	  var app_rule_group_labelLabel = '<fmt:message key="rule_group_label" bundle="${resword}"/>';
 								  
 	  
-	  
+     //study subject	  
+	  var app_date_of_birthLabel = '<fmt:message key="date_of_birth" bundle="${resword}"/>';
+	  var app_genderLabel = '<fmt:message key="gender" bundle="${resword}"/>';
+	  var app_enrollMMDDYYYYLabel = '<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>';
+	  var app_subject_statusLabel = '<fmt:message key="subject_status" bundle="${resword}"/>';
+	  var app_subject_unique_IDLabel = '<fmt:message key="subject_unique_ID" bundle="${resword}"/>';
+	  var app_secondary_IDLabel = '<fmt:message key="secondary_ID" bundle="${resword}"/>';
+	  var app_groupLabel = '<fmt:message key="group" bundle="${resword}"/>';
 	  
 	  
 	  

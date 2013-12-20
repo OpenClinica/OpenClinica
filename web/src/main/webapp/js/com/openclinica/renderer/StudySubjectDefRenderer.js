@@ -2,6 +2,7 @@ function StudySubjectDefRenderer() {
   //this.json = json;
   //this.name = json["@Name"];
   //this.OID = json["@OID"];
+
   this.studySubjectdns=undefined;
   this.studySubjectaudits=undefined;
   
@@ -19,7 +20,13 @@ function StudySubjectDefRenderer() {
 	    return s[0].outerHTML;
 	  }
 
-  
 
-  }
+	  
+  this.renderStudySubjectData = function(title){
+		    var template="print_study_subject_details";
+		    var s = RenderUtil.render(RenderUtil.get(template),{title:title});
+		    return s[0].outerHTML;
+	  }
+  
+}
   
