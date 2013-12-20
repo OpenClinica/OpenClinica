@@ -23,7 +23,9 @@
 
       var app_eventCRFLabel = '<fmt:message key="event_CRF" bundle="${resword}"/>';
       var app_SELabel = '<fmt:message key="SE" bundle="${resword}"/>';
+      var app_study_subjectLabel = '<fmt:message key="study_subject" bundle="${resword}"/>';
   
+     
       var app_Audit_HistoryLabel = '<fmt:message key="Audit_History" bundle="${resword}"/>';
       var app_audit_eventLabel = '<fmt:message key="audit_event" bundle="${resword}"/>';
 	  var app_date_time_of_serverLabel = '<fmt:message key="date_time_of_server" bundle="${resword}"/>';

@@ -59,7 +59,7 @@ a:active {
 }
 
 .DNBackgroundColorForHeaders{
-   background-color : grey;
+   background-color : #597590;
    color : white;
    text-decoration:underline;
    font-size: 90%;
@@ -80,13 +80,14 @@ a:active {
    font-size: 80%;
 }
 .MetadataBackgroundColorForHeaders{
-   background-color : lightblue;
+   background-color : #004563;
    text-decoration:underline;
    font-size: 90%;
+   color: white;
 }
 
 .ALBackgroundColorForHeaders{
-   background-color : lightgreen;
+   background-color : #94B1C7;
    text-decoration:underline;
    font-size: 90%;
 }
