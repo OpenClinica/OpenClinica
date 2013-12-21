@@ -142,7 +142,7 @@ function StudyRenderer(json) {
 		        }
 		      }
 		    }
-	    
+	    if (forms){
 	    for(var i=0;i<forms.length;i++){
 		   var formOID = forms[i]["@FormOID"];
 		   var formDef = app_formDefMap[formOID];
@@ -152,7 +152,7 @@ function StudyRenderer(json) {
 			  str += "<div style=text-indent:100px;> <a href='#"+link+"'>" + formDef["@Name"] + "</a></div>";
 		   }
 	   }
-	    
+	    }
 	  
 	    str +="</br></br>";
 

@@ -68,8 +68,9 @@
 	  var app_subject_unique_IDLabel = '<fmt:message key="subject_unique_ID" bundle="${resword}"/>';
 	  var app_secondary_IDLabel = '<fmt:message key="secondary_ID" bundle="${resword}"/>';
 	  var app_groupLabel = '<fmt:message key="group" bundle="${resword}"/>';
+	  var app_detailsLabel = '<fmt:message key="details" bundle="${resword}"/>';
 	  
-	  
+
 	  
 	  
   
