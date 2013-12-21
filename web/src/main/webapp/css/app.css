@@ -58,18 +58,26 @@ a:active {
   width: 66%;
 }
 
-#page-header td.box1, td.box3, td.box5 {
-	width: 7%;
+#page-header td.box1 {
+	width: 9%;
 }
 
 #page-header td.box2 {
-	width: 33%;
+	width: 31%;
 	font-weight:bold;
 }
 
+#page-header td.box3 {
+	width: 6%;
+}
+
 #page-header td.box4 {
-	width: 19%;
+	width: 20%;
 	font-weight:bold;
+}
+
+#page-header td.box5 {
+	width: 8%;
 }
 
 #page-header td.box6 {
