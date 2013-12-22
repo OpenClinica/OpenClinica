@@ -22,9 +22,10 @@ function StudySubjectDefRenderer() {
 
 
 	  
-  this.renderStudySubjectData = function(title){
+  this.renderStudySubjectData = function(app_thisSubjectsData, subjectGroupData){
 		    var template="print_study_subject_details";
-		    var s = RenderUtil.render(RenderUtil.get(template),{title:title});
+		    
+		    var s = RenderUtil.render(RenderUtil.get(template),{app_thisSubjectsData:app_thisSubjectsData, subjectGroupData:subjectGroupData});
 		    return s[0].outerHTML;
 	  }
   

@@ -1,26 +1,51 @@
 <td>
 <table width="100%">
 </br>
-<tr>${app_study_subjectLabel}&nbsp;${app_detailsLabel} </tr>
+<tr>   <div class= 'study_subject_header_title'> ${app_study_subjectLabel}&nbsp;${app_detailsLabel} </div> </tr>
 </br>
 </br>
 <tr>
 <td width="60%">
-{{html app_date_of_birthLabel}}:
+
+{{if app_thisSubjectsData["@OpenClinica:DateOfBirth"] }}
+{{html app_date_of_birthLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:DateOfBirth"]}</b>  
 <br/>
-{{html app_genderLabel}}:
+{{/if}}
+
+{{if app_thisSubjectsData["@OpenClinica:Sex"] }}
+{{html app_genderLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Sex"]}</b>
 <br/>
-{{html app_enrollMMDDYYYYLabel}}:
+{{/if}}
+
+{{if app_thisSubjectsData["@OpenClinica:DateOfBirth"] }}
+{{html app_enrollMMDDYYYYLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:DateOfBirth"]}</b>
 <br/>
-{{html app_subject_statusLabel}}:
+{{/if}}
+
+
+{{if app_thisSubjectsData["@OpenClinica:Status"] }}
+{{html app_subject_statusLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Status"]}</b>
+{{/if}}
+
 </td>
 <td width="40%">
 
-{{html app_subject_unique_IDLabel}}: 
+{{if app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]}}
+{{html app_subject_unique_IDLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]}</b>
 <br/>
-{{html app_secondary_IDLabel}}: 
+{{/if}}
+
+
+{{if app_thisSubjectsData["@OpenClinica:SecondaryID"] }}
+{{html app_secondary_IDLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:SecondaryID"]}</b>
 <br/>
-{{html app_groupLabel}}: 
+{{/if}}
+
+{{each subjectGroupData}}
+{{html app_groupLabel}}: <b>({{html studyGroupName}}) - ({{html studyGroupClassName}})</b> <br/>
+
+{{/each}}
+
 
 </td>
 </tr>

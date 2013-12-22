@@ -414,9 +414,44 @@ function StudyRenderer(json) {
        
        
        
-//       var str = "</br><h3><center>" + app_thisSubjectsData["@Name"]+ "Details</center></h3></br>";
+       
+       
+       
+       
+       
+       
+//     var str = "</br><h3><center>" + app_thisSubjectsData["@Name"]+ "Details</center></h3></br>";
        var studySubjectDefRenderer = new StudySubjectDefRenderer();
-       this.renderString += studySubjectDefRenderer.renderStudySubjectData(app_thisSubjectsData);
+       
+       
+       
+       var subjectGroupData = util_ensureArray(app_thisSubjectsData["OpenClinica:SubjectGroupData"]);
+
+	    var currentSubjectGroupData = [];
+        var thisSubjectGroupData = {};
+
+   if (subjectGroupData){    
+  	for(var k=0;k<subjectGroupData.length;k++){
+
+         
+	    thisSubjectGroupData.studyGroupClassName = subjectGroupData[k]["@OpenClinica:StudyGroupClassName"]?subjectGroupData[k]["@OpenClinica:StudyGroupClassName"] :"";
+  		thisSubjectGroupData.studyGroupName = subjectGroupData[k]["@OpenClinica:StudyGroupName"]?subjectGroupData[k]["@OpenClinica:StudyGroupName"] :"";
+ 			   
+  		currentSubjectGroupData.push(thisSubjectGroupData);
+  		thisSubjectGroupData = {};
+	   
+  	}		    
+   }	
+       
+       
+       
+       
+       
+       this.renderString += studySubjectDefRenderer.renderStudySubjectData(app_thisSubjectsData, currentSubjectGroupData);
+       
+       
+       
+       
        studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
        studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
        if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }
