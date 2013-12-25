@@ -224,6 +224,10 @@ function StudyDataLoader(study, json) {
       app_formDefs = new Array();
       app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
     }
+    for(var i=0;i<app_formDefs.length;i++){
+    	var formDefOid = app_formDefs[i]["@OID"];
+    	app_formDefMap[formDefOid]= app_formDefs[i]["@Name"];//can expand this to use form object. However, every where else the app_formDefMap is being iterated over and over and at this stage its left that way
+    }
   }
   
   this.loadGlobalStudyDef = function(json) {

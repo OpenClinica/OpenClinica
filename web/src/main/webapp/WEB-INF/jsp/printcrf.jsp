@@ -116,7 +116,7 @@ var app_eventStatus='<fmt:message key="event_status" bundle="${resword}"/>';
 //var app_groupClassName='<fmt:message key="group_class_name" bundle="${resword}"/>';
 var app_subjectStatus='<fmt:message key="subject_status" bundle="${resword}"/>';
 var app_studyLabel='<fmt:message key="study" bundle="${resword}"/>';
-// var app_studyEventLabel='<fmt:message key="SE" bundle="${resword}"/>';
+ var app_studyEventLabel='<fmt:message key="events" bundle="${resword}"/>';
 //var app_subjectLabel='<fmt:message key="subject" bundle="${resword}"/>';
 var app_groupLabel='<fmt:message key="group" bundle="${resword}"/>';
 var app_crfLabel='<fmt:message key="CRF_status" bundle="${resword}"/>';
@@ -126,7 +126,8 @@ var app_eventEndDateLabel = '<fmt:message key="end_date" bundle="${resword}"/>';
 var app_meaning_of_signatureLabel ='<fmt:message key="meaning_of_signature" bundle="${resword}"/>';
 var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="${resword}"/>'+'<fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>';
 var app_formSigned= '<fmt:message key="signed" bundle="${resword}"/>';
-var app_electronicSignatureLabel='<fmt:message key="electronic_signature" bundle="${resword}"/>'; 
+var app_electronicSignatureLabel='<fmt:message key="electronic_signature" bundle="${resword}"/>';
+var app_statusLabel='<fmt:message key="status" bundle="${resword}"/>'; 
   </script>
 
 <html>

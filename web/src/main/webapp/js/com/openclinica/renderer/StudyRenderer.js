@@ -227,6 +227,9 @@ function StudyRenderer(json) {
 
 	if(renderMode=="STUDY_SUBJECT_CASE_BOOK")
    {
+		 this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
+
+		this.renderString+=this.renderSubjectTableOfContents();
     	 this.renderStudyEventData(eventDef);
 	   
    }
@@ -241,17 +244,12 @@ function StudyRenderer(json) {
     }
     
     for (var i=0;i< studyEventFormRefs.length;i++) {
-    	
-    	
     	pageBreak = this.PAGE_BREAK
       var defaultDisplayed = false;
       var formRef = studyEventFormRefs[i];
       for (var j=0;j< app_formDefs.length && !defaultDisplayed;j++) {
         if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
           var formDef = app_formDefs[j];
- 
-    //        app_thisFormData ==formDef["@OID"];
- 
           var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
           for(var l=0;l<presentInEventDef.length;l++){
             var inEventDef = presentInEventDef[l];
@@ -266,6 +264,33 @@ function StudyRenderer(json) {
     }
      }
   }
+  
+  
+  this.renderSubjectTableOfContents = function(){
+	  var htmlString = "";
+	  var studyEvents = util_ensureArray(app_thisSubjectsData["StudyEventData"]);
+	  var subjectTableOfCnts = [];
+	  for(var i=0;i<studyEvents.length;i++){
+		  var subjectTables = {};
+		  var studyEventOID = studyEvents[i]["@StudyEventOID"];
+		  subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
+		  subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
+		  var formTables = {};
+		  var forms = util_ensureArray(studyEvents[i]["FormData"]);
+		  for(var j=0;j<forms.length;j++){
+			  var formOID= forms[j]["@FormOID"];
+			  formTables.formName = app_formDefMap[formOID];
+			  formTables.formStatus = forms[j]["@OpenClinica:Status"];
+			  subjectTables.forms = formTables;
+		  }
+		  
+		  subjectTableOfCnts.push(subjectTables);
+	  }
+	  htmlString= RenderUtil.render(RenderUtil.get(
+      "print_subject_table_contents"),{subjectTableOfCnts:subjectTableOfCnts})[0].outerHTML;; 
+return htmlString;
+  }
+  
   /*
    * For subject case book the study events  will be iterated and all the forms will be retrieved.                //app_thisSubjectsData
    */
@@ -410,56 +435,24 @@ function StudyRenderer(json) {
     else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
 	   app_renderMode =renderMode;
        this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
-       // this.renderString += this.createStudyCoverPage();// to be replaced by subject table of contents and subject details
-       
-       
-       
-       
-       
-       
-       
-       
-       
-//     var str = "</br><h3><center>" + app_thisSubjectsData["@Name"]+ "Details</center></h3></br>";
-       var studySubjectDefRenderer = new StudySubjectDefRenderer();
-       
-       
-       
+        var studySubjectDefRenderer = new StudySubjectDefRenderer();
        var subjectGroupData = util_ensureArray(app_thisSubjectsData["OpenClinica:SubjectGroupData"]);
-
 	    var currentSubjectGroupData = [];
         var thisSubjectGroupData = {};
-
    if (subjectGroupData){    
   	for(var k=0;k<subjectGroupData.length;k++){
-
-         
 	    thisSubjectGroupData.studyGroupClassName = subjectGroupData[k]["@OpenClinica:StudyGroupClassName"]?subjectGroupData[k]["@OpenClinica:StudyGroupClassName"] :"";
   		thisSubjectGroupData.studyGroupName = subjectGroupData[k]["@OpenClinica:StudyGroupName"]?subjectGroupData[k]["@OpenClinica:StudyGroupName"] :"";
- 			   
   		currentSubjectGroupData.push(thisSubjectGroupData);
   		thisSubjectGroupData = {};
 	   
   	}		    
    }	
-       
-       
-       
-       
-       
        this.renderString += studySubjectDefRenderer.renderStudySubjectData(app_thisSubjectsData, currentSubjectGroupData);
-       
-       
-       
-       
        studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
        studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
        if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectdns); }
        if(app_displayAudits=='y') 	  { this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studySubjectDefRenderer,studySubjectDefRenderer.studySubjectaudits);}
-
-       
-       
-        
         // select all CRFs from study
         for (var i=0;i< app_studyEventDefs.length;i++) {
           eventDef = app_studyEventDefs[i];
