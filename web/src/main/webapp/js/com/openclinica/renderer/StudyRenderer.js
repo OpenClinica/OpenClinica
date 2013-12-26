@@ -229,7 +229,7 @@ function StudyRenderer(json) {
    {
 		 this.renderPageHeader(pageBreak, app_printTime, app_studyEventCoverPageType, app_eventName);
 
-		this.renderString+=this.renderSubjectTableOfContents();
+		
     	 this.renderStudyEventData(eventDef);
 	   
    }
@@ -273,6 +273,7 @@ function StudyRenderer(json) {
 	  for(var i=0;i<studyEvents.length;i++){
 		  var subjectTables = {};
 		  var studyEventOID = studyEvents[i]["@StudyEventOID"];
+		 if(app_studyEventDefMap!=undefined && app_studyEventDefMap[studyEventOID]!=undefined){
 		  subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 		  subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
 		  var formTables = {};
@@ -285,6 +286,7 @@ function StudyRenderer(json) {
 		  }
 		  
 		  subjectTableOfCnts.push(subjectTables);
+	  }
 	  }
 	  htmlString= RenderUtil.render(RenderUtil.get(
       "print_subject_table_contents"),{subjectTableOfCnts:subjectTableOfCnts})[0].outerHTML;; 
@@ -435,7 +437,10 @@ return htmlString;
     else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
 	   app_renderMode =renderMode;
        this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
-        var studySubjectDefRenderer = new StudySubjectDefRenderer();
+       this.renderString+=this.renderSubjectTableOfContents();
+       this.renderPageHeader(this.PAGE_BREAK, app_printTime, app_studyCoverPageType, app_eventName);
+
+       var studySubjectDefRenderer = new StudySubjectDefRenderer();
        var subjectGroupData = util_ensureArray(app_thisSubjectsData["OpenClinica:SubjectGroupData"]);
 	    var currentSubjectGroupData = [];
         var thisSubjectGroupData = {};
