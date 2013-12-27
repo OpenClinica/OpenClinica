@@ -481,8 +481,10 @@ return htmlString;
     this.studyDataLoader.loadItemGroupDefs(formDef);
     
     // Get Form Wrapper
+    if(eventDef!=undefined){
     var formDefRenderer = new FormDefRenderer(formDef,eventDef["@OID"],studyEventRepeatKey);
     this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+    }
     var repeatingHeaderString = "";
     var repeatingRowString = "";
     var currentItemGroupOID = "";
