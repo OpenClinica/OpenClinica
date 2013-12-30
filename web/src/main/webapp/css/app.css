@@ -144,7 +144,6 @@ a:active {
   text-align: center;
 }
 
-
 .text-right-aligned {
   text-align: right;
 }
@@ -236,7 +235,6 @@ div.inline {
   font-size: 0.6em;
 }
 
-
 .header-title {
   background-color:#DDDDDD;
   padding-left:10px;
@@ -262,7 +260,7 @@ div.inline {
   background-color: #B5B5B5;
   border: thin solid #999999;
   font-size: 1em;
-  padding-top: 3px;
+   padding-top: 3px;
   padding-left: 6px;
   padding-right: 6px;
   padding-bottom: 3px;
@@ -294,8 +292,6 @@ padding-left: 2px;
 color: #333333;
 font-size: 14px;
 padding-bottom: 7px;
-
-padding-left: 2px;
 }
 
 
@@ -304,8 +300,6 @@ color: #333333;
 font-size: 14px;
 font-weight:bold;
 padding-bottom: 7px;
-
-padding-left: 2px;
 }
 .investigator-text {
   color: #333333;
@@ -415,9 +409,6 @@ td {
 	padding-top: 1em;
 }
 
-.study_subject_header_title{
-	font-weight:bold;
-    font-size: 1.2em;
-    text-align: center;
-	
+.dn_notes {
+	margin: 0 0 0 20px;
 }

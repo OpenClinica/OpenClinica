@@ -31,7 +31,8 @@
       {{if description != "" }}
     
     <tr class="provenance">
-      <td> {{html description}} &nbsp;&nbsp;{{html detailedNote}} </td>
+      <td><strong>{{html description}} </strong>
+        <p class="dn_notes">{{html detailedNote}}</p></td>
       {{/if}}
       <td>{{html user}}</td>
       <td>{{html id}} </td>
