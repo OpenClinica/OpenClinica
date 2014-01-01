@@ -318,7 +318,7 @@ return htmlString;
   studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
   if(app_displayDNs=='y') 	  {	this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Discrepancies(studyEventDefRenderer,studyEventDefRenderer.studyEventdns); }
   if(app_displayAudits=='y') 	  { this.renderString+=this.print_EventCRF_StudyEvent_StudySubject_Audits(studyEventDefRenderer,studyEventDefRenderer.studyEventaudits);}
-			 var forms = utils_ensureArray(studyEvent["FormData"]);
+			 var forms = util_ensureArray(studyEvent["FormData"]);
 			 if(forms){
 			 for(var i=0;i<forms.length;i++){
 				 app_thisFormData = forms[i];//over writting the global variable to get the exact form data.
