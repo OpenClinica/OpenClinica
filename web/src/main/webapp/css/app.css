@@ -49,7 +49,7 @@ a:active {
 }
 
 
-#page-header td.left-header, td.right-header, td.box1, td.box2, td.box3, td.box4, td.box5, td.box6 {
+#page-header td.left-header, td.right-header, td.printCrf_box1, td.printCrf_box2, td.printCrf_box3, td.printCrf_box4, td.printCrf_box5, td.printCrf_box6 {
   vertical-align: top;
   padding-top: 10px;
 }
@@ -58,29 +58,29 @@ a:active {
   width: 66%;
 }
 
-#page-header td.box1 {
+#page-header td.printCrf_box1 {
 	width: 9%;
 }
 
-#page-header td.box2 {
+#page-header td.printCrf_box2 {
 	width: 31%;
 	font-weight:bold;
 }
 
-#page-header td.box3 {
+#page-header td.printCrf_box3 {
 	width: 6%;
 }
 
-#page-header td.box4 {
+#page-header td.printCrf_box4 {
 	width: 20%;
 	font-weight:bold;
 }
 
-#page-header td.box5 {
+#page-header td.printCrf_box5 {
 	width: 8%;
 }
 
-#page-header td.box6 {
+#page-header td.printCrf_box6 {
 	font-weight:bold;
 }
 
