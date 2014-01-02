@@ -1069,7 +1069,7 @@ function StudyRenderer(json) {
 					userid += audits["@UserName"] ? "(" + audits["@UserName"]
 							+ ")" : "";
 					thisAuditLog.user = userid;
-					thisAuditLog.dateTimeStamp = audits["@DateTimeStamp"];
+					thisAuditLog.dateTime = audits["@DateTimeStamp"];
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
 					currentAuditLogs.push(thisAuditLog);
