@@ -287,23 +287,27 @@ function StudyRenderer(json) {
 		var studyEvents = util_ensureArray(app_thisSubjectsData["StudyEventData"]);
 		var subjectTableOfCnts = [];
 		for ( var i = 0; i < studyEvents.length; i++) {
-			var subjectTables = {};
-			var studyEventOID = studyEvents[i]["@StudyEventOID"];
+						var studyEventOID = studyEvents[i]["@StudyEventOID"];
 			if (app_studyEventDefMap != undefined
 					&& app_studyEventDefMap[studyEventOID] != undefined) {
+				var subjectTables = {};
 				subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 				subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
-				var formTables = {};
+			
+				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
-				if (forms != undefined)
+				//if (forms != undefined){
 					for ( var j = 0; j < forms.length; j++) {
+						
 						var formOID = forms[j]["@FormOID"];
+						var formTables = {};
 						formTables.formName = app_formDefMap[formOID];
 						formTables.formStatus = forms[j]["@OpenClinica:Status"];
-						subjectTables.forms = formTables;
+						subjectTables.forms.push(formTables);
 					}
 
 				subjectTableOfCnts.push(subjectTables);
+				//}
 			}
 		}
 		htmlString = RenderUtil.render(RenderUtil
