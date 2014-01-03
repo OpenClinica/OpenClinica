@@ -296,7 +296,7 @@ function StudyRenderer(json) {
 			
 				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
-				//if (forms != undefined){
+				if (forms != undefined){
 					for ( var j = 0; j < forms.length; j++) {
 						
 						var formOID = forms[j]["@FormOID"];
@@ -307,7 +307,7 @@ function StudyRenderer(json) {
 					}
 
 				subjectTableOfCnts.push(subjectTables);
-				//}
+				}
 			}
 		}
 		htmlString = RenderUtil.render(RenderUtil
