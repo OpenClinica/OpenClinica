@@ -995,25 +995,30 @@ function StudyRenderer(json) {
 					// var discrepancyNote=[];
 					var currentDiscrepancyNotes = [];
 					var thisDiscrepancyNote = {};
+					var parentDiscrepancyNote = {};
 					var childNote = [];
 					for ( var i = 0; i < discrepancyNote.length; i++) {
 						var dns = discrepancyNote[i];
 
-						thisDiscrepancyNote.description = "";
-						thisDiscrepancyNote.id = dns["@ID"].substring(3);
-						thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
-						thisDiscrepancyNote.status = dns["@Status"];
-						thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
-						thisDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
+						parentDiscrepancyNote.description = "ABC";
+						parentDiscrepancyNote.id = dns["@ID"].substring(3);
+						parentDiscrepancyNote.parent_noteType = dns["@NoteType"];
+						parentDiscrepancyNote.status = dns["@Status"];
+						parentDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
+						parentDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
 
 						childNote = dns["OpenClinica:ChildNote"];
 						childNote = util_ensureArray(childNote);
-						currentDiscrepancyNotes.push(thisDiscrepancyNote);
-						thisDiscrepancyNote = {};
+												thisDiscrepancyNote = {};
 
 						for ( var j = 0; j < childNote.length; j++) {
 							var cn = childNote[j];
 							var description = cn["OpenClinica:Description"];
+							if(j==0)
+							{	parentDiscrepancyNote.description = description;
+								currentDiscrepancyNotes.push(parentDiscrepancyNote);
+							}
+
 							var detailedNote = cn["OpenClinica:DetailedNote"];
 							var userRef = cn['UserRef'];
 							thisDiscrepancyNote.description = description;
@@ -1038,6 +1043,7 @@ function StudyRenderer(json) {
 							currentDiscrepancyNotes.push(thisDiscrepancyNote);
 							thisDiscrepancyNote = {};
 						}
+
 						// (repeating) ? rowNumber = repeatRowNumber : rowNumber
 						// = "";
 					}
