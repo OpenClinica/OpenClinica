@@ -305,9 +305,9 @@ function StudyRenderer(json) {
 						formTables.formStatus = forms[j]["@OpenClinica:Status"];
 						subjectTables.forms.push(formTables);
 					}
-
-				subjectTableOfCnts.push(subjectTables);
 				}
+				subjectTableOfCnts.push(subjectTables);
+				
 			}
 		}
 		htmlString = RenderUtil.render(RenderUtil
