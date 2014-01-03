@@ -24,17 +24,16 @@
     </tr>
     {{each discrepancyNotes}}
     
-<!--     {{if description == "" }} -->
-<!--     <tr class='DNParentRowColor' > -->
-<!--       <td> ${app_this_is_a_new_threadLabel} </td> -->
-<!--       {{/if}} -->
-<!--       {{if description != "" }} -->
+    {{if description == "" }}
+    <tr class='DNParentRowColor' >
+      <td> ${app_this_is_a_new_threadLabel} </td>
+      {{/if}}
+      {{if description != "" }}
     
     <tr class="provenance">
-      <td>
-      <!-- <strong>{{html description}} </strong>-->
+      <td><strong>{{html description}} </strong>
         <p class="dn_notes">{{html detailedNote}}</p></td>
-<!--       {{/if}} -->
+      {{/if}}
       <td>{{html user}}</td>
       <td>{{html id}} </td>
       <td>{{html parent_noteType}}</td>
