@@ -1,11 +1,9 @@
 
-<td valign='center'><table class='AL_DNBackgroundColorForHeaders' border="1" width="100%" >
-    <tr>&nbsp;</tr>
-    <tr>
-      <td>${title} </td>
-    </tr>
-  </table>
+<td valign='center'>
   <table border="1" width="100%" >
+    <tr class="AL_DNBackgroundColorForHeaders">
+      <td colspan="7">${title}</td>
+    </tr>
     <tr class="provenance">
       <td>${app_noteLabel}</td>
       <td>${app_assigned_toLabel}</td>
@@ -15,18 +13,24 @@
       <td>${app_n_of_notesLabel}</td>
       <td>${app_CreatedLabel}</td>
     </tr>
-    {{each discrepancyNotes}}
-         {{if parentThread }}   <tr class='DNParentRowColor' >  {{else}} <tr class="provenance"> {{/if}}  
     
-        <td><strong>{{html description}} </strong>
-        <p class="dn_notes">{{html detailedNote}}</p></td>
+    {{each discrepancyNotes}}
+	{{if parentThread }}
+    <tr class='DNParentRowColor' >
+    {{else}}
+    <tr class="provenance">
+    {{/if}}  
+    
+	<td><strong>{{html description}} </strong>
+	<p class="dn_notes">{{html detailedNote}}</p></td>
 
       <td>{{html user}}</td>
-      <td>{{html id}} </td>
+      <td>{{html id}}</td>
       <td>{{html parent_noteType}}</td>
       <td>{{html status}}</td>
       <td>{{html numberOfChildNotes}}</td>
       <td>{{html dateUpdated}}</td>
     </tr>
     {{/each}}
-  </table></td>
+  </table>
+</td>
