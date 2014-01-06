@@ -1,33 +1,25 @@
 
 <td class="study_subject_header_title" valign='center'><br />
+<h3 class="tocHeader">Subject Table Of Contents</h3>
   <table border="1" width="100%" >
-  <tr><td colspan="3"><h3>Subject Table Of Contents</h3></td></tr>
-  <tr><td >{{html app_studyEventLabel}}</td>
-  <td>{{html app_eventCRFLabel}}</td>
-  <td>{{html app_statusLabel}}</td>
-  </tr>
-  {{each subjectTableOfCnts}}  
-  <tr>
-  <td>
-  {{html studyEventName}}
-  </td>
-  <td></td>
-  <td>
-  {{html studyEventStatus}}
-  </td>
-  </tr>
-  {{each forms}}
-  <tr>
-  <td></td>
-  <td>
-  ${formName}
-  </td>
-  <td>${formStatus}
-</td>
-  </tr>
-  {{/each}}
-  
-  {{/each}}
-  </table>
-  </td>
-  
+    <tr class="tocLabel">
+      <td>{{html app_studyEventLabel}}</td>
+      <td>{{html app_eventCRFLabel}}</td>
+      <td>{{html app_statusLabel}}</td>
+    </tr>
+    {{each subjectTableOfCnts}}
+    <tr class="tocEvent">
+      <td>{{html studyEventName}}</td>
+      <td>&nbsp;</td>
+      <td>{{html studyEventStatus}}</td>
+    </tr>
+    {{each forms}}
+    <tr>
+      <td></td>
+      <td>${formName}</td>
+      <td>${formStatus}</td>
+    </tr>
+    {{/each}}
+    
+    {{/each}}
+  </table></td>
