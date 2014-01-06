@@ -28,6 +28,8 @@ public class ExportSubjectDataBean extends SubjectDataBean {
     private String dateOfBirth;
     private String subjectGender;
 
+    private String enrollmentDate = "";
+    
     private List<ExportStudyEventDataBean> exportStudyEventData;
     private List<SubjectGroupDataBean> subjectGroupData;
 
@@ -108,4 +110,12 @@ public class ExportSubjectDataBean extends SubjectDataBean {
     public List<SubjectGroupDataBean> getSubjectGroupData() {
         return this.subjectGroupData;
     }
+
+	public String getEnrollmentDate() {
+		return enrollmentDate;
+	}
+
+	public void setEnrollmentDate(String enrollmentDate) {
+		this.enrollmentDate = enrollmentDate;
+	}
 }

@@ -90,6 +90,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (gender != null && gender.length() > 0) {
                     xml.append("\" OpenClinica:Sex=\"" + StringEscapeUtils.escapeXml(gender));
                 }
+                String enrollmentDate = sub.getEnrollmentDate();
+                if(enrollmentDate!=null && enrollmentDate.length()>0){
+                    xml.append("\" OpenClinica:EnrollmentDate=\"" + enrollmentDate);
+
+                }
             }
             xml.append("\">");
             xml.append(nls);
