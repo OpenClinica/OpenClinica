@@ -293,12 +293,12 @@ function StudyRenderer(json) {
 				var subjectTables = {};
 				subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 				subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
-			
+
 				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
 				if (forms != undefined){
 					for ( var j = 0; j < forms.length; j++) {
-						
+
 						var formOID = forms[j]["@FormOID"];
 						var formTables = {};
 						formTables.formName = app_formDefMap[formOID];
@@ -307,7 +307,7 @@ function StudyRenderer(json) {
 					}
 				}
 				subjectTableOfCnts.push(subjectTables);
-				
+
 			}
 		}
 		htmlString = RenderUtil.render(RenderUtil
@@ -395,7 +395,7 @@ function StudyRenderer(json) {
 				for ( var i = 0; i < audits.length; i++) {
 					var newVal = audits[i]["@NewValue"];
 					if (newVal == 'signed') {
-						electronicSignature = audits[i]["@Name"] + "("
+						electronicSignature = audits[i]["@Name"] + " ("
 								+ audits[i]["@UserName"] + ")" + "|"
 								+ audits[i]["@DateTimeStamp"];
 
@@ -963,7 +963,7 @@ function StudyRenderer(json) {
 						var audits = auditLog[i];
 						thisAuditLog.auditType = audits["@AuditType"];
 						var userid = audits["@Name"] ? audits["@Name"] : "";
-						userid += audits["@UserName"] ? "("
+						userid += audits["@UserName"] ? " ("
 								+ audits["@UserName"] + ")" : "";
 						// thisAuditLog.user =
 						// app_userData[userid]?app_userData[userid]["FullName"]:userid;
@@ -1028,7 +1028,7 @@ function StudyRenderer(json) {
 							if (userRef) {
 								var userid = userRef["@OpenClinica:FullName"] ? userRef["@OpenClinica:FullName"]
 										: "";
-								userid += userRef["@OpenClinica:UserName"] ? "("
+								userid += userRef["@OpenClinica:UserName"] ? " ("
 										+ userRef["@OpenClinica:UserName"]
 										+ ")"
 										: "";
@@ -1076,7 +1076,7 @@ function StudyRenderer(json) {
 					thisAuditLog.auditType = audits["@AuditType"];
 
 					var userid = audits["@Name"] ? audits["@Name"] : "";
-					userid += audits["@UserName"] ? "(" + audits["@UserName"]
+					userid += audits["@UserName"] ? " (" + audits["@UserName"]
 							+ ")" : "";
 					thisAuditLog.user = userid;
 					thisAuditLog.dateTime = audits["@DateTimeStamp"];
@@ -1137,7 +1137,7 @@ function StudyRenderer(json) {
 						if (userRef) {
 							var userid = userRef["@OpenClinica:FullName"] ? userRef["@OpenClinica:FullName"]
 									: "";
-							userid += userRef["@OpenClinica:UserName"] ? "("
+							userid += userRef["@OpenClinica:UserName"] ? " ("
 									+ userRef["@OpenClinica:UserName"] + ")"
 									: "";
 
