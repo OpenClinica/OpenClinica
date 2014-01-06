@@ -442,8 +442,23 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (cn.getDateCreated() != null) {
                     Date d = cn.getDateCreated();
                     if (d.toString().length() > 0) {
-                        xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\"");
+                        xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
                     }
+                }
+                if(cn.getOwnerUserName()!=""){
+                	String ownerUserName = cn.getOwnerUserName();
+                	if(ownerUserName.length()>0){
+                		xml.append("UserName=\"" + ownerUserName + "\" ");
+                	}
+                	
+                }
+                if(cn.getOwnerFirstName()!="" || cn.getOwnerLastName()!=""){
+                	String ownerLastName = cn.getOwnerLastName();
+                	String ownerFirstName = cn.getOwnerFirstName();
+                	if(ownerLastName.length()>0 || ownerFirstName.length()>0){
+                		xml.append("Name=\"" + ownerFirstName+" "+ownerLastName + "\"");
+                	}
+                	
                 }
                 xml.append(">");
                 xml.append(nls);
@@ -463,6 +478,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append(nls);
                     }
                 }
+               
                 if (cn.getUserRef() != null) {
                     String uid = cn.getUserRef().getElementDefOID();
                     String userName = cn.getUserRef().getUserName();

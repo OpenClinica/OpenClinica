@@ -613,6 +613,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			childNoteBean.setDetailedNote(childDN.getDetailedNotes());
 			
 			childNoteBean.setDateCreated(childDN.getDateCreated());
+			if(childDN.getUserAccountByOwnerId()!=null)
+			{
+				childNoteBean.setOwnerUserName(childDN.getUserAccountByOwnerId().getUserName());
+				childNoteBean.setOwnerFirstName(childDN.getUserAccountByOwnerId().getFirstName());
+				childNoteBean.setOwnerLastName(childDN.getUserAccountByOwnerId().getLastName());
+			}
 			
 			if(childDN.getUserAccount()!=null)
 			{

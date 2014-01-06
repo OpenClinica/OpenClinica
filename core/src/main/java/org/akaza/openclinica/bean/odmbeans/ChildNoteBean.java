@@ -11,6 +11,8 @@ package org.akaza.openclinica.bean.odmbeans;
 
 import java.util.Date;
 
+import org.akaza.openclinica.domain.user.UserAccount;
+
 /**
  *
  * @author ywang (March, 2010)
@@ -22,6 +24,10 @@ public class ChildNoteBean extends ElementOIDBean {
     private String description;
     private String detailedNote;
     private ElementRefBean userRef;
+    
+    private String ownerUserName="";
+    private String ownerFirstName="";
+    private String ownerLastName="";
     
     public String getStatus() {
         return status;
@@ -53,4 +59,22 @@ public class ChildNoteBean extends ElementOIDBean {
     public void setUserRef(ElementRefBean userRef) {
         this.userRef = userRef;
     }
+	public String getOwnerLastName() {
+		return ownerLastName;
+	}
+	public void setOwnerLastName(String ownerLastName) {
+		this.ownerLastName = ownerLastName;
+	}
+	public String getOwnerUserName() {
+		return ownerUserName;
+	}
+	public void setOwnerUserName(String ownerUserName) {
+		this.ownerUserName = ownerUserName;
+	}
+	public String getOwnerFirstName() {
+		return ownerFirstName;
+	}
+	public void setOwnerFirstName(String ownerFirstName) {
+		this.ownerFirstName = ownerFirstName;
+	}
 }
