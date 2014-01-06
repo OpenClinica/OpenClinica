@@ -1,0 +1,433 @@
+body {
+  font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+  margin-left:10px;
+}
+
+table.item-row {
+ padding-left: 15px;
+ padding-right: 15px;
+}
+
+h1 {
+  font-weight:normal
+  font-size: 12px;
+}
+h2 {
+  font-weight:normal
+  font-size: 11px;
+}
+h3 {
+  font-weight:normal
+  font-size: 10px;
+}
+h4 {
+  font-weight:normal
+  font-size: 9px;
+}
+
+a:link {
+  color: red;
+}
+a:visited {
+  color: red;
+}
+a:hover {
+  color: blue;
+}
+a:active {
+  color: red;
+}
+
+
+
+
+#page-header {
+  table-layout:fixed;
+  width: 100%;
+  padding:20px;
+  margin-bottom: 1px;
+}
+
+
+#page-header td.left-header, td.right-header, td.printCrf_box1, td.printCrf_box2, td.printCrf_box3, td.printCrf_box4, td.printCrf_box5, td.printCrf_box6 {
+  vertical-align: top;
+  padding-top: 10px;
+}
+
+#page-header td.left-header {
+  width: 66%;
+}
+
+#page-header td.printCrf_box1 {
+	width: 9%;
+}
+
+#page-header td.printCrf_box2 {
+	width: 31%;
+	font-weight:bold;
+}
+
+#page-header td.printCrf_box3 {
+	width: 6%;
+}
+
+#page-header td.printCrf_box4 {
+	width: 20%;
+	font-weight:bold;
+}
+
+#page-header td.printCrf_box5 {
+	width: 8%;
+}
+
+#page-header td.printCrf_box6 {
+	font-weight:bold;
+}
+
+.DNBackgroundColorForHeaders{
+   background-color : #597590;
+   color : white;
+   text-decoration:underline;
+   font-size: 90%;
+}
+
+.AL_DNBackgroundColorForHeaders{
+	background-color : #999;
+	text-decoration:underline;
+	border-bottom-width: thick;
+	border-bottom-style: solid;
+	border-bottom-color: black;
+	width: 100%;
+   font-size: 90%;
+}
+
+.DNParentRowColor{
+	background-color : #CCC;
+   font-size: 80%;
+}
+.MetadataBackgroundColorForHeaders{
+   background-color : #153A5A;
+   text-decoration:underline;
+   font-size: 90%;
+   color: white;
+}
+
+.ALBackgroundColorForHeaders{
+   background-color : #B2BEC8;
+   text-decoration:underline;
+   font-size: 90%;
+}
+
+
+
+.spinner {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -190px;
+  margin-left: -259px;
+}
+
+
+.with_border {
+  border:1px solid black;
+}
+
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text_centered {
+  text-align: center;
+}
+
+.text-right-aligned {
+  text-align: right;
+}
+
+.text-left-aligned {
+  text-align: left;
+}
+
+.text-left-aligned-bold {
+  text-align: left;
+  font-weight:bold;
+
+}
+.text-right-aligned-bold {
+  text-align: right;
+  font-weight:bold;
+}
+.repeating_item_wrapper{
+  display:inline-block;
+  margin-top:0px;
+  margin-bottom:0px;
+  margin-left:5x;
+}
+
+
+.item_def_wrapper{
+  min-width:400px;
+  padding-top:0px;
+  padding-bottom:0px;
+  margin-top:0px;
+  margin-bottom:0px;
+  margin-right:10px;
+  padding-left: 5px;
+}
+
+.item_def_name{
+  vertical-align: top;
+  display: inline-block;
+  font-weight: normal;
+}
+
+.item_def_number{
+  vertical-align: top;
+  display: inline-block;
+  font-weight: normal;
+}
+
+.item_def_title{
+  vertical-align: top;
+  display: inline-block;
+  width:200px;
+  font-weight: normal;
+}
+
+div.item_def_control{
+  vertical-align: bottom;
+  display: inline-block;
+  padding-top:0;
+  padding-bottom:0;
+  margin-top:0;
+  margin-bottom:0;
+  min-height:20px
+}
+
+span.item_def_control{
+  vertical-align: bottom;
+  display: inline-block;
+  font-size: 0.7em;
+  padding-top:0;
+  padding-bottom:0;
+  margin-top:0;
+  margin-bottom:0;
+}
+
+.item_def_format_label{
+  vertical-align: top;
+  color:  gray;
+  }
+
+div.inline {
+  display: inline;
+}
+
+.checkbox_control{
+}
+
+.item_def_repeating_unit {
+  display: inline-block;
+  font-size: 0.6em;
+}
+
+.header-title {
+  background-color:#DDDDDD;
+  padding-left:10px;
+  padding-right:10px;
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+.section-title {
+  background-color: #B5B5B5;
+  border: thin solid #999999;
+  font-size: 1em;
+  font-weight:bold;
+  padding-top: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  vertical-align: top;
+}
+
+
+.section-info {
+  background-color: #B5B5B5;
+  border: thin solid #999999;
+  font-size: 1em;
+   padding-top: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  vertical-align: top;
+}
+
+.title_manage {
+  color: #D4A718;
+}
+
+.select-option {
+  display: block;
+  padding-top:1px;
+  padding-right:2px;
+  padding-bottom:2px;
+  min-height:20px;
+}
+
+.header-text {
+color: #333333;
+font-size: 13px;
+padding-bottom: 7px;
+
+padding-left: 2px;
+
+}
+
+.header-text-plus-not-bold {
+color: #333333;
+font-size: 14px;
+padding-bottom: 7px;
+}
+
+
+.header-text-plus {
+color: #333333;
+font-size: 14px;
+font-weight:bold;
+padding-bottom: 7px;
+}
+.investigator-text {
+  color: #333333;
+  padding-top: 100px;
+}
+
+.repeating_item_header {
+  border:1px solid;
+  font-size: 13px;
+  font-weight: bold;
+  background-color: #DDDDDD;
+}
+
+.repeating_item_group {
+  vertical-align:top;
+}
+.repeating_item_option_names {
+  font-weight: bold;
+  padding-right: 10px;
+  text-align: left;
+}
+
+tr.min-height {
+  min-height: 18px;
+  font-size : 0.8em
+}
+
+tr.min-height-20 {
+  min-height: 20px;
+  font-size : 0.9em
+}
+
+
+td.item-def-cell {
+  vertical-align: top;
+}
+
+.repeating_item_group_header{
+  font-size: 0.9em;
+  padding-left: 5px;
+  line-height: 15px;
+  color: #4D4D4D;
+}
+
+.page-break-screen {
+  display: block;
+  margin-top: 300px;
+  margin-bottom:50px;
+}
+
+.vertical-spacer-30px {
+  margin-top: 30px;
+}
+
+.vertical-spacer-20px {
+  margin-top: 20px;
+}
+
+table.repeating-horiz-items td, th {
+   border:none;
+}
+
+input[type="text"], textarea {
+  display: inline-block;
+  background-color : #EEEEEE;
+  border: none;
+  width: 70%;
+  margin-top:3px;
+  margin-bottom:3px;
+  text-align: center;
+}
+
+
+@media all {
+  .page-break { display: none; }
+}
+
+@media print {
+  .page-break { display: block; page-break-before: always; }
+
+  body {
+    background-color: white;
+  }
+
+  .no_print {
+    display: none;
+  }
+
+  .page-break-screen {
+    display: none;
+  }
+}
+
+
+td {
+	vertical-align: top;
+}
+
+
+
+
+.provenance td {
+	font-size: 80%;
+}
+
+.esig {
+	padding-top: 1em;
+}
+
+.dn_notes {
+	margin: 0 0 0 20px;
+}
+
+.dn_notes {
+	margin: 0 0 0 20px;
+}
+
+.tocHeader {
+	text-align: center;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.tocLabel {
+	background-color: #153A5A;
+	color: white;
+}
+
+.tocEvent {
+	background-color: #B2BEC8;
+}
