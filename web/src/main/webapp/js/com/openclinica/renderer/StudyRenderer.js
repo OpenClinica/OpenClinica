@@ -240,8 +240,8 @@ function StudyRenderer(json) {
 		app_renderMode = undefined;
 
 		if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
-			this.renderPageHeader(pageBreak, app_printTime,
-					app_studyEventCoverPageType, app_eventName);
+	//		this.renderPageHeader(pageBreak, app_printTime,
+	//				app_studyEventCoverPageType, app_eventName);
 
 			this.renderStudyEventData(eventDef);
 
