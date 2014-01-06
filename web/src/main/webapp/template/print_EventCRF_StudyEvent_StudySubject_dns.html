@@ -13,19 +13,14 @@
       <td>${app_typeLabel}</td>
       <td>${app_current_statusLabel}</td>
       <td>${app_n_of_notesLabel}</td>
-      <td>${app_Last_updatedLabel}</td>
+      <td>${app_CreatedLabel}</td>
     </tr>
     {{each discrepancyNotes}}
+         {{if parentThread }}   <tr class='DNParentRowColor' >  {{else}} <tr class="provenance"> {{/if}}  
     
-    {{if description == "" }}
-    <tr class='DNParentRowColor' >
-      <td> ${app_this_is_a_new_threadLabel} </td>
-      {{/if}}
-      {{if description != "" }}
-    
-    <tr class="provenance">
-      <td> {{html description}} &nbsp;&nbsp;{{html detailedNote}} </td>
-      {{/if}}
+        <td><strong>{{html description}} </strong>
+        <p class="dn_notes">{{html detailedNote}}</p></td>
+
       <td>{{html user}}</td>
       <td>{{html id}} </td>
       <td>{{html parent_noteType}}</td>
