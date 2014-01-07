@@ -1130,7 +1130,7 @@ function StudyRenderer(json) {
 
 					childNote = dns["OpenClinica:ChildNote"];
 					childNote = util_ensureArray(childNote);
-					currentDiscrepancyNotes.push(thisDiscrepancyNote);
+//					currentDiscrepancyNotes.push(thisDiscrepancyNote);
 					thisDiscrepancyNote = {};
 
 					for ( var j = 0; j < childNote.length; j++) {
