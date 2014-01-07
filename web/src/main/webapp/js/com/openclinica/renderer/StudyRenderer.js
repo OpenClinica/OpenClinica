@@ -240,8 +240,8 @@ function StudyRenderer(json) {
 		app_renderMode = undefined;
 
 		if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
-			this.renderPageHeader(pageBreak, app_printTime,
-					app_studyEventCoverPageType, app_eventName);
+	//		this.renderPageHeader(pageBreak, app_printTime,
+	//				app_studyEventCoverPageType, app_eventName);
 
 			this.renderStudyEventData(eventDef);
 
@@ -293,12 +293,12 @@ function StudyRenderer(json) {
 				var subjectTables = {};
 				subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 				subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
-			
+
 				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
 				if (forms != undefined){
 					for ( var j = 0; j < forms.length; j++) {
-						
+
 						var formOID = forms[j]["@FormOID"];
 						var formTables = {};
 						formTables.formName = app_formDefMap[formOID];
@@ -307,7 +307,7 @@ function StudyRenderer(json) {
 					}
 				}
 				subjectTableOfCnts.push(subjectTables);
-				
+
 			}
 		}
 		htmlString = RenderUtil.render(RenderUtil
@@ -395,7 +395,7 @@ function StudyRenderer(json) {
 				for ( var i = 0; i < audits.length; i++) {
 					var newVal = audits[i]["@NewValue"];
 					if (newVal == 'signed') {
-						electronicSignature = audits[i]["@Name"] + "("
+						electronicSignature = audits[i]["@Name"] + " ("
 								+ audits[i]["@UserName"] + ")" + "|"
 								+ audits[i]["@DateTimeStamp"];
 
@@ -963,7 +963,7 @@ function StudyRenderer(json) {
 						var audits = auditLog[i];
 						thisAuditLog.auditType = audits["@AuditType"];
 						var userid = audits["@Name"] ? audits["@Name"] : "";
-						userid += audits["@UserName"] ? "("
+						userid += audits["@UserName"] ? " ("
 								+ audits["@UserName"] + ")" : "";
 						// thisAuditLog.user =
 						// app_userData[userid]?app_userData[userid]["FullName"]:userid;
@@ -995,18 +995,19 @@ function StudyRenderer(json) {
 					// var discrepancyNote=[];
 					var currentDiscrepancyNotes = [];
 					var thisDiscrepancyNote = {};
-					var parentDiscrepancyNote = {};
+					var parentDiscrepancyNote;
 					var childNote = [];
 					for ( var i = 0; i < discrepancyNote.length; i++) {
 						var dns = discrepancyNote[i];
-
+						parentDiscrepancyNote = {};
 						parentDiscrepancyNote.description = "ABC";
 						parentDiscrepancyNote.id = dns["@ID"].substring(3);
 						parentDiscrepancyNote.parent_noteType = dns["@NoteType"];
 						parentDiscrepancyNote.status = dns["@Status"];
 						parentDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
 						parentDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
-						parentDiscrepancyNote.parentThread=true;
+						
+
 						childNote = dns["OpenClinica:ChildNote"];
 						childNote = util_ensureArray(childNote);
 												thisDiscrepancyNote = {};
@@ -1014,9 +1015,14 @@ function StudyRenderer(json) {
 						for ( var j = 0; j < childNote.length; j++) {
 							var cn = childNote[j];
 							var description = cn["OpenClinica:Description"];
+
 							if(j==0)
 							{	parentDiscrepancyNote.description = description;
+							    parentDiscrepancyNote.parentThread = "true";
 								currentDiscrepancyNotes.push(parentDiscrepancyNote);
+							}else{
+							    parentDiscrepancyNote.parentThread = "false";
+									
 							}
 
 							var detailedNote = cn["OpenClinica:DetailedNote"];
@@ -1028,7 +1034,7 @@ function StudyRenderer(json) {
 							if (userRef) {
 								var userid = userRef["@OpenClinica:FullName"] ? userRef["@OpenClinica:FullName"]
 										: "";
-								userid += userRef["@OpenClinica:UserName"] ? "("
+								userid += userRef["@OpenClinica:UserName"] ? " ("
 										+ userRef["@OpenClinica:UserName"]
 										+ ")"
 										: "";
@@ -1038,8 +1044,7 @@ function StudyRenderer(json) {
 
 							thisDiscrepancyNote.id = cn["@ID"].substring(4);
 							thisDiscrepancyNote.status = cn["@Status"];
-							thisDiscrepancyNote.dateUpdated = cn["@DateCreated"]
-							
+							thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
 
 							currentDiscrepancyNotes.push(thisDiscrepancyNote);
 							thisDiscrepancyNote = {};
@@ -1077,7 +1082,7 @@ function StudyRenderer(json) {
 					thisAuditLog.auditType = audits["@AuditType"];
 
 					var userid = audits["@Name"] ? audits["@Name"] : "";
-					userid += audits["@UserName"] ? "(" + audits["@UserName"]
+					userid += audits["@UserName"] ? " (" + audits["@UserName"]
 							+ ")" : "";
 					thisAuditLog.user = userid;
 					thisAuditLog.dateTime = audits["@DateTimeStamp"];
@@ -1110,16 +1115,18 @@ function StudyRenderer(json) {
 				// var discrepancyNote=[];
 				var currentDiscrepancyNotes = [];
 				var thisDiscrepancyNote = {};
+				var parentDiscrepancyNote;
 				var childNote = [];
 				for ( var i = 0; i < discrepancyNote.length; i++) {
 					var dns = discrepancyNote[i];
 
-					thisDiscrepancyNote.description = "";
-					thisDiscrepancyNote.id = dns["@ID"].substring(3);
-					thisDiscrepancyNote.parent_noteType = dns["@NoteType"];
-					thisDiscrepancyNote.status = dns["@Status"];
-					thisDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
-					thisDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
+					parentDiscrepancyNote = {};
+					parentDiscrepancyNote.description = "ABC";
+					parentDiscrepancyNote.id = dns["@ID"].substring(3);
+					parentDiscrepancyNote.parent_noteType = dns["@NoteType"];
+					parentDiscrepancyNote.status = dns["@Status"];
+					parentDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
+					parentDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
 
 					childNote = dns["OpenClinica:ChildNote"];
 					childNote = util_ensureArray(childNote);
@@ -1129,6 +1136,20 @@ function StudyRenderer(json) {
 					for ( var j = 0; j < childNote.length; j++) {
 						var cn = childNote[j];
 						var description = cn["OpenClinica:Description"];
+						
+						
+						if(j==0)
+						{	parentDiscrepancyNote.description = description;
+						    parentDiscrepancyNote.parentThread = "true";
+							currentDiscrepancyNotes.push(parentDiscrepancyNote);
+						}else{
+						    parentDiscrepancyNote.parentThread = "false";
+								
+						}
+
+						
+						
+						
 						var detailedNote = cn["OpenClinica:DetailedNote"];
 						var userRef = cn["UserRef"];
 						thisDiscrepancyNote.description = description;
@@ -1138,7 +1159,7 @@ function StudyRenderer(json) {
 						if (userRef) {
 							var userid = userRef["@OpenClinica:FullName"] ? userRef["@OpenClinica:FullName"]
 									: "";
-							userid += userRef["@OpenClinica:UserName"] ? "("
+							userid += userRef["@OpenClinica:UserName"] ? " ("
 									+ userRef["@OpenClinica:UserName"] + ")"
 									: "";
 
