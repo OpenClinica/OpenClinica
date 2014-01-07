@@ -1045,6 +1045,7 @@ function StudyRenderer(json) {
 							thisDiscrepancyNote.id = cn["@ID"].substring(4);
 							thisDiscrepancyNote.status = cn["@Status"];
 							thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
+							thisDiscrepancyNote.userName = cn["@UserName"];
 
 							currentDiscrepancyNotes.push(thisDiscrepancyNote);
 							thisDiscrepancyNote = {};
@@ -1169,6 +1170,7 @@ function StudyRenderer(json) {
 						thisDiscrepancyNote.id = cn["@ID"].substring(4);
 						thisDiscrepancyNote.status = cn["@Status"];
 						thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
+						thisDiscrepancyNote.userName = cn["@UserName"];
 
 						currentDiscrepancyNotes.push(thisDiscrepancyNote);
 						thisDiscrepancyNote = {};

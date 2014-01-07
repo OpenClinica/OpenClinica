@@ -34,7 +34,12 @@
       <td>{{html parent_noteType}}</td>
       <td>{{html status}}</td>
       <td>{{html numberOfChildNotes}}</td>
-      <td>{{html dateUpdated}}</td>
+      <td>{{html dateUpdated}}
+      
+      {{if userName}} ({{html userName}})   {{/if}} 
+      
+       </td>
+       
     </tr>
     {{/each}}
   </table></td>
