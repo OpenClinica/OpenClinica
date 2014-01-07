@@ -234,6 +234,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				.setExportStudyEventData(setExportStudyEventDataBean(studySubj,studyEvents,formVersionOID));
 
 		exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
+		
+		exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate()+"");
 		}
 		return exportSubjectDataBean;
 
