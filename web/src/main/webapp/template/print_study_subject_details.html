@@ -10,9 +10,10 @@
       <div>{{html app_genderLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Sex"]}</b></div>
       {{/if}}             
 
-      {{if app_thisSubjectsData["@OpenClinica:Enrolment"] }}
-      <div>{{html app_enrollMMDDYYYYLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Enrolment"]}</b></div>
+      {{if app_thisSubjectsData["@OpenClinica:EnrollmentDate"] }}
+      <div>{{html app_enrollMMDDYYYYLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:EnrollmentDate"]}</b></div>
       {{/if}}             
+
 
 
       {{if app_thisSubjectsData["@OpenClinica:Status"] }}
