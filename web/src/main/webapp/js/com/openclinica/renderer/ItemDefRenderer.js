@@ -31,12 +31,13 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
   
   if (this.studyEventOID!=undefined && app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]) { 
     this.itemValue = app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]; 
-    if(app_displayAudits=='y')
-    this.audits = app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID];
-    if(app_displayDNs=='y')
-    this.dns = app_dns[this.studyEventOID+this.studyEventRepeatKey+this.OID];
+    
     }
   
+  if(this.studyEventOID!=undefined && app_displayAudits=='y' && app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID])
+	    this.audits = app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID];
+	    if(this.studyEventOID!=undefined && app_displayDNs=='y' && app_dns[this.studyEventOID+this.studyEventRepeatKey+this.OID])
+	    this.dns = app_dns[this.studyEventOID+this.studyEventRepeatKey+this.OID];
   
   
   if (this.responseType!=undefined) {
