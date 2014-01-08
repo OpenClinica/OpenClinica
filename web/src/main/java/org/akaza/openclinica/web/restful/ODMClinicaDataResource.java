@@ -16,6 +16,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,14 +80,13 @@ public class ODMClinicaDataResource {
 		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
 		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
 		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
+		int userId = ((UserAccountBean)request.getSession().getAttribute("userBean")).getId();
 		XMLSerializer xmlSerializer = new XMLSerializer();
-		FullReportBean report = getMetadataCollectorResource()
-				.collectODMMetadataForClinicalData(
-						studyOID,
+		FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale(), userId));
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
 		xmlSerializer.setTypeHintsEnabled(true);
@@ -133,6 +133,8 @@ public class ODMClinicaDataResource {
 		LOGGER.debug("Requesting clinical data resource");
 		boolean includeDN=false;
 		boolean includeAudit= false;
+		int userId = ((UserAccountBean)request.getSession().getAttribute("userBean")).getId();
+
 		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
 		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
 		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
@@ -143,7 +145,7 @@ public class ODMClinicaDataResource {
 						formVersionOID,
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, studySubjOID,
-										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale()));
+										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale(), userId));
 
 		report.createOdmXml(true);
 		LOGGER.debug(report.getXmlOutput().toString().trim());

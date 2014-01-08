@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -64,7 +65,7 @@ public class UserAccount extends DataMapDomainObject {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private Integer activeStudy;
+	private Study activeStudy;
 	private String institutionalAffiliation;
 	private Date dateCreated;
 	private Date dateUpdated;
@@ -266,12 +267,14 @@ public class UserAccount extends DataMapDomainObject {
 		this.email = email;
 	}
 
-	@Column(name = "active_study")
-	public Integer getActiveStudy() {
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "active_study")
+	public Study getActiveStudy() {
 		return this.activeStudy;
 	}
 
-	public void setActiveStudy(Integer activeStudy) {
+	public void setActiveStudy(Study activeStudy) {
 		this.activeStudy = activeStudy;
 	}
 
@@ -532,7 +535,7 @@ public class UserAccount extends DataMapDomainObject {
 		this.discrepancyNotesForOwnerId = discrepancyNotesForOwnerId;
 	}
 
-	/*//@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<StudyUserRole> getStudyUserRoles() {
 		return this.studyUserRoles;
 	}

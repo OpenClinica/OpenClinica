@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
 
@@ -20,10 +21,11 @@ import org.akaza.openclinica.domain.user.UserAccount;
  */
 @Entity
 @Table(name = "study_user_role")
-public class StudyUserRole  extends AbstractMutableDomainObject {
+public class StudyUserRole  extends DataMapDomainObject {
 
 	private StudyUserRoleId id;
 	private UserAccount userAccount;
+	
 	private Study study;
 	private Status status;
 

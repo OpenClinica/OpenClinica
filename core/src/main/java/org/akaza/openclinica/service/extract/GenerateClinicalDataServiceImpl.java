@@ -26,10 +26,12 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnEventCrfMap;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
@@ -37,6 +39,7 @@ import org.akaza.openclinica.domain.datamap.DnStudyEventMap;
 import org.akaza.openclinica.domain.datamap.DnStudySubjectMap;
 import org.akaza.openclinica.domain.datamap.DnSubjectMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
@@ -47,6 +50,7 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +73,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private static final Object STATUS = "Status";
 	private static final Object EVENT_CRF = "event_crf";
 	private static final Object STUDY_EVENT = "study_event";
+	private static boolean isActiveRoleAtSite = true;
+	
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
@@ -78,6 +84,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private boolean collectAudits=true;
 	private AuditLogEventDao auditEventDAO;
 	private Locale locale;
+	
+	private UserAccountDao userAccountDao;
 	
 	public AuditLogEventDao getAuditEventDAO() {
 		return auditEventDAO;
@@ -263,12 +271,15 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		for (StudyEvent se : studyEvents) {
+			
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
+			
 			expSEBean.setLocation(se.getLocation());
 			if(se.getDateEnd()!=null)
 			expSEBean.setEndDate(se.getDateEnd() + "");
 			expSEBean.setStartDate(se.getDateStart() + "");
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
+			
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
 			if(se.getStudySubject().getSubject().getDateOfBirth()!=null && se.getDateStart()!=null)
 			expSEBean.setAgeAtEvent(Utils.getAge(se.getStudySubject().getSubject().getDateOfBirth(), se.getDateStart()));
@@ -292,8 +303,24 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if(formVersionOID!=null)formCheck = false;
+		boolean hiddenCrfCheckPassed=true;
+		List<CrfBean> hiddenCrfs= new ArrayList<CrfBean>();
+		
 		for (EventCrf ecrf : se.getEventCrfs()) {
+			
+			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
+			
+			
+			if(isActiveRoleAtSite){
+				hiddenCrfs	 = listOfHiddenCrfs(seds);
+				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
+				{
+					hiddenCrfCheckPassed = false;
+				}
+			}
+			
 			//This logic is to use the same method for both S_OID/SS_OID/*/* and full path
+			if(hiddenCrfCheckPassed){
 			if(!formCheck)
 				{	if(ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
 						formCheck=true;
@@ -323,11 +350,25 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if(formVersionOID!=null)formCheck=false;
 				}
 			}
+		}
 
 		return (ArrayList<ExportFormDataBean>) formDataBean;
 	}
 
 	
+	private List<CrfBean> listOfHiddenCrfs(List<EventDefinitionCrf> seds) {
+	
+		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+		for(EventDefinitionCrf eventDefCrf:seds){
+			if(eventDefCrf.getHideCrf()){
+				hiddenCrfs.add(eventDefCrf.getCrf());
+			}
+		}
+
+		
+		return hiddenCrfs;
+	}
+
 	// This logic is taken from eventCRFBean. 
 	private String fetchEventCRFStatus(EventCrf ecrf) {
 		String stage = null;
@@ -720,11 +761,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	@Override
 	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID,
-			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit, Locale locale) {
+			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit, Locale locale, int userId) {
 		setLocale(locale);
 		setCollectDns(collectDNs);
 		setCollectAudits(collectAudit);
 		LinkedHashMap<String,OdmClinicalDataBean> clinicalDataHash = new LinkedHashMap<String, OdmClinicalDataBean>();
+		UserAccount userAccount = getUserAccountDao().findByColumnName(userId,"userId");
+		if(userAccount.getActiveStudy().getStudy()!=null){
+			isActiveRoleAtSite=true;
+		}
+		else{
+			isActiveRoleAtSite=false;
+		}
+		
 		if(!studySubjectOID.equals(INDICATE_ALL) )
 		{
 		StudySubjectDao ssdao =getStudySubjectDao();
@@ -753,6 +802,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		
 		return null;
+	}
+
+	private void checkForHiddenCRFs() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void setLocale(Locale locale) {
@@ -817,6 +871,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				}
 		}
 	return sEs;
+	}
+
+	public UserAccountDao getUserAccountDao() {
+		return userAccountDao;
+	}
+
+	public void setUserAccountDao(UserAccountDao userAccountDao) {
+		this.userAccountDao = userAccountDao;
 	}
 
 	
