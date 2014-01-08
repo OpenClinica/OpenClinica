@@ -406,6 +406,9 @@ td {
 
 .esig {
 	padding-top: 1em;
+	 text-indent:50px;
+	 font-style: italic;
+	
 }
 
 .dn_notes {
