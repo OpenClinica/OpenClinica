@@ -20,22 +20,23 @@
       <td>${app_typeLabel}</td>
       <td>${app_current_statusLabel}</td>
       <td>${app_n_of_notesLabel}</td>
-      <td colspan="2">${app_CreatedLabel}</td>
+      <td>${app_CreatedLabel}</td>
+      <td>&nbsp;</td>
     </tr>
     {{each discrepancyNotes}}
-
-     {{if parentThread }}   <tr class='DNParentRowColor' >  {{else}} <tr class="provenance"> {{/if}}  
     
+    {{if parentThread }}
+    <tr class="DNParentRowColor">{{else}}
+    <tr class="provenance"> {{/if}}
       <td><strong>{{html description}} </strong>
         <p class="dn_notes">{{html detailedNote}}</p></td>
-
       <td>{{html user}}</td>
       <td>{{html id}} </td>
       <td>{{html parent_noteType}}</td>
       <td>{{html status}}</td>
       <td>{{html numberOfChildNotes}}</td>
-      <td>{{html dateUpdated}}       </td>
+      <td>{{html dateUpdated}} </td>
       <td>{{if userName}}({{html userName}}){{/if}}</td>
-     </tr>
+    </tr>
     {{/each}}
   </table></td>
