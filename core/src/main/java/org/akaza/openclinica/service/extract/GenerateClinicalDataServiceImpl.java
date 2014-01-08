@@ -695,7 +695,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
-		if(auditLogEvent.getUserAccount()!=null)
+		if(auditLogEvent.getUserAccount()!=null && auditLogEvent.getUserAccount().getUserId()!=0)
 		{
 			auditBean.setUserId("USR_"+auditLogEvent.getUserAccount().getUserId());
 			auditBean.setUserName(auditLogEvent.getUserAccount().getUserName());
