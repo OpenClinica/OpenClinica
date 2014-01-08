@@ -135,6 +135,7 @@ var app_the_eCRF_that_are_part_of_this_event_were_signed_by ='<fmt:message key="
 var app_under_the_following_attestation ='<fmt:message key="under_the_following_attestation" bundle="${resword}"/>';
 var app_server_time='<fmt:message key="server_time" bundle="${resword}"/>'; 
 var app_on='<fmt:message key="on" bundle="${resword}"/>'; 
+var app_tableOfContentsLabel='<fmt:message key="table_of_contents" bundle="${resword}"/>'; 
 
 
 
