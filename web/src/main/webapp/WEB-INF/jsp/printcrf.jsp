@@ -131,7 +131,15 @@ var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="
 var app_formSigned= '<fmt:message key="signed" bundle="${resword}"/>';
 var app_electronicSignatureLabel='<fmt:message key="electronic_signature" bundle="${resword}"/>';
 var app_statusLabel='<fmt:message key="status" bundle="${resword}"/>'; 
-  </script>
+var app_the_eCRF_that_are_part_of_this_event_were_signed_by ='<fmt:message key="the_eCRF_that_are_part_of_this_event_were_signed_by" bundle="${resword}"/>';
+var app_under_the_following_attestation ='<fmt:message key="under_the_following_attestation" bundle="${resword}"/>';
+var app_server_time='<fmt:message key="server_time" bundle="${resword}"/>'; 
+var app_on='<fmt:message key="on" bundle="${resword}"/>'; 
+var app_tableOfContentsLabel='<fmt:message key="table_of_contents" bundle="${resword}"/>'; 
+
+
+
+</script>
 
 <html>
  <head>

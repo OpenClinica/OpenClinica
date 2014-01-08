@@ -406,6 +406,9 @@ td {
 
 .esig {
 	padding-top: 1em;
+	 text-indent:50px;
+	 font-style: italic;
+	
 }
 
 .dn_notes {
@@ -429,4 +432,13 @@ td {
 
 .tocEvent {
 	background-color: #B2BEC8;
+}
+
+.eventTable {
+	margin-top: 20px;
+	width: 100%;
+}
+
+.eventTable tr td {
+	border: 1px solid black;
 }

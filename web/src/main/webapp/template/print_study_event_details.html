@@ -13,10 +13,13 @@
     </tr>
     {{if electronicSig}}
     <tr>
-      <td class="esig" colspan="6"> Electronic Signature: {{html electronicSig}} </td>
+      <p class="esig" colspan="6">{{html app_the_eCRF_that_are_part_of_this_event_were_signed_by }} {{html electronicSig}} ({{html app_server_time}}) {{html app_under_the_following_attestation}}:</p>
+      <p class="esig" colspan="6">{{html app_meaning_of_signature}}</p>
     </tr>
-    <tr>
-      <td class="esig" colspan="6"> {{html app_meaning_of_signatureLabel}}: {{html app_meaning_of_signature}} </td>
-    </tr>
+
     {{/if}}
   </table></td>
+
+
+  
+  

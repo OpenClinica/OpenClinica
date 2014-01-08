@@ -1,5 +1,5 @@
 <td>
-<h3 class="centered text_centered"> ${app_study_subjectLabel}&nbsp;${app_detailsLabel}</h3>
+<h3 class="centered text_centered"> ${app_study_subjectLabel}&nbsp;${app_thisSubjectsData["@OpenClinica:StudySubjectID"]}&nbsp;${app_detailsLabel}</h3>
 <table id="page-header">
   <tr>
     <td class="left-header">
@@ -9,6 +9,13 @@
       {{if app_thisSubjectsData["@OpenClinica:Sex"] }}
       <div>{{html app_genderLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Sex"]}</b></div>
       {{/if}}             
+
+      {{if app_thisSubjectsData["@OpenClinica:EnrollmentDate"] }}
+      <div>{{html app_enrollMMDDYYYYLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:EnrollmentDate"]}</b></div>
+      {{/if}}             
+
+
+
       {{if app_thisSubjectsData["@OpenClinica:Status"] }}
       <div>{{html app_subject_statusLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Status"]}</b></div>
       {{/if}}
