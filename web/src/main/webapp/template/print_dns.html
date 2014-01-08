@@ -1,16 +1,16 @@
 
 <td valign='center'><br />
-  <table border="1" width="100%" >
+  <table class="eventTable">
     {{if repeating}}
     <tr>
-      <td colspan="7" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Notes & Discrepancies </td>
+      <td colspan="8" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Notes & Discrepancies </td>
     </tr>
     {{/if}}
     
     
     {{if !repeating}}
     <tr>
-      <td colspan="7" class="DNBackgroundColorForHeaders">${value}: Notes & Discrepancies </td>
+      <td colspan="8" class="DNBackgroundColorForHeaders">${value}: Notes & Discrepancies </td>
     </tr>
     {{/if}}
     <tr class="provenance">
@@ -20,7 +20,7 @@
       <td>${app_typeLabel}</td>
       <td>${app_current_statusLabel}</td>
       <td>${app_n_of_notesLabel}</td>
-      <td>${app_CreatedLabel}</td>
+      <td colspan="2">${app_CreatedLabel}</td>
     </tr>
     {{each discrepancyNotes}}
 
@@ -34,12 +34,8 @@
       <td>{{html parent_noteType}}</td>
       <td>{{html status}}</td>
       <td>{{html numberOfChildNotes}}</td>
-      <td>{{html dateUpdated}}
-      
-      {{if userName}} ({{html userName}})   {{/if}} 
-      
-       </td>
-       
-    </tr>
+      <td>{{html dateUpdated}}       </td>
+      <td>{{if userName}}({{html userName}}){{/if}}</td>
+     </tr>
     {{/each}}
   </table></td>

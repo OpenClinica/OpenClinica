@@ -433,3 +433,12 @@ td {
 .tocEvent {
 	background-color: #B2BEC8;
 }
+
+.eventTable {
+	margin-top: 20px;
+	width: 100%;
+}
+
+.eventTable tr td {
+	border: 1px solid black;
+}
