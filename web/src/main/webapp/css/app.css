@@ -434,11 +434,11 @@ td {
 	background-color: #B2BEC8;
 }
 
-.eventTable {
+.eventTable, .itemTable {
 	margin-top: 20px;
 	width: 100%;
 }
 
-.eventTable tr td {
+.eventTable tr td, .itemTable tr td {
 	border: 1px solid black;
 }

@@ -1,6 +1,6 @@
 
-<td valign='center'><br />
-  <table border="1" width="100%" >
+<td valign='center'>
+  <table class="itemTable">
     <tr>
 <!--  <td colspan="7" class="DNBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName}: ${app_metadataLabel}</td>  -->
       <td colspan="7" class="MetadataBackgroundColorForHeaders"><a id="${itemNameLink}"></a>${itemName}: ${app_metadataLabel}</td>
@@ -16,12 +16,11 @@
     <tr class="provenance">
       <td> {{html leftItemText}} </td>
       <td>{{html units}}</td>
-      <td> {{html dataType}} </td>
+      <td> {{html dataType}}</td>
       <td> {{each responseOptions}}
-        
         {{html label}}&nbsp;({{html id}})<br />
-        
-        {{/each}} </td>
-      <td> {{html groupLabel}} </td>
+        {{/each}}</td>
+      <td>{{html groupLabel}}</td>
     </tr>
-  </table></td>
+  </table>
+ </td>
