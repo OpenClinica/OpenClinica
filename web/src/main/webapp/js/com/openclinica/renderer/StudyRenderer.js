@@ -139,7 +139,8 @@ function StudyRenderer(json) {
 		
 		str += "<div id="+crfList+"><p>"+app_case_report_form+"</p>" ;
 
-		var studyEventFormRefs = eventDef["FormRef"];
+		var studyEventFormRefs = util_ensureArray(eventDef["FormRef"]);
+
 		var forms = util_ensureArray(studyEvent["FormData"]);
 		for ( var i = 0; i < studyEventFormRefs.length; i++) {
 			var formRef = studyEventFormRefs[i];
@@ -1106,7 +1107,6 @@ function StudyRenderer(json) {
 							+ ")" : "";
 					thisAuditLog.user = userid;
 					thisAuditLog.dateTime = audits["@DateTimeStamp"];
-					thisAuditLog.valueType = audits["@AuditType"];
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
 					currentAuditLogs.push(thisAuditLog);
