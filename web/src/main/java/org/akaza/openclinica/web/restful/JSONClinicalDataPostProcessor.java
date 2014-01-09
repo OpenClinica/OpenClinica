@@ -28,6 +28,8 @@ public class JSONClinicalDataPostProcessor {
 
     private static final DateFormat DATE_TIME_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
+    private static final DateFormat DATE_TIME_AUDIT_LOG_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+
     private static final String DATE_FORMAT_KEY = "date_format_string";
 
     private static final String DATE_TIME_FORMAT_KEY = "date_time_format_string";
@@ -36,6 +38,13 @@ public class JSONClinicalDataPostProcessor {
 
     private static final Pattern DATE_TIME_PATTERN =
             Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]");
+
+    /**
+     * Matches the date & time format used to render audit log entries
+     */
+    private static final Pattern DATE_TIME_AUDIT_LOG_PATTERN =
+            Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}");
+
 
     private final Locale locale;
 
@@ -98,12 +107,15 @@ public class JSONClinicalDataPostProcessor {
         Tries to match the string with the following formats:
         2011-07-05
         2011-05-17 00:00:00.0
+        2013-11-18T18:42:28 (Audit log date format)
         */
 
         boolean isShort = DATE_PATTERN.matcher(elem).matches();
         boolean isLong = DATE_TIME_PATTERN.matcher(elem).matches();
+        boolean isAudit = DATE_TIME_AUDIT_LOG_PATTERN.matcher(elem).matches();
+        //boolean isAudit = false;
 
-        if (isShort || isLong) {
+        if (isShort || isLong || isAudit) {
             try {
                 Date date;
                 DateFormat formatter;
@@ -111,8 +123,11 @@ public class JSONClinicalDataPostProcessor {
                 if (isShort) {
                     date = DATE_INTERNAL_FORMAT.parse(elem);
                     formatter = new SimpleDateFormat(formatResourceBundle.getString(DATE_FORMAT_KEY), locale);
-                } else {
+                } else if (isLong) {
                     date = DATE_TIME_INTERNAL_FORMAT.parse(elem);
+                    formatter = new SimpleDateFormat(formatResourceBundle.getString(DATE_TIME_FORMAT_KEY), locale);
+                } else {
+                    date = DATE_TIME_AUDIT_LOG_INTERNAL_FORMAT.parse(elem);
                     formatter = new SimpleDateFormat(formatResourceBundle.getString(DATE_TIME_FORMAT_KEY), locale);
                 }
 
