@@ -125,19 +125,16 @@ function StudyRenderer(json) {
 			eventDef) {
 
 		if (eventDef["@Repeating"] == "Yes")
-			var str = "</br><h3><center>" + eventDef["@Name"] + " ("
+			var str = "<h3><center>" + eventDef["@Name"] + " ("
 					+ studyEvent["@StudyEventRepeatKey"]
-					+ ") Details</center></h3></br>";
+					+ ") Details</center></h3>";
 		if (eventDef["@Repeating"] == "No")
-			var str = "</br><h3><center>" + eventDef["@Name"]
-					+ " Details</center></h3></br>";
+			var str = "<h3><center>" + eventDef["@Name"]
+					+ " Details</center></h3>";
 
 		str += this.renderStudyEventDetails(studyEvent, eventDef);
-//		str += "</br></br><div style=text-indent:50px;>" + app_case_report_form
-//				+ "</div>";
-		var crfList;
-		
-		str += "<div id="+crfList+"><p>"+app_case_report_form+"</p>" ;
+
+		str += "<div id='crfList'><p>"+app_case_report_form+"</p>" ;
 
 		var studyEventFormRefs = eventDef["FormRef"];
 		var forms = util_ensureArray(studyEvent["FormData"]);
@@ -153,33 +150,29 @@ function StudyRenderer(json) {
 				}
 			}
 		}
-	    str += "<ul>" ; 
+	    str += "<ul>" ;
 		if (forms) {
 			for ( var i = 0; i < forms.length; i++) {
 				var formOID = forms[i]["@FormOID"];
 				var formDef = app_formDefMap[formOID];
 
-//				var formDef = util_ensureArray(app_formDefMap[formOID]);
-
 				if (formDef != undefined) {
 					var link = studyEvent["@StudyEventOID"] + "/"
 							+ studyEvent["@StudyEventRepeatKey"] + "/"
 							+ formDef["@OID"];
-					
-				//	str += "<div style=text-indent:100px;> <a href='#" + link + "'>" + formDef["@Name"] + "</a></div>";
-					//	str += "<div style=text-indent:100px;> <a href='#" + link + "'>" + formDef["@Name"] + "</a></div>";
+
              			str +="	    <li><a href='#" + link + "'>" + formDef["@Name"] + "</a></li>  " ;
-			
-					
+
+
 				}
-			     ; 
+			     ;
 			}
 			str += "</ul>"
 			str += "</div>"  ;
-			
+
 		}
 
-		str += "</br></br>";
+		str += "";
 
 		return str;
 	}
@@ -572,9 +565,9 @@ function StudyRenderer(json) {
 		}else{
 			var formDefRenderer = new FormDefRenderer(formDef,"", "");
 			this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
-				
+
 		}
-		
+
 		var repeatingHeaderString = "";
 		var repeatingRowString = "";
 		var currentItemGroupOID = "";
@@ -1024,7 +1017,7 @@ function StudyRenderer(json) {
 						parentDiscrepancyNote.status = dns["@Status"];
 						parentDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
 						parentDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
-						
+
 
 						childNote = dns["OpenClinica:ChildNote"];
 						childNote = util_ensureArray(childNote);
@@ -1040,7 +1033,7 @@ function StudyRenderer(json) {
 								currentDiscrepancyNotes.push(parentDiscrepancyNote);
 							}else{
 							    parentDiscrepancyNote.parentThread = "false";
-									
+
 							}
 
 							var detailedNote = cn["OpenClinica:DetailedNote"];
@@ -1157,20 +1150,20 @@ function StudyRenderer(json) {
 					for ( var j = 0; j < childNote.length; j++) {
 						var cn = childNote[j];
 						var description = cn["OpenClinica:Description"];
-						
-						
+
+
 						if(j==0)
 						{	parentDiscrepancyNote.description = description;
 						    parentDiscrepancyNote.parentThread = "true";
 							currentDiscrepancyNotes.push(parentDiscrepancyNote);
 						}else{
 						    parentDiscrepancyNote.parentThread = "false";
-								
+
 						}
 
-						
-						
-						
+
+
+
 						var detailedNote = cn["OpenClinica:DetailedNote"];
 						var userRef = cn["UserRef"];
 						thisDiscrepancyNote.description = description;
