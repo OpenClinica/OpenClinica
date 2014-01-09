@@ -137,6 +137,8 @@ var app_under_the_following_attestation ='<fmt:message key="under_the_following_
 var app_server_time='<fmt:message key="server_time" bundle="${resword}"/>'; 
 var app_on='<fmt:message key="on" bundle="${resword}"/>'; 
 var app_tableOfContentsLabel='<fmt:message key="table_of_contents" bundle="${resword}"/>'; 
+var app_case_report_form='<fmt:message key="case_report_form" bundle="${resword}"/>'; 
+
 
 
 

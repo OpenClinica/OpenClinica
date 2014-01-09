@@ -133,7 +133,7 @@ function StudyRenderer(json) {
 					+ " Details</center></h3></br>";
 
 		str += this.renderStudyEventDetails(studyEvent, eventDef);
-		str += "</br></br><div style=text-indent:50px;>" + "Case Report Form:"
+		str += "</br></br><div style=text-indent:50px;>" + app_case_report_form
 				+ "</div>";
 		var studyEventFormRefs = eventDef["FormRef"];
 		var forms = util_ensureArray(studyEvent["FormData"]);
