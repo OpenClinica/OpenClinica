@@ -20,8 +20,8 @@
       <td>${app_typeLabel}</td>
       <td>${app_current_statusLabel}</td>
       <td>${app_n_of_notesLabel}</td>
-      <td>${app_CreatedLabel}</td>
-      <td>&nbsp;</td>
+      <td>${app_CreatedDateLabel}</td>
+      <td>${app_CreatedByLabel}</td>
     </tr>
     {{each discrepancyNotes}}
     
@@ -36,7 +36,7 @@
       <td>{{html status}}</td>
       <td>{{html numberOfChildNotes}}</td>
       <td>{{html dateUpdated}} </td>
-      <td>{{if userName}}({{html userName}}){{/if}}</td>
+      <td>{{if userName}}{{html name}} ({{html userName}}){{/if}}</td>
     </tr>
     {{/each}}
   </table></td>

@@ -551,11 +551,14 @@ function StudyRenderer(json) {
 
 		// Get Form Wrapper
 		if (eventDef != undefined) {
-			var formDefRenderer = new FormDefRenderer(formDef,
-					eventDef["@OID"], studyEventRepeatKey);
-			this.renderString += app_crfHeader = formDefRenderer
-					.renderPrintableForm()[0].outerHTML;
+			var formDefRenderer = new FormDefRenderer(formDef,eventDef["@OID"], studyEventRepeatKey);
+			this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+		}else{
+			var formDefRenderer = new FormDefRenderer(formDef,"", "");
+			this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
+				
 		}
+		
 		var repeatingHeaderString = "";
 		var repeatingRowString = "";
 		var currentItemGroupOID = "";
@@ -930,8 +933,7 @@ function StudyRenderer(json) {
 			app_renderMode = undefined;
 			this.renderPageHeader(true, app_printTime,
 					app_studyContentPageType, eventDef);
-			this.renderString += app_crfHeader = formDefRenderer
-					.renderPrintableForm()[0].outerHTML;
+			this.renderString += app_crfHeader = formDefRenderer.renderPrintableForm()[0].outerHTML;
 		}
 
 		this.renderString += logs;
@@ -1046,6 +1048,7 @@ function StudyRenderer(json) {
 							thisDiscrepancyNote.status = cn["@Status"];
 							thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
 							thisDiscrepancyNote.userName = cn["@UserName"];
+							thisDiscrepancyNote.name = cn["@Name"];
 
 							currentDiscrepancyNotes.push(thisDiscrepancyNote);
 							thisDiscrepancyNote = {};
@@ -1171,6 +1174,7 @@ function StudyRenderer(json) {
 						thisDiscrepancyNote.status = cn["@Status"];
 						thisDiscrepancyNote.dateUpdated = cn["@DateCreated"];
 						thisDiscrepancyNote.userName = cn["@UserName"];
+						thisDiscrepancyNote.name = cn["@Name"];
 
 						currentDiscrepancyNotes.push(thisDiscrepancyNote);
 						thisDiscrepancyNote = {};
