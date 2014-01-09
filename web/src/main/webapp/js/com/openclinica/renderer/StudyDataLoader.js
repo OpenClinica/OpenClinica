@@ -219,7 +219,9 @@ function StudyDataLoader(study, json) {
    */
   this.loadFormDefs = function() {
     debug("loading crfs", util_logDebug );
-    app_formDefs = this.study["MetaDataVersion"]["FormDef"];
+    // app_formDefs = this.study["MetaDataVersion"]["FormDef"];
+	  app_formDefs  = util_ensureArray(this.study["MetaDataVersion"]["FormDef"]);
+
     if (app_formDefs[0] == undefined) { 
       app_formDefs = new Array();
       app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
