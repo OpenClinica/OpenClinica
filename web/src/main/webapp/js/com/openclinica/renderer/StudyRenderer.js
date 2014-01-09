@@ -133,14 +133,18 @@ function StudyRenderer(json) {
 					+ " Details</center></h3></br>";
 
 		str += this.renderStudyEventDetails(studyEvent, eventDef);
-		str += "</br></br><div style=text-indent:50px;>" + app_case_report_form
-				+ "</div>";
+//		str += "</br></br><div style=text-indent:50px;>" + app_case_report_form
+//				+ "</div>";
+		var crfList;
+		
+		str += "<div id="+crfList+"><p>"+app_case_report_form+"</p>" ;
+
 		var studyEventFormRefs = eventDef["FormRef"];
 		var forms = util_ensureArray(studyEvent["FormData"]);
 		for ( var i = 0; i < studyEventFormRefs.length; i++) {
 			var formRef = studyEventFormRefs[i];
 			var formFound = false;
-			for ( var j = 0; j < app_formDefs.length && !formFound; j++) {
+    		for ( var j = 0; j < app_formDefs.length && !formFound; j++) {
 				if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
 					var formDef = app_formDefs[j];
 					var formOID = formDef["@OID"];
@@ -149,18 +153,30 @@ function StudyRenderer(json) {
 				}
 			}
 		}
+	    str += "<ul>" ; 
 		if (forms) {
 			for ( var i = 0; i < forms.length; i++) {
 				var formOID = forms[i]["@FormOID"];
 				var formDef = app_formDefMap[formOID];
+
+//				var formDef = util_ensureArray(app_formDefMap[formOID]);
+
 				if (formDef != undefined) {
 					var link = studyEvent["@StudyEventOID"] + "/"
 							+ studyEvent["@StudyEventRepeatKey"] + "/"
 							+ formDef["@OID"];
-					str += "<div style=text-indent:100px;> <a href='#" + link
-							+ "'>" + formDef["@Name"] + "</a></div>";
+					
+				//	str += "<div style=text-indent:100px;> <a href='#" + link + "'>" + formDef["@Name"] + "</a></div>";
+					//	str += "<div style=text-indent:100px;> <a href='#" + link + "'>" + formDef["@Name"] + "</a></div>";
+             			str +="	    <li><a href='#" + link + "'>" + formDef["@Name"] + "</a></li>  " ;
+			
+					
 				}
+			     ; 
 			}
+			str += "</ul>"
+			str += "</div>"  ;
+			
 		}
 
 		str += "</br></br>";
@@ -1090,6 +1106,7 @@ function StudyRenderer(json) {
 							+ ")" : "";
 					thisAuditLog.user = userid;
 					thisAuditLog.dateTime = audits["@DateTimeStamp"];
+					thisAuditLog.valueType = audits["@AuditType"];
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
 					currentAuditLogs.push(thisAuditLog);
