@@ -113,7 +113,6 @@ public class JSONClinicalDataPostProcessor {
         boolean isShort = DATE_PATTERN.matcher(elem).matches();
         boolean isLong = DATE_TIME_PATTERN.matcher(elem).matches();
         boolean isAudit = DATE_TIME_AUDIT_LOG_PATTERN.matcher(elem).matches();
-        //boolean isAudit = false;
 
         if (isShort || isLong || isAudit) {
             try {
