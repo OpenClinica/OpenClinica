@@ -442,3 +442,18 @@ td {
 .eventTable tr td, .itemTable tr td {
 	border: 1px solid black;
 }
+
+#crfList {
+	margin: 50px 0 50px 0;
+}
+
+#crfList p {
+	margin: 0;
+	padding-left: 50px;
+}
+
+#crfList ul {
+	margin: 0;
+	padding-left: 100px;
+	list-style-type: none;
+}
