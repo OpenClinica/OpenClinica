@@ -992,6 +992,7 @@ function StudyRenderer(json) {
 						// app_userData[userid]?app_userData[userid]["FullName"]:userid;
 						thisAuditLog.user = userid;
 						thisAuditLog.dateTime = audits["@DateTimeStamp"];
+//						thisAuditLog.valueType = audits["@OldValue"];
 						thisAuditLog.oldValue = audits["@OldValue"];
 						thisAuditLog.newValue = audits["@NewValue"];
 						currentAuditLogs.push(thisAuditLog);
@@ -1111,6 +1112,7 @@ function StudyRenderer(json) {
 							+ ")" : "";
 					thisAuditLog.user = userid;
 					thisAuditLog.dateTime = audits["@DateTimeStamp"];
+					thisAuditLog.valueType = audits["@OldValue"];
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
 					currentAuditLogs.push(thisAuditLog);
