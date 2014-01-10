@@ -60,6 +60,16 @@ function StudyRenderer(json) {
 				: this.json["Study"];
 		switch (renderMode) {
 		case 'UNPOPULATED_FORM_CRF':
+		case 'POPULATED_FORM_CRF':
+			app_studyName = this.study["GlobalVariables"]["StudyName"];
+			app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
+			if (app_siteName) {
+				app_studyName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@ParentStudyName"];
+			}
+			app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
+			break;
+			
+			
 		case 'UNPOPULATED_EVENT_CRFS':
 		case 'UNPOPULATED_STUDY_CRFS':
 			app_studyName = this.study["GlobalVariables"]["StudyName"];
@@ -74,7 +84,7 @@ function StudyRenderer(json) {
 			app_siteName = "";
 			app_protocolName = "";
 			break;
-		case 'STUDY_SUBJECT_CASE_BOOK':
+		case 'STUDY_SUBJECT_CASE_BOOK' :
 			app_studyName = this.study["GlobalVariables"]["StudyName"];
 			app_siteName = this.study["MetaDataVersion"]["OpenClinica:StudyDetails"]["@SiteName"];
 			if (app_siteName) {
@@ -449,7 +459,7 @@ function StudyRenderer(json) {
 		var formDef = undefined;
 		var eventDef = undefined;
 		if (renderMode == "UNPOPULATED_FORM_CRF"
-				|| renderMode == "UNPOPULATED_GLOBAL_CRF") {
+				|| renderMode == "UNPOPULATED_GLOBAL_CRF" ||renderMode == "POPULATED_FORM_CRF") {
 			// select CRF by OID
 			for ( var i = 0; i < app_formDefs.length; i++) {
 				if (app_formDefs[i]["@OID"] == app_formVersionOID) {
@@ -463,7 +473,7 @@ function StudyRenderer(json) {
 				window.close();
 				return;
 			}
-			if (renderMode == 'UNPOPULATED_FORM_CRF') {
+			if (renderMode == 'UNPOPULATED_FORM_CRF' || renderMode == 'POPULATED_FORM_CRF' ) {
 				for ( var i = 0; i < app_studyEventDefs.length; i++) {
 					if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
 						eventDef = app_studyEventDefs[i];
@@ -551,7 +561,8 @@ function StudyRenderer(json) {
 	 */
 	this.renderPrintableFormDef = function(formDef, pageBreak, eventDef,
 			studyEventRepeatKey) {
-		app_renderMode = undefined;
+		
+		app_renderMode = undefined ;
 		this.renderPageHeader(pageBreak, app_printTime,
 				app_studyContentPageType, eventDef);
 

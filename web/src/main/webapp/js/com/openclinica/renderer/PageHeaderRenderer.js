@@ -1,5 +1,7 @@
 function PageHeaderRenderer() {
-if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVENT_CRFS' || app_renderMode =='UNPOPULATED_GLOBAL_CRF' || app_renderMode =='UNPOPULATED_FORM_CRF' ) {
+	
+
+	if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVENT_CRFS' || app_renderMode =='UNPOPULATED_GLOBAL_CRF' || app_renderMode =='UNPOPULATED_FORM_CRF' ) {
 	this.render = function(printTime, pageType, eventName,eventLocation) { 
 	    return RenderUtil.render(RenderUtil.get("print_page_header_global"), {
 	      printTime: printTime,
@@ -18,8 +20,9 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
 	    });
 	  }
 }
+
 	
-	else
+else
   this.render = function(printTime, pageType, eventName,eventLocation) { 
 	 
 	  
@@ -37,7 +40,7 @@ if(app_renderMode =='UNPOPULATED_STUDY_CRFS'|| app_renderMode =='UNPOPULATED_EVE
 	  var groupName="";
 	 eventStartDate = util_cleanDate(eventStartDate);
 	 eventEndDate = util_cleanDate(eventEndDate);
-	 var thisStudyEventDef = app_studyEventDefMap[app_thisStudyEvent["@StudyEventOID"]];
+	 var thisStudyEventDef = app_thisStudyEvent?app_studyEventDefMap[app_thisStudyEvent["@StudyEventOID"]]:"";
 	 var repeating = thisStudyEventDef["@Repeating"];
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])

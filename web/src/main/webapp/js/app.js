@@ -113,10 +113,13 @@ function setRenderMode() {
 }
 
 else{
-	 if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID!="*") {
+	 if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID !="*") {
 		    renderMode = 'STUDY_SUBJECT_CASE_BOOK';
 		  }
 		  
+	 else if (app_studyOID != "*" && app_eventOID != "*" && app_formVersionOID != "*" && app_studySubjectOID !="*") {
+		    renderMode = 'POPULATED_FORM_CRF';
+		  }
 }
   
 }
