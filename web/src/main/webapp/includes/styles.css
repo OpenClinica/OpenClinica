@@ -1993,3 +1993,34 @@ background-color: transparent;
 padding-left: 12px;;
 margin: 2px;;
 }
+
+.connect-widget {
+    background: #F5F4EF;
+    border: 1px solid #E7E6DE;
+    padding: 10px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+.connect-widget:hover {
+    border: 1px solid;
+    -webkit-transition: all .3s ease-in;
+    background: #FFF
+}
+
+.connect-widget a {
+    text-decoration: none;
+    font-weight: bold;
+    font-family: Arial, Helvetica, Sans-serif;
+    color: #4B4D4E
+}
+
+.connect-widget a:hover {
+    text-decoration: underline;
+    color: #F77C04
+}
+
+.connect-widget img {
+    vertical-align: middle;
+    margin-right: 5px;
+}
