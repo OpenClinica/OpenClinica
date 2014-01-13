@@ -86,9 +86,11 @@ public class StudyDataLoader {
     studyRenderer.app_showPersonID = getStudyParamValue(studyParamList, "SPL_collectDob");;
     studyRenderer.app_interviewerNameRequired = getStudyParamValue(studyParamList, "SPL_collectDob");;
     studyRenderer.app_interviewDateRequired = getStudyParamValue(studyParamList, "SPL_collectDob");;
-    studyRenderer.app_secondaryLabelViewable = getStudyParamValue(studyParamList, "SPL_collectDob");;
+    studyRenderer.app_secondaryLabelViewable = getStudyParamValue(studyParamList, "SPL_genderRequired");;
     studyRenderer.app_eventLocationRequired = getStudyParamValue(studyParamList, "SPL_collectDob");;
     studyRenderer.app_secondaryIDs = getStudyParamValue(studyParamList, "SPL_collectDob");;
+    studyRenderer.app_genderRequired = getStudyParamValue(studyParamList, "SPL_collectDob");;
+  
   } 
   
   

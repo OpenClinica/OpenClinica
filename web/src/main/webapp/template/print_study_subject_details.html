@@ -3,13 +3,17 @@
 <table id="page-header">
   <tr>
     <td class="left-header">
-    {{if app_thisSubjectsData["@OpenClinica:DateOfBirth"] }}
+    {{if app_collectSubjectDOB == 1 || app_collectSubjectDOB == 2}}
       <div>{{html app_date_of_birthLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:DateOfBirth"]}</b></div>
       {{/if}}
-      {{if app_thisSubjectsData["@OpenClinica:Sex"] }}
+   
+   
+      {{if app_genderRequired =='true' }}
       <div>{{html app_genderLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Sex"]}</b></div>
       {{/if}}             
 
+   
+   
       {{if app_thisSubjectsData["@OpenClinica:EnrollmentDate"] }}
       <div>{{html app_enrollMMDDYYYYLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:EnrollmentDate"]}</b></div>
       {{/if}}             
@@ -21,10 +25,15 @@
       {{/if}}
       </td>
     <td class="right-header">
-    {{if app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]}}
-      <div>{{html app_subject_unique_IDLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]}</b></div>
-      {{/if}}
-      {{if app_thisSubjectsData["@OpenClinica:SecondaryID"] }}
+    {{if app_personIDRequired !='not used'}}
+       {{if app_showPersonID !='false'}}
+        <div>{{html app_subject_unique_IDLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]}</b></div>
+       {{/if}}
+    {{/if}}
+
+
+
+      {{if app_secondaryLabelViewable =='true' }}
       <div>{{html app_secondary_IDLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:SecondaryID"]}</b></div>
       {{/if}}
       {{each subjectGroupData}}
