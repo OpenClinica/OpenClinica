@@ -178,10 +178,10 @@ function StudyRenderer(json) {
 				}
 			     ;
 			}
-			str += "</ul>"
-			str += "</div>"  ;
 
 		}
+		str += "</ul>"
+		str += "</div>"  ;
 
 		str += "";
 
