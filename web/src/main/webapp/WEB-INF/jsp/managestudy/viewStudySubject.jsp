@@ -28,6 +28,9 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
 <script type="text/javascript" language="javascript">
+
+    function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
+
     function checkCRFLocked(ecId, url){
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
@@ -785,6 +788,9 @@
 </div>
 
 </div>
+
+<jsp:include page="studySubject/casebookGenerationForm.jsp"/>
+
 <c:choose>
 <c:when test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
 <p> <a href="ViewSubject?id=<c:out value="${subject.id}"/>"><fmt:message key="go_back_to_view_subject" bundle="${resword}"/></a>  </p>
@@ -806,3 +812,5 @@
 
 
 <jsp:include page="../include/footer.jsp"/>
+
+<script type="text/javascript" src="includes/studySubject/viewStudySubject.js"></script>
