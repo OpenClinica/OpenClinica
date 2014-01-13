@@ -6,7 +6,12 @@
 
 <!-- casebookGenerationForm.jsp - BEGIN -->
 
-<div style="" id="archivableCasebook">
+<div class="table_titla_manage">
+    	<a name="global"></a><a href="javascript:leftnavExpand('archivableCasebook');">
+        <img id="excl_archivableCasebook" src="images/bt_Expand.gif" border="0">
+    <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/></a></div>
+
+<div style="display:none" id="archivableCasebook">
     <div style="width: 750px">
 
         <div class="tablebox_center">
