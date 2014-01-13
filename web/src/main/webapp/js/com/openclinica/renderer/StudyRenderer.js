@@ -306,6 +306,7 @@ function StudyRenderer(json) {
 		var htmlString = "";
 		var studyEvents = util_ensureArray(app_thisSubjectsData["StudyEventData"]);
 		var subjectTableOfCnts = [];
+	if ( studyEvents!=undefined ){
 		for ( var i = 0; i < studyEvents.length; i++) {
 						var studyEventOID = studyEvents[i]["@StudyEventOID"];
 			if (app_studyEventDefMap != undefined
@@ -330,6 +331,7 @@ function StudyRenderer(json) {
 
 			}
 		}
+	}
 		htmlString = RenderUtil.render(RenderUtil
 				.get("print_subject_table_contents"), {
 			subjectTableOfCnts : subjectTableOfCnts
