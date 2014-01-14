@@ -26,6 +26,7 @@ public class AuditLogBean extends ElementOIDBean {
     private String newValue;
     private String userName="";
     private String name="";
+    private String valueType="";
     
     public String getUserId() {
         return userId;
@@ -74,5 +75,11 @@ public class AuditLogBean extends ElementOIDBean {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getValueType() {
+		return valueType;
+	}
+	public void setValueType(String valueType) {
+		this.valueType = valueType;
 	}
 }

@@ -330,6 +330,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String r = audit.getReasonForChange();
             String o = audit.getOldValue();
             String n = audit.getNewValue();
+            String vt = audit.getValueType();
+            
             Boolean p = i.length() > 0 || u.length() > 0 || d != null || t.length() > 0 || r.length() > 0 || o.length() > 0 || n.length() > 0 ? true : false;
             if (p) {
                 xml.append(currentIndent + "<OpenClinica:AuditLog ");
@@ -363,6 +365,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (n.length() > 0) {
                     xml.append(nls);
                     xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(n) + "\"");
+                }
+                if (vt.length() > 0) {
+                    xml.append(nls);
+                    xml.append(currentIndent + "                      ValueType=\"" + StringEscapeUtils.escapeXml(vt) + "\"");
                 }
                 xml.append("/>");
                 xml.append(nls);

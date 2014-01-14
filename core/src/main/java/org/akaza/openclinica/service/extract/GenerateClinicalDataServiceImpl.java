@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -27,7 +26,6 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
-
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
@@ -69,9 +67,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String INDICATE_ALL="*";
 	private final static String OPEN_ORDINAL_DELIMITER = "[";
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
-	private static final String ITEM_DATA_AUDIT_TABLE = null;
 	private static final Object STATUS = "Status";
-	private static final Object EVENT_CRF = "event_crf";
 	private static final Object STUDY_EVENT = "study_event";
 	private static boolean isActiveRoleAtSite = true;
 	
@@ -736,6 +732,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		auditBean.setReasonForChange(auditLogEvent.getReasonForChange()==null?"":auditLogEvent.getReasonForChange());
 		auditBean.setType(auditLogEvent.getAuditLogEventType().getName());
+		auditBean.setValueType(auditLogEvent.getEntityName()==null?"":auditLogEvent.getEntityName());
 		if(auditLogEvent.getUserAccount()!=null && auditLogEvent.getUserAccount().getUserId()!=0)
 		{
 			auditBean.setUserId("USR_"+auditLogEvent.getUserAccount().getUserId());
@@ -804,11 +801,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return null;
 	}
 
-	private void checkForHiddenCRFs() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	private void setLocale(Locale locale) {
 		this.locale=locale;
 	}

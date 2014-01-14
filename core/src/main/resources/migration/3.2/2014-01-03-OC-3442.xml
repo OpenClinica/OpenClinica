@@ -3,6 +3,9 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="jrousseau" id="2014-01-03-OC-3442-1">
+    <preConditions onFail="MARK_RAN">
+    <indexExists indexName="i_versioning_map_item_id"/>
+    </preConditions>
         <createIndex indexName="i_versioning_map_item_id"
                      tableName="versioning_map"
                      unique="false">
@@ -10,6 +13,9 @@
         </createIndex>
     </changeSet>
     <changeSet author="jrousseau" id="2014-01-03-OC-3442-2">
+      <preConditions onFail="MARK_RAN">
+    <indexExists indexName="i_versioning_map_crf_version_id"/>
+    </preConditions>
         <createIndex indexName="i_versioning_map_crf_version_id"
                      tableName="versioning_map"
                      unique="false">
