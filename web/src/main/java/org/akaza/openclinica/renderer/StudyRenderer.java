@@ -61,7 +61,8 @@ public class StudyRenderer extends JSONRenderer{
   public String appSectionTitle; 
   public String appSectionSubtitle; 
   public String appSectionInstructions; 
-  public String appSectionPage; 
+  public String appSectionPage;
+  public String app_genderRequired; 
   
   
   public StudyRenderer(JSONObject json, Configuration cfg, Map templateVars) {
