@@ -321,10 +321,14 @@ function StudyRenderer(json) {
 					for ( var j = 0; j < forms.length; j++) {
 
 						var formOID = forms[j]["@FormOID"];
+						
 						var formTables = {};
+						if(app_formDefMap[formOID]!=undefined){
 						formTables.formName = app_formDefMap[formOID];
+						
 						formTables.formStatus = forms[j]["@OpenClinica:Status"];
 						subjectTables.forms.push(formTables);
+						}
 					}
 				}
 				subjectTableOfCnts.push(subjectTables);
