@@ -314,7 +314,8 @@ function StudyRenderer(json) {
 				var subjectTables = {};
 				subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 				subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
-
+				subjectTables.studyEventRepeatingflag = app_studyEventDefMap[studyEventOID]["@Repeating"];
+				subjectTables.studyEventRepeatKey = studyEvents[i]["@StudyEventRepeatKey"];
 				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
 				if (forms != undefined){
