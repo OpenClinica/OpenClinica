@@ -41,7 +41,11 @@ else
 	 eventStartDate = util_cleanDate(eventStartDate);
 	 eventEndDate = util_cleanDate(eventEndDate);
 	 var thisStudyEventDef = app_thisStudyEvent?app_studyEventDefMap[app_thisStudyEvent["@StudyEventOID"]]:"";
+	
+	 if(thisStudyEventDef!=undefined){
+	 
 	 var repeating = thisStudyEventDef["@Repeating"];
+	 
 	  if(app_thisSubjectsData &&  app_thisSubjectsData["OpenClinica:SubjectGroupData"]!=undefined)
 			 if(  app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupName"] || app_thisSubjectsData["OpenClinica:SubjectGroupData"]["@OpenClinica:StudyGroupClassName"])
 	  { groupClassInfo  =
@@ -52,13 +56,12 @@ else
 		 groupClassInfo =  groupClassInfo.concat("---");
 		 groupClassInfo = groupClassInfo.concat(groupName);
 	  }
-	  
+	 }	  
 	  var interviewerName = app_thisFormData?(app_thisFormData["@OpenClinica:InterviewerName"]?app_thisFormData["@OpenClinica:InterviewerName"]:""):"";
 	  var interviewDate = app_thisFormData?(app_thisFormData["@OpenClinica:InterviewDate"]?app_thisFormData["@OpenClinica:InterviewDate"]:""):"";
 	  var gender = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:Sex"]?app_thisSubjectsData["@OpenClinica:Sex"]:""):"";
 	  var ssID = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:StudySubjectID"]?app_thisSubjectsData["@OpenClinica:StudySubjectID"]:""):"";
-		  
-	  
+
 	  
 	  return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
