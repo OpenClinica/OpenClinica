@@ -1,36 +1,17 @@
 package org.akaza.openclinica.web.restful;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
-
-import org.akaza.openclinica.renderer.ODMRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -40,7 +21,6 @@ import com.sun.jersey.api.view.Viewable;
 
 import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
-import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 /**
  *  Rest service for ODM metadata 
@@ -108,9 +88,10 @@ public void setMetadataCollectorResource(
   }
 	
   
-  @GET
-  @Path("/pdf/print/{studyOID}/{eventOID}/{formVersionOID}")
- 	public javax.ws.rs.core.Response getPdf(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID, 
+//  @GET
+ // @Path("/pdf/print/{studyOID}/{eventOID}/{formVersionOID}")
+  //JN: Commenting out this part of pdf generation written by Nick as the approach might be different. Look for these files in mercurial repo for history. 
+ /*	public javax.ws.rs.core.Response getPdf(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID, 
  	    @PathParam("eventOID") String eventOID, @Context HttpServletRequest request, @Context HttpServletResponse response ) {
       JSON json = metadataCollectorResource.collectODMMetadataJson(studyOID,formVersionOID);
       try {
@@ -120,7 +101,7 @@ public void setMetadataCollectorResource(
 		e.printStackTrace();
 	}
     return javax.ws.rs.core.Response.ok().type("application/pdf").build(); 
- }
+ }*/
  	
  /*	
    @GET
@@ -160,70 +141,7 @@ public void setMetadataCollectorResource(
  	}
  	
  	
-  public  void getPrintServer(HttpServletRequest request, HttpServletResponse response, JSON json, String studyOID, String eventOID, String formVersionOID) throws Exception{
-    String APP_TMP_DIR = "tmp";
-    String APP_BIN_DIR = "bin";
-    String TMP_HTML_FILE = "crf.html";
-    String TMP_PDF_FILE = "crf.pdf";
-    HttpSession session = request.getSession();      
-    ServletContext context = session.getServletContext();
-
-    String WKHTML_TO_PDF = context.getInitParameter("WKHTML_TO_PDF");
-    String APP_BASE_DIR = context.getRealPath("/");
-    Map templateVars = new HashMap();
-    XMLSerializer xmlSerializer = new XMLSerializer();
-    String htmlOutput = APP_BASE_DIR + APP_TMP_DIR + File.separator + TMP_HTML_FILE;
-    File htmlFile = new File(htmlOutput);
-    FileWriter txt = new FileWriter(htmlFile);
-    PrintWriter out = new PrintWriter(txt);
-   
-    // create freemarker templates and render html elements 
-    Configuration cfg = initFreemarker(context);
-    Template t = cfg.getTemplate("crf.ftl");
-    ODMRenderer odmRenderer = new ODMRenderer(json, cfg, templateVars);
-    String formDef = odmRenderer.render(json, studyOID, eventOID, formVersionOID);
-    templateVars.put("formDef", formDef);
-    StringWriter sw = new StringWriter(); 
-    t.process(templateVars, sw);
-   
-    // write to crf.html 
-    out.write(sw.toString());
-    out.close();
-    String pdfOutput =  APP_BASE_DIR + APP_TMP_DIR + File.separator + TMP_PDF_FILE;
-    
-    // convert crf.html to crf.pdf with wkhtmtltopdf 
-    String[] cmd = new String[] {WKHTML_TO_PDF, htmlOutput, pdfOutput };
-    ProcessBuilder pb = new ProcessBuilder(cmd);
-    pb.redirectErrorStream(true);
-    Process process = pb.start();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line;
-    while ((line = reader.readLine()) != null) {
-      System.out.println("tasklist: " + line);
-    }
-    process.waitFor();
-    
-    // stream crf.pdf back to the browser for downloading 
-    RandomAccessFile pdfFile = new RandomAccessFile(pdfOutput, "r");
-    byte[] outputBytes = new byte[(int)pdfFile.length()];
-    pdfFile.read(outputBytes);
-    
-    response.setHeader("Pragma", "no-cache");  
-    response.setHeader("Cache-control", "private");  
-    response.setDateHeader("Expires", 0);  
-    response.setContentType("application/pdf");  
-    response.setHeader("Content-Disposition", "attachment; filename=test.pdf");  
- 
-    if (outputBytes != null) {  
-      response.setContentLength(outputBytes.length);  
-      ServletOutputStream sos = response.getOutputStream();  
-      sos.write(outputBytes);  
-      sos.flush();  
-      sos.close();  
-      pdfFile.close();
-    }
-  }
-  
+ /**/  
   
   private Configuration initFreemarker(ServletContext context) {
     // Initialize the FreeMarker configuration;

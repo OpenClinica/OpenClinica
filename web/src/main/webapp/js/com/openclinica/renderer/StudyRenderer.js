@@ -409,6 +409,7 @@ function StudyRenderer(json) {
 		var startDate = util_cleanDate(studyEventData["@OpenClinica:StartDate"]);
 		var endDate = util_cleanDate(studyEventData["@OpenClinica:EndDate"]);
 		var studyEventStatus = studyEventData["@OpenClinica:Status"];
+		var valueType = studyEventData["@OpenClinica:ValueType"];
 		var electronicSignature = undefined;
 
 		if (app_displayAudits == 'y') {
@@ -434,6 +435,7 @@ function StudyRenderer(json) {
 			studyEventStatus : studyEventStatus,
 			startDate : startDate,
 			endDate : endDate,
+			valueType:valueType,
 			electronicSig : electronicSignature
 		})[0].outerHTML;
 		;
@@ -1117,6 +1119,8 @@ function StudyRenderer(json) {
 					thisAuditLog.valueType = audits["@OldValue"];
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
+					thisAuditLog.valueType = audits["@ValueType"];
+		
 					currentAuditLogs.push(thisAuditLog);
 
 				}

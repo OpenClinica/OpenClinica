@@ -1,12 +1,18 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
+<c:set var="search" value="'"/>
+<c:set var="replace" value="\\'"/>
+<c:set var="test"><fmt:message key="sure_to_sign_subject1" bundle="${resword}"/><fmt:message key="sure_to_sign_subject2" bundle="${resword}"/></c:set>
+<c:set var="test1" value="${fn:replace(test,search,replace)}"></c:set>
 
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
@@ -128,7 +134,9 @@ var genderLabel='<fmt:message key="gender" bundle="${resword}"/>';
 var app_eventStartDateLabel = '<fmt:message key="start_date" bundle="${resword}"/>';
 var app_eventEndDateLabel = '<fmt:message key="end_date" bundle="${resword}"/>';
 var app_meaning_of_signatureLabel ='<fmt:message key="meaning_of_signature" bundle="${resword}"/>';
-var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="${resword}"/>'+'<fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>';
+//var app_meaning_of_signature ='<fmt:message key="sure_to_sign_subject1" bundle="${resword}"/>'+'<fmt:message key="sure_to_sign_subject2" bundle="${resword}"/>';
+var app_meaning_of_signature ='${fn:replace(test,search,replace)}';
+
 var app_formSigned= '<fmt:message key="signed" bundle="${resword}"/>';
 var app_electronicSignatureLabel='<fmt:message key="electronic_signature" bundle="${resword}"/>';
 var app_statusLabel='<fmt:message key="status" bundle="${resword}"/>'; 
