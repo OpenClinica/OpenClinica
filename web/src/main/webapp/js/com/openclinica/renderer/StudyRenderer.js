@@ -68,8 +68,8 @@ function StudyRenderer(json) {
 			}
 			app_protocolName = this.study["GlobalVariables"]["ProtocolName"];
 			break;
-			
-			
+
+
 		case 'UNPOPULATED_EVENT_CRFS':
 		case 'UNPOPULATED_STUDY_CRFS':
 			app_studyName = this.study["GlobalVariables"]["StudyName"];
@@ -144,7 +144,7 @@ function StudyRenderer(json) {
 
 		str += this.renderStudyEventDetails(studyEvent, eventDef);
 
-		str += "<div id='crfList'><p>"+app_case_report_form+"</p>" ;
+		str += "<div id='crfList'><p>"+app_case_report_form+':'+"</p>" ;
 
 		var studyEventFormRefs = util_ensureArray(eventDef["FormRef"]);
 
@@ -322,11 +322,11 @@ function StudyRenderer(json) {
 					for ( var j = 0; j < forms.length; j++) {
 
 						var formOID = forms[j]["@FormOID"];
-						
+
 						var formTables = {};
 						if(app_formDefMap[formOID]!=undefined){
 						formTables.formName = app_formDefMap[formOID];
-						
+
 						formTables.formStatus = forms[j]["@OpenClinica:Status"];
 						subjectTables.forms.push(formTables);
 						}
@@ -570,7 +570,7 @@ function StudyRenderer(json) {
 	 */
 	this.renderPrintableFormDef = function(formDef, pageBreak, eventDef,
 			studyEventRepeatKey) {
-		
+
 		app_renderMode = undefined ;
 		this.renderPageHeader(pageBreak, app_printTime,
 				app_studyContentPageType, eventDef);
@@ -1125,7 +1125,7 @@ function StudyRenderer(json) {
 					thisAuditLog.oldValue = audits["@OldValue"];
 					thisAuditLog.newValue = audits["@NewValue"];
 					thisAuditLog.valueType = audits["@ValueType"];
-		
+
 					currentAuditLogs.push(thisAuditLog);
 
 				}
