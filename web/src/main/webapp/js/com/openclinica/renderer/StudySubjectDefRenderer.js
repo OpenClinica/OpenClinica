@@ -24,8 +24,14 @@ function StudySubjectDefRenderer() {
 	  
   this.renderStudySubjectData = function(app_thisSubjectsData, subjectGroupData){
 		    var template="print_study_subject_details";
+            var yearOnly="";		    
 		    
-		    var s = RenderUtil.render(RenderUtil.get(template),{app_thisSubjectsData:app_thisSubjectsData, subjectGroupData:subjectGroupData});
+		    var date = app_thisSubjectsData["@OpenClinica:DateOfBirth"];   
+		    if (date != undefined)
+		    {yearOnly= date.match(/\d{4}/)} 		       
+		       
+		    
+		    var s = RenderUtil.render(RenderUtil.get(template),{app_thisSubjectsData:app_thisSubjectsData, yearOnly:yearOnly ,subjectGroupData:subjectGroupData});
 		    return s[0].outerHTML;
 	  }
   

@@ -3,14 +3,16 @@
 <table id="page-header">
   <tr>
     <td class="left-header">
-    {{if app_collectSubjectDOB == 1 || app_collectSubjectDOB == 2}}
+    {{if app_collectSubjectDOB == 1 }}
       <div>{{html app_date_of_birthLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:DateOfBirth"]}</b></div>
+      {{/if}}
+    
+    {{if app_collectSubjectDOB == 2}}
+      <div>{{html app_date_of_birthLabel}}:<b> {{html yearOnly}}</b></div>
       {{/if}}
    
    
-      {{if app_genderRequired =='true' }}
       <div>{{html app_genderLabel}}:<b> ${app_thisSubjectsData["@OpenClinica:Sex"]}</b></div>
-      {{/if}}             
 
    
    
