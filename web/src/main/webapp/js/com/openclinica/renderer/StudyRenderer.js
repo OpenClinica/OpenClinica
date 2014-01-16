@@ -314,17 +314,22 @@ function StudyRenderer(json) {
 				var subjectTables = {};
 				subjectTables.studyEventName = app_studyEventDefMap[studyEventOID]["@Name"];
 				subjectTables.studyEventStatus = studyEvents[i]["@OpenClinica:Status"];
-
+				subjectTables.studyEventRepeatingflag = app_studyEventDefMap[studyEventOID]["@Repeating"];
+				subjectTables.studyEventRepeatKey = studyEvents[i]["@StudyEventRepeatKey"];
 				subjectTables.forms = [];
 				var forms = util_ensureArray(studyEvents[i]["FormData"]);
 				if (forms != undefined){
 					for ( var j = 0; j < forms.length; j++) {
 
 						var formOID = forms[j]["@FormOID"];
+						
 						var formTables = {};
+						if(app_formDefMap[formOID]!=undefined){
 						formTables.formName = app_formDefMap[formOID];
+						
 						formTables.formStatus = forms[j]["@OpenClinica:Status"];
 						subjectTables.forms.push(formTables);
+						}
 					}
 				}
 				subjectTableOfCnts.push(subjectTables);

@@ -9,7 +9,8 @@
     </tr>
     {{each subjectTableOfCnts}}
     <tr class="tocEvent">
-      <td>{{html studyEventName}}</td>
+      <td>{{html studyEventName}}{{if studyEventRepeatingflag == 'Yes'}}({{html studyEventRepeatKey}}){{/if}}
+      </td>
       <td>&nbsp;</td>
       <td>{{html studyEventStatus}}</td>
     </tr>
