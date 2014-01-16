@@ -32,6 +32,7 @@ else
 	  var eventEndDate = app_thisStudyEvent?( app_thisStudyEvent["@OpenClinica:EndDate"]?app_thisStudyEvent["@OpenClinica:EndDate"]:""):"";
 	  var ageAtEnrollment = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]?app_thisStudyEvent["@OpenClinica:SubjectAgeAtEvent"]:""):"";
 	  var studyEventStatus = app_thisStudyEvent?(app_thisStudyEvent["@OpenClinica:Status"]?app_thisStudyEvent["@OpenClinica:Status"]:""):"";
+	  var formStatus = app_thisFormData?(app_thisFormData["@OpenClinica:Status"]?app_thisFormData["@OpenClinica:Status"]:""):"";
 	  var personId = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]?app_thisSubjectsData["@OpenClinica:UniqueIdentifier"]:""):"";
 	  var secondaryId = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:SecondaryID"]?app_thisSubjectsData["@OpenClinica:SecondaryID"]:""):"";
 	  var subjectStatus = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:Status"]?app_thisSubjectsData["@OpenClinica:Status"]:""):"";
@@ -79,7 +80,7 @@ else
       secondaryLabelViewable: app_secondaryLabelViewable,
       eventLocationRequired: app_eventLocationRequired,eventLocation:eventLocation,eventEndDate:eventEndDate,ageAtEnrollment:ageAtEnrollment,
       studyEventStatus:studyEventStatus,personId:personId,secondaryId:secondaryId,subjectBday:subjectBday,subjectStatus:subjectStatus,groupClassInfo:groupClassInfo,interviewerName:interviewerName,
-      interviewDate:interviewDate,eventStartDate:eventStartDate,ssID:ssID,repeating:repeating,repeatOrdinal:repeatOrdinal
+      interviewDate:interviewDate,eventStartDate:eventStartDate,ssID:ssID,repeating:repeating,repeatOrdinal:repeatOrdinal,formStatus:formStatus
       
     });
   }
