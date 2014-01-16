@@ -46,6 +46,7 @@ a:active {
   width: 100%;
   padding:20px;
   margin-bottom: 1px;
+  font-size: 14px;
 }
 
 #page-header td.left-header, td.right-header, td.printCrf_box1, td.printCrf_box2, td.printCrf_box3, td.printCrf_box4, td.printCrf_box5, td.printCrf_box6 {
@@ -434,12 +435,17 @@ td {
 	background-color: #B2BEC8;
 }
 
-.eventTable, .itemTable {
+.eventTable, .itemTable, .metadataTable {
 	margin-top: 20px;
 	width: 100%;
 }
 
-.eventTable tr td, .itemTable tr td {
+.itemTable {
+	margin-left: 1%;
+	width: 99%;
+}
+
+.eventTable tr td, .itemTable tr td, .metadataTable tr td {
 	border: 1px solid black;
 }
 
