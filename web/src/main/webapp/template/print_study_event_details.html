@@ -1,4 +1,5 @@
-<td><table id="page-header">
+<td>
+<table id="page-header">
     <tr>
       <td class="printCrf_box1">{{html app_eventNameLabel}}:<br/>
         {{html app_eventLocationLabel}}:</td>
@@ -11,15 +12,11 @@
       <td class="printCrf_box5">{{html app_eventStatus}}:</td>
       <td class="printCrf_box6">{{html studyEventStatus}}</td>
     </tr>
-    {{if electronicSig}}
-    <tr>
-      <p class="esig" colspan="6">{{html app_the_eCRF_that_are_part_of_this_event_were_signed_by }} {{html electronicSig}} ({{html app_server_time}}) {{html app_under_the_following_attestation}}:</p>
-      <p class="esig" colspan="6">{{html app_meaning_of_signature}}</p>
-    </tr>
-
+  </table>
+  {{if electronicSig}}
+  <div class="sigbox">
+    <p class="esig">{{html app_the_eCRF_that_are_part_of_this_event_were_signed_by }}{{html electronicSig}} ({{html app_server_time}}) {{html app_under_the_following_attestation}}:</p>
+    <p class="esig">{{html app_meaning_of_signature}}</p>
+    </div>
     {{/if}}
-  </table></td>
-
-
-  
-  
+</td>

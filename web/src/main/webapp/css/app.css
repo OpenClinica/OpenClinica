@@ -405,11 +405,13 @@ td {
 	font-size: 80%;
 }
 
+.sigbox {
+	margin-top: 50px;
+}
+
 .esig {
-	padding-top: 1em;
-	 text-indent:50px;
-	 font-style: italic;
-	
+	 text-indent:20px;
+	 font-style: italic;	
 }
 
 .dn_notes {
