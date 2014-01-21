@@ -579,7 +579,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
             sur.setRoleName(roleName);
             sur.setStudyId(studyId.intValue());
             sur.setStudyName(studyName);
-            sur.setRole(Role.getByName(roleName));
             allStudyUserRoleBeans.put(studyId, sur);
         }
 
