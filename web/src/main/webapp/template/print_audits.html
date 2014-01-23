@@ -4,33 +4,33 @@
     {{if repeating}}
     <tr>
 <!--   <td colspan="6" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Audit History </td>  -->
-      <td colspan="6" class="ALBackgroundColorForHeaders">${value}(${repeatRow}): Audit History </td>
+      <td colspan="6" id="ALBackgroundColorForHeaders">${value}(${repeatRow}): Audit History </td>
       {{/if}}
       
       {{if !repeating}}
     
     <tr>
 <!--    <td colspan="6" class="DNBackgroundColorForHeaders">${value}: Audit History </td>   -->
-      <td colspan="6" class="ALBackgroundColorForHeaders">${value}: Audit History </td>
+      <td colspan="6" id="ALBackgroundColorForHeaders">${value}: Audit History </td>
       {{/if}} </tr>
     
     <!-- <tr class='ALBackgroundColorForHeaders'> -->
     <tr class="provenance">
-      <td><strong>${app_audit_eventLabel}:</strong></td>
-      <td><strong>${app_date_time_of_serverLabel}:</strong></td>
-      <td><strong>${app_userLabel}:</strong></td>
-       <td><strong>${app_value_typeLabel}:</strong></td>
-      <td><strong>${app_oldLabel}:</strong></td>
-      <td><strong>${app_newLabel}:</strong></td>
+      <td id="auditLabel"><strong>${app_audit_eventLabel}:</strong></td>
+      <td id="timeLabel"><strong>${app_date_time_of_serverLabel}:</strong></td>
+      <td id="usrLabel"><strong>${app_userLabel}:</strong></td>
+       <td id="valueTypeLabel"><strong>${app_value_typeLabel}:</strong></td>
+      <td id="oldLabel"><strong>${app_oldLabel}:</strong></td>
+      <td id="newLabel" class="right"><strong>${app_newLabel}:</strong></td>
     </tr>
     {{each auditLogs}}
     <tr class="provenance">
-      <td> {{html auditType}} </td>
-      <td>{{html dateTime}}</td>
-      <td>{{html user}}</td>
-      <td>{{html valueType}}</td> 
-      <td>{{html oldValue}}</td>
-      <td>{{html newValue}}</td>
+      <td id="auditType"> {{html auditType}} </td>
+      <td id="dateTime">{{html dateTime}}</td>
+      <td id="usr">{{html user}}</td>
+      <td id="valueType">{{html valueType}}</td> 
+      <td id="oldValue">{{html oldValue}}</td>
+      <td id="newValue" class="right">{{html newValue}}</td>
     </tr>
     {{/each}}
   </table></td>

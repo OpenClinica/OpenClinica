@@ -11,7 +11,7 @@
       <td><strong>${app_userLabel}:</strong></td>
       <td><strong>${app_value_typeLabel}:</strong></td> 
       <td><strong>${app_oldLabel}:</strong></td>
-      <td><strong>${app_newLabel}:</strong></td>
+      <td class="right"><strong>${app_newLabel}:</strong></td>
     </tr>
     {{each auditLogs}}
     <tr class="provenance">
@@ -20,7 +20,7 @@
       <td>{{html user}}</td>
       <td>{{html valueType}}</td>    
       <td>{{html oldValue}}</td>
-      <td>{{html newValue}}</td>
+      <td class="right">{{html newValue}}</td>
     </tr>
     {{/each}}
   </table></td>
