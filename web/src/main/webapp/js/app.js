@@ -70,6 +70,9 @@ var app_userData ={};
 var app_formDefMap = {};
 var app_thisStudyEventRepeatKeyForSingleEvents=undefined;
 var app_formDefMap={};
+var app_attributes = undefined;
+app_attributes = util_ensureArray(app_attributes);	
+
 /***********      @JQUERY INIT    *******************/
 $(document).ready(function() {
   if (INITIALIZED == false) {

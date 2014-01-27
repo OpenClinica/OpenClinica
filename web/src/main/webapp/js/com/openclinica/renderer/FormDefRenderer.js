@@ -11,9 +11,9 @@ function FormDefRenderer(json,studyEventOID,studyEventRepeatKey) {
   
   
     
-  this.renderDiscrepancyNotes = function(discrepancyNotes){
+  this.renderDiscrepancyNotes = function(discrepancyNotes, attribute){
     var template="print_EventCRF_StudyEvent_StudySubject_dns";
-	var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes, title:app_eventCRFLabel+" "+app_nav_notes_and_discrepanciesLabel } );
+	var s = RenderUtil.render(RenderUtil.get(template),{discrepancyNotes:discrepancyNotes, title:attribute +" "+app_nav_notes_and_discrepanciesLabel } );
     return s[0].outerHTML;
   }
   
