@@ -547,7 +547,7 @@ function StudyRenderer(json) {
 			studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
 			studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
 			if (app_displayDNs == 'y') {
-				app_attributes = ['23-Jan-2014','28-Oct-2013'];
+				app_attributes = ['23-Jan-2014','28-Oct-2013' ,'18-Nov-2013'];
                 for (var i=0;i<app_attributes.length;i++) {
 
 				this.renderString += this
