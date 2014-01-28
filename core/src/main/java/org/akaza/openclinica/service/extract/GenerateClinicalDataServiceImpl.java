@@ -69,6 +69,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private static final Object STATUS = "Status";
 	private static final Object STUDY_EVENT = "study_event";
+    private static final Object SUBJECT_GROUP_MAP = "subject_group_map";
 	private static boolean isActiveRoleAtSite = true;
 	
 	private StudyDao studyDao;
@@ -231,6 +232,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
 		if(isCollectAudits())
 		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid(), "subject"));
+        AuditLogsBean logs = fetchAuditLogs(studySubj.getStudySubjectId(),"subject_group_map", studySubj.getOcOid(), "subject");
+        exportSubjectDataBean.getAuditLogs().getAuditLogs().addAll(logs.getAuditLogs());
 		if(isCollectDns())
 			exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 		
@@ -718,7 +721,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if(auditLogEvent.getAuditTable().equals(STUDY_EVENT)){
 				auditBean.setNewValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getNewValue())));
 				auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
-			}
+			}else if (auditLogEvent.getAuditTable().equals(SUBJECT_GROUP_MAP)){
+                auditBean.setNewValue(auditLogEvent.getNewValue());
+                auditBean.setOldValue(auditLogEvent.getOldValue());
+            }
 			else{
 			auditBean.setNewValue(Status.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).getI18nDescription(getLocale()));
 			auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getI18nDescription(getLocale()));
