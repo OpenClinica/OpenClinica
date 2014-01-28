@@ -6,21 +6,21 @@
       <td colspan="6">${title}</td>
     </tr>
     <tr class="provenance">
-      <td><strong>${app_audit_eventLabel}:</strong></td>
-      <td><strong>${app_date_time_of_serverLabel}:</strong></td>
-      <td><strong>${app_userLabel}:</strong></td>
-      <td><strong>${app_value_typeLabel}:</strong></td> 
-      <td><strong>${app_oldLabel}:</strong></td>
-      <td><strong>${app_newLabel}:</strong></td>
+      <td id="eventEventLabel"><strong>${app_audit_eventLabel}:</strong></td>
+      <td id="eventTimeLabel"><strong>${app_date_time_of_serverLabel}:</strong></td>
+      <td id="eventUsrLabel"><strong>${app_userLabel}:</strong></td>
+      <td id="eventValueLabel"><strong>${app_value_typeLabel}:</strong></td> 
+      <td id="eventOldLabel"><strong>${app_oldLabel}:</strong></td>
+      <td id="eventNewLabel"class="right"><strong>${app_newLabel}:</strong></td>
     </tr>
     {{each auditLogs}}
     <tr class="provenance">
-      <td> {{html auditType}} </td>
-      <td>{{html dateTime}}</td>
-      <td>{{html user}}</td>
-      <td>{{html valueType}}</td>    
-      <td>{{html oldValue}}</td>
-      <td>{{html newValue}}</td>
+      <td id="eventAuditType"> {{html auditType}} </td>
+      <td id="eventTime">{{html dateTime}}</td>
+      <td id="eventUsr">{{html user}}</td>
+      <td id="eventValue">{{html valueType}}</td>    
+      <td id="eventOld">{{html oldValue}}</td>
+      <td id="eventNew"class="right">{{html newValue}}</td>
     </tr>
     {{/each}}
   </table></td>

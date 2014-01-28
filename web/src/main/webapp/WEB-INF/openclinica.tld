@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+    <description>OpenClinica Custom Tags</description>
+    <tlib-version>1.0</tlib-version>
+    <short-name>oc</short-name>
+    <uri>http://www.openclinica.com/jsp/tld/oc</uri>
+
+    <tag>
+        <name>jsEscape</name>
+        <tag-class>org.akaza.openclinica.view.tags.JavaScriptEscapeTag</tag-class>
+        <body-content>empty</body-content>
+
+        <attribute>
+            <name>key</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>bundle</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+</taglib>

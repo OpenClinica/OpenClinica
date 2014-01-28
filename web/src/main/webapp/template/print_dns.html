@@ -3,40 +3,41 @@
   <table class="itemTable">
     {{if repeating}}
     <tr>
-      <td colspan="8" class="DNBackgroundColorForHeaders">${value}(${repeatRow}): Notes & Discrepancies </td>
+      <td colspan="8" id="DNBackgroundColorForHeaders">${value}(${repeatRow}): Notes & Discrepancies </td>
     </tr>
     {{/if}}
     
     
     {{if !repeating}}
     <tr>
-      <td colspan="8" class="DNBackgroundColorForHeaders">${value}: Notes & Discrepancies </td>
+      <td colspan="8" id="DNBackgroundColorForHeaders">${value}: Notes & Discrepancies </td>
     </tr>
     {{/if}}
     <tr class="provenance">
-      <td><strong>${app_noteLabel}:</strong></td>
-      <td><strong>${app_assigned_toLabel}:</strong></td>
-      <td><strong>${app_IDLabel}:</strong></td>
-      <td><strong>${app_typeLabel}:</strong></td>
-      <td><strong>${app_current_statusLabel}:</strong></td>
-      <td><strong>${app_n_of_notesLabel}:</strong></td>
-      <td><strong>${app_CreatedDateLabel}:</strong></td>
-      <td><strong>${app_CreatedByLabel}:</strong></td>
+      <td id="noteLabel"><strong>${app_noteLabel}:</strong></td>
+      <td id="assignLabel"><strong>${app_assigned_toLabel}:</strong></td>
+      <td id="idLabel"><strong>${app_IDLabel}:</strong></td>
+      <td id="notetypeLabel"><strong>${app_typeLabel}:</strong></td>
+      <td id="statusLabel"><strong>${app_current_statusLabel}:</strong></td>
+      <td id="numLabel"><strong>${app_n_of_notesLabel}:</strong></td>
+      <td id="dateLabel"><strong>${app_CreatedDateLabel}:</strong></td>
+      <td id="byLabel" class="right"><strong>${app_CreatedByLabel}:</strong></td>
     </tr>
     {{each discrepancyNotes}}
     
     {{if parentThread }}
     <tr class="DNParentRowColor">{{else}}
     <tr class="provenance"> {{/if}}
-      <td><strong>{{html description}} </strong>
+      <td id="description"><strong>{{html description}} </strong>
         <p class="dn_notes">{{html detailedNote}}</p></td>
-      <td>{{html user}}</td>
-      <td>{{html id}} </td>
-      <td>{{html parent_noteType}}</td>
-      <td>{{html status}}</td>
-      <td>{{html numberOfChildNotes}}</td>
-      <td>{{html dateUpdated}} </td>
-      <td>{{if userName}}{{html name}} ({{html userName}}){{/if}}</td>
+      <td id="user">{{html user}}</td>
+      <td id="id">{{html id}} </td>
+      <td id="notetype">{{html parent_noteType}}</td>
+      <td id="status">{{html status}}</td>
+      <td id="number">{{html numberOfChildNotes}}</td>
+      <td id="date">{{html dateUpdated}} </td>
+      <td id="by" class="right">{{if userName}}{{html name}} ({{html userName}}){{/if}}</td>
     </tr>
     {{/each}}
-  </table></td>
+  </table>
+</td>

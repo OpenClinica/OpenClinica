@@ -84,9 +84,8 @@ a:active {
 	font-weight:bold;
 }
 
-.DNBackgroundColorForHeaders{
-   background-color : #597590;
-   color : white;
+#DNBackgroundColorForHeaders{
+   background-color : #C4CFD6;
    text-decoration:underline;
    font-size: 90%;
 }
@@ -101,19 +100,19 @@ a:active {
    font-size: 90%;
 }
 
-.DNParentRowColor{
+.DNParentRowColor {
 	background-color : #CCC;
-   font-size: 80%;
-}
-.MetadataBackgroundColorForHeaders{
-   background-color : #153A5A;
-   text-decoration:underline;
-   font-size: 90%;
-   color: white;
+	font-size: 80%;
 }
 
-.ALBackgroundColorForHeaders{
-   background-color : #B2BEC8;
+#MetadataBackgroundColorForHeaders {
+   background-color : #B6C4CF;
+   text-decoration:underline;
+   font-size: 90%;
+}
+
+#ALBackgroundColorForHeaders {
+   background-color : #DADFE5;
    text-decoration:underline;
    font-size: 90%;
 }
@@ -401,6 +400,10 @@ td {
 
 
 
+.provenance td, .DNParentRowColor td {
+	border-right: 1px solid black;
+}
+
 .provenance td {
 	font-size: 80%;
 }
@@ -438,8 +441,10 @@ td {
 }
 
 .eventTable, .itemTable, .metadataTable {
+	padding-left: 5px;
 	margin-top: 20px;
 	width: 100%;
+	border-collapse:collapse;
 }
 
 .itemTable {
@@ -447,8 +452,14 @@ td {
 	width: 99%;
 }
 
-.eventTable tr td, .itemTable tr td, .metadataTable tr td {
-	border: 1px solid black;
+.eventTable td, .itemTable td, .metadataTable td {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	padding-left: 5px;
+}
+
+.provenance .right, .DNParentRowColor .right {
+	border-right: 0;
 }
 
 #crfList {

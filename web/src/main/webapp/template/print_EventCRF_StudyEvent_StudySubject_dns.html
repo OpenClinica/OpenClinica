@@ -4,28 +4,28 @@
       <td colspan="8">${title}</td>
     </tr>
     <tr class="provenance">
-      <td><strong>${app_noteLabel}:</strong></td>
-      <td><strong>${app_assigned_toLabel}:</strong></td>
-      <td><strong>${app_IDLabel}:</strong></td>
-      <td><strong>${app_typeLabel}:</strong></td>
-      <td><strong>${app_current_statusLabel}:</strong></td>
-      <td><strong>${app_n_of_notesLabel}:</strong></td>
-      <td><strong>${app_CreatedDateLabel}:</strong></td>
-      <td><strong>${app_CreatedByLabel}:</strong></td>
+      <td id="eventNoteLabel"><strong>${app_noteLabel}:</strong></td>
+      <td id="eventAssignLabel"><strong>${app_assigned_toLabel}:</strong></td>
+      <td id="eventIdLabel"><strong>${app_IDLabel}:</strong></td>
+      <td id="eventTypeLabel"><strong>${app_typeLabel}:</strong></td>
+      <td id="eventStatusLabel"><strong>${app_current_statusLabel}:</strong></td>
+      <td id="eventNumLabel"><strong>${app_n_of_notesLabel}:</strong></td>
+      <td id="eventDateLabel"><strong>${app_CreatedDateLabel}:</strong></td>
+      <td id="eventByLabel" class="right"><strong>${app_CreatedByLabel}:</strong></td>
     </tr>
     {{each discrepancyNotes}}
     {{if parentThread }}
     <tr class="DNParentRowColor"> {{else}}
     <tr class="provenance"> {{/if}}
-      <td><strong>{{html description}} </strong>
+      <td id="eventDescription"><strong>{{html description}} </strong>
         <p class="dn_notes">{{html detailedNote}}</p></td>
-      <td>{{html user}}</td>
-      <td>{{html id}}</td>
-      <td>{{html parent_noteType}}</td>
-      <td>{{html status}}</td>
-      <td>{{html numberOfChildNotes}}</td>
-      <td>{{html dateUpdated}}</td>
-     <td>{{if userName}}{{html name}} ({{html userName}}){{/if}}</td>
+      <td id="eventUser">{{html user}}</td>
+      <td id="eventID">{{html id}}</td>
+      <td id="eventType">{{html parent_noteType}}</td>
+      <td id="eventStatus">{{html status}}</td>
+      <td id="eventNum">{{html numberOfChildNotes}}</td>
+      <td id="eventDate">{{html dateUpdated}}</td>
+     <td id="eventBy" class="right">{{if userName}}{{html name}} ({{html userName}}){{/if}}</td>
     </tr>
     {{/each}}
   </table></td>
