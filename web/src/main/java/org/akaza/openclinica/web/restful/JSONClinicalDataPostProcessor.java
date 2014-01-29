@@ -26,7 +26,7 @@ public class JSONClinicalDataPostProcessor {
 
     private static final DateFormat DATE_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static final DateFormat DATE_TIME_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateFormat DATE_TIME_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
     private static final DateFormat DATE_TIME_AUDIT_LOG_INTERNAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
