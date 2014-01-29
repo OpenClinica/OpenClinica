@@ -40,7 +40,7 @@
       <div class='header-text'>${app_crfLabel}: ${formStatus ? formStatus : '___________________'}</div>  
 
 {{if app_interviewerNameRequired != "not_used"}}
-      <div class='header-text'>{{html app_interviewerName}}: ${interviewerName?interviewerName:'_____________________________'}</div>  
+      <div class='header-text'>{{html app_interviewerLabel}}: ${interviewerName?interviewerName:'_____________________________'}</div>  
     {{/if}}
     {{if app_interviewDateRequired != "not_used"}}
       <div class='header-text'>{{html app_interviewDateLabel}}: ${interviewDate?interviewDate:'_______________________'}</div>  

@@ -105,7 +105,7 @@
   var app_eventLocationLabel = '<oc:jsEscape key="event_location" bundle="${resword}"/>'; 
   var app_eventNameLabel = '<oc:jsEscape key="event_name" bundle="${resword}"/>'; 
   var app_personIDLabel = '<oc:jsEscape key="person_ID" bundle="${resword}"/>'; 
-  var app_interviewerLabel = '<oc:jsEscape key="interviewer" bundle="${resword}"/>'; 
+  //var app_interviewerLabel = '<oc:jsEscape key="interviewer" bundle="${resword}"/>'; 
   var app_interviewerLabel = '<oc:jsEscape key="interviewer_name" bundle="${resword}"/>'; 
   var app_interviewDateLabel = '<oc:jsEscape key="interview_date" bundle="${resword}"/>'; 
   var app_secondaryLabel = '<oc:jsEscape key="secondary_label" bundle="${resword}"/>'; 
