@@ -1174,44 +1174,6 @@ function StudyRenderer(json) {
 					var dns = discrepancyNote[i];
 
 	if (dns["@Attribute"] == attribute) {
-		switch (attribute)
-		{
-		   case "unique_identifier":
-			   attribute = app_personIDLabel;
-			   break;
-		   case "date_of_birth":
-			   attribute = app_studySubjectDOBLabel;
-			   break;
-		   case "enrollment_date":
-			   attribute = app_enrollment_dateLabel;
-			   break;
-		   case "gender":
-			   attribute = app_genderLabel;
-			   break;
-
-   
-		   
-		   case "start_date":
-			   attribute =  app_start_date_timeLabel;
-			   break;
-		   case "end_date":
-			   attribute =  app_end_date_timeLabel;
-			   break;
-		   case "location":
-			   attribute = app_eventLocationLabel;
-			   break;
-		  
-
-		   case "interviewer_name":
-			   attribute = app_interviewerLabel;
-			   break;
-		   case "date_interviewed":
-			   attribute = app_interviewDateLabel;
-			   break;
-
-		   default: 
-		       break;
-		}
 		
 					parentDiscrepancyNote = {};
 			//		parentDiscrepancyNote.description = "ABC";
@@ -1271,11 +1233,48 @@ function StudyRenderer(json) {
 						thisDiscrepancyNote = {};
 					}
 		 	      
-					this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes , attribute);
 					  }
 				}
+				switch (attribute)
+				{
+				   case "unique_identifier":
+					   attribute = app_personIDLabel;
+					   break;
+				   case "date_of_birth":
+					   attribute = app_studySubjectDOBLabel;
+					   break;
+				   case "enrollment_date":
+					   attribute = app_enrollment_dateLabel;
+					   break;
+				   case "gender":
+					   attribute = app_genderLabel;
+					   break;
 
-//				this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes);
+		   
+				   
+				   case "start_date":
+					   attribute =  app_start_date_timeLabel;
+					   break;
+				   case "end_date":
+					   attribute =  app_end_date_timeLabel;
+					   break;
+				   case "location":
+					   attribute = app_eventLocationLabel;
+					   break;
+				  
+
+				   case "interviewer_name":
+					   attribute = app_interviewerLabel;
+					   break;
+				   case "date_interviewed":
+					   attribute = app_interviewDateLabel;
+					   break;
+
+				   default: 
+				       break;
+				}
+
+				this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes , attribute);
 				currentDiscrepancyNotes = [];
 
 			}
