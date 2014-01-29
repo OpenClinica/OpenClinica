@@ -110,7 +110,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         StudySubjectBean studySubject = null;
-
+        SubjectBean subject = null;
 		ArrayList events = null;
         ArrayList studySubjectAudits = new ArrayList();
         ArrayList eventCRFAudits = new ArrayList();
@@ -145,7 +145,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 }
             }
 
-            SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
+            subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
 
             /* Show both study subject and subject audit events together */
             // Study subject value changed
@@ -213,7 +213,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 		WritableFont headerFormat = new WritableFont(WritableFont.ARIAL, 8, WritableFont.BOLD,false, UnderlineStyle.NO_UNDERLINE, Colour.BLUE2);
 		WritableCellFormat cellFormat = new WritableCellFormat();
 		cellFormat.setFont(headerFormat);
-//		WritableFont dataFormat = new WritableFont(WritableFont.ARIAL, 8, WritableFont.NO_BOLD,false, UnderlineStyle.NO_UNDERLINE, Colour.BLACK);
     	
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", 
@@ -246,13 +245,13 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 		excelRow = new String[] {
 				studySubject.getLabel(), 
 				studySubject.getSecondaryLabel(), 
-				dateFormat(studySubject.getDateOfBirth()), 
-				studySubject.getUniqueIdentifier(), 
+				dateFormat(subject.getDateOfBirth()), 
+				subject.getUniqueIdentifier(), 
 				studySubject.getOwner().getName(), 
 				studySubject.getStatus().getName() 
 			};
 		for (int i = 0; i < excelRow.length; i++) {
-			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]));
+			Label label = new Label(i, row, excelRow[i]);
 			excelSheet.addCell(label);
 		}
 		row++;
