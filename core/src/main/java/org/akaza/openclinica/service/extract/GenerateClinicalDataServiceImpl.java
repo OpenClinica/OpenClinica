@@ -560,7 +560,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnItemDataMap dnItemDataMap:dnItemDataMaps){
 			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnNoteBean, dnNotes, addDN, dn, dnItemDataMap.getDnItemDataMapId().getColumnName());
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn, null);
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		}
