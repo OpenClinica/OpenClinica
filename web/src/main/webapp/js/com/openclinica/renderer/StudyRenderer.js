@@ -426,7 +426,7 @@ function StudyRenderer(json) {
 				var audits = studyEventData["OpenClinica:AuditLogs"]["OpenClinica:AuditLog"];
 				for ( var i = 0; i < audits.length; i++) {
 					var newVal = audits[i]["@NewValue"];
-					if (newVal == 'signed') {
+					if (newVal == app_formSigned) {
 						electronicSignature = audits[i]["@Name"] + " ("
 								+ audits[i]["@UserName"] + ")" + " " + app_on + " "
 								+ audits[i]["@DateTimeStamp"];

@@ -138,7 +138,9 @@ var app_meaning_of_signatureLabel ='<oc:jsEscape key="meaning_of_signature" bund
 //var app_meaning_of_signature ='<oc:jsEscape key="sure_to_sign_subject1" bundle="${resword}"/>'+'<oc:jsEscape key="sure_to_sign_subject2" bundle="${resword}"/>';
 var app_meaning_of_signature ='${fn:replace(test,search,replace)}';
 
-var app_formSigned= '<oc:jsEscape key="signed" bundle="${resword}"/>';
+
+
+var app_formSigned= '<oc:jsEscape key="signed" bundle="${resterm}"/>';
 var app_electronicSignatureLabel='<oc:jsEscape key="electronic_signature" bundle="${resword}"/>';
 var app_statusLabel='<oc:jsEscape key="status" bundle="${resword}"/>'; 
 var app_the_eCRF_that_are_part_of_this_event_were_signed_by ='<oc:jsEscape key="the_eCRF_that_are_part_of_this_event_were_signed_by" bundle="${resword}"/>';
