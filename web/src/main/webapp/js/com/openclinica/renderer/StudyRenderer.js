@@ -372,13 +372,14 @@ function StudyRenderer(json) {
 					studyEventDefRenderer.studyEventdns = app_thisStudyEvent["OpenClinica:DiscrepancyNotes"];
 					studyEventDefRenderer.studyEventaudits = app_thisStudyEvent["OpenClinica:AuditLogs"];
 					if (app_displayDNs == 'y') {
-						app_attributes = ['17-Dec-2013'];
-	                  for (var i=0;i<app_attributes.length;i++) {
+			//			app_attributes = ['17-Dec-2013'];
+	        //          for (var i=0;i<app_attributes.length;i++) {
 						this.renderString += this
 								.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
 										studyEventDefRenderer,
-										studyEventDefRenderer.studyEventdns, app_attributes[i]);
-					}
+										studyEventDefRenderer.studyEventdns);
+//						studyEventDefRenderer.studyEventdns, app_attributes[i]);
+			//		}
 					
 					}
 					if (app_displayAudits == 'y') {
@@ -547,14 +548,15 @@ function StudyRenderer(json) {
 			studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
 			studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
 			if (app_displayDNs == 'y') {
-				app_attributes = ['23-Jan-2014','28-Oct-2013' ,'18-Nov-2013'];
-                for (var i=0;i<app_attributes.length;i++) {
+			//	app_attributes = ['23-Jan-2014','28-Oct-2013' ,'18-Nov-2013'];
+            //    for (var i=0;i<app_attributes.length;i++) {
 
 				this.renderString += this
 						.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
 								studySubjectDefRenderer,
-								studySubjectDefRenderer.studySubjectdns,app_attributes[i]);
-                }
+ 								studySubjectDefRenderer.studySubjectdns);
+//				studySubjectDefRenderer.studySubjectdns,app_attributes[i]);
+            //    }
                 }
 			if (app_displayAudits == 'y') {
 				this.renderString += this
@@ -625,14 +627,15 @@ function StudyRenderer(json) {
 			if (app_displayAudits == 'y')
 				formDefRenderer.eventCRFaudits = app_thisFormData["OpenClinica:AuditLogs"];
 			if (app_displayDNs == 'y') {
-				app_attributes = ['28-Oct-2013'];
+			//	app_attributes = ['28-Oct-2013'];
 				
-                for (var i=0;i<app_attributes.length;i++) {
+           //     for (var i=0;i<app_attributes.length;i++) {
 
 				logs += this
 						.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
-								formDefRenderer, formDefRenderer.eventCRFdns,app_attributes [i]);
-                } 
+								formDefRenderer, formDefRenderer.eventCRFdns);
+//				formDefRenderer, formDefRenderer.eventCRFdns,app_attributes [i]);
+            //    } 
                 }
 			if (app_displayAudits == 'y') {
 				logs += this.print_EventCRF_StudyEvent_StudySubject_Audits(
@@ -1154,8 +1157,8 @@ function StudyRenderer(json) {
 
 	// function(formDefRenderer , formDefRenderer.eventCRFdns) for Event CRF
 	// ,Study Event and Study Subject
-	this.print_EventCRF_StudyEvent_StudySubject_Discrepancies = function(
-			renderer, dn , attribute) {
+	this.print_EventCRF_StudyEvent_StudySubject_Discrepancies = function(renderer, dn ) {
+//		this.print_EventCRF_StudyEvent_StudySubject_Discrepancies = function(renderer, dn , attribute) {
 		this.discrepancyNotes = "";
 		if (app_displayDNs == 'y' && dn) {
 			var discrepancyNotes = dn;
@@ -1171,7 +1174,7 @@ function StudyRenderer(json) {
 				for ( var i = 0; i < discrepancyNote.length; i++) {
 					var dns = discrepancyNote[i];
 
-	if (dns["@DateUpdated"] == attribute) {
+//	if (dns["@DateUpdated"] == attribute) {
 					
 					parentDiscrepancyNote = {};
 			//		parentDiscrepancyNote.description = "ABC";
@@ -1228,11 +1231,11 @@ function StudyRenderer(json) {
 						currentDiscrepancyNotes.push(thisDiscrepancyNote);
 						thisDiscrepancyNote = {};
 					}
-		 	    }
+		// 	    }
 				}
 
-				this.discrepancyNotes += renderer
-						.renderDiscrepancyNotes(currentDiscrepancyNotes , attribute);
+				this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes);
+//				this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes , attribute);
 				currentDiscrepancyNotes = [];
 
 			}
