@@ -560,7 +560,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnItemDataMap dnItemDataMap:dnItemDataMaps){
 			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn, dnItemDataMap.getDnItemDataMapId().getColumnName());
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		}
@@ -578,7 +578,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnEventCrfMap dnItemDataMap:dnEventCrfMaps){
 			DiscrepancyNote dn =  dnItemDataMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn, dnItemDataMap.getDnEventCrfMapId().getColumnName());
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		return dnNotesBean;
@@ -597,7 +597,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnStudySubjectMap dnMap:dnMaps){
 			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn, dnMap.getDnStudySubjectMapId().getColumnName());
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		List<DnSubjectMap> dnSubjMaps = studySubj.getSubject().getDnSubjectMaps();
@@ -606,7 +606,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnSubjectMap dnMap:dnSubjMaps){
 			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnSubjBean, dnSubjs, addDN, dn);
+			fillDNObject(dnSubjBean, dnSubjs, addDN, dn, dnMap.getDnSubjectMapId().getColumnName());
 		}
 		
 		for(DiscrepancyNoteBean dnSubjMap:dnSubjs)
@@ -624,15 +624,15 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(DnStudyEventMap dnMap:dnMaps){
 			DiscrepancyNote dn =  dnMap.getDiscrepancyNote();
 			addDN=true;
-			fillDNObject(dnNoteBean, dnNotes, addDN, dn);
+			fillDNObject(dnNoteBean, dnNotes, addDN, dn, dnMap.getDnStudyEventMapId().getColumnName());
 		}
 		dnNotesBean.setDiscrepancyNotes(dnNotes);
 		return dnNotesBean;
 		
 	} 
 	private void fillDNObject(DiscrepancyNoteBean dnNoteBean,
-			ArrayList<DiscrepancyNoteBean> dnNotes, boolean addDN,
-			DiscrepancyNote dn) {
+                              ArrayList<DiscrepancyNoteBean> dnNotes, boolean addDN,
+                              DiscrepancyNote dn, String columnName) {
 		
 		if(dn.getParentDiscrepancyNote()!=null){
 			
@@ -645,6 +645,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			dnNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
 			dnNoteBean.setNoteType(dn.getDiscrepancyNoteType().getName());
 			dnNoteBean.setDateUpdated(dn.getDateCreated());
+            dnNoteBean.setAttribute(columnName);
 			
 		for(DiscrepancyNote childDN:dn.getChildDiscrepancyNotes()){
 			ChildNoteBean childNoteBean = new ChildNoteBean();
