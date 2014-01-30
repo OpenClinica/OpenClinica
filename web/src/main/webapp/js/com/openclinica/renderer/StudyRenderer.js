@@ -1174,7 +1174,7 @@ function StudyRenderer(json) {
 				for ( var i = 0; i < discrepancyNote.length; i++) {
 					var dns = discrepancyNote[i];
 
-	if (dns["@Attribute"] == attribute) {
+	if (dns["@EntityName"] == attribute) {
 		isAttributeExist = true;
 					parentDiscrepancyNote = {};
 			//		parentDiscrepancyNote.description = "ABC";
@@ -1183,7 +1183,7 @@ function StudyRenderer(json) {
 					parentDiscrepancyNote.status = dns["@Status"];
 					parentDiscrepancyNote.numberOfChildNotes = dns["@NumberOfChildNotes"];
 					parentDiscrepancyNote.dateUpdated = dns["@DateUpdated"];
-					parentDiscrepancyNote.attr = dns["@Attribute"];
+					parentDiscrepancyNote.attr = dns["@EntityName"];
 
 					
 					childNote = dns["OpenClinica:ChildNote"];

@@ -428,10 +428,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 xml.append("DateUpdated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
             }
         }
-        if (dn.getAttribute() != null) {
-            String s = dn.getAttribute();
+        if (dn.getEntityName() != null) {
+            String s = dn.getEntityName();
             if (s.length() > 0) {
-                xml.append("Attribute=\"" + s + "\" ");
+                xml.append("EntityName=\"" + s + "\" ");
             }
         }
         int n = dn.getNumberOfChildNotes();

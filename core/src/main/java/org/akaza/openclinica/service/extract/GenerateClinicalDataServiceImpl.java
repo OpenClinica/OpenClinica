@@ -645,7 +645,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			dnNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
 			dnNoteBean.setNoteType(dn.getDiscrepancyNoteType().getName());
 			dnNoteBean.setDateUpdated(dn.getDateCreated());
-            dnNoteBean.setAttribute(columnName);
+            dnNoteBean.setEntityName(columnName);
 			
 		for(DiscrepancyNote childDN:dn.getChildDiscrepancyNotes()){
 			ChildNoteBean childNoteBean = new ChildNoteBean();

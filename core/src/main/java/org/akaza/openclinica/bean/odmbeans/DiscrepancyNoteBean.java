@@ -24,7 +24,7 @@ public class DiscrepancyNoteBean extends ElementOIDBean {
     private Date dateUpdated;
     private int numberOfChildNotes;
     private List<ChildNoteBean> childNotes = new ArrayList<ChildNoteBean>();
-    private String attribute;
+    private String entityName;
     
     public String getStatus() {
         return status;
@@ -57,11 +57,11 @@ public class DiscrepancyNoteBean extends ElementOIDBean {
         this.childNotes = childNotes;
     }
 
-    public String getAttribute() {
-        return attribute;
+    public String getEntityName() {
+        return entityName;
     }
 
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
+    public void setEntityName(String attribute) {
+        this.entityName = attribute;
     }
 }
