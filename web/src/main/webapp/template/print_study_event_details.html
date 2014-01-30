@@ -1,22 +1,20 @@
 <td>
 <table id="page-header">
     <tr>
-      <td class="printCrf_box1">{{html app_eventNameLabel}}:<br/>
-        {{html app_eventLocationLabel}}:</td>
-      <td class="printCrf_box2">{{html studyEventName}}<br />
-        {{html studyEventLocation}}</td>
-      <td class="printCrf_box3">{{html app_eventStartDateLabel}}:<br/>
-        {{html app_eventEndDateLabel}}:</td>
-      <td class="printCrf_box4">{{html startDate}}<br />
-        {{html endDate}}</td>
-      <td class="printCrf_box5">{{html app_eventStatus}}:</td>
-      <td class="printCrf_box6">{{html studyEventStatus}}</td>
+      <td id="eventName"><div class="eventHeaderLabel">{{html app_eventNameLabel}}:</div>&nbsp;<strong>{{html studyEventName}}</strong></td>
+      <td id="eventStartDate"><div class="eventHeaderLabel">{{html app_eventStartDateLabel}}:</div>&nbsp;<strong>{{html startDate}}</strong></td>
+      <td id="eventStatus"><div class="eventHeaderLabel">{{html app_eventStatus}}:</div>&nbsp;<strong>{{html studyEventStatus}}</strong></td>
+    </tr>
+    <tr>
+      <td id="eventLocation"><div class="eventHeaderLabel">{{html app_eventLocationLabel}}:</div>&nbsp;<strong>{{html studyEventLocation}}</strong></td>
+      <td id="eventEndDate"><div class="eventHeaderLabel">{{html app_eventEndDateLabel}}:</div>&nbsp;<strong>{{html endDate}}</strong></td>
+      <td>&nbsp;</td>
     </tr>
   </table>
   {{if electronicSig}}
   <div class="sigbox">
     <p class="esig">{{html app_the_eCRF_that_are_part_of_this_event_were_signed_by }}{{html electronicSig}} ({{html app_server_time}}) {{html app_under_the_following_attestation}}:</p>
     <p class="esig">{{html app_meaning_of_signature}}</p>
-    </div>
-    {{/if}}
-</td>
+  </div>
+  {{/if}}
+ </td>

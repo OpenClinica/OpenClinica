@@ -54,30 +54,13 @@ a:active {
   padding-top: 10px;
 }
 
-#page-header td.left-header {
-  width: 66%;
+#page-header td#eventName, #page-header td#eventStartDate, #page-header td#eventLocation, #page-header td#eventEndDate {
+  width: 33%;
 }
 
-#page-header td.printCrf_box1 {
-	width: 9%;
-}
-
-#page-header td.printCrf_box2 {
-	width: 31%;
-	font-weight:bold;
-}
-
-#page-header td.printCrf_box3 {
-	width: 6%;
-}
-
-#page-header td.printCrf_box4 {
-	width: 20%;
-	font-weight:bold;
-}
-
-#page-header td.printCrf_box5 {
-	width: 8%;
+.eventHeaderLabel {
+	width: 30%;
+	float: left;
 }
 
 #page-header td.printCrf_box6 {
