@@ -231,9 +231,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		exportSubjectDataBean.setSecondaryId(studySubj.getSecondaryLabel());
 		exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
 		if(isCollectAudits())
-		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid(), "subject"));
-        AuditLogsBean logs = fetchAuditLogs(studySubj.getStudySubjectId(),"subject_group_map", studySubj.getOcOid(), null);
-        exportSubjectDataBean.getAuditLogs().getAuditLogs().addAll(logs.getAuditLogs());
+		exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(),"study_subject", studySubj.getOcOid(), "subject_group_map"));
+//        AuditLogsBean logs = fetchAuditLogs(studySubj.getStudySubjectId(),"subject_group_map", studySubj.getOcOid(), null);
+//        exportSubjectDataBean.getAuditLogs().getAuditLogs().addAll(logs.getAuditLogs());
 		if(isCollectDns())
 			exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 		
