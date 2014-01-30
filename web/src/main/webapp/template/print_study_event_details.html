@@ -6,7 +6,16 @@
       <td id="eventStatus"><div class="eventHeaderLabel">{{html app_eventStatus}}:</div>&nbsp;<strong>{{html studyEventStatus}}</strong></td>
     </tr>
     <tr>
-      <td id="eventLocation"><div class="eventHeaderLabel">{{html app_eventLocationLabel}}:</div>&nbsp;<strong>{{html studyEventLocation}}</strong></td>
+      <td id="eventLocation">
+         {{if app_eventLocationRequired == 'required'}}
+         <div class="eventHeaderLabel">{{html app_eventLocationLabel}}:</div>&nbsp;<strong>{{html studyEventLocation}}</strong>
+      {{/if}}
+        
+      {{if app_eventLocationRequired == 'optional'}}
+         <div class="eventHeaderLabel">{{html app_eventLocationLabel}}:</div>&nbsp;<strong>{{html studyEventLocation}}</strong>
+      {{/if}}
+         </td>
+  
       <td id="eventEndDate"><div class="eventHeaderLabel">{{html app_eventEndDateLabel}}:</div>&nbsp;<strong>{{html endDate}}</strong></td>
       <td>&nbsp;</td>
     </tr>
