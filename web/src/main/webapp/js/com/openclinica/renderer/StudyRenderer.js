@@ -1170,11 +1170,12 @@ function StudyRenderer(json) {
 				var thisDiscrepancyNote = {};
 				var parentDiscrepancyNote;
 				var childNote = [];
+		var isAttributeExist =false;
 				for ( var i = 0; i < discrepancyNote.length; i++) {
 					var dns = discrepancyNote[i];
 
 	if (dns["@Attribute"] == attribute) {
-		
+		isAttributeExist = true;
 					parentDiscrepancyNote = {};
 			//		parentDiscrepancyNote.description = "ABC";
 					parentDiscrepancyNote.id = dns["@ID"].substring(3);
@@ -1235,6 +1236,8 @@ function StudyRenderer(json) {
 		 	      
 					  }
 				}
+		
+				if (isAttributeExist==true) {
 				switch (attribute)
 				{
 				   case "unique_identifier":
@@ -1276,7 +1279,7 @@ function StudyRenderer(json) {
 
 				this.discrepancyNotes += renderer.renderDiscrepancyNotes(currentDiscrepancyNotes , attribute);
 				currentDiscrepancyNotes = [];
-
+				}
 			}
 		}
 		// }
