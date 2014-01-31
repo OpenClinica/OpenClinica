@@ -313,7 +313,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 			}
 			else {
 				excelRow = new String[] {
-					event.getStudyEventDefinition().getName(),
 					event.getLocation(),
 					dateFormat(event.getDateStarted()),
 					Integer.toString(event.getSampleOrdinal())};
@@ -562,6 +561,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								oldValue = "locked";
 							else if(getOld.equals("7"))
 								oldValue = "auto-removed";
+							else {
+								oldValue = getOld;
+							}
 						}
 						else if(eventCrfAudit.getAuditEventTypeId() == 32) {
 							String getOld = eventCrfAudit.getOldValue();
@@ -569,14 +571,14 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								oldValue = "FALSE";
 							else if(getOld.equals("1"))
 								oldValue = "TRUE";
+							else {
+								oldValue = getOld;
+							}
 						}
 						else {
 							oldValue = eventCrfAudit.getOldValue();
 						}
 							
-						
-						
-						
 						if(eventCrfAudit.getAuditEventTypeId() == 12 || eventCrfAudit.getEntityName().equals("Status")) {
 							String getNew = eventCrfAudit.getNewValue();
 							if(getNew.equals("0"))
@@ -595,6 +597,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								newValue = "locked";
 							else if(getNew.equals("7"))
 								newValue = "auto-removed";
+							else {
+								newValue = getNew;
+							}
 						}
 						else if(eventCrfAudit.getAuditEventTypeId() == 32) {
 							String getNew = eventCrfAudit.getNewValue();
@@ -602,14 +607,15 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								newValue = "FALSE";
 							else if(getNew.equals("1"))
 								newValue = "TRUE";
+							else {
+								newValue = getNew;
+							}
+
 						}
 						else {
 							newValue = eventCrfAudit.getNewValue();
-						}						
+						}
 						
-						
-						
-
 						excelRow = new String[] {
 								eventCrfAudit.getAuditEventTypeName(),
 								dateTimeFormat(eventCrfAudit.getAuditDate()),
