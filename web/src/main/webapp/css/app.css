@@ -49,9 +49,13 @@ a:active {
   font-size: 14px;
 }
 
-#page-header td.left-header, td.right-header, td.printCrf_box1, td.printCrf_box2, td.printCrf_box3, td.printCrf_box4, td.printCrf_box5, td.printCrf_box6 {
+#page-header td.left-header, #page-header td.right-header {
   vertical-align: top;
   padding-top: 10px;
+}
+
+#page-header td.left-header {
+	width: 66%;
 }
 
 #page-header td#eventName, #page-header td#eventStartDate, #page-header td#eventLocation, #page-header td#eventEndDate {
