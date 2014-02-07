@@ -3,22 +3,22 @@
 <h3 class="tocHeader">${app_study_subjectLabel}&nbsp;${app_thisSubjectsData["@OpenClinica:StudySubjectID"]}&nbsp;${app_tableOfContentsLabel}</h3>
   <table border="1" width="100%" >
     <tr class="tocLabel">
-      <td>{{html app_studyEventLabel}}</td>
-      <td>{{html app_eventCRFLabel}}</td>
-      <td>{{html app_statusLabel}}</td>
+      <td id="toc_eventLabel">{{html app_studyEventLabel}}</td>
+      <td id="toc_crfLabel">{{html app_eventCRFLabel}}</td>
+      <td id="toc_statusLabel">{{html app_statusLabel}}</td>
     </tr>
     {{each subjectTableOfCnts}}
     <tr class="tocEvent">
-      <td>{{html studyEventName}}{{if studyEventRepeatingflag == 'Yes'}}({{html studyEventRepeatKey}}){{/if}}
+      <td id="toc_eventName">{{html studyEventName}}{{if studyEventRepeatingflag == 'Yes'}}({{html studyEventRepeatKey}}){{/if}}
       </td>
       <td>&nbsp;</td>
-      <td>{{html studyEventStatus}}</td>
+      <td id="toc_status">{{html studyEventStatus}}</td>
     </tr>
     {{each forms}}
     <tr>
-      <td></td>
-      <td>${formName}</td>
-      <td>${formStatus}</td>
+      <td>&nbsp;</td>
+      <td id="toc_formName">${formName}</td>
+      <td id="toc_formStatus">${formStatus}</td>
     </tr>
     {{/each}}
     
