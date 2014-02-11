@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.extract;
 import java.util.*;
 
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -199,6 +200,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 
 
+	@SuppressWarnings("unchecked")
 	private ExportSubjectDataBean setExportSubjectDataBean(
 			StudySubject studySubj, Study study,List<StudyEvent> studyEvents,String formVersionOID) {
 
@@ -289,13 +291,33 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 			
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
+			expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
+			
 
 			al.add(expSEBean);
 		}
-
+        
+		
+		Collections.sort(al, new Comparator<ExportStudyEventDataBean>() {
+		    @Override
+			public int compare(ExportStudyEventDataBean s1, ExportStudyEventDataBean s2) {
+		    	int c;
+		    	c= (s1.getStudyEventDefinition().getOrdinal()) - (s2.getStudyEventDefinition().getOrdinal());
+		        if (c == 0)
+			    	c= (s1.getStudyEventRepeatKey()).compareTo (s2.getStudyEventRepeatKey());
+		        return c;
+			    }
+		});		
+			
+			
 		return al;
 	}
 
+	
+	
+	
+	
+	
 	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(
 			StudyEvent se,String formVersionOID) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
