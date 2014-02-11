@@ -313,6 +313,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 			}
 			else {
 				excelRow = new String[] {
+					event.getStudyEventDefinition().getName(),
 					event.getLocation(),
 					dateFormat(event.getDateStarted()),
 					Integer.toString(event.getSampleOrdinal())};
@@ -495,7 +496,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 				EventCRFBean eventCrf = (EventCRFBean) event.getEventCRFs().get(j);
 				
 				
-				
 				//Audit Events for Study Event
 				excelRow = new String[] {
 						"name", 
@@ -504,6 +504,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 						"interviewer_name",
 						"owner"
 					};
+				
 				for (int i = 0; i < excelRow.length; i++) {
 					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
@@ -513,7 +514,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 				excelRow = new String[] {
 						eventCrf.getCrf().getName(),
 						eventCrf.getCrfVersion().getName(),
-						dateTimeFormat(eventCrf.getDateInterviewed()),
+						dateFormat(eventCrf.getDateInterviewed()),
 						eventCrf.getInterviewerName(),
 						eventCrf.getOwner().getName()
 					};
