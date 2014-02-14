@@ -20,6 +20,9 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
+
+
+
 <body>
 <!-- Head Anchor-->
 <a name="root"></a>
@@ -69,10 +72,18 @@
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="new" bundle="${resword}"/></b></td>
     </tr>
     <c:forEach var="studySubjectAudit" items="${studySubjectAudits}">
-        <tr>
-            <td class="table_header_column"><c:out value="${studySubjectAudit.auditEventTypeName}"/>&nbsp;</td>
+
+         <tr>
+            <c:set var="string1" value="${studySubjectAudit.auditEventTypeName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
+            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+
+        
             <!-- YW 12-06-2007, use dateStyle and timeStyle to display datetime -->
             <td class="table_header_column"><fmt:formatDate value="${studySubjectAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+
+
+
             <td class="table_header_column"><c:out value="${studySubjectAudit.userName}"/>&nbsp;</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.entityName}"/>&nbsp;</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.oldValue}"/>&nbsp;</td>
@@ -189,7 +200,12 @@
                 <c:forEach var="studyEventAudit" items="${studyEventAudits}">
                     <c:if test="${studyEventAudit.entityId==event.id}">
                         <tr>
-                            <td class="table_header_column"><c:out value="${studyEventAudit.auditEventTypeName}"/>&nbsp;</td>
+
+
+            <c:set var="string1" value="${studyEventAudit.auditEventTypeName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
+            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+
                             <td class="table_header_column"><fmt:formatDate value="${studyEventAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.userName}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.entityName}"/>&nbsp;</td>
@@ -299,7 +315,11 @@
                 <c:forEach var="eventCRFAudit" items="${eventCRFAudits}">
                     <c:if test="${eventCRFAudit.eventCRFId==eventCRF.id}">
                         <tr>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.auditEventTypeName}"/>&nbsp;</td>
+
+            <c:set var="string1" value="${eventCRFAudit.auditEventTypeName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
+            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
