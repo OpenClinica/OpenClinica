@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -106,6 +107,7 @@ public class StudyEvent extends DataMapDomainObject {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "study_event_definition_id")
+	@OrderBy("ordinal")
 	public StudyEventDefinition getStudyEventDefinition() {
 		return this.studyEventDefinition;
 	}

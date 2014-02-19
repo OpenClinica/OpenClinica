@@ -298,16 +298,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
         
 		
-		Collections.sort(al, new Comparator<ExportStudyEventDataBean>() {
-		    @Override
-			public int compare(ExportStudyEventDataBean s1, ExportStudyEventDataBean s2) {
-		    	int c;
-		    	c= (s1.getStudyEventDefinition().getOrdinal()) - (s2.getStudyEventDefinition().getOrdinal());
-		        if (c == 0)
-			    	c= (s1.getStudyEventRepeatKey()).compareTo (s2.getStudyEventRepeatKey());
-		        return c;
-			    }
-		});		
+		
 			
 			
 		return al;
