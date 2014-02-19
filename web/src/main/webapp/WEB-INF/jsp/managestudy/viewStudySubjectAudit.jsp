@@ -21,8 +21,6 @@
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 
-
-
 <body>
 <!-- Head Anchor-->
 <a name="root"></a>
@@ -59,8 +57,8 @@
     </tr>
 </table><br><br>
 
-		<!-- excel encoding -->
-	
+        <!-- excel encoding -->
+    
 <%-- Subject Audit Events --%>
 <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
     <tr>
@@ -76,16 +74,31 @@
          <tr>
             <c:set var="string1" value="${studySubjectAudit.auditEventTypeName}"/>
             <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
-            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_column">
+                <fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;
+            </td>
 
         
             <!-- YW 12-06-2007, use dateStyle and timeStyle to display datetime -->
             <td class="table_header_column"><fmt:formatDate value="${studySubjectAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
 
-
-
             <td class="table_header_column"><c:out value="${studySubjectAudit.userName}"/>&nbsp;</td>
-            <td class="table_header_column"><c:out value="${studySubjectAudit.entityName}"/>&nbsp;</td>
+            <c:set var="string1" value="${studySubjectAudit.entityName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,fn:length(string1)))}"/>
+            <c:set var="string3" value="${fn:substring(string2,fn:length(string2)-2,fn:length(string2))}"/>
+            <td class="table_header_column">
+            <c:if test="${string2 != ''}">
+                <c:choose>
+                    <c:when test="${string3 == 'id'}">
+                        <fmt:message  key="${fn:replace(fn:replace(string2,'id','ID'),' ','_')}" bundle="${resword}"/>&nbsp;
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;
+                    </c:otherwise>
+                </c:choose>
+            </c:if>
+            </td>
+
             <td class="table_header_column"><c:out value="${studySubjectAudit.oldValue}"/>&nbsp;</td>
             <td class="table_header_column"><c:out value="${studySubjectAudit.newValue}"/>&nbsp;</td>
 
@@ -103,8 +116,8 @@
     </tr>
     <c:forEach var="event" items="${events}">
         <tr>
-			<!-- Link to Dynamic Anchor -->
-			<td class="table_header_column"><a href="#<c:out value="${event.studyEventDefinition.name}"/><c:out value="${event.sampleOrdinal}"/>"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</a></td>
+            <!-- Link to Dynamic Anchor -->
+            <td class="table_header_column"><a href="#<c:out value="${event.studyEventDefinition.name}"/><c:out value="${event.sampleOrdinal}"/>"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</a></td>
             <%-- <td class="table_header_column"><c:out value="${event.studyEventDefinition.name}"/>&nbsp;</td> --%>
             <td class="table_header_column"><c:out value="${event.location}"/>&nbsp;</td>
             <c:choose>
@@ -130,11 +143,11 @@
     <td class="table_header_column_top" style="color: #789EC5"><b><c:out value="${event.studyEventDefinition.name}"/></b>&nbsp;</td>
 </tr>
 <tr>
-    <td class="table_header_column"><c:out value="Location"/></td>
+    <td class="table_header_column"><fmt:message key="location" bundle="${resword}"/></td>
     <td class="table_header_column"><c:out value="${event.location}"/>&nbsp;</td>
 </tr>
 <tr>
-    <td class="table_header_column"><c:out value="Start Date"/></td>
+    <td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/></td>
     <c:choose>
         <c:when test="${event.startTimeFlag=='false'}">
             <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
@@ -145,7 +158,7 @@
     </c:choose>
 </tr>
 <tr>
-    <td class="table_header_column"><c:out value="Status"/></td>
+    <td class="table_header_column"><fmt:message key="status" bundle="${resword}"/></td>
     <td class="table_header_column"><c:out value="${event.subjectEventStatus.name}"/>&nbsp;</td>
 </tr>
 <tr>
@@ -208,20 +221,43 @@
 
                             <td class="table_header_column"><fmt:formatDate value="${studyEventAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${studyEventAudit.userName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${studyEventAudit.entityName}"/>&nbsp;</td>
+
+            <c:set var="string1" value="${studyEventAudit.entityName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,fn:length(string1)))}"/>
+            <td class="table_header_column">
+                 <fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;
+            </td>               
                             <td class="table_header_column">
                                         <c:choose>
                                             <%--BWP issue 3300; 02/24/2009: The displayed old value is the SubjectEventStatus id;
                                 the new value is the Status id (both objects in a StudyEventBean) --%>
-                                            <c:when test="${studyEventAudit.oldValue eq '0'}">invalid</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '1'}">scheduled</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '2'}">not_scheduled</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '3'}">data_entry_started</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '4'}">completed</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '5'}">stopped</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '6'}">skipped</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '7'}">locked</c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '8'}">signed</c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '0'}">
+                                                <fmt:message  key="invalid" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '1'}">
+                                                <fmt:message  key="scheduled" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '2'}">
+                                                <fmt:message  key="not_scheduled" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '3'}">
+                                                <fmt:message  key="data_entry_started" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '4'}">
+                                                <fmt:message  key="completed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '5'}">
+                                                <fmt:message  key="stopped" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '6'}">
+                                                <fmt:message  key="skipped" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '7'}">
+                                                <fmt:message  key="locked" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.oldValue eq '8'}">
+                                                <fmt:message  key="signed" bundle="${resword}"/>
+                                            </c:when>
 
                                             <c:otherwise><c:out value="${studyEventAudit.oldValue}"/></c:otherwise>
                                         </c:choose>
@@ -231,31 +267,69 @@
                                     <%-- A removed Study Event ...--%>
                                     <c:when test="${studyEventAudit.newValue eq '5'}">
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.newValue eq '0'}">invalid</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '1'}">available</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '2'}">pending</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '3'}">private</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '4'}">unavailable</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '5'}">removed</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '6'}">locked</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '7'}">auto-removed</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '8'}">signed</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '9'}">frozen</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '0'}">
+                                                <fmt:message  key="invalid" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '1'}">
+                                                <fmt:message  key="available" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '2'}">
+                                                <fmt:message  key="pending" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '3'}">
+                                                <fmt:message  key="private" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '4'}">
+                                                <fmt:message  key="unavailable" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '5'}">
+                                                <fmt:message  key="removed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '6'}">
+                                                <fmt:message  key="locked" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '7'}">
+                                                <fmt:message  key="auto-removed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '8'}">
+                                                <fmt:message  key="signed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '9'}">
+                                                <fmt:message  key="frozen" bundle="${resword}"/>
+                                            </c:when>
 
                                             <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.newValue eq '0'}">invalid</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '1'}">scheduled</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '2'}">not_scheduled</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '3'}">data_entry_started</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '4'}">completed</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '5'}">stopped</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '6'}">skipped</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '7'}">locked</c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '8'}">signed</c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '0'}">
+                                                <fmt:message  key="invalid" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '1'}">
+                                                <fmt:message  key="scheduled" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '2'}">
+                                                <fmt:message  key="not_scheduled" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '3'}">
+                                                <fmt:message  key="data_entry_started" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '4'}">
+                                                <fmt:message  key="completed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '5'}">
+                                                <fmt:message  key="stopped" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '6'}">
+                                                <fmt:message  key="skipped" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '7'}">
+                                                <fmt:message  key="locked" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:when test="${studyEventAudit.newValue eq '8'}">
+                                                <fmt:message  key="signed" bundle="${resword}"/>
+                                            </c:when>
 
                                             <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
                                         </c:choose>
@@ -287,9 +361,9 @@
                     <td class="table_header_column"><c:out value="${eventCRF.crf.name}"/>&nbsp;</td>
                     <td class="table_header_column"><c:out value="${eventCRF.crfVersion.name}"/>&nbsp;</td>
                     <td class="table_header_column">
-						<fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
-                    	<%--<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;--%>
-					</td>
+                        <fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
+                        <%--<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;--%>
+                    </td>
                     <td class="table_header_column"><c:out value="${eventCRF.interviewerName}"/>&nbsp;</td>
                     <td class="table_header_column"><c:out value="${eventCRF.owner.name}"/>&nbsp;</td>
                 </tr>
@@ -322,25 +396,62 @@
 
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
+
+
+            <c:set var="string1" value="${eventCRFAudit.entityName}"/>
+            <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,fn:length(string1)))}"/>
+            <td class="table_header_column">
+                <c:if test="${string2 != ''}">
+                    <c:choose>
+                        <c:when test="${string2 == 'status'}">
+                            <fmt:message  key="${string2}" bundle="${resword}"/>&nbsp;
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${string1}"/>
+                        </c:otherwise>
+                    </c:choose>
+                    &nbsp;(<c:out value="${eventCRFAudit.ordinal}"/>)
+
+                </c:if>
+            </td>  
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.oldValue eq '0'}">invalid</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '1'}">available</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '2'}">unavailable</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '3'}">private</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '4'}">pending</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '5'}">removed</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '6'}">locked</c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '0'}">
+                                            <fmt:message  key="invalid" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '1'}">
+                                            <fmt:message  key="available" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '2'}">
+                                            <fmt:message  key="unavailable" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '3'}">
+                                            <fmt:message  key="private" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '4'}">
+                                            <fmt:message  key="pending" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '5'}">
+                                            <fmt:message  key="removed" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '6'}">
+                                            <fmt:message  key="locked" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '7'}">
+                                            <fmt:message  key="auto-removed" bundle="${resword}"/>
+                                        </c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
-                                    	<c:choose>
-                                    	<c:when test="${eventCRFAudit.oldValue eq '1'}">TRUE</c:when>
-                                    	<c:when test="${eventCRFAudit.oldValue eq '0'}">FALSE</c:when>
-                                    	<c:otherwise><c:out value="${eventCRFAudit.oldValue}"/></c:otherwise>
-                                    	</c:choose>
+                                        <c:choose>
+                                        <c:when test="${eventCRFAudit.oldValue eq '1'}">
+                                            <fmt:message  key="true" bundle="${resword}"/>
+                                        </c:when>
+                                        <c:when test="${eventCRFAudit.oldValue eq '0'}">
+                                            <fmt:message  key="false" bundle="${resword}"/>
+                                        </c:when>
+                                        <c:otherwise><c:out value="${eventCRFAudit.oldValue}"/></c:otherwise>
+                                        </c:choose>
                                     </c:when>
                                     <c:otherwise>
                                         <c:choose>
@@ -358,21 +469,41 @@
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.newValue eq '0'}">invalid</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '1'}">available</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '2'}">unavailable</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '3'}">private</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '4'}">pending</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '5'}">removed</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '6'}">locked</c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '0'}">
+                                            <fmt:message  key="invalid" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '1'}">
+                                            <fmt:message  key="available" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '2'}">
+                                            <fmt:message  key="unavailable" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '3'}">
+                                            <fmt:message  key="private" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '4'}">
+                                            <fmt:message  key="pending" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '5'}">
+                                            <fmt:message  key="removed" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '6'}">
+                                            <fmt:message  key="locked" bundle="${resword}"/>
+                                        </c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '7'}">
+                                            <fmt:message  key="auto-removed" bundle="${resword}"/>
+                                        </c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
-                                    	<c:choose>
-                                    	<c:when test="${eventCRFAudit.newValue eq '1'}">TRUE</c:when>
-                                    	<c:when test="${eventCRFAudit.newValue eq '0'}">FALSE</c:when>
-                                    	<c:otherwise><c:out value="${eventCRFAudit.newValue}"/></c:otherwise>
-                                    	</c:choose>
+                                        <c:choose>
+                                        <c:when test="${eventCRFAudit.newValue eq '1'}">
+                                             <fmt:message  key="true" bundle="${resword}"/>
+                                        </c:when>
+                                        <c:when test="${eventCRFAudit.newValue eq '0'}">
+                                            <fmt:message  key="false" bundle="${resword}"/>
+                                        </c:when>
+                                        <c:otherwise><c:out value="${eventCRFAudit.newValue}"/></c:otherwise>
+                                        </c:choose>
                                     </c:when>
                                     <c:otherwise>
                                         <c:choose>
@@ -394,9 +525,9 @@
         </td></tr></table><%-- Margin --%>
     </td>
     </tr>
-	<!-- Return to Root -->
+    <!-- Return to Root -->
     <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
-	
+    
 
 </c:forEach>
 </table>
