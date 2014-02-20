@@ -2,6 +2,8 @@
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 package org.akaza.openclinica.domain.datamap;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -44,6 +47,21 @@ public class ResolutionStatus  extends DataMapDomainObject {
 		this.discrepancyNotes = discrepancyNotes;
 	}
 
+	public String getI18nName(Locale locale) {
+        if (!"".equals(this.name)) {
+            ResourceBundle resWords = ResourceBundleProvider.getWordsBundle(locale);
+            String des = resWords.getString(this.name);
+            if(des != null) {
+                return des.trim();
+            }  else {
+                return "";
+            }
+        } else {
+            return this.name;
+        }
+    }
+
+	
 	@Id
 	@Column(name = "resolution_status_id", unique = true, nullable = false)
 	@GeneratedValue(generator = "id-generator")
