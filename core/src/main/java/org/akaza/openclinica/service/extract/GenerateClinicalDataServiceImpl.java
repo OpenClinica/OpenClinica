@@ -157,8 +157,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return studySubjs;
 	}
 
+	
 	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID) {
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
+		
 		
 
 		return constructClinicalData(study,listStudySubjects(studySubjectOID));
@@ -174,7 +176,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs) {
 
-		
+				
 		return constructClinicalDataStudy(studySubjs, study,null, null);
 	}
 
@@ -185,7 +187,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for(StudySubject studySubj:studySubjs)
 		{
 		if(studyEvents==null)
-			expSubjectBean = setExportSubjectDataBean(studySubj, study,studySubj.getStudyEvents(),formVersionOID);
+			{
+			studyEvents = (ArrayList<StudyEvent>)getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
+			
+			expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents,formVersionOID);
+			}
 		else
 			 expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents,formVersionOID);
 		exportSubjDataBeanList.add(expSubjectBean);
@@ -271,7 +277,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		for (StudyEvent se : studyEvents) {
-			
+			if(se!=null){
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			
 			expSEBean.setLocation(se.getLocation());
@@ -292,11 +298,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			
 			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
 			expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
-			
-
-			al.add(expSEBean);
+						al.add(expSEBean);
 		}
-        
+		}
 		
 		
 			
@@ -801,11 +805,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			isActiveRoleAtSite=false;
 		}
 		
-		if(!studySubjectOID.equals(INDICATE_ALL) )
+		if(!studySubjectOID.equals(INDICATE_ALL) &&  studyOID.equals(INDICATE_ALL))
 		{
-		StudySubjectDao ssdao =getStudySubjectDao();
-		StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(
-					studySubjectOID, "ocOid");
+		
+
+			StudySubjectDao ssdao =getStudySubjectDao();
+			StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(
+						studySubjectOID, "ocOid");
 		studyOID = ss.getStudy().getOc_oid();
 		}
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
@@ -854,6 +860,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			seOrdinal = new Integer(temp.substring(idx+1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
 			}
 		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
+		
 		if(seOrdinal>0)
 			{
 			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
