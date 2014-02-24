@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -49,7 +51,8 @@ public class StudySubject  extends DataMapDomainObject {
 	private List<DnStudySubjectMap> dnStudySubjectMaps;
 	private List<StudyEvent> studyEvents ;
 	private List<EventCrf> eventCrfs;
-
+	private List<StudyEventDefinition> studyEventDefinitions;
+	
 	public StudySubject() {
 	}
 
@@ -221,7 +224,11 @@ public class StudySubject  extends DataMapDomainObject {
 		this.dnStudySubjectMaps = dnStudySubjectMaps;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studySubject")
+	@OneToMany(fetch = FetchType.EAGER)
+	
+	@JoinColumn(name="study_subject_id")
+	
+
 	public List<StudyEvent> getStudyEvents() {
 		return this.studyEvents;
 	}
