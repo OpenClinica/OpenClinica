@@ -22,6 +22,8 @@ import javax.persistence.Transient;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -32,6 +34,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "study_event")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_event_study_event_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class StudyEvent extends DataMapDomainObject {
 
@@ -248,6 +251,8 @@ public class StudyEvent extends DataMapDomainObject {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEvent")
+	@OrderBy("dateUpdated asc")
+	
 	public List<EventCrf> getEventCrfs() {
 		return this.eventCrfs;
 	}
