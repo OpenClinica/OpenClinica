@@ -22,6 +22,8 @@ import javax.persistence.UniqueConstraint;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -32,7 +34,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "study_subject", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_subject_study_subject_id_seq") })
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudySubject  extends DataMapDomainObject {
 
 	private int studySubjectId;
@@ -224,11 +226,11 @@ public class StudySubject  extends DataMapDomainObject {
 		this.dnStudySubjectMaps = dnStudySubjectMaps;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	
 	@JoinColumn(name="study_subject_id")
 	
-
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	public List<StudyEvent> getStudyEvents() {
 		return this.studyEvents;
 	}

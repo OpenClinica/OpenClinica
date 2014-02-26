@@ -346,7 +346,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				ExportFormDataBean dataBean = new ExportFormDataBean();
 				dataBean.setItemGroupData(fetchItemData(ecrf.getCrfVersion()
 						.getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf
-						.getCrfVersion().getVersioningMaps()));
+						.getCrfVersion().getVersioningMaps(), ecrf));
 				dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
 				if(ecrf.getDateInterviewed()!=null)
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
@@ -428,17 +428,20 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private ArrayList<ImportItemGroupDataBean> fetchItemData(
-			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms) {
+			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms, EventCrf eventCrf) {
 		String groupOID, itemOID;
 		String itemValue = null;
 		String itemDataValue;
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
 		HashMap<String, List<ItemData>> oidDNAuditMap = new HashMap<String, List<ItemData>>();
+		List<ItemData> itds =  eventCrf.getItemDatas();
 		
 		// For each metadata get the group, and then get list of all items in
 		// that group.so we can a data structure of groupOID and list of
 		// itemOIDs with corresponding values will be created.
-		for (ItemGroupMetadata igGrpMetadata : set) {
+		for (ItemData itemData : itds) {
+			List<ItemGroupMetadata> igmetadatas = itemData.getItem().getItemGroupMetadatas();
+			for (ItemGroupMetadata igGrpMetadata : igmetadatas) {
 			groupOID = igGrpMetadata.getItemGroup().getOcOid();
 			
 			if (!oidMap.containsKey(groupOID)) {
@@ -451,24 +454,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				for (ItemGroupMetadata itemGrpMetada : allItemsInAGroup) {
 					itemOID = itemGrpMetada.getItem().getOcOid();
 					itemsValues = new ArrayList<String>();
-					List<ItemData> itds = itemGrpMetada.getItem()
-							.getItemDatas();
+				/*	List<ItemData> itds = itemGrpMetada.getItem()
+							.getItemDatas();*/
+					
+				
 
 		
 					// look for the key
 					// of same group and ordinal and add this item to
 					// that hashmap
-					for (ItemData itemData : itds) {
+					
 						itemsValues = new ArrayList<String>();
 						itemDataValue = fetchItemDataValue(itemData,
-								itemGrpMetada.getItem());
+								itemData.getItem());
 						itemDatas =  new ArrayList<ItemData>();
 						itemValue = itemOID + DELIMITER + itemDataValue;
 						itemsValues.add(itemValue);
 						groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
 								+ itemData.getOrdinal();
 						
-						if (itemData.getEventCrf().getEventCrfId() == eventCrfId) {
+						if (itemData.getItem().getOcOid() == itemOID) {
 
 							if (oidMap.containsKey(groupOIDOrdnl)) {
 

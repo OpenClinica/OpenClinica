@@ -20,6 +20,8 @@ import javax.persistence.UniqueConstraint;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -30,6 +32,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "study_event_definition", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_event_definition_study_event_definition_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class StudyEventDefinition  extends DataMapDomainObject {
 

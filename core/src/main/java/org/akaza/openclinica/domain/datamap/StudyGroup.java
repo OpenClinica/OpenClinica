@@ -15,6 +15,8 @@ import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -25,7 +27,7 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "study_group")
 
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_group_study_group_id_seq") })
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyGroup  extends DataMapDomainObject {
 
 	private int studyGroupId;
