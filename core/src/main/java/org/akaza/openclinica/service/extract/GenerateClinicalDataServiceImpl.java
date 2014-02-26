@@ -810,7 +810,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			isActiveRoleAtSite=false;
 		}
 		
-		if(!studySubjectOID.equals(INDICATE_ALL) &&  studyOID.equals(INDICATE_ALL))
+		// This piece of code identifies if the study subject is assigned to study level or site level. If the study subject assigned to site  is pulled from study level this will get the site OID correctly displayed. 
+		if(!studySubjectOID.equals(INDICATE_ALL))
 		{
 		
 
