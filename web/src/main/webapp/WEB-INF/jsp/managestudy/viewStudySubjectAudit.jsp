@@ -5,6 +5,96 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
+<%! 
+    private String getEventAuditValue1(String val) {
+        String eventAuditValue1;
+        switch( Integer.parseInt(val) ) {
+            case 1: eventAuditValue1 = "scheduled";
+            break;
+            case 2: eventAuditValue1 = "not_scheduled";
+            break;
+            case 3: eventAuditValue1 = "data_entry_started";
+            break;
+            case 4: eventAuditValue1 = "completed";
+            break;
+            case 5: eventAuditValue1 = "stopped";
+            break;
+            case 6: eventAuditValue1 = "skipped";
+            break;
+            case 7: eventAuditValue1 = "locked";
+            break;
+            case 8: eventAuditValue1 = "signed";
+            break;
+            default: eventAuditValue1 = "invalid";
+        }
+        return eventAuditValue1;
+    } 
+%>
+
+<%! 
+    private String getEventAuditValue2(String val) {
+        String eventAuditValue2;
+        switch( Integer.parseInt(val) ) {
+            case 1: eventAuditValue2 = "available";
+            break;
+            case 2: eventAuditValue2 = "pending";
+            break;
+            case 3: eventAuditValue2 = "private";
+            break;
+            case 4: eventAuditValue2 = "unavailable";
+            break;
+            case 5: eventAuditValue2 = "removed";
+            break;
+            case 6: eventAuditValue2 = "locked";
+            break;
+            case 7: eventAuditValue2 = "auto-removed";
+            break;
+            case 8: eventAuditValue2 = "signed";
+            break;
+            case 9: eventAuditValue2 = "frozen";
+            break;
+            default: eventAuditValue2 = "invalid";
+        }
+        return eventAuditValue2;
+    } 
+%>
+
+<%! 
+    private String getCRFAuditValue(String val) {
+        String crfAuditValue;
+        switch( Integer.parseInt(val) ) {
+            case 1: crfAuditValue = "available";
+            break;
+            case 2: crfAuditValue = "unavailable";
+            break;
+            case 3: crfAuditValue = "private";
+            break;
+            case 4: crfAuditValue = "pending";
+            break;
+            case 5: crfAuditValue = "removed";
+            break;
+            case 6: crfAuditValue = "locked";
+            break;
+            case 7: crfAuditValue = "auto-removed";
+            break;
+            default: crfAuditValue = "invalid";
+        }
+
+        return crfAuditValue;
+    } 
+%>
+
+<%! 
+    private String getBooleanAuditValue(String val) {
+        if ( val.equals("1") ) {
+            return "true";
+        } else {
+            return "false";
+        }
+
+    } 
+%>
+
 <html>
 <head>
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
@@ -22,6 +112,8 @@
 
 
 <body>
+
+
 <!-- Head Anchor-->
 <a name="root"></a>
 
@@ -212,9 +304,8 @@
 
                 <c:forEach var="studyEventAudit" items="${studyEventAudits}">
                     <c:if test="${studyEventAudit.entityId==event.id}">
+                        
                         <tr>
-
-
             <c:set var="string1" value="${studyEventAudit.auditEventTypeName}"/>
             <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
             <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
@@ -228,110 +319,38 @@
                  <fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;
             </td>               
                             <td class="table_header_column">
-                                        <c:choose>
-                                            <%--BWP issue 3300; 02/24/2009: The displayed old value is the SubjectEventStatus id;
+                                
+                                <%--BWP issue 3300; 02/24/2009: The displayed old value is the SubjectEventStatus id;
                                 the new value is the Status id (both objects in a StudyEventBean) --%>
-                                            <c:when test="${studyEventAudit.oldValue eq '0'}">
-                                                <fmt:message  key="invalid" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '1'}">
-                                                <fmt:message  key="scheduled" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '2'}">
-                                                <fmt:message  key="not_scheduled" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '3'}">
-                                                <fmt:message  key="data_entry_started" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '4'}">
-                                                <fmt:message  key="completed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '5'}">
-                                                <fmt:message  key="stopped" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '6'}">
-                                                <fmt:message  key="skipped" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '7'}">
-                                                <fmt:message  key="locked" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.oldValue eq '8'}">
-                                                <fmt:message  key="signed" bundle="${resword}"/>
-                                            </c:when>
+                                <c:set var="eventAuditValue" value="${studyEventAudit.oldValue}"/> 
+                                <% pageContext.setAttribute("val", getEventAuditValue1((String) pageContext.getAttribute("eventAuditValue"))); %>
+                                <c:choose>
+                                    <c:when test="${fn:length(eventAuditValue) == 1}">
+                                        <fmt:message  key="${val}" bundle="${resword}"/>
+                                    </c:when>
+                                    <c:otherwise><c:out value="${eventAuditValue}"/></c:otherwise>
+                                </c:choose>
 
-                                            <c:otherwise><c:out value="${studyEventAudit.oldValue}"/></c:otherwise>
-                                        </c:choose>
                                 &nbsp;</td>
                             <td class="table_header_column">
+                                <c:set var="eventAuditValue" value="${studyEventAudit.newValue}"/> 
+                                <% pageContext.setAttribute("val", getEventAuditValue2((String) pageContext.getAttribute("eventAuditValue"))); %>
                                 <c:choose>
                                     <%-- A removed Study Event ...--%>
                                     <c:when test="${studyEventAudit.newValue eq '5'}">
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.newValue eq '0'}">
-                                                <fmt:message  key="invalid" bundle="${resword}"/>
+                                            <c:when test="${fn:length(eventAuditValue) == 1}">
+                                                <fmt:message  key="${val}" bundle="${resword}"/>
                                             </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '1'}">
-                                                <fmt:message  key="available" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '2'}">
-                                                <fmt:message  key="pending" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '3'}">
-                                                <fmt:message  key="private" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '4'}">
-                                                <fmt:message  key="unavailable" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '5'}">
-                                                <fmt:message  key="removed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '6'}">
-                                                <fmt:message  key="locked" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '7'}">
-                                                <fmt:message  key="auto-removed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '8'}">
-                                                <fmt:message  key="signed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '9'}">
-                                                <fmt:message  key="frozen" bundle="${resword}"/>
-                                            </c:when>
-
-                                            <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
+                                            <c:otherwise><c:out value="${eventAuditValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
                                         <c:choose>
-                                            <c:when test="${studyEventAudit.newValue eq '0'}">
-                                                <fmt:message  key="invalid" bundle="${resword}"/>
+                                            <c:when test="${fn:length(eventAuditValue) == 1}">
+                                                <fmt:message  key="${val}" bundle="${resword}"/>
                                             </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '1'}">
-                                                <fmt:message  key="scheduled" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '2'}">
-                                                <fmt:message  key="not_scheduled" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '3'}">
-                                                <fmt:message  key="data_entry_started" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '4'}">
-                                                <fmt:message  key="completed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '5'}">
-                                                <fmt:message  key="stopped" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '6'}">
-                                                <fmt:message  key="skipped" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '7'}">
-                                                <fmt:message  key="locked" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:when test="${studyEventAudit.newValue eq '8'}">
-                                                <fmt:message  key="signed" bundle="${resword}"/>
-                                            </c:when>
-
-                                            <c:otherwise><c:out value="${studyEventAudit.newValue}"/></c:otherwise>
+                                            <c:otherwise><c:out value="${eventAuditValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:otherwise>
                                 </c:choose>
@@ -417,40 +436,18 @@
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.oldValue eq '0'}">
-                                            <fmt:message  key="invalid" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '1'}">
-                                            <fmt:message  key="available" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '2'}">
-                                            <fmt:message  key="unavailable" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '3'}">
-                                            <fmt:message  key="private" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '4'}">
-                                            <fmt:message  key="pending" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '5'}">
-                                            <fmt:message  key="removed" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '6'}">
-                                            <fmt:message  key="locked" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.oldValue eq '7'}">
-                                            <fmt:message  key="auto-removed" bundle="${resword}"/>
-                                        </c:if>
+                                        <c:set var="crfAuditValue" value="${eventCRFAudit.oldValue}"/> 
+                                        <% pageContext.setAttribute("val", getCRFAuditValue((String) pageContext.getAttribute("crfAuditValue"))); %>
+                                        <fmt:message  key="${val}" bundle="${resword}"/>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
+                                        <c:set var="crfAuditValue" value="${eventCRFAudit.oldValue}"/> 
+                                        <% pageContext.setAttribute("val", getBooleanAuditValue((String) pageContext.getAttribute("crfAuditValue"))); %>
                                         <c:choose>
-                                        <c:when test="${eventCRFAudit.oldValue eq '1'}">
-                                            <fmt:message  key="true" bundle="${resword}"/>
-                                        </c:when>
-                                        <c:when test="${eventCRFAudit.oldValue eq '0'}">
-                                            <fmt:message  key="false" bundle="${resword}"/>
-                                        </c:when>
-                                        <c:otherwise><c:out value="${eventCRFAudit.oldValue}"/></c:otherwise>
+                                            <c:when test="${fn:length(crfAuditValue) == 1}">
+                                                <fmt:message  key="${val}" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:otherwise><c:out value="${crfAuditValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
@@ -469,40 +466,18 @@
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
-                                        <c:if test="${eventCRFAudit.newValue eq '0'}">
-                                            <fmt:message  key="invalid" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '1'}">
-                                            <fmt:message  key="available" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '2'}">
-                                            <fmt:message  key="unavailable" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '3'}">
-                                            <fmt:message  key="private" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '4'}">
-                                            <fmt:message  key="pending" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '5'}">
-                                            <fmt:message  key="removed" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '6'}">
-                                            <fmt:message  key="locked" bundle="${resword}"/>
-                                        </c:if>
-                                        <c:if test="${eventCRFAudit.newValue eq '7'}">
-                                            <fmt:message  key="auto-removed" bundle="${resword}"/>
-                                        </c:if>
+                                        <c:set var="crfAuditValue" value="${eventCRFAudit.newValue}"/> 
+                                        <% pageContext.setAttribute("val", getCRFAuditValue((String) pageContext.getAttribute("crfAuditValue"))); %>
+                                        <fmt:message  key="${val}" bundle="${resword}"/>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
+                                        <c:set var="crfAuditValue" value="${eventCRFAudit.newValue}"/> 
+                                        <% pageContext.setAttribute("val", getBooleanAuditValue((String) pageContext.getAttribute("crfAuditValue"))); %>
                                         <c:choose>
-                                        <c:when test="${eventCRFAudit.newValue eq '1'}">
-                                             <fmt:message  key="true" bundle="${resword}"/>
-                                        </c:when>
-                                        <c:when test="${eventCRFAudit.newValue eq '0'}">
-                                            <fmt:message  key="false" bundle="${resword}"/>
-                                        </c:when>
-                                        <c:otherwise><c:out value="${eventCRFAudit.newValue}"/></c:otherwise>
+                                            <c:when test="${fn:length(crfAuditValue) == 1}">
+                                                <fmt:message  key="${val}" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:otherwise><c:out value="${crfAuditValue}"/></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
