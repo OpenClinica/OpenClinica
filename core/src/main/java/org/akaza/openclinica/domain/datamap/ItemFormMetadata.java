@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -23,7 +25,7 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "item_form_metadata")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_form_metadata_item_form_metadata_id_seq") })
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ItemFormMetadata  extends DataMapDomainObject {
 
 	private int itemFormMetadataId;

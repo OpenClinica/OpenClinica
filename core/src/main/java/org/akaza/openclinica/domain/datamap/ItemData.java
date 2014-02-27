@@ -20,6 +20,8 @@ import javax.persistence.TemporalType;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -30,6 +32,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "item_data")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class ItemData  extends DataMapDomainObject {
 
@@ -173,7 +176,7 @@ public class ItemData  extends DataMapDomainObject {
 	}
 
 	
-	@OneToMany(fetch = FetchType.EAGER,cascade = {CascadeType.ALL}, mappedBy = "itemData")
+	@OneToMany(fetch = FetchType.LAZY,cascade = {CascadeType.ALL}, mappedBy = "itemData")
 	public List<DnItemDataMap> getDnItemDataMaps() {
 		return this.dnItemDataMaps;
 	}

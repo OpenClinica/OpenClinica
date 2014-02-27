@@ -168,9 +168,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         actions.add(ruleAction);
     }
 
-    // getters & setters
     @ManyToOne
-    // @JoinColumn(name = "rule_set_id", nullable = false)
     @JoinColumn(name = "rule_set_id", nullable = false, updatable = false, insertable = false)
     public RuleSetBean getRuleSetBean() {
         return ruleSetBean;

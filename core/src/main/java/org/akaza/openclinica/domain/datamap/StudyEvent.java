@@ -13,13 +13,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -30,6 +34,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "study_event")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_event_study_event_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class StudyEvent extends DataMapDomainObject {
 
@@ -51,6 +56,8 @@ public class StudyEvent extends DataMapDomainObject {
 	private Boolean endTimeFlag;
 	private List<DnStudyEventMap> dnStudyEventMaps ;
 	private List<EventCrf> eventCrfs ;
+	private Integer sedOrdinal;
+	
 	public StudyEvent() {
 	}
 
@@ -105,9 +112,9 @@ public class StudyEvent extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "study_event_definition_id")
-	@OrderBy("ordinal")
+
 	public StudyEventDefinition getStudyEventDefinition() {
 		return this.studyEventDefinition;
 	}
@@ -149,6 +156,7 @@ public class StudyEvent extends DataMapDomainObject {
 	}
 
 	@Column(name = "sample_ordinal")
+	
 	public Integer getSampleOrdinal() {
 		return this.sampleOrdinal;
 	}
@@ -243,6 +251,8 @@ public class StudyEvent extends DataMapDomainObject {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEvent")
+	@OrderBy("dateUpdated asc")
+	
 	public List<EventCrf> getEventCrfs() {
 		return this.eventCrfs;
 	}
@@ -258,6 +268,17 @@ public class StudyEvent extends DataMapDomainObject {
 	public void setStatusId(Integer statusId) {
 		this.statusId = statusId;
 	}
+
+	/*@Column(name="sed_ordinal",insertable=false,updatable=false,table="study_event_definition")
+	
+	public Integer getSedOrdinal() {
+		return sedOrdinal;
+	}
+
+	public void setSedOrdinal(Integer sedOrdinal) {
+		this.sedOrdinal = sedOrdinal;
+	}
+*/
 
 	
 }

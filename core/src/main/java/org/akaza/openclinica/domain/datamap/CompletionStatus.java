@@ -15,6 +15,8 @@ import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -25,7 +27,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "completion_status")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "completion_status_completion_status_id_seq") })
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CompletionStatus  extends DataMapDomainObject {
 
 	private int completionStatusId;

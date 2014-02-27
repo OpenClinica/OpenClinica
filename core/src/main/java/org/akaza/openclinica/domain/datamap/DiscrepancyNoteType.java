@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -24,7 +25,7 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "discrepancy_note_type")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "discrepancy_note_type_discrepancy_note_type_id_seq") })
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DiscrepancyNoteType  extends DataMapDomainObject {
 
 	private int discrepancyNoteTypeId;
