@@ -327,11 +327,20 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			hiddenCrfCheckPassed=true;
 			
 			if(isActiveRoleAtSite){
-				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),seds);
+				Integer parentStudyId =0;
+				if(ss.getStudy()!=null)
+				{
+					parentStudyId= ss.getStudy().getStudy().getStudyId();
+				
+				}
+				
+				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),parentStudyId,seds);
+				
 				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
 				{
 					hiddenCrfCheckPassed = false;
 				}
+				
 			}
 			
 			//This logic is to use the same method for both S_OID/SS_OID/*/* and full path
@@ -371,14 +380,25 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	
-	private List<CrfBean> listOfHiddenCrfs(Integer siteId,List<EventDefinitionCrf> seds) {
+	private List<CrfBean> listOfHiddenCrfs(Integer siteId,Integer parentStudyId,List<EventDefinitionCrf> seds) {
 	
 		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
 		LOGGER.info("The study subject is at the site/study"+siteId);
 		for(EventDefinitionCrf eventDefCrf:seds){
-			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId)){
+			
+			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId ||parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()))
+			{
 				hiddenCrfs.add(eventDefCrf.getCrf());
 			}
+			/*else if(eventDefCrf.getHideCrf()&&parentStudyId!=0)
+			
+			{
+	
+				if(parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()){
+					hiddenCrfs.add(eventDefCrf.getCrf());
+				}
+			}*/
+	
 		}
 
 		
