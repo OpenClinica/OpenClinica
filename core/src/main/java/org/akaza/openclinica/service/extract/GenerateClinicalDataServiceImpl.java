@@ -660,22 +660,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		else{
 			dnNoteBean = new DiscrepancyNoteBean();
-			
-			String discrepancyNoteStatus = dn.getResolutionStatus().getName();
-			discrepancyNoteStatus = discrepancyNoteStatus.replace(' ', '_');		
-			discrepancyNoteStatus =  discrepancyNoteStatus.substring(0, 1).toLowerCase() + discrepancyNoteStatus.substring(1);
-	    	dn.getResolutionStatus().setName(discrepancyNoteStatus);
-			dnNoteBean.setStatus(dn.getResolutionStatus().getI18nName(locale));
-			
+			dnNoteBean.setStatus(dn.getResolutionStatus().getName());
 			dnNoteBean.setNoteType(dn.getEntityType());
 			dnNoteBean.setOid("DN_"+dn.getDiscrepancyNoteId());
-
-	    	String discrepancyNoteTypeName = dn.getDiscrepancyNoteType().getName();
-	    	discrepancyNoteTypeName = discrepancyNoteTypeName.replace(' ', '_');		
-	    	discrepancyNoteTypeName =  discrepancyNoteTypeName.substring(0, 1).toLowerCase() + discrepancyNoteTypeName.substring(1);
-	    	dn.getDiscrepancyNoteType().setName(discrepancyNoteTypeName);
-   	        dnNoteBean.setNoteType(dn.getDiscrepancyNoteType().getI18nName(locale));
-
+			dnNoteBean.setNoteType(dn.getDiscrepancyNoteType().getName());
+			
+	    	
 			dnNoteBean.setDateUpdated(dn.getDateCreated());
             dnNoteBean.setEntityName(columnName);
 			
@@ -684,12 +674,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			childNoteBean.setOid("CDN_"+childDN.getDiscrepancyNoteId());
 			ElementRefBean userRef =  new ElementRefBean();
 			childNoteBean.setDescription(childDN.getDescription());
-
-			String childDiscrepancyNoteStatus = childDN.getResolutionStatus().getName();
-			childDiscrepancyNoteStatus = childDiscrepancyNoteStatus.replace(' ', '_');		
-			childDiscrepancyNoteStatus =  childDiscrepancyNoteStatus.substring(0, 1).toLowerCase() + childDiscrepancyNoteStatus.substring(1);
-			childDN.getResolutionStatus().setName(childDiscrepancyNoteStatus);
-			childNoteBean.setStatus(childDN.getResolutionStatus().getI18nName(locale));
+			childNoteBean.setStatus(childDN.getResolutionStatus().getName());
 			
 			childNoteBean.setDetailedNote(childDN.getDetailedNotes());
 			
