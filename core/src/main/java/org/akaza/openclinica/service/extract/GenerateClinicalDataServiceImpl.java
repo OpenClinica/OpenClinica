@@ -296,7 +296,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if(collectDns)
 				expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 			
-			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
+			expSEBean.setExportFormData(getFormDataForClinicalStudy(ss,se,formVersionOID));
 			expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 						al.add(expSEBean);
 		}
@@ -314,7 +314,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	
 	
 	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(
-			StudyEvent se,String formVersionOID) {
+		StudySubject ss,	StudyEvent se,String formVersionOID) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if(formVersionOID!=null)formCheck = false;
@@ -324,10 +324,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			
 			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
-			
+			hiddenCrfCheckPassed=true;
 			
 			if(isActiveRoleAtSite){
-				hiddenCrfs	 = listOfHiddenCrfs(seds);
+				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),seds);
 				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
 				{
 					hiddenCrfCheckPassed = false;
@@ -371,11 +371,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	
-	private List<CrfBean> listOfHiddenCrfs(List<EventDefinitionCrf> seds) {
+	private List<CrfBean> listOfHiddenCrfs(Integer siteId,List<EventDefinitionCrf> seds) {
 	
 		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+		LOGGER.info("The study subject is at the site/study"+siteId);
 		for(EventDefinitionCrf eventDefCrf:seds){
-			if(eventDefCrf.getHideCrf()){
+			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId)){
 				hiddenCrfs.add(eventDefCrf.getCrf());
 			}
 		}
