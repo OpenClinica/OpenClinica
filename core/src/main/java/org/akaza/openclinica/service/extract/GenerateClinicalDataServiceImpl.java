@@ -296,7 +296,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if(collectDns)
 				expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 			
-			expSEBean.setExportFormData(getFormDataForClinicalStudy(se,formVersionOID));
+			expSEBean.setExportFormData(getFormDataForClinicalStudy(ss,se,formVersionOID));
 			expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 						al.add(expSEBean);
 		}
@@ -314,7 +314,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	
 	
 	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(
-			StudyEvent se,String formVersionOID) {
+		StudySubject ss,	StudyEvent se,String formVersionOID) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if(formVersionOID!=null)formCheck = false;
@@ -324,14 +324,23 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			
 			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
-			
+			hiddenCrfCheckPassed=true;
 			
 			if(isActiveRoleAtSite){
-				hiddenCrfs	 = listOfHiddenCrfs(seds);
+				Integer parentStudyId =0;
+				if(ss.getStudy()!=null)
+				{
+					parentStudyId= ss.getStudy().getStudy().getStudyId();
+				
+				}
+				
+				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),parentStudyId,seds);
+				
 				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
 				{
 					hiddenCrfCheckPassed = false;
 				}
+				
 			}
 			
 			//This logic is to use the same method for both S_OID/SS_OID/*/* and full path
@@ -371,13 +380,25 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	
-	private List<CrfBean> listOfHiddenCrfs(List<EventDefinitionCrf> seds) {
+	private List<CrfBean> listOfHiddenCrfs(Integer siteId,Integer parentStudyId,List<EventDefinitionCrf> seds) {
 	
 		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+		LOGGER.info("The study subject is at the site/study"+siteId);
 		for(EventDefinitionCrf eventDefCrf:seds){
-			if(eventDefCrf.getHideCrf()){
+			
+			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId ||parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()))
+			{
 				hiddenCrfs.add(eventDefCrf.getCrf());
 			}
+			/*else if(eventDefCrf.getHideCrf()&&parentStudyId!=0)
+			
+			{
+	
+				if(parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()){
+					hiddenCrfs.add(eventDefCrf.getCrf());
+				}
+			}*/
+	
 		}
 
 		
