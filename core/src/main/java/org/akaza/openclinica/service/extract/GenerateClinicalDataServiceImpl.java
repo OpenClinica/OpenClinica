@@ -818,6 +818,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		
 	}
 
+	/**
+	 * This is a generic method where the control enters first. Regardless what URL is being used. Depending upon the combination of URL parameters, further course is determined. 
+	 */
 	@Override
 	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID,
 			String studyEventOID, String formVersionOID,Boolean collectDNs,Boolean collectAudit, Locale locale, int userId) {
@@ -826,6 +829,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		setCollectAudits(collectAudit);
 		LinkedHashMap<String,OdmClinicalDataBean> clinicalDataHash = new LinkedHashMap<String, OdmClinicalDataBean>();
 		UserAccount userAccount = getUserAccountDao().findByColumnName(userId,"userId");
+		LOGGER.debug("Entering the URL with "+studyOID+":"+studySubjectOID+":"+studyEventOID+":"+formVersionOID+":DNS:"+collectDNs+":Audits:"+collectAudit);
+		LOGGER.info("Determining the generic paramters...");
+		
 		if(userAccount.getActiveStudy().getStudy()!=null){
 			isActiveRoleAtSite=true;
 		}
@@ -845,13 +851,21 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
 		{
+			LOGGER.info("Adding all the study events,formevents as it is a *");
+			LOGGER.info("study subject is not all and so is study");
+			
 			clinicalDataHash.put(studyOID,  getClinicalData(studyOID, studySubjectOID));
+		
 			return clinicalDataHash;
 		}
 		else 	if(studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL)&& studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL))
+		{
+			LOGGER.info("At the study level.. study event,study subject and forms are *");
 			return getClinicalData(studyOID);
+		}
 		else if(!studyEventOID.equals(INDICATE_ALL)&&!studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL) &&  formVersionOID.equals(INDICATE_ALL))
 				 {
+			LOGGER.info("Obtaining the form version specific");
 				clinicalDataHash.put(studyOID, getClinicalDatas(studyOID,studySubjectOID,studyEventOID,null));
 				return clinicalDataHash;
 				 }
@@ -883,13 +897,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> ss = listStudySubjects(studySubjectOID);
 		int idx = studyEventOID.indexOf(OPEN_ORDINAL_DELIMITER);
+		LOGGER.info("study event oridinal is.."+idx);
 		if(idx>0)
 			{
 			studyEventOID=  studyEventOID.substring(0,idx);
 			seOrdinal = new Integer(temp.substring(idx+1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
 			}
 		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
-		
+		LOGGER.info("study event ordinal.."+seOrdinal);
 		if(seOrdinal>0)
 			{
 			studyEvents = fetchSE(seOrdinal,sed.getStudyEvents(),studySubjectOID);
@@ -910,6 +925,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	
 	private List<StudyEvent>  fetchSE(int seOrdinal, List<StudyEvent> studyEvents,String ssOID) {
 		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
+		LOGGER.debug("fetching all the study events");
 		for(StudyEvent se:studyEvents){
 			if(se.getSampleOrdinal()==seOrdinal &&se.getStudySubject().getOcOid().equals(ssOID))
 				{
