@@ -542,7 +542,7 @@ public class ExpressionService {
     }
 
     public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
-        if(expression == null) {
+        if(expression == null || expression.isEmpty()) {
             logger.debug("expression is null.");
             return expression;
         } else {
