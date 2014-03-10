@@ -7,6 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage_messages"/>
 
 
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
@@ -14,6 +15,7 @@
 <c:set var="replace" value="\\'"/>
 <c:set var="test"><fmt:message key="sure_to_sign_subject1" bundle="${resword}"/><fmt:message key="sure_to_sign_subject2" bundle="${resword}"/></c:set>
 <c:set var="test1" value="${fn:replace(test,search,replace)}"></c:set>
+<c:set var="app_print_CRF_Message_at_Loading"><fmt:message key="print_CRF_Message_at_Loading" bundle="${respage_messages}"/></c:set>
 
 <script>
   var app_contextPath = '${pageContext.request.contextPath}'; 
@@ -155,7 +157,6 @@ var app_case_report_form='<oc:jsEscape key="case_report_form" bundle="${resword}
 
 
 
-
 </script>
 
 <html>
@@ -169,6 +170,7 @@ var app_case_report_form='<oc:jsEscape key="case_report_form" bundle="${resword}
  </head>
  
  <body>
-   <img id="loading" src="${pageContext.request.contextPath}/images/loading_wh.gif" class="spinner"/> 
+     <div style=color:gray;text-align:center> ${app_print_CRF_Message_at_Loading}</div> 
+    <img id="loading" src="${pageContext.request.contextPath}/images/loading_wh.gif" class="spinner"/> 
  </body>
 </html>
