@@ -463,3 +463,11 @@ td {
 	padding-left: 100px;
 	list-style-type: none;
 }
+
+#loading_msg {
+	margin-top: 50px;
+	color: gray;
+	width: 100%;
+	text-align: center;
+	font-size: x-large;
+}
