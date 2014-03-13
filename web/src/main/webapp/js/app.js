@@ -96,12 +96,25 @@ function getPrintableContent() {
     setRenderMode();
     app_renderMode = renderMode;
     app_odmRenderer = new ODMRenderer(data);
-    var renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+    var renderString =undefined; 
+
+    try {  
+    renderString = app_odmRenderer.renderPrintableStudy(renderMode);
+    }
+    catch (error)  {
+	alert(app_error_print_CRF_Message_at_Loading +"   "+error.message);
+    }   
     
+     
     $('body').html(renderString);
    });
-}
 
+
+
+
+
+
+}
 function setRenderMode() {
 	
 	

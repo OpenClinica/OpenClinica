@@ -155,6 +155,7 @@ var app_on='<oc:jsEscape key="on" bundle="${resword}"/>';
 var app_tableOfContentsLabel='<oc:jsEscape key="table_of_contents" bundle="${resword}"/>';
 var app_case_report_form='<oc:jsEscape key="case_report_form" bundle="${resword}"/>';
 
+var app_error_print_CRF_Message_at_Loading='<oc:jsEscape key="error_print_CRF_Message_at_Loading" bundle="${respage_messages}"/>';
 
 
 </script>
