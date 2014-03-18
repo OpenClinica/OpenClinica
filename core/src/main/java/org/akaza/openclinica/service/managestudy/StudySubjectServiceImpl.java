@@ -138,8 +138,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             // CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
             CRFVersionBean cvb = crfVersionById.get(crfVersionId);
             ecb.setCrfVersion(cvb);
-           if( cvb==null)
-        	   continue;
+
             // CRFBean cb = crfDao.findByVersionId(crfVersionId);
             CRFBean cb = crfById.get(cvb.getCrfId());
             ecb.setCrf(cb);
@@ -222,14 +221,15 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         for (i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-            if(crfVersionById.get(ecrf.getCRFVersionId())!=null){
+            // System.out.println("########event crf id:" + ecrf.getId());
+            // int crfId =
+            // crfVersionDao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
             int crfId = crfVersionById.get(ecrf.getCRFVersionId()).getCrfId();
             if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data
                                                           // already
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
                 startedButIncompleted.put(new Integer(crfId), ecrf);
-            }
             }
         }
 
@@ -272,7 +272,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             CRFBean cb = crfById.get(dedcrf.getEdc().getCrfId());
             dedcrf.getEdc().setCrf(cb);
 
-            ArrayList<CRFVersionBean> theVersions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllByCRFId(dedcrf.getEdc().getCrfId());
+            ArrayList<CRFVersionBean> theVersions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
             ArrayList<CRFVersionBean> versions = new ArrayList<CRFVersionBean>();
             HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
 

@@ -136,13 +136,11 @@
                   <c:when test="${dedc.edc.defaultVersionId==version.id}">
                   <option value="<c:out value="${version.id}"/>" selected>
 					<c:out value="${version.name}"/>
-					   <c:set var="crfVersionOID" value="${version.oid}"/>
 				  </option>
                   </c:when>
                   <c:otherwise>
                     <option value="<c:out value="${version.id}"/>">
 						<c:out value="${version.name}"/>
-						 <c:set var="crfVersionOID" value="${version.oid}"/>
 					</option>
                   </c:otherwise>
                   </c:choose>
@@ -159,10 +157,7 @@
                 </SCRIPT>
                  </c:when>
 
-				 <c:otherwise><c:out value="${dedc.eventCRF.crfVersion.name}"/>
-				             <c:set var="crfVersionOID" value="${dedc.eventCRF.crfVersion.oid}"/>
-				 
-				 </c:otherwise>
+				 <c:otherwise><c:out value="${dedc.eventCRF.crfVersion.name}"/></c:otherwise>
 
 				 </c:choose>
 
