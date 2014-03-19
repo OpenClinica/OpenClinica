@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -331,6 +332,7 @@ public class EventCrf  extends DataMapDomainObject {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "eventCrf")
+	@OrderBy("discrepancyNote")
 	public List<DnEventCrfMap> getDnEventCrfMaps() {
 		return this.dnEventCrfMaps;
 	}

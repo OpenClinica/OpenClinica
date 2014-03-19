@@ -242,7 +242,8 @@ public class StudyEvent extends DataMapDomainObject {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEvent")
-	public List<DnStudyEventMap> getDnStudyEventMaps() {
+	@OrderBy("discrepancyNote")
+    public List<DnStudyEventMap> getDnStudyEventMaps() {
 		return this.dnStudyEventMaps;
 	}
 
