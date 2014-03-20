@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service.extract;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.akaza.openclinica.bean.core.Utils;
@@ -276,6 +277,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			StudySubject ss,List<StudyEvent>studyEvents,String formVersionOID) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for (StudyEvent se : studyEvents) {
 			if(se!=null){
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
@@ -283,7 +285,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			expSEBean.setLocation(se.getLocation());
 			if(se.getDateEnd()!=null)
 			expSEBean.setEndDate(se.getDateEnd() + "");
+if(se.getStartTimeFlag())
 			expSEBean.setStartDate(se.getDateStart() + "");
+else
+{
+	String temp = sdf.format(se.getDateStart());
+	expSEBean.setStartDate(temp);
+	
+}
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
@@ -611,6 +620,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 	
 	private DiscrepancyNotesBean fetchDiscrepancyNotes(EventCrf eventCrf) {
+		LOGGER.info("Fetching the discrepancy notes..");
 		List<DnEventCrfMap> dnEventCrfMaps  = eventCrf.getDnEventCrfMaps();
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean()	;
 		dnNotesBean.setEntityID(eventCrf.getCrfVersion().getOcOid());
