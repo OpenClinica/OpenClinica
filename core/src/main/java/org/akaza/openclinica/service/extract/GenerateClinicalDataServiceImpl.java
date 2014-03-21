@@ -284,15 +284,24 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			
 			expSEBean.setLocation(se.getLocation());
 			if(se.getDateEnd()!=null)
-			expSEBean.setEndDate(se.getDateEnd() + "");
-if(se.getStartTimeFlag())
-			expSEBean.setStartDate(se.getDateStart() + "");
-else
-{
-	String temp = sdf.format(se.getDateStart());
-	expSEBean.setStartDate(temp);
-	
-}
+			
+              if(se.getEndTimeFlag())
+                 expSEBean.setEndDate(se.getDateEnd() + "");
+            else
+	        {
+		      String temp = sdf.format(se.getDateEnd());
+    		  expSEBean.setEndDate(temp);
+	        }
+
+			
+            if(se.getStartTimeFlag())
+    			expSEBean.setStartDate(se.getDateStart() + "");
+          else
+	        {
+		      String temp = sdf.format(se.getDateStart());
+  		      expSEBean.setStartDate(temp);
+	        }
+
 			expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 			
 			expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());

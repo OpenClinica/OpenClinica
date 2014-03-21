@@ -86,19 +86,19 @@ function util_checkSessionResponse(obj) {
 }
 
 
- function util_cleanDate(eventStartDate){
+ function util_cleanDate(eventDate){
 	
-	 if(!eventStartDate)
-		return eventStartDate;
+	 if(!eventDate)
+		return eventDate;
 	
-	 if(eventStartDate){
-		  if(eventStartDate.toString().indexOf("00:00:00")>1) {
-			  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().indexOf("00:00:00"));
+	 if(eventDate){
+		  if(eventDate.toString().indexOf("00:00:00")>1) {
+			  eventDate = eventDate.substring(0,eventDate.toString().indexOf("00:00:00"));
 		  }
 		  else
 			  {
-			  if(eventStartDate.toString().lastIndexOf(":00")){
-			  eventStartDate = eventStartDate.substring(0,eventStartDate.toString().lastIndexOf(":00"));
+			  if(eventDate.toString().lastIndexOf(":00")>1){
+			  eventDate = eventDate.substring(0,eventDate.toString().lastIndexOf(":00"));
 			  }
 			  }
 			  
@@ -110,8 +110,8 @@ function util_checkSessionResponse(obj) {
        String.prototype.trim = function() {
             return this.replace(/^\s+|\s+$/g, ''); 
               }
-           }
-	 return eventStartDate.trim();
+           }   
+	 return eventDate.trim();
 } 
 
 function util_checkSession() {
