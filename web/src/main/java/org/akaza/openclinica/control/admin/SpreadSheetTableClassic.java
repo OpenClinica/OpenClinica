@@ -477,7 +477,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // YW >>
                         int numberOfOptions = 0;
                         if (!resNames.contains(responseLabel) && StringUtil.isBlank(resOptions) && responseTypeId != ResponseType.TEXT.getId()
-                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.URL.getId()) {
+                            && responseTypeId != ResponseType.TEXTAREA.getId()) {
                             // << tbh #4180
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_OPTIONS_TEXT_column")
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
@@ -511,7 +511,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             resValues = "file";
                         }
                         if (!resNames.contains(responseLabel) && StringUtil.isBlank(resValues) && responseTypeId != ResponseType.TEXT.getId()
-                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.URL.getId()) {
+                            && responseTypeId != ResponseType.TEXTAREA.getId()) {
                             // << tbh, #4180, add textarea too?
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");

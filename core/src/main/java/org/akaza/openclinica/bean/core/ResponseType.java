@@ -11,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
- * All response types defined here should have a matching entry in the 'RESPONSE_TYPE' database table.
- *
  * @author ssachs
  */
 public class ResponseType extends Term {
@@ -38,15 +35,19 @@ public class ResponseType extends Term {
 
     public static final ResponseType INSTANT_CALCULATION = new ResponseType(10, "instant-calculation");
 
-    public static final ResponseType URL = new ResponseType(11, "url");
+    // public static final ResponseType CODING = new ResponseType(10, "text(non-editable)");// added 03/2009, tbh
+    // changed 03/09, from 'coding' to 'text(non-editable)' to accept spreadsheet changes
 
-    private static final ResponseType[] members = { TEXT, TEXTAREA, CHECKBOX, FILE, RADIO, SELECT, SELECTMULTI,
-            CALCULATION, GROUP_CALCULATION, INSTANT_CALCULATION, URL};
 
-    public static final List<ResponseType> list = Arrays.asList(members);
+    private static final ResponseType[] members = { TEXT, TEXTAREA, CHECKBOX, FILE, RADIO, SELECT, SELECTMULTI, CALCULATION, GROUP_CALCULATION, INSTANT_CALCULATION};// , CODING };
+
+    public static final List list = Arrays.asList(members);
 
     private ResponseType(int id, String name) {
         super(id, name);
+    }
+
+    private ResponseType() {
     }
 
     public static boolean contains(int id) {
@@ -64,8 +65,9 @@ public class ResponseType extends Term {
     }
 
     public static boolean findByName(String name) {
-        for (ResponseType rt : list) {
-            if (rt.getName().equals(name)) {
+        for (int i = 0; i < list.size(); i++) {
+            ResponseType temp = (ResponseType) list.get(i);
+            if (temp.getName().equals(name)) {
                 return true;
             }
         }
@@ -82,9 +84,10 @@ public class ResponseType extends Term {
             return ResponseType.INVALID;
         }
         name = name.trim();
-        for (ResponseType rt : list) {
-            if (rt.getName().equalsIgnoreCase(name)) {
-                return rt;
+        for (int i = 0; i < list.size(); i++) {
+            ResponseType temp = (ResponseType) list.get(i);
+            if (temp.getName().equalsIgnoreCase(name)) {
+                return temp;
             }
         }
         return ResponseType.INVALID;

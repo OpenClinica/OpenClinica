@@ -26,45 +26,4 @@
         </attribute>
     </tag>
 
-
-    <tag>
-        <name>urlItem</name>
-        <tag-class>org.akaza.openclinica.view.tags.UrlItemTag</tag-class>
-        <body-content>empty</body-content>
-
-        <attribute>
-            <name>displayItem</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-
-        <attribute>
-            <name>section</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-
-
-        <attribute>
-            <name>study</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-
-        <attribute>
-            <name>studySubject</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-
-        <attribute>
-            <name>bundle</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-
-
-
-    </tag>
-
 </taglib>
