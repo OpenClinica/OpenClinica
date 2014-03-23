@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="oc" uri="http://www.openclinica.com/jsp/tld/oc" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -928,6 +929,11 @@ include the default value first in the select list --%>
         </c:otherwise>
         </c:choose>
 </c:if>
+
+<c:if test='${inputType == "url"}'>
+    &nbsp;<oc:urlItem displayItem="${displayItem}" section="${section}" study="${study}" studySubject="${studySubject}" bundle="${resword}"/>
+</c:if>
+
 <c:if test="${displayItem.metadata.required}">
   <td valign="top"><span class="alert">*</span></td>
 </c:if>
