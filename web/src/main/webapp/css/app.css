@@ -463,3 +463,12 @@ td {
 	padding-left: 100px;
 	list-style-type: none;
 }
+
+#loading_msg {
+	margin-top: 5%;
+	color: #999999;
+	width: 100%;
+	text-align: center;
+	font-size: 18px;
+	font-family: Verdana, Geneva, sans-serif;
+}

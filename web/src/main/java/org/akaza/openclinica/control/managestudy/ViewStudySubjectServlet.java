@@ -593,7 +593,7 @@ public class ViewStudySubjectServlet extends SecureController {
             CRFBean cb = (CRFBean) cdao.findByPK(dedcrf.getEdc().getCrfId());
             dedcrf.getEdc().setCrf(cb);
 
-            ArrayList theVersions = (ArrayList) cvdao.findAllByCRFId(dedcrf.getEdc().getCrfId());
+            ArrayList theVersions = (ArrayList) cvdao.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
             ArrayList versions = new ArrayList();
             HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
 

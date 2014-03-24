@@ -218,6 +218,7 @@ public class StudySubject  extends DataMapDomainObject {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studySubject")
+	@OrderBy("discrepancyNote")
 	public List<DnStudySubjectMap> getDnStudySubjectMaps() {
 		return this.dnStudySubjectMaps;
 	}
