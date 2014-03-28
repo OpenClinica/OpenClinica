@@ -17,7 +17,7 @@ This is OpenClinica release ${project.version}.
 
 Please check the following URL for the latest release notes:
 
-https://docs.openclinica.com/release-notes/openclinica-3.1.3-release-notes
+https://docs.openclinica.com/release-notes/release-notes-openclinica-3.2
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 
@@ -61,16 +61,9 @@ Some key features of OpenClinica include:
 II. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 --------------------------------------------------------------
 
-Pre-requisites (versions):
-    Operating system(s): Windows XP, Windows Server 2003, Redhat Enterprise Linux 4.0+
-    Browsers: Internet Explorer  7.0, or 8.0 Mozilla Firefox 3.x
-    JDK : 1.6.0
-    Application server : Tomcat 6.0
-    Database server : PostgreSQL 8.4 or Oracle 10g
-    OpenClinica version for Upgrades only: OpenClinica 3.0.x,OpenClinica 3.1.X
+Refer to https://docs.openclinica.com/installation/system-requirements for system requirements.
 
-The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://dev.openclinica.com/hg/.
-
+The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://dev.openclinica.com/hg/
 --------------------------------------------------------------
 III. ABOUT OPENCLINICA
 --------------------------------------------------------------
