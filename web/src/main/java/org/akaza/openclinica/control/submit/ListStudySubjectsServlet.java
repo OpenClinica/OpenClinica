@@ -90,6 +90,7 @@ public class ListStudySubjectsServlet extends SecureController {
             // request.setAttribute("label", new Integer(nextLabel).toString());
             request.setAttribute("label", resword.getString("id_generated_Save_Add"));
             fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
+        
         }
 
         if (fp.getRequest().getParameter("subjectOverlay") == null){

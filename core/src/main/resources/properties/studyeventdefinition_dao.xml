@@ -145,4 +145,6 @@
             study_event group by study_event_definition_id, study_subject_id having study_subject_id = ?
         </sql>
     </query>
+    
+    
 </queries>

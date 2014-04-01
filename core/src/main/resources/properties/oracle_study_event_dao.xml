@@ -284,4 +284,11 @@
 			and sed.study_event_definition_id = ?
     	</sql>
     </query>
+    <query>
+    	<name>getStudyEventIdsForWSReq</name>
+    	<sql>
+select study_event_definition_id from study_event where study_subject_id = ?  
+
+    	</sql>
+    </query>
 </queries>

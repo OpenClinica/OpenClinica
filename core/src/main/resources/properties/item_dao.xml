@@ -247,4 +247,19 @@ crf_version.name as version_name, crf_version.status_id as v_status
  	</sql>
    </query>
   
+   
+    <query>
+        <name>getItemsForSpecificEvents</name>
+        <sql>
+            
+select item_id from versioning_map where crf_version_id in (select distinct crf_version_id from event_crf ec where ec.study_event_id in 
+    		(
+select study_event_definition_id from study_event where study_subject_id = ?  
+))
+
+    	</sql>
+   </query>
+
+   
+   
 </queries>
