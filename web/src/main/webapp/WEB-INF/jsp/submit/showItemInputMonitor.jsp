@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="oc" uri="http://www.openclinica.com/jsp/tld/oc" %>
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -390,11 +389,6 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 </c:if>
-
-<c:if test='${inputType == "url"}'>
-    &nbsp;<oc:urlItem displayItem="${displayItem}" section="${section}" study="${study}" studySubject="${studySubject}" bundle="${resword}"/>
-</c:if>
-
 <c:if test="${displayItem.metadata.required}">
   <td valign="top"><span class="alert">*</span></td>
 </c:if>

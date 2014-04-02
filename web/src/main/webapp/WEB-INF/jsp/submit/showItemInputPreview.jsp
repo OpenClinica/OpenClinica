@@ -1,6 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib prefix="oc" uri="http://www.openclinica.com/jsp/tld/oc" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -151,11 +150,6 @@
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" /><input type="text" disabled="disabled" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 </c:if>
-
-<c:if test='${inputType == "url"}'>
-    &nbsp;<oc:urlItem displayItem="${displayItem}" section="${section}" study="${study}" studySubject="${studySubject}" bundle="${resword}"/>
-</c:if>
-
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 	<c:choose>
 		<c:when test="${displayItem.numDiscrepancyNotes > 0}">
