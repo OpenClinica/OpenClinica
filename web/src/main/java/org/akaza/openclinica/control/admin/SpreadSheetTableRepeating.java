@@ -502,7 +502,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         }
                         int numberOfOptions = 0;
                         if (!resNames.contains(responseLabel) && StringUtil.isBlank(resOptions) && responseTypeId != ResponseType.TEXT.getId()
-                            && responseTypeId != ResponseType.TEXTAREA.getId()) {
+                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.URL.getId()) {
                             // << tbh #4180
                             // errors.add("The RESPONSE_OPTIONS_TEXT column was
                             // blank at row " + k
@@ -562,7 +562,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             resValues = "file";
                         }
                         if (!resNames.contains(responseLabel) && StringUtil.isBlank(resValues) && responseTypeId != ResponseType.TEXT.getId()
-                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.INSTANT_CALCULATION.getId()) {
+                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.INSTANT_CALCULATION.getId()
+                                && responseTypeId != ResponseType.URL.getId()) {
                             // << tbh #4180
 
                             // errors.add("The RESPONSE_VALUES column was blank

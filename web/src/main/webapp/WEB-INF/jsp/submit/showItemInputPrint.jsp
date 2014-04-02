@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="oc" uri="http://www.openclinica.com/jsp/tld/oc" %>
 
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
@@ -95,4 +96,7 @@
 </c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" /><input type="text" disabled="disabled" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+</c:if>
+<c:if test='${inputType == "url"}'>
+    &nbsp;<oc:urlItem displayItem="${displayItem}" section="${section}" study="${study}" studySubject="${studySubject}" bundle="${resword}"/>
 </c:if>
