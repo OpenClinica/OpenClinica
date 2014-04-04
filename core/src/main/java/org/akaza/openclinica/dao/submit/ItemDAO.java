@@ -717,4 +717,29 @@ crf_version.name as version_name, crf_version.status_id as v_status
         }
         return item_group_crfversion_info;
     }
+	
+	 public String getItemsForSpecificEvents(int studyId,int ssubjectId){
+    	StringBuilder sb = new StringBuilder();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(ssubjectId));
+
+        ArrayList alist2 =(ArrayList<V>) this.select(digester.getQuery("getItemsForSpecificEvents"), variables);
+        
+       
+        for(Object item:alist2){
+        	HashMap temp = (HashMap)item;
+            if(sb.length() > 0){
+                sb.append(',');
+            }
+            String entry = (temp.entrySet().toArray()[0]).toString();
+            if(entry!=null && !entry.isEmpty())
+            sb.append(entry.split("=")[1]);
+        }
+        String result = sb.toString();
+        
+        return result;
+    }
+
 }

@@ -30,7 +30,6 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -47,15 +46,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.InsertPropertyActionBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.expression.Context;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
@@ -727,9 +718,6 @@ public class AddNewSubjectServlet extends SecureController {
                     }
                 } else {
                     studySubject = ssd.createWithoutGroup(studySubject);
-                    StudySubjectBean ssBeanNuminfi = (StudySubjectBean) ssd.findByPK(studySubject.getId());//The enrollment date is changed in the above method only format and some other things are changed. TODO:Cast the enrollment date instead of roundtrip to db.
-                    getRuleSetService().runRulesInBeanProperty(createRuleSet(ssBeanNuminfi),currentStudy,ub,request,ssBeanNuminfi);
-                    
                 }
                 if (!classes.isEmpty() && studySubject.isActive()) {
                     SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
@@ -1022,102 +1010,5 @@ public class AddNewSubjectServlet extends SecureController {
 
         }
 
-    }
-    
-    
-    //JIKAN specific rules for creating events
-    private RuleSetService getRuleSetService() {
-        return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
-    }
-    
-    private ArrayList<RuleSetBean> createRuleSet(StudySubjectBean studySubject){
-        RuleBean rule = createRuleBean(studySubject.getLabel());
-        RuleSetBean ruleSet = getRuleSet(rule.getOid(),rule);
-
-        ArrayList<RuleSetBean> list = new ArrayList<RuleSetBean>();
-        list.add(ruleSet);
-        return list;
-    }
-
-//Calendar configuration or set up should take parameters from something like this....
-    private RuleSetBean getRuleSet(String ruleOid, RuleBean ruleBean) {
-        RuleSetBean ruleSet = new RuleSetBean();
-        ruleSet.setTarget(createExpression(Context.OC_RULES_V1, "SS.enrollmentDate"));//TODO:needs to change to enrollmentDate
-        RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, ruleOid,ruleBean);
-        ruleSet.addRuleSetRule(ruleSetRule);
-        return ruleSet;
-
-    }
-
-/*    private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, String ruleOid,RuleBean ruleBean) {
-        RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
-        ruleSetRule.setRuleBean(ruleBean);
-        InsertPropertyActionBean ruleAction = new InsertPropertyActionBean();
-        ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.dateStarted","SS.enrollmentDate + 0"));
-        ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.dateStarted","SS.enrollmentDate + 2"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.dateStarted","SS.enrollmentDate + 6"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.dateStarted","SS.enrollmentDate +13"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.dateStarted","SE_FOLLOWUPVISIT1.dateStarted + 7"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.subjectEventStatus","Scheduled"));
-        ruleAction.setExpressionEvaluatesTo(true);// this would evaluate to false in case the subject is rejected for example at screening stage.
-        ruleSetRule.addAction(ruleAction);
-        ruleSetRule.setRuleSetBean(ruleSet);
-        ruleSetRule.setOid(ruleOid);
-
-        return ruleSetRule;
-    }*/
-
-    
-    private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, String ruleOid,RuleBean ruleBean) {
-        RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
-        ruleSetRule.setRuleBean(ruleBean);
-        InsertPropertyActionBean ruleAction = new InsertPropertyActionBean();
-        ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.dateStarted","SS.enrollmentDate + 0"));
-        ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.dateStarted","SE_RANDOMIZATION.dateStarted + 2"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.dateStarted","SE_TREATMENTVISIT1.dateStarted + 4"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.dateStarted","SE_TREATMENTVISIT2.dateStarted + 5"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.dateStarted","SE_FOLLOWUPVISIT1.dateStarted + 7"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.subjectEventStatus","Scheduled"));
-        ruleAction.setExpressionEvaluatesTo(true);// this would evaluate to false in case the subject is rejected for example at screening stage.
-        ruleSetRule.addAction(ruleAction);
-        ruleSetRule.setRuleSetBean(ruleSet);
-        ruleSetRule.setOid(ruleOid);
-
-        return ruleSetRule;
-    }
-    private PropertyBean createPropertyBean(String Oid,String expression)
-    {
-        PropertyBean propertyBean = new PropertyBean();
-        propertyBean.setOid(Oid);
-        ExpressionBean expressionBean = createExpression(Context.OC_RULES_V1,expression);
-        propertyBean.setValueExpression(expressionBean);
-        return propertyBean;
-    }
-
-    private RuleBean createRuleBean(String label) {
-        RuleBean ruleBean = new RuleBean();
-        ruleBean.setName("TEST");
-        ruleBean.setOid("BOY");
-        ruleBean.setDescription("Yellow");
-        ruleBean.setExpression(createExpression(Context.OC_RULES_V1,
-                "SS.label eq \"" +
-                label +
-                "\""));
-        return ruleBean;
-    }
-
-    private ExpressionBean createExpression(Context context, String value) {
-        ExpressionBean expression = new ExpressionBean();
-        expression.setContext(context);
-        expression.setValue(value);
-        return expression;
     }
 }
