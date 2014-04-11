@@ -31,23 +31,7 @@ public class DatasetBean extends AuditableEntityBean {
     private java.util.Date dateStart;
     private java.util.Date dateEnd;
     private int approverId = 0;
-    //For use for webservice, getStudySubjectODM which does not have item data
-    private Boolean collectItemData = true;
-    private Boolean collectFormAuditData = true;
-    private Boolean collectFormDNdata = true;
-    private Boolean collectStudyEventAuditLogs = true;//for use from webservice only,default is true from webservice getStudySubjectEvent it is false
-    private Boolean showSubjectDataAuditLogs = true;
-    private Boolean collectFormsWithNoEventCRFS=false;
-    
-    public Boolean getCollectStudyEventAuditLogs() {
-		return collectStudyEventAuditLogs;
-	}
-
-	public void setCollectStudyEventAuditLogs(Boolean collectStudyEventAuditLogs) {
-		this.collectStudyEventAuditLogs = collectStudyEventAuditLogs;
-	}
-
-	// private int maxItemDataBeanOrdinal = 0;
+    // private int maxItemDataBeanOrdinal = 0;
     // above somewhat of a hack,
     // we need to deliver the maximum ordinal size
     // for repeating items to the extract data bean
@@ -90,8 +74,6 @@ public class DatasetBean extends AuditableEntityBean {
     private boolean showCRFcompletionDate = false;
     // again, how is it different from Start/End?
     private boolean showSubjectGroupInformation = false;
-    
-    
     // private boolean showGroupInformation = false;
     // private boolean showDiscrepancyInformation = false;
     // removed above after meeting 07/16/2007, tbh
@@ -635,50 +617,6 @@ public class DatasetBean extends AuditableEntityBean {
         sql += s1[0] + itemIdStr + s1[1].substring(s1[1].indexOf(")"));
         return sql;
     }
-/**
- * For use for webservice, getStudySubjectODM which does not have item data
- * @param collectItemData
- */
-	public void setCollectItemData(Boolean collectItemData) {
-		this.collectItemData = collectItemData;
-	}
-
-	public Boolean getCollectItemData() {
-		return collectItemData;
-	}
-
-	public void setCollectFormAuditData(Boolean collectFormAuditData) {
-		this.collectFormAuditData = collectFormAuditData;
-	}
-
-	public Boolean getCollectFormAuditData() {
-		return collectFormAuditData;
-	}
-
-	public void setCollectFormDNdata(Boolean collectFormDNdata) {
-		this.collectFormDNdata = collectFormDNdata;
-	}
-
-	public Boolean getCollectFormDNdata() {
-		return collectFormDNdata;
-	}
-
-	public void setShowSubjectDataAuditLogs(boolean showSubjectDataAuditLogs) {
-		this.showSubjectDataAuditLogs = showSubjectDataAuditLogs;
-	}
-
-	public boolean isShowSubjectDataAuditLogs() {
-		return showSubjectDataAuditLogs;
-	}
-
-	public void setCollectFormsWithNoEventCRFS(
-			Boolean collectFormsWithNoEventCRFS) {
-		this.collectFormsWithNoEventCRFS = collectFormsWithNoEventCRFS;
-	}
-
-	public Boolean getCollectFormsWithNoEventCRFS() {
-		return collectFormsWithNoEventCRFS;
-	}
 
     /*
      * public int getMaxItemDataBeanOrdinal() { return maxItemDataBeanOrdinal; }

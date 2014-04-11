@@ -45,11 +45,6 @@ public class ClinicalDataCollector extends OdmDataCollector {
         this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
     }
 
-    
-    public ClinicalDataCollector(DataSource ds,StudyBean currentStudy){
-    	  super(ds, currentStudy);
-    	  this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
-    }
     @Override
     public void collectFileData() {
         this.collectOdmRoot();
@@ -70,31 +65,6 @@ public class ClinicalDataCollector extends OdmDataCollector {
         }
     }
 
-    
-    public void collectOdmClinicalDataMapPerStudySubj(Integer StudySubjectId,StudyBean study ){
-    	ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds,this.dataset,this.getOdmbean(),study,this.getCategory());
-    	  StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
-    	cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(study.getId()+""));
-    	cdata.collectOdmClinicalData();
-    	odmClinicalDataMap.put(study.getOid(), cdata.getOdmClinicalData());
-    }
-    
-    
-    public void collectOdmClinicalDataMapPerStudySubj(Integer StudySubjectId,StudyBean study,DatasetBean dataset ){
-    	ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds,dataset,this.getOdmbean(),study,this.getCategory());
-    	  StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
-    	cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(study.getId()+""));
-    	cdata.collectOdmClinicalData(dataset);
-    	odmClinicalDataMap.put(study.getOid(), cdata.getOdmClinicalData());
-    }
-    
-    public void collectOdmClinicalDataMap(Integer StudySubjectId,StudyBean study,DatasetBean dataset ){
-    	ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds,dataset,this.getOdmbean(),study,this.getCategory());
-    	  StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
-    	cdata.setStudySubjectIds(StudySubjectId+"");
-    	cdata.collectOdmClinicalData(dataset);
-    	odmClinicalDataMap.put(study.getOid(), cdata.getOdmClinicalData());
-    }
     public LinkedHashMap<String, OdmClinicalDataBean> getOdmClinicalDataMap() {
         return odmClinicalDataMap;
     }

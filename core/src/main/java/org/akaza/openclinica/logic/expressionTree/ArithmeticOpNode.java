@@ -50,8 +50,8 @@ public class ArithmeticOpNode extends ExpressionNode {
     @Override
     String calculate() throws OpenClinicaSystemException {
 
-        String l = (String) left.value();
-        String r = (String) right.value();
+        String l = left.value();
+        String r = right.value();
         validate(l, r);
         String t = calculateDate(l, r);
         if (t != null) {
@@ -99,8 +99,7 @@ public class ArithmeticOpNode extends ExpressionNode {
         DateTimeFormatter fmt = ISODateTimeFormat.date();
         switch (op) {
         case PLUS: {
-            dm = dm.plusDays( Double.valueOf(value2).intValue());
-          
+            dm = dm.plusDays(Double.valueOf(value2).intValue());
             return fmt.print(dm);
         }
         case MINUS: {

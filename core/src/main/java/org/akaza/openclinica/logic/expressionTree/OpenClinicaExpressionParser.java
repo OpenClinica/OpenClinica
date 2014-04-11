@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.logic.expressionTree;
 
-import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ public class OpenClinicaExpressionParser {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     TextIO textIO;
     ExpressionObjectWrapper expressionWrapper;
-    ExpressionBeanObjectWrapper expressionBeanWrapper;
     private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
     private HashMap<String, String> testValues;
     private HashMap<String, String> responseTestValues;
@@ -32,6 +30,7 @@ public class OpenClinicaExpressionParser {
     public OpenClinicaExpressionParser() {
         textIO = new TextIO();
     }
+
     public HashMap<String, String> getTestValues() {
         return testValues;
     }
@@ -56,11 +55,6 @@ public class OpenClinicaExpressionParser {
         this.expressionWrapper = expressionWrapper;
     }
 
-    public OpenClinicaExpressionParser(ExpressionBeanObjectWrapper expressionBeanWrapper) {
-        textIO = new TextIO();
-        this.expressionBeanWrapper = expressionBeanWrapper;
-    }
-
     public void parseExpression(String expression) throws OpenClinicaSystemException {
         getTextIO().fillBuffer(expression);
         getTextIO().skipBlanks();
@@ -70,7 +64,7 @@ public class OpenClinicaExpressionParser {
         exp.printStackCommands();
     }
 
-    public Object parseAndEvaluateExpression(String expression) throws OpenClinicaSystemException {
+    public String parseAndEvaluateExpression(String expression) throws OpenClinicaSystemException {
         getTextIO().fillBuffer(expression);
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();
@@ -225,9 +219,7 @@ public class OpenClinicaExpressionParser {
         textIO.skipBlanks();
         char ch = textIO.peek();
         logger.debug("TheChar is : " + ch);
-        System.out.println("ch:::::factorTreaee"+ch);
         if (Character.isDigit(ch)) {
-        	
             String dateOrNum = textIO.getDate();
             if (dateOrNum == null) {
                 dateOrNum = String.valueOf(textIO.getDouble());
@@ -248,13 +240,7 @@ public class OpenClinicaExpressionParser {
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
             logger.debug("TheWord 1 is : " + k);
-            // TODO: Fix this if/else needs a better way of doing this.
-            if(null != expressionWrapper){
-                return new OpenClinicaVariableNode(k, expressionWrapper, this);
-            }else{
-                return new OpenClinicaBeanVariableNode(k, expressionBeanWrapper, this);
-            }
-
+            return new OpenClinicaVariableNode(k, expressionWrapper, this);
         } else if (String.valueOf(ch).matches("\"")) {
             String k = textIO.getDoubleQuoteWord();
             logger.debug("TheWord 2 is : " + k);

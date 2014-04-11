@@ -30,7 +30,7 @@ public class UnaryMinusNode extends ExpressionNode {
     @Override
     String calculate() {
         // The value is the negative of the value of the operand.
-        String theOperand = (String) operand.value();
+        String theOperand = operand.value();
         validate(theOperand);
         double neg = Double.valueOf(theOperand);
         return String.valueOf(-neg);

@@ -321,7 +321,7 @@ public class ViewStudySubjectServlet extends SecureController {
             }
             // >>
             EntityBeanTable table = fp.getEntityBeanTable();
-            table.setSortingIfNotExplicitlySet(1, true);// sort by start
+            table.setSortingIfNotExplicitlySet(1, false);// sort by start
             // date, desc
             ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 

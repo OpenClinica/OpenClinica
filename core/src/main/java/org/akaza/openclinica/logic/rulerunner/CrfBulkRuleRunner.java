@@ -120,7 +120,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
                     ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
@@ -206,7 +206,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
                     ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                         itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 
                         // Actions

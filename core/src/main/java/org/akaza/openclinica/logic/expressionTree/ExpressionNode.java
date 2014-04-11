@@ -23,7 +23,7 @@ public abstract class ExpressionNode {
     private HashMap<String, String> testValues;
     private OpenClinicaExpressionParser expressionParser;
 
-    Object value() throws OpenClinicaSystemException {
+    String value() throws OpenClinicaSystemException {
         return calculate();
     }
 
@@ -37,7 +37,7 @@ public abstract class ExpressionNode {
         return testCalculate();
     }
 
-    abstract Object calculate() throws OpenClinicaSystemException;
+    abstract String calculate() throws OpenClinicaSystemException;
 
     abstract String testCalculate() throws OpenClinicaSystemException;
 

@@ -83,7 +83,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                     ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue,ecb);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                         itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
                         
                         // Actions

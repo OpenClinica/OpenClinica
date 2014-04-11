@@ -46,25 +46,6 @@
         </complexType>
     </element>
     
-        <element name="getStudySubjectEventRequest">
-       <complexType>
-            <sequence>
-                <element name="studySubject" type="beans:studySubjectType"  minOccurs="1" maxOccurs="1"/>
-           </sequence>
-        </complexType>
-    </element>
-
- 
-    <element name="getStudySubjectEventResponse">
-        <complexType>
-            <sequence>
-                <element name="result" type="string"/>
-                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
-                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
-            </sequence>
-        </complexType>
-    </element>
-    
     <element name="listAllByStudyRequest" type="beans:listStudySubjectsInStudyType"/>
     
     <element name="listAllByStudyResponse">
@@ -77,9 +58,5 @@
             </sequence>
         </complexType>
     </element>
-
-
-
-
 
 </schema>

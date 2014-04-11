@@ -381,24 +381,6 @@ public class StudyEventDAO extends AuditableEntityDAO {
         return eb;
     }
 
-    public EntityBean findByStudySubjectIdAndDefinitionIdAndOrdinalreturnNull(int ssbid, int sedid, int ord) {
-        this.setTypesExpected();
-        HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(ssbid));
-        variables.put(Integer.valueOf(2), Integer.valueOf(sedid));
-        variables.put(Integer.valueOf(3), Integer.valueOf(ord));
-
-        String sql = digester.getQuery("findByStudySubjectIdAndDefinitionIdAndOrdinal");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
-        StudyEventBean eb =null;
-        if (it.hasNext()) {
-            eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
-        }
-        return eb;
-    }
-    
-    
     // YW >>
 
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -1177,28 +1159,4 @@ public class StudyEventDAO extends AuditableEntityDAO {
         return returnMe;
     }
 
-    
-    public String getStudyEventIdsForWSReq(int studyId,int ssubjectId){
-    	StringBuilder sb = new StringBuilder();
-         this.setTypesExpected();
-
-         HashMap variables = new HashMap();
-         variables.put(Integer.valueOf(1), Integer.valueOf(ssubjectId));
-
-         ArrayList<HashMap> alist = this.select(digester.getQuery("getStudyEventIdsForWSReq"), variables);
-         
-         
-         for(HashMap item: alist){
-             if(sb.length() > 0){
-                 sb.append(',');
-             }
-             String temp = item.entrySet().toArray()[0].toString();
-             if(temp!=null &&!temp.isEmpty())
-             sb.append(temp.split("=")[1]);
-         }
-         String result = sb.toString();
-         
-         return result;
-         
-    }
 }
