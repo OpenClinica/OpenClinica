@@ -3,6 +3,7 @@
   <include  file="migration/2.5/release.xml"/> 
   <include  file="migration/3.0/release.xml"/>
   <include  file="migration/amethyst/release.xml"/>   
-       <include  file="migration/3.2/release.xml"/>  
+       <include  file="migration/3.2/release.xml"/>
+       <include  file="migration/3.3/release.xml"/>  
 <include  file="migration/customDevelopment/release.xml"/>   
 </databaseChangeLog> 
