@@ -84,7 +84,8 @@ public class ExpressionService {
     private CRFVersionDAO crfVersionDao;
     private ItemDataDAO itemDataDao;
     private StudyEventDAO studyEventDao;
-
+    private final String STARTDATE =".STARTDATE";
+    private final String STATUS =".STATUS";
     /*
      * The variables below are used as a small Cache so that we don't go to the
      * database every time we want to get an Object by it's OID. This is a very
@@ -785,6 +786,35 @@ public class ExpressionService {
         }
     }
 
+    
+    public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression) {
+        return expression.split(ESCAPED_SEPERATOR).length == 2 ? getStudyEventDefinitionFromExpressionForEventScheduling(expression, expressionWrapper.getStudyBean()) : null;
+    }
+
+    public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression, StudyBean study) {
+        
+    	String studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
+    	//String studyEventDefinitionKey = getStudyEventDefinitionOidFromExpression(expression);
+        logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey, study.getId() });
+        if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
+            return studyEventDefinitions.get(studyEventDefinitionKey);
+        } else {
+            // temp fix
+            int studyId = study.getParentStudyId() != 0 ? study.getParentStudyId() : study.getId();
+            StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(studyEventDefinitionKey, studyId, studyId);
+            // another way to get at the problem which I fix in the
+            // findByOidAndStudy method, tbh
+            if (studyEventDefinition != null) {
+                studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);
+                return studyEventDefinition;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    
+    
     public ItemGroupBean getItemGroupExpression(String expression) {
         if (expression.split(ESCAPED_SEPERATOR).length < 2) {
             return null;
@@ -923,30 +953,31 @@ public class ExpressionService {
         ItemBean item = null;
         ItemGroupBean itemGroup = null;
         CRFBean crf = null;
-
-        if (length > 0) {
+        boolean isEventStartDateAndStatusParamExist = expression.contains(STARTDATE) || expression.contains(STATUS);
+        
+        if (length > 0 && !isEventStartDateAndStatusParamExist) {
             item = getItemFromExpression(expression);
             if (item == null)
                 throw new OpenClinicaSystemException("OCRERR_0023");
             // throw new OpenClinicaSystemException("item is Invalid");
         }
 
-        if (length > 1) {
+        if (length > 1 && !isEventStartDateAndStatusParamExist) {
             String itemGroupOid = getItemGroupOidFromExpression(expression);
             itemGroup = getItemGroupDao().findByOid(itemGroupOid);
-            if(itemGroup == null)
+            if(itemGroup == null )
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
         }
 
-        if (length > 2) {
+        if (length > 2 && !isEventStartDateAndStatusParamExist) {
             crf = getCRFFromExpression(expression);
             if (crf == null || crf.getId() != itemGroup.getCrfId())
                 throw new OpenClinicaSystemException("OCRERR_0033");
             // throw new OpenClinicaSystemException("CRF is Invalid");
         }
 
-        if (length > 3) {
+        if (length > 3 && !isEventStartDateAndStatusParamExist) {
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
             crf = getCRFFromExpression(expression);
             if (studyEventDefinition == null || crf == null)
@@ -962,6 +993,13 @@ public class ExpressionService {
             // throw new
             // OpenClinicaSystemException("StudyEventDefinition is Invalid");
         }
+
+        if (length == 2  && isEventStartDateAndStatusParamExist) {
+            StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpressionForEventScheduling(expression);
+             if (studyEventDefinition == null)
+                 throw new OpenClinicaSystemException("OCRERR_0034");
+        }
+
     }
 
     public EventDefinitionCRFBean getEventDefinitionCRF(String expression) {
