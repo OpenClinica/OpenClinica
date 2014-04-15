@@ -6,6 +6,11 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 
+/**
+ * 
+ * @author jnyayapathi
+ *
+ */
 public class EventActionProcessor implements ActionProcessor {
 
 	@Override
