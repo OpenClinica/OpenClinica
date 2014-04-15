@@ -10,6 +10,7 @@ package org.akaza.openclinica.domain.rule;
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -55,6 +56,10 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     private List<InsertActionBean> lazyInsertActions = LazyList.decorate(new ArrayList<InsertActionBean>(),
             FactoryUtils.instantiateFactory(InsertActionBean.class));
 
+    private List<EventActionBean> lazyEventActions =  LazyList.decorate(new ArrayList<EventActionBean>(),
+            FactoryUtils.instantiateFactory(EventActionBean.class));
+
+    
     // Transient
     String oid;
     RuleSetRuleBeanImportStatus ruleSetRuleBeanImportStatus;

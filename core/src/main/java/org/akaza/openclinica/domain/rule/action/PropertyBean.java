@@ -20,6 +20,9 @@ public class PropertyBean extends AbstractMutableDomainObject {
     private String oid;
     private String value;
     private ExpressionBean valueExpression;
+    
+    private String property;
+    
 
     @Column(name = "oc_oid")
     public String getOid() {
@@ -60,6 +63,7 @@ public class PropertyBean extends AbstractMutableDomainObject {
         result = prime * result + ((oid == null) ? 0 : oid.hashCode());
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         result = prime * result + ((valueExpression == null) ? 0 : valueExpression.hashCode());
+        result = prime * result + ((property == null) ? 0 : property.hashCode());
         return result;
     }
 
@@ -87,7 +91,20 @@ public class PropertyBean extends AbstractMutableDomainObject {
                 return false;
         } else if (!valueExpression.equals(other.valueExpression))
             return false;
+        if (property == null) {
+            if (other.property != null)
+                return false;
+        } else if (!property.equals(other.property))
+            return false;
         return true;
     }
+
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
+	}
 
 }

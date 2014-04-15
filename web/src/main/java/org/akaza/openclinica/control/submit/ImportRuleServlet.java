@@ -90,7 +90,9 @@ public class ImportRuleServlet extends SecureController {
                 // File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
                 InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
+                
                 schemaValidator.validateAgainstSchema(f, xsdFile);
+                
                 RulesPostImportContainer importedRules = handleLoadCastor(f);
                 logger.info(ub.getFirstName());
                 importedRules = getRulesPostImportContainerService().validateRuleDefs(importedRules);

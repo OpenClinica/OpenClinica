@@ -539,6 +539,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String text1 = resOptions.replaceAll("\\\\,", "##");
                         String[] resArray = text1.split(",");
                         item_from_row.setResponseOptions(resArray);
+                        System.out.println(item_from_row.getItemName());
                         if (labelWithOptions.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resOptions)) {
                                 for (int i = 0; i < resArray.length; i++) {

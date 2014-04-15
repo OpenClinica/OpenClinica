@@ -164,6 +164,27 @@
        </field>
      </class>
      
+     <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
+        <map-to xml="EventAction" />
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.EventPropertyBean"
+            collection="arraylist">
+            <bind-xml name="EventDestination"/>
+        </field>
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="Oc_oid_reference"
+               type="java.lang.String">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="RunOnStatus"/>
+       </field>
+     </class>
+     
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
         <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">
             <bind-xml name="OID" node="attribute"/>
