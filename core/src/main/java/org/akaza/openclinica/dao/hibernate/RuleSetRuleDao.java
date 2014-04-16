@@ -1,20 +1,21 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
@@ -78,6 +79,10 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
                 if (action instanceof HideActionBean) {
                     ((HideActionBean) action).getProperties().size();
                 }
+                if (action instanceof EventActionBean) {
+                    ((EventActionBean) action).getProperties().size();
+                }
+
             }
         }
         return ruleSetRules;
