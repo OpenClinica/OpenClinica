@@ -75,6 +75,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         actions.addAll(lazyEmailActions);
         actions.addAll(lazyShowActions);
         actions.addAll(lazyHideActions);
+        actions.addAll(lazyEventActions);
     }
 
     @Transient

@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -21,6 +22,7 @@ import org.hibernate.annotations.FetchMode;
  *
  */
 @Entity
+@DiscriminatorValue("6")
 public class EventActionBean extends RuleActionBean {
 
 	
