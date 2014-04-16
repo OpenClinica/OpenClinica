@@ -22,7 +22,7 @@ public class RuleActionContainerComparator implements Comparator<RuleActionConta
         order.put(ActionType.INSERT, "3");
         order.put(ActionType.SHOW, "4");
         order.put(ActionType.HIDE, "5");
-
+        order.put(ActionType.EVENT,"6");
     }
 
     public int compare(RuleActionContainer o1, RuleActionContainer o2) {
