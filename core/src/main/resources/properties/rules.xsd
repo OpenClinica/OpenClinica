@@ -98,7 +98,7 @@
     <xs:complexType name="EventActionType">
         <xs:sequence>
            <xs:element name="RunOnStatus" type="RunOnType" minOccurs="0"/>
-           <xs:element name="EventDestination" type="EventDestinationType" minOccurs="0"/>
+           <xs:element name="EventDestination" type="EventDestinationType" maxOccurs="unbounded"/>
         </xs:sequence>
          
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
@@ -108,7 +108,7 @@
     <xs:complexType name="RunOnType">
       <xs:attribute name="not_started"        type="xs:boolean" use="required"/>
       <xs:attribute name="scheduled"          type="xs:boolean" use="required"/>
-      <xs:attribute name="date_entry_started" type="xs:boolean" use="required"/>
+      <xs:attribute name="data_entry_started" type="xs:boolean" use="required"/>
       <xs:attribute name="complete"           type="xs:boolean" use="required"/>
       <xs:attribute name="skipped"            type="xs:boolean" use="required"/>
       <xs:attribute name="stopped"            type="xs:boolean" use="required"/>
