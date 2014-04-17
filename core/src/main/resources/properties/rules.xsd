@@ -98,7 +98,7 @@
     <xs:complexType name="EventActionType">
         <xs:sequence>
            <xs:element name="RunOnStatus" type="RunOnType" minOccurs="0"/>
-           <xs:element name="EventDestination" type="EventDestinationType" minOccurs="0"/>
+           <xs:element name="EventDestination" type="EventDestinationType" maxOccurs="unbounded"/>
         </xs:sequence>
          
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
