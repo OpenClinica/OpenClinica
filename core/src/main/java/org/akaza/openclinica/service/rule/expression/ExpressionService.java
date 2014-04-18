@@ -504,7 +504,7 @@ public class ExpressionService {
             }
 
         } else {
-            boolean isEventStartDateAndStatusParamExist = expression.startsWith("SE_") && (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
+            boolean isEventStartDateAndStatusParamExist =  (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
            if (isEventStartDateAndStatusParamExist) { 
         	   result = true; 
            }else if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
@@ -961,7 +961,7 @@ public class ExpressionService {
         ItemBean item = null;
         ItemGroupBean itemGroup = null;
         CRFBean crf = null;
-        boolean isEventStartDateAndStatusParamExist = expression.startsWith("SE_") && (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
+        boolean isEventStartDateAndStatusParamExist = (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
             
         
         if (length > 0 && !isEventStartDateAndStatusParamExist) {
