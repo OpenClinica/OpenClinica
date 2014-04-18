@@ -32,7 +32,7 @@ public class EventActionBean extends RuleActionBean {
 	
 	 public EventActionBean() {
 	        setActionType(ActionType.EVENT);
-	        setRuleActionRun(new RuleActionRunBean(true, true, true, false, false));
+	        setRuleActionRun(new RuleActionRunBean(null, null, null, null, null, true,true,false,false,false,false));
 	    }
 
 	public String getOc_oid_reference() {

@@ -197,10 +197,7 @@
      
      <class name="org.akaza.openclinica.domain.rule.action.EventPropertyBean"  >
         <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
-            <bind-xml name="OID" node="attribute"/>
-       </field>
-       <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
-            <bind-xml name="Value" node="attribute"/>
+            <bind-xml name="property" node="attribute"/>
        </field>
        <field name="valueExpression"
                type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
