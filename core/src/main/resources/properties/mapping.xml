@@ -197,6 +197,16 @@
                <bind-xml name="ValueExpression"/>
        </field>
      </class>
+     <class name="org.akaza.openclinica.domain.rule.action.EventPropertyBean"  >
+        <field name="property" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
+            <bind-xml name="property" node="attribute"/>
+       </field>
+       <field name="valueExpression"
+               type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+               <bind-xml name="ValueExpression"/>
+       </field>
+     </class>
+     
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" auto-complete="true">
         <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
             <bind-xml name="Context" node="attribute"/>
@@ -210,7 +220,7 @@
             <bind-xml name="AdministrativeDataEntry" node="attribute"/>
        </field>
        <field name="initialDataEntry" type="boolean">
-            <bind-xml name="InitialDataEntry" node="attribute"/>
+            <bind-xml name="InitialDataEntry" node="attribute" />
        </field>
        <field name="doubleDataEntry" type="boolean">
             <bind-xml name="DoubleDataEntry" node="attribute"/>
@@ -220,6 +230,25 @@
        </field>
        <field name="batch" type="boolean">
             <bind-xml name="Batch" node="attribute"/>
+       </field>
+       <field name="not_started" type="boolean">
+            <bind-xml name="not_started" node="attribute"/>
+       </field>
+       <field name="scheduled" type="boolean">
+            <bind-xml name="scheduled" node="attribute"/>
+       </field>
+       <field name="data_entry_started" type="boolean">
+            <bind-xml name="data_entry_started" node="attribute"/>
+       </field>
+    
+       <field name="complete" type="boolean">
+            <bind-xml name="complete" node="attribute"/>
+       </field>
+          <field name="skipped" type="boolean">
+            <bind-xml name="skipped" node="attribute"/>
+       </field>
+         <field name="stopped" type="boolean">
+            <bind-xml name="stopped" node="attribute"/>
        </field>
      </class>
 </mapping>

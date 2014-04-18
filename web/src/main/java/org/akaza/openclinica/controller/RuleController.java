@@ -1,5 +1,15 @@
 package org.akaza.openclinica.controller;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -65,16 +75,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping(value = "/rule")
@@ -185,6 +185,26 @@ public class RuleController {
             }
             ruleSetRuleBean.addAction(action);
         }
+        
+       /* for (EventActionType insertActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getEventAction()) {
+            InsertActionBean action = new InsertActionBean();
+            action.setExpressionEvaluatesTo(Boolean.valueOf(insertActionType.getIfExpressionEvaluates()));
+            action.getRuleActionRun().setInitialDataEntry(insertActionType.getRun().isInitialDataEntry());
+            action.getRuleActionRun().setDoubleDataEntry(insertActionType.getRun().isDoubleDataEntry());
+            action.getRuleActionRun().setAdministrativeDataEntry(insertActionType.getRun().isAdministrativeDataEntry());
+            action.getRuleActionRun().setImportDataEntry(insertActionType.getRun().isImportDataEntry());
+            action.getRuleActionRun().setBatch(insertActionType.getRun().isBatch());
+            ruleSetRuleBean.addAction(action);
+            for (PropertyType propertyType : insertActionType.getDestinationProperty()) {
+                PropertyBean property = new PropertyBean();
+                property.setOid(propertyType.getOID());
+                property.setValue(propertyType.getValue());
+                ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, propertyType.getValueExpression().getValue());
+                property.setValueExpression(expressionBean);
+                action.addProperty(property);
+            }
+            ruleSetRuleBean.addAction(action);
+        }*/
 
         ruleSetBean.addRuleSetRule(ruleSetRuleBean);
         rpic.addRuleSet(ruleSetBean);

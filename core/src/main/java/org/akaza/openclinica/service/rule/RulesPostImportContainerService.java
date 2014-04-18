@@ -335,15 +335,12 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof EventActionBean) {
-            //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-            if (ruleActionBean.getRuleActionRun().getBatch() == true) {
-                ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
-            }
+          
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
          //Insert eventaction bean validator
             if (errors.hasErrors()) {
-                ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
+                ruleSetBeanWrapper.error("EventAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
         //if (ruleActionBean instanceof EmailActionBean) {

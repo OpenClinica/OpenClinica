@@ -105,7 +105,7 @@
         <xs:attribute name="OID" type="xs:string"></xs:attribute>
     </xs:complexType>
     
-    <xs:complexType name="RunOnType">
+    <xs:complexType name="RunOnType" >
       <xs:attribute name="not_started"        type="xs:boolean" use="required"/>
       <xs:attribute name="scheduled"          type="xs:boolean" use="required"/>
       <xs:attribute name="data_entry_started" type="xs:boolean" use="required"/>

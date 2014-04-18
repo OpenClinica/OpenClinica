@@ -28,6 +28,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionType;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -647,11 +648,17 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
             String s = "";
             RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
-            if(ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
-            if(ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
-            if(ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
-            if (ruleActionRun.getImportDataEntry()) s += resword.getString("import_comma") + " ";
-            if(ruleActionRun.getBatch()) s+=resword.getString("batch_comma")+" ";
+            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true)s+=resword.getString("not_started");
+            if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true)s+=resword.getString("scheduled");
+            if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true)s+=resword.getString("data_entry_started");
+            if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true)s+=resword.getString("skipped");
+            if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true)s+=resword.getString("stopped");
+            
+            if(ruleActionRun.getInitialDataEntry()!=null &&ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
+            if(ruleActionRun.getDoubleDataEntry()!=null&&ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
+            if(ruleActionRun.getAdministrativeDataEntry()!=null && ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
+            if (ruleActionRun.getImportDataEntry()!=null && ruleActionRun.getImportDataEntry()) s += resword.getString("import_comma") + " ";
+            if(ruleActionRun.getBatch()!=null && ruleActionRun.getBatch()) s+=resword.getString("batch_comma")+" ";
             s = s.trim(); s = s.substring(0,s.length()-1);
             if(s.length()>0)
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
@@ -661,6 +668,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             ActionType actionType = ruleAction.getActionType();
             if(actionType==ActionType.INSERT) {
                 InsertActionBean a = (InsertActionBean)ruleAction;
+                appendDestProps(builder,a.getProperties());
+            }
+            if(actionType==ActionType.EVENT) {
+                EventActionBean a = (EventActionBean)ruleAction;
                 appendDestProps(builder,a.getProperties());
             }
             if(actionType==ActionType.SHOW) {
@@ -677,7 +688,14 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if(propertyBeans!=null && propertyBeans.size()>0) {
                 String s = "";
                 for(org.akaza.openclinica.domain.rule.action.PropertyBean p : propertyBeans) {
-                    s += p.getOid().trim() + ", ";
+                	if(p.getOid()!=null)
+                	{
+                		s += p.getOid().trim() + ", ";
+                	}
+                	else if(p.getProperty()!=null){
+                		s +=p.getProperty().trim()+", ";
+                	}
+                		
                 }
                 s = s.trim(); s = s.substring(0,s.length()-1);
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("dest_prop_colon") + "</i>").tdEnd()
