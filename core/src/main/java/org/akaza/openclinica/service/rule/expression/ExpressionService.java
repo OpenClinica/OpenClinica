@@ -504,9 +504,17 @@ public class ExpressionService {
             }
 
         } else {
-            if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
+            boolean isEventStartDateAndStatusParamExist =  (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
+           if (isEventStartDateAndStatusParamExist) { 
+        	   result = true; 
+           }else if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
                 result = true;
-            }
+            }  
+             
+           
+        
+        
+        
         }
         return result;
     }
@@ -953,7 +961,8 @@ public class ExpressionService {
         ItemBean item = null;
         ItemGroupBean itemGroup = null;
         CRFBean crf = null;
-        boolean isEventStartDateAndStatusParamExist = expression.contains(STARTDATE) || expression.contains(STATUS);
+        boolean isEventStartDateAndStatusParamExist = (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
+            
         
         if (length > 0 && !isEventStartDateAndStatusParamExist) {
             item = getItemFromExpression(expression);
@@ -996,10 +1005,16 @@ public class ExpressionService {
 
         if (length == 2  && isEventStartDateAndStatusParamExist) {
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpressionForEventScheduling(expression);
-             if (studyEventDefinition == null)
+        //    System.out.println("StudyEventDefinition:  " + studyEventDefinition.getOid());
+            if (studyEventDefinition == null)
                  throw new OpenClinicaSystemException("OCRERR_0034");
         }
 
+        if (length != 2  && isEventStartDateAndStatusParamExist) {
+                 throw new OpenClinicaSystemException("OCRERR_0034");
+        }
+
+    
     }
 
     public EventDefinitionCRFBean getEventDefinitionCRF(String expression) {

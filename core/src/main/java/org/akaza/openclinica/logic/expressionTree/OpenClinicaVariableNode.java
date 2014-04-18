@@ -8,6 +8,7 @@
 package org.akaza.openclinica.logic.expressionTree;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -24,6 +25,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
     String number;
     ExpressionService expressionService;
     ExpressionObjectWrapper expressionWrapper;
+    private final String STARTDATE =".STARTDATE";
+    private final String STATUS =".STATUS";
 
     OpenClinicaVariableNode(String val) {
         number = val;
@@ -75,6 +78,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
 
     	validate();
         String variableValue = testCalculateVariable();
+    	boolean isEventStartDateAndStatusParamExist = (number.endsWith(STARTDATE) ||number.endsWith(STATUS));
+
         if (variableValue != null) {
             return variableValue;
         }
@@ -84,6 +89,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         String testBoolean = "true";
         String testDate = "2008-01-01";
         String testPDate = "";
+        
+                
         if (item != null) {
             ItemDataType itemDataType = ItemDataType.get(item.getItemDataTypeId());
             switch (itemDataType.getId()) {
@@ -123,9 +130,16 @@ public class OpenClinicaVariableNode extends ExpressionNode {
             default:
                 throw new OpenClinicaSystemException("OCRERR_0011");
             }
+        } else if(isEventStartDateAndStatusParamExist) {
+          	StudyEventDefinitionBean studyEventDefinition = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(number);
+           if (studyEventDefinition == null)          throw new OpenClinicaSystemException("OCRERR_0034");
+                else             return theTest(testDate);
+ 
+            
         } else {
             throw new OpenClinicaSystemException("OCRERR_0012", new String[] { number });
-        }
+        } 
+        
     }
 
     @Override
