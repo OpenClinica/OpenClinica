@@ -33,6 +33,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,7 @@ public class RulesPostImportContainerService {
 
     private ExpressionService expressionService;
     private InsertActionValidator insertActionValidator;
+    private EventActionValidator eventActionValidator;
     ResourceBundle respage;
 
     public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
@@ -338,17 +340,15 @@ public class RulesPostImportContainerService {
           
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
-         //Insert eventaction bean validator
+            EventActionValidator eventActionValidator = getEventActionValidator();
+            eventActionValidator.setRuleSetBeanWrapper(ruleSetBeanWrapper);
+            eventActionValidator.setExpressionService(expressionService);
+            eventActionValidator.setRespage(respage);
+            eventActionValidator.validate(ruleActionBean, errors);
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("EventAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
-        //if (ruleActionBean instanceof EmailActionBean) {
-            //if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-            //    ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString()
-            //        + " is not Valid.You cannot have ImportDataEntry=\"true\". ");
-            //}
-        //}
     }
 
     private String createError(String key) {
@@ -472,6 +472,14 @@ public class RulesPostImportContainerService {
 
     public void setInsertActionValidator(InsertActionValidator insertActionValidator) {
         this.insertActionValidator = insertActionValidator;
+    }
+
+    public EventActionValidator getEventActionValidator() {
+        return eventActionValidator;
+    }
+
+    public void setEventActionValidator(EventActionValidator eventActionValidator) {
+        this.eventActionValidator = eventActionValidator;
     }
 
     /**

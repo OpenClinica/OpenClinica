@@ -112,6 +112,8 @@
       <xs:attribute name="complete"           type="xs:boolean" use="required"/>
       <xs:attribute name="skipped"            type="xs:boolean" use="required"/>
       <xs:attribute name="stopped"            type="xs:boolean" use="required"/>
+      <xs:attribute name="signed"             type="xs:boolean" use="optional" fixed="false"/>
+      <xs:attribute name="locked"             type="xs:boolean" use="optional" fixed="false"/>
     </xs:complexType>
 
     <xs:complexType name="EventDestinationType">

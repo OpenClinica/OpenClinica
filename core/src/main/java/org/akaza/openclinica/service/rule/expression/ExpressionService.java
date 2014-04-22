@@ -796,18 +796,19 @@ public class ExpressionService {
 
     
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression) {
-        return expression.split(ESCAPED_SEPERATOR).length == 2 ? getStudyEventDefinitionFromExpressionForEventScheduling(expression, expressionWrapper.getStudyBean()) : null;
+        return expression.split(ESCAPED_SEPERATOR).length == 2 ? getStudyEventDefinitionFromExpressionForEventScheduling(expression, false) : null;
     }
 
-    public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression, StudyBean study) {
-        
-    	String studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
-    	//String studyEventDefinitionKey = getStudyEventDefinitionOidFromExpression(expression);
+    public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression, boolean onlyOID) {
+        StudyBean study = expressionWrapper.getStudyBean();
+    	String studyEventDefinitionKey;
+    	if (onlyOID) studyEventDefinitionKey = expression;
+    	else studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
+
         logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey, study.getId() });
         if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
             return studyEventDefinitions.get(studyEventDefinitionKey);
         } else {
-            // temp fix
             int studyId = study.getParentStudyId() != 0 ? study.getParentStudyId() : study.getId();
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(studyEventDefinitionKey, studyId, studyId);
             // another way to get at the problem which I fix in the

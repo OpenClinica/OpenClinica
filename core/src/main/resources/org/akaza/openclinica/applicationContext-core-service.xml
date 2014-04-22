@@ -39,6 +39,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="eventActionValidator" class="org.akaza.openclinica.validator.rule.action.EventActionValidator">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="simpleConditionalDisplayService" class="org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>

@@ -53,7 +53,7 @@ public class PropertyBean extends AbstractMutableDomainObject {
 
     @Override
     public String toString() {
-        return "PropertyBean [oid=" + oid + ", value=" + value + ", valueExpression=" + valueExpression + "]";
+        return "PropertyBean [oid=" + oid + ", value=" + value + ", property=" + property + ", valueExpression=" + valueExpression + "]";
     }
 
     @Override
