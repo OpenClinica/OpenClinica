@@ -697,7 +697,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 	}
                 		
                 }
-                s = s.trim(); s = s.substring(0,s.length()-1);
+                s = s.trim(); 
+                
+                if(s.length()>0)
+                s = s.substring(0,s.length()-1);
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("dest_prop_colon") + "</i>").tdEnd()
                 .td(1).close().append(s).tdEnd().td(1).close().tdEnd();
                 builder.trEnd(1);
