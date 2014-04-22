@@ -156,7 +156,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getItemName() {
-        return getItem().getName();
+    	if(getItem()==null) return "";
+    	return getItem().getName();
     }
 
     @Transient
@@ -166,7 +167,9 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getItemNameWithOid() {
-        return getItemName() + " (" + getItem().getOid() + ")";
+       if(getItemName()!=null&& !getItemName().isEmpty())
+    	return getItemName() + " (" + getItem().getOid() + ")";
+       else return "";
     }
 
     // Getters & Setters
