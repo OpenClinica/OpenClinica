@@ -132,7 +132,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
             }
         } else if(isEventStartDateAndStatusParamExist) {
           	StudyEventDefinitionBean studyEventDefinition = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(number);
-           if (studyEventDefinition == null)          throw new OpenClinicaSystemException("OCRERR_0034");
+           if (studyEventDefinition == null)          throw new OpenClinicaSystemException("OCRERR_0034", new String[] { number });
                 else             return theTest(testDate);
  
             
