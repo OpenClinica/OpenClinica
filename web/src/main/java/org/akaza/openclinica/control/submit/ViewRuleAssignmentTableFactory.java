@@ -401,8 +401,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 
             value =
-                builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')").style("color: #789EC5;text-decoration: none;")
-                        .onmouseover(mouseOver).onmouseout(mouseOut).close().append(theItem.getName()).aEnd().toString();
+                builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" +(theItem!=null?theItem.getId():"" ) + "')").style("color: #789EC5;text-decoration: none;")
+                        .onmouseover(mouseOver).onmouseout(mouseOut).close().append(theItem!=null?theItem.getName():"").aEnd().toString();
 
             return value;
         }
@@ -435,7 +435,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             crfVersion = (CRFVersionBean) ((HashMap<Object, Object>) item).get("crfVersion");
 
             if (crfVersion != null) {
-                ItemFormMetadataBean ifm = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(theItem.getId(), crfVersion.getId());
+                ItemFormMetadataBean ifm = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(theItem!=null?theItem.getId():0, crfVersion.getId());
                 if (ifm.getId() != 0 && ifm.getRegexp() != null && !ifm.getRegexp().equals("")) {
                     value = YES;
                 } else {
@@ -490,7 +490,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     value = NO;
                 }
             } else {
-                ArrayList<ItemFormMetadataBean> itemFormMetadatas = getItemFormMetadataDAO().findAllByItemIdAndHasValidations(theItem.getId());
+                ArrayList<ItemFormMetadataBean> itemFormMetadatas = getItemFormMetadataDAO().findAllByItemIdAndHasValidations(theItem!=null?theItem.getId():0);
                 if (itemFormMetadatas.size() > 0) {
                     value =
                         builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')").close().append(YES).aEnd().toString();
