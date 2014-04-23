@@ -17,6 +17,8 @@ public class EqualityOpNode extends ExpressionNode {
     Operator op; // The operator.
     ExpressionNode left; // The expression for its left operand.
     ExpressionNode right; // The expression for its right operand.
+    private final String STARTDATE =".STARTDATE";
+    private final String STATUS =".STATUS";
 
     EqualityOpNode(Operator op, ExpressionNode left, ExpressionNode right) {
         // Construct a BinOpNode containing the specified data.
@@ -45,6 +47,22 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
+
+    	boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
+    	System.out.println("OID :"+left.getNumber());
+        if( (isEventStatusParamExist) 
+        	&& !y.equals("not_started")              
+        	&& !y.equals("started")              
+        	&& !y.equals("completed")              
+        	&& !y.equals("stopped")              
+        	&& !y.equals("skipped")              
+        	&& !y.equals("locked")              
+        	&& !y.equals("signed")              
+        	&& !y.equals("scheduled")              
+                )
+        	  throw new OpenClinicaSystemException("OCRERR_0038", new String[] { y });
+        	
+
         return calc(x, y);
     }
 
@@ -66,7 +84,7 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
-        return calc(x, y);
+        	return calc(x, y);
 
     }
 
