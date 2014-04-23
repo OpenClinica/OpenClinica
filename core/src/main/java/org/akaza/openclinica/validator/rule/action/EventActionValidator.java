@@ -1,8 +1,12 @@
 package org.akaza.openclinica.validator.rule.action;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
@@ -22,7 +26,15 @@ import javax.sql.DataSource;
 public class EventActionValidator implements Validator {
 
     DataSource dataSource;
-    ExpressionService expressionService;
+    public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	ExpressionService expressionService;
     AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper;
     ResourceBundle respage;
 
@@ -74,9 +86,11 @@ public class EventActionValidator implements Validator {
     private boolean isEventActionValueExpressionValid(PropertyBean property, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
         boolean isValid = true;
 
-        //TODO:  May need to loop here if there are many value expressions.  check with Alicia if there can be more than one.
+        StudyDAO studyDAO =  new StudyDAO<String, ArrayList>(getDataSource());
+        StudyBean study = (StudyBean) studyDAO.findByPK(ruleSetBeanWrapper.getAuditableBean().getStudyId());
+               
         ExpressionBean expressionBean = isExpressionValid(property.getValueExpression(), ruleSetBeanWrapper);
-        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource, ruleSetBeanWrapper.getAuditableBean().getStudy(), expressionBean, ruleSetBeanWrapper.getAuditableBean());
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource,study, expressionBean, ruleSetBeanWrapper.getAuditableBean());
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
         String errorString = ep.isRuleExpressionValid();

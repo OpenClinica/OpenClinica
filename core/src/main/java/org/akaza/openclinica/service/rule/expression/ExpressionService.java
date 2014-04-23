@@ -771,10 +771,49 @@ public class ExpressionService {
     }
 
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpression(String expression) {
-        return expression.split(ESCAPED_SEPERATOR).length == 4 ? getStudyEventDefinitionFromExpression(expression, expressionWrapper.getStudyBean()) : null;
+    	
+    	
+    	if (expression.split(ESCAPED_SEPERATOR).length == 4){
+    		getStudyEventDefinitionFromExpression(expression, expressionWrapper.getStudyBean()) ;
+    	}
+    	else if (expression.split(ESCAPED_SEPERATOR).length == 2 && (expression.split(ESCAPED_SEPERATOR)[1].startsWith(STARTDATE)|| expression.split(ESCAPED_SEPERATOR)[1].startsWith(STATUS))){
+    	
+    		getStudyEventDefinitionFromExpressionForEvents(expression, expressionWrapper.getStudyBean());
+    	}
+    	
+    		return null;
     }
 
-    public StudyEventDefinitionBean getStudyEventDefinitionFromExpression(String expression, StudyBean study) {
+    private StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEvents(
+			String expression, StudyBean study) {
+		// TODO Auto-generated method stub
+        String studyEventDefinitionKey = getStudyEventDefinitionOidFromExpressionForEvents(expression);
+        logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey, study.getId() });
+        if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
+            return studyEventDefinitions.get(studyEventDefinitionKey);
+        } else {
+            // temp fix
+            int studyId = study.getParentStudyId() != 0 ? study.getParentStudyId() : study.getId();
+            StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(studyEventDefinitionKey, studyId, studyId);
+            // another way to get at the problem which I fix in the
+            // findByOidAndStudy method, tbh
+            if (studyEventDefinition != null) {
+                studyEventDefinitions.put(studyEventDefinitionKey, studyEventDefinition);
+                return studyEventDefinition;
+            } else {
+                return null;
+            }
+        }
+
+	}
+    
+
+	private String getStudyEventDefinitionOidFromExpressionForEvents(
+			String expression) {
+		  return getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
+	}
+
+	public StudyEventDefinitionBean getStudyEventDefinitionFromExpression(String expression, StudyBean study) {
         String studyEventDefinitionKey = getStudyEventDefinitionOidFromExpression(expression);
         logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey, study.getId() });
         if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
@@ -805,7 +844,9 @@ public class ExpressionService {
     	if (onlyOID) studyEventDefinitionKey = expression;
     	else studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
 
-        logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey, study.getId() });
+    	
+    
+        logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey,study!=null? study.getId():null });
         if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
             return studyEventDefinitions.get(studyEventDefinitionKey);
         } else {

@@ -117,7 +117,7 @@
         </property>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.show_sql">true</prop>
                 <prop key="hibernate.format_sql">true</prop>
                 <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
            <!-- <prop key="hibernate.cache.region.factory_class"> net.sf.ehcache.hibernate.EhCacheRegionFactory</prop> -->
