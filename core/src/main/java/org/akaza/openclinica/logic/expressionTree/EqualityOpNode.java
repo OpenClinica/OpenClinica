@@ -47,6 +47,20 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
+    	boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
+        if( (isEventStatusParamExist) 
+        	&& !y.equals("not_started")              
+        	&& !y.equals("started")              
+        	&& !y.equals("completed")              
+        	&& !y.equals("stopped")              
+        	&& !y.equals("skipped")              
+        	&& !y.equals("locked")              
+        	&& !y.equals("signed")              
+        	&& !y.equals("scheduled")              
+                )
+        	  throw new OpenClinicaSystemException("OCRERR_0038", new String[] { y });
+        	
+
         return calc(x, y);
     }
 
@@ -69,20 +83,6 @@ public class EqualityOpNode extends ExpressionNode {
             y = String.valueOf(r);
         }
 
-    	boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
-    	System.out.println("OID :"+left.getNumber());
-        if( (isEventStatusParamExist) 
-        	&& !y.equals("not_started")              
-        	&& !y.equals("started")              
-        	&& !y.equals("completed")              
-        	&& !y.equals("stopped")              
-        	&& !y.equals("skipped")              
-        	&& !y.equals("locked")              
-        	&& !y.equals("signed")              
-        	&& !y.equals("scheduled")              
-                )
-        	  throw new OpenClinicaSystemException("OCRERR_0038", new String[] { y });
-        	
         	return calc(x, y);
 
     }
