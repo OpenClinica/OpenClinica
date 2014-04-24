@@ -17,6 +17,8 @@ public class EqualityOpNode extends ExpressionNode {
     Operator op; // The operator.
     ExpressionNode left; // The expression for its left operand.
     ExpressionNode right; // The expression for its right operand.
+    private final String STARTDATE =".STARTDATE";
+    private final String STATUS =".STATUS";
 
     EqualityOpNode(Operator op, ExpressionNode left, ExpressionNode right) {
         // Construct a BinOpNode containing the specified data.
@@ -41,13 +43,31 @@ public class EqualityOpNode extends ExpressionNode {
         } catch (NumberFormatException nfe) {
             // Don't do anything cause we were just testing above.
         }
+    	
+ 
+        
         if (x == null && y == null) {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
-        return calc(x, y);
+        boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
+              if(isEventStatusParamExist
+        		  && !y.equals("not_started")
+          		  && !y.equals("scheduled")
+        		  && !y.equals("started")
+        		  && !y.equals("completed")
+        		  && !y.equals("signed")
+        		  && !y.equals("stopped")
+        		  && !y.equals("skipped")
+        		  && !y.equals("locked")
+        		  ) 
+          throw new OpenClinicaSystemException("OCRERR_0035", new String[] { y });
+    
+    return calc(x, y);
     }
-
+	  
+		
+		
     @Override
     String calculate() throws OpenClinicaSystemException {
         String x = null;
