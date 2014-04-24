@@ -106,12 +106,12 @@
     </xs:complexType>
     
     <xs:complexType name="RunOnType" >
-      <xs:attribute name="not_started"        type="xs:boolean" use="required"/>
-      <xs:attribute name="scheduled"          type="xs:boolean" use="required"/>
-      <xs:attribute name="data_entry_started" type="xs:boolean" use="required"/>
-      <xs:attribute name="complete"           type="xs:boolean" use="required"/>
-      <xs:attribute name="skipped"            type="xs:boolean" use="required"/>
-      <xs:attribute name="stopped"            type="xs:boolean" use="required"/>
+      <xs:attribute name="not_started"        type="xs:boolean" default="true"/>
+      <xs:attribute name="scheduled"          type="xs:boolean" default="true"/>
+      <xs:attribute name="data_entry_started" type="xs:boolean" default="false"/>
+      <xs:attribute name="complete"           type="xs:boolean" default="false"/>
+      <xs:attribute name="skipped"            type="xs:boolean" default="false"/>
+      <xs:attribute name="stopped"            type="xs:boolean" default="false"/>
       <xs:attribute name="signed"             type="xs:boolean" use="optional" fixed="false"/>
       <xs:attribute name="locked"             type="xs:boolean" use="optional" fixed="false"/>
     </xs:complexType>
@@ -120,7 +120,7 @@
       <xs:sequence>
         <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>
       </xs:sequence>		          
-      <xs:attribute name="property" type="xs:string" use="required"/>
+      <xs:attribute name="Property" type="xs:string" use="required"/>
     </xs:complexType>
    
    <xs:complexType name="ValueExpressionType">

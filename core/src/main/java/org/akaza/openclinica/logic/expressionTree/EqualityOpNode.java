@@ -43,31 +43,27 @@ public class EqualityOpNode extends ExpressionNode {
         } catch (NumberFormatException nfe) {
             // Don't do anything cause we were just testing above.
         }
-    	
- 
-        
         if (x == null && y == null) {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
-        boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
-              if(isEventStatusParamExist
-        		  && !y.equals("not_started")
-          		  && !y.equals("scheduled")
-        		  && !y.equals("started")
-        		  && !y.equals("completed")
-        		  && !y.equals("signed")
-        		  && !y.equals("stopped")
-        		  && !y.equals("skipped")
-        		  && !y.equals("locked")
-        		  ) 
-          throw new OpenClinicaSystemException("OCRERR_0035", new String[] { y });
-    
-    return calc(x, y);
+    	boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
+        if( (isEventStatusParamExist) 
+        	&& !y.equals("not_started")              
+        	&& !y.equals("data_entry_started")              
+        	&& !y.equals("completed")              
+        	&& !y.equals("stopped")              
+        	&& !y.equals("skipped")              
+        	&& !y.equals("locked")              
+        	&& !y.equals("signed")              
+        	&& !y.equals("scheduled")              
+                )
+        	  throw new OpenClinicaSystemException("OCRERR_0038", new String[] { y });
+        	
+
+        return calc(x, y);
     }
-	  
-		
-		
+
     @Override
     String calculate() throws OpenClinicaSystemException {
         String x = null;
@@ -86,7 +82,8 @@ public class EqualityOpNode extends ExpressionNode {
             x = String.valueOf(l);
             y = String.valueOf(r);
         }
-        return calc(x, y);
+
+        	return calc(x, y);
 
     }
 

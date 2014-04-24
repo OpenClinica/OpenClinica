@@ -199,7 +199,7 @@
      </class>
      <class name="org.akaza.openclinica.domain.rule.action.EventPropertyBean"  >
         <field name="property" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
-            <bind-xml name="property" node="attribute"/>
+            <bind-xml name="Property" node="attribute"/>
        </field>
        <field name="valueExpression"
                type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">

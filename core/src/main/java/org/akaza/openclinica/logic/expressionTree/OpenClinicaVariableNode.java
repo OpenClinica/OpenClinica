@@ -135,8 +135,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         } else if(isEventStartDateAndStatusParamExist) {
           	StudyEventDefinitionBean studyEventDefinition = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(number);
            if (studyEventDefinition == null)          throw new OpenClinicaSystemException("OCRERR_0034", new String[] { number });
-                else if (isEventStatusParamExist)              return theTest(testString);
-                else if (isEventStartDateParamExist)           return theTest(testDate);
+                else if(isEventStatusParamExist)               return theTest(testString);
+                else if(isEventStartDateParamExist)            return theTest(testDate);
                 else             return null;
  
             

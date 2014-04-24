@@ -1032,7 +1032,7 @@ public class ExpressionService {
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
             crf = getCRFFromExpression(expression);
             if (studyEventDefinition == null || crf == null)
-                throw new OpenClinicaSystemException("OCRERR_0034");
+           	 throw new OpenClinicaSystemException("OCRERR_0034", new String[] { expression });
             // throw new
             // OpenClinicaSystemException("StudyEventDefinition is Invalid");
 
@@ -1040,7 +1040,7 @@ public class ExpressionService {
                 getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(),
                         crf.getId());
             if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
-                throw new OpenClinicaSystemException("OCRERR_0034");
+           	 throw new OpenClinicaSystemException("OCRERR_0034", new String[] { expression });
             // throw new
             // OpenClinicaSystemException("StudyEventDefinition is Invalid");
         }
@@ -1049,11 +1049,11 @@ public class ExpressionService {
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpressionForEventScheduling(expression);
         //    System.out.println("StudyEventDefinition:  " + studyEventDefinition.getOid());
             if (studyEventDefinition == null)
-                 throw new OpenClinicaSystemException("OCRERR_0034");
-        }
+            	 throw new OpenClinicaSystemException("OCRERR_0034", new String[] { expression });
+            }
 
         if (length != 2  && isEventStartDateAndStatusParamExist) {
-                 throw new OpenClinicaSystemException("OCRERR_0034");
+       	 throw new OpenClinicaSystemException("OCRERR_0034", new String[] { expression });
         }
 
     
