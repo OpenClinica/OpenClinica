@@ -120,7 +120,7 @@
       <xs:sequence>
         <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>
       </xs:sequence>		          
-      <xs:attribute name="property" type="xs:string" use="required"/>
+      <xs:attribute name="Property" type="xs:string" use="required"/>
     </xs:complexType>
    
    <xs:complexType name="ValueExpressionType">
