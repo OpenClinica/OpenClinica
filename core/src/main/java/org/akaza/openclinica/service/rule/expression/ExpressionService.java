@@ -774,13 +774,13 @@ public class ExpressionService {
     	
     	
     	if (expression.split(ESCAPED_SEPERATOR).length == 4){
-    		getStudyEventDefinitionFromExpression(expression, expressionWrapper.getStudyBean()) ;
+    		return getStudyEventDefinitionFromExpression(expression, expressionWrapper.getStudyBean()) ;
     	}
-    	else if (expression.split(ESCAPED_SEPERATOR).length == 2 && (expression.split(ESCAPED_SEPERATOR)[1].startsWith(STARTDATE)|| expression.split(ESCAPED_SEPERATOR)[1].startsWith(STATUS))){
+    	else if (expression.split(ESCAPED_SEPERATOR).length == 2 && (expression.endsWith(STARTDATE)|| expression.endsWith(STATUS))){
     	
-    		getStudyEventDefinitionFromExpressionForEvents(expression, expressionWrapper.getStudyBean());
+    	return	getStudyEventDefinitionFromExpressionForEvents(expression, expressionWrapper.getStudyBean());
     	}
-    	
+    	else
     		return null;
     }
 
