@@ -50,7 +50,7 @@ public class EqualityOpNode extends ExpressionNode {
     	boolean isEventStatusParamExist = left.getNumber().endsWith(STATUS);
         if( (isEventStatusParamExist) 
         	&& !y.equals("not_started")              
-        	&& !y.equals("started")              
+        	&& !y.equals("data_entry_started")              
         	&& !y.equals("completed")              
         	&& !y.equals("stopped")              
         	&& !y.equals("skipped")              
