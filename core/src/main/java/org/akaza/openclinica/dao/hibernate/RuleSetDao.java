@@ -101,6 +101,8 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("studyId", currentStudy.getId());
         return (ArrayList<RuleSetBean>) q.list();
     }
+    
+   
 
     @SuppressWarnings("unchecked")
     public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, StudyBean currentStudy) {
@@ -142,4 +144,10 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         return (Long) q.uniqueResult();
     }
 
+    public ArrayList<RuleSetBean> findAllByStudyEventDef(StudyEventDefinitionBean sed){
+    	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyEventDefId", sed.getId());
+        return (ArrayList<RuleSetBean>) q.list();
+    }
 }

@@ -36,7 +36,7 @@ public class ConditionalOpNode extends ExpressionNode {
     }
 
     @Override
-    String calculate() throws OpenClinicaSystemException {
+    Object calculate() throws OpenClinicaSystemException {
         String l = String.valueOf(left.value());
         String r = String.valueOf(right.value());
         validate(l, r);

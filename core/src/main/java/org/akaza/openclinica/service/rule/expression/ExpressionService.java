@@ -84,8 +84,9 @@ public class ExpressionService {
     private CRFVersionDAO crfVersionDao;
     private ItemDataDAO itemDataDao;
     private StudyEventDAO studyEventDao;
-    private final String STARTDATE =".STARTDATE";
-    private final String STATUS =".STATUS";
+    public final static String STARTDATE =".STARTDATE";
+    public final  static String STATUS =".STATUS";
+    public static final String STUDY_EVENT_OID_START_KEY="SE_";
     /*
      * The variables below are used as a small Cache so that we don't go to the
      * database every time we want to get an Object by it's OID. This is a very
@@ -327,6 +328,11 @@ public class ExpressionService {
             }
         }
         if (expressionWrapper.getRuleSet() != null) {
+        	if(checkIfExpressionIsForScheduling(expression)){
+        		return "2014-04-27";//TODO: Return the values in expression especially when they are coded to return study event start date and or status
+        		//HARD CODED FOR NOW
+        	}
+        	
             if (isExpressionPartial(expression)) {
                 String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
                 List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
@@ -379,8 +385,14 @@ public class ExpressionService {
         return value;
     }
 
+    private boolean checkIfExpressionIsForScheduling(String expression){
+    	if(expression.startsWith("SE_")&&(expression.endsWith(this.STARTDATE)|| expression.endsWith(this.STATUS))){
+    		return true;
+    	}
+    	return false;
+    }
     private List<ItemDataBean> getItemDatas(String expression) {
-
+    	
         String studyEventId = getStudyEventDefinitionOidOrdinalFromExpression(expression);
         List<ItemDataBean> itemData =
             getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), getItemOidFromExpression(expression),
@@ -470,6 +482,7 @@ public class ExpressionService {
         boolean result = false;
         boolean isRuleExpressionValid = false;
         if (expressionWrapper.getRuleSet() != null) {
+        	//TODO: While uploading a rule with study event, the following expression is verified and is wrongly returning... this needs to be fixed..
             if (isExpressionPartial(expressionWrapper.getRuleSet().getTarget().getValue())) {
                 return true;
             }
@@ -526,9 +539,12 @@ public class ExpressionService {
 
     public Boolean isExpressionPartial(String expression) {
         String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-        if (splitExpression.length == 4)
+       /* if(expression.endsWith(STARTDATE)||expression.endsWith(STATUS)){
+        	return false;
+        }
+        else */if (splitExpression.length == 4)
             return false;
-        else
+        else 
             return true;
     }
 
@@ -759,7 +775,7 @@ public class ExpressionService {
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-                throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
+                throw new OpenClinicaSystemException("OCRER'R_0019", new String[] { expression });
             }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];

@@ -28,4 +28,6 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 		return (ArrayList<StudyEvent>) q.list();
 		
 	}
+	
+	
 }

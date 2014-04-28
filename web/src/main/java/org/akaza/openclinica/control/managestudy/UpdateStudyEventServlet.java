@@ -44,6 +44,7 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -54,7 +55,9 @@ import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -465,7 +468,8 @@ public class UpdateStudyEventServlet extends SecureController {
                 logger.debug("update study event...");
                 studyEvent.setUpdater(ub);
                 studyEvent.setUpdatedDate(new Date());
-                sedao.update(studyEvent);
+                StudyEventBean updatedStudyEvent = (StudyEventBean) sedao.update(studyEvent);
+
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -475,6 +479,8 @@ public class UpdateStudyEventServlet extends SecureController {
                 AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
 
+                getRuleSetService().runRulesInBeanProperty(createRuleSet(ssub,sed),currentStudy,ub,request,ssub);
+                
                 addPageMessage(respage.getString("study_event_updated"));
                 request.setAttribute("id", new Integer(studySubjectId).toString());
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -656,7 +662,23 @@ public class UpdateStudyEventServlet extends SecureController {
 
     }
 
-    private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
+    
+    
+    private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
+			StudyEventDefinitionBean sed) {
+    	
+    	return getRuleSetDao().findAllByStudyEventDef(sed);
+    	
+    	
+	}
+    
+    private RuleSetDao getRuleSetDao() {
+       return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
+        
+    }
+
+
+	private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
         int i;
         HashMap completed = new HashMap();
         HashMap startedButIncompleted = new HashMap();
@@ -783,6 +805,10 @@ public class UpdateStudyEventServlet extends SecureController {
 
         }
 
+    }
+    
+    private RuleSetService getRuleSetService() {
+        return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
     }
 
 }

@@ -65,11 +65,11 @@ public class EqualityOpNode extends ExpressionNode {
     }
 
     @Override
-    String calculate() throws OpenClinicaSystemException {
+    Object calculate() throws OpenClinicaSystemException {
         String x = null;
         String y = null;
-        String l = left.value();
-        String r = right.value();
+        String l = (String) left.value();
+        String r = (String) right.value();
         try {
             Float fx = Float.valueOf(l);
             Float fy = Float.valueOf(r);

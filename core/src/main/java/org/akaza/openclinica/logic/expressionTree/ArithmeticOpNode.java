@@ -48,10 +48,10 @@ public class ArithmeticOpNode extends ExpressionNode {
     }
 
     @Override
-    String calculate() throws OpenClinicaSystemException {
+    Object calculate() throws OpenClinicaSystemException {
 
-        String l = left.value();
-        String r = right.value();
+        String l = (String) left.value();
+        String r = (String) right.value();
         validate(l, r);
         String t = calculateDate(l, r);
         if (t != null) {
