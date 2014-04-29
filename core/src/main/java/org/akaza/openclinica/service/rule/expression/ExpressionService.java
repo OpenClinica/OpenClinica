@@ -329,6 +329,7 @@ public class ExpressionService {
         }
         if (expressionWrapper.getRuleSet() != null) {
         	if(checkIfExpressionIsForScheduling(expression)){
+        		expressionWrapper.getStudyEventDaoHib();//THIS SHOULD GIVE 
         		return "2014-04-27";//TODO: Return the values in expression especially when they are coded to return study event start date and or status
         		//HARD CODED FOR NOW
         	}

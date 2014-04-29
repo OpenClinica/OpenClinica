@@ -106,12 +106,17 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
             	studyEvent.setStatusId(1);//TODO:Change this
             	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
         	}
+        	else{
+        		resetStudyEventStatuses(studyEvent);
+        	}
         	try {
 				studyEvent.setDateStart(df.parse((String) result));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+        	
+        	
         	
         	getStudyEventDAO().saveOrUpdate(studyEvent);
         	
@@ -161,7 +166,13 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 */    }
 
 
-    private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
+    private void resetStudyEventStatuses(StudyEvent studyEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
    return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
     	
 	}
