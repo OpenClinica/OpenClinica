@@ -70,13 +70,16 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
         StudyEventDao studyEventdao = getStudyEventDAO();
         int index = 0;
+        
+        
         for(PropertyBean propertyBean: ((EventActionBean) ruleActionBean).getProperties()){
             // This will execute the contents of <ValueExpression>SS.ENROLLMENT_DATE + 2</ValueExpression>
         	System.out.println("Values:expression??::"+propertyBean.getValueExpression().getValue());
             
+        	
         	Object result = oep.parseAndEvaluateExpression(propertyBean.getValueExpression().getValue());
         	
-        	String value = propertyBean.getValueExpression().getValue();
+       
         	
             executeAction(result,propertyBean,eow,(EventActionBean)ruleActionBean);
          }
@@ -103,12 +106,10 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
             	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBean().getId());
             	studyEvent.setStudySubject(ss);
-            	studyEvent.setStatusId(1);//TODO:Change this
+            	studyEvent.setStatusId(1);//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
             	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
         	}
-        	else{
-        		resetStudyEventStatuses(studyEvent);
-        	}
+        	
         	try {
 				studyEvent.setDateStart(df.parse((String) result));
 			} catch (ParseException e) {
@@ -123,53 +124,10 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 
         }
         
-        
-/*    	if(oid.startsWith("SE")){
-    		StudyEventBean studyEventBean =(StudyEventBean) studyEventdao.findByStudySubjectIdAndDefinitionIdAndOrdinalreturnNull(eow.getStudySubjectBean().getId(), sDefBean.getId(),1);//TODO:hard coding the sample ordinal 1 for now, it needs to read from rules nad expression needs to handle the studyevent ordinal
-    		if(studyEventBean == null){
-    			updateFlag = false;
-    			studyEventBean = new StudyEventBean();
-    			studyEventBean.setStatus(Status.AVAILABLE);//setting it first, because its a prerequiste and also its possible that one of the properties to be set could be status.
-    		
-    		
-           
-             studyEventBean.setStudySubjectId(eow.getStudySubjectBean().getId());
-             studyEventBean.setSampleOrdinal(1);//TODO:how to deal with different ordinals?// add 
-             //studyEventBean.setStudyEventDefinition(sDefBean);//doesnt work
-             studyEventBean.setStudyEventDefinitionId(sDefBean.getId());
-             
-             studyEventBean.setOwner(eow.getUserAccountBean());
-         
-    		}
-    		
-    		try {
-           //   	System.out.println("class?"+result.getClass());
-              	if(property.contains("date")||property.contains("Date"))
-              	MVEL.setProperty(studyEventBean, property, df.parse((String) result));// for now it is date  i.e enrollment date, any property should be able to be inserted
-              	else
-              		MVEL.setProperty(studyEventBean, property, result);
-              	
-  				//studyEventBean.setDateStarted(df.parse(result));
-  			} catch (ParseException e) {
-  				// TODO Auto-generated catch block
-  				e.printStackTrace();
-          		MVEL.setProperty(studyEventBean, property, result);
-
-  			}
-             if(updateFlag)
-            	 {
-            	 	studyEventdao.update(studyEventBean);
-            	 }
-             else             
-            	 studyEventdao.create(studyEventBean);
-    	}
-*/    }
+  }
 
 
-    private void resetStudyEventStatuses(StudyEvent studyEvent) {
-		// TODO Auto-generated method stub
-		
-	}
+  
 
 
 	private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
