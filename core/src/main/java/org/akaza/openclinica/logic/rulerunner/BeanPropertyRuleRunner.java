@@ -1,6 +1,6 @@
 package org.akaza.openclinica.logic.rulerunner;
 
-import com.ecyrd.speed4j.StopWatch;
+//import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -41,14 +41,14 @@ public class BeanPropertyRuleRunner {
                     RuleBean rule = ruleSetRule.getRuleBean();
                     ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBean, studyEventDaoHib, studyEventDefDaoHib);
                     try {
-                        StopWatch sw = new StopWatch();
+                       // StopWatch sw = new StopWatch();
                         ExpressionObjectWrapper ew = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet);
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
                         eow.setUserAccountBean(ub);
                         eow.setStudyBean(currentStudy);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-                        sw.stop();
-	                    System.out.println(sw + "Result : " + result);
+                       // sw.stop();
+	                    //System.out.println(sw + "Result : " + result);
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 
