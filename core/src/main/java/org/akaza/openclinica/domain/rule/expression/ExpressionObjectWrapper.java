@@ -21,8 +21,17 @@ public class ExpressionObjectWrapper {
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
     
     StudyEventDao studyEventDaoHib;
+    Integer StudySubjectId;
 
-    public StudyEventDao getStudyEventDaoHib() {
+    public Integer getStudySubjectId() {
+		return StudySubjectId;
+	}
+
+	public void setStudySubjectId(Integer studySubjectId) {
+		StudySubjectId = studySubjectId;
+	}
+
+	public StudyEventDao getStudyEventDaoHib() {
 		return studyEventDaoHib;
 	}
 
