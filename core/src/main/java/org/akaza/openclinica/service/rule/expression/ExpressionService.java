@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -329,9 +331,40 @@ public class ExpressionService {
         }
         if (expressionWrapper.getRuleSet() != null) {
         	if(checkIfExpressionIsForScheduling(expression)){
-        		expressionWrapper.getStudyEventDaoHib();//THIS SHOULD GIVE 
-        		return "2014-04-27";//TODO: Return the values in expression especially when they are coded to return study event start date and or status
-        		//HARD CODED FOR NOW
+             StudyEvent studyEvent;        		
+
+				if (expression.endsWith(this.STARTDATE)) {
+					String oid = expression.substring(0,
+							expression.indexOf(this.STARTDATE));
+					studyEvent = expressionWrapper.getStudyEventDaoHib()
+							.fetchByStudyEventDefOID(oid,
+									expressionWrapper.getStudySubjectId());
+					if (studyEvent != null) {
+						logger.debug("Study Event Start Date: "
+								+ studyEvent.getDateStart().toString()
+										.substring(0, 10).trim());
+
+						return studyEvent.getDateStart().toString()
+								.substring(0, 10).trim();
+					} else
+						return "";
+				} else {
+					String oid = expression.substring(0,
+							expression.indexOf(this.STATUS));
+					studyEvent = expressionWrapper.getStudyEventDaoHib()
+							.fetchByStudyEventDefOID(oid,
+									expressionWrapper.getStudySubjectId());
+					if (studyEvent != null) {
+						logger.debug("Status: "
+								+ SubjectEventStatus.get(
+										studyEvent.getSubjectEventStatusId())
+										.getName());
+						return SubjectEventStatus.get(
+								studyEvent.getSubjectEventStatusId()).getName();
+					} else
+						return "";
+
+				}
         	}
         	
             if (isExpressionPartial(expression)) {
