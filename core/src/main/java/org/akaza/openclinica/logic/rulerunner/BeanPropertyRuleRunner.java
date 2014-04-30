@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -38,6 +39,8 @@ public class BeanPropertyRuleRunner {
 
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
                     Object result = null;
+                    
+                    if(ruleSetRule.getStatus()==Status.AVAILABLE){
                     RuleBean rule = ruleSetRule.getRuleBean();
                     ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBean, studyEventDaoHib, studyEventDefDaoHib);
                     try {
@@ -64,6 +67,7 @@ public class BeanPropertyRuleRunner {
                         System.out.println("Something happeneing : " + osa.getMessage());
                         // TODO: report something useful
                     }
+                }
                 }
 
     }
