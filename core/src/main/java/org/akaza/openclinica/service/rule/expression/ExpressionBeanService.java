@@ -108,16 +108,17 @@ public class ExpressionBeanService {
         	*/if(checkIfForScheduling(test)){
         	
         	
-        	Integer subjectId = expressionBeanWrapper.getStudySubjectBean().getSubjectId();
+        	Integer subjectId = expressionBeanWrapper.getStudySubjectBean().getId();
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");
         	oid = test.substring(0,index);
         	temp = test.substring(index,test.length());
         	StudyEvent studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
         	
+        	
         	if(ExpressionService.STARTDATE.endsWith(temp)){
-        		value = 				String.valueOf(DateUtils.truncate((java.sql.Timestamp)studyEvent.getDateStart(), Calendar.DATE));
-        		value = sdf.format(DateUtils.truncate((java.sql.Timestamp)studyEvent.getDateStart(), Calendar.DATE));
+        		//value = 				String.valueOf(DateUtils.truncate((java.sql.Date)studyEvent.getDateStart(), Calendar.DATE));
+        		value = sdf.format(DateUtils.truncate((java.util.Date)studyEvent.getDateStart(), Calendar.DATE));
         		value = value.replace(("00:00:00.0"),"");
                 value = value.trim();
         	}

@@ -45,15 +45,8 @@ public class BeanPropertyService{
     private ExpressionService expressionService;
  private StudySubjectDao studySubjectDao;
     
-    public StudySubjectDao getStudySubjectDao() {
-	return studySubjectDao;
-}
-
-
-public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
-	this.studySubjectDao = studySubjectDao;
-}
-
+ private static final Logger LOGGER = LoggerFactory.getLogger(BeanPropertyService.class);
+   
 
 	public BeanPropertyService(DataSource ds) {
     	// itemsAlreadyShown = new ArrayList<Integer>();
@@ -74,7 +67,7 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
         
         for(PropertyBean propertyBean: ((EventActionBean) ruleActionBean).getProperties()){
             // This will execute the contents of <ValueExpression>SS.ENROLLMENT_DATE + 2</ValueExpression>
-        	System.out.println("Values:expression??::"+propertyBean.getValueExpression().getValue());
+        	LOGGER.debug("Values:expression??::"+propertyBean.getValueExpression().getValue());
             
         	
         	Object result = oep.parseAndEvaluateExpression(propertyBean.getValueExpression().getValue());
@@ -105,16 +98,19 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
         	if(studyEvent==null){
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
             	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBean().getId());
+            	StudyEventDefinition sed = getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
+            	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
-            	studyEvent.setStatusId(1);//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
+            	studyEvent.setStatusId(1);
             	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
+            	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
         	}
         	
         	try {
 				studyEvent.setDateStart(df.parse((String) result));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				LOGGER.info(e.getMessage());
 			}
         	
         	
@@ -188,32 +184,16 @@ public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 		this.studyEventDAO = studyEventDAO;
 	}
 
-	class ItemOrItemGroupHolder {
 
-        ItemBean itemBean;
-        ItemGroupBean itemGroupBean;
 
-        public ItemOrItemGroupHolder(ItemBean itemBean, ItemGroupBean itemGroupBean) {
-            this.itemBean = itemBean;
-            this.itemGroupBean = itemGroupBean;
-        }
+	 public StudySubjectDao getStudySubjectDao() {
+			return studySubjectDao;
+		}
 
-        public ItemBean getItemBean() {
-            return itemBean;
-        }
 
-        public void setItemBean(ItemBean itemBean) {
-            this.itemBean = itemBean;
-        }
+		public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
+			this.studySubjectDao = studySubjectDao;
+		}
 
-        public ItemGroupBean getItemGroupBean() {
-            return itemGroupBean;
-        }
-
-        public void setItemGroupBean(ItemGroupBean itemGroupBean) {
-            this.itemGroupBean = itemGroupBean;
-        }
-
-    }
-
+	
 }
