@@ -3,14 +3,9 @@ package org.akaza.openclinica.service.crfdata;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -19,17 +14,16 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.akaza.openclinica.domain.rule.action.InsertPropertyActionBean;
-
-import ch.qos.logback.core.status.Status;
 
 public class BeanPropertyService{
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -60,24 +54,56 @@ public class BeanPropertyService{
      * @param eow
      */
     public void runAction(RuleActionBean ruleActionBean,ExpressionBeanObjectWrapper eow){
+    	boolean statusMatch = false;
         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-        StudyEventDao studyEventdao = getStudyEventDAO();
-        int index = 0;
-        
-        
-        for(PropertyBean propertyBean: ((EventActionBean) ruleActionBean).getProperties()){
-            // This will execute the contents of <ValueExpression>SS.ENROLLMENT_DATE + 2</ValueExpression>
-        	LOGGER.debug("Values:expression??::"+propertyBean.getValueExpression().getValue());
-            
-        	
-        	Object result = oep.parseAndEvaluateExpression(propertyBean.getValueExpression().getValue());
-        	
-       
-        	
-            executeAction(result,propertyBean,eow,(EventActionBean)ruleActionBean);
-         }
+    	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(((EventActionBean)ruleActionBean).getOc_oid_reference(), eow.getStudySubjectBean().getId());
+    	RuleActionRunBean runOnStatuses = ruleActionBean.getRuleActionRun();
 
-
+    	if (studyEvent != null)
+    	{
+	    	switch (SubjectEventStatus.getByCode(studyEvent.getSubjectEventStatusId()))
+	    	{
+	    	case NOT_SCHEDULED:
+	    		if (runOnStatuses.getNot_started()) statusMatch = true;
+	    		break;
+	    	case SCHEDULED:
+	    		if (runOnStatuses.getScheduled()) statusMatch = true;
+	    		break;
+	    	case DATA_ENTRY_STARTED:
+	    		if (runOnStatuses.getData_entry_started()) statusMatch = true;
+	    		break;
+	    	case COMPLETED:
+	    		if (runOnStatuses.getComplete()) statusMatch = true;
+	    		break;
+	    	case SKIPPED:
+	    		if (runOnStatuses.getSkipped()) statusMatch = true;
+	    		break;
+	    	case STOPPED:
+	    		if (runOnStatuses.getStopped()) statusMatch = true;
+	    		break;
+	    	case SIGNED:
+	    	case LOCKED:
+	    	default:
+	    		statusMatch = false;
+	    		break;
+	    	}
+    	}
+    	//Special case if destination study event doesn't exist yet, ie not scheduled.
+    	else
+    	{
+    		if (runOnStatuses.getNot_started()) statusMatch = true;
+    	}
+    	
+    	if (statusMatch)
+    	{
+	        for(PropertyBean propertyBean: ((EventActionBean) ruleActionBean).getProperties())
+	        {
+	            // This will execute the contents of <ValueExpression>SS.ENROLLMENT_DATE + 2</ValueExpression>
+	        	LOGGER.debug("Values:expression??::"+propertyBean.getValueExpression().getValue());
+	        	Object result = oep.parseAndEvaluateExpression(propertyBean.getValueExpression().getValue());
+	            executeAction(result,propertyBean,eow,(EventActionBean)ruleActionBean);
+	        }
+    	}
     }
 
     
