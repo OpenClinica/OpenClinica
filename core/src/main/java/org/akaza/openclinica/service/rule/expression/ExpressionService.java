@@ -420,7 +420,7 @@ public class ExpressionService {
     }
 
     private boolean checkIfExpressionIsForScheduling(String expression){
-    	if(expression.startsWith("SE_")&&(expression.endsWith(this.STARTDATE)|| expression.endsWith(this.STATUS))){
+    	if(expression.toUpperCase().startsWith("SE_")&&(expression.toUpperCase().endsWith(this.STARTDATE)|| expression.toUpperCase().endsWith(this.STATUS))){
     		return true;
     	}
     	return false;
@@ -515,8 +515,13 @@ public class ExpressionService {
     public boolean ruleExpressionChecker(String expression) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
+        
+        if (checkIfExpressionIsForScheduling(expression)) {
+            if (checkSyntax(expression)) return true;
+            else return false;
+        }
+        
         if (expressionWrapper.getRuleSet() != null) {
-        	//TODO: While uploading a rule with study event, the following expression is verified and is wrongly returning... this needs to be fixed..
             if (isExpressionPartial(expressionWrapper.getRuleSet().getTarget().getValue())) {
                 return true;
             }
@@ -549,19 +554,10 @@ public class ExpressionService {
                     result = false;
                 }
             }
-
         } else {
-            boolean isEventStartDateAndStatusParamExist =  (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
-           if (isEventStartDateAndStatusParamExist) { 
-        	   result = true; 
-           }else if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
+            if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
                 result = true;
             }  
-             
-           
-        
-        
-        
         }
         return result;
     }
