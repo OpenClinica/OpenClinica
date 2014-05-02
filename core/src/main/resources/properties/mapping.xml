@@ -231,7 +231,7 @@
        <field name="batch" type="boolean">
             <bind-xml name="Batch" node="attribute"/>
        </field>
-       <field name="not_started" type="boolean">
+       <field name="not_scheduled" type="boolean">
             <bind-xml name="not_scheduled" node="attribute"/>
        </field>
        <field name="scheduled" type="boolean">
@@ -241,7 +241,7 @@
             <bind-xml name="data_entry_started" node="attribute"/>
        </field>
     
-       <field name="complete" type="boolean">
+       <field name="completed" type="boolean">
             <bind-xml name="completed" node="attribute"/>
        </field>
           <field name="skipped" type="boolean">
