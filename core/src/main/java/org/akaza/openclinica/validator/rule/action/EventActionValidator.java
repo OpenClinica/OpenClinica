@@ -1,7 +1,11 @@
 package org.akaza.openclinica.validator.rule.action;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,17 +31,11 @@ import javax.sql.DataSource;
 public class EventActionValidator implements Validator {
 
     DataSource dataSource;
-    public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
 	ExpressionService expressionService;
     AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper;
     ResourceBundle respage;
+    
+    public static final String VALUE_EXPRESSION_DATE_FORMAT = "yyyy-MM-dd";
 
 	public EventActionValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -85,7 +83,6 @@ public class EventActionValidator implements Validator {
     }
 
     private boolean isEventActionValueExpressionValid(PropertyBean property, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
-        boolean isValid = true;
 
         StudyDAO studyDAO =  new StudyDAO<String, ArrayList>(getDataSource());
         StudyBean study = (StudyBean) studyDAO.findByPK(ruleSetBeanWrapper.getAuditableBean().getStudyId());
@@ -95,11 +92,35 @@ public class EventActionValidator implements Validator {
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
         String errorString = ep.isRuleExpressionValid();
+        
         if (errorString != null) {
             ruleSetBeanWrapper.error(errorString);
-            isValid = false;
+            return false;
         }
-        return isValid;
+        
+        //Verify expression generates a valid date string.
+        try {
+
+            SimpleDateFormat df = new SimpleDateFormat(VALUE_EXPRESSION_DATE_FORMAT);
+            df.setLenient(false);
+            
+            String valueExpression = ep.testEvaluateExpression();
+            Date   valueExpressionDate = df.parse(valueExpression);
+
+            // simpledateformat.parse will accept any date as long as it's in the format
+            // you defined, it simply rolls dates over, for example, december 32
+            // becomes jan 1 and december 0 becomes november 30
+            // This statement will make sure that once the string
+            // has been checked for proper formatting that the date is still the
+            // date that was entered, if it's not, we assume that the date is invalid
+            if (!df.format(valueExpressionDate).equals(valueExpression)) {
+            	return false;
+            }
+        } catch (ParseException ex) {
+             return false;
+        }
+
+        return true;
     }
     
     private ExpressionBean isExpressionValid(ExpressionBean expressionBean, AuditableBeanWrapper<?> beanWrapper) {
@@ -147,6 +168,14 @@ public class EventActionValidator implements Validator {
 
 	public void setRespage(ResourceBundle respage) {
 		this.respage = respage;
+	}
+
+    public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 

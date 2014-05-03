@@ -26,7 +26,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.apache.commons.lang.time.DateUtils;
-import org.mvel2.MVEL;
+//import org.mvel2.MVEL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,16 +108,17 @@ public class ExpressionBeanService {
         	*/if(checkIfForScheduling(test)){
         	
         	
-        	Integer subjectId = expressionBeanWrapper.getStudySubjectBean().getSubjectId();
+        	Integer subjectId = expressionBeanWrapper.getStudySubjectBean().getId();
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");
         	oid = test.substring(0,index);
         	temp = test.substring(index,test.length());
         	StudyEvent studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
         	
+        	
         	if(ExpressionService.STARTDATE.endsWith(temp)){
-        		value = 				String.valueOf(DateUtils.truncate((java.sql.Timestamp)studyEvent.getDateStart(), Calendar.DATE));
-        		value = sdf.format(DateUtils.truncate((java.sql.Timestamp)studyEvent.getDateStart(), Calendar.DATE));
+        		//value = 				String.valueOf(DateUtils.truncate((java.sql.Date)studyEvent.getDateStart(), Calendar.DATE));
+        		value = sdf.format(DateUtils.truncate((java.util.Date)studyEvent.getDateStart(), Calendar.DATE));
         		value = value.replace(("00:00:00.0"),"");
                 value = value.trim();
         	}

@@ -1,12 +1,13 @@
 package org.akaza.openclinica.logic.rulerunner;
 
-import com.ecyrd.speed4j.StopWatch;
+//import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -38,17 +39,21 @@ public class BeanPropertyRuleRunner {
 
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
                     Object result = null;
+                    
+                    if(ruleSetRule.getStatus()==Status.AVAILABLE){
                     RuleBean rule = ruleSetRule.getRuleBean();
                     ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBean, studyEventDaoHib, studyEventDefDaoHib);
                     try {
-                        StopWatch sw = new StopWatch();
+                       // StopWatch sw = new StopWatch();
                         ExpressionObjectWrapper ew = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet);
+                        ew.setStudyEventDaoHib(studyEventDaoHib);
+                        ew.setStudySubjectId(studySubjectBean.getId());
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
                         eow.setUserAccountBean(ub);
                         eow.setStudyBean(currentStudy);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-                        sw.stop();
-	                    System.out.println(sw + "Result : " + result);
+                       // sw.stop();
+	                    //System.out.println(sw + "Result : " + result);
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 
@@ -62,6 +67,7 @@ public class BeanPropertyRuleRunner {
                         System.out.println("Something happeneing : " + osa.getMessage());
                         // TODO: report something useful
                     }
+                }
                 }
 
     }
