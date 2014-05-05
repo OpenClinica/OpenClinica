@@ -32,10 +32,10 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
     Boolean importDataEntry;
     Boolean batch;
     //study event stage
-    Boolean not_started;
+    Boolean not_scheduled;
     Boolean scheduled;
     Boolean data_entry_started;
-    Boolean complete;
+    Boolean completed;
     Boolean skipped;
     Boolean stopped;
     
@@ -59,18 +59,18 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
     
     
     
-    public RuleActionRunBean(Boolean administrativeDataEntry, Boolean initialDataEntry, Boolean doubleDataEntry, Boolean importDataEntry, Boolean batch,Boolean NOT_STARTED,Boolean scheduled,
-    		Boolean DATA_ENTRY_STARTED,Boolean complete,Boolean skipped,Boolean stopped  ) {
+    public RuleActionRunBean(Boolean administrativeDataEntry, Boolean initialDataEntry, Boolean doubleDataEntry, Boolean importDataEntry, Boolean batch,Boolean NOT_SCHEDULED,Boolean scheduled,
+    		Boolean DATA_ENTRY_STARTED,Boolean completed,Boolean skipped,Boolean stopped  ) {
         super();
         this.administrativeDataEntry = administrativeDataEntry;
         this.initialDataEntry = initialDataEntry;
         this.doubleDataEntry = doubleDataEntry;
         this.importDataEntry = importDataEntry;
         this.batch = batch;
-        this.not_started = NOT_STARTED;
+        this.not_scheduled = NOT_SCHEDULED;
         this.scheduled = scheduled;
         this.data_entry_started = DATA_ENTRY_STARTED;
-        this.complete = complete;
+        this.completed = completed;
         this.skipped = skipped;
         this.stopped = stopped;
     }
@@ -82,10 +82,10 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
     }
     
     public enum studyEventPhase{
-    	NOT_STARTED,
+    	NOT_SCHEDULED,
     	SCHEDULED,
     	DATA_ENTRY_STARTED,
-    	COMPLETE,
+    	COMPLETED,
     	SKIPPED,
     	STOPPED
     }
@@ -130,12 +130,12 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
         this.batch = batch;
     }
 
-    public Boolean getNot_started() {
-		return not_started;
+    public Boolean getNot_scheduled() {
+		return not_scheduled;
 	}
 
-	public void setNot_started(Boolean not_started) {
-		this.not_started = not_started;
+	public void setNot_scheduled(Boolean not_scheduled) {
+		this.not_scheduled = not_scheduled;
 	}
 
 	public Boolean getScheduled() {
@@ -154,12 +154,12 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
 		this.data_entry_started = data_entry_started;
 	}
 
-	public Boolean getComplete() {
-		return complete;
+	public Boolean getCompleted() {
+		return completed;
 	}
 
-	public void setComplete(Boolean complete) {
-		this.complete = complete;
+	public void setCompleted(Boolean completed) {
+		this.completed = completed;
 	}
 
 	public Boolean getSkipped() {
