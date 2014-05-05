@@ -61,10 +61,6 @@
     <bean id="datasetDao" class="org.akaza.openclinica.dao.extract.DatasetDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
-   
-    <bean id="studyeventdaojdbc" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
-       <constructor-arg ref="dataSource"/>
-    </bean>
     
     <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
