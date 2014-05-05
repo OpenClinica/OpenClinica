@@ -64,7 +64,7 @@ public class BeanPropertyService{
 	    	switch (SubjectEventStatus.getByCode(studyEvent.getSubjectEventStatusId()))
 	    	{
 	    	case NOT_SCHEDULED:
-	    		if (runOnStatuses.getNot_scheduled()) statusMatch = true;
+	    		if (runOnStatuses.getNot_started()) statusMatch = true;
 	    		break;
 	    	case SCHEDULED:
 	    		if (runOnStatuses.getScheduled()) statusMatch = true;
@@ -73,7 +73,7 @@ public class BeanPropertyService{
 	    		if (runOnStatuses.getData_entry_started()) statusMatch = true;
 	    		break;
 	    	case COMPLETED:
-	    		if (runOnStatuses.getCompleted()) statusMatch = true;
+	    		if (runOnStatuses.getComplete()) statusMatch = true;
 	    		break;
 	    	case SKIPPED:
 	    		if (runOnStatuses.getSkipped()) statusMatch = true;
@@ -91,7 +91,7 @@ public class BeanPropertyService{
     	//Special case if destination study event doesn't exist yet, ie not scheduled.
     	else
     	{
-    		if (runOnStatuses.getNot_scheduled()) statusMatch = true;
+    		if (runOnStatuses.getNot_started()) statusMatch = true;
     	}
     	
     	if (statusMatch)

@@ -648,10 +648,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
             String s = "";
             RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
-            if(ruleActionRun.getNot_scheduled()!=null && ruleActionRun.getNot_scheduled()==true)s+=resword.getString("not_scheduled");
+            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true)s+=resword.getString("not_started");
             if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true)s+=resword.getString("scheduled");
             if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true)s+=resword.getString("data_entry_started");
-            if(ruleActionRun.getCompleted()!=null && ruleActionRun.getCompleted()==true)s+=resword.getString("completed");
             if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true)s+=resword.getString("skipped");
             if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true)s+=resword.getString("stopped");
             

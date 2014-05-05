@@ -33,7 +33,6 @@
             <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="EventAction" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
     </xs:complexType>
@@ -93,36 +92,6 @@
             <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
-    </xs:complexType>
-
-    <xs:element name="EventAction" type="EventActionType">
-    </xs:element>
-    <xs:complexType name="EventActionType">
-        <xs:sequence>
-           <xs:element name="RunOnStatus" type="RunOnType" minOccurs="0"/>
-           <xs:element name="EventDestination" type="EventDestinationType" maxOccurs="unbounded"/>
-        </xs:sequence>
-         
-        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
-        <xs:attribute name="OID" type="xs:string"></xs:attribute>
-    </xs:complexType>
-
-    <xs:complexType name="RunOnType" >
-      <xs:attribute name="not_scheduled"      type="xs:boolean" use="required"/>
-      <xs:attribute name="scheduled"          type="xs:boolean" use="required"/>
-      <xs:attribute name="data_entry_started" type="xs:boolean" use="required"/>
-      <xs:attribute name="completed"          type="xs:boolean" use="required"/>
-      <xs:attribute name="skipped"            type="xs:boolean" use="required"/>
-      <xs:attribute name="stopped"            type="xs:boolean" use="required"/>
-      <xs:attribute name="signed"             type="xs:boolean" use="optional"/>
-      <xs:attribute name="locked"             type="xs:boolean" use="optional"/>
-    </xs:complexType>
-
-    <xs:complexType name="EventDestinationType">
-      <xs:sequence>
-        <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>
-      </xs:sequence>                  
-      <xs:attribute name="Property" type="xs:string" use="required"/>
     </xs:complexType>
     
     <xs:attributeGroup name="DiscrepancyNoteActionAttributeType">
