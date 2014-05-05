@@ -65,6 +65,10 @@
     <bean id="studyeventdaojdbc" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
     </bean>
+    <bean id="studyEventBeanListener" class="org.akaza.openclinica.service.rule.StudyEventBeanListener">
+    <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
+ <property name="dataSource" ref="dataSource"/>
+     </bean>
     
     <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
@@ -74,6 +78,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
     
+    <bean id="ruleSetListenerService" class="org.akaza.openclinica.service.rule.RuleSetListenerService">
+    	<property name="ruleSetService" ref="ruleSetService"/>
+    	<property name="ruleSetDao" ref="ruleSetDao"/>
+    </bean>
     <bean id="generateExtractFileService" class="org.akaza.openclinica.service.extract.GenerateExtractFileService">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="coreResources"/>

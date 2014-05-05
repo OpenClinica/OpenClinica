@@ -479,7 +479,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
 
-   //             getRuleSetService().runRulesInBeanProperty(createRuleSet(ssub,sed),currentStudy,ub,request,ssub);
+        //      getRuleSetService().runRulesInBeanProperty(createRuleSet(ssub,sed),currentStudy,ub,request,ssub);
                 
                 addPageMessage(respage.getString("study_event_updated"));
                 request.setAttribute("id", new Integer(studySubjectId).toString());

@@ -35,7 +35,7 @@ public class ExpressionBeanObjectWrapper {
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
     EventCRFBean eventCrf; // used only in data entry based rule executions
-    StudySubjectBean studySubjectBean;
+    Integer studySubjectBeanId;
     UserAccountBean userAccountBean;
     StudyEventDao studyEventDaoHib;
     StudyEventDefinitionDao studyEventDefDaoHib;
@@ -58,7 +58,7 @@ public class ExpressionBeanObjectWrapper {
         this.expressionBean = expressionBean;
     }
 
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,StudySubjectBean studySubjectBean, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
+    /*public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,StudySubjectBean studySubjectBean, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
@@ -67,16 +67,19 @@ public class ExpressionBeanObjectWrapper {
         this.studySubjectBean = studySubjectBean;
         this.studyEventDefDaoHib=studyEventDefDao;
         this.studyEventDaoHib = studyEventDao;
-    }
+    }*/
     
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,StudySubject studySubjectHibBean) {
+    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,Integer studySubjectBeanId, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
         this.expressionBean = expressionBean;
         this.ruleSet = ruleSet;
-        this.studySubjectBean = studySubjectBean;
+        this.studySubjectBeanId = studySubjectBeanId;
+        this.studyEventDefDaoHib=studyEventDefDao;
+        this.studyEventDaoHib = studyEventDao;
     }
+   
 
 
     public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
@@ -183,11 +186,11 @@ public class ExpressionBeanObjectWrapper {
 		this.eventCrf = eventCrf;
 	}
 
-    public StudySubjectBean getStudySubjectBean() {
-        return studySubjectBean;
+    public Integer getStudySubjectBeanId() {
+        return studySubjectBeanId;
     }
 
-    public void setStudySubjectBean(StudySubjectBean studySubjectBean) {
-        this.studySubjectBean = studySubjectBean;
+    public void setStudySubjectBeanId(Integer studySubjectBeanId) {
+        this.studySubjectBeanId = studySubjectBeanId;
     }
 }

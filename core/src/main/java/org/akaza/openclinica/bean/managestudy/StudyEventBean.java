@@ -11,6 +11,8 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.patterns.ocobserver.Listener;
+import org.akaza.openclinica.patterns.ocobserver.Observer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +21,7 @@ import java.util.Date;
  * @author jxu
  *
  */
-public class StudyEventBean extends AuditableEntityBean {
+public class StudyEventBean extends AuditableEntityBean implements Listener {
     // STUDY_EVENT_ID STUDY_EVENT_DEFINITION_ID SUBJECT_ID
     // LOCATION SAMPLE_ORDINAL DATE_START DATE_END
     // OWNER_ID STATUS_ID DATE_CREATED DATE_UPDATED
@@ -358,4 +360,16 @@ public class StudyEventBean extends AuditableEntityBean {
     public void setStudySubject(StudySubjectBean studySubject) {
         this.studySubject = studySubject;
     }
+
+	@Override
+	public void setObserver(Observer o) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Observer getObserver() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

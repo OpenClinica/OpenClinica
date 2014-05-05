@@ -93,7 +93,7 @@ public class ExpressionBeanService {
     }
     
     public String evaluateExpression(String test){
-        String value =null;
+        String value ="";
         String temp = null;
         String oid = null;
         int index = 0;
@@ -108,7 +108,7 @@ public class ExpressionBeanService {
         	*/if(checkIfForScheduling(test)){
         	
         	
-        	Integer subjectId = expressionBeanWrapper.getStudySubjectBean().getId();
+        	Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");
         	oid = test.substring(0,index);
@@ -118,9 +118,11 @@ public class ExpressionBeanService {
         	
         	if(ExpressionService.STARTDATE.endsWith(temp)){
         		//value = 				String.valueOf(DateUtils.truncate((java.sql.Date)studyEvent.getDateStart(), Calendar.DATE));
+        		if(studyEvent!=null){
         		value = sdf.format(DateUtils.truncate((java.util.Date)studyEvent.getDateStart(), Calendar.DATE));
         		value = value.replace(("00:00:00.0"),"");
                 value = value.trim();
+        		}
         	}
         	
         	

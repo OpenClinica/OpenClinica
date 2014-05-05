@@ -33,7 +33,17 @@ import java.util.List;
  */
 public class BeanPropertyRuleRunner {
 
-    public void runRules(List<RuleSetBean> ruleSets, UserAccountBean ub,DataSource ds,StudyBean currentStudy,StudySubjectBean studySubjectBean,
+    /**
+	 * @deprecated Use {@link #runRules(List<RuleSetBean>,UserAccountBean,DataSource,StudyBean,Integer,BeanPropertyService,StudyEventDao,StudyEventDefinitionDao)} instead
+	 */
+	public void runRules(List<RuleSetBean> ruleSets, UserAccountBean ub,DataSource ds,StudyBean currentStudy,StudySubjectBean studySubjectBean,
+	                     BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib) {
+							runRules(ruleSets,  ds, 
+									studySubjectBean.getId(), beanPropertyService,
+									studyEventDaoHib, studyEventDefDaoHib);
+						}
+
+	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib) {
         for (RuleSetBean ruleSet : ruleSets) {
 
@@ -42,14 +52,15 @@ public class BeanPropertyRuleRunner {
                     
                     if(ruleSetRule.getStatus()==Status.AVAILABLE){
                     RuleBean rule = ruleSetRule.getRuleBean();
-                    ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBean, studyEventDaoHib, studyEventDefDaoHib);
+                    StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
+                    ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBeanId, studyEventDaoHib, studyEventDefDaoHib);
                     try {
                        // StopWatch sw = new StopWatch();
                         ExpressionObjectWrapper ew = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet);
                         ew.setStudyEventDaoHib(studyEventDaoHib);
-                        ew.setStudySubjectId(studySubjectBean.getId());
+                        ew.setStudySubjectId(studySubjectBeanId);
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
-                        eow.setUserAccountBean(ub);
+                       // eow.setUserAccountBean(ub);
                         eow.setStudyBean(currentStudy);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                        // sw.stop();

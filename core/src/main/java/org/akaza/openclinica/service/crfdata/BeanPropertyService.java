@@ -56,7 +56,7 @@ public class BeanPropertyService{
     public void runAction(RuleActionBean ruleActionBean,ExpressionBeanObjectWrapper eow){
     	boolean statusMatch = false;
         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-    	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(((EventActionBean)ruleActionBean).getOc_oid_reference(), eow.getStudySubjectBean().getId());
+    	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(((EventActionBean)ruleActionBean).getOc_oid_reference(), eow.getStudySubjectBeanId());
     	RuleActionRunBean runOnStatuses = ruleActionBean.getRuleActionRun();
 
     	if (studyEvent != null)
@@ -120,10 +120,10 @@ public class BeanPropertyService{
         
         if(oid.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY))
         {
-        	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBean().getId());
+        	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBeanId());
         	if(studyEvent==null){
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
-            	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBean().getId());
+            	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBeanId());
             	StudyEventDefinition sed = getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
