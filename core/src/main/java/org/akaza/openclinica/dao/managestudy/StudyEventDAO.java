@@ -34,6 +34,8 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.patterns.ocobserver.Listener;
+import org.akaza.openclinica.patterns.ocobserver.Observer;
 
 /**
  * @author jxu
@@ -41,7 +43,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
  *         Modified by ywang.
  *
  */
-public class StudyEventDAO extends AuditableEntityDAO {
+public class StudyEventDAO extends AuditableEntityDAO implements Listener {
     // private DAODigester digester;
 
     private void setQueryNames() {
@@ -571,6 +573,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
             sb.setActive(true);
         }
 
+        
+        
         return sb;
     }
 
@@ -1158,5 +1162,11 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
         return returnMe;
     }
+
+	@Override
+	public void addObserver(Observer o) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
