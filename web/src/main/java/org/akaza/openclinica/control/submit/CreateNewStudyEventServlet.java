@@ -731,7 +731,7 @@ public class CreateNewStudyEventServlet extends SecureController {
     private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
 			StudyEventDefinitionBean sed) {
     	
-    	return getRuleSetDao().findAllByStudyEventDefWhereItemIsNull(sed);
+    	return getRuleSetDao().findAllByStudyEventDef(sed);
     	
     	
 	}

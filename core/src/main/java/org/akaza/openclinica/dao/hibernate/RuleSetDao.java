@@ -4,8 +4,6 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.hibernate.annotations.Cache;
@@ -148,12 +146,6 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
     public ArrayList<RuleSetBean> findAllByStudyEventDef(StudyEventDefinitionBean sed){
     	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyEventDefId", sed.getId());
-        return (ArrayList<RuleSetBean>) q.list();
-    }
-    public ArrayList<RuleSetBean> findAllByStudyEventDefWhereItemIsNull(StudyEventDefinitionBean sed){
-    	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  and ruleSet.itemId is null";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyEventDefId", sed.getId());
         return (ArrayList<RuleSetBean>) q.list();

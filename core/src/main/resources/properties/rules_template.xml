@@ -1,32 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <RuleImport>
 	<RuleAssignment>
-	<Target Context="OC_RULES_V1"></Target>
+		<Target Context="OC_RULES_V1"></Target>
 		<RuleRef OID="">
 			<DiscrepancyNoteAction IfExpressionEvaluates="">
-                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
-				<Message></Message>
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+				<Message/>
 			</DiscrepancyNoteAction>
 			<EmailAction IfExpressionEvaluates="">
-                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
-				<Message></Message>
-				<To></To>
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+				<Message/>
+				<To/>
 			</EmailAction>
-            <ShowAction IfExpressionEvaluates="">
-                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
-                <Message></Message>
-				<DestinationProperty OID =""/>
-            </ShowAction>			
+			<ShowAction IfExpressionEvaluates="">
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
+				<Message/>
+				<DestinationProperty OID=""/>
+			</ShowAction>			
 			<HideAction IfExpressionEvaluates="">
-                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
-                <Message></Message>
-				<DestinationProperty OID =""/>
-            </HideAction>
-            <InsertAction IfExpressionEvaluates="">
-                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch=""/>
-				<DestinationProperty OID="" Value=""></DestinationProperty>
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
+				<Message/>
+				<DestinationProperty OID=""/>
+			</HideAction>
+			<InsertAction IfExpressionEvaluates="">
+				<Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch=""/>
+				<DestinationProperty OID="" Value="">
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
-            </InsertAction>
+				</DestinationProperty>
+			</InsertAction>
+			<EventAction IfExpressionEvaluates="true" OID="">
+				<RunOnStatus not_scheduled="true" scheduled="true" data_entry_started="false" completed="false"  skipped="false" stopped="false"/>
+				<EventDestination Property="STARTDATE">
+					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+				</EventDestination>
+			</EventAction>
 		</RuleRef>
 	</RuleAssignment>
 	<RuleDef OID="" Name="">

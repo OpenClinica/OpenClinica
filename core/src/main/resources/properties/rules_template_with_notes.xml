@@ -52,6 +52,17 @@ Translated variables: [[Key to variables and/or reference document]] -->
 					<!-- ValueExpression is used to copy a value from one item to another.  If it is part of the same group as the target, you only need to provide the ITEM OID.  If it is in a different group, but the same CRF, you must provide the GROUP OID with the ITEM OID.   If the item is in a different CRF, you must provide the CRF OID, GROUP OID, and ITEM OID.-->
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
             </InsertAction>
+			<!-- Event Action is used to schedule an event automatically based on a rule. EventAction OID is the OID of the Event to be updated. -->
+			<EventAction IfExpressionEvaluates="true" OID="">
+			<!-- RunOnStatus allows you to control if the Event date of the future event (or the event to be created or updated) should be updated or not based on its status. For example if Event 2 is complete and the user updates the start date of Event 1, if RunOnStatus complete="false" then only Event 1 will be updated and no action will take place for Event 2. The sytem does not support automatic updates of Event Start Date with a status of Signed or Locked.-->
+				<RunOnStatus not_scheduled="true" scheduled="true" data_entry_started="false" completed="false"  skipped="false" stopped="false"/>
+				<!-- EventDestination Property is where you specify the property of the above Study Event which the rule should update. Currently the property which can be updated is "STARTDATE" -->
+				<EventDestination Property="STARTDATE">
+					<!-- ValueExpression is the value or the expression which will evaluate to a result be inserted into the start date. You can use Study Event Start Date, a specific date in the YYYY-MM-DD format, or _CURRENT_DATE, with + or - with integer values. Example: 
+					<ValueExpression Context="OC_RULES_V1">SE_VISIT1 + 7</ValueExpression> --> 
+					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+				</EventDestination>
+			</EventAction>
 		</RuleRef>
 	</RuleAssignment>
 	<!-- RuleDef is where you define your expression and description. In the RuleDef tag, there are two attributes that must be defined: OID and Name. OID must be uniqe, all UPPERCASE and can not contain whitespace. Name should be a descriptive name for anyone that might be managing the rules through the rules interface. -->
