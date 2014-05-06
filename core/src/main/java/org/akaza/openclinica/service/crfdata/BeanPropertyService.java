@@ -106,7 +106,13 @@ public class BeanPropertyService{
     	}
     }
 
-    
+    /**
+     * The Event action runs based on the values set in the rules.
+     * @param result
+     * @param propertyBean
+     * @param eow
+     * @param eventAction
+     */
     
     private void executeAction(Object result,PropertyBean propertyBean,ExpressionBeanObjectWrapper eow,EventActionBean eventAction){
     	String oid = eventAction.getOc_oid_reference();
@@ -130,6 +136,9 @@ public class BeanPropertyService{
             	studyEvent.setStatusId(1);
             	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
             	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
+            	studyEvent.setStartTimeFlag(false);
+            	studyEvent.setEndTimeFlag(false);
+            	
         	}
         	
         	try {
