@@ -881,7 +881,7 @@ public class AddNewSubjectServlet extends SecureController {
 
                 se.setSampleOrdinal(sedao.getMaxSampleOrdinal(sed, s) + 1);
                 sedao.create(se);
-                getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
+            //    getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
 
  
             }
