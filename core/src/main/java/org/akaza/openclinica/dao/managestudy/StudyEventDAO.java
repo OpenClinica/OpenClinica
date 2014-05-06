@@ -517,7 +517,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         if (isQuerySuccessful()) {
             sb.setId(getLatestPK());
         }
-
+        notifyObservers(sb);
         return sb;
     }
 

@@ -515,7 +515,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
 
                 studyEvent = (StudyEventBean) sed.create(studyEvent);
-                getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
+               // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
 
                 
                 if (!studyEvent.isActive()) {
