@@ -28,6 +28,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	        getSessionFactory().getStatistics().logSummary();
 	        getCurrentSession().saveOrUpdate(domainObject);
 	        getCurrentSession().flush();
+	        
 	        this.eventPublisher.publishEvent(new OnStudyEventUpdated(domainObject));
 
 	        		
