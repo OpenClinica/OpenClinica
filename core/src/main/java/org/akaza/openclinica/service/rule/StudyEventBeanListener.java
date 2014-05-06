@@ -21,7 +21,7 @@ public class StudyEventBeanListener implements Observer {
 	@Override
 	public void update(Listener lstnr) {
 	System.out.println("Triggering the rules based on event updates");
-		
+		//ADD LOGIC
 	}
 	public DataSource getDataSource() {
 		return dataSource;
