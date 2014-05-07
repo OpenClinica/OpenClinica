@@ -97,7 +97,7 @@
             <dependency>
                 <groupId>org.akaza.openclinica.odm</groupId>
                 <artifactId>openclinica-odm</artifactId>
-                <version>1.0</version>
+                <version>0.2.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
