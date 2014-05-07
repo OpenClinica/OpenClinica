@@ -355,12 +355,9 @@ public class ExpressionService {
 							.fetchByStudyEventDefOID(oid,
 									expressionWrapper.getStudySubjectId());
 					if (studyEvent != null) {
-						logger.debug("Status: "
-								+ SubjectEventStatus.get(
-										studyEvent.getSubjectEventStatusId())
-										.getName());
-						return SubjectEventStatus.get(
-								studyEvent.getSubjectEventStatusId()).getName();
+						logger.debug("Status: "	+ SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
+						return SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId());
+						
 					} else
 						return "";
 
