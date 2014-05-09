@@ -16,12 +16,16 @@ public class ExpressionObjectWrapper {
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
     EventCRFBean eventCrf; // used only in data entry based rule executions
+    String expressionContext = null;  // Used only where context specific validation checking is needed. Not always populated.
 
     // This will carry item/value pairs used in DataEntry Rule Execution
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
-    
     StudyEventDao studyEventDaoHib;
     Integer StudySubjectId;
+    
+    public static final String CONTEXT_EXPRESSION = "expression";
+    public static final String CONTEXT_TARGET = "target";
+    public static final String CONTEXT_VALUE_EXPRESSION = "valueexpression";
 
     public Integer getStudySubjectId() {
 		return StudySubjectId;
@@ -54,6 +58,14 @@ public class ExpressionObjectWrapper {
         this.ruleSet = ruleSet;
     }
 
+    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, String expressionContext) {
+        super();
+        this.ds = ds;
+        this.studyBean = studyBean;
+        this.expressionBean = expressionBean;
+        this.expressionContext = expressionContext;
+    }
+
     public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
             HashMap<String, String> itemsAndTheirValues) {
         super();
@@ -62,6 +74,16 @@ public class ExpressionObjectWrapper {
         this.expressionBean = expressionBean;
         this.ruleSet = ruleSet;
         this.itemsAndTheirValues = itemsAndTheirValues;
+    }
+    
+    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
+            String expressionContext) {
+        super();
+        this.ds = ds;
+        this.studyBean = studyBean;
+        this.expressionBean = expressionBean;
+        this.ruleSet = ruleSet;
+        this.expressionContext = expressionContext;
     }
     
     public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
@@ -157,4 +179,14 @@ public class ExpressionObjectWrapper {
 	public void setEventCrf(EventCRFBean eventCrf) {
 		this.eventCrf = eventCrf;
 	}
+
+	public String getExpressionContext() {
+		return expressionContext;
+	}
+
+	public void setExpressionContext(String expressionContext) {
+		this.expressionContext = expressionContext;
+	}
+	
+	
 }

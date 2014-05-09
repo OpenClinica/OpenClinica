@@ -887,7 +887,7 @@ public class ExpressionService {
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression, boolean onlyOID) {
         StudyBean study = expressionWrapper.getStudyBean();
     	String studyEventDefinitionKey;
-    	if (onlyOID) studyEventDefinitionKey = expression;
+    	if (onlyOID) studyEventDefinitionKey = expression.replaceAll(BRACKETS_AND_CONTENTS, "");
     	else studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
 
     	
