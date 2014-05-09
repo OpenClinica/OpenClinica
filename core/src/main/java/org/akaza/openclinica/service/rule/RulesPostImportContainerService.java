@@ -361,7 +361,7 @@ public class RulesPostImportContainerService {
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {
         boolean isValid = true;
         ExpressionBean expressionBean = isExpressionValid(ruleBeanWrapper.getAuditableBean().getExpression(), ruleBeanWrapper);
-        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean, ruleSet, ExpressionObjectWrapper.CONTEXT_EXPRESSION);
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean, ruleSet);
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
         String errorString = ep.isRuleExpressionValid();
@@ -375,7 +375,7 @@ public class RulesPostImportContainerService {
     private boolean isRuleSetExpressionValid(AuditableBeanWrapper<RuleSetBean> beanWrapper) {
         boolean isValid = true;
         ExpressionBean expressionBean = isExpressionValid(beanWrapper.getAuditableBean().getTarget(), beanWrapper);
-        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean,ExpressionObjectWrapper.CONTEXT_TARGET);
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean);
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
         String errorString = ep.isRuleAssignmentExpressionValid();
@@ -512,8 +512,8 @@ public class RulesPostImportContainerService {
 
     private ExpressionService getExpressionService() {
         expressionService =
-            this.expressionService != null ? expressionService : new ExpressionService(new ExpressionObjectWrapper(ds, currentStudy, (ExpressionBean)null, (RuleSetBean)null));
-        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, (ExpressionBean)null, (RuleSetBean)null));
+            this.expressionService != null ? expressionService : new ExpressionService(new ExpressionObjectWrapper(ds, currentStudy, null, null));
+        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, null, null));
 
         return expressionService;
     }
