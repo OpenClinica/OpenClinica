@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
     private HibernateTemplate hibernateTemplate;
@@ -17,6 +18,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     }
 
     @SuppressWarnings("unchecked")
+    
     public T findById(Integer id) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.id = :id";
