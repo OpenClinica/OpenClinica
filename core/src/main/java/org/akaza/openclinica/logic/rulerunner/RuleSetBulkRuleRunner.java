@@ -80,7 +80,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                     ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
                         // HashMap<String, ArrayList<RuleActionBean>> actionsToBeExecuted = ruleSetRule.getAllActionsWithEvaluatesToAsKey(result);
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
@@ -161,7 +161,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                     ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                         itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
 
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);

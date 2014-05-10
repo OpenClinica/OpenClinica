@@ -24,13 +24,13 @@ public class UnaryMinusNode extends ExpressionNode {
 
     @Override
     String testCalculate() throws OpenClinicaSystemException {
-        return calculate();
+        return (String) calculate();
     }
 
     @Override
-    String calculate() {
+    Object calculate() {
         // The value is the negative of the value of the operand.
-        String theOperand = operand.value();
+        String theOperand = (String) operand.value();
         validate(theOperand);
         double neg = Double.valueOf(theOperand);
         return String.valueOf(-neg);

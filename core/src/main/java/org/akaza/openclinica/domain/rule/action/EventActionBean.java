@@ -76,4 +76,40 @@ public class EventActionBean extends RuleActionBean {
 	        return p;
 	    }
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime
+					* result
+					+ ((oc_oid_reference == null) ? 0 : oc_oid_reference
+							.hashCode());
+			result = prime * result
+					+ ((properties == null) ? 0 : properties.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			EventActionBean other = (EventActionBean) obj;
+			if (oc_oid_reference == null) {
+				if (other.oc_oid_reference != null)
+					return false;
+			} else if (!oc_oid_reference.equals(other.oc_oid_reference))
+				return false;
+			if (properties == null) {
+				if (other.properties != null)
+					return false;
+			} else if (!properties.equals(other.properties))
+				return false;
+			return true;
+		}
+
+	    
 }

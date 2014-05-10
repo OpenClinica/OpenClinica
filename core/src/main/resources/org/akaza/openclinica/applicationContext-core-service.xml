@@ -24,6 +24,9 @@
     </bean>
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
         <property name="dataSource" ref="dataSource"/>
+        <property name="beanPropertyService" ref="beanPropertyService"/>
+        <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
+        <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
     </bean>
     <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
         <constructor-arg ref="dataSource"/>
@@ -58,6 +61,14 @@
     <bean id="datasetDao" class="org.akaza.openclinica.dao.extract.DatasetDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
+   
+    <bean id="studyeventdaojdbc" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
+       <constructor-arg ref="dataSource"/>
+    </bean>
+    <bean id="studyEventBeanListener" class="org.akaza.openclinica.service.rule.StudyEventBeanListener">
+    <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
+ <property name="dataSource" ref="dataSource"/>
+     </bean>
     
     <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
@@ -67,6 +78,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
     
+    <bean id="ruleSetListenerService" class="org.akaza.openclinica.service.rule.RuleSetListenerService">
+    	<property name="ruleSetService" ref="ruleSetService"/>
+    	<property name="ruleSetDao" ref="ruleSetDao"/>
+    </bean>
     <bean id="generateExtractFileService" class="org.akaza.openclinica.service.extract.GenerateExtractFileService">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="coreResources"/>
@@ -97,5 +112,25 @@
 	<property name="userAccountDao" ref="userDaoDomain"/>
 </bean>
 
-
+<bean id="beanPropertyService" class="org.akaza.openclinica.service.crfdata.BeanPropertyService" autowire="byName">
+      <constructor-arg ref="dataSource"/>
+		<property name="studyEventDAO" ref="studyEventDaoDomain"/>
+		<property name="studyEventDefinitionDao" ref="studyEventDefDaoDomain"/>
+		<property name="studySubjectDao" ref = "studySubjectDaoDomain"/>
+    </bean>
+    
+    <!-- 
+<bean id="expressionBeanService" class="org.akaza.openclinica.service.rule.expression.ExpressionBeanService" autowire="byName">
+     
+     <constructor-arg ref="datasource">
+     </constructor-arg>
+     
+     <constructor-arg ref="studyEventDaoDomain" name="studyEventDAO">
+     </constructor-arg>
+     
+	<constructor-arg ref="studyEventDefDaoDomain" name="studyEventDefDao">
+     </constructor-arg>
+     
+     	
+    </bean> -->
 </beans>

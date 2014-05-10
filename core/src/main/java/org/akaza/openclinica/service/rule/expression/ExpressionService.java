@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -84,8 +86,9 @@ public class ExpressionService {
     private CRFVersionDAO crfVersionDao;
     private ItemDataDAO itemDataDao;
     private StudyEventDAO studyEventDao;
-    private final String STARTDATE =".STARTDATE";
-    private final String STATUS =".STATUS";
+    public final static String STARTDATE =".STARTDATE";
+    public final  static String STATUS =".STATUS";
+    public static final String STUDY_EVENT_OID_START_KEY="SE_";
     /*
      * The variables below are used as a small Cache so that we don't go to the
      * database every time we want to get an Object by it's OID. This is a very
@@ -327,6 +330,40 @@ public class ExpressionService {
             }
         }
         if (expressionWrapper.getRuleSet() != null) {
+        	if(checkIfExpressionIsForScheduling(expression)){
+             StudyEvent studyEvent;        		
+
+				if (expression.endsWith(this.STARTDATE)) {
+					String oid = expression.substring(0,
+							expression.indexOf(this.STARTDATE));
+					studyEvent = expressionWrapper.getStudyEventDaoHib()
+							.fetchByStudyEventDefOID(oid,
+									expressionWrapper.getStudySubjectId());
+					if (studyEvent != null) {
+						logger.debug("Study Event Start Date: "
+								+ studyEvent.getDateStart().toString()
+										.substring(0, 10).trim());
+
+						return studyEvent.getDateStart().toString()
+								.substring(0, 10).trim();
+					} else
+						return "";
+				} else {
+					String oid = expression.substring(0,
+							expression.indexOf(this.STATUS));
+					studyEvent = expressionWrapper.getStudyEventDaoHib()
+							.fetchByStudyEventDefOID(oid,
+									expressionWrapper.getStudySubjectId());
+					if (studyEvent != null) {
+						logger.debug("Status: "	+ SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
+						return SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId());
+						
+					} else
+						return "";
+
+				}
+        	}
+        	
             if (isExpressionPartial(expression)) {
                 String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
                 List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
@@ -379,8 +416,14 @@ public class ExpressionService {
         return value;
     }
 
+    private boolean checkIfExpressionIsForScheduling(String expression){
+    	if(expression.toUpperCase().startsWith("SE_")&&(expression.toUpperCase().endsWith(this.STARTDATE)|| expression.toUpperCase().endsWith(this.STATUS))){
+    		return true;
+    	}
+    	return false;
+    }
     private List<ItemDataBean> getItemDatas(String expression) {
-
+    	
         String studyEventId = getStudyEventDefinitionOidOrdinalFromExpression(expression);
         List<ItemDataBean> itemData =
             getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), getItemOidFromExpression(expression),
@@ -469,6 +512,12 @@ public class ExpressionService {
     public boolean ruleExpressionChecker(String expression) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
+        
+        if (checkIfExpressionIsForScheduling(expression)) {
+            if (checkSyntax(expression)) return true;
+            else return false;
+        }
+        
         if (expressionWrapper.getRuleSet() != null) {
             if (isExpressionPartial(expressionWrapper.getRuleSet().getTarget().getValue())) {
                 return true;
@@ -502,19 +551,10 @@ public class ExpressionService {
                     result = false;
                 }
             }
-
         } else {
-            boolean isEventStartDateAndStatusParamExist =  (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
-           if (isEventStartDateAndStatusParamExist) { 
-        	   result = true; 
-           }else if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
+            if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
                 result = true;
             }  
-             
-           
-        
-        
-        
         }
         return result;
     }
@@ -526,9 +566,12 @@ public class ExpressionService {
 
     public Boolean isExpressionPartial(String expression) {
         String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-        if (splitExpression.length == 4)
+       /* if(expression.endsWith(STARTDATE)||expression.endsWith(STATUS)){
+        	return false;
+        }
+        else */if (splitExpression.length == 4)
             return false;
-        else
+        else 
             return true;
     }
 
@@ -759,7 +802,7 @@ public class ExpressionService {
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-                throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
+                throw new OpenClinicaSystemException("OCRER'R_0019", new String[] { expression });
             }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];

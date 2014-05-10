@@ -7,12 +7,13 @@
  */
 package org.akaza.openclinica.logic.expressionTree;
 
+import java.util.HashMap;
+
+import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 
 /**
  * @author Krikor Krumlian
@@ -26,6 +27,13 @@ public class OpenClinicaExpressionParser {
     private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
     private HashMap<String, String> testValues;
     private HashMap<String, String> responseTestValues;
+	private ExpressionBeanObjectWrapper expressionBeanWrapper;
+
+    
+    public OpenClinicaExpressionParser(ExpressionBeanObjectWrapper expressionBeanWrapper) {
+        textIO = new TextIO();
+        this.expressionBeanWrapper = expressionBeanWrapper;
+    }
 
     public OpenClinicaExpressionParser() {
         textIO = new TextIO();
@@ -64,7 +72,7 @@ public class OpenClinicaExpressionParser {
         exp.printStackCommands();
     }
 
-    public String parseAndEvaluateExpression(String expression) throws OpenClinicaSystemException {
+    public Object parseAndEvaluateExpression(String expression) throws OpenClinicaSystemException {
         getTextIO().fillBuffer(expression);
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();
@@ -240,8 +248,12 @@ public class OpenClinicaExpressionParser {
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
             logger.debug("TheWord 1 is : " + k);
-            return new OpenClinicaVariableNode(k, expressionWrapper, this);
-        } else if (String.valueOf(ch).matches("\"")) {
+            if(null != expressionWrapper){
+               return new OpenClinicaVariableNode(k, expressionWrapper, this);
+            }else{
+                return new OpenClinicaBeanVariableNode(k, expressionBeanWrapper, this);
+        } 
+        }else if (String.valueOf(ch).matches("\"")) {
             String k = textIO.getDoubleQuoteWord();
             logger.debug("TheWord 2 is : " + k);
             return new ConstantNode(k);

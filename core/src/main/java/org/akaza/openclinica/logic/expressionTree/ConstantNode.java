@@ -28,11 +28,11 @@ public class ConstantNode extends ExpressionNode {
 
     @Override
     String testCalculate() throws OpenClinicaSystemException {
-        return calculate();
+        return (String) calculate();
     }
 
     @Override
-    String calculate() throws OpenClinicaSystemException {
+    Object calculate() throws OpenClinicaSystemException {
         // The value of the node is the number that it contains.
         return number;
     }

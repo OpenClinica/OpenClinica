@@ -34,6 +34,9 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.patterns.ocobserver.Listener;
+import org.akaza.openclinica.patterns.ocobserver.Observer;
+import org.akaza.openclinica.service.rule.StudyEventBeanListener;
 
 /**
  * @author jxu
@@ -41,10 +44,13 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
  *         Modified by ywang.
  *
  */
-public class StudyEventDAO extends AuditableEntityDAO {
-    // private DAODigester digester;
+public class StudyEventDAO extends AuditableEntityDAO implements Listener {
+    
+	
+	private Observer observer;
+	// private DAODigester digester;
 
-    private void setQueryNames() {
+	    private void setQueryNames() {
         findByPKAndStudyName = "findByPKAndStudy";
         getCurrentPKName = "getCurrentPrimaryKey";
     }
@@ -511,7 +517,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             sb.setId(getLatestPK());
         }
-
+        notifyObservers(sb);
         return sb;
     }
 
@@ -571,6 +577,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
             sb.setActive(true);
         }
 
+       notifyObservers(sb);
+        
         return sb;
     }
 
@@ -1158,5 +1166,20 @@ public class StudyEventDAO extends AuditableEntityDAO {
 
         return returnMe;
     }
+
+    private void notifyObservers(StudyEventBean sb){
+    if(getObserver()!=null)
+    	getObserver().update(sb);
+    }
+    
+    @Override
+	public Observer getObserver() {
+		return new StudyEventBeanListener(this);
+	}
+
+	@Override
+    public void setObserver(Observer observer) {
+		this.observer = observer;
+	}
 
 }

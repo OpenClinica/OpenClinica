@@ -187,12 +187,13 @@
   <bean id="studyDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyDao" parent="abstractDomainDao" autowire="byName">
   
   </bean>
-  
+    
   <bean id="studySubjectDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDao" parent="abstractDomainDao" autowire="byName">
   </bean>
    <bean id="studyEventDefDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao" parent="abstractDomainDao" autowire="byName">
   </bean>
    <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
   </bean>
-  <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/> 
+  <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
+  <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean> 
 </beans>

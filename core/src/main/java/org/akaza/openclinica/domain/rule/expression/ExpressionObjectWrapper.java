@@ -2,6 +2,7 @@ package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 
 import java.util.HashMap;
@@ -18,8 +19,27 @@ public class ExpressionObjectWrapper {
 
     // This will carry item/value pairs used in DataEntry Rule Execution
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
+    
+    StudyEventDao studyEventDaoHib;
+    Integer StudySubjectId;
 
-    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean) {
+    public Integer getStudySubjectId() {
+		return StudySubjectId;
+	}
+
+	public void setStudySubjectId(Integer studySubjectId) {
+		StudySubjectId = studySubjectId;
+	}
+
+	public StudyEventDao getStudyEventDaoHib() {
+		return studyEventDaoHib;
+	}
+
+	public void setStudyEventDaoHib(StudyEventDao studyEventDaoHib) {
+		this.studyEventDaoHib = studyEventDaoHib;
+	}
+
+	public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;

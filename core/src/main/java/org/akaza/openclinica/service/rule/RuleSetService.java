@@ -21,6 +21,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -33,6 +34,8 @@ import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -45,6 +48,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
@@ -58,6 +62,7 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.logic.rulerunner.BeanPropertyRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
@@ -65,6 +70,7 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
+import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
@@ -104,7 +110,11 @@ public class RuleSetService implements RuleSetServiceInterface {
     private String contextPath;
     private DynamicsMetadataService dynamicsMetadataService;
     private RuleActionRunLogDao ruleActionRunLogDao;
-
+    private BeanPropertyService beanPropertyService;
+    
+    //hibernate based daos
+    private StudyEventDao studyEventDomainDao;
+    private StudyEventDefinitionDao studyEventDefDomainDao;
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
@@ -115,7 +125,15 @@ public class RuleSetService implements RuleSetServiceInterface {
         return persistentRuleSetBean;
     }
 
- @Transactional
+ public BeanPropertyService getBeanPropertyService() {
+		return beanPropertyService;
+	}
+
+	public void setBeanPropertyService(BeanPropertyService beanPropertyService) {
+		this.beanPropertyService = beanPropertyService;
+	}
+
+@Transactional
     public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
     	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
         for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
@@ -998,7 +1016,33 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,StudyBean currentStudy, UserAccountBean ub,HttpServletRequest request,
+    		                                                   StudySubjectBean studySubjectBean) {
+    		        BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
+    		        ruleRunner.runRules(ruleSets,ub,dataSource, currentStudy, studySubjectBean,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
+    		    }
 
+    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
+            Integer StudySubjectBeanId) {
+BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
+ruleRunner.runRules(ruleSets,dataSource,  StudySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
+}
+
+	public StudyEventDao getStudyEventDomainDao() {
+		return studyEventDomainDao;
+	}
+
+	public void setStudyEventDomainDao(StudyEventDao studyEventDomainDao) {
+		this.studyEventDomainDao = studyEventDomainDao;
+	}
+
+	public StudyEventDefinitionDao getStudyEventDefDomainDao() {
+		return studyEventDefDomainDao;
+	}
+
+	public void setStudyEventDefDomainDao(StudyEventDefinitionDao studyEventDefDomainDao) {
+		this.studyEventDefDomainDao = studyEventDefDomainDao;
+	}
 
 
 }

@@ -83,7 +83,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
             oep = new OpenClinicaExpressionParser(expressionWrapper);
             String result = oep.parseAndTestEvaluateExpression(e.getValue());
             logger.debug("Test Result : " + result);
-            return "Pass : " + result;
+            return result;
         } catch (OpenClinicaSystemException e) {
             MessageFormat mf = new MessageFormat("");
             mf.applyPattern(respage.getString(e.getErrorCode()));

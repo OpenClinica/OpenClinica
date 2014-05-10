@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -30,12 +31,14 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -46,12 +49,14 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.akaza.openclinica.service.rule.RuleSetService;
 
 // import javax.servlet.http.*;
 
@@ -825,6 +830,26 @@ public class AddNewSubjectServlet extends SecureController {
         }// end of fp.isSubmitted()
     }
 
+    
+    private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
+			StudyEventDefinitionBean sed) {
+    	
+    	return getRuleSetDao().findAllByStudyEventDef(sed);
+    	
+    	
+	}
+    private RuleSetService getRuleSetService() {
+        return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+    }
+
+    
+    private RuleSetDao getRuleSetDao() {
+       return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
+        
+    }
+
+    
+    
     protected void createStudyEvent(FormProcessor fp, StudySubjectBean s) {
         int studyEventDefinitionId = fp.getInt("studyEventDefinition");
         String location = fp.getString("location");
@@ -849,10 +874,16 @@ public class AddNewSubjectServlet extends SecureController {
                 se.setStatus(Status.AVAILABLE);
                 se.setStudySubjectId(s.getId());
                 se.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                
 
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
+
+
                 se.setSampleOrdinal(sedao.getMaxSampleOrdinal(sed, s) + 1);
                 sedao.create(se);
+            //    getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
+
+ 
             }
 
         } else {
