@@ -27,6 +27,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
     ExpressionObjectWrapper expressionWrapper;
     private final String STARTDATE =".STARTDATE";
     private final String STATUS =".STATUS";
+    private final String REPEATING = ".*\\[(END|ALL|[1-9]\\d*)\\]$";
+    private final String REPEATING_NOALL = ".*\\[(END|[1-9]\\d*)\\]$";
 
     OpenClinicaVariableNode(String val) {
         number = val;
@@ -133,13 +135,9 @@ public class OpenClinicaVariableNode extends ExpressionNode {
                 throw new OpenClinicaSystemException("OCRERR_0011");
             }
         } else if(isEventStartDateAndStatusParamExist) {
-          	StudyEventDefinitionBean studyEventDefinition = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(number);
-           if (studyEventDefinition == null)          throw new OpenClinicaSystemException("OCRERR_0034", new String[] { number });
-                else if(isEventStatusParamExist)               return theTest(testString);
-                else if(isEventStartDateParamExist)            return theTest(testDate);
-                else             return null;
- 
-            
+           if(isEventStatusParamExist) return theTest(testString);
+           else if(isEventStartDateParamExist) return theTest(testDate);
+           else return null;
         } else {
             throw new OpenClinicaSystemException("OCRERR_0012", new String[] { number });
         } 
@@ -168,6 +166,23 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         else if (!getExpressionService().ruleExpressionChecker(number)) {
             logger.info("Go down");
             throw new OpenClinicaSystemException("OCRERR_0013", new Object[] { number });
+        }
+        if (number.endsWith(STARTDATE) ||number.endsWith(STATUS)) validateEvent();
+    }
+    
+    void validateEvent() throws OpenClinicaSystemException {
+        StudyEventDefinitionBean studyEventDefinition = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(number);
+        String studyEventOID = number.split("\\.")[0];
+        String expressionContext = expressionWrapper.getExpressionContext();
+        //Verify expression refers to a valid event.
+        if (studyEventDefinition == null) throw new OpenClinicaSystemException("OCRERR_0034", new String[] { number });
+        //Verify expression doesn't use repeating event notation if event is not repeating
+        if (!studyEventDefinition.isRepeating() && studyEventOID.matches(REPEATING))
+        	throw new OpenClinicaSystemException("OCRERR_0039", new String[] { number });
+        //Verify only Target expressions use the 'ALL' repeating notation.
+        if (expressionContext != null && !expressionContext.equals(ExpressionObjectWrapper.CONTEXT_TARGET) ) {
+            if (studyEventOID.matches(REPEATING) && !studyEventOID.matches(REPEATING_NOALL)) 
+                throw new OpenClinicaSystemException("OCRERR_0040", new String[] { number });
         }
     }
 
