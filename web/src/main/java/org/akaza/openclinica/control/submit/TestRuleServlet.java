@@ -446,8 +446,8 @@ public class TestRuleServlet extends SecureController {
     private ExpressionService getExpressionService() {
         expressionService =
             this.expressionService != null ? expressionService : new ExpressionService(
-                    new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, null, null));
-        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, null, null));
+                    new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, (ExpressionBean) null, (RuleSetBean) null));
+        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(sm.getDataSource(), currentStudy, (ExpressionBean) null, (RuleSetBean)null));
 
         return expressionService;
     }
