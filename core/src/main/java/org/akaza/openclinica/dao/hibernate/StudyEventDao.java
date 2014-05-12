@@ -25,8 +25,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	}
 @Override
 	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-	        getSessionFactory().getStatistics().logSummary();
-	        getCurrentSession().saveOrUpdate(domainObject);
+	 super.saveOrUpdate(domainObject);
 	        getCurrentSession().flush();
 	        
 	        this.eventPublisher.publishEvent(new OnStudyEventUpdated(domainObject));
