@@ -69,12 +69,11 @@ public class EventActionValidator implements Validator {
     }
 
     public void validateOidInAction(String oid, Errors e) {
-            if (getExpressionService().getExpressionSize(oid).intValue() > 1) {
-                getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
-            }
             try {
-            	if (getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true) == null)
-            		getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
+            	if (getExpressionService().getExpressionSize(oid).intValue() > 1 ||
+                    getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true) == null) {
+                    getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
+                }
             } 
             catch (OpenClinicaSystemException ose) {
             	getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
