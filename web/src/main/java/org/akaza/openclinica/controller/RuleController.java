@@ -33,8 +33,6 @@ import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.rule.action.EventActionBean;
-import org.akaza.openclinica.domain.rule.action.EventPropertyBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -59,8 +57,6 @@ import org.openclinica.ns.rules.v31.InsertActionType;
 import org.openclinica.ns.rules.v31.PropertyType;
 import org.openclinica.ns.rules.v31.ShowActionType;
 import org.openclinica.ns.rules.v31.TargetType;
-import org.openclinica.ns.rules.v31.EventActionType;
-import org.openclinica.ns.rules.v31.EventDestinationType;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -190,25 +186,25 @@ public class RuleController {
             ruleSetRuleBean.addAction(action);
         }
         
-       for (EventActionType eventActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getEventAction()) {
-            EventActionBean action = new EventActionBean();
-            action.setExpressionEvaluatesTo(Boolean.valueOf(eventActionType.getIfExpressionEvaluates()));
-            action.setOc_oid_reference(eventActionType.getOID());
-            action.getRuleActionRun().setNot_started(eventActionType.getRunOnStatus().isNotScheduled());
-            action.getRuleActionRun().setScheduled(eventActionType.getRunOnStatus().isScheduled());
-            action.getRuleActionRun().setData_entry_started(eventActionType.getRunOnStatus().isDataEntryStarted());
-            action.getRuleActionRun().setComplete(eventActionType.getRunOnStatus().isCompleted());
-            action.getRuleActionRun().setSkipped(eventActionType.getRunOnStatus().isSkipped());
-            action.getRuleActionRun().setStopped(eventActionType.getRunOnStatus().isStopped());
-            for (EventDestinationType eventDestinationType : eventActionType.getEventDestination()) {
-                EventPropertyBean property = new EventPropertyBean();
-                property.setProperty(eventDestinationType.getProperty());
-                ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, eventDestinationType.getValueExpression().getValue());
+       /* for (EventActionType insertActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getEventAction()) {
+            InsertActionBean action = new InsertActionBean();
+            action.setExpressionEvaluatesTo(Boolean.valueOf(insertActionType.getIfExpressionEvaluates()));
+            action.getRuleActionRun().setInitialDataEntry(insertActionType.getRun().isInitialDataEntry());
+            action.getRuleActionRun().setDoubleDataEntry(insertActionType.getRun().isDoubleDataEntry());
+            action.getRuleActionRun().setAdministrativeDataEntry(insertActionType.getRun().isAdministrativeDataEntry());
+            action.getRuleActionRun().setImportDataEntry(insertActionType.getRun().isImportDataEntry());
+            action.getRuleActionRun().setBatch(insertActionType.getRun().isBatch());
+            ruleSetRuleBean.addAction(action);
+            for (PropertyType propertyType : insertActionType.getDestinationProperty()) {
+                PropertyBean property = new PropertyBean();
+                property.setOid(propertyType.getOID());
+                property.setValue(propertyType.getValue());
+                ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, propertyType.getValueExpression().getValue());
                 property.setValueExpression(expressionBean);
                 action.addProperty(property);
             }
             ruleSetRuleBean.addAction(action);
-        }
+        }*/
 
         ruleSetBean.addRuleSetRule(ruleSetRuleBean);
         rpic.addRuleSet(ruleSetBean);

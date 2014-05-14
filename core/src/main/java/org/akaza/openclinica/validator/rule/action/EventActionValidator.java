@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
@@ -36,8 +35,6 @@ public class EventActionValidator implements Validator {
     ResourceBundle respage;
     
     public static final String VALUE_EXPRESSION_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String BRACKETS_AND_CONTENTS = ".*\\[(END|ALL|[1-9]\\d*)\\]";
-    private final String REPEATING = ".*\\[(END|ALL|[1-9]\\d*)\\]";
 
 	public EventActionValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -54,7 +51,7 @@ public class EventActionValidator implements Validator {
         EventActionBean eventActionBean = (EventActionBean) obj;
 
         validateOidInAction(eventActionBean.getOc_oid_reference(), e);
-        
+
         boolean foundStartDate=false;
         for (int i = 0; i < eventActionBean.getProperties().size(); i++) {
             PropertyBean propertyBean = eventActionBean.getProperties().get(i);
@@ -72,13 +69,12 @@ public class EventActionValidator implements Validator {
     }
 
     public void validateOidInAction(String oid, Errors e) {
+            if (getExpressionService().getExpressionSize(oid).intValue() > 1) {
+                getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
+            }
             try {
-            	StudyEventDefinitionBean studyEventBean = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true);
-            	if (studyEventBean == null) getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
-            	
-                if (oid.split("\\.")[0].matches(REPEATING) && !studyEventBean.isRepeating()) 
-                    throw new OpenClinicaSystemException("OCRERR_0039", new String[] { oid });
-
+            	if (getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true) == null)
+            		getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
             } 
             catch (OpenClinicaSystemException ose) {
             	getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
@@ -91,8 +87,7 @@ public class EventActionValidator implements Validator {
         StudyBean study = (StudyBean) studyDAO.findByPK(ruleSetBeanWrapper.getAuditableBean().getStudyId());
                
         ExpressionBean expressionBean = isExpressionValid(property.getValueExpression(), ruleSetBeanWrapper);
-        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource,study, expressionBean, ruleSetBeanWrapper.getAuditableBean(),
-        		ExpressionObjectWrapper.CONTEXT_VALUE_EXPRESSION);
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource,study, expressionBean, ruleSetBeanWrapper.getAuditableBean());
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
         String errorString = ep.isRuleExpressionValid();

@@ -27,10 +27,7 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 		LOGGER.debug("listening");
 		Integer studyEventDefId = event.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId();
 		Integer studySubjectId = event.getStudyEvent().getStudySubject().getStudySubjectId();
-		Integer userId = event.getStudyEvent().getUpdateId();
-		
-		if(userId==null && event.getStudyEvent().getUserAccount()!=null )userId=  event.getStudyEvent().getUserAccount().getUserId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId);
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId);
 	}
 
 

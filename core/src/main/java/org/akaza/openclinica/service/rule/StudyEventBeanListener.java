@@ -51,9 +51,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 
 		Integer studyEventDefId = studyEventBean.getStudyEventDefinitionId();
 		Integer studySubjectId = studyEventBean.getStudySubjectId();
-		Integer userId = studyEventBean.getUpdaterId();
-		if(userId==null) userId = studyEventBean.getOwnerId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId);
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId);
 		
 		
 	}

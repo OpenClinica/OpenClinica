@@ -884,7 +884,7 @@ public class ExpressionService {
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression, boolean onlyOID) {
         StudyBean study = expressionWrapper.getStudyBean();
     	String studyEventDefinitionKey;
-    	if (onlyOID) studyEventDefinitionKey = expression.replaceAll(BRACKETS_AND_CONTENTS, "");
+    	if (onlyOID) studyEventDefinitionKey = expression;
     	else studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
 
     	
@@ -893,7 +893,8 @@ public class ExpressionService {
         if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
             return studyEventDefinitions.get(studyEventDefinitionKey);
         } else {
-            StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOid(studyEventDefinitionKey);
+            int studyId = study.getParentStudyId() != 0 ? study.getParentStudyId() : study.getId();
+            StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(studyEventDefinitionKey, studyId, studyId);
             // another way to get at the problem which I fix in the
             // findByOidAndStudy method, tbh
             if (studyEventDefinition != null) {
