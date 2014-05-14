@@ -4,7 +4,9 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional    
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
 
 	private ApplicationEventPublisher eventPublisher;
@@ -17,6 +19,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 		 org.hibernate.Query q = getCurrentSession().createQuery(query);
          q.setInteger("studySubjectId", studySubjectId);
          q.setString("oid", oid);
+         
          StudyEvent se = (StudyEvent) q.uniqueResult();
         // this.eventPublisher.publishEvent(new OnStudyEventUpdated(se));
          return se;
@@ -25,8 +28,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	}
 @Override
 	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-	        getSessionFactory().getStatistics().logSummary();
-	        getCurrentSession().saveOrUpdate(domainObject);
+	 super.saveOrUpdate(domainObject);
 	        getCurrentSession().flush();
 	        
 	        this.eventPublisher.publishEvent(new OnStudyEventUpdated(domainObject));

@@ -6,7 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
     private HibernateTemplate hibernateTemplate;

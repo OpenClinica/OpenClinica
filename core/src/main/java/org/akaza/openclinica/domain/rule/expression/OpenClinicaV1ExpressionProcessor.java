@@ -45,6 +45,9 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
     public String isRuleAssignmentExpressionValid() {
         try {
+            oep = new OpenClinicaExpressionParser(expressionWrapper);
+            oep.parseAndTestEvaluateExpression(e.getValue());
+
             expressionService = new ExpressionService(expressionWrapper);
             if (expressionService.ruleSetExpressionChecker(e.getValue())) {
                 return null;
