@@ -119,7 +119,6 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -539,10 +538,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
        // boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
         logMe("Entering getDisplayBean:::::Thread::::"+Thread.currentThread());
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
-        //hasSCDItem has been initialized in getDisplayBean() which is online above
-
-        VariableSubstitutionHelper.replaceVariables(section, study, ssb, studyEventDefinition, dataSource);
-
+        //hasSCDItem has been initiallized in getDisplayBean() which is online above
         if(section.getSection().hasSCDItem()) {
             SimpleConditionalDisplayService cds0 = (SimpleConditionalDisplayService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
             "simpleConditionalDisplayService");
@@ -3101,6 +3097,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
      * Creates an input name for an item data entry in an item group
      *
      * @param digb
+     * @param ordinal
      * @param dib
      * @return
      */
