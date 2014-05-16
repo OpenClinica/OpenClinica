@@ -23,6 +23,18 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
        
 		
 	}
+	public StudyEvent fetchByStudyEventDefOIDAndOrdinal(String oid,Integer ordinal,Integer studySubjectId){
+		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+		 org.hibernate.Query q = getCurrentSession().createQuery(query);
+         q.setInteger("studySubjectId", studySubjectId);
+         q.setString("oid", oid);
+         q.setInteger("ordinal", ordinal);
+         StudyEvent se = (StudyEvent) q.uniqueResult();
+        // this.eventPublisher.publishEvent(new OnStudyEventUpdated(se));
+         return se;
+       
+		
+	}
 @Override
 	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
 	        getSessionFactory().getStatistics().logSummary();

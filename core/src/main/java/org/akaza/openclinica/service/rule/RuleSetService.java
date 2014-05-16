@@ -48,6 +48,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -1016,16 +1017,11 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,StudyBean currentStudy, UserAccountBean ub,HttpServletRequest request,
-    		                                                   StudySubjectBean studySubjectBean) {
-    		        BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-    		        ruleRunner.runRules(ruleSets,ub,dataSource, currentStudy, studySubjectBean,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
-    		    }
 
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
-            Integer StudySubjectBeanId) {
+            Integer StudySubjectBeanId, Integer targetEventOrdinal) {
 BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-ruleRunner.runRules(ruleSets,dataSource,  StudySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
+ruleRunner.runRules(ruleSets,dataSource,  StudySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal);
 }
 
 	public StudyEventDao getStudyEventDomainDao() {

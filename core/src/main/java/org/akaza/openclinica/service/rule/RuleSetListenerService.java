@@ -5,6 +5,7 @@ import java.util.List;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.slf4j.Logger;
@@ -26,8 +27,9 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 	public void onApplicationEvent(final OnStudyEventUpdated event) {
 		LOGGER.debug("listening");
 		Integer studyEventDefId = event.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId();
+		Integer studyEventOrdinal = event.getStudyEvent().getSampleOrdinal();
 		Integer studySubjectId = event.getStudyEvent().getStudySubject().getStudySubjectId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId);
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId,studyEventOrdinal);
 	}
 
 
@@ -53,7 +55,5 @@ public void setRuleSetDao(RuleSetDao ruleSetDao) {
 private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {
 	
 	return getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
-	
-	
 }
 }
