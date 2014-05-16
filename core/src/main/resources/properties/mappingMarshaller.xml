@@ -164,26 +164,36 @@
        </field>
      </class>
      
-     <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
-        <map-to xml="EventAction" />
-        <field name="Properties"
-            type="org.akaza.openclinica.domain.rule.action.EventPropertyBean"
-            collection="arraylist">
-            <bind-xml name="EventDestination"/>
-        </field>
+    <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
+        <map-to xml="EventAction"/>
+     
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
+
+        <field name="oc_oid_reference"
+               type="java.lang.String">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+
        <field name="RuleActionRun"
                type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
-               <bind-xml name="Run"/>
+               <bind-xml name="RunOnStatus"/>
        </field>
+
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="EventDestination"/>
+        </field>
+
+       
      </class>
-     
+ 
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" >
-        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">
+        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
             <bind-xml name="OID" node="attribute"/>
        </field>
        <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
@@ -193,17 +203,13 @@
                type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
                <bind-xml name="ValueExpression"/>
        </field>
+
+       <field name="property" 
+              type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
+               <bind-xml name="Property" node="attribute"/>
+       </field>
      </class>
      
-     <class name="org.akaza.openclinica.domain.rule.action.EventPropertyBean"  >
-        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
-            <bind-xml name="property" node="attribute"/>
-       </field>
-       <field name="valueExpression"
-               type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
-               <bind-xml name="ValueExpression"/>
-       </field>
-     </class>
      
      
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" >
