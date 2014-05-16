@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -48,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,8 +132,18 @@ public class TestRuleServlet extends SecureController {
                  request.setAttribute("ruleSetRuleId", ruleSetRuleId);
                 request.setAttribute("ruleSetId", rsr.getRuleSetBean().getId());
                 ItemBean item = getExpressionService().getItemBeanFromExpression(rsr.getRuleSetBean().getTarget().getValue());
-                request.setAttribute("itemName", item.getName());
-                request.setAttribute("itemDefinition", item.getDescription());
+                if(item!=null)
+                {
+                	request.setAttribute("itemName", item.getName());
+                	request.setAttribute("itemDefinition", item.getDescription());
+                }
+                else
+                	{
+                	StudyEventDefinitionBean studyEventDef= getExpressionService().getStudyEventDefinitionFromExpressionForEvents(rsr.getRuleSetBean().getTarget().getValue(),this.currentStudy);
+                	request.setAttribute("itemName", studyEventDef.getName());
+                	request.setAttribute("itemDefinition", studyEventDef.getDescription());
+                	}
+                
                 request.setAttribute("ruleSetRuleAvailable", true);
 
             } else { // free form testing
@@ -241,11 +253,26 @@ public class TestRuleServlet extends SecureController {
         if (testVariablesAndValues != null) {
             for (Map.Entry<String, String> entry : testVariablesAndValues.entrySet()) {
                 ItemBean item = getExpressionService().getItemBeanFromExpression(entry.getKey());
+                if(item!=null){
                 DisplayItemBean dib = new DisplayItemBean();
                 dib.setItem(item);
                 request.setAttribute(entry.getKey() + "-tooltip", item.getName() + ": " + ItemDataType.get(item.getItemDataTypeId()).getName());
                 request.setAttribute(entry.getKey() + "-dib", dib);
-                if (item.getItemDataTypeId() == 9) {
+                }
+                else{
+                	StudyEventDefinitionBean sed = getExpressionService().getStudyEventDefinitionFromExpressionForEvents(entry.getKey(), currentStudy);
+                	if(entry.getKey().contains(ExpressionService.STARTDATE))
+                	{
+                		request.setAttribute(entry.getKey() + "-tooltip", sed.getName() + ": " + "date");
+                		request.setAttribute("studyEventProperty", new Integer(9));
+                	}
+                	else if(entry.getKey().contains(ExpressionService.STATUS))
+                	{
+                		request.setAttribute(entry.getKey() + "-tooltip", sed.getName() + ": " + "status");
+                		request.setAttribute("studyEventProperty", new Integer(5));
+                	}
+                }
+                if ((item!=null &&item.getItemDataTypeId() == 9)||(item==null&&entry.getKey().contains(ExpressionService.STARTDATE))) {//so enter this in case if the rules are event action based or if item has date type
                     try {
                         SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
                         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -263,7 +290,7 @@ public class TestRuleServlet extends SecureController {
 
     }
 
-    private HashMap<String, String> validate(Validator v) {
+    private HashMap<String, String> validate(Validator v) throws ParseException {
 
         FormProcessor fp = new FormProcessor(request);
 
@@ -278,6 +305,23 @@ public class TestRuleServlet extends SecureController {
         if (p != null) {
             for (Map.Entry<String, String> entry : p.entrySet()) {
                 entry.setValue(fp.getString(entry.getKey()));
+              if(entry.getKey().startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&&(entry.getKey().endsWith(ExpressionService.STATUS)||entry.getKey().endsWith(ExpressionService.STARTDATE)))
+              {
+            	  StudyEventDefinitionBean sed = getExpressionService().getStudyEventDefinitionFromExpressionForEvents(entry.getKey(), currentStudy);
+            	  if(entry.getKey().endsWith(ExpressionService.STATUS)){
+            		  //TODO add the logic for status
+            	  }
+            	  else if(entry.getKey().endsWith(ExpressionService.STARTDATE)){
+            		  SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+                      SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                      if(!entry.getValue().isEmpty()) {
+                          java.util.Date date = sdf.parse(entry.getValue());
+                          entry.setValue(sdf2.format(date));
+                      }
+            	  }
+            		  
+              }
+              else{
                 ItemBean item = getExpressionService().getItemBeanFromExpression(entry.getKey());
                 List<ItemFormMetadataBean> itemFormMetadataBeans = getItemFormMetadataDAO().findAllByItemId(item.getId());
                 ItemFormMetadataBean itemFormMetadataBean = itemFormMetadataBeans.size() > 0 ? itemFormMetadataBeans.get(0) : null;
@@ -309,6 +353,7 @@ public class TestRuleServlet extends SecureController {
                     }
                 }
             }
+            }
         }
 
         List<RuleActionBean> actions =
@@ -338,11 +383,21 @@ public class TestRuleServlet extends SecureController {
 
         // Auto update itemName & itemDefinition based on target
         ItemBean item = getExpressionService().getItemBeanFromExpression(targetString);
+        StudyEventDefinitionBean sed = null ; 
         if (item != null) {
             request.setAttribute("itemName", item.getName());
             request.setAttribute("itemDefinition", item.getDescription());
         }
-
+        else{
+        	sed = getExpressionService().getStudyEventDefinitionFromExpressionForEvents(targetString, currentStudy);
+        	if(sed!=null)
+        	{
+        		request.setAttribute("itemName",sed.getName());
+        		request.setAttribute("itemDefinition",sed.getDescription());
+        	}
+        }
+        
+        	
         RuleSetBean ruleSet = new RuleSetBean();
         ExpressionBean target = new ExpressionBean();
         target.setContext(Context.OC_RULES_V1);
@@ -352,7 +407,10 @@ public class TestRuleServlet extends SecureController {
         RuleSetBean persistentRuleSet = getRuleSetDao().findByExpressionAndStudy(ruleSet,currentStudy.getId());
 
         if (persistentRuleSet != null) {
-            request.setAttribute("ruleSetId", item.getId());
+if(item!=null)
+        	request.setAttribute("ruleSetId", item.getId());
+else
+		request.setAttribute("ruleSetId", sed.getId());
 
         }
 

@@ -827,7 +827,7 @@ public class ExpressionService {
     		return null;
     }
 
-    private StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEvents(
+    public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEvents(
 			String expression, StudyBean study) {
 		// TODO Auto-generated method stub
         String studyEventDefinitionKey = getStudyEventDefinitionOidFromExpressionForEvents(expression);
@@ -851,7 +851,7 @@ public class ExpressionService {
 	}
     
 
-	private String getStudyEventDefinitionOidFromExpressionForEvents(
+	public String getStudyEventDefinitionOidFromExpressionForEvents(
 			String expression) {
 		  return getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
 	}
