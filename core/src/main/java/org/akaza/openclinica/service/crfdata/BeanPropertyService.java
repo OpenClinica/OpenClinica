@@ -116,17 +116,28 @@ public class BeanPropertyService{
     
     private void executeAction(Object result,PropertyBean propertyBean,ExpressionBeanObjectWrapper eow,EventActionBean eventAction){
     	String oid = eventAction.getOc_oid_reference();
-    	//int index = propertyBean.getOid().indexOf(".");
-    	String eventOID = eventAction.getOc_oid_reference();
-    	StudyEventDao studyEventdao = getStudyEventDAO();
-        String property = propertyBean.getProperty();
+    	String eventOID = null;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        StudyEventDefinition sDefBean =  getStudyEventDefinitionBean(eventOID);
-        boolean updateFlag = true;
+        int ordinal = 1;
+        
         
         if(oid.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY))
         {
-        	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBeanId());
+        	StudyEvent studyEvent = null;
+        	if (oid.contains("["))
+        	{
+        		int leftBracketIndex = oid.indexOf("[");
+        		int rightBracketIndex = oid.indexOf("]");
+        		ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
+        		eventOID = oid.substring(0,leftBracketIndex);
+        		studyEvent= getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(eventOID, ordinal, eow.getStudySubjectBeanId());
+        	}	
+        	else 
+        	{
+        		eventOID = oid;
+        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBeanId());
+        	}
+        	
         	if(studyEvent==null){
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
             	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBeanId());
@@ -134,7 +145,7 @@ public class BeanPropertyService{
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
             	studyEvent.setStatusId(1);
-            	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
+            	studyEvent.setSampleOrdinal(ordinal);//TODO:change this to address repeating events.
             	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
             	studyEvent.setStartTimeFlag(false);
             	studyEvent.setEndTimeFlag(false);
