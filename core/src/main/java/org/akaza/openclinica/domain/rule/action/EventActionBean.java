@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -26,11 +27,36 @@ import org.hibernate.annotations.FetchMode;
 public class EventActionBean extends RuleActionBean {
 
 	
+
 	private String oc_oid_reference;
     private List<PropertyBean> properties;
+    private RuleActionRunEventBean ruleActionRunEvent;
+    
+    @Transient
+	public RuleActionRunEventBean getRuleActionRunEvent() {
 
+        RuleActionRunEventBean ruleActionRunEventBean = new RuleActionRunEventBean();
+    	    
+    	ruleActionRunEventBean.setComplete(super.getRuleActionRun().getComplete());
+    	ruleActionRunEventBean.setData_entry_started(super.getRuleActionRun().getData_entry_started());
+    	ruleActionRunEventBean.setNot_started(super.getRuleActionRun().getNot_started());
+    	ruleActionRunEventBean.setScheduled(super.getRuleActionRun().getScheduled());
+    	ruleActionRunEventBean.setSkipped(super.getRuleActionRun().getSkipped());
+    	ruleActionRunEventBean.setStopped(super.getRuleActionRun().getStopped());
+ 		 return ruleActionRunEventBean;
+
+	}
+
+	public void setRuleActionRunEvent(RuleActionRunEventBean ruleActionRunEvent) {
+		this.ruleActionRunEvent = ruleActionRunEvent;
+	}
+     
+    
+
+        
+    
 	
-	 public EventActionBean() {
+        public EventActionBean() {
 	        setActionType(ActionType.EVENT);
 	        setRuleActionRun(new RuleActionRunBean(null, null, null, null, null, true,true,false,false,false,false));
 	    }
@@ -113,3 +139,5 @@ public class EventActionBean extends RuleActionBean {
 
 	    
 }
+
+ 

@@ -177,11 +177,11 @@
             <bind-xml name="OID" node="attribute"/>
        </field>
 
-       <field name="RuleActionRun"
-               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+       <field name="ruleActionRunEvent"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunEventBean">
                <bind-xml name="RunOnStatus"/>
-       </field>
-
+       </field>   
+ 
         <field name="Properties"
             type="org.akaza.openclinica.domain.rule.action.PropertyBean"
             collection="arraylist">
@@ -220,6 +220,8 @@
             <bind-xml node="text"/>         
        </field>
      </class>
+   
+   
      <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunBean" >
         <field name="administrativeDataEntry" type="boolean">
             <bind-xml name="AdministrativeDataEntry" node="attribute"/>
@@ -236,6 +238,14 @@
        <field name="batch" type="boolean">
             <bind-xml name="Batch" node="attribute"/>
        </field>
+    
+     </class>
+
+
+
+
+     <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunEventBean" >
+
        <field name="not_started" type="boolean">
             <bind-xml name="not_scheduled" node="attribute"/>
        </field>
@@ -256,4 +266,6 @@
             <bind-xml name="stopped" node="attribute"/>
        </field>
      </class>
+
+
 </mapping>
