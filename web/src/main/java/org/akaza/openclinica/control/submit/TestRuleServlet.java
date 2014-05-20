@@ -312,13 +312,19 @@ public class TestRuleServlet extends SecureController {
             		  //TODO add the logic for status
             	  }
             	  else if(entry.getKey().endsWith(ExpressionService.STARTDATE)){
-            		  SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
-                      SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                      if(!entry.getValue().isEmpty()) {
-                          java.util.Date date = sdf.parse(entry.getValue());
-                          entry.setValue(sdf2.format(date));
+            		  try {
+                          v.addValidation(entry.getKey(), Validator.IS_A_DATE);
+                          SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+                          SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                          if(!entry.getValue().isEmpty()) {
+                              java.util.Date date = sdf2.parse(entry.getValue());
+                              entry.setValue(sdf.format(date));
+                          }
+                      } catch (Exception e) {
+                          logger.error(e.toString());
+                          // TODO: handle exception
                       }
-            	  }
+                             	  }
             		  
               }
               else{
