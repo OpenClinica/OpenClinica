@@ -21,6 +21,7 @@ import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class BeanPropertyService{
 	public BeanPropertyService(DataSource ds) {
     	// itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
+        this.expressionService = new ExpressionService(ds);
     }
 
 
@@ -56,7 +58,8 @@ public class BeanPropertyService{
     public void runAction(RuleActionBean ruleActionBean,ExpressionBeanObjectWrapper eow){
     	boolean statusMatch = false;
         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-    	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(((EventActionBean)ruleActionBean).getOc_oid_reference(), eow.getStudySubjectBeanId());
+        ExpressionBeanService ebs = new ExpressionBeanService(eow);
+    	StudyEvent studyEvent = ebs.getStudyEventFromOID(((EventActionBean)ruleActionBean).getOc_oid_reference());
     	RuleActionRunBean runOnStatuses = ruleActionBean.getRuleActionRun();
 
     	if (studyEvent != null)
@@ -167,13 +170,8 @@ public class BeanPropertyService{
         }
         
   }
-
-
-  
-
-
 	private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
-   return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
+        return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
     	
 	}
 

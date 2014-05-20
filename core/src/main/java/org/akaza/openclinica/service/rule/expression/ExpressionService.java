@@ -334,33 +334,21 @@ public class ExpressionService {
              StudyEvent studyEvent;        		
 
 				if (expression.endsWith(this.STARTDATE)) {
-					String oid = expression.substring(0,
-							expression.indexOf(this.STARTDATE));
-					studyEvent = expressionWrapper.getStudyEventDaoHib()
-							.fetchByStudyEventDefOID(oid,
-									expressionWrapper.getStudySubjectId());
+					String oid = expression.substring(0,expression.indexOf(this.STARTDATE));
+					studyEvent = getStudyEventFromOID(oid);
 					if (studyEvent != null) {
-						logger.debug("Study Event Start Date: "
-								+ studyEvent.getDateStart().toString()
-										.substring(0, 10).trim());
-
-						return studyEvent.getDateStart().toString()
-								.substring(0, 10).trim();
+						logger.debug("Study Event Start Date: " + studyEvent.getDateStart().toString().substring(0, 10).trim());
+						return studyEvent.getDateStart().toString().substring(0, 10).trim();
 					} else
 						return "";
 				} else {
-					String oid = expression.substring(0,
-							expression.indexOf(this.STATUS));
-					studyEvent = expressionWrapper.getStudyEventDaoHib()
-							.fetchByStudyEventDefOID(oid,
-									expressionWrapper.getStudySubjectId());
+					String oid = expression.substring(0,expression.indexOf(this.STATUS));
+					studyEvent = getStudyEventFromOID(oid);
 					if (studyEvent != null) {
 						logger.debug("Status: "	+ SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
 						return SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId());
-						
 					} else
 						return "";
-
 				}
         	}
         	
@@ -422,6 +410,22 @@ public class ExpressionService {
     	}
     	return false;
     }
+    
+    public StudyEvent getStudyEventFromOID(String oid)
+    {
+    	Integer subjectId = expressionWrapper.getStudySubjectId();
+    	StudyEvent studyEvent = null;
+        	if (oid.contains("["))
+        	{
+        		int leftBracketIndex = oid.indexOf("[");
+        		int rightBracketIndex = oid.indexOf("]");
+        		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
+        		studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
+        	}	
+        	else studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
+        return studyEvent;
+    }
+    
     private List<ItemDataBean> getItemDatas(String expression) {
     	
         String studyEventId = getStudyEventDefinitionOidOrdinalFromExpression(expression);

@@ -73,11 +73,22 @@ public class EventActionValidator implements Validator {
 
     public void validateOidInAction(String oid, Errors e) {
             try {
-            	StudyEventDefinitionBean studyEventBean = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true);
-            	if (studyEventBean == null) getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
+            	if (oid.contains(".")) {
+            		getRuleSetBeanWrapper().error(createError("OCRERR_0041", new String[]{oid}));
+            		return;
+            	}
             	
-                if (oid.split("\\.")[0].matches(REPEATING) && !studyEventBean.isRepeating()) 
-                    throw new OpenClinicaSystemException("OCRERR_0039", new String[] { oid });
+            	StudyEventDefinitionBean studyEventBean = getExpressionService().getStudyEventDefinitionFromExpressionForEventScheduling(oid,true);
+            	if (studyEventBean == null) {
+            		getRuleSetBeanWrapper().error(createError("OCRERR_0019", new String[]{oid}));
+            		return;
+            	}
+            	
+                if (oid.matches(REPEATING) && !studyEventBean.isRepeating()) {
+                	getRuleSetBeanWrapper().error(createError("OCRERR_0039", new String[]{oid}));
+                    //throw new OpenClinicaSystemException("OCRERR_0039", new String[] { oid });
+                	return;
+                }
 
             } 
             catch (OpenClinicaSystemException ose) {
