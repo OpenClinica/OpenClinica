@@ -258,20 +258,45 @@
             <c:set var="tooltipKey" value="${mapEntry.key}-tooltip" />
             <c:set var="dibKey" value="${mapEntry.key}-dib" />
             <c:choose>
-            <c:when test= "${dibKey}">
-            <c:set var="dibItemDataType" value ='<%= ((org.akaza.openclinica.bean.submit.DisplayItemBean)request.getAttribute((String)pageContext.getAttribute("dibKey"))).getItem().getItemDataTypeId() %>' />
-            </c:when>
+               <c:when test= "${dibKey}">
+                 <c:set var="dibItemDataType" value ='<%= ((org.akaza.openclinica.bean.submit.DisplayItemBean)request.getAttribute((String)pageContext.getAttribute("dibKey"))).getItem().getItemDataTypeId() %>' />
+               </c:when>
             <c:otherwise>
             <c:set var="dibItemDataType" value="${studyEventProperty}"/>
             </c:otherwise>
             </c:choose>
+ 
+      
+ <c:choose>
+  <c:when test="${fn:endsWith(mapEntry.key,'.STATUS')}">
             <tr valign="top">
-                <td class="formlabel"><a
-                    href="javascript: displayLink('${mapEntry.key}')"
-                    onmouseover="Tip('<%= request.getAttribute((String)pageContext.getAttribute("tooltipKey") ) %>')" 
-                    onmouseout="UnTip()"
-                    ><script>spliceAndReturn('${mapEntry.key}')</script></a>:</td>
+                <td class="formlabel">
+                 <script>spliceAndReturn('${mapEntry.key}')</script>:</td>
                 <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
+  </c:when>
+
+  <c:when test="${fn:endsWith(mapEntry.key,'.STARTDATE')}">
+            <c:set var="dibItemDataType" value="9"/>
+            <tr valign="top">
+                <td class="formlabel">
+                <script>spliceAndReturn('${mapEntry.key}')</script>:</td>
+                <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
+  </c:when>
+ 
+  <c:otherwise>
+            <tr valign="top">
+                <td class="formlabel">
+ 
+                  <a href="javascript: displayLink('${mapEntry.key}')"
+                    onmouseover="Tip('<%= request.getAttribute((String)pageContext.getAttribute("tooltipKey") ) %>')" 
+                    onmouseout="UnTip()" >
+                    <script>spliceAndReturn('${mapEntry.key}')</script></a>:</td>
+                <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
+  </c:otherwise>
+</c:choose>
+ 
+ 
+  
                 <c:if test="${dibItemDataType == 9 }">
                     <A HREF="#">
                       <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${mapEntry.key}trigger" />
