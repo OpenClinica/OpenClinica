@@ -260,28 +260,6 @@
 		   
 		   
     
-	
-    
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		
-	
-	
-	
-	
-	
-	
 		   
 		   		        <c:if test="${fn:length(runon)>0}">
 			        <tr valign="top">
@@ -293,12 +271,34 @@
 		        <c:if test="${val.actionType.code!=1 && val.actionType.code !=2 && fn:length(val.properties)>0}">
 		        	<c:set var="props" value=""/>
 		    		<c:forEach items="${val.properties}" var="prop" varStatus="status">
+		    		
+
+
+
+<c:choose>
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STATUS')}">
+		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.property}"/>,</c:set>
+	  </c:when>
+
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STARTDATE')}">
+		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.property}"/>,</c:set>
+	 </c:when>
+ 
+  <c:otherwise>
 		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+  </c:otherwise>
+</c:choose>
+
+		    		
 		    		</c:forEach>
 		        	<c:if test="${fn:length(props)>0}">
 		    			<tr valign="top">
 	                		<td ><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i></td>
+    
+
+
                 			<td ><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+    
                 		</tr>
                 	</c:if>
                 </c:if>
