@@ -101,21 +101,11 @@ public class ExpressionBeanService {
         System.out.println("TEST  :: " + test);
 
         if(checkIfForScheduling(test)){
-        	Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");
         	oid = test.substring(0,index);
         	temp = test.substring(index,test.length());
-        	StudyEvent studyEvent = null;
-
-        	if (oid.contains("["))
-        	{
-        		int leftBracketIndex = oid.indexOf("[");
-        		int rightBracketIndex = oid.indexOf("]");
-        		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
-        		studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
-        	}	
-        	else studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
+        	StudyEvent studyEvent = getStudyEventFromOID(oid);
         	
         	if(ExpressionService.STARTDATE.endsWith(temp)){
         		if(studyEvent!=null){
@@ -128,9 +118,21 @@ public class ExpressionBeanService {
         return value;
     }
 
-
-
-
+    public StudyEvent getStudyEventFromOID(String oid)
+    {
+    	Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
+    	StudyEvent studyEvent = null;
+        	if (oid.contains("["))
+        	{
+        		int leftBracketIndex = oid.indexOf("[");
+        		int rightBracketIndex = oid.indexOf("]");
+        		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
+        		studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
+        	}	
+        	else studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
+        return studyEvent;
+    }
+  
     private boolean match(String input, Pattern pattern) {
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();

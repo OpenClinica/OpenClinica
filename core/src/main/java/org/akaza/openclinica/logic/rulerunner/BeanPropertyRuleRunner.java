@@ -47,6 +47,7 @@ public class BeanPropertyRuleRunner {
 	                        ExpressionObjectWrapper ew = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet);
 	                        ew.setStudyEventDaoHib(studyEventDaoHib);
 	                        ew.setStudySubjectId(studySubjectBeanId);
+	                        ew.setExpressionContext(ExpressionObjectWrapper.CONTEXT_EXPRESSION);
 	                        OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
 	                       // eow.setUserAccountBean(ub);
 	                        eow.setStudyBean(currentStudy);
