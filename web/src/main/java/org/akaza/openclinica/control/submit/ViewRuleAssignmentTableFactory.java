@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -37,6 +38,8 @@ import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -627,11 +630,15 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     builder.tr(1).close().td(1).close().append("<i>" + resword.getString(entry.getKey()) + "</i>").tdEnd().td(1).close()
                             .append(entry.getValue()).tdEnd().trEnd(1);
                 }
-                
-                
-                
-                
+           
+            String targetValue =ruleAction.getRuleSetRule().getRuleSetBean().getOriginalTarget().getValue(); 
+ 
+           if(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS)))
+           	{
+                appendRunOnForEventAction(builder,ruleAction);
+          	}else{
                 appendRunOn(builder,ruleAction);
+           	}                
                 
                 appendDest(builder,ruleAction);
             }
@@ -654,13 +661,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             String s = "";
             RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
             
-            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true) s+=resword.getString("not_scheduled_comma")+" ";
-            if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true) s+=resword.getString("scheduled_comma")+" ";
-            if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true) s+=resword.getString("data_entry_started_comma")+" ";
-            if(ruleActionRun.getComplete()!=null && ruleActionRun.getComplete()==true) s+=resword.getString("completed_comma")+" ";
-            if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true) s+=resword.getString("skipped_comma")+" ";
-            if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true) s+=resword.getString("stopped_comma")+" ";
-            
             if(ruleActionRun.getInitialDataEntry()!=null &&ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
             if(ruleActionRun.getDoubleDataEntry()!=null&&ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
             if(ruleActionRun.getAdministrativeDataEntry()!=null && ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
@@ -671,6 +671,23 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
         }
 
+        public void appendRunOnForEventAction(HtmlBuilder builder, RuleActionBean ruleAction) {
+            String s = "";
+            RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
+            
+            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true) s+=resword.getString("not_scheduled_comma")+" ";
+            if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true) s+=resword.getString("scheduled_comma")+" ";
+            if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true) s+=resword.getString("data_entry_started_comma")+" ";
+            if(ruleActionRun.getComplete()!=null && ruleActionRun.getComplete()==true) s+=resword.getString("completed_comma")+" ";
+            if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true) s+=resword.getString("skipped_comma")+" ";
+            if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true) s+=resword.getString("stopped_comma")+" ";
+            
+            s = s.trim(); s = s.substring(0,s.length()-1);
+            if(s.length()>0)
+                builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
+        }
+
+        
         public void appendDest(HtmlBuilder builder, RuleActionBean ruleAction) {
             ActionType actionType = ruleAction.getActionType();
             if(actionType==ActionType.INSERT) {
