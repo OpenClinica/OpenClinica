@@ -627,7 +627,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     builder.tr(1).close().td(1).close().append("<i>" + resword.getString(entry.getKey()) + "</i>").tdEnd().td(1).close()
                             .append(entry.getValue()).tdEnd().trEnd(1);
                 }
+                
+                
+                
+                
                 appendRunOn(builder,ruleAction);
+                
                 appendDest(builder,ruleAction);
             }
             builder.tableEnd(1);
@@ -648,11 +653,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
             String s = "";
             RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
-            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true)s+=resword.getString("not_started");
-            if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true)s+=resword.getString("scheduled");
-            if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true)s+=resword.getString("data_entry_started");
-            if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true)s+=resword.getString("skipped");
-            if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true)s+=resword.getString("stopped");
+            
+            if(ruleActionRun.getNot_started()!=null && ruleActionRun.getNot_started()==true) s+=resword.getString("not_scheduled_comma")+" ";
+            if(ruleActionRun.getScheduled()!=null && ruleActionRun.getScheduled()==true) s+=resword.getString("scheduled_comma")+" ";
+            if(ruleActionRun.getData_entry_started()!=null && ruleActionRun.getData_entry_started()==true) s+=resword.getString("data_entry_started_comma")+" ";
+            if(ruleActionRun.getComplete()!=null && ruleActionRun.getComplete()==true) s+=resword.getString("completed_comma")+" ";
+            if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true) s+=resword.getString("skipped_comma")+" ";
+            if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true) s+=resword.getString("stopped_comma")+" ";
             
             if(ruleActionRun.getInitialDataEntry()!=null &&ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
             if(ruleActionRun.getDoubleDataEntry()!=null&&ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
