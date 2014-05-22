@@ -56,6 +56,7 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
+
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private RuleSetServiceInterface ruleSetService;
@@ -765,14 +766,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
             String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
             String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
-
         //    if (isDesignerRequest)
           //  {
                 value += testEditByDesignerBuilder(target, ruleOid);
             //} else
                 if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
-                    viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
+                    viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId , target) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
             } else {
                 value +=
@@ -814,13 +814,18 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     }
 
-    private String executeLinkBuilder(Integer ruleSetId, Integer ruleId) {
+    private String executeLinkBuilder(Integer ruleSetId, Integer ruleId , String targetValue) {
         HtmlBuilder actionLink = new HtmlBuilder();
+       
+     if  (!(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS))))
+     {   
         actionLink.a().href("RunRuleSet?ruleSetId=" + ruleSetId + "&ruleId=" + ruleId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"").close();
+     }
         actionLink.img().name("bt_Run1").src("images/bt_ExexuteRules.gif").border("0").alt("Run").title("Run").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
+        
         return actionLink.toString();
 
     }
@@ -868,6 +873,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         actionLink.append("onMouseUp=\"javascript:setImage('bt_run','images/bt_ExexuteRules.gif');\"").close();
         actionLink.img().name("Run").src("images/bt_ExexuteRules.gif").border("0").alt("Run").title("Run").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
+  
         return actionLink.toString();
 
     }
