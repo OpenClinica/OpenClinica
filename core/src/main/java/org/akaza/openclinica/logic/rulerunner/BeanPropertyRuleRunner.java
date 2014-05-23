@@ -13,7 +13,9 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -27,11 +29,11 @@ public class BeanPropertyRuleRunner {
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         int eventOrdinal) 
+                         int eventOrdinal, StudyEventChangeDetails changeDetails) 
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
-        	if (checkTargetMatch(eventOrdinal,ruleSet))
+        	if (checkTargetMatch(eventOrdinal,ruleSet,changeDetails))
         	{
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) 
                 {
@@ -72,20 +74,27 @@ public class BeanPropertyRuleRunner {
         }
     }
 	
-	public boolean checkTargetMatch(Integer eventOrdinal, RuleSetBean ruleSet)
+	public boolean checkTargetMatch(Integer eventOrdinal, RuleSetBean ruleSet,StudyEventChangeDetails changeDetails)
 	{
 		Boolean result = true;
     	String ruleOrdinal = null;
     	String targetOID = ruleSet.getTarget().getValue().substring(0,ruleSet.getTarget().getValue().indexOf("."));
+    	String targetProperty = ruleSet.getTarget().getValue().substring(ruleSet.getTarget().getValue().indexOf("."));
 
+    	//Compare Target rule property (STATUS or STARTDATE) to what has been changed in event.
+    	//Don't run rule if there isn't a match.
+    	if (targetProperty.equals(ExpressionService.STARTDATE) && !changeDetails.getStartDateChanged()) result = false;
+    	else if (targetProperty.equals(ExpressionService.STATUS) && !changeDetails.getStatusChanged()) result = false;
+    	
+    	//For repeating study events, run rule if ordinals match or "ALL" is specified.
+    	//No brackets implies "ALL" or that the it is not a repeating event, in which case rule should run.
     	if (targetOID.contains("["))
     	{
     		int leftBracketIndex = targetOID.indexOf("[");
     		int rightBracketIndex = targetOID.indexOf("]");
     		ruleOrdinal =  targetOID.substring(leftBracketIndex + 1,rightBracketIndex);
     	
-	    	if (ruleOrdinal.equals("ALL") || Integer.valueOf(ruleOrdinal) == eventOrdinal) result = true;
-	    	else result = false;
+	    	if (!(ruleOrdinal.equals("ALL") || Integer.valueOf(ruleOrdinal) == eventOrdinal)) result = false;
     	}
 		return result;
 	}

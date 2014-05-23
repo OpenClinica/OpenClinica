@@ -129,7 +129,7 @@ public class ExpressionBeanService {
         		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
         		studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
         	}	
-        	else studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
+        	else studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid, 1, subjectId);
         return studyEvent;
     }
   
