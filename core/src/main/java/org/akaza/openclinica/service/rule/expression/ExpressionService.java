@@ -422,7 +422,7 @@ public class ExpressionService {
         		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
         		studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
         	}	
-        	else studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
+        	else studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid, 1, subjectId);
         return studyEvent;
     }
     

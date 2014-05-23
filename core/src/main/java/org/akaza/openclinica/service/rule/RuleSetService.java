@@ -71,6 +71,7 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -1019,9 +1020,10 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
-            Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal) {
+            Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
+            StudyEventChangeDetails changeDetails) {
 BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal);
+ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails);
 }
 
 	public StudyEventDao getStudyEventDomainDao() {
