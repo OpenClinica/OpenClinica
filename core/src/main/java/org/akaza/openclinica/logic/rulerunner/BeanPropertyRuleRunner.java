@@ -27,7 +27,7 @@ public class BeanPropertyRuleRunner {
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         int eventOrdinal) 
+                         int eventOrdinal , Integer userId) 
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
@@ -59,7 +59,7 @@ public class BeanPropertyRuleRunner {
 	
 	                        for (RuleActionBean ruleActionBean: actionListBasedOnRuleExecutionResult){
 	                            // ActionProcessor ap =ActionProcessorFacade.getActionProcessor(ruleActionBean.getActionType(), ds, null, null,ruleSet, null, ruleActionBean.getRuleSetRule());
-	                            beanPropertyService.runAction(ruleActionBean,eow);
+	                            beanPropertyService.runAction(ruleActionBean,eow,userId);
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
 	                    	osa.printStackTrace();
