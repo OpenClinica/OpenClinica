@@ -160,15 +160,14 @@ public class BeanPropertyService{
             	studyEvent.setEndTimeFlag(false);
                 studyEvent.setDateCreated(new Date());
                 studyEvent.setUserAccount(getUserAccountDao().findById(userId));
-        	}else{
-                studyEvent.setUpdateId(userId);
-                studyEvent.setDateUpdated(new Date());
- 	
             	changeDetails.setStartDateChanged(true);
             	changeDetails.setStatusChanged(true);
-        	} else
-        	{
-        		changeDetails.setStatusChanged(false);
+        
+        	}else{
+            
+        		studyEvent.setUpdateId(userId);
+                studyEvent.setDateUpdated(new Date());
+ 	        	changeDetails.setStatusChanged(false);
         	}
         	
         	try {
