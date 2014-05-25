@@ -23,6 +23,8 @@ import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
@@ -142,9 +144,9 @@ public class BeanPropertyService{
         	else 
         	{
         		eventOID = oid;
-        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBeanId());
+        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(oid, 1, eow.getStudySubjectBeanId());
         	}
-        	
+        	StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
         	if(studyEvent==null){
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
             	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBeanId());
@@ -162,18 +164,26 @@ public class BeanPropertyService{
                 studyEvent.setUpdateId(userId);
                 studyEvent.setDateUpdated(new Date());
  	
+            	changeDetails.setStartDateChanged(true);
+            	changeDetails.setStatusChanged(true);
+        	} else
+        	{
+        		changeDetails.setStatusChanged(false);
         	}
         	
         	try {
+        		if (studyEvent.getDateStart() == null || studyEvent.getDateStart().compareTo(df.parse((String) result)) != 0)
+        			changeDetails.setStartDateChanged(true);
 				studyEvent.setDateStart(df.parse((String) result));
+
 			} catch (ParseException e) {
 				e.printStackTrace();
 				LOGGER.info(e.getMessage());
 			}
         	
         	
-        	
-        	getStudyEventDAO().saveOrUpdate(studyEvent);
+        	StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
+        	getStudyEventDAO().saveOrUpdate(container);
         	
 
         }

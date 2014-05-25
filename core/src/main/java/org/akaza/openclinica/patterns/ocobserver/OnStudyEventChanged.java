@@ -13,18 +13,19 @@ public abstract class OnStudyEventChanged extends ApplicationEvent {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private  StudyEvent studyEvent;
-	public OnStudyEventChanged(StudyEvent source) {
-		super(source);
-		this.setStudyEvent(source);
-		
-		
+	private StudyEventContainer container;
+	
+	public OnStudyEventChanged(StudyEventContainer container) {
+		super(container);
+		this.setContainer(container);
 	}
-	public StudyEvent getStudyEvent() {
-		return studyEvent;
+
+	public StudyEventContainer getContainer() {
+		return container;
 	}
-	public void setStudyEvent(StudyEvent studyEvent) {
-		this.studyEvent = studyEvent;
+
+	public void setContainer(StudyEventContainer container) {
+		this.container = container;
 	}
 
 }

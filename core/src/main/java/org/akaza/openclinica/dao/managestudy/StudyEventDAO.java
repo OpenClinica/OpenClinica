@@ -36,6 +36,8 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.rule.StudyEventBeanListener;
 
 /**
@@ -517,7 +519,10 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         if (isQuerySuccessful()) {
             sb.setId(getLatestPK());
         }
-        notifyObservers(sb);
+        
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,true);
+        StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
+        notifyObservers(container);
         return sb;
     }
 
@@ -532,6 +537,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
     
     public EntityBean update(EntityBean eb, Connection con) {
         StudyEventBean sb = (StudyEventBean) eb;
+        StudyEventBean oldStudyEventBean = (StudyEventBean)findByPK(sb.getId());
         HashMap nullVars = new HashMap();
         HashMap variables = new HashMap();
         // UPDATE study_event SET
@@ -577,7 +583,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             sb.setActive(true);
         }
 
-       notifyObservers(sb);
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
+        if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
+        	changeDetails.setStartDateChanged(true);
+        if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId()) 
+        	changeDetails.setStatusChanged(true);
+        StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
+       notifyObservers(container);
         
         return sb;
     }
@@ -1167,9 +1179,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return returnMe;
     }
 
-    private void notifyObservers(StudyEventBean sb){
+    private void notifyObservers(StudyEventBeanContainer sbc){
     if(getObserver()!=null)
-    	getObserver().update(sb);
+    	getObserver().update(sbc);
     }
     
     @Override

@@ -26,13 +26,13 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 @Override
 	public void onApplicationEvent(final OnStudyEventUpdated event) {
 		LOGGER.debug("listening");
-		Integer studyEventDefId = event.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId();
-		Integer studyEventOrdinal = event.getStudyEvent().getSampleOrdinal();
-		Integer studySubjectId = event.getStudyEvent().getStudySubject().getStudySubjectId();
-		Integer userId = event.getStudyEvent().getUpdateId();
+		Integer studyEventDefId = event.getContainer().getEvent().getStudyEventDefinition().getStudyEventDefinitionId();
+		Integer studyEventOrdinal = event.getContainer().getEvent().getSampleOrdinal();
+		Integer studySubjectId = event.getContainer().getEvent().getStudySubject().getStudySubjectId();
+		Integer userId = event.getContainer().getEvent().getUpdateId();
 		
-		if(userId==null && event.getStudyEvent().getUserAccount()!=null )userId=  event.getStudyEvent().getUserAccount().getUserId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal);
+		if(userId==null && event.getContainer().getEvent().getUserAccount()!=null )userId=  event.getContainer().getEvent().getUserAccount().getUserId();
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal,event.getContainer().getChangeDetails());
 	}
 
 
