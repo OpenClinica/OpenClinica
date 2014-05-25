@@ -29,7 +29,7 @@ public class BeanPropertyRuleRunner {
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         int eventOrdinal, StudyEventChangeDetails changeDetails) 
+                         int eventOrdinal, StudyEventChangeDetails changeDetails,Integer userId) 
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
