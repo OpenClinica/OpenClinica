@@ -150,6 +150,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("studyEventDefId", sed.getId());
         return (ArrayList<RuleSetBean>) q.list();
     }
+    @Transactional
     public ArrayList<RuleSetBean> findAllByStudyEventDefIdWhereItemIsNull(Integer studyEventDefId){
     	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  and ruleSet.itemId is null";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
