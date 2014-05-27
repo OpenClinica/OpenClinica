@@ -1023,9 +1023,9 @@ public class RuleSetService implements RuleSetServiceInterface {
     		    }
 
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
-            Integer StudySubjectBeanId) {
+            Integer studySubjectBeanId, Integer userId) {
 BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-ruleRunner.runRules(ruleSets,dataSource,  StudySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
+ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
 }
 
 	public StudyEventDao getStudyEventDomainDao() {
