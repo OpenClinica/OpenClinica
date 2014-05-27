@@ -81,9 +81,9 @@ public class UpdateRuleSetRuleServlet extends SecureController {
                 if (theRuleSetRule.getStatus() != Status.DELETED) {
                     status = Status.DELETED;
                     updateRuleSetRule(theRuleSetRule, status);
-                    pageMessage = "view_rules_remove_confirmation";
                 }
-            }
+          }
+            pageMessage = "view_rules_remove_confirmation";
         }
 
         addPageMessage(resword.getString(pageMessage));

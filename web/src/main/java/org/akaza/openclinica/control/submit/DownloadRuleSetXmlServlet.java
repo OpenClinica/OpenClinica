@@ -95,12 +95,16 @@ public class DownloadRuleSetXmlServlet extends SecureController {
         List<RuleSetRuleBean> ruleSetRules = new ArrayList<RuleSetRuleBean>();
         RulesPostImportContainer rpic = new RulesPostImportContainer();
 
+        if (ruleSetRuleIds !="") {
         String[] splitExpression = ruleSetRuleIds.split(",");
+
         for (String string : splitExpression) {
             RuleSetRuleBean rsr = getRuleSetService().getRuleSetRuleDao().findById(Integer.valueOf(string));
             ruleSetRules.add(rsr);
         }
         rpic.populate(ruleSetRules);
+        
+        } 
         return rpic;
     }
 

@@ -187,9 +187,39 @@
        </field>
      </class>
      
+     
+     
+         <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
+        <map-to xml="EventAction" ns-prefix="OpenClinicaRules" />
+     
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+
+        <field name="oc_oid_reference"
+               type="java.lang.String">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+
+       <field name="ruleActionRunEvent"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunEventBean">
+               <bind-xml name="RunOnStatus"/>
+       </field>   
+ 
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="EventDestination"/>
+        </field>
+
+       
+     </class>
+ 
+     
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" >
-     	<map-to ns-prefix="OpenClinicaRules"/>
-        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">
+        <map-to ns-prefix="OpenClinicaRules"/>
+        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
             <bind-xml name="OID" node="attribute"/>
        </field>
        <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
@@ -199,7 +229,15 @@
                type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
                <bind-xml name="ValueExpression"/>
        </field>
+
+       <field name="property" 
+              type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
+               <bind-xml name="Property" node="attribute"/>
+       </field>
      </class>
+     
+     
+     
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" >
      	<map-to ns-prefix="OpenClinicaRules"/>
         <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
@@ -227,4 +265,30 @@
             <bind-xml name="Batch" node="attribute"/>
        </field>
      </class>
+     
+     
+     <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunEventBean" >
+        <map-to ns-prefix="OpenClinicaRules"/>
+        
+       <field name="not_started" type="boolean">
+            <bind-xml name="not_scheduled" node="attribute"/>
+       </field>
+       <field name="scheduled" type="boolean">
+            <bind-xml name="scheduled" node="attribute"/>
+       </field>
+       <field name="data_entry_started" type="boolean">
+            <bind-xml name="data_entry_started" node="attribute"/>
+       </field>
+    
+       <field name="complete" type="boolean">
+            <bind-xml name="completed" node="attribute"/>
+       </field>
+          <field name="skipped" type="boolean">
+            <bind-xml name="skipped" node="attribute"/>
+       </field>
+         <field name="stopped" type="boolean">
+            <bind-xml name="stopped" node="attribute"/>
+       </field>
+     </class>
+     
 </mapping>

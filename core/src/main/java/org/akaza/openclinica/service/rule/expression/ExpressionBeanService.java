@@ -99,85 +99,40 @@ public class ExpressionBeanService {
         int index = 0;
         // TODO fix this
         System.out.println("TEST  :: " + test);
-        /*if (test.startsWith("SS")){
-            value = String.valueOf(MVEL.eval(test.replaceFirst("SS.",""), expressionBeanWrapper.getStudySubjectBean()));
-           // MVEL.eval("label", ctx)
-            System.out.println("Val::::"+value);
-        }
-        else
-        	*/if(checkIfForScheduling(test)){
-        	
-        	
-        	Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
+
+        if(checkIfForScheduling(test)){
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");
         	oid = test.substring(0,index);
         	temp = test.substring(index,test.length());
-        	StudyEvent studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOID(oid, subjectId);
-        	
+        	StudyEvent studyEvent = getStudyEventFromOID(oid);
         	
         	if(ExpressionService.STARTDATE.endsWith(temp)){
-        		//value = 				String.valueOf(DateUtils.truncate((java.sql.Date)studyEvent.getDateStart(), Calendar.DATE));
         		if(studyEvent!=null){
         		value = sdf.format(DateUtils.truncate((java.util.Date)studyEvent.getDateStart(), Calendar.DATE));
         		value = value.replace(("00:00:00.0"),"");
                 value = value.trim();
         		}
         	}
-        	
-        	
-        	
-        	//StudyEventDefinition studyEventDefinitionBean =null;
-        	
-        	/*StudyEventDefinitionDao studyEventDefDao = new StudyEventDefinitionDao<String, ArrayList>(this.ds);
-        	StudyEventDAO studyEventDao = new StudyEventDAO(this.ds);
-        	SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd");
-        	StudyEvent studyEvent = null;
-        	index = test.indexOf(".");
-        	oid = test.substring(0,index);
-        	temp = test.substring(index,test.length());//property(startDate for ex)
-        	
-        
-        	*/
-        	
-        	
-        /*	//studyEventDefinitionBean.setOid(oid);
-        	studyEventDefinitionBean = studyEventDefDao.findByOid(oid);
-        	studyEvent = (StudyEventBean) studyEventDao.findByStudySubjectIdAndDefinitionIdAndOrdinal(expressionBeanWrapper.getStudySubjectBean().getId(), studyEventDefinitionBean.getId(), 1);
-        	//grab study event name
-        	System.out.println("vl"+ MVEL.getProperty(temp,studyEvent));
-        	Object obj =  MVEL.getProperty(temp,studyEvent);
-  
-        	if(temp.contains("date"))//not a good way of recognizing date fields, but works for now.
-        	{
-        		
-        		value = String.valueOf(DateUtils.truncate((java.sql.Timestamp)obj, Calendar.DATE));
-        		value = sdf.format(DateUtils.truncate((java.sql.Timestamp)obj, Calendar.DATE));
-        	}
-        	else
-        		value = String.valueOf(obj);
-        	
-        	value = value.replace(("00:00:00.0"),"");
-           value = value.trim();
-        			
-        	
-        
-				//value = (String) (((obj.getClass()).isInstance((java.util.Date.class)))?(DateUtils.truncate((java.sql.Date)obj,Calendar.DATE)):String.valueOf(obj));
-			
-        //	value = String.valueOf( MVEL.getProperty(temp,studyEvent));
-        	
-        	//eventName = temp.substring(temp.indexOf("."));
-        	logger.info("value now is::"+value);
-        	logger.info("OID::"+oid);
-        	*/
-        	
         }
         return value;
     }
 
-
-
-
+    public StudyEvent getStudyEventFromOID(String oid)
+    {
+    	Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
+    	StudyEvent studyEvent = null;
+        	if (oid.contains("["))
+        	{
+        		int leftBracketIndex = oid.indexOf("[");
+        		int rightBracketIndex = oid.indexOf("]");
+        		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
+        		studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
+        	}	
+        	else studyEvent= expressionBeanWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid, 1, subjectId);
+        return studyEvent;
+    }
+  
     private boolean match(String input, Pattern pattern) {
         Matcher matcher = pattern.matcher(input);
         return matcher.matches();

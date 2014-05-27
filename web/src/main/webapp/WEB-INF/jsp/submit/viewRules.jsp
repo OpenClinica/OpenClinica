@@ -77,9 +77,21 @@
   <a href="javascript: openDocWindow('ViewItemDetail?itemId=${ruleSet.itemId}')"><c:out value="${ruleSet.itemNameWithOid}"/></a>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="actions" bundle="${resword}"/>:</td><td class="table_cell">
+
+<c:choose>
+<c:when test="${fn:endsWith(ruleSet.target.value,'.STATUS')}">
+       </c:when>
+<c:when test="${fn:endsWith(ruleSet.target.value,'.STARTDATE')}">
+       </c:when>
+  <c:otherwise>
     <a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>"
        onmouseover="Tip('<fmt:message key="view_rules_run_all_tip" bundle="${resword}"/>')" 
        onmouseout="UnTip()"><fmt:message key="view_rules_run_all" bundle="${resword}"/></a> ,
+  </c:otherwise>
+</c:choose>
+    
+  
+  
     <a href="UpdateRuleSetRule?action=remove&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
        onClick='return confirm("<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>");'
        onmouseover="Tip('<fmt:message key="view_rules_remove_all_tip" bundle="${resword}"/>')" 
@@ -209,11 +221,47 @@
                 </c:forEach>
                 
                 <c:set var="runon" value=""/>
-		        <c:if test="${val.ruleActionRun.initialDataEntry eq 'true'}"><c:set var="runon"><fmt:message key="IDE_comma" bundle="${resword}" /></c:set></c:if>
+
+
+<c:choose>
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STATUS')}">
+    
+    	        <c:if test="${val.ruleActionRun.not_started eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="not_scheduled_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.scheduled eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="scheduled_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.data_entry_started eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="data_entry_started_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.complete eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="completed_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.skipped eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="skipped_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.stopped eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="stopped_comma" bundle="${resword}"/></c:set></c:if>
+	
+	  </c:when>
+
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STARTDATE')}">
+    
+    	        <c:if test="${val.ruleActionRun.not_started eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="not_scheduled_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.scheduled eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="scheduled_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.data_entry_started eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="data_entry_started_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.complete eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="completed_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.skipped eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="skipped_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.stopped eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="stopped_comma" bundle="${resword}"/></c:set></c:if>
+	
+	 </c:when>
+ 
+  <c:otherwise>
+    
+    	        <c:if test="${val.ruleActionRun.initialDataEntry eq 'true'}"><c:set var="runon"><fmt:message key="IDE_comma" bundle="${resword}" /></c:set></c:if>
 		        <c:if test="${val.ruleActionRun.doubleDataEntry eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="DDE_comma" bundle="${resword}" /></c:set></c:if>
 		        <c:if test="${val.ruleActionRun.administrativeDataEntry eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="ADE_comma" bundle="${resword}" /></c:set></c:if>
 		        <c:if test="${val.ruleActionRun.batch eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="batch_comma" bundle="${resword}"/></c:set></c:if>
-		        <c:if test="${fn:length(runon)>0}">
+
+
+  </c:otherwise>
+</c:choose>
+
+		   
+		   
+    
+		   
+		   		        <c:if test="${fn:length(runon)>0}">
 			        <tr valign="top">
 		        		<td><i><fmt:message key="run_on_colon" bundle="${resword}" /></i></td>
 	        			<td><c:out value="${fn:substring(runon,0,fn:length(runon)-1)}"/></td>
@@ -223,12 +271,34 @@
 		        <c:if test="${val.actionType.code!=1 && val.actionType.code !=2 && fn:length(val.properties)>0}">
 		        	<c:set var="props" value=""/>
 		    		<c:forEach items="${val.properties}" var="prop" varStatus="status">
+		    		
+
+
+
+<c:choose>
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STATUS')}">
+		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.property}"/>,</c:set>
+	  </c:when>
+
+  <c:when test="${fn:endsWith(ruleSet.target.value,'.STARTDATE')}">
+		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.property}"/>,</c:set>
+	 </c:when>
+ 
+  <c:otherwise>
 		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+  </c:otherwise>
+</c:choose>
+
+		    		
 		    		</c:forEach>
 		        	<c:if test="${fn:length(props)>0}">
 		    			<tr valign="top">
 	                		<td ><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i></td>
+    
+
+
                 			<td ><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+    
                 		</tr>
                 	</c:if>
                 </c:if>

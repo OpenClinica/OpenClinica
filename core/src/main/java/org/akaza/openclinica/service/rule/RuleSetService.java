@@ -48,6 +48,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -70,6 +71,7 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -1016,16 +1018,12 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,StudyBean currentStudy, UserAccountBean ub,HttpServletRequest request,
-    		                                                   StudySubjectBean studySubjectBean) {
-    		        BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-    		        ruleRunner.runRules(ruleSets,ub,dataSource, currentStudy, studySubjectBean,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
-    		    }
 
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
-            Integer studySubjectBeanId, Integer userId) {
+            Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
+            StudyEventChangeDetails changeDetails) {
 BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao());
+ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId);
 }
 
 	public StudyEventDao getStudyEventDomainDao() {

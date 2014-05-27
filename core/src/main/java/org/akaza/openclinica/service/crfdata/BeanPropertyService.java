@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.crfdata;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.sql.DataSource;
 
@@ -11,6 +12,7 @@ import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -21,6 +23,9 @@ import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +42,9 @@ public class BeanPropertyService{
 
 	private StudyEventDao studyEventDAO;
     private ExpressionService expressionService;
- private StudySubjectDao studySubjectDao;
+    private StudySubjectDao studySubjectDao;
+
+    private UserAccountDao userAccountDao;
     
  private static final Logger LOGGER = LoggerFactory.getLogger(BeanPropertyService.class);
    
@@ -45,6 +52,7 @@ public class BeanPropertyService{
 	public BeanPropertyService(DataSource ds) {
     	// itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
+        this.expressionService = new ExpressionService(ds);
     }
 
 
@@ -53,10 +61,11 @@ public class BeanPropertyService{
      * @param ruleActionBean
      * @param eow
      */
-    public void runAction(RuleActionBean ruleActionBean,ExpressionBeanObjectWrapper eow){
+    public void runAction(RuleActionBean ruleActionBean,ExpressionBeanObjectWrapper eow ,Integer userId){
     	boolean statusMatch = false;
         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-    	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(((EventActionBean)ruleActionBean).getOc_oid_reference(), eow.getStudySubjectBeanId());
+        ExpressionBeanService ebs = new ExpressionBeanService(eow);
+    	StudyEvent studyEvent = ebs.getStudyEventFromOID(((EventActionBean)ruleActionBean).getOc_oid_reference());
     	RuleActionRunBean runOnStatuses = ruleActionBean.getRuleActionRun();
 
     	if (studyEvent != null)
@@ -101,7 +110,7 @@ public class BeanPropertyService{
 	            // This will execute the contents of <ValueExpression>SS.ENROLLMENT_DATE + 2</ValueExpression>
 	        	LOGGER.debug("Values:expression??::"+propertyBean.getValueExpression().getValue());
 	        	Object result = oep.parseAndEvaluateExpression(propertyBean.getValueExpression().getValue());
-	            executeAction(result,propertyBean,eow,(EventActionBean)ruleActionBean);
+	            executeAction(result,propertyBean,eow,(EventActionBean)ruleActionBean,userId);
 	        }
     	}
     }
@@ -114,19 +123,30 @@ public class BeanPropertyService{
      * @param eventAction
      */
     
-    private void executeAction(Object result,PropertyBean propertyBean,ExpressionBeanObjectWrapper eow,EventActionBean eventAction){
+    private void executeAction(Object result,PropertyBean propertyBean,ExpressionBeanObjectWrapper eow,EventActionBean eventAction,Integer userId){
     	String oid = eventAction.getOc_oid_reference();
-    	//int index = propertyBean.getOid().indexOf(".");
-    	String eventOID = eventAction.getOc_oid_reference();
-    	StudyEventDao studyEventdao = getStudyEventDAO();
-        String property = propertyBean.getProperty();
+    	String eventOID = null;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        StudyEventDefinition sDefBean =  getStudyEventDefinitionBean(eventOID);
-        boolean updateFlag = true;
+        int ordinal = 1;
+        
         
         if(oid.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY))
         {
-        	StudyEvent studyEvent = getStudyEventDAO().fetchByStudyEventDefOID(oid, eow.getStudySubjectBeanId());
+        	StudyEvent studyEvent = null;
+        	if (oid.contains("["))
+        	{
+        		int leftBracketIndex = oid.indexOf("[");
+        		int rightBracketIndex = oid.indexOf("]");
+        		ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
+        		eventOID = oid.substring(0,leftBracketIndex);
+        		studyEvent= getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(eventOID, ordinal, eow.getStudySubjectBeanId());
+        	}	
+        	else 
+        	{
+        		eventOID = oid;
+        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(oid, 1, eow.getStudySubjectBeanId());
+        	}
+        	StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
         	if(studyEvent==null){
         		studyEvent = new StudyEvent();//the studyevent may not have been created.
             	StudySubject ss = getStudySubjectDao().findById(eow.getStudySubjectBeanId());
@@ -134,35 +154,42 @@ public class BeanPropertyService{
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
             	studyEvent.setStatusId(1);
-            	studyEvent.setSampleOrdinal(1);//TODO:change this to address repeating events.
+            	studyEvent.setSampleOrdinal(ordinal);//TODO:change this to address repeating events.
             	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
             	studyEvent.setStartTimeFlag(false);
             	studyEvent.setEndTimeFlag(false);
-            	
+                studyEvent.setDateCreated(new Date());
+                studyEvent.setUserAccount(getUserAccountDao().findById(userId));
+            	changeDetails.setStartDateChanged(true);
+            	changeDetails.setStatusChanged(true);
+        
+        	}else{
+            
+        		studyEvent.setUpdateId(userId);
+                studyEvent.setDateUpdated(new Date());
+ 	        	changeDetails.setStatusChanged(false);
         	}
         	
         	try {
+        		if (studyEvent.getDateStart() == null || studyEvent.getDateStart().compareTo(df.parse((String) result)) != 0)
+        			changeDetails.setStartDateChanged(true);
 				studyEvent.setDateStart(df.parse((String) result));
+
 			} catch (ParseException e) {
 				e.printStackTrace();
 				LOGGER.info(e.getMessage());
 			}
         	
         	
-        	
-        	getStudyEventDAO().saveOrUpdate(studyEvent);
+        	StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
+        	getStudyEventDAO().saveOrUpdate(container);
         	
 
         }
         
   }
-
-
-  
-
-
 	private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
-   return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
+        return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
     	
 	}
 
@@ -228,6 +255,16 @@ public class BeanPropertyService{
 
 		public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 			this.studySubjectDao = studySubjectDao;
+		}
+
+
+		public UserAccountDao getUserAccountDao() {
+			return userAccountDao;
+		}
+
+
+		public void setUserAccountDao(UserAccountDao userAccountDao) {
+			this.userAccountDao = userAccountDao;
 		}
 
 	

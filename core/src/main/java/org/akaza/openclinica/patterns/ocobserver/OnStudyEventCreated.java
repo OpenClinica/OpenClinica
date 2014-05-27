@@ -9,8 +9,8 @@ public class OnStudyEventCreated extends OnStudyEventChanged {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public OnStudyEventCreated(StudyEvent source) {
-		super(source);
+	public OnStudyEventCreated(StudyEventContainer container) {
+		super(container);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -11,6 +11,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventJDBCBeanChanged;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -47,13 +48,14 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	System.out.println("Triggering the rules based on event updates");
 	
 		System.out.println("RuleSetDao"+ruleSetDao);
-		StudyEventBean studyEventBean = (StudyEventBean)lstnr;
+		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
 
-		Integer studyEventDefId = studyEventBean.getStudyEventDefinitionId();
-		Integer studySubjectId = studyEventBean.getStudySubjectId();
-		Integer userId = studyEventBean.getUpdaterId();
-		if(userId==null) userId = studyEventBean.getOwnerId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId);
+		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();
+		Integer studySubjectId = studyEventBeanContainer.getEvent().getStudySubjectId();
+		Integer userId = studyEventBeanContainer.getEvent().getUpdaterId();
+		Integer studyEventOrdinal = studyEventBeanContainer.getEvent().getSampleOrdinal();
+		if(userId==0) userId = studyEventBeanContainer.getEvent().getOwnerId();
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal, studyEventBeanContainer.getChangeDetails());
 		
 		
 	}
