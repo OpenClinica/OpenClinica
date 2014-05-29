@@ -345,6 +345,45 @@ public class RulesPostImportContainerService {
             eventActionValidator.setExpressionService(expressionService);
             eventActionValidator.setRespage(respage);
             eventActionValidator.validate(ruleActionBean, errors);
+            
+            String targetExpression = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
+            String targetStudyEventDef;
+            String targetStudyEventRepeatNumber;
+            String targetProperty;
+            
+           if (targetExpression.contains("[")){ 
+        	   targetStudyEventDef = targetExpression.substring(0,targetExpression.indexOf("["));
+               targetStudyEventRepeatNumber = targetExpression.substring(targetExpression.indexOf("[")+1,targetExpression.indexOf("]"));
+           }else{
+        	   targetStudyEventDef = targetExpression.substring(0,targetExpression.indexOf("."));
+               targetStudyEventRepeatNumber = "ALL" ;
+           }
+            targetProperty= targetExpression.substring(targetExpression.indexOf(".")+1);
+           
+            String destination =((EventActionBean) ruleActionBean).getOc_oid_reference();
+            String destinationStudyEventDef;
+            String destinationStudyEventRepeatNumber;
+
+            if (destination.contains("[")){ 
+            	destinationStudyEventDef = destination.substring(0,destination.indexOf("["));
+            	destinationStudyEventRepeatNumber = destination.substring(destination.indexOf("[")+1,destination.indexOf("]"));
+            }else{
+            	destinationStudyEventDef = destination.substring(0);
+            	destinationStudyEventRepeatNumber = "1" ;
+            }
+            
+            System.out.println(targetExpression +"  "+ targetStudyEventDef +"  "+ targetStudyEventRepeatNumber + " "+ targetProperty);
+            System.out.println(destination +"  "+ destinationStudyEventDef +"  "+ destinationStudyEventRepeatNumber );
+            
+            
+       if (targetProperty.equals("STARTDATE") && targetStudyEventRepeatNumber.equals("ALL") && targetStudyEventDef.equals(destinationStudyEventDef)
+    		 ||  targetProperty.equals("STARTDATE") && targetStudyEventRepeatNumber.equals(destinationStudyEventRepeatNumber) && targetStudyEventDef.equals(destinationStudyEventDef)
+    		     		   )
+            	ruleSetBeanWrapper.error(createError("OCRERR_0042"));
+       
+
+       
+            
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("EventAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
