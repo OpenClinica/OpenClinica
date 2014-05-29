@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -144,7 +145,7 @@ public class BeanPropertyService{
         	else 
         	{
         		eventOID = oid;
-        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(oid, 1, eow.getStudySubjectBeanId());
+        		studyEvent = getStudyEventDAO().fetchByStudyEventDefOIDAndOrdinal(oid, ordinal, eow.getStudySubjectBeanId());
         	}
         	StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
         	if(studyEvent==null){
@@ -154,7 +155,7 @@ public class BeanPropertyService{
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
             	studyEvent.setStatusId(1);
-            	studyEvent.setSampleOrdinal(ordinal);//TODO:change this to address repeating events.
+            	studyEvent.setSampleOrdinal(getNewEventOrdinal(eventOID,eow.getStudySubjectBeanId(), sed));
             	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
             	studyEvent.setStartTimeFlag(false);
             	studyEvent.setEndTimeFlag(false);
@@ -187,7 +188,18 @@ public class BeanPropertyService{
 
         }
         
-  }
+    }
+    
+    private Integer getNewEventOrdinal(String eventOID,Integer studySubjectId,StudyEventDefinition eventDef)
+    {
+    	if (eventDef.getRepeating())
+    	{
+    		List<StudyEvent> events = getStudyEventDAO().fetchListByStudyEventDefOID(eventOID, studySubjectId);
+    		return events.size()+1;
+    	}
+    	else return 1;
+    }
+    
 	private StudyEventDefinition getStudyEventDefinitionBean(String eventOID) {
         return getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
     	
