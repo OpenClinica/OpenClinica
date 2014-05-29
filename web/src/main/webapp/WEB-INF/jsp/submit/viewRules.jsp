@@ -163,10 +163,23 @@
       <%--<c:choose>--%>
       <%--<c:when test="${ ruleSet.status.name eq 'AVAILABLE'  }">--%>
       <c:if test="${ ruleSetRule.status.name eq 'AVAILABLE'  }">
-      <td><a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>&ruleId=<c:out value="${ruleSetRule.ruleBean.id}"/>"
+      <td>
+      <c:choose>
+        <c:when test="${fn:endsWith(ruleSet.target.value,'.STATUS')}">
+           <a/>  <img  name="bt_View1" src="images/bt_ExexuteRules.gif" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
+        </c:when>
+        <c:when test="${fn:endsWith(ruleSet.target.value,'.STARTDATE')}">
+           <a/>  <img  name="bt_View1" src="images/bt_ExexuteRules.gif" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
+        </c:when>
+         <c:otherwise>
+      
+      <a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>&ruleId=<c:out value="${ruleSetRule.ruleBean.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_ExexuteRules.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_ExexuteRules.gif');"><img
-      name="bt_View1" src="images/bt_ExexuteRules.gif" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseUp="javascript:setImage('bt_View1','images/bt_ExexuteRules.gif');">
+      <img  name="bt_View1" src="images/bt_ExexuteRules.gif" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
+       </c:otherwise>
+    </c:choose>
+  
       </td>
       <td><a href="UpdateRuleSetRule?action=remove&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
