@@ -541,7 +541,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initialized in getDisplayBean() which is online above
 
-        VariableSubstitutionHelper.replaceVariables(section, study, ssb, studyEventDefinition, dataSource);
+        VariableSubstitutionHelper.replaceVariables(section, study, ssb, studyEventDefinition, studyEventBean, dataSource);
 
         if(section.getSection().hasSCDItem()) {
             SimpleConditionalDisplayService cds0 = (SimpleConditionalDisplayService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(

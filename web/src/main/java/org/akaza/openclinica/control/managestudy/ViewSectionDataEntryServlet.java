@@ -439,11 +439,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(getDataSource());
+        StudyEventDAO studyEventDAO = new StudyEventDAO(getDataSource());
         StudyEventDefinitionBean studyEventDefinition =
                 (StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(edcb.getStudyEventDefinitionId());
-
+        StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
         VariableSubstitutionHelper.replaceVariables(dsb, currentStudy,
-                (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId), studyEventDefinition,
+                (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId), studyEventDefinition, studyEvent,
                 getDataSource());
 
         FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);

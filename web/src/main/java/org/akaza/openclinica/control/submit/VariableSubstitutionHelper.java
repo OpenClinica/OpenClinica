@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.*;
@@ -37,9 +38,9 @@ public class VariableSubstitutionHelper {
      * @param studySubject Subject associated with the display section.
      */
     public static void replaceVariables(DisplaySectionBean section, StudyBean study, StudySubjectBean studySubject,
-                                        StudyEventDefinitionBean event, DataSource dataSource) {
+                                        StudyEventDefinitionBean eventDef, StudyEventBean event, DataSource dataSource) {
 
-        StrSubstitutor subst = new StrSubstitutor(buildTokensMap(section, studySubject, study, event, dataSource));
+        StrSubstitutor subst = new StrSubstitutor(buildTokensMap(section, studySubject, study, eventDef, event, dataSource));
 
         for (DisplayItemBean displayItem: section.getItems()) {
             ItemFormMetadataBean metadata = displayItem.getMetadata();
@@ -53,8 +54,8 @@ public class VariableSubstitutionHelper {
 
     @SuppressWarnings("unchecked")
     private static Map<String, String> buildTokensMap(DisplaySectionBean section, StudySubjectBean studySubject,
-                                                      StudyBean study, StudyEventDefinitionBean event,
-                                                      DataSource dataSource) {
+                                                      StudyBean study, StudyEventDefinitionBean eventDef,
+                                                      StudyEventBean event, DataSource dataSource) {
 
         ItemDAO itemDAO = new ItemDAO(dataSource);
 
@@ -64,8 +65,9 @@ public class VariableSubstitutionHelper {
         Map<String, String> tokensMap = new HashMap<String, String>();
         tokensMap.put("studySubject", encode(studySubject.getName()));
         tokensMap.put("studyName", encode(study.getName()));
-        tokensMap.put("eventName", encode(event.getName()));
-        tokensMap.put("eventOrdinal", encode(Integer.toString(event.getOrdinal())));
+        tokensMap.put("eventName", encode(eventDef.getName()));
+        if (event == null) tokensMap.put("eventOrdinal", "");
+        else tokensMap.put("eventOrdinal", encode(Integer.toString(event.getSampleOrdinal())));
         tokensMap.put("crfName", encode(section.getCrf().getName()));
         tokensMap.put("crfVersion", encode(section.getCrfVersion().getName()));
 
