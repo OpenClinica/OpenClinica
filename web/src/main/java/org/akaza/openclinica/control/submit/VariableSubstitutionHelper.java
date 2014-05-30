@@ -30,6 +30,8 @@ public class VariableSubstitutionHelper {
 
     private static final String ENCODING = "UTF-8";
 
+    private static final String TOKEN_REGEX = "\\$\\{.*?\\}";
+
     /**
      * Replaces the variables in each {@link DisplayItemBean} of the {@link DisplaySectionBean}.
      *
@@ -44,12 +46,16 @@ public class VariableSubstitutionHelper {
 
         for (DisplayItemBean displayItem: section.getItems()) {
             ItemFormMetadataBean metadata = displayItem.getMetadata();
-            metadata.setRightItemText(subst.replace(metadata.getRightItemText()));
-            metadata.setLeftItemText(subst.replace(metadata.getLeftItemText()));
-            metadata.setHeader(subst.replace(metadata.getHeader()));
-            metadata.setSubHeader(subst.replace(metadata.getSubHeader()));
+            metadata.setRightItemText(replace(subst, metadata.getRightItemText()));
+            metadata.setLeftItemText(replace(subst, metadata.getLeftItemText()));
+            metadata.setHeader(replace(subst, metadata.getHeader()));
+            metadata.setSubHeader(replace(subst, metadata.getSubHeader()));
         }
 
+    }
+
+    private static final String replace(StrSubstitutor subst, String value) {
+        return subst.replace(value).replaceAll(TOKEN_REGEX, StringUtils.EMPTY);
     }
 
     @SuppressWarnings("unchecked")
