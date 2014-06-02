@@ -7,18 +7,22 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.ArrayList;
 
-public class RulesPostImportContainerServiceTest extends HibernateOcDbTestCase {
+import junit.framework.TestCase;
+
+public class RulesPostImportContainerServiceTest extends TestCase {
 
     public RulesPostImportContainerServiceTest() {
         super();
     }
 
+    /**
     public void testDuplicationRuleSetDefs() {
         StudyDAO studyDao = new StudyDAO(getDataSource());
         StudyBean study = (StudyBean) studyDao.findByPK(1);
@@ -38,35 +42,47 @@ public class RulesPostImportContainerServiceTest extends HibernateOcDbTestCase {
         assertEquals(0, container.getInValidRuleSetDefs().size());
         assertEquals(0, container.getValidRuleSetDefs().size());
     }
+    **/
+    
+    public void testCreateObj(){
+    	RulesPostImportContainerService service = new RulesPostImportContainerService(null);
+    	service.runValidationInList("SE_REG2.STARTDATE","SE_REG.STARTDATE",null,prepareContainer());
+    	
+    }
 
-    private RulesPostImportContainer prepareContainer() {
+    private  ArrayList<RuleSetBean> prepareContainer() {
         RulesPostImportContainer container = new RulesPostImportContainer();
         ArrayList<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
         ArrayList<RuleBean> ruleDefs = new ArrayList<RuleBean>();
 
         RuleBean rule = createRuleBean();
-        RuleSetBean ruleSet = getRuleSet(rule.getOid());
+        RuleSetBean ruleSet = getRuleSet(rule.getOid(),"SE_REG.STARTDATE","SE_REG3");
+        RuleSetBean ruleSet2 = getRuleSet(rule.getOid(),"SE_REG3.STARTDATE","SE_REG2");
         ruleSets.add(ruleSet);
-        ruleDefs.add(rule);
-        container.setRuleSets(ruleSets);
-        container.setRuleDefs(ruleDefs);
-        return container;
+        ruleSets.add(ruleSet2);
+        //ruleDefs.add(rule);
+        //container.setRuleSets(ruleSets);
+        //container.setRuleDefs(ruleDefs);
+        return ruleSets;
 
     }
+    
 
-    private RuleSetBean getRuleSet(String ruleOid) {
+    private RuleSetBean getRuleSet(String ruleOid,String target,String oidRef) {
         RuleSetBean ruleSet = new RuleSetBean();
-        ruleSet.setTarget(createExpression(Context.OC_RULES_V1, "SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME"));
-        RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, ruleOid);
+        ruleSet.setTarget(createExpression(Context.OC_RULES_V1, target));
+        ruleSet.setOriginalTarget(createExpression(Context.OC_RULES_V1, target));
+        RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, ruleOid,oidRef);
         ruleSet.addRuleSetRule(ruleSetRule);
         return ruleSet;
 
     }
 
-    private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, String ruleOid) {
+    private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, String ruleOid, String oidRef) {
         RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
-        DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
-        ruleAction.setMessage("HELLO WORLD");
+        //DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
+        EventActionBean ruleAction = new EventActionBean();
+        ruleAction.setOc_oid_reference(oidRef);
         ruleAction.setExpressionEvaluatesTo(true);
         ruleSetRule.addAction(ruleAction);
         ruleSetRule.setRuleSetBean(ruleSet);

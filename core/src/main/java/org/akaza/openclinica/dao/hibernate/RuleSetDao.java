@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,6 +151,15 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("studyEventDefId", sed.getId());
         return (ArrayList<RuleSetBean>) q.list();
     }
+    public ArrayList<RuleSetBean> findAllEventActions(StudyBean currentStudy){
+    	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value LIKE '%.STARTDATE%' or ruleSet.originalTarget.value LIKE '%.STATUS%' and ruleSet.studyId = :studyId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyId", currentStudy.getId());
+        return (ArrayList<RuleSetBean>) q.list();
+    }
+
+
+    
     @Transactional
     public ArrayList<RuleSetBean> findAllByStudyEventDefIdWhereItemIsNull(Integer studyEventDefId){
     	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  and ruleSet.itemId is null";
