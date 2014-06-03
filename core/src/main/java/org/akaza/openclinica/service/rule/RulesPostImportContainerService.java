@@ -133,7 +133,9 @@ public class RulesPostImportContainerService {
     }
 
     public RulesPostImportContainer validateRuleSetDefs(RulesPostImportContainer importContainer) {
-        for (RuleSetBean ruleSetBean : importContainer.getRuleSets()) {
+        List<RuleSetBean> eventActionsRuleSetBean = getRuleSetDao().findAllEventActions(currentStudy);
+        
+    	for (RuleSetBean ruleSetBean : importContainer.getRuleSets()) {
             AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
             ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
             if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
@@ -177,7 +179,6 @@ public class RulesPostImportContainerService {
                     ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
                 }
-              List<RuleSetBean> eventActionsRuleSetBean = getRuleSetDao().findAllEventActions(currentStudy);
               isRuleSetRuleValid(importContainer, ruleSetBeanWrapper, eventActionsRuleSetBean);
             }
             putRuleSetInCorrectContainer(ruleSetBeanWrapper, importContainer);
@@ -349,13 +350,18 @@ public class RulesPostImportContainerService {
           
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
-            EventActionValidator eventActionValidator = new EventActionValidator(ds, currentStudy);
             eventActionValidator.setRuleSetBeanWrapper(ruleSetBeanWrapper);
             eventActionValidator.setExpressionService(expressionService);
             eventActionValidator.setRespage(respage);
             eventActionValidator.validate(ruleActionBean, errors);
+          
+            String currentTarget=null;
+            currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
+            if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS"))
+        		System.out.println("-------------------------------------------------------------------");
+               	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
 
-            inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
+            
             
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("EventAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
@@ -369,9 +375,9 @@ public class RulesPostImportContainerService {
    
      target = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
      destination =((EventActionBean) ruleActionBean).getOc_oid_reference();
-    // String destinationProperty = ((EventActionBean) ruleActionBean).getProperties().get(0).getProperty();
-     String destinationProperty = "STARTDATE";
-     destination = destination + "." + destinationProperty;
+     
+     System.out.println("new Rule Assignment:  target :"+ target+ "   destination:  " +destination );
+        
      if (isDestinationAndTargetMatch(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0042"));
      if (isDestinationAndTargetAcceptable(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0043"));
    
@@ -383,15 +389,15 @@ public class RulesPostImportContainerService {
     
 	public void runValidationInList(String target, String destination ,AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,List<RuleSetBean> eventActionsRuleSetBean){
         // eventActionsRuleSetBean is the list of all events from rule set table
-		System.out.println("In" );
-		
+		System.out.println("I'm in runValidationInList" );
 		Boolean isDestinationATarget = false;
 		RuleSetBean isDestination = null;
 				
 		for (RuleSetBean ruleSetBean : eventActionsRuleSetBean) {
+   
 			if (isDestinationAndTargetMatch(parseTarget(ruleSetBean.getOriginalTarget().getValue()) , parseDestination(destination)) 
 					|| isDestinationAndTargetAcceptable(parseTarget(ruleSetBean.getOriginalTarget().getValue()) , parseDestination(destination))) {  	
-				System.out.println("Target and Destination match  " + ruleSetBean.getOriginalTarget().getValue() +"  "+ destination );
+//				System.out.println("I'm in runValidationInList  ,  Target and Destination match  " + ruleSetBean.getOriginalTarget().getValue() +"  "+ destination );
                   isDestinationATarget = true;
                   isDestination = ruleSetBean;
                   break;
@@ -399,38 +405,59 @@ public class RulesPostImportContainerService {
 		}
 		
 		System.out.println("isDestinationATarget:  " + isDestinationATarget);
+	 //    destination = (destination.contains(".STARTDATE")) ? destination : destination +".STARTDATE" ;
 		
 		if (isDestinationATarget == true && isDestination != null){
 		
 			List<RuleActionBean> ruleActions = getAllRuleActions(isDestination);
+			System.out.println("I'm in ruleActions  target:  "+ target + "  destination:  "+ destination);
+			
 			
 			for (RuleActionBean ruleActionBean: ruleActions){
-	             if (isDestinationAndTargetMatch(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"),parseDestination(target))){
+				System.out.println("I'm in ruleActionbean loops  target:  "+ ((EventActionBean)ruleActionBean).getOc_oid_reference()+"     destination: " + target);
+				     if (isDestinationAndTargetMatch(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"),parseDestination(target))){
                      System.out.println("Oooooops" );
 	                  ruleSetBeanWrapper.error(createError("OCRERR_0042"));
 	                  break;
 				}
-	             if (isDestinationAndTargetAcceptable(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"),parseDestination(target))){  	
+	             if (isDestinationAndTargetAcceptable(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()),parseDestination(target))){  	
 	            	 System.out.println("Oooooops2" );
 	            	 ruleSetBeanWrapper.error(createError("OCRERR_0043"));
 	                  break;
 	             }
-	             runValidationInList(target,((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE",ruleSetBeanWrapper,eventActionsRuleSetBean);
+	             runValidationInList(target,((EventActionBean)ruleActionBean).getOc_oid_reference(),ruleSetBeanWrapper,eventActionsRuleSetBean);
 			}
 		}
 		else{
 		 
-			System.out.println("I'm in else clause and Target value is :"+ target);
-  
-				
-	//			eventActionsRuleSetBean.add(new RuleSetBean(){
-					
-	//			});
-       
+			System.out.println("I'm in else clause and Target :"+ target + "   Destingation :"+ destination );
+			addNewRuleSetBeanInList(target, destination,eventActionsRuleSetBean);   
       }
-   
+    }
+	
+	private void  addNewRuleSetBeanInList(String target , String destination, List<RuleSetBean> eventActionsRuleSetBean) { 
+	ExpressionBean expression= new ExpressionBean();
+    expression.setValue(target);
+	
+    RuleSetBean ruleSetBean = new RuleSetBean();
+	ruleSetBean.setOriginalTarget(expression);
     
-        }
+	EventActionBean eventActionBean = new EventActionBean();
+    eventActionBean.setOc_oid_reference(destination);
+
+    List <RuleActionBean> listRuleActionBean = new ArrayList<RuleActionBean>();
+    listRuleActionBean.add(eventActionBean);
+                
+    RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
+    ruleSetRuleBean.setActions(listRuleActionBean);
+	
+	ruleSetBean.addRuleSetRule(ruleSetRuleBean);
+    
+	eventActionsRuleSetBean.add(ruleSetBean);
+	System.out.println("size of list  :  "+ eventActionsRuleSetBean.size());
+	}
+	
+	
 	
 	private List<RuleActionBean> getAllRuleActions(RuleSetBean ruleSetBean){
 		List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
@@ -453,8 +480,9 @@ public class RulesPostImportContainerService {
     	
     	
 	public Map<String, String> parseTarget(String target) {
+	     target = (target.contains(".STARTDATE")) ? target : target +".STARTDATE" ;
+     System.out.println("I'm in parseTarget "+ target);
 		Map<String, String> targetValues = new HashMap<String, String>();
-	//	System.out.println(target);
 	
 		String targetStudyEventDefOid = null;
 		String targetStudyEventRepeatNumber = null;
@@ -466,7 +494,6 @@ public class RulesPostImportContainerService {
 		} else {
 			targetStudyEventDefOid = target.substring(0, target.indexOf("."));
 
-//			System.out.println("Repeating or not " + studyEventDefinition.isRepeating());
 			if (isEventTypeRepeating(targetStudyEventDefOid))
 				targetStudyEventRepeatNumber = "ALL";
 			else
@@ -475,8 +502,6 @@ public class RulesPostImportContainerService {
 		}
 		targetProperty = target.substring(target.indexOf(".") + 1);
 
-//		System.out.println("targetStudyevent def  " + targetStudyEventDef);
-
 		targetValues.put("targetStudyEventDefOid", targetStudyEventDefOid);
 		targetValues.put("targetStudyEventRepeatNumber", targetStudyEventRepeatNumber);
 		targetValues.put("targetProperty", targetProperty);
@@ -484,8 +509,9 @@ public class RulesPostImportContainerService {
 	}
 
 	public Map<String, String> parseDestination(String destination) {
+	     destination = (destination.contains(".STARTDATE")) ? destination : destination +".STARTDATE" ;
+	     System.out.println("I'm in parseDestination "+ destination);
 		Map<String, String> destinationValues = new HashMap<String, String>();
-	//	System.out.println(destination);
 
 		String destinationStudyEventDefOid = null;
 		String destinationStudyEventRepeatNumber = null;
@@ -508,7 +534,7 @@ public class RulesPostImportContainerService {
     	
     
 	private boolean isDestinationAndTargetMatch(Map<String, String> target, Map<String, String> destination) {
-
+      
 		String targetProperty = (String) target.get("targetProperty");
 		String targetStudyEventDefOid = (String) target.get("targetStudyEventDefOid");
 		String targetStudyEventRepeatNumber = (String) target.get("targetStudyEventRepeatNumber");
@@ -516,8 +542,8 @@ public class RulesPostImportContainerService {
 		String destinationStudyEventRepeatNumber = (String) destination.get("destinationStudyEventRepeatNumber");
 		String destinationProperty = (String) destination.get("destinationProperty");
 
-		System.out.println("target "+targetProperty +" "+ targetStudyEventDefOid+"  "+targetStudyEventRepeatNumber );
-		System.out.println("destination "+destinationProperty +" "+ destinationStudyEventDefOid+"  "+destinationStudyEventRepeatNumber );
+		System.out.println( "I'm in isDestinationAndTargetMatch,   target "+targetProperty +" "+ targetStudyEventDefOid+"  "+targetStudyEventRepeatNumber 
+		+"   &   destination "+destinationProperty +" "+ destinationStudyEventDefOid+"  "+destinationStudyEventRepeatNumber );
 		
 		if (targetProperty.equals(destinationProperty) && targetStudyEventRepeatNumber.equals(destinationStudyEventRepeatNumber) && targetStudyEventDefOid.equals(destinationStudyEventDefOid)) {
 			return true;
@@ -536,6 +562,9 @@ public class RulesPostImportContainerService {
 		String destinationStudyEventRepeatNumber = (String) destination.get("destinationStudyEventRepeatNumber");
 		String destinationProperty = (String) destination.get("destinationProperty");
 
+		System.out.println( "I'm in isDestinationAndTargetAcceptable,   target "+targetProperty +" "+ targetStudyEventDefOid+"  "+targetStudyEventRepeatNumber 
+				+"   &   destination "+destinationProperty +" "+ destinationStudyEventDefOid+"  "+destinationStudyEventRepeatNumber );
+				
 		if (targetProperty.equals(destinationProperty) && targetStudyEventRepeatNumber.equals("ALL") && targetStudyEventDefOid.equals(destinationStudyEventDefOid)) {
 			return true;
 		} else {
