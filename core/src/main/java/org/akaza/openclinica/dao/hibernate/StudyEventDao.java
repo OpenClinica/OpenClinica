@@ -1,5 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
@@ -40,6 +43,19 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
          return se;
        
 		
+	}
+	
+	public List<StudyEvent> fetchListByStudyEventDefOID(String oid,Integer studySubjectId){
+		List<StudyEvent> eventList = null;
+		
+		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+		 org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studySubjectId", studySubjectId);
+        q.setString("oid", oid);
+        
+        eventList = (List<StudyEvent>) q.list();
+        return eventList;
+      
 	}
 	
 	public StudyEvent saveOrUpdate(StudyEventContainer container) {
