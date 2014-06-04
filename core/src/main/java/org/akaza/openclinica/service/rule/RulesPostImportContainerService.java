@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.rule.action.EmailActionBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -30,6 +31,8 @@ import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -298,8 +301,22 @@ public class RulesPostImportContainerService {
 
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean ,List<RuleSetBean> eventActionsRuleSetBean ) {
-        if (ruleActionBean instanceof ShowActionBean) {
-            List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
+
+    	if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean) {
+          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
+            	} 
+    	}
+    	if (ruleActionBean instanceof DiscrepancyNoteActionBean) {
+           	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
+           		} 
+           	}
+    	        
+              	
+              	
+    	if (ruleActionBean instanceof ShowActionBean) {
+          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+          	  
+        	List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
             //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
             if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
                 ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
@@ -314,8 +331,10 @@ public class RulesPostImportContainerService {
                 }
             }
         }
+        }  	
         if (ruleActionBean instanceof HideActionBean) {
-            List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
+          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+          	            List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
             //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
             if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
                 ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
@@ -330,8 +349,10 @@ public class RulesPostImportContainerService {
                 }
             }
         }
+      }  	
         if (ruleActionBean instanceof InsertActionBean) {
-            //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+        	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+        	//if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
             if (ruleActionBean.getRuleActionRun().getBatch() == true) {
                 ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
@@ -346,6 +367,7 @@ public class RulesPostImportContainerService {
                 ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
+        } 	
         if (ruleActionBean instanceof EventActionBean) {
           
             DataBinder dataBinder = new DataBinder(ruleActionBean);
@@ -357,10 +379,14 @@ public class RulesPostImportContainerService {
           
             String currentTarget=null;
             currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
-            if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS"))
+            if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
         		System.out.println("-------------------------------------------------------------------");
                	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
-
+            }else{
+            	ruleSetBeanWrapper.error(createError("OCRERR_0044"));
+            	System.out.println("The target contains Item OID and Event Action instance benn added in the rule");
+               		
+            }
             
             
             if (errors.hasErrors()) {
@@ -369,6 +395,18 @@ public class RulesPostImportContainerService {
         }
     }
     
+  private boolean isUploadedRuleSupportedForEventAction (AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper){
+    String currentTarget=null ;
+    currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
+    if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
+		ruleSetBeanWrapper.error(createError("OCRERR_0045"));
+    	System.out.println("The target contains Item OID and Event Action instance benn added in the rule");
+    	return true;
+    	}
+    return false;
+  }
+  
+  
     public void inValidateInfiniteLoop(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper ,List<RuleSetBean> eventActionsRuleSetBean){
    String target=null;
    String destination=null;
@@ -430,7 +468,7 @@ public class RulesPostImportContainerService {
 		}
 		else{
 		 
-			System.out.println("I'm in else clause and Target :"+ target + "   Destingation :"+ destination );
+	//		System.out.println("I'm in else clause and Target :"+ target + "   Destination :"+ destination );
 			addNewRuleSetBeanInList(target, destination,eventActionsRuleSetBean);   
       }
     }
