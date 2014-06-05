@@ -414,7 +414,7 @@ public class RulesPostImportContainerService {
      target = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
      destination =((EventActionBean) ruleActionBean).getOc_oid_reference();
      
-     System.out.println("new Rule Assignment:  target :"+ target+ "   destination:  " +destination );
+     System.out.println("new Rule Assignment:  target :"+ target+ "   destination:  " +destination +".STARTDATE");
         
      if (isDestinationAndTargetMatch(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0042"));
      if (isDestinationAndTargetAcceptable(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0043"));
@@ -452,18 +452,19 @@ public class RulesPostImportContainerService {
 			
 			
 			for (RuleActionBean ruleActionBean: ruleActions){
-				System.out.println("I'm in ruleActionbean loops  target:  "+ ((EventActionBean)ruleActionBean).getOc_oid_reference()+"     destination: " + target);
-				     if (isDestinationAndTargetMatch(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"),parseDestination(target))){
+				System.out.println("I'm in ruleActionbean loops  target:  "+target +"     destination: " + ((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE");
+			     if (isDestinationAndTargetMatch(parseTarget(target),parseDestination(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"))){
                      System.out.println("Oooooops" );
 	                  ruleSetBeanWrapper.error(createError("OCRERR_0042"));
 	                  break;
 				}
-	             if (isDestinationAndTargetAcceptable(parseTarget(((EventActionBean)ruleActionBean).getOc_oid_reference()),parseDestination(target))){  	
+	             if (isDestinationAndTargetAcceptable(parseTarget(target),parseDestination(((EventActionBean)ruleActionBean).getOc_oid_reference()))){  	
 	            	 System.out.println("Oooooops2" );
 	            	 ruleSetBeanWrapper.error(createError("OCRERR_0043"));
 	                  break;
 	             }
-	             runValidationInList(target,((EventActionBean)ruleActionBean).getOc_oid_reference(),ruleSetBeanWrapper,eventActionsRuleSetBean);
+
+				    runValidationInList(target,((EventActionBean)ruleActionBean).getOc_oid_reference(),ruleSetBeanWrapper,eventActionsRuleSetBean);
 			}
 		}
 		else{
