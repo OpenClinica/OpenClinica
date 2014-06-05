@@ -87,7 +87,7 @@ public class VariableSubstitutionHelper {
             }
             String value = StringUtils.join(values, ',');
 
-            tokensMap.put("item['" + item.getName() + "']", value);
+            tokensMap.put("item['" + item.getName() + "']", encode(value));
         }
 
         if (LOG.isDebugEnabled()) {
