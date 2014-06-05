@@ -404,7 +404,7 @@ public class ExpressionService {
         return value;
     }
 
-    private boolean checkIfExpressionIsForScheduling(String expression){
+    public boolean checkIfExpressionIsForScheduling(String expression){
     	if(expression.toUpperCase().startsWith("SE_")&&(expression.toUpperCase().endsWith(this.STARTDATE)|| expression.toUpperCase().endsWith(this.STATUS))){
     		return true;
     	}

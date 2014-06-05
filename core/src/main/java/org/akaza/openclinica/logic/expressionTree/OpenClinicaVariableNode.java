@@ -161,13 +161,19 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         // getExpressionService().checkSyntax(number));
         if (calculateVariable() != null) {
 
-        }
+        
         // logger.info("e" + expressionWrapper.getRuleSet());
-        else if (!getExpressionService().ruleExpressionChecker(number)) {
+        }else if((expressionWrapper.getRuleSet() != null) && (getExpressionService().checkIfExpressionIsForScheduling(expressionWrapper.getRuleSet().getTarget().getValue())) && !number.endsWith(STARTDATE) && !number.endsWith(STATUS))  {
+          System.out.println("the Target value is  " + expressionWrapper.getRuleSet().getTarget().getValue());        	
+          System.out.println("the number is  " + number );        	
+            throw new OpenClinicaSystemException("OCRERR_0046", new Object[] { number });
+        
+        }else if (!getExpressionService().ruleExpressionChecker(number)) {
             logger.info("Go down");
             throw new OpenClinicaSystemException("OCRERR_0013", new Object[] { number });
         }
-        if (number.endsWith(STARTDATE) ||number.endsWith(STATUS)) validateEvent();
+        if (number.endsWith(STARTDATE) ||number.endsWith(STATUS)) 
+        	validateEvent();
     }
     
     void validateEvent() throws OpenClinicaSystemException {
