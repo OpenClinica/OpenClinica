@@ -195,7 +195,7 @@
       </c:choose>
 
   <fmt:message key="event_name" bundle="${resword}"/>: <c:out value="${eventView.definition.name}"/></span><br>
-	<b><fmt:message key="event_type" bundle="${resword}"/></b>:<fmt:message key="${eventView.definition.type}" bundle="${resword}"/>,
+	<b><fmt:message key="event_type" bundle="${resword}"/></b>: <fmt:message key="${eventView.definition.type}" bundle="${resword}"/>,
 	<c:choose>
      <c:when test="${eventView.definition.repeating}">
        <fmt:message key="repeating" bundle="${resword}"/>
@@ -203,7 +203,7 @@
      <c:otherwise>
       <fmt:message key="non_repeating" bundle="${resword}"/>
      </c:otherwise>
-    </c:choose>,
+    </c:choose>
 	<b><fmt:message key="category" bundle="${resword}"/></b>:
 	<c:choose>
 	 <c:when test="${eventView.definition.category == null || eventView.definition.category ==''}">
@@ -222,7 +222,7 @@
      <c:otherwise>
        <fmt:formatDate value="${eventView.firstScheduledStartDate}" pattern="${dteFormat}"/>
      </c:otherwise>
-     </c:choose>), <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
+     </c:choose>) <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
    <c:choose>
    <c:when test="${eventView.lastCompletionDate== null}">
     <fmt:message key="N/A" bundle="${resword}"/>
@@ -230,7 +230,7 @@
    <c:otherwise>
     <fmt:formatDate value="${eventView.lastCompletionDate}" pattern="${dteFormat}"/>
    </c:otherwise>
- </c:choose>), <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br>
+ </c:choose>) <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br>
 	<c:set var="table" value="${eventView.studyEventTable}" scope="request" />
 	<c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showEventByDefinitionRow.jsp" /></c:import>
 <br>

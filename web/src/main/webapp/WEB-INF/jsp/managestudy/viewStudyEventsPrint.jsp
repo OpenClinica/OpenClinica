@@ -57,7 +57,8 @@
         </c:otherwise>
       </c:choose>
  <fmt:message key="event_name" bundle="${resword}"/>: <c:out value="${eventView.definition.name}"/></span>
-	<p><b><fmt:message key="event_type" bundle="${resword}"/></b>:<c:out value="${eventView.definition.type}"/>,
+	<p><b><fmt:message key="event_type" bundle="${resword}"/></b>: <fmt:message key="${eventView.definition.type}" bundle="${resword}"/>,
+
 	<c:choose>
      <c:when test="${eventView.definition.repeating}">
       <fmt:message key="repeating" bundle="${resword}"/>
@@ -65,7 +66,7 @@
      <c:otherwise>
       <fmt:message key="non_repeating" bundle="${resword}"/>
      </c:otherwise>
-    </c:choose>,
+    </c:choose>
 	<b><fmt:message key="category" bundle="${resword}"/></b>:
 	<c:choose>
 	 <c:when test="${eventView.definition.category == null || eventView.definition.category ==''}">
@@ -84,7 +85,7 @@
      <c:otherwise>
        <fmt:formatDate value="${eventView.firstScheduledStartDate}" pattern="${dteFormat}"/>
      </c:otherwise>
-     </c:choose>), <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
+     </c:choose>) <b><fmt:message key="completed" bundle="${resword}"/></b>: <c:out value="${eventView.subjectCompleted}"/> (<fmt:message key="completion_date_of_last_event" bundle="${resword}"/>:
    <c:choose>
    <c:when test="${eventView.lastCompletionDate== null}">
     <fmt:message key="na" bundle="${resword}"/>
@@ -92,7 +93,7 @@
    <c:otherwise>
     <fmt:formatDate value="${eventView.lastCompletionDate}" pattern="${dteFormat}"/>
    </c:otherwise>
- </c:choose>), <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br></p>
+ </c:choose>) <b><fmt:message key="discontinued" bundle="${resword}"/></b>: <c:out value="${eventView.subjectDiscontinued}"/><br></p>
 	<c:set var="events" value="${eventView.studyEvents}" scope="request" />
 	<div style="width: 600px">
 	 <!-- These DIVs define shaded box borders -->
