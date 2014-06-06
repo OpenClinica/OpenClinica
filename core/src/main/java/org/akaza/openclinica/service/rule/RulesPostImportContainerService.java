@@ -302,16 +302,11 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean ,List<RuleSetBean> eventActionsRuleSetBean ) {
 
-    	if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean) {
-          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
-            	} 
-    	}
-    	if (ruleActionBean instanceof DiscrepancyNoteActionBean) {
-           	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
-           		} 
-           	}
-    	        
-              	
+		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean)
+			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
+
+		if (ruleActionBean instanceof DiscrepancyNoteActionBean)
+			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);              	
               	
     	if (ruleActionBean instanceof ShowActionBean) {
           	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
@@ -380,11 +375,9 @@ public class RulesPostImportContainerService {
             String currentTarget=null;
             currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
             if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
-        		System.out.println("-------------------------------------------------------------------");
                	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
             }else{
             	ruleSetBeanWrapper.error(createError("OCRERR_0044"));
-            	System.out.println("The target contains Item OID and Event Action instance benn added in the rule");
                		
             }
             
@@ -395,134 +388,115 @@ public class RulesPostImportContainerService {
         }
     }
     
-  private boolean isUploadedRuleSupportedForEventAction (AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper){
-    String currentTarget=null ;
-    currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
-    if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
-		ruleSetBeanWrapper.error(createError("OCRERR_0045"));
-    	System.out.println("The target contains Item OID and Event Action instance benn added in the rule");
-    	return true;
-    	}
-    return false;
-  }
+	private boolean isUploadedRuleSupportedForEventAction(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
+		String currentTarget = null;
+		currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
+		if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")) {
+			ruleSetBeanWrapper.error(createError("OCRERR_0045"));
+			return true;
+		}
+		return false;
+	}  
   
-  
-    public void inValidateInfiniteLoop(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper ,List<RuleSetBean> eventActionsRuleSetBean){
-   String target=null;
-   String destination=null;
-   
-     target = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
-     destination =((EventActionBean) ruleActionBean).getOc_oid_reference();
-     
-     System.out.println("new Rule Assignment:  target :"+ target+ "   destination:  " +destination +".STARTDATE");
-        
-     if (isDestinationAndTargetMatch(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0042"));
-     if (isDestinationAndTargetAcceptable(parseTarget(target) , parseDestination(destination)))    ruleSetBeanWrapper.error(createError("OCRERR_0043"));
-   
-   
-//    List<RuleSetBean> eventActionsRuleSetBean = getRuleSetDao().findAllEventActions(currentStudy);
-    runValidationInList(target,destination,ruleSetBeanWrapper,eventActionsRuleSetBean);           
-    }
+	public void inValidateInfiniteLoop(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, List<RuleSetBean> eventActionsRuleSetBean) {
+		String target = null;
+		String destination = null;
 
+		target = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
+		destination = ((EventActionBean) ruleActionBean).getOc_oid_reference();
+
+		if (isDestinationAndTargetMatch(parseTarget(target), parseDestination(destination)))
+			ruleSetBeanWrapper.error(createError("OCRERR_0042"));
+		if (isDestinationAndTargetAcceptable(parseTarget(target), parseDestination(destination)))
+			ruleSetBeanWrapper.error(createError("OCRERR_0043"));
+
+		// List<RuleSetBean> eventActionsRuleSetBean =
+		// getRuleSetDao().findAllEventActions(currentStudy);
+		runValidationInList(target, destination, ruleSetBeanWrapper, eventActionsRuleSetBean);
+	}
     
-	public void runValidationInList(String target, String destination ,AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,List<RuleSetBean> eventActionsRuleSetBean){
-        // eventActionsRuleSetBean is the list of all events from rule set table
-		System.out.println("I'm in runValidationInList" );
+	public void runValidationInList(String target, String destination, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, List<RuleSetBean> eventActionsRuleSetBean) {
+		// eventActionsRuleSetBean is the list of all events from rule set table
 		Boolean isDestinationATarget = false;
 		RuleSetBean isDestination = null;
-				
+
 		for (RuleSetBean ruleSetBean : eventActionsRuleSetBean) {
-   
-			if (isDestinationAndTargetMatch(parseTarget(ruleSetBean.getOriginalTarget().getValue()) , parseDestination(destination)) 
-					|| isDestinationAndTargetAcceptable(parseTarget(ruleSetBean.getOriginalTarget().getValue()) , parseDestination(destination))) {  	
-//				System.out.println("I'm in runValidationInList  ,  Target and Destination match  " + ruleSetBean.getOriginalTarget().getValue() +"  "+ destination );
-                  isDestinationATarget = true;
-                  isDestination = ruleSetBean;
-                  break;
+
+			if (isDestinationAndTargetMatch(parseTarget(ruleSetBean.getOriginalTarget().getValue()), parseDestination(destination)) || isDestinationAndTargetAcceptable(parseTarget(ruleSetBean.getOriginalTarget().getValue()), parseDestination(destination))) {
+				isDestinationATarget = true;
+				isDestination = ruleSetBean;
+				break;
 			}
 		}
-		
-		System.out.println("isDestinationATarget:  " + isDestinationATarget);
-	 //    destination = (destination.contains(".STARTDATE")) ? destination : destination +".STARTDATE" ;
-		
-		if (isDestinationATarget == true && isDestination != null){
-		
+
+		// destination = (destination.contains(".STARTDATE")) ? destination :
+		// destination +".STARTDATE" ;
+
+		if (isDestinationATarget == true && isDestination != null) {
+
 			List<RuleActionBean> ruleActions = getAllRuleActions(isDestination);
-			System.out.println("I'm in ruleActions  target:  "+ target + "  destination:  "+ destination);
-			
-			
-			for (RuleActionBean ruleActionBean: ruleActions){
-				System.out.println("I'm in ruleActionbean loops  target:  "+target +"     destination: " + ((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE");
-			     if (isDestinationAndTargetMatch(parseTarget(target),parseDestination(((EventActionBean)ruleActionBean).getOc_oid_reference()+".STARTDATE"))){
-                     System.out.println("Oooooops" );
-	                  ruleSetBeanWrapper.error(createError("OCRERR_0042"));
-	                  break;
+
+			for (RuleActionBean ruleActionBean : ruleActions) {
+				if (isDestinationAndTargetMatch(parseTarget(target), parseDestination(((EventActionBean) ruleActionBean).getOc_oid_reference() + ".STARTDATE"))) {
+					ruleSetBeanWrapper.error(createError("OCRERR_0042"));
+					break;
 				}
-	             if (isDestinationAndTargetAcceptable(parseTarget(target),parseDestination(((EventActionBean)ruleActionBean).getOc_oid_reference()))){  	
-	            	 System.out.println("Oooooops2" );
-	            	 ruleSetBeanWrapper.error(createError("OCRERR_0043"));
-	                  break;
-	             }
+				if (isDestinationAndTargetAcceptable(parseTarget(target), parseDestination(((EventActionBean) ruleActionBean).getOc_oid_reference()))) {
+					ruleSetBeanWrapper.error(createError("OCRERR_0043"));
+					break;
+				}
 
-				    runValidationInList(target,((EventActionBean)ruleActionBean).getOc_oid_reference(),ruleSetBeanWrapper,eventActionsRuleSetBean);
+				runValidationInList(target, ((EventActionBean) ruleActionBean).getOc_oid_reference(), ruleSetBeanWrapper, eventActionsRuleSetBean);
 			}
-		}
-		else{
-		 
-	//		System.out.println("I'm in else clause and Target :"+ target + "   Destination :"+ destination );
-			addNewRuleSetBeanInList(target, destination,eventActionsRuleSetBean);   
-      }
-    }
-	
-	private void  addNewRuleSetBeanInList(String target , String destination, List<RuleSetBean> eventActionsRuleSetBean) { 
-	ExpressionBean expression= new ExpressionBean();
-    expression.setValue(target);
-	
-    RuleSetBean ruleSetBean = new RuleSetBean();
-	ruleSetBean.setOriginalTarget(expression);
-    
-	EventActionBean eventActionBean = new EventActionBean();
-    eventActionBean.setOc_oid_reference(destination);
+		} else {
 
-    List <RuleActionBean> listRuleActionBean = new ArrayList<RuleActionBean>();
-    listRuleActionBean.add(eventActionBean);
-                
-    RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
-    ruleSetRuleBean.setActions(listRuleActionBean);
-	
-	ruleSetBean.addRuleSetRule(ruleSetRuleBean);
-    
-	eventActionsRuleSetBean.add(ruleSetBean);
-	System.out.println("size of list  :  "+ eventActionsRuleSetBean.size());
+			addNewRuleSetBeanInList(target, destination, eventActionsRuleSetBean);
+		}
 	}
 	
+	private void addNewRuleSetBeanInList(String target, String destination, List<RuleSetBean> eventActionsRuleSetBean) {
+		ExpressionBean expression = new ExpressionBean();
+		expression.setValue(target);
+
+		RuleSetBean ruleSetBean = new RuleSetBean();
+		ruleSetBean.setOriginalTarget(expression);
+
+		EventActionBean eventActionBean = new EventActionBean();
+		eventActionBean.setOc_oid_reference(destination);
+
+		List<RuleActionBean> listRuleActionBean = new ArrayList<RuleActionBean>();
+		listRuleActionBean.add(eventActionBean);
+
+		RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
+		ruleSetRuleBean.setActions(listRuleActionBean);
+
+		ruleSetBean.addRuleSetRule(ruleSetRuleBean);
+
+		eventActionsRuleSetBean.add(ruleSetBean);
+	}	
 	
 	
-	private List<RuleActionBean> getAllRuleActions(RuleSetBean ruleSetBean){
+	private List<RuleActionBean> getAllRuleActions(RuleSetBean ruleSetBean) {
 		List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
-		
-		for (RuleSetRuleBean ruleSetRuleBean :ruleSetBean.getRuleSetRules()){
+
+		for (RuleSetRuleBean ruleSetRuleBean : ruleSetBean.getRuleSetRules()) {
 			ruleActions.addAll(ruleSetRuleBean.getActions());
 		}
 		return ruleActions;
 	}
-	
 
-    public boolean isEventTypeRepeating(String event){
-    boolean isRepeating= false;	
-	StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-	StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByOid(event);
-	System.out.println("is the event Repeating " + studyEventDefinition.isRepeating());
-    return studyEventDefinition.isRepeating();	
-    }	
-    	
+	public boolean isEventTypeRepeating(String event) {
+		boolean isRepeating = false;
+		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
+		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByOid(event);
+		return studyEventDefinition.isRepeating();
+	}    	
     	
     	
 	public Map<String, String> parseTarget(String target) {
-	     target = (target.contains(".STARTDATE")) ? target : target +".STARTDATE" ;
-     System.out.println("I'm in parseTarget "+ target);
+		target = (target.contains(".STARTDATE")) ? target : target + ".STARTDATE";
 		Map<String, String> targetValues = new HashMap<String, String>();
-	
+
 		String targetStudyEventDefOid = null;
 		String targetStudyEventRepeatNumber = null;
 		String targetProperty = null;
@@ -548,19 +522,18 @@ public class RulesPostImportContainerService {
 	}
 
 	public Map<String, String> parseDestination(String destination) {
-	     destination = (destination.contains(".STARTDATE")) ? destination : destination +".STARTDATE" ;
-	     System.out.println("I'm in parseDestination "+ destination);
+		destination = (destination.contains(".STARTDATE")) ? destination : destination + ".STARTDATE";
 		Map<String, String> destinationValues = new HashMap<String, String>();
 
 		String destinationStudyEventDefOid = null;
 		String destinationStudyEventRepeatNumber = null;
-        String destinationProperty =null;
-		
+		String destinationProperty = null;
+
 		if (destination.contains("[")) {
 			destinationStudyEventDefOid = destination.substring(0, destination.indexOf("["));
 			destinationStudyEventRepeatNumber = destination.substring(destination.indexOf("[") + 1, destination.indexOf("]"));
 		} else {
-			destinationStudyEventDefOid = destination.substring(0,destination.indexOf("."));
+			destinationStudyEventDefOid = destination.substring(0, destination.indexOf("."));
 			destinationStudyEventRepeatNumber = "1";
 		}
 		destinationProperty = destination.substring(destination.indexOf(".") + 1);
@@ -569,11 +542,10 @@ public class RulesPostImportContainerService {
 		destinationValues.put("destinationStudyEventRepeatNumber", destinationStudyEventRepeatNumber);
 		destinationValues.put("destinationProperty", destinationProperty);
 		return destinationValues;
-	}
-    	
+	}    	
     
 	private boolean isDestinationAndTargetMatch(Map<String, String> target, Map<String, String> destination) {
-      
+
 		String targetProperty = (String) target.get("targetProperty");
 		String targetStudyEventDefOid = (String) target.get("targetStudyEventDefOid");
 		String targetStudyEventRepeatNumber = (String) target.get("targetStudyEventRepeatNumber");
@@ -581,9 +553,6 @@ public class RulesPostImportContainerService {
 		String destinationStudyEventRepeatNumber = (String) destination.get("destinationStudyEventRepeatNumber");
 		String destinationProperty = (String) destination.get("destinationProperty");
 
-		System.out.println( "I'm in isDestinationAndTargetMatch,   target "+targetProperty +" "+ targetStudyEventDefOid+"  "+targetStudyEventRepeatNumber 
-		+"   &   destination "+destinationProperty +" "+ destinationStudyEventDefOid+"  "+destinationStudyEventRepeatNumber );
-		
 		if (targetProperty.equals(destinationProperty) && targetStudyEventRepeatNumber.equals(destinationStudyEventRepeatNumber) && targetStudyEventDefOid.equals(destinationStudyEventDefOid)) {
 			return true;
 		} else {
@@ -601,17 +570,13 @@ public class RulesPostImportContainerService {
 		String destinationStudyEventRepeatNumber = (String) destination.get("destinationStudyEventRepeatNumber");
 		String destinationProperty = (String) destination.get("destinationProperty");
 
-		System.out.println( "I'm in isDestinationAndTargetAcceptable,   target "+targetProperty +" "+ targetStudyEventDefOid+"  "+targetStudyEventRepeatNumber 
-				+"   &   destination "+destinationProperty +" "+ destinationStudyEventDefOid+"  "+destinationStudyEventRepeatNumber );
-				
 		if (targetProperty.equals(destinationProperty) && targetStudyEventRepeatNumber.equals("ALL") && targetStudyEventDefOid.equals(destinationStudyEventDefOid)) {
 			return true;
 		} else {
 			return false;
 		}
 
-	}    
-
+	}
     
     private String createError(String key) {
         MessageFormat mf = new MessageFormat("");
