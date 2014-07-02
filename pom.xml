@@ -3,7 +3,7 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
     <packaging>pom</packaging>
-    <version>SNAPSHOT</version>
+    <version>MAINLINE-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Project's source control URL -->
-		<hg.url>https://dev.openclinica.com/hg/openclinica/community/OpenClinica-3.1-SNAPSHOT</hg.url>
+        <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
 
         <!-- Config file - required by liquibase plugin -->
         <config.file>src/main/resources/datainfo.properties</config.file>
@@ -70,8 +70,12 @@
 	                          	<artifactId>buildnumber-maven-plugin</artifactId>
 	                            <versionRange>[1.0.0,)</versionRange>
 	                            <goals>
-	                              <goal>hgchangeset</goal>
+	                              <goal>create</goal>
 	                            </goals>
+                                  <configuration>
+                                      <doUpdate>false</doUpdate>
+                                      <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                                  </configuration>
 	                          </pluginExecutionFilter>
 	                          <action>
 	                            <ignore />
@@ -449,13 +453,13 @@
                         <execution>
                             <phase>validate</phase>
                             <goals>
-                                <goal>hgchangeset</goal>
+                                <goal>create</goal>
                             </goals>
                         </execution>
                     </executions>
                     <configuration>
-                        <doCheck>true</doCheck>
-                        <doUpdate>true</doUpdate>
+                        <doUpdate>false</doUpdate>
+                        <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -503,10 +507,10 @@
 
     </build>
     <scm>
-		<connection>scm:hg:${hg.url}</connection>
-		<developerConnection>scm:hg:${hg.url}</developerConnection>
-	<tag>HEAD</tag>
-  </scm>
+		<connection>scm:git:${git.url}</connection>
+		<developerConnection>scm:git:${git.url}</developerConnection>
+	    <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
