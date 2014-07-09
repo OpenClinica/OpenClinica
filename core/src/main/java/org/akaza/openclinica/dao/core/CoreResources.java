@@ -105,7 +105,33 @@ public class CoreResources implements ResourceLoaderAware {
 		return prop;
 	}    
     
-    
+
+    public void getPropertiesSource(){
+    	try {
+            String filePath = "$catalina.home/$WEBAPP.lower.config";
+
+            filePath = replaceWebapp(filePath);
+            filePath = replaceCatHome(filePath);
+            
+            String dataInfoPropFileName = filePath +"/datainfo.properties";
+            String extractPropFileName =  filePath+"/extract.properties";
+             
+            
+                
+            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp,dataInfoPropFileName);
+            Properties OC_dataExtractProperties = getPropValues(extractProp,extractPropFileName);
+            
+            if  (OC_dataDataInfoProperties!=null)  dataInfo=OC_dataDataInfoProperties;
+            if  (OC_dataExtractProperties!=null)  extractInfo=OC_dataExtractProperties;
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+	
+	
     
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -114,7 +140,7 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-
+            getPropertiesSource();   
             
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
@@ -257,6 +283,8 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
+        getPropertiesSource();   
+
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
             filePath = "$catalina.home/$WEBAPP.lower.data";
@@ -953,6 +981,9 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
+	public static Properties getDATAINFO() {
+		return DATAINFO;
+	}
 
     
     // // TODO comment out system out after dev
