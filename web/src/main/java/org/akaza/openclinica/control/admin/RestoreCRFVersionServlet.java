@@ -92,7 +92,7 @@ public class RestoreCRFVersionServlet extends SecureController {
                 cvdao.update(version);
                 // below added by tbh 092007, update all eventcrfs which are
                 // auto_deleted, tbh
-                for (int ii = 0; ii < eventCRFs.size(); ii++) {
+/*                for (int ii = 0; ii < eventCRFs.size(); ii++) {
                     EventCRFBean ecbean = (EventCRFBean) eventCRFs.get(ii);
                     if (ecbean.getStatus().equals(Status.AUTO_DELETED)) {
                         ecbean.setStatus(Status.AVAILABLE);
@@ -101,7 +101,7 @@ public class RestoreCRFVersionServlet extends SecureController {
                         evdao.update(ecbean);
                     }
                 }
-                // above added tbh, 092007
+*/                // above added tbh, 092007
                 // all sections
                 ArrayList sections = secdao.findAllByCRFVersionId(version.getId());
                 for (int j = 0; j < sections.size(); j++) {
