@@ -40,9 +40,9 @@
 <title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css" type="text/css" media="print">
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
+    <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css" media="screen">
+    <link rel="stylesheet" href="<c:url value='/includes/print.css' />" type="text/css" media="print">
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <!-- <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script> -->
     <script type="text/javascript" language="JavaScript" src=
