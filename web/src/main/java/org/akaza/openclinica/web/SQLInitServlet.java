@@ -44,10 +44,15 @@ public class SQLInitServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        context = getServletContext();
 
-        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
-        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
+    	
+        context = getServletContext();
+        CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+        params = cr.getDATAINFO();
+        entParams =cr.getDATAINFO();
+
+//        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
+//        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
 
         ConfigurationDao configurationDao = SpringServletAccess
                 .getApplicationContext(context)
