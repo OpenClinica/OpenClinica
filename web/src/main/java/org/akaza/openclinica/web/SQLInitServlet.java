@@ -52,7 +52,7 @@ public class SQLInitServlet extends HttpServlet {
         entParams =cr.getDATAINFO();
 
 //        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
-        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
+//        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
 
         ConfigurationDao configurationDao = SpringServletAccess
                 .getApplicationContext(context)
