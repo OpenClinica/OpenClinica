@@ -52,7 +52,7 @@ public class SQLInitServlet extends HttpServlet {
         entParams =cr.getDATAINFO();
 
 //        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
-//        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
+        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
 
         ConfigurationDao configurationDao = SpringServletAccess
                 .getApplicationContext(context)
@@ -128,8 +128,10 @@ public class SQLInitServlet extends HttpServlet {
      * @return String The value of field
      */
     public static String getEnterpriseField(String key) {
-        String name = null;
-        name = entParams.getProperty(key).trim();
+        String name = entParams.getProperty(key);
+        if (name != null) {
+            name = name.trim();
+        }
         return name == null ? "" : name;
     }
 
