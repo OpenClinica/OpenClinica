@@ -319,6 +319,18 @@ public class CoreResources implements ResourceLoaderAware {
             // designerURL =
             // "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
         DATAINFO.setProperty("designer.url", designerURL);
+        
+        String portalURL = DATAINFO.getProperty("portalURL");
+        if (portalURL == null || portalURL.isEmpty())
+        { DATAINFO.setProperty("portal.url", "");
+        //    System.out.println(" Portal URL NOT Defined in datainfo" );
+            logger.debug(" Portal URL NOT Defined in datainfo ");
+           
+        }else{
+        //	System.out.println ("Portal URL IS Defined in datainfo:  "+ portalURL);
+            logger.debug("Portal URL IS Defined in datainfo:  "+ portalURL);
+        	
+        }
         return DATAINFO;
     }
 
