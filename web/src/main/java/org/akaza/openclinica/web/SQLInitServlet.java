@@ -128,8 +128,10 @@ public class SQLInitServlet extends HttpServlet {
      * @return String The value of field
      */
     public static String getEnterpriseField(String key) {
-        String name = null;
-        name = entParams.getProperty(key).trim();
+        String name = entParams.getProperty(key);
+        if (name != null) {
+            name = name.trim();
+        }
         return name == null ? "" : name;
     }
 

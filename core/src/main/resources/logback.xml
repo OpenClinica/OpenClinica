@@ -2,7 +2,8 @@
 
 <configuration>
   
-  <property resource="datainfo.properties" />
+ <contextListener class="org.akaza.openclinica.log.LoggerStartupListener"/>
+ 
   
   <!-- APPENDERS -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
