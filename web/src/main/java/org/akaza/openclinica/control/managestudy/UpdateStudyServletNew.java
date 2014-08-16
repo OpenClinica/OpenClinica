@@ -354,6 +354,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
         study.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
         study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
+        study.getStudyParameterConfig().setParticipantPortal(fp.getString("participantPortal"));
         if (!errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
         }
@@ -578,6 +579,12 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
         updateParameter(spvdao, spv);
 
+         //participant Portal        
+        spv.setParameter("participantPortal");
+        spv.setValue(study1.getStudyParameterConfig().getParticipantPortal());
+        updateParameter(spvdao, spv);
+
+        
         StudyBean curStudy = (StudyBean) session.getAttribute("study");
         if (curStudy != null && study1.getId() == curStudy.getId()) {
             super.currentStudy = study1;

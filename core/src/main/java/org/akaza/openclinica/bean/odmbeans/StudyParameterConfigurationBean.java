@@ -11,7 +11,7 @@ package org.akaza.openclinica.bean.odmbeans;
 
 
 /**
- *
+ 
  * @author ywang (Aug, 2010)
  *
  */
@@ -31,8 +31,15 @@ public class StudyParameterConfigurationBean {
     private String interviewDateEditable;
     private String secondatryLabelViewable;
     private String forcedReasonForChangeInAdministrativeEditing;
+    private String participantPortal;
     
-    public String getCollectSubjectDateOfBirth() {
+    public String getParticipantPortal() {
+		return participantPortal;
+	}
+	public void setParticipantPortal(String participantPortal) {
+		this.participantPortal = participantPortal;
+	}
+	public String getCollectSubjectDateOfBirth() {
         return collectSubjectDateOfBirth;
     }
     public void setCollectSubjectDateOfBirth(String collectSubjectDateOfBirth) {
@@ -116,4 +123,5 @@ public class StudyParameterConfigurationBean {
     public void setForcedReasonForChangeInAdministrativeEditing(String forcedReasonForChangeInAdministrativeEditing) {
         this.forcedReasonForChangeInAdministrativeEditing = forcedReasonForChangeInAdministrativeEditing;
     }
+    
 }

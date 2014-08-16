@@ -138,6 +138,8 @@ public class StudyConfigService {
                     spc.setAdminForcedReasonForChange(spv.getValue());
                 } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
                     spc.setEventLocationRequired(spv.getValue());
+                } else if (handle.equalsIgnoreCase("participantPortal")) {
+                    spc.setParticipantPortal(spv.getValue());
                 }
             }
         }

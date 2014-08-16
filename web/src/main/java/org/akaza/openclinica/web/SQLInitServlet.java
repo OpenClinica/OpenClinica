@@ -47,9 +47,9 @@ public class SQLInitServlet extends HttpServlet {
 
     	
         context = getServletContext();
-        CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-        params = cr.getDATAINFO();
-        entParams =cr.getDATAINFO();
+  //      CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+        params = CoreResources.getDATAINFO();
+        entParams =CoreResources.getDATAINFO();
 
 //        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
 //        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");

@@ -48,8 +48,18 @@ public class StudyParameterConfig {
     private String adminForcedReasonForChange;//Administrative editing will not allow changes without a DN added 'reason for change'
 
     private String eventLocationRequired;
+    
+    private String participantPortal;
+                   
+    public String getParticipantPortal() {
+		return participantPortal;
+	}
 
-    public StudyParameterConfig() {
+	public void setParticipantPortal(String participantPortal) {
+		this.participantPortal = participantPortal;
+	}
+
+	public StudyParameterConfig() {
         collectDob = "1";
         discrepancyManagement = "true";
         genderRequired = "true";
@@ -68,6 +78,7 @@ public class StudyParameterConfig {
         secondaryLabelViewable = "false";
         adminForcedReasonForChange = "true";
         eventLocationRequired = "not_used";
+        participantPortal="disabled";
     }
 
     /**
@@ -288,4 +299,6 @@ public class StudyParameterConfig {
     public void setEventLocationRequired(String eventLocationRequired) {
         this.eventLocationRequired = eventLocationRequired;
     }
+
+
 }
