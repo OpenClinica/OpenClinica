@@ -61,6 +61,11 @@
         var theOid = itemOid.match('[A-Z_0-9]*$');
         openDocWindow('ViewItemDetail?itemOid='+theOid);
     }
+    function displayEventLink(itemOid)
+    {
+        var theOid = itemOid.split(".")[0];
+        openDocWindow('ViewEventDefinitionReadOnly?eventOid='+theOid);
+    }
     function spliceAndReturn(itemOid)
     {
         if (itemOid.length > 50){
@@ -196,28 +201,28 @@
             </tr>
             <c:forEach items="${testRuleAction.propertiesForDisplay}" var="mapEntry" varStatus="status">
                 <tr valign="top"><td></td>
-	                <c:choose>
-	                <c:when test="${status.count == 1}">
-                		<td class="formlabel"><fmt:message key="test_rules_execute_action" bundle="${resword}"/></td>
-	                </c:when>
-	                <c:otherwise><td></td></c:otherwise>
-                	</c:choose>     
-	                <td><i><fmt:message key="${mapEntry.key}" bundle="${resword}"/></i></td>
-	                <td>${mapEntry.value}</td>
+                    <c:choose>
+                    <c:when test="${status.count == 1}">
+                        <td class="formlabel"><fmt:message key="test_rules_execute_action" bundle="${resword}"/></td>
+                    </c:when>
+                    <c:otherwise><td></td></c:otherwise>
+                    </c:choose>     
+                    <td><i><fmt:message key="${mapEntry.key}" bundle="${resword}"/></i></td>
+                    <td>${mapEntry.value}</td>
                 </tr>
             </c:forEach>
             
-	        <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
-	        	<c:set var="props" value=""/>
-	    		<c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
-	    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
-	    		</c:forEach>
-	        	<c:if test="${fn:length(props)>0}">
-	    			<tr valign="top"><td></td><td></td>
-                		<td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
-                		<td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
-               		</tr>
-               	</c:if>
+            <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+                <c:set var="props" value=""/>
+                <c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
+                    <c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+                </c:forEach>
+                <c:if test="${fn:length(props)>0}">
+                    <tr valign="top"><td></td><td></td>
+                        <td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
+                        <td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+                    </tr>
+                </c:if>
                </c:if>
 
             <tr valign="top">
@@ -279,7 +284,10 @@
             <c:set var="dibItemDataType" value="9"/>
             <tr valign="top">
                 <td class="formlabel">
-                <script>spliceAndReturn('${mapEntry.key}')</script>:</td>
+                <a href="javascript: displayEventLink('${mapEntry.key}')"
+                    onmouseover="Tip('<%= request.getAttribute((String)pageContext.getAttribute("tooltipKey") ) %>')" 
+                    onmouseout="UnTip()" >
+                <script>spliceAndReturn('${mapEntry.key}')</script></a>:</td>
                 <td style="color: #789EC5;"><input name="${mapEntry.key}" value="${mapEntry.value}" id="${mapEntry.key}"/>
   </c:when>
  
@@ -447,21 +455,21 @@
                         <td>${mapEntry.value}</td>
                     </tr>
                 </c:forEach>
-		        
-	        	<c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
-	        	<c:set var="props" value=""/>
-	    		<c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
-	    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
-	    		</c:forEach>
-	        	<c:if test="${fn:length(props)>0}">
-	    			<tr valign="top">
-	    				<td class="formlabel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                
+                <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+                <c:set var="props" value=""/>
+                <c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
+                    <c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+                </c:forEach>
+                <c:if test="${fn:length(props)>0}">
+                    <tr valign="top">
+                        <td class="formlabel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                         <td style="color: #789EC5;"></td>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                		<td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
-                		<td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
-               		</tr>
-               	</c:if>
+                        <td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
+                        <td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+                    </tr>
+                </c:if>
                </c:if>
                 
                 <tr valign="top">

@@ -276,6 +276,7 @@ public enum Page {
      */
     VIEW_EVENT_DEFINITION ("/WEB-INF/jsp/managestudy/viewEventDefinition.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_READONLY ("/WEB-INF/jsp/managestudy/viewEventDefinitionReadOnly.jsp", "View Event Definition"),
+    VIEW_EVENT_DEFINITION_NOSIDEBAR ("/WEB-INF/jsp/managestudy/viewEventDefinitionNoSidebar.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_SERVLET ("/ViewEventDefinition", "View Event Definition Servlet"),
 
     /**
