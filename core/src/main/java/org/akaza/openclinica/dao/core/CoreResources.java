@@ -376,15 +376,19 @@ public class CoreResources implements ResourceLoaderAware {
         if (DATAINFO.getProperty("userAccountNotification") != null)
             DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
         logger.debug("DataInfo..." + DATAINFO);
+
         String designerURL = DATAINFO.getProperty("designerURL");
-        if (designerURL == null || designerURL.isEmpty())
-            // @pgawade 13-April-2011 - Fix for issue #8877: Commented out the
-            // hardcoded rule designer
-            // URL as it is added as a property
-            // in datainfo.properties file
-            // designerURL =
-            // "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
-        DATAINFO.setProperty("designer.url", designerURL);
+        if (designerURL == null || designerURL.isEmpty()) {
+            DATAINFO.setProperty("designer.url", designerURL);
+        }
+
+        String portalURL = DATAINFO.getProperty("portalURL");
+        if (portalURL == null || portalURL.isEmpty()){
+            DATAINFO.setProperty("portal.url", "");
+            logger.debug(" Portal URL NOT Defined in datainfo ");
+        }else{
+            logger.debug("Portal URL IS Defined in datainfo:  "+ portalURL);
+        }
         return DATAINFO;
     }
 
