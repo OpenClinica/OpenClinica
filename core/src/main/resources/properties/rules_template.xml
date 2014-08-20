@@ -9,7 +9,7 @@
 			<EmailAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
                 <Message></Message>
-				<To/>
+                <To></To>
 			</EmailAction>
 			<ShowAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
