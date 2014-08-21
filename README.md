@@ -3,9 +3,7 @@
 OpenClinica is an open source clinical trial software for Electronic Data Capture (EDC) and Clinical Data Management (CDM) helping people around the world optimize their workflow in a smart and secure fashion.
 
 
-### [About OpenClinica](http://www.openclinica.com)&nbsp;&nbsp;&nbsp;[Release Notes](https://docs.openclinica.com/release-notes)&nbsp;&nbsp;&nbsp;[Submit Issue](https://community.openclinica.com/issue-tracker)
-
-[![image](yeoman-illustration.png)](http://yeoman.io)
+### [About OpenClinica](http://www.openclinica.com)&nbsp;&nbsp;&nbsp;&nbsp;[Release Notes](https://docs.openclinica.com/release-notes)&nbsp;&nbsp;&nbsp;&nbsp;[Submit Issue](https://community.openclinica.com/issue-tracker)
 
 
 ## Issue Submission
