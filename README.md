@@ -23,25 +23,22 @@ Installation guidelines are available for [Linux](https://docs.openclinica.com/i
 
 OpenClinica is currently compatible with ...
 
-## Release Notes
+## Release Notes 3.3
 
+**What's new?**
+- Schedule next event: Study designers can build rules to automatically schedule events using Event Start Date and Event Status. When users schedule events and perform data entry, the next event or events can be automatically scheduled.
+- Parameterized links: Using Tokens (substitution variables) for study objects (such as Study Name, Event Name, CRF Name, Study Subject, etc). users can designer a form that will dynamically use the value of these variables either for representation on the form, to build a dynamic URL or for use in jquery.
+
+**Changes & Fixes**
+- Long duration of saving CRFs with dynamic items: long save times were experienced with complex CRFs including dynamic items. Indeces were added to improve performance times.
+
+**Known Issues**
+- [Print CRF Left ITem Text HTML will not render](https://jira.openclinica.com/browse/OC-5619)
 
 
 ## Feature requests
 
-Feature requests should be submitted to the [repo](https://github.com/yeoman) it concerns. Submit to [yeoman/yeoman](https://github.com/yeoman/yeoman/issues) if you're unsure, otherwise the respositories for our officially maintained generators can be found below:
-
-* [Web App](https://github.com/yeoman/generator-webapp#readme)
-* [AngularJS](https://github.com/yeoman/generator-angular#readme)
-* [Backbone](https://github.com/yeoman/generator-backbone#readme)
-* [Ember](https://github.com/yeoman/generator-ember#readme)
-* [Polymer](https://github.com/yeoman/generator-polymer#readme)
-* [Jasmine](https://github.com/yeoman/generator-jasmine#readme)
-* [Mocha](https://github.com/yeoman/generator-mocha#readme)
-* [Karma](https://github.com/yeoman/generator-karma#readme)
-* [Chrome Apps Basic Boilerplate](https://github.com/yeoman/generator-chromeapp#readme)
-* [Chrome Extension Boilerplate](https://github.com/yeoman/generator-chrome-extension#readme)
-
+Submit your feature requests should to OpenClinica's main [repo](https://github.com/openclinica).
 
 ## Contribute
 
