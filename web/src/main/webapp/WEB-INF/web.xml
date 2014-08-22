@@ -1308,6 +1308,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
        
+    <servlet>
+        <servlet-name>ParticipantFormServlet</servlet-name>
+        <display-name>ParticipantFormServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.submit.ParticipantFormServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -2170,10 +2175,15 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewItemAuditLogServlet</servlet-name>
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ParticipantFormServlet</servlet-name>
+        <url-pattern>/ParticipantFormServlet</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
-  <servlet-name>urlRewriterServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet
-    </servlet-class>
+        <servlet-name>urlRewriterServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
