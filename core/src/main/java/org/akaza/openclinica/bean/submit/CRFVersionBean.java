@@ -29,6 +29,8 @@ public class CRFVersionBean extends AuditableEntityBean {
 
     // not in DB, tells whether the spreadsheet is downloadable
     private boolean downloadable = false;
+    // not in DB, stores a URL for displaying the CRF in Enketo
+    private String enketoURL = "";
 
     private String oid;
     private OidGenerator oidGenerator;
@@ -138,7 +140,15 @@ public class CRFVersionBean extends AuditableEntityBean {
         this.oidGenerator = oidGenerator;
     }
 
-    /* (non-Javadoc)
+    public String getEnketoURL() {
+		return enketoURL;
+	}
+
+	public void setEnketoURL(String enketoURL) {
+		enketoURL = enketoURL;
+	}
+
+	/* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
