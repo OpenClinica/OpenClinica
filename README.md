@@ -13,17 +13,7 @@ Today the OpenClinica community works on building and improving the OpenClinica 
 If you are looking for a repo for a particular piece, you'll find it on our [organization](http://github.com/openclinica) page.
 
 
-## Installation & Setup
-
-To be up to date with our latest release check out the [System requirements](https://docs.openclinica.com/installation/system-requirements)
-
-Installation guidelines are available for [Linux](https://docs.openclinica.com/installation/install-openclinica-3.3-linux) and [Windows](https://docs.openclinica.com/installation/install-openclinica-3.3-windows)  
-
-## Hosting
-
-OpenClinica is currently compatible with ...
-
-## Release Notes 3.3
+## Getting Started
 
 **What's new?**
 - Schedule next event: Study designers can build rules to automatically schedule events using Event Start Date and Event Status. When users schedule events and perform data entry, the next event or events can be automatically scheduled.
@@ -35,38 +25,24 @@ OpenClinica is currently compatible with ...
 **Known Issues**
 - [Print CRF Left ITem Text HTML will not render](https://jira.openclinica.com/browse/OC-5619)
 
+To be up to date with our latest release check out the [System requirements](https://docs.openclinica.com/installation/system-requirements)
+
+Installation guidelines are available for [Linux](https://docs.openclinica.com/installation/install-openclinica-3.3-linux) and [Windows](https://docs.openclinica.com/installation/install-openclinica-3.3-windows)  
+
+## Request a feature
+
+...
+
+## Building from Source/ How to work with the source code
+
+...
 
 ## Feature requests
 
-Submit your feature requests should to OpenClinica's main [repo](https://github.com/openclinica).
-
-## Contribute
-
-See the [contributing docs](contributing.md)
+Submit your feature requests to OpenClinica's main [repo](https://github.com/openclinica).
 
 
-## Support
-
-Need help or have a question?
-
-- [StackOverflow](http://stackoverflow.com/questions/tagged/yeoman)
-- [\#yeoman](http://webchat.freenode.net/?channels=yeoman) on Freenode
-
-*Please don't use the issue trackers for support/questions.*
-
-
-## Links
-
-- [Website](http://yeoman.io)
-- [Development discussions](https://github.com/yeoman/yeoman/issues)
-- [Google+](https://plus.google.com/101063139999404044459/posts)
-- [Twitter](https://twitter.com/yeoman)
-- [Media kit](https://github.com/yeoman/yeoman.io/tree/master/media)
-- [Discover Bower packages](http://bower.io/search)
-
-
- 
 ## License
 
-[BSD license](http://opensource.org/licenses/bsd-license.php)
-Copyright (c) Google
+[GNU LGPL license](http://www.gnu.org/licenses/lgpl.html)
+
