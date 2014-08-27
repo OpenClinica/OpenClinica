@@ -981,7 +981,7 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
-	public static Properties getDATAINFO() {
+	public Properties getDATAINFO() {
 		return DATAINFO;
 	}
 
