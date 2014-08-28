@@ -769,7 +769,8 @@ public class CreateStudyServlet extends SecureController {
         newStudy.getStudyParameterConfig().setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
         newStudy.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
         newStudy.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
-
+      //  newStudy.getStudyParameterConfig().setParticipantPortant(fp.getString("participantPortal"));
+        
         session.setAttribute("newStudy", newStudy);
 
         if (errors.isEmpty()) {

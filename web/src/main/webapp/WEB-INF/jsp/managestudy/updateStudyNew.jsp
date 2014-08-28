@@ -1001,13 +1001,22 @@
   </c:choose>
   </td>
   </tr>
-
+  
+  
   <tr valign="top">
       <td class="formlabel"><fmt:message key="event_location_required" bundle="${resword}"/></td><td>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'required'}"> checked </c:if> name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'optional'}"> checked </c:if> name="eventLocationRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'not_used'}"> checked </c:if> name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
+  </tr>
+
+
+<tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
+            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
+  <a href="http://google.com" target="def_win" onClick="openDefWindow('http://google.com'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td
+ 
   </tr>
 
 
