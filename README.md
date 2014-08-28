@@ -11,7 +11,7 @@ OpenClinica is an open source software for Electronic Data Capture (EDC) and Cli
 and more.
 
 ##Screenshots
-![alt text](http://imgur.com/sjQk4Kn "Logo Title Text 1")
+![Imgur](http://i.imgur.com/sjQk4Kn.png "Home screen")
 
 
 ## Getting Started
