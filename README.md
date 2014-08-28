@@ -1,16 +1,15 @@
 # Welcome!
 
-OpenClinica is an open source clinical trial software for Electronic Data Capture (EDC) and Clinical Data Management (CDM) helping people around the world optimize their workflow in a smart and secure fashion.
+OpenClinica is an open source software for Electronic Data Capture (EDC) and Clinical Data Management (CDM) used to optimize clinical trial workflow in a smart and secure fashion.
 
+- Build studies
+- Create eCRFs
+- Design rules/edit checks
+- Import/Export Data
+- Safe Data Migration
+- Schedule patient visits
+and more.
 
-### [About OpenClinica](http://www.openclinica.com)&nbsp;&nbsp;&nbsp;&nbsp;[Release Notes](https://docs.openclinica.com/release-notes)&nbsp;&nbsp;&nbsp;&nbsp;[Submit Issue](https://community.openclinica.com/issue-tracker)
-
-
-## About
-
-Today the OpenClinica community works on building and improving the OpenClinica core and the recently released Rule Designer - a drag-and-drop feature making XML rules a piece of cake.  
-
-If you are looking for a repo for a particular piece, you'll find it on our [organization](http://github.com/openclinica) page.
 
 
 ## Getting Started
