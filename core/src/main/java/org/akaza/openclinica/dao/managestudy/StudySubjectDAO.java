@@ -1060,14 +1060,15 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             ind++;
         }
 
-        variables.put(new Integer(ind), new java.util.Date());
-        ind++;
+        // Date_updated is now()
+//        variables.put(new Integer(ind), new java.util.Date());
+//        ind++;
         variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));
-        ind++;
+        //ind++;
 
         String sql = digester.getQuery("update");
         if ( con == null){
