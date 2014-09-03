@@ -27,7 +27,7 @@ public class ParticipantFormServlet extends SecureController {
             String enketoToken = "enketorules";
             String enketoURL = "http://192.168.15.187:8005/api/v1";
             EnketoAPI enketo = new EnketoAPI(enketoURL,enketoToken,ocOpenRosaURL);  
-            formURL = enketo.getFormURL(crf_oid);
+            formURL = enketo.getFormPreviewURL(crf_oid);
             response.sendRedirect(formURL);
         }
         forwardPage(Page.PARTICIPANT_FORM_SERVLET);
