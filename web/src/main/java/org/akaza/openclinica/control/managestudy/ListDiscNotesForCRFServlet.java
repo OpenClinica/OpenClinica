@@ -66,7 +66,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
         }
 
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2)
             || r.equals(Role.MONITOR)) {
             return;
         }

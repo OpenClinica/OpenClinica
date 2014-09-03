@@ -43,7 +43,7 @@ public class SubmitDataServlet extends SecureController {
         if (currentRole != null) {
             Role r = currentRole.getRole();
             if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
-                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) ||r.equals(Role.MONITOR) )) {
+                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2) ||r.equals(Role.MONITOR) )) {
                 return true;
             }
         }
@@ -56,7 +56,7 @@ public class SubmitDataServlet extends SecureController {
         if (currentRole != null) {
             Role r = currentRole.getRole();
             if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
-                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT))) {
+                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2))) {
                 return true;
             }
         }

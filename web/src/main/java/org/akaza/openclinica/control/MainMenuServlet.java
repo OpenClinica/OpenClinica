@@ -188,7 +188,7 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                 }
                 setPresetValues(fp.getPresetValues());
 
-                if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+                if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
                     setupListStudySubjectTable();
                 }
                 if (currentRole.isMonitor()) {

@@ -432,6 +432,9 @@ public abstract class CoreSecureController extends HttpServlet {
                     case 6:
                         role.setDescription("site_monitor");
                         break;
+                    case 7:
+                        role.setDescription("site_Data_Entry_Person2");
+                        break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }

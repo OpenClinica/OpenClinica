@@ -214,6 +214,9 @@ public class UpdateStudyEventServlet extends SecureController {
         if(currentRole.isResearchAssistant()){
             removeSign = true;
         }
+        if(currentRole.isResearchAssistant2()){
+            removeSign = true;
+        }
 
 
         if (removeSign == true || !currentRole.isInvestigator()) {

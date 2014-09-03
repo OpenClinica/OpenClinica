@@ -63,6 +63,7 @@ public class SQLInitServlet extends HttpServlet {
         Role.STUDYDIRECTOR.setDescription(getField("director"));
         Role.INVESTIGATOR.setDescription(getField("investigator"));
         Role.RESEARCHASSISTANT.setDescription(getField("ra"));
+        Role.RESEARCHASSISTANT2.setDescription(getField("ra2"));
         Role.MONITOR.setDescription(getField("monitor"));
         
         Page.INITIAL_DATA_ENTRY_NW.getFileName();

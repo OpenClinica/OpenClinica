@@ -229,6 +229,9 @@ public class ChangeStudyServlet extends SecureController {
                     case 6:
                         role.setDescription("site_monitor");
                         break;
+                    case 7:
+                        role.setDescription("site_Data_Entry_Person2");
+                        break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }
@@ -282,7 +285,7 @@ public class ChangeStudyServlet extends SecureController {
                 + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
-        if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+        if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
             setupListStudySubjectTable();
         }
         if (currentRole.isMonitor()) {
