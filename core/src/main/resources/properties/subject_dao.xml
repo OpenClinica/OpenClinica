@@ -88,14 +88,14 @@
 		   ( STATUS_ID, 
 		   DATE_OF_BIRTH,GENDER,UNIQUE_IDENTIFIER,DATE_CREATED,
            OWNER_ID,DOB_COLLECTED) 
-		   VALUES (?,?,?,?,NOW(),?,?)
+		   VALUES (?,?,?,?,now(),?,?)
 		</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>
 		  UPDATE subject SET  STATUS_ID=?, 
-		  DATE_OF_BIRTH=?,GENDER=?,UNIQUE_IDENTIFIER=?, DATE_UPDATED=?,
+		  DATE_OF_BIRTH=?,GENDER=?,UNIQUE_IDENTIFIER=?, DATE_UPDATED=now(),
 		  UPDATE_ID=?,DOB_COLLECTED=? WHERE SUBJECT_ID=?
 	    </sql>
 	</query>
