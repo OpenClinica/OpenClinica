@@ -4419,7 +4419,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if (hasItemGroup) {
             ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
 
-            ArrayList<ItemDataBean> data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+            ArrayList<ItemDataBean> data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
             HashMap<String,ItemDataBean> dataMap = (HashMap<String, ItemDataBean>) getAllActive(data);
 
             if (data != null && data.size() > 0) {
