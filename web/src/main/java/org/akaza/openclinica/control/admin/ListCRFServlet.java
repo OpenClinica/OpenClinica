@@ -154,6 +154,7 @@ public class ListCRFServlet extends SecureController {
         table.computeDisplay();
 
         request.setAttribute("table", table);
+        request.setAttribute("study", currentStudy);
 
         resetPanel();
         panel.setStudyInfoShown(false);
