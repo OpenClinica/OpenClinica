@@ -259,17 +259,26 @@
 		</dependency>
 
     <!-- for OAuth 1.0a -->
-    <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth</artifactId>
-        <version>1.0.0.M5</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth2</artifactId>
-        <version>1.0.0.M5</version>
-    </dependency>
-		<!-- HIBERNATE -->
+<dependency>
+    <groupId>org.springframework.security.oauth</groupId>
+    <artifactId>spring-security-oauth</artifactId>
+    <version>1.0.0.M3</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>		
+<!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
