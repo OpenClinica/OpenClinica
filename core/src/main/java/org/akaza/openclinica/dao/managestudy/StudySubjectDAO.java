@@ -1059,9 +1059,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             variables.put(new Integer(ind), enrollmentDate);
             ind++;
         }
-
-        variables.put(new Integer(ind), new java.util.Date());
-        ind++;
+      // date_updated is set to now()
+      //  variables.put(new Integer(ind), new java.util.Date());
+      //  ind++;
         variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
