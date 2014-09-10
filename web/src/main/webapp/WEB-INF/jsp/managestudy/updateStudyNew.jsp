@@ -1015,7 +1015,7 @@
 <tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
-  <a href="http://google.com" target="def_win" onClick="openDefWindow('http://google.com'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td
+  <a href="https://www.openclinica.com/participant-portal-registration" target="def_win" onClick="openDefWindow('https://www.openclinica.com/participant-portal-registration'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td
  
   </tr>
 
