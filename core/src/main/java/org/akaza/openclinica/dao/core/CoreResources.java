@@ -889,8 +889,10 @@ public class CoreResources implements ResourceLoaderAware {
 
 
     public static String getDBName() {
-        return DB_NAME;
-    }
+            if (null == DB_NAME)
+                return "postgres";
+            return DB_NAME;
+        }
 
     public static String getField(String key) {
         String value = DATAINFO.getProperty(key);

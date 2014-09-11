@@ -7,7 +7,7 @@
   <crf_version crf_version_id="2" crf_id="2" name="v2.0" description="Test" revision_notes="agoodwin 10.16.2007" status_id="1" date_created="2008-07-02" owner_id="1" oc_oid="F_CONC_V20"/>
 
   <subject subject_id="1" status_id="1" date_of_birth="2008-07-01" gender="m" unique_identifier="pID1" date_created="2008-07-02" owner_id="1" dob_collected="true"/>
-  <study_subject study_subject_id="1" label="ssID1" secondary_label="" subject_id="1" study_id="1" status_id="1" enrollment_date="2008-07-01" date_created="2008-07-02" owner_id="1" oc_oid="SS_SSID1"/>
+  <study_subject study_subject_id="1" label="ssID1" secondary_label="ssID1_sec_label" subject_id="1" study_id="1" status_id="1" enrollment_date="2008-07-01" date_created="2008-07-02" owner_id="1" oc_oid="SS_SSID1"/>
 
 
   <study_event_definition study_event_definition_id="1" study_id="1" name="ED-1-NonRepeating" description="" repeating="false" type="scheduled" category="" owner_id="1" status_id="1" date_created="2008-07-02" ordinal="1" oc_oid="SE_ED1NONRE"/>
