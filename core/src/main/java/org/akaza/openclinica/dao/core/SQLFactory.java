@@ -100,8 +100,9 @@ public class SQLFactory {
     
    //TODO: for some reason, this is hardcoded, not sure how we run junits from server if this is hardcoded ??? 
     public static final String  JUNIT_XML_DIR =
-        "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
-
+//        "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
+    "C:\\OC\\OC_GIT\\OpenClinica\\core\\src\\main\\resources\\properties\\";
+    
   /*  public  void setXMLDir(String path) {
         JUNIT_XML_DIR = path;
     }*/
