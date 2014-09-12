@@ -57,6 +57,9 @@
 <body class="aka_bodywidth" onload=" document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
 <%-- onload="if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});}"
 giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
+
+<c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
+
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
