@@ -359,7 +359,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         }
 
               //only for adding a new thread
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.RESOLVED);
@@ -485,7 +485,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
                     // remove this option for CRCs and Investigators
                     //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT)
+                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)
                         || currentRole.getRole().equals(Role.INVESTIGATOR)) {
                         request.setAttribute("autoView", "0");
                     } else {
@@ -505,7 +505,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 // solution, tbh
 
                 // adding second rule here, tbh 08/2009
-                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2) && currentStudy.getId() != currentStudy.getParentStudyId()) {
                     dnb.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
                     request.setAttribute("autoView", "0");
                     // hide the panel, tbh
@@ -541,7 +541,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
-            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) && currentStudy.getId() != currentStudy.getParentStudyId()) {
                 // assigning back to OP, tbh
                 request.setAttribute(USER_ACCOUNT_ID,  Integer.valueOf(parent.getOwnerId()).toString());
                 logger.debug("assigned owner id: " + parent.getOwnerId());
@@ -657,7 +657,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // is done
 
             Role r = currentRole.getRole();
-            if (r.equals(Role.MONITOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.COORDINATOR)) { // investigator
+            if (r.equals(Role.MONITOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2) || r.equals(Role.COORDINATOR)) { // investigator
                 request.setAttribute("unlock", "1");
                 logger.debug("set UNLOCK to ONE");
             } else {

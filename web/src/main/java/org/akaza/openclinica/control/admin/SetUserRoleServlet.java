@@ -91,7 +91,9 @@ public class SetUserRoleServlet extends SecureController {
             Map roleMap = new LinkedHashMap();
             for (Iterator it = getRoles().iterator(); it.hasNext();) {
                 Role role = (Role) it.next();
-                roleMap.put(role.getId(), role.getDescription());
+                // I added the below if statement , to exclude displaying on study level the newly added 'ReseachAssisstant2' role by default.
+                if (role.getId() != 7)        
+                    roleMap.put(role.getId(), role.getDescription());
             }
 
             Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request.getParameter("changeRoles"));
@@ -115,6 +117,8 @@ public class SetUserRoleServlet extends SecureController {
                                 break;
                             case 6: roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
                                 break;
+                            case 7: roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person2").trim());
+                            break;
                         default:
                             // logger.info("No role matched when setting role description");
                         }
