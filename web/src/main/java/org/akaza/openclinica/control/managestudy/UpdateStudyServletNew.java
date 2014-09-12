@@ -24,6 +24,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +38,7 @@ public class UpdateStudyServletNew extends SecureController {
     public static final String INPUT_END_DATE = "endDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";
     public static StudyBean study;
+    private CoreResources core;
 
     /**
      *
@@ -77,6 +79,8 @@ public class UpdateStudyServletNew extends SecureController {
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
+
+        request.setAttribute("portalURL", core.getField("portalURL"));
 
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);

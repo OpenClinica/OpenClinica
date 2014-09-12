@@ -2,20 +2,20 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-<changeSet author="jnyayapathi" id="2010-04-15-OC-4822-1">
+<!-- <changeSet author="jnyayapathi" id="2010-04-15-OC-4822-1">
         <comment>Add Column</comment>
         <addColumn tableName="rule_action_property">
             <column name="property" type="varchar(4000)"/>
             
         </addColumn>
-    </changeSet>
+    </changeSet> -->
     
-    <changeSet author="jnyayapathi" id="2010-04-15-OC-4822-2">
+    <!-- <changeSet author="jnyayapathi" id="2010-04-15-OC-4822-2">
         <comment>Add Column</comment>
         <addColumn tableName="rule_action">
             <column name="oc_oid_reference" type="varchar(4000)"/>
         </addColumn>
-    </changeSet>
+    </changeSet> -->
     <!-- rule_action_rule -->
     
       <changeSet author="jnyayapathi" id="2010-04-15-OC-4822-3">
