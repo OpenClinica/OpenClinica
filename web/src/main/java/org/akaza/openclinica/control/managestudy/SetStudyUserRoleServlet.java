@@ -74,6 +74,7 @@ public class SetStudyUserRoleServlet extends SecureController {
 
                 ArrayList roles = Role.toArrayList();
                 roles.remove(Role.ADMIN); // admin is not a user role, only used for tomcat
+                roles.remove(Role.RESEARCHASSISTANT2);
 
                 StudyBean studyBean = (StudyBean) sdao.findByPK(uRole.getStudyId());
 

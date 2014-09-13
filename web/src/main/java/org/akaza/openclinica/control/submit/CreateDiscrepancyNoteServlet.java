@@ -505,7 +505,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 // solution, tbh
 
                 // adding second rule here, tbh 08/2009
-                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+              if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getId() != currentStudy.getParentStudyId()) {
                     dnb.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
                     request.setAttribute("autoView", "0");
                     // hide the panel, tbh
@@ -541,8 +541,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
-            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) && currentStudy.getId() != currentStudy.getParentStudyId()) {
-                // assigning back to OP, tbh
+         if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getId() != currentStudy.getParentStudyId()) {             // assigning back to OP, tbh
                 request.setAttribute(USER_ACCOUNT_ID,  Integer.valueOf(parent.getOwnerId()).toString());
                 logger.debug("assigned owner id: " + parent.getOwnerId());
             } else if (dnb.getEventCRFId() > 0) {
