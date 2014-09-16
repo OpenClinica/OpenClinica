@@ -1,5 +1,9 @@
 package org.akaza.openclinica.ws;
 
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -9,10 +13,6 @@ import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.server.EndpointInterceptor;
 import org.springframework.ws.soap.SoapBody;
 import org.springframework.ws.soap.SoapMessage;
-
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 public class UserPermissionInterceptor implements EndpointInterceptor {
 
@@ -55,4 +55,10 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
         return true;
     }
 
+    public void afterCompletion(MessageContext messageContext, Object endpoint, Exception e)  {
+        // TODO Auto-generated method stub
+        //return true;
+    }
+    
+    
 }
