@@ -254,6 +254,12 @@
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
         </dependency>
+<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
 		<!--@pgawade 10-DEC-2010 Added to get spring ContextLoaderListener class 
 			in core -->
 		<dependency>
@@ -269,24 +275,21 @@
 		</dependency>
 
 <!-- for OAuth 2.0 -->
-    <!-- for OAuth 1.0a -->
-    <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth</artifactId>
-        <version>1.0.0.M6</version>
-    </dependency>    
-    <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth2</artifactId>
-        <version>1.0.5.RELEASE</version>
-
-    </dependency>    
+<dependency>
+	<groupId>org.opensaml</groupId>
+	<artifactId>xmltooling</artifactId>
+	<version>1.4.1</version>
+</dependency>
     <dependency>
   		<groupId>org.springframework.security.extensions</groupId>
   		<artifactId>spring-security-saml2-core</artifactId>
   		<version>1.0.0.RELEASE</version>
   	</dependency>
-
+<dependency>
+	<groupId>org.springframework.security.oauth</groupId>
+	<artifactId>spring-security-oauth2</artifactId>
+	<version>1.0.5.RELEASE</version>
+</dependency>
 <!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
@@ -301,7 +304,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>3.6.10.Final</version>
+			<version>3.5.1-Final</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>

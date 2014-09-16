@@ -34,7 +34,6 @@
     <security:http pattern="/ws/**" security="none"/>
     <security:http pattern="/Contact" security="none"/>
     <security:http security="none" pattern="/favicon.ico"/>
-    <security:http security="none" pattern="/images/**"/>
     <security:http security="none" pattern="/css/**"/>
     <security:http security="none" pattern="/logout.jsp"/>
 
@@ -73,6 +72,8 @@
     <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
      -->
   </security:http>  
+
+
 
     <!-- Filters for processing of SAML messages -->
     <bean id="samlFilter" class="org.springframework.security.web.FilterChainProxy">
@@ -296,18 +297,6 @@
         </oauth:client-details-service>
 
 <!-- SAML START -->
-
-
-    <!-- XML parser pool needed for OpenSAML parsing -->
-    <bean id="parserPool" class="org.opensaml.xml.parse.StaticBasicParserPool" init-method="initialize">
-        <property name="builderFeatures">
-            <map>
-                <entry key="http://apache.org/xml/features/dom/defer-node-expansion" value="false"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="parserPoolHolder" class="org.springframework.security.saml.parser.ParserPoolHolder"/>
 
 
 <!-- SAML END -->

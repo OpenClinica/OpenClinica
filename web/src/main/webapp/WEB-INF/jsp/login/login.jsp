@@ -113,7 +113,7 @@
             <td class="loginBox">
             <div ID="samlBox">
                 <!-- News box contents -->
-                <h1><A HREF="/saml/">SAML</A></h1>
+                <h1><a href="${pageContext.request.contextPath}/saml/login/">SAML</A></h1>
                 <!-- End News box contents -->
             </div>
             </td>
