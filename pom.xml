@@ -22,13 +22,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Project's source control URL -->
-		<git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
+		<git.url>git://github.com/hms-dbmi/OpenClinica.git</git.url>
 
 		<!-- Config file - required by liquibase plugin -->
 		<config.file>src/main/resources/datainfo.properties</config.file>
 
 		<!-- Library Versions -->
-		<spring.version>3.0.5.RELEASE</spring.version>
+		<spring.version>3.1.4.RELEASE</spring.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -199,6 +199,11 @@
 			<artifactId>spring-tx</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+                <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-core</artifactId>
+                        <version>${spring.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -244,6 +249,11 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
 		<!--@pgawade 10-DEC-2010 Added to get spring ContextLoaderListener class 
 			in core -->
 		<dependency>
@@ -258,26 +268,25 @@
 			<version>${spring.version}</version>
 		</dependency>
 
+<!-- for OAuth 2.0 -->
     <!-- for OAuth 1.0a -->
-<dependency>
-    <groupId>org.springframework.security.oauth</groupId>
-    <artifactId>spring-security-oauth</artifactId>
-    <version>1.0.0.M3</version>
-    <exclusions>
-        <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>		
+    <dependency>
+        <groupId>org.springframework.security.oauth</groupId>
+        <artifactId>spring-security-oauth</artifactId>
+        <version>1.0.0.M6</version>
+    </dependency>    
+    <dependency>
+        <groupId>org.springframework.security.oauth</groupId>
+        <artifactId>spring-security-oauth2</artifactId>
+        <version>1.0.5.RELEASE</version>
+
+    </dependency>    
+    <dependency>
+  		<groupId>org.springframework.security.extensions</groupId>
+  		<artifactId>spring-security-saml2-core</artifactId>
+  		<version>1.0.0.RELEASE</version>
+  	</dependency>
+
 <!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
@@ -292,7 +301,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>3.5.1-Final</version>
+			<version>3.6.10.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>

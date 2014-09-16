@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.0.xsd
+                           http://www.springframework.org/schema/security/oauth2 
+                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+
+  <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
+    
+    <security:anonymous />
+    <security:intercept-url pattern="/pages/login/login" filters="none"/>
+    <security:intercept-url pattern="/SystemStatus" filters="none"/>
+    <security:intercept-url pattern="/RssReader" filters="none"/>
+    <security:intercept-url pattern="/RequestPassword" filters="none"/>
+    <security:intercept-url pattern="/RequestAccount" filters="none"/>
+    <security:intercept-url pattern="/includes/**" filters="none"/>
+    <security:intercept-url pattern="/images/**" filters="none"/>
+    <security:intercept-url pattern="/help/**" filters="none"/>
+    <security:intercept-url pattern="/ws/**" filters="none"/>
+    <security:intercept-url pattern="/Contact" filters="none"/>
+    <!--
+    <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
+      default-target-url='/MainMenu' always-use-default-target='true' />
+     -->
+    <security:intercept-url pattern="/**" access="ROLE_USER" />
+    <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
+    <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
+    <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
+    <security:session-management session-authentication-strategy-ref="sas"/>
+    <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
+    
+  </security:http>  
+ 
+
+    <bean id="authenticationProcessingFilterEntryPoint"
+          class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <property name="loginFormUrl" value="/pages/login/login"/>
+        <property name="forceHttps" value="false"/>
+    </bean>
+    
+    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler" ref="failureHandler" />
+        <property name="authenticationSuccessHandler" ref="successHandler" />
+        <!-- 
+        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
+        <property name="defaultTargetUrl" value="/MainMenu"/>
+         -->
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="configurationDao" ref="configurationDao"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="allowSessionCreation" value="true" />
+        <property name="sessionAuthenticationStrategy" ref="sas"/>
+        <property name="crfLocker" ref="crfLocker"/>
+    </bean>
+    
+    <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
+        <property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
+    </bean>
+    
+    <bean id="failureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler" >
+        <property name="defaultFailureUrl" value="/pages/login/login?action=errorLogin" />
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.security.authentication.LockedException">/pages/login/login?action=errorLocked</prop>
+            </props>
+        </property>
+    </bean>
+    
+     <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
+        <property name="sessionRegistry" ref="sessionRegistry" />
+        <property name="expiredUrl" value="/MainMenu" />
+        <property name="logoutHandlers">
+            <list>
+               <ref bean="openClinicaLogoutHandler"/>
+            </list>
+        </property>
+     </bean>
+     
+     <bean id="sessionRegistry" class="org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="dataSource" ref="dataSource"/>
+     </bean>
+    
+    
+   
+    <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+        <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+        <property name="maximumSessions" value="1" />
+    </bean>
+
+    
+    <bean id="openClinicaLogoutHandler" class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+   
+    
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
+        <property name="supportRefreshToken" value="true"/>
+    </bean>
+    <bean id="tokenServicesJdbc" class="org.springframework.security.oauth2.provider.token.JdbcOAuth2ProviderTokenServices">
+        <constructor-arg>
+               <ref bean="dataSource"/>
+        </constructor-arg> 
+        <property name="supportRefreshToken" value="true"/>
+    </bean>
+
+    <oauth:provider client-details-service-ref="clientDetails" token-services-ref="tokenServices" >
+        <oauth:verification-code user-approval-page="/oauth/confirm_access"/>
+    </oauth:provider>
+
+    <oauth:client-details-service id="clientDetails">
+        <oauth:client clientId="my-trusted-client" authorizedGrantTypes="password,authorization_code,refresh_token"/>
+        <oauth:client clientId="my-less-trusted-client" authorizedGrantTypes="authorization_code"/>
+        <oauth:client clientId="designer" authorizedGrantTypes="authorization_code,refresh_token"/>
+    </oauth:client-details-service>
+    
+    
+    	<bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
+<property name="dataSource" ref="dataSource"></property>
+<property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
+<property name="coreResources" ref="coreResources"/>
+<property name = "studyDaoHib" ref = "studyDaoDomain"/>
+</bean>
+<bean id="odmMetadataRestResource" class="org.akaza.openclinica.web.restful.ODMMetadataRestResource">
+	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
+</bean>
+<bean id="clinicalDataCollectorResource" class="org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
+<property name = "generateClinicalDataService" ref = "generateClinicalDataService"></property>
+</bean>
+<bean id="odmClinicalDataRestResource" class="org.akaza.openclinica.web.restful.ODMClinicaDataResource">
+	<property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
+	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
+</bean>
+</beans>

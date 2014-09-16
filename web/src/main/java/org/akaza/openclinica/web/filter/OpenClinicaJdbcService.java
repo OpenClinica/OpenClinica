@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Arrays;
 
 import javax.sql.DataSource;
 
@@ -46,9 +47,9 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
         if (!isUsernameBasedPrimaryKey()) {
             returnUsername = username;
         }
-
+	List<GrantedAuthority> authorities = Arrays.<GrantedAuthority>asList(combinedAuthorities);
         return new User(returnUsername, userFromUserQuery.getPassword(), userFromUserQuery.isEnabled(), true, true, userFromUserQuery.isAccountNonLocked(),
-                combinedAuthorities);
+                authorities);
     }
 
     /**
@@ -67,7 +68,9 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             String password = rs.getString(2);
             boolean enabled = rs.getBoolean(3);
             boolean nonLocked = rs.getBoolean(4);
-            UserDetails user = new User(username, password, enabled, true, true, nonLocked, new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") });
+            GrantedAuthority[] authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") };
+            List<GrantedAuthority> authorities_l = Arrays.<GrantedAuthority>asList(authorities);
+            UserDetails user = new User(username, password, enabled, true, true, nonLocked, authorities_l);
 
             return user;
         }

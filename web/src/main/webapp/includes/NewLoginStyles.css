@@ -18,7 +18,7 @@ div.login_BG { background: url(../images/login_BG.gif) no-repeat top center; hei
 
 .loginBox { background: url(../images/login_box_BG.png) no-repeat bottom center; }
 
-#loginBox, #newsBox { padding: 6px 28px 38px 28px; }
+#loginBox, #newsBox, #samlBox { padding: 6px 28px 38px 28px; }
 
 .loginBox form, .loginBox H1 { margin-top: 0px; }
 

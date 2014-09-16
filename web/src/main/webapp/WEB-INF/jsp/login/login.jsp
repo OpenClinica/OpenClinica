@@ -111,6 +111,13 @@
             </div>
             </td>
             <td class="loginBox">
+            <div ID="samlBox">
+                <!-- News box contents -->
+                <h1><A HREF="/saml/">SAML</A></h1>
+                <!-- End News box contents -->
+            </div>
+            </td>
+            <td class="loginBox">
             <div ID="newsBox">
                 <!-- News box contents -->
                 <h1><fmt:message key="news" bundle="${resword}"/></h1><fmt:message key="loading" bundle="${resword}"/> ...

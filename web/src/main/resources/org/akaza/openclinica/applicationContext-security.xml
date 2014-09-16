@@ -5,19 +5,44 @@
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:security="http://www.springframework.org/schema/security"
     xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+    xmlns:context="http://www.springframework.org/schema/context"    
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                            http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.0.xsd
+                           http://www.springframework.org/schema/security/spring-security-3.1.xsd
                            http://www.springframework.org/schema/security/oauth2 
-                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
+    <!-- Enable auto-wiring -->
+    <context:annotation-config/>
+
+    <!-- Scan for auto-wiring classes in spring saml packages -->
+    <context:component-scan base-package="org.springframework.security.saml"/>
+
+    <security:http pattern="/pages/login/login" security="none"/>
+    <security:http pattern="/SystemStatus" security="none"/>
+    <security:http pattern="/RssReader" security="none"/>
+    <security:http pattern="/RequestPassword" security="none"/>
+    <security:http pattern="/RequestAccount" security="none"/>
+    <security:http pattern="/includes/**" security="none"/>
+    <security:http pattern="/images/**" security="none"/>
+    <security:http pattern="/help/**" security="none"/>
+    <security:http pattern="/ws/**" security="none"/>
+    <security:http pattern="/Contact" security="none"/>
+    <security:http security="none" pattern="/favicon.ico"/>
+    <security:http security="none" pattern="/images/**"/>
+    <security:http security="none" pattern="/css/**"/>
+    <security:http security="none" pattern="/logout.jsp"/>
 
   <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
-    
+    <!--  <security:http entry-point-ref="samlEntryPoint">-->
     <security:anonymous />
+
+<!--     
     <security:intercept-url pattern="/pages/login/login" filters="none"/>
     <security:intercept-url pattern="/SystemStatus" filters="none"/>
     <security:intercept-url pattern="/RssReader" filters="none"/>
@@ -28,19 +53,121 @@
     <security:intercept-url pattern="/help/**" filters="none"/>
     <security:intercept-url pattern="/ws/**" filters="none"/>
     <security:intercept-url pattern="/Contact" filters="none"/>
-    <!--
+    
+    <security:intercept-url filters="none" pattern="/favicon.ico"/>
+    <security:intercept-url filters="none" pattern="/images/**"/>
+    <security:intercept-url filters="none" pattern="/css/**"/>
+    <security:intercept-url filters="none" pattern="/logout.jsp"/>
+ -->    
+     
+    <security:intercept-url pattern="/**" access="ROLE_USER" />
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
       default-target-url='/MainMenu' always-use-default-target='true' />
-     -->
-    <security:intercept-url pattern="/**" access="ROLE_USER" />
+    <security:custom-filter before="FIRST" ref="metadataGeneratorFilter"/>
+    <security:custom-filter after="BASIC_AUTH_FILTER" ref="samlFilter"/>
+
+    <!-- 
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
-    <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
     <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
     <security:session-management session-authentication-strategy-ref="sas"/>
     <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
-    
+     -->
   </security:http>  
+
+    <!-- Filters for processing of SAML messages -->
+    <bean id="samlFilter" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/saml/login/**" filters="samlEntryPoint"/>
+            <security:filter-chain pattern="/saml/logout/**" filters="samlLogoutFilter"/>
+            <security:filter-chain pattern="/saml/metadata/**" filters="metadataDisplayFilter"/>
+            <security:filter-chain pattern="/saml/SSO/**" filters="samlWebSSOProcessingFilter"/>
+            <security:filter-chain pattern="/saml/SSOHoK/**" filters="samlWebSSOHoKProcessingFilter"/>
+            <security:filter-chain pattern="/saml/SingleLogout/**" filters="samlLogoutProcessingFilter"/>
+            <security:filter-chain pattern="/saml/discovery/**" filters="samlIDPDiscovery"/>
+        </security:filter-chain-map>
+    </bean>
+
+<!--  
+<security:authentication-manager>
+        <security:authentication-provider ref="samlAuthenticationProvider"/>
+    </security:authentication-manager>
+-->
+    <!-- Logger for SAML messages and events -->
+
+    <!-- Central storage of cryptographic keys -->
+    <bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">
+        <constructor-arg value="classpath:security/samlKeystore.jks"/>
+        <constructor-arg type="java.lang.String" value="nalle123"/>
+        <constructor-arg>
+            <map>
+                <entry key="apollo" value="nalle123"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg type="java.lang.String" value="apollo"/>
+    </bean>
+
+    <!-- IDP Discovery Service -->
+    <bean id="samlIDPDiscovery" class="org.springframework.security.saml.SAMLDiscovery">
+        <property name="idpSelectionPath" value="/WEB-INF/security/idpSelection.jsp"/>
+    </bean>
+
+    <!-- The filter is waiting for connections on URL suffixed with filterSuffix and presents SP metadata there -->
+    <bean id="metadataDisplayFilter" class="org.springframework.security.saml.metadata.MetadataDisplayFilter"/>
+
+
+    <!-- Handler deciding where to redirect user after successful login -->
+    <bean id="successRedirectHandler"
+          class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/"/>
+    </bean>
+    <!--
+    Use the following for interpreting RelayState coming from unsolicited response as redirect URL:
+    <bean id="successRedirectHandler" class="org.springframework.security.saml.SAMLRelayStateSuccessHandler">
+       <property name="defaultTargetUrl" value="/" />
+    </bean>
+    -->
+
+    <!-- Handler deciding where to redirect user after failed login -->
+    <bean id="failureRedirectHandler"
+          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        <property name="useForward" value="true"/>
+        <property name="defaultFailureUrl" value="/error.jsp"/>
+    </bean>
+
+    <!-- Handler for successful logout -->
+    <bean id="successLogoutHandler" class="org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler">
+        <property name="defaultTargetUrl" value="/logout.jsp"/>
+    </bean>
+
+
+    <!-- Filter automatically generates default SP metadata -->
+    <bean id="metadataGeneratorFilter" class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.saml.metadata.MetadataGenerator">
+                <property name="extendedMetadata">
+                    <bean class="org.springframework.security.saml.metadata.ExtendedMetadata">
+                        <property name="idpDiscoveryEnabled" value="true"/>
+                    </bean>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
  
+ <bean id="metadata" class="org.springframework.security.saml.metadata.CachingMetadataManager">
+	<constructor-arg>
+		<list>
+			<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
+				<constructor-arg>
+					<value type="java.lang.String">https://adfs.medlab.harvard.edu/FederationMetadata/2007-06/FederationMetadata.xml</value>
+				</constructor-arg>
+				<constructor-arg>
+					<value type="int">5000</value>
+				</constructor-arg>
+				<property name="parserPool" ref="parserPool"/>
+			</bean>
+		</list>
+	</constructor-arg>
+</bean>
 
     <bean id="authenticationProcessingFilterEntryPoint"
           class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
@@ -106,27 +233,34 @@
     </bean>
     
    
-    
-    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
-        <property name="supportRefreshToken" value="true"/>
-    </bean>
-    <bean id="tokenServicesJdbc" class="org.springframework.security.oauth2.provider.token.JdbcOAuth2ProviderTokenServices">
-        <constructor-arg>
-               <ref bean="dataSource"/>
-        </constructor-arg> 
-        <property name="supportRefreshToken" value="true"/>
+<oauth:authorization-server
+        client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+        <oauth:authorization-code />
+        <oauth:implicit/>
+        <oauth:refresh-token/>
+        <oauth:client-credentials />
+        <oauth:password />
+    </oauth:authorization-server>
+ 
+    <bean id="tokenStore"
+        class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" />
+ 
+    <bean id="tokenServices"
+        class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="accessTokenValiditySeconds" value="120"></property>
+        <property name="clientDetailsService" ref="clientDetails" />
     </bean>
 
-    <oauth:provider client-details-service-ref="clientDetails" token-services-ref="tokenServices" >
-        <oauth:verification-code user-approval-page="/oauth/confirm_access"/>
-    </oauth:provider>
-
-    <oauth:client-details-service id="clientDetails">
-        <oauth:client clientId="my-trusted-client" authorizedGrantTypes="password,authorization_code,refresh_token"/>
-        <oauth:client clientId="my-less-trusted-client" authorizedGrantTypes="authorization_code"/>
-        <oauth:client clientId="designer" authorizedGrantTypes="authorization_code,refresh_token"/>
-    </oauth:client-details-service>
-    
+<oauth:client-details-service id="clientDetails">
+                <oauth:client client-id="my-trusted-client" authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                        authorities="ROLE_CLIENT, ROLE_TRUSTED_CLIENT" scope="read,write,trust" access-token-validity="60" />
+                <oauth:client client-id="my-less-trusted-client" authorized-grant-types="authorization_code,implicit"
+                        authorities="ROLE_CLIENT" />
+                <oauth:client client-id="designer" authorized-grant-types="authorization_code,implicit"
+                        authorities="ROLE_CLIENT" scope="read,write" secret="secret" />
+        </oauth:client-details-service>    
     
     	<bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
 <property name="dataSource" ref="dataSource"></property>
@@ -144,4 +278,24 @@
 	<property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
 	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
 </bean>
+
+
+<!-- SAML START -->
+
+
+    <!-- XML parser pool needed for OpenSAML parsing -->
+    <bean id="parserPool" class="org.opensaml.xml.parse.StaticBasicParserPool" init-method="initialize">
+        <property name="builderFeatures">
+            <map>
+                <entry key="http://apache.org/xml/features/dom/defer-node-expansion" value="false"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="parserPoolHolder" class="org.springframework.security.saml.parser.ParserPoolHolder"/>
+
+
+<!-- SAML END -->
+
+
 </beans>
