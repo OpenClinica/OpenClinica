@@ -1,0 +1,241 @@
+<?xml version="1.0"?><!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"                         
+"http://castor.org/mapping.dtd">
+<mapping>
+
+
+	<class name="org.akaza.openclinica.web.pform.dto.HtmlDTO">
+        <map-to xml="html" ns-uri="http://www.w3.org/1999/xhtml" ns-prefix="h" />
+        <!-- map-to xml="html" ns-uri="http://www.w3.org/2002/xforms" /-->
+		<field name="head" type="org.akaza.openclinica.web.pform.dto.HeadDTO">
+			<bind-xml name="head" node="element" />
+		</field>
+		<field name="body" type="org.akaza.openclinica.web.pform.dto.BodyDTO">
+			<bind-xml name="body" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.HeadDTO">
+		<map-to xml="head" ns-uri="http://www.w3.org/1999/xhtml" ns-prefix="h"  />
+		<field name="title" type="string">
+            <bind-xml name="h:title" node="element" xmlns:h="http://www.w3.org/1999/xhtml" />
+		</field>
+		<field name="model" type="org.akaza.openclinica.web.pform.dto.ModelDTO">
+			<bind-xml name="model" node="element"/>
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.ModelDTO">
+		<map-to xml="model" />
+		<field name="instance" type="string">
+			<bind-xml name="instance" node="element" />
+		</field>
+		<field name="bind" type="org.akaza.openclinica.web.pform.dto.BindDTO" collection="arraylist">
+			<bind-xml name="bind" node="element" />
+		</field>
+		<field name="itext" type="org.akaza.openclinica.web.pform.dto.ITextDTO">
+			<bind-xml name="itext" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.ITextDTO">
+		<map-to xml="itext" />
+		<field name="translation" type="org.akaza.openclinica.web.pform.dto.TranslationDTO">
+			<bind-xml name="translation" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.TranslationDTO">
+		<map-to xml="translation" />
+		<field name="lang" type="string">
+			<bind-xml name="lang" node="attribute" />
+		</field>
+		<field name="text" type="org.akaza.openclinica.web.pform.dto.TextDTO" collection="arraylist">
+			<bind-xml name="text" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.TextDTO">
+		<map-to xml="text" />
+		<field name="id" type="string">
+			<bind-xml name="id" node="attribute" />
+		</field>
+		<field name="value" type="string">
+			<bind-xml name="value" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.BindDTO">
+		<map-to xml="bind" />
+		<field name="nodeSet" type="string">
+			<bind-xml name="nodeset" node="attribute" />
+		</field>
+		<field name="type" type="string">
+			<bind-xml name="type" node="attribute" />
+		</field>
+		<field name="readOnly" type="string">
+			<bind-xml name="readonly" node="attribute" />
+		</field>
+		<field name="calculate" type="string">
+			<bind-xml name="calculate" node="attribute" />
+		</field>
+		<field name="constraint" type="string">
+			<bind-xml name="constraint" node="attribute" />
+		</field>
+		<field name="constraintMsg" type="string">
+			<bind-xml name="constraintMsg" node="attribute" />
+		</field>
+		<field name="required" type="string">
+			<bind-xml name="required" node="attribute" />
+		</field>
+        <field name="jrPreload" type="string" >
+            <bind-xml name="jr:preload" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
+        </field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.BodyDTO">
+		<map-to xml="body" ns-uri="http://www.w3.org/1999/xhtml" ns-prefix="h" />
+		<field name="input" type="org.akaza.openclinica.web.pform.dto.InputDTO" collection="arraylist">
+			<bind-xml name="input" node="element" />
+		</field>
+		<field name="group" type="org.akaza.openclinica.web.pform.dto.GroupDTO" collection="arraylist">
+			<bind-xml name="group" node="element" />
+		</field>
+		<field name="selectOne" type="org.akaza.openclinica.web.pform.dto.SelectOneDTO" collection="arraylist">
+			<bind-xml name="select1" node="element" />
+		</field>
+		<field name="upload" type="org.akaza.openclinica.web.pform.dto.UploadDTO" collection="arraylist">
+			<bind-xml name="upload" node="element" />
+		</field>
+		<field name="select" type="org.akaza.openclinica.web.pform.dto.SelectDTO" collection="arraylist">
+			<bind-xml name="select" node="element" />
+		</field>
+		<field name="repeat" type="org.akaza.openclinica.web.pform.dto.RepeatDTO" collection="arraylist">
+			<bind-xml name="repeat" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.InputDTO">
+		<map-to xml="input" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+        <field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+            <bind-xml name="label" node="element" />
+        </field>
+		<field name="hint" type="org.akaza.openclinica.web.pform.dto.HintDTO">
+			<bind-xml name="hint" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.LabelDTO">
+		<map-to xml="label" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+		<field name="label" type="string">
+			<bind-xml name="label" node="text" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.HintDTO">
+		<map-to xml="hint" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+		<field name="hint" type="string">
+			<bind-xml name="hint" node="text" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.GroupDTO">
+		<map-to xml="group" />
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="input" type="org.akaza.openclinica.web.pform.dto.InputDTO" collection="arraylist">
+			<bind-xml name="input" node="element" />
+		</field>
+		<field name="selectOne" type="org.akaza.openclinica.web.pform.dto.SelectOneDTO" collection="arraylist">
+			<bind-xml name="select1" node="element" />
+		</field>
+		<field name="group" type="org.akaza.openclinica.web.pform.dto.GroupDTO" collection="arraylist">
+			<bind-xml name="group" node="element" />
+		</field>
+		<field name="upload" type="org.akaza.openclinica.web.pform.dto.UploadDTO" collection="arraylist">
+			<bind-xml name="upload" node="element" />
+		</field>
+		<field name="select" type="org.akaza.openclinica.web.pform.dto.SelectDTO" collection="arraylist">
+			<bind-xml name="select" node="element" />
+		</field>
+		<field name="repeat" type="org.akaza.openclinica.web.pform.dto.RepeatDTO" collection="arraylist">
+			<bind-xml name="repeat" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.SelectOneDTO">
+		<map-to xml="select1" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="hint" type="org.akaza.openclinica.web.pform.dto.HintDTO">
+			<bind-xml name="hint" node="element" />
+		</field>
+		<field name="item" type="org.akaza.openclinica.web.pform.dto.ItemDTO" collection="arraylist">
+			<bind-xml name="item" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.ItemDTO">
+		<map-to xml="item" />
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="value" type="string">
+			<bind-xml name="value" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.UploadDTO">
+		<map-to xml="upload" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+		<field name="mediaType" type="string">
+			<bind-xml name="mediatype" node="attribute" />
+		</field>
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="hint" type="org.akaza.openclinica.web.pform.dto.HintDTO">
+			<bind-xml name="hint" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.SelectDTO">
+		<map-to xml="select" />
+		<field name="ref" type="string">
+			<bind-xml name="ref" node="attribute" />
+		</field>
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="hint" type="org.akaza.openclinica.web.pform.dto.HintDTO">
+			<bind-xml name="hint" node="element" />
+		</field>
+		<field name="item" type="org.akaza.openclinica.web.pform.dto.ItemDTO" collection="arraylist">
+			<bind-xml name="item" node="element" />
+		</field>
+	</class>
+	<class name="org.akaza.openclinica.web.pform.dto.RepeatDTO">
+		<map-to xml="repeat" />
+		<field name="label" type="org.akaza.openclinica.web.pform.dto.LabelDTO">
+			<bind-xml name="label" node="element" />
+		</field>
+		<field name="input" type="org.akaza.openclinica.web.pform.dto.InputDTO" collection="arraylist">
+			<bind-xml name="input" node="element" />
+		</field>
+		<field name="selectOne" type="org.akaza.openclinica.web.pform.dto.SelectOneDTO" collection="arraylist">
+			<bind-xml name="select1" node="element" />
+		</field>
+		<field name="group" type="org.akaza.openclinica.web.pform.dto.GroupDTO" collection="arraylist">
+			<bind-xml name="group" node="element" />
+		</field>
+		<field name="upload" type="org.akaza.openclinica.web.pform.dto.UploadDTO" collection="arraylist">
+			<bind-xml name="upload" node="element" />
+		</field>
+		<field name="select" type="org.akaza.openclinica.web.pform.dto.SelectDTO" collection="arraylist">
+			<bind-xml name="select" node="element" />
+		</field>
+		<field name="repeat" type="org.akaza.openclinica.web.pform.dto.RepeatDTO" collection="arraylist">
+			<bind-xml name="repeat" node="element" />
+		</field>
+	</class>
+</mapping>

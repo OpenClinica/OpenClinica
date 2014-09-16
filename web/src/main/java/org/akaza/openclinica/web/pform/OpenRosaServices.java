@@ -74,8 +74,11 @@ public class OpenRosaServices{
         			{
 						XForm form = new XForm(crf, version);
 						//TODO: Need to generate hash based on contents of XForm.  Will be done in a later story.
-						//TODO: For now all XForms get the same hardcoded hash.
-						form.setHash(DigestUtils.md5Hex("1234"));
+						//TODO: For now all XForms get a date based hash to trick Enketo into always downloading
+						//TODO: them.
+						Calendar cal = Calendar.getInstance();
+						cal.setTime(new Date());
+						form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
 						
 						String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
 						form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
@@ -121,15 +124,25 @@ public class OpenRosaServices{
 			@PathParam("studyOID") String studyOID,
 			@QueryParam("formID") String crfOID,
 			@RequestHeader("Authorization") String authorization)
-	{			
+	{	
+		
+		String xform = null;
 
 		// get parameters
 		String formId = request.getParameter("formId");
 		if (formId == null) {
-			return "<oops>formID is null :(</oops>";
+			return "<error>formID is null :(</error>";
 		}
-
-		String xform = buildForm(formId);
+			
+		try
+		{
+			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources);
+			xform = generator.buildForm(formId);
+		} 
+		catch (Exception e) 
+		{
+			return "<error>" + e.getMessage() + "</error>";
+		}
 		
 		response.setHeader("Content-Type", "text/xml; charset=UTF-8");		
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + crfOID + ".xml" +  "\";");
@@ -139,31 +152,6 @@ public class OpenRosaServices{
 	}    
 
 	
-	private String buildForm(String formId)
-	{
-	    String formBasic="" +
-		"<?xml version=\"1.0\"?>" +
-		"<h:html xmlns=\"http://www.w3.org/2002/xforms\" xmlns:h=\"http://www.w3.org/1999/xhtml\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:jr=\"http://openrosa.org/javarosa\" >" +
-            "<h:head>" +
-                "<h:title>" + formId + "</h:title>" +
-                "<model>" +
-                    "<instance>" +
-                        "<data id=\"" + formId + "\">" +
-                            "<StringData/>" +
-                        "</data>" +
-                    "</instance> " +
-                    "<bind nodeset=\"/data/StringData\" type=\"string\" />" +
-                "</model>" +
-            "</h:head>" +
-            "<h:body>" +   
-                "<input ref=\"StringData\">" +
-                    "<label>please enter a string</label>" +
-                "</input>" +
-            "</h:body>" +
-        "</h:html>";
-		  
-		  return formBasic;
-	}
 	
 	public DataSource getDataSource() {
 		return dataSource;
