@@ -576,8 +576,7 @@ public class SubjectDAO extends AuditableEntityDAO {
         }
         ind++;
         variables.put(new Integer(ind++), new String(sb.getUniqueIdentifier()));
-        // date_updated is set to now()
-        //    variables.put(new Integer(ind++), new java.util.Date());
+        variables.put(new Integer(ind++), new java.util.Date());
         variables.put(new Integer(ind++), new Integer(sb.getUpdater().getId()));
         variables.put(new Integer(ind++), new Boolean(sb.isDobCollected()));
         // YW >>
