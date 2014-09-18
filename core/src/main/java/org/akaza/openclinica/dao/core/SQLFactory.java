@@ -10,6 +10,7 @@ package org.akaza.openclinica.dao.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -96,15 +97,6 @@ public class SQLFactory {
     public void setEhCacheWrapper(EhCacheWrapper ehCacheWrapper) {
         this.ehCacheWrapper = ehCacheWrapper;
     }
-
-    
-   //TODO: for some reason, this is hardcoded, not sure how we run junits from server if this is hardcoded ??? 
-    public static final String  JUNIT_XML_DIR =
-        "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
-
-  /*  public  void setXMLDir(String path) {
-        JUNIT_XML_DIR = path;
-    }*/
 
     private static Hashtable digesters = new Hashtable();
 
@@ -271,8 +263,10 @@ public class SQLFactory {
             DAODigester newDaoDigester = new DAODigester();
 
             try {
+         
                 if (System.getProperty("catalina.home") == null) {
-                    newDaoDigester.setInputStream(new FileInputStream(JUNIT_XML_DIR + DAOFileName));
+                    String path = getPropertiesDir();
+                    newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 } else {
                     String path = CoreResources.PROPERTIES_DIR;
                     newDaoDigester.setInputStream(resourceLoader.getResource("classpath:properties/" + DAOFileName).getInputStream());
@@ -289,6 +283,19 @@ public class SQLFactory {
             }// end try block for files
         }// end for loop
 
+    }
+
+    public String getPropertiesDir() {
+        String resource = "properties/placeholder.properties";
+        String absolutePath = null;
+        URL path = this.getClass().getClassLoader().getResource(resource);
+        if (null != path) {
+            absolutePath = path.getPath();
+        }else{
+            throw new RuntimeException("Could not get a path please investigate !!");
+        }
+        absolutePath = absolutePath.replaceAll("placeholder.properties", "");
+        return absolutePath;
     }
 
 }
