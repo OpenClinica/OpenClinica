@@ -138,7 +138,7 @@ public class CRFVersionBean extends AuditableEntityBean {
         this.oidGenerator = oidGenerator;
     }
 
-    /* (non-Javadoc)
+	/* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
