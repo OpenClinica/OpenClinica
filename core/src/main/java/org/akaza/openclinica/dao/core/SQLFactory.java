@@ -97,15 +97,6 @@ public class SQLFactory {
         this.ehCacheWrapper = ehCacheWrapper;
     }
 
-    
-   //TODO: for some reason, this is hardcoded, not sure how we run junits from server if this is hardcoded ??? 
-    public static final String  JUNIT_XML_DIR =
-        "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
-
-  /*  public  void setXMLDir(String path) {
-        JUNIT_XML_DIR = path;
-    }*/
-
     private static Hashtable digesters = new Hashtable();
 
     private final String dbName = "";
@@ -271,8 +262,13 @@ public class SQLFactory {
             DAODigester newDaoDigester = new DAODigester();
 
             try {
+         
                 if (System.getProperty("catalina.home") == null) {
-                    newDaoDigester.setInputStream(new FileInputStream(JUNIT_XML_DIR + DAOFileName));
+                    String path = this.getClass().getClassLoader().getResource(".").getPath().toString()
+                            .replace("/test-classes/","/classes/properties/");
+              //      path = path.startsWith("/") ? path.substring(1) : path;
+                    System.out.println("Path: " + path);
+                    newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 } else {
                     String path = CoreResources.PROPERTIES_DIR;
                     newDaoDigester.setInputStream(resourceLoader.getResource("classpath:properties/" + DAOFileName).getInputStream());
