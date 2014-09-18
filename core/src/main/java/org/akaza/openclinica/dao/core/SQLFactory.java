@@ -291,9 +291,10 @@ public class SQLFactory {
         URL path = this.getClass().getClassLoader().getResource(resource);
         if (null != path) {
             absolutePath = path.getPath();
+        }else{
+            throw new RuntimeException("Could not get a path please investigate !!");
         }
         absolutePath = absolutePath.replaceAll("placeholder.properties", "");
-        System.out.println("BoomPath: " + absolutePath);
         return absolutePath;
     }
 
