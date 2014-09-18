@@ -10,6 +10,7 @@ package org.akaza.openclinica.dao.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -264,10 +265,7 @@ public class SQLFactory {
             try {
          
                 if (System.getProperty("catalina.home") == null) {
-                    String path = this.getClass().getClassLoader().getResource(".").getPath().toString()
-                            .replace("/test-classes/","/classes/properties/");
-              //      path = path.startsWith("/") ? path.substring(1) : path;
-                    System.out.println("Path: " + path);
+                    String path = getPropertiesDir();
                     newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 } else {
                     String path = CoreResources.PROPERTIES_DIR;
@@ -285,6 +283,19 @@ public class SQLFactory {
             }// end try block for files
         }// end for loop
 
+    }
+
+    public String getPropertiesDir() {
+        String resource = "properties/placeholder.properties";
+        String absolutePath = null;
+        URL path = this.getClass().getClassLoader().getResource(resource);
+        if (null != path) {
+            absolutePath = path.getPath();
+        }else{
+            throw new RuntimeException("Could not get a path please investigate !!");
+        }
+        absolutePath = absolutePath.replaceAll("placeholder.properties", "");
+        return absolutePath;
     }
 
 }
