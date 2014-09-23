@@ -561,16 +561,17 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
         }
         variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
-        variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
-        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getUpdater().getId()));
-        variables.put(Integer.valueOf(10), Integer.valueOf(sb.getSubjectEventStatus().getId()));
-        variables.put(Integer.valueOf(11), sb.getStartTimeFlag()); // YW
+        // changing date_updated from java.util.Date() into postgres now() statement
+       // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
+        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getUpdater().getId()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
+        variables.put(Integer.valueOf(10), sb.getStartTimeFlag()); // YW
         // 08-17-2007,
         // start_time_flag
-        variables.put(Integer.valueOf(12), sb.getEndTimeFlag()); // YW
+        variables.put(Integer.valueOf(11), sb.getEndTimeFlag()); // YW
         // 08-17-2007,
         // end_time_flag
-        variables.put(Integer.valueOf(13), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(12), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
         if ( con == null){
