@@ -168,6 +168,11 @@ public class ODMClinicaDataResource {
 		return report.getXmlOutput().toString().trim();
 	}
 	
+	/**
+	 *  This function checks to see whether the supplied subject identifier is a Study Subject OID or a Study Subject ID.
+	 *  If a valid Study Subject OID is supplied, just return it.
+	 *  If a Study Subject ID is supplied, a lookup is done to get the Study Subject OID and return that.
+	 */
 	private String getStudySubjectOID(String subjectIdentifier, String studyOID)
 	{
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
@@ -177,7 +182,9 @@ public class ODMClinicaDataResource {
 		{
 			StudyDAO studyDAO = new StudyDAO(getDataSource());
 			StudyBean study = studyDAO.findByOid(studyOID); 
-			return studySubjectDAO.findByLabelAndStudy(subjectIdentifier,study).getOid();
+			studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier,study);
+			if (studySubject != null && studySubject.getOid() != null) return studySubject.getOid();
+			else return null;
 		}
 	}
 
