@@ -136,11 +136,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
+        idb =convertValueByDataType(idb,dataType);
+        
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -167,17 +164,27 @@ public class ItemDataDAO extends AuditableEntityDAO {
      * @param eb
      * @return
      */
-	public EntityBean updateValue(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
 
+	public ItemDataBean convertValueByDataType(ItemDataBean idb, ItemDataType dataType) {
+
+		if (dataType.equals(ItemDataType.DATE)) {
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
+				} else if (dataType.equals(ItemDataType.PDATE)) {
+			idb.setValue(formatPDate(idb.getValue()));
+				}
+		return idb;
+	}
+    
+ 
+    public EntityBean updateValue(EntityBean eb) {
+        ItemDataBean idb = (ItemDataBean) eb;
+        ItemDataType dataType = getDataType(idb.getItemId());
+     
+        idb =convertValueByDataType(idb,dataType);
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string,locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
+
+        
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -201,11 +208,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
+        idb =convertValueByDataType(idb,dataType);
+        
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -247,18 +251,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
      */
     public EntityBean updateValue(EntityBean eb, String current_df_string) {
         ItemDataBean idb = (ItemDataBean) eb;
-
+        ItemDataType dataType = getDataType(idb.getItemId());
+        idb =convertValueByDataType(idb,dataType);
+        
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string,
-                ResourceBundleProvider.getLocale()));
         
-        ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
+      
         
         idb.setActive(false);
 
@@ -298,12 +297,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
-
+        idb =convertValueByDataType(idb,dataType);
+        
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
         int id = getNextPK();
         variables.put(new Integer(1), new Integer(id));
@@ -328,12 +323,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
-
+        idb =convertValueByDataType(idb,dataType);
+        
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
         int id = getNextPK();
         variables.put(new Integer(1), new Integer(id));

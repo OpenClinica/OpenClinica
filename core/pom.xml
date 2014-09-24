@@ -240,6 +240,14 @@
 		    <groupId>log4jdbc</groupId>
 		    <artifactId>log4jdbc4</artifactId>
 		</dependency>
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-all</artifactId>
+		<version>1.9.5</version>
+		<scope>test</scope>
+	</dependency>
+		
+		
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
 
