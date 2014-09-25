@@ -111,6 +111,8 @@ public class EditStudyUserRoleServlet extends SecureController {
                             break;
                         case 6: roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
                             break;
+                        case 7: roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person2").trim());
+                        break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }

@@ -20,8 +20,10 @@ public class Role extends Term {
     public static final Role INVESTIGATOR = new Role(4, "Investigator", "Investigator", null);
     public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
     public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
-
-    private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT};
+    public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "Data_Entry_Person2", null);
+   
+    
+    private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT,RESEARCHASSISTANT2};
     public static final List list = Arrays.asList(members);
     
     public static final Map studyRoleMap = new LinkedHashMap();
@@ -31,7 +33,7 @@ public class Role extends Term {
         studyRoleMap.put(4, "Investigator");
         studyRoleMap.put(5, "Data_Entry_Person");
         studyRoleMap.put(6, "Monitor");
-    }
+           }
 
     public static final Map siteRoleMap = new LinkedHashMap();
     static {
@@ -40,6 +42,7 @@ public class Role extends Term {
         siteRoleMap.put(4, "site_investigator");
         siteRoleMap.put(5, "site_Data_Entry_Person");
         siteRoleMap.put(6, "site_monitor");
+        siteRoleMap.put(7, "site_Data_Entry_Person2");
     }
 
     private List privileges;
