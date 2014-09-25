@@ -170,21 +170,22 @@ public class ODMClinicaDataResource {
 	
 	/**
 	 *  This function checks to see whether the supplied subject identifier is a Study Subject OID or a Study Subject ID.
-	 *  If a valid Study Subject OID is supplied, just return it.
+	 *  If a valid Study Subject OID or wildcard (*) is supplied, just return it.
 	 *  If a Study Subject ID is supplied, a lookup is done to get the Study Subject OID and return that.
 	 */
 	private String getStudySubjectOID(String subjectIdentifier, String studyOID)
 	{
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(getDataSource());
 		StudySubjectBean studySubject = studySubjectDAO.findByOid(subjectIdentifier);
-		if (studySubject != null  && studySubject.getOid() != null) return studySubject.getOid();
+		if (subjectIdentifier.equals("*") || 
+				(studySubject != null  && studySubject.getOid() != null)) return subjectIdentifier;
 		else 
 		{
 			StudyDAO studyDAO = new StudyDAO(getDataSource());
 			StudyBean study = studyDAO.findByOid(studyOID); 
 			studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier,study);
 			if (studySubject != null && studySubject.getOid() != null) return studySubject.getOid();
-			else return null;
+			else return subjectIdentifier;
 		}
 	}
 
