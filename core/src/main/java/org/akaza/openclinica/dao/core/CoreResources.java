@@ -349,6 +349,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
 
         DATAINFO.setProperty("ra", "Data_Entry_Person");
+        DATAINFO.setProperty("ra2", "Data_Entry_Person2");
         DATAINFO.setProperty("investigator", "Investigator");
         DATAINFO.setProperty("director", "Study_Director");
 
