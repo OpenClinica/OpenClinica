@@ -70,7 +70,9 @@ public class VariableSubstitutionHelper {
 
         Map<String, String> tokensMap = new HashMap<String, String>();
         tokensMap.put("studySubject", encode(studySubject.getName()));
-        if (!studySubject.getOid() != null && !studySubject.getOid().isEmpty()) tokensMap.put("studySubjectOID", encode(studySubject.getOid()));
+        if (studySubject.getOid() != null && !studySubject.getOid().isEmpty()){
+            tokensMap.put("studySubjectOID", encode(studySubject.getOid()));
+        }
         else tokensMap.put("studySubjectOID", "");
         tokensMap.put("studyName", encode(study.getName()));
         tokensMap.put("eventName", encode(eventDef.getName()));
