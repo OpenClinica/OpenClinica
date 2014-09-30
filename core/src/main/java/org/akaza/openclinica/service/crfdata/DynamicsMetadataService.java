@@ -506,7 +506,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         	format = "dd-MMM-yyyy";
         }
         
-        logger.info("They format of the date will be : {}", format);
+        logger.info("The format of the date will be : {}", format);
         return format;
     }
 
