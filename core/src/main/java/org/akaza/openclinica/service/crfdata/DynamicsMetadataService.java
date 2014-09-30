@@ -497,6 +497,18 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return value;
 
     }
+    
+    private String getDateFormat(PropertyBean property){
+    	String format = "yyyy-MM-dd";
+    	
+        if(property.getValueExpression() != null) {
+        	logger.info("The Value is ValueExpression in the property so the date format will be : {}", "dd-MMM-yyyy");
+        	format = "dd-MMM-yyyy";
+        }
+        
+        logger.info("They format of the date will be : {}", format);
+        return format;
+    }
 
     public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
         insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus());
@@ -564,7 +576,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is not repeating group & B is a repeating group with no index selected
             if (!isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
@@ -573,7 +585,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
                     oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                     if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                    getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                    getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
                 }
             }
             // If A is not repeating group & B is a repeating group with index selected
@@ -583,7 +595,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating/ non repeating group & B is a repeating group with index selected as END
             if (isGroupBRepeating && itemGroupBOrdinal.equals("END")) {
@@ -591,7 +603,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToEndMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating group with index & B is a repeating group with index selected
             if (isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("") && !itemGroupBOrdinal.equals("END")) {
@@ -600,7 +612,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating group with index & B is a repeating group with no index selected
             if (isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
@@ -609,7 +621,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                             ub, Integer.valueOf(itemGroupAOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
-                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
 //            // If A is repeating group with index & B is none-repeating group 
 //            if (isGroupARepeating && !isGroupBRepeating ) {

@@ -94,6 +94,16 @@ public class ExpressionTreeHelper {
             return false;
     }
     
+    static public boolean isDateyyyyMMddDashes(String dateString) {
+        String dateFormatDashes = yyyyMMddFORMATDashes;
+        String dateRegexpDashes = yyyyMMddDashes;
+
+        if (isDate(dateString, dateFormatDashes, dateRegexpDashes))
+            return true;
+        else
+            return false;
+    }
+    
     static public boolean isDateddMMMyyyyDashes(String dateString) {
         String dateFormat = ddMMMyyyyFORMATDashes;
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
