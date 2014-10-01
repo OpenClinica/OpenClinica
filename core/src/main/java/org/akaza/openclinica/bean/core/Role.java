@@ -20,7 +20,7 @@ public class Role extends Term {
     public static final Role INVESTIGATOR = new Role(4, "Investigator", "Investigator", null);
     public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
     public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
-    public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "Data_Entry_Person2", null);
+    public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "site_Data_Entry_Person2", null);
    
     
     private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT,RESEARCHASSISTANT2};
