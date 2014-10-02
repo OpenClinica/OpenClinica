@@ -28,6 +28,7 @@ public class HtmlDTO {
 	  this.body = body;
   }
 	
+	
 	@Override
 	public String toString() {
 	  return "<html> "+body.toString()+" </html>";

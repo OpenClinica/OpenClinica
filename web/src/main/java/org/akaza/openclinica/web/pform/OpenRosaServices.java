@@ -136,7 +136,7 @@ public class OpenRosaServices{
 			
 		try
 		{
-			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources);
+			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources,dataSource);
 			xform = generator.buildForm(formId);
 		} 
 		catch (Exception e) 

@@ -3,7 +3,7 @@
    <h:head>
       <h:title>Template title</h:title>
       <model>
-         <instance />
+         <instance></instance>
       </model>
    </h:head>
    <h:body>

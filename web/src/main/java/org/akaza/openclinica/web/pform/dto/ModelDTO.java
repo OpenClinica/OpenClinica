@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ModelDTO {
 	private List<BindDTO> bind;
-	private String instance;
+	private String instance = "initialvalueinmodeldto";
 	private ITextDTO itext;
 	
 	public String getInstance() {
@@ -45,7 +45,7 @@ public class ModelDTO {
 	
 	@Override
 	public String toString() {
-		String temp = "<model> "+instance.toString();
+		String temp = "<model> "+instance;
 		if (itext != null) {
 			temp = temp + " " + itext.toString();
 		}
