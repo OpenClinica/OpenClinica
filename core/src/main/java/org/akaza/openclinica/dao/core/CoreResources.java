@@ -349,6 +349,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
 
         DATAINFO.setProperty("ra", "Data_Entry_Person");
+        DATAINFO.setProperty("ra2", "site_Data_Entry_Person2");
         DATAINFO.setProperty("investigator", "Investigator");
         DATAINFO.setProperty("director", "Study_Director");
 
@@ -889,8 +890,10 @@ public class CoreResources implements ResourceLoaderAware {
 
 
     public static String getDBName() {
-        return DB_NAME;
-    }
+            if (null == DB_NAME)
+                return "postgres";
+            return DB_NAME;
+        }
 
     public static String getField(String key) {
         String value = DATAINFO.getProperty(key);

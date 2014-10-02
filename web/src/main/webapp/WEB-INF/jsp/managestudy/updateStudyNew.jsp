@@ -553,7 +553,7 @@
 <br>
 
 <div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:17px;">
-    
+
     <fmt:message key="expand_each_section" bundle="${restext}"/>
 </div>
     <br>
@@ -1001,8 +1001,8 @@
   </c:choose>
   </td>
   </tr>
-  
-  
+
+
   <tr valign="top">
       <td class="formlabel"><fmt:message key="event_location_required" bundle="${resword}"/></td><td>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'required'}"> checked </c:if> name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
@@ -1012,11 +1012,11 @@
   </tr>
 
 
-<tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
+<c:if test="${portalURL!= '' && portalURL!= null}"><tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
-  <a href="https://www.openclinica.com/participant-portal-registration" target="def_win" onClick="openDefWindow('https://www.openclinica.com/participant-portal-registration'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td
- 
+  <a href="https://www.openclinica.com/participant-portal-registration" target="def_win" onClick="openDefWindow('https://www.openclinica.com/participant-portal-registration'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td></c:if>
+
   </tr>
 
 

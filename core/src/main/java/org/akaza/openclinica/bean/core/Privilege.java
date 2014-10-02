@@ -26,8 +26,9 @@ public class Privilege extends Term {
     public static final Privilege INVESTIGATOR = new Privilege(3, "investigator");
     public static final Privilege RESEARCHASSISTANT = new Privilege(4, "ra");
     public static final Privilege MONITOR = new Privilege(5, "monitor");
+    public static final Privilege RESEARCHASSISTANT2 = new Privilege(6, "ra2");
 
-    private static final Privilege[] members = { ADMIN, STUDYDIRECTOR, INVESTIGATOR, RESEARCHASSISTANT, MONITOR };
+    private static final Privilege[] members = { ADMIN, STUDYDIRECTOR, INVESTIGATOR, RESEARCHASSISTANT, MONITOR,RESEARCHASSISTANT2 };
     public static final List list = Arrays.asList(members);
 
     private Privilege(int id, String name) {

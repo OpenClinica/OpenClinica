@@ -45,7 +45,7 @@ public class SQLInitServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
 
-    	
+
         context = getServletContext();
         CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
         params = cr.getDATAINFO();
@@ -63,8 +63,9 @@ public class SQLInitServlet extends HttpServlet {
         Role.STUDYDIRECTOR.setDescription(getField("director"));
         Role.INVESTIGATOR.setDescription(getField("investigator"));
         Role.RESEARCHASSISTANT.setDescription(getField("ra"));
+        Role.RESEARCHASSISTANT2.setDescription(getField("ra2"));
         Role.MONITOR.setDescription(getField("monitor"));
-        
+
         Page.INITIAL_DATA_ENTRY_NW.getFileName();
 
         //The crf/original/CRF Template  will be created if not exist.
@@ -184,7 +185,7 @@ public class SQLInitServlet extends HttpServlet {
      * @param propertyNameInProperties
      */
     private void overridePropertyFromDatabase(ConfigurationDao configurationDao, String propertyNameInDatabase,
-            Properties properties, String propertyNameInProperties) {
+                                              Properties properties, String propertyNameInProperties) {
         ConfigurationBean config = configurationDao.findByKey(propertyNameInDatabase);
         if (config != null) {
             properties.setProperty(propertyNameInProperties, config.getValue());

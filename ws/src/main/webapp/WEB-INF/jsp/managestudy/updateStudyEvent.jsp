@@ -164,7 +164,7 @@
     <td>
      <div class="formfieldM_BG">
          <c:choose>
-         <c:when test="${event.subjectEventStatus.locked && userRole.researchAssistant}">
+         <c:when test="${event.subjectEventStatus.locked && userRole.researchAssistant ||event.subjectEventStatus.locked && userRole.researchAssistant2}">
            <c:set var="status1" value="${event.subjectEventStatus.id}"/>
            <select class="formfieldM" name="statusId" disabled="true">
                  <option value="<c:out value="${event.subjectEventStatus.id}"/>" selected><c:out value="${event.subjectEventStatus.name}"/>
