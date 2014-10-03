@@ -238,6 +238,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
+    
+    /*
+     * current_df_string= yyyy-MM-dd
+     * oc_df_string     = yyyy-mm-dd
+     * local_df_string  = dd-MMM-yyyy
+     *  
+     */
+	public ItemDataBean setItemDataBeanIfDateOrPdate(ItemDataBean idb, String current_df_string, ItemDataType dataType) {
+		if (dataType.equals(ItemDataType.DATE)) {
+			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string, locale));
+		} else if (dataType.equals(ItemDataType.PDATE)) {
+			idb.setValue(formatPDate(idb.getValue()));
+		}
+		return idb;
+	}
 
     /**
      * This will update item data value
@@ -247,11 +262,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
      */
     public EntityBean updateValue(EntityBean eb, String current_df_string) {
         ItemDataBean idb = (ItemDataBean) eb;
-
-        // YW 12-06-2007 << convert to oc_date_format_string pattern before
-        // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string,
-                ResourceBundleProvider.getLocale()));
+        
+        ItemDataType dataType = getDataType(idb.getItemId());
+        setItemDataBeanIfDateOrPdate(idb, current_df_string,dataType);
 
         idb.setActive(false);
 
