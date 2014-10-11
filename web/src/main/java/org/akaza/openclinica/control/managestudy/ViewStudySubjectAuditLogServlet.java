@@ -100,6 +100,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         ArrayList eventCRFAudits = new ArrayList();
         ArrayList studyEventAudits = new ArrayList();
         ArrayList allDeletedEventCRFs = new ArrayList();
+        ArrayList allDeletedEventCRFItems = new ArrayList();
         String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
         int studySubId = fp.getInt("id", true);// studySubjectId
@@ -165,11 +166,13 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
 
                 // Find deleted Event CRFs
-                List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
-                allDeletedEventCRFs.addAll(deletedEventCRFs);
-                logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
-            }
+           //     List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
+                allDeletedEventCRFs.addAll(adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId()));
+                allDeletedEventCRFItems.addAll(adao.findDeletedEventCRFAuditEventsWithItemDataType(studyEvent.getId()));
 
+                logger.info("deletedEventCRFs size[" + allDeletedEventCRFs.size() + "]");
+            }
+            
             for (int i = 0; i < events.size(); i++) {
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
                 studyEventAudits.addAll(adao.findStudyEventAuditEvents(studyEvent.getId()));
@@ -197,6 +200,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             request.setAttribute("eventCRFAudits", eventCRFAudits);
             request.setAttribute("studyEventAudits", studyEventAudits);
             request.setAttribute("allDeletedEventCRFs", allDeletedEventCRFs);
+            request.setAttribute("allDeletedEventCRFItems", allDeletedEventCRFItems);
             request.setAttribute("attachedFilePath", attachedFilePath);
 
             forwardPage(Page.VIEW_STUDY_SUBJECT_AUDIT);

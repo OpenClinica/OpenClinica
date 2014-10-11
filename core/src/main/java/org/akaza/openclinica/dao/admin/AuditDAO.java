@@ -250,6 +250,28 @@ public class AuditDAO extends EntityDAO {
 
     }
 
+    
+
+    public Collection findDeletedEventCRFAuditEventsWithItemDataType(int studyEventId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventId));
+
+        String sql = digester.getQuery("findDeletedEventCRFAuditEventsWithItemDataType");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataType((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+    
+    
+    
     /*
      * Find audit log events type for an Study Event
      *
@@ -283,7 +305,8 @@ public class AuditDAO extends EntityDAO {
         this.setTypeExpected(2, TypeNames.STRING); // crf name
         this.setTypeExpected(3, TypeNames.STRING); // crf version
         this.setTypeExpected(4, TypeNames.STRING); // user name
-        this.setTypeExpected(5, TypeNames.DATE); // delete date
+        this.setTypeExpected(5, TypeNames.TIMESTAMP); // delete date
+        this.setTypeExpected(6, TypeNames.INT); // delete date
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(13)); // audit_log_event_type_id
@@ -304,6 +327,8 @@ public class AuditDAO extends EntityDAO {
             bean.setCrfVersion((String) map.get("crf_version_name"));
             bean.setDeletedBy((String) map.get("user_name"));
             bean.setDeletedDate((Date) map.get("audit_date"));
+            bean.setDeletedEventCrfId((Integer) map.get("event_crf_id"));
+            
             al.add(bean);
         }
         return al;

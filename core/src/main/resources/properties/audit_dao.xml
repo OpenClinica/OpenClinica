@@ -58,7 +58,7 @@
 		<name>findDeletedEventCRFsFromAuditEvent</name>
 		<sql>
             SELECT distinct on (ale.event_crf_id) ale.study_event_id as study_event_id, crf.name as crf_name,
-                             cv.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date
+                             cv.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date, ale.event_crf_id
                 FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
                     JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
                     JOIN crf_version cv on ale.event_crf_version_id=cv.crf_version_id
@@ -82,10 +82,10 @@
     	<sql>
     	SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id
+        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id ,ale.study_event_id
 		FROM (SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name
+        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name ,ale.study_event_id
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
 			WHERE ale.audit_log_event_type_id IN (1,8,9,10,11,12,13,14,15,16,30,32,33) AND ale.event_crf_id=?
@@ -94,6 +94,26 @@
 			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
     	</sql>
     </query>
+    
+    <query>
+    	<name>findDeletedEventCRFAuditEventsWithItemDataType</name>
+    	<sql>
+    	SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+        	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+        	ale.new_value, ale.event_crf_id, ale.user_name, ale.name, item.item_data_type_id ,ale.study_event_id
+		FROM (SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+        	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name ,ale.study_event_id
+			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
+     		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
+			WHERE ale.audit_log_event_type_id IN (13) AND ale.study_event_id=?
+			)as ale
+			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (13) and ale.entity_id = id.item_data_id
+			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
+    	</sql>
+    </query>
+    
+    
     <query>
         <name>findSingleItemAuditEvents</name>
         <sql>
