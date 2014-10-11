@@ -265,14 +265,7 @@
     </td>
 </tr>
 
-
-
-
-
-
-
-
-<%-- Event CRFs for this Study Event --%>
+<%-- Deleted Event CRFs for this Study Event --%>
 <c:forEach var="deletedEventCRF" items="${allDeletedEventCRFs}">
     <c:if test="${deletedEventCRF.studyEventId==event.id}">
 
@@ -395,15 +388,6 @@
 	
 </c:if>
 </c:forEach>
-
-
-
-
-
-
-
-
-
 
     <%-- Event CRFs for this Study Event --%>
 <c:forEach var="eventCRF" items="${event.eventCRFs}">
@@ -532,9 +516,6 @@
 	
 
 </c:forEach>
-
-
-
 </table>
 <br>
 </c:forEach>

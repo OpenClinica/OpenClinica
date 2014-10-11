@@ -108,10 +108,28 @@
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
 			WHERE ale.audit_log_event_type_id IN (13) AND ale.study_event_id=?
 			)as ale
-			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (13) and ale.entity_id = id.item_data_id
+			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (1,12,13,30) and ale.entity_id = id.item_data_id
 			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
     	</sql>
     </query>
+
+
+	<query>
+		<name>findDeletedEventCRFAuditEventsWithItemDataTypeUpdated</name>
+		<sql>
+			SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+        	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name, item.item_data_type_id ,ale.study_event_id FROM
+			(SELECT DISTINCT ale.event_crf_id from audit_log_event ale
+			WHERE ale.audit_log_event_type_id IN (13) AND ale.study_event_id=?) as joe ,audit_log_event ale
+			JOIN user_account ua ON ale.user_id=ua.user_id
+			JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
+			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (1,12,13,30) and ale.entity_id = id.item_data_id
+			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name =item.name
+			WHERE ale.event_crf_id =joe.event_crf_id and ale.audit_log_event_type_id in (1,2,13,30)
+			ORDER by ale.audit_date
+		</sql>
+	</query>
     
     
     <query>

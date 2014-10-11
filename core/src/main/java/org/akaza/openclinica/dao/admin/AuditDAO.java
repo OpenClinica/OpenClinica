@@ -252,13 +252,13 @@ public class AuditDAO extends EntityDAO {
 
     
 
-    public Collection findDeletedEventCRFAuditEventsWithItemDataType(int studyEventId) {
+    public Collection findDeletedEventCRFAuditEventsWithItemDataTypeUpdated(int studyEventId) {
         this.setTypesExpectedWithItemDataType();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEventId));
 
-        String sql = digester.getQuery("findDeletedEventCRFAuditEventsWithItemDataType");
+        String sql = digester.getQuery("findDeletedEventCRFAuditEventsWithItemDataTypeUpdated");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
