@@ -163,10 +163,10 @@
                     <c:if test="${deletedEventCRF.studyEventId==event.id}">
 
                         <tr>
-                            <td class="table_header_column"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
-                            <td class="table_header_column"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+                            <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
+                            <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
+                            <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
+                            <td class="table_header_column"  style="color: #FF0000"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                         </tr>
                     </c:if>
                 </c:forEach>
@@ -279,10 +279,10 @@
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="owner" bundle="${resword}"/></b></td>
                 </tr>
                 <tr>
-                    <td class="table_header_column"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
-                    <td class="table_header_column"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
-                    <td class="table_header_column"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
-                    <td class="table_header_column"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
+                    <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
+                    <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
+                    <td class="table_header_column"  style="color: #FF0000"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+                    <td class="table_header_column"  style="color: #FF0000"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
                 </tr>
             </table>
         </td>
@@ -307,7 +307,7 @@
                         <tr>
             <c:set var="string1" value="${eventCRFAudit.auditEventTypeName}"/>
             <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
-            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_column" style="color: #FF0000"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
                 
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
