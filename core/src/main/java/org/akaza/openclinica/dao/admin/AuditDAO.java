@@ -88,6 +88,13 @@ public class AuditDAO extends EntityDAO {
     public void setTypesExpectedWithItemDataType() {
         this.setTypesExpected();
         this.setTypeExpected(14, TypeNames.INT); // item_data_type_id
+        this.setTypeExpected(15, TypeNames.INT); // event_crf_version_id
+        this.setTypeExpected(16, TypeNames.STRING); // event_crf_version_Name
+        this.setTypeExpected(17, TypeNames.STRING); // event_crf_Name
+        this.setTypeExpected(18, TypeNames.INT); // study_event_id
+        this.setTypeExpected(19, TypeNames.INT); // ordinal
+        this.setTypeExpected(20, TypeNames.DATE); // audit_date
+        this.setTypeExpected(21, TypeNames.STRING); // audit_table
     }
 
     /**
@@ -127,6 +134,20 @@ public class AuditDAO extends EntityDAO {
         return eb;
     }
 
+    public Object getEntityFromHashMapWithItemDataTypeUpdated(HashMap hm) {
+        AuditBean eb = (AuditBean) this.getEntityFromHashMap(hm);
+        eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));       
+        eb.setEventCrfVersionId((Integer) hm.get("event_crf_version_id"));
+        eb.setCrfVersionName((String) hm.get("crf_version_name"));
+        eb.setCrfName((String) hm.get("crf_name"));       
+        eb.setStudyEventId((Integer) hm.get("study_event_id"));
+        eb.setOrdinal((Integer) hm.get("ordinal"));
+        eb.setDateInterviewed((java.util.Date) hm.get("date_interviewed"));
+        eb.setInterviewerName((String) hm.get("interviewer_name"));       
+        return eb;
+    }
+
+    
     /*
      * Find By Primary Key
      *
@@ -252,18 +273,36 @@ public class AuditDAO extends EntityDAO {
 
     
 
-    public Collection findDeletedEventCRFAuditEventsWithItemDataTypeUpdated(int studyEventId) {
+    public Collection findAllEventCRFAuditEvents(int studyEventId) {
         this.setTypesExpectedWithItemDataType();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEventId));
 
-        String sql = digester.getQuery("findDeletedEventCRFAuditEventsWithItemDataTypeUpdated");
+        String sql = digester.getQuery("findAllEventCRFAuditEvents");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataType((HashMap) it.next());
+            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeUpdated((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+
+    public Collection findAllEventCRFAuditEventsWithItemDataType(int studyEventId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventId));
+
+        String sql = digester.getQuery("findAllEventCRFAuditEventsWithItemDataType");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeUpdated((HashMap) it.next());
             al.add(eb);
         }
         return al;

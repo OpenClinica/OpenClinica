@@ -100,7 +100,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         ArrayList eventCRFAudits = new ArrayList();
         ArrayList studyEventAudits = new ArrayList();
         ArrayList allDeletedEventCRFs = new ArrayList();
-        ArrayList allDeletedEventCRFItems = new ArrayList();
+        ArrayList allEventCRFs = new ArrayList();
+        ArrayList allEventCRFItems = new ArrayList();
         String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
         int studySubId = fp.getInt("id", true);// studySubjectId
@@ -168,10 +169,12 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 // Find deleted Event CRFs and their deleted Items
                 List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
                 allDeletedEventCRFs.addAll(deletedEventCRFs);
-                List deletedEventCRFItems = (List) adao.findDeletedEventCRFAuditEventsWithItemDataTypeUpdated(studyEvent.getId());
-                allDeletedEventCRFItems.addAll(deletedEventCRFItems);
+                List eventCRFs = (List) adao.findAllEventCRFAuditEvents(studyEvent.getId());
+                allEventCRFs.addAll(eventCRFs);                
+                List eventCRFItems = (List) adao.findAllEventCRFAuditEventsWithItemDataType(studyEvent.getId());
+                allEventCRFItems.addAll(eventCRFItems);
                 logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
-                logger.info("deletedEventCRFItems size[" + deletedEventCRFItems.size() + "]");
+                logger.info("allEventCRFItems size[" + allEventCRFItems.size() + "]");
             }
             
             for (int i = 0; i < events.size(); i++) {
@@ -201,7 +204,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             request.setAttribute("eventCRFAudits", eventCRFAudits);
             request.setAttribute("studyEventAudits", studyEventAudits);
             request.setAttribute("allDeletedEventCRFs", allDeletedEventCRFs);
-            request.setAttribute("allDeletedEventCRFItems", allDeletedEventCRFItems);
+            request.setAttribute("allEventCRFs", allEventCRFs);
+            request.setAttribute("allEventCRFItems", allEventCRFItems);
             request.setAttribute("attachedFilePath", attachedFilePath);
 
             forwardPage(Page.VIEW_STUDY_SUBJECT_AUDIT);
