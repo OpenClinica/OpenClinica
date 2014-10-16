@@ -116,6 +116,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         ArrayList eventCRFAudits = new ArrayList();
         ArrayList studyEventAudits = new ArrayList();
         ArrayList allDeletedEventCRFs = new ArrayList();
+        ArrayList allEventCRFs = new ArrayList();
+        ArrayList allEventCRFItems = new ArrayList();
         String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
         FormProcessor fp = new FormProcessor(request);
@@ -179,8 +181,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 // Find deleted Event CRFs
                 List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
                 allDeletedEventCRFs.addAll(deletedEventCRFs);
+                List eventCRFs = (List) adao.findAllEventCRFAuditEvents(studyEvent.getId());
+                allEventCRFs.addAll(eventCRFs);                
+                List eventCRFItems = (List) adao.findAllEventCRFAuditEventsWithItemDataType(studyEvent.getId());
+                allEventCRFItems.addAll(eventCRFItems);
                 logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
-            }
+                logger.info("allEventCRFItems size[" + allEventCRFItems.size() + "]");          }
 
             for (int i = 0; i < events.size(); i++) {
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
@@ -488,12 +494,15 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 				}
 			}
 			row++;
-			
-			
+			row++;
 			
 			//Event CRFs Audit Events
-			for(int j = 0; j < event.getEventCRFs().size(); j++) {
-				EventCRFBean eventCrf = (EventCRFBean) event.getEventCRFs().get(j);
+			for(int j = 0; j < allEventCRFs.size(); j++) {
+				AuditBean auditBean = (AuditBean) allEventCRFs.get(j);
+
+				if(auditBean.getStudyEventId()==event.getId()){
+					
+					
 				
 				
 				//Audit Events for Study Event
@@ -512,11 +521,11 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 				row++;
 				
 				excelRow = new String[] {
-						eventCrf.getCrf().getName(),
-						eventCrf.getCrfVersion().getName(),
-						dateFormat(eventCrf.getDateInterviewed()),
-						eventCrf.getInterviewerName(),
-						eventCrf.getOwner().getName()
+						auditBean.getCrfName(),
+						auditBean.getCrfVersionName(),
+                       dateFormat(auditBean.getDateInterviewed()),                      
+                       auditBean.getInterviewerName(),
+                       auditBean.getUserName()
 					};
 				for (int i = 0; i < excelRow.length; i++) {
 					label = new Label(i, row, excelRow[i]);
@@ -538,10 +547,11 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 					excelSheet.addCell(label);
 				}
 				row++;
-				
-				for(int k = 0; k < eventCRFAudits.size(); k++ ) {
-					AuditBean eventCrfAudit = (AuditBean) eventCRFAudits.get(k);
-					if(eventCrfAudit.getEventCRFId() == eventCrf.getId()) {
+				row++;
+				for(int k = 0; k < allEventCRFItems.size(); k++ ) {
+					row--;
+					AuditBean eventCrfAudit = (AuditBean) allEventCRFItems.get(k);
+					if (eventCrfAudit.getStudyEventId()==event.getId() && eventCrfAudit.getEventCrfVersionId()==auditBean.getEventCrfVersionId()){
 						String oldValue = "";
 						String newValue = "";
 						if(eventCrfAudit.getAuditEventTypeId() == 12 || eventCrfAudit.getEntityName().equals("Status")) {
@@ -616,12 +626,18 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 						else {
 							newValue = eventCrfAudit.getNewValue();
 						}
+						String ordinal="";
+						if(eventCrfAudit.getOrdinal()!=0){
+							ordinal="(" + eventCrfAudit.getOrdinal() + ")" ;
+							
+						}
+						
 						
 						excelRow = new String[] {
 								eventCrfAudit.getAuditEventTypeName(),
 								dateTimeFormat(eventCrfAudit.getAuditDate()),
 								eventCrfAudit.getUserName(),
-								eventCrfAudit.getEntityName() + "(" + eventCrfAudit.getOrdinal() + ")",
+								eventCrfAudit.getEntityName() + ordinal,
 								oldValue,
 								newValue
 							};
@@ -630,12 +646,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								excelSheet.addCell(label);
 							}
 						row++;
-					}
+						row++;
 				}
-				row++;			
-			}
 			
+					row++;
+					
+			}
+				row++;
+
+				}
 			autoSizeColumns(excelSheet);			
+		 }
 		}
 		
 		
