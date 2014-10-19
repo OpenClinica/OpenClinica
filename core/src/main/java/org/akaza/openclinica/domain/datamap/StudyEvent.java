@@ -59,6 +59,8 @@ public class StudyEvent extends DataMapDomainObject  {
 	private List<DnStudyEventMap> dnStudyEventMaps ;
 	private List<EventCrf> eventCrfs ;
 	private Integer sedOrdinal;
+	private List <AuditLogEvent> auditLogEvent;
+	
 	
 	public StudyEvent() {
 	}
@@ -272,8 +274,18 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.statusId = statusId;
 	}
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "studyEventId")
+	@OrderBy("auditDate asc")
+	public List<AuditLogEvent> getAuditLogEvent() {
+		return auditLogEvent;
+	}
+
+	public void setAuditLogEvent(List<AuditLogEvent> auditLogEvent) {
+		this.auditLogEvent = auditLogEvent;
+	}
 
 
+	
 	/*@Column(name="sed_ordinal",insertable=false,updatable=false,table="study_event_definition")
 	
 	public Integer getSedOrdinal() {

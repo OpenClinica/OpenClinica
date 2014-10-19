@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -47,8 +48,9 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	private Integer studyEventId;
 	private Integer eventCrfVersionId;
 	private UserAccount userAccount;
-	
+	private CrfVersion crfVersion;
 	private AuditLogEventType auditLogEventType;
+	private EventCrf eventCrf;
 	
 	public AuditLogEvent() {
 	}
@@ -77,8 +79,11 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.eventCrfId = eventCrfId;
 		this.studyEventId = studyEventId;
 		this.eventCrfVersionId = eventCrfVersionId;
+		
 	}
 
+	
+	
 	@Id
 	@Column(name = "audit_id", unique = true, nullable = false)
 	public int getAuditId() {
@@ -171,13 +176,24 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.newValue = newValue;
 	}
 
-	@Column(name = "event_crf_id")
+/*	@Column(name = "event_crf_id")
 	public Integer getEventCrfId() {
 		return this.eventCrfId;
 	}
 
 	public void setEventCrfId(Integer eventCrfId) {
 		this.eventCrfId = eventCrfId;
+	}
+*/
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_crf_id")
+	public EventCrf getEventCrf() {
+		return eventCrf;
+	}
+
+	public void setEventCrf(EventCrf eventCrf) {
+		this.eventCrf = eventCrf;
 	}
 
 	@Column(name = "study_event_id")
@@ -189,15 +205,29 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.studyEventId = studyEventId;
 	}
 
+	/*
 	@Column(name = "event_crf_version_id")
 	public Integer getEventCrfVersionId() {
-		return this.eventCrfVersionId;
+		return eventCrfVersionId;
 	}
 
 	public void setEventCrfVersionId(Integer eventCrfVersionId) {
 		this.eventCrfVersionId = eventCrfVersionId;
+	}*/
+
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_crf_version_id")
+	public CrfVersion getCrfVersion() {
+		return crfVersion;
 	}
 
+
+	public void setCrfVersion(CrfVersion crfVersion) {
+		this.crfVersion = crfVersion;
+	}
+
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "audit_log_event_type_id", nullable = false)
 	public AuditLogEventType getAuditLogEventType() {

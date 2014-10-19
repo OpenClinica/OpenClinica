@@ -49,6 +49,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Generate CDISC-ODM clinical data without data set.
  * 
@@ -78,6 +79,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private boolean collectAudits=true;
 	private AuditLogEventDao auditEventDAO;
 	private Locale locale;
+
+	ArrayList<AuditLogEvent> eventCrfAudits = new ArrayList();
+
+	ArrayList<EventCrf> activeEventCrfs = new ArrayList();
 	
 	private UserAccountDao userAccountDao;
 	
@@ -339,9 +344,43 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		boolean hiddenCrfCheckPassed=true;
 		List<CrfBean> hiddenCrfs= new ArrayList<CrfBean>();
 		
+		System.out.println("count: " + se.getAuditLogEvent().size());
+		eventCrfAudits.clear();
+		Boolean included = false;
+
+		for (AuditLogEvent ale : se.getAuditLogEvent()) {
+			if (eventCrfAudits.isEmpty()) {
+				eventCrfAudits.add(ale);
+				System.out.println("New Event_CRFs: " + ale.getEventCrf().getEventCrfId() + "  StudyEvent: " + ale.getStudyEventId()
+						+ "  crfVersionId: " + ale.getCrfVersion().getCrfVersionId());
+			}
+
+			included = false;
+			for (AuditLogEvent list : eventCrfAudits) {
+				if (list.getEventCrf().getEventCrfId() == ale.getEventCrf().getEventCrfId()) {
+					included = true;
+				}
+			}
+			if (!included) {
+				eventCrfAudits.add(ale);
+				System.out.println("NET Event_CRFs: " + ale.getEventCrf().getEventCrfId() + "  StudyEvent: " + ale.getStudyEventId()
+						+ "  crfVersionId: " + ale.getCrfVersion().getCrfVersionId());
+			}
+		}
+
+		System.out.println("");
+
+		System.out.println("count: " + se.getEventCrfs().size());
 		for (EventCrf ecrf : se.getEventCrfs()) {
-			
-			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
+			System.out.println("Active Event_CRFs: " + ecrf.getEventCrfId() + "  StudyEvent: " + ecrf.getStudyEvent().getStudyEventId()
+					+ " crfVersionId " + ecrf.getCrfVersion().getCrfVersionId());
+			activeEventCrfs.add(ecrf);
+		}
+
+		EventCrf ecrf;
+		for (AuditLogEvent eca : eventCrfAudits) {
+			ecrf=eca.getEventCrf();
+        	List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
 			hiddenCrfCheckPassed=true;
 			
 			if(isActiveRoleAtSite){
@@ -354,7 +393,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				
 				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),parentStudyId,seds);
 				
-				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
+				if(hiddenCrfs.contains(eca.getCrfVersion().getCrf()))
 				{
 					hiddenCrfCheckPassed = false;
 				}
@@ -364,27 +403,33 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			//This logic is to use the same method for both S_OID/SS_OID/*/* and full path
 			if(hiddenCrfCheckPassed){
 			if(!formCheck)
-				{	if(ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
+				{	if(eca.getCrfVersion().getOcOid().equals(formVersionOID))
 						formCheck=true;
 					else
 						formCheck=false;
 				}
 				if(formCheck){
 				ExportFormDataBean dataBean = new ExportFormDataBean();
-				dataBean.setItemGroupData(fetchItemData(ecrf.getCrfVersion()
-						.getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf
-						.getCrfVersion().getVersioningMaps(), ecrf));
-				dataBean.setFormOID(ecrf.getCrfVersion().getOcOid());
-				if(ecrf.getDateInterviewed()!=null)
+				/*dataBean.setItemGroupData(fetchItemData(eca.getCrfVersion()
+						.getItemGroupMetadatas(), eca.getEventCrf().getEventCrfId(), eca
+						.getCrfVersion().getVersioningMaps(), eca));
+*/
+				dataBean.setItemGroupData(fetchItemDataUpdated(eca));
+				
+				dataBean.setFormOID(eca.getCrfVersion().getOcOid());
+				   if (eca.getEventCrf().getEventCrfId() != 87 && eca.getEventCrf().getEventCrfId() != 88 && eca.getEventCrf().getEventCrfId() != 90){
+						
+				if(eca.getEventCrf().getDateInterviewed()!=null)
 				dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
-				if(ecrf.getInterviewerName()!=null)
+				if(eca.getEventCrf().getInterviewerName()!=null)
 				dataBean.setInterviewerName(ecrf.getInterviewerName());
 				//dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
 				dataBean.setStatus(fetchEventCRFStatus(ecrf));
-				if(ecrf.getCrfVersion().getName()!=null)
+				if(eca.getEventCrf().getCrfVersion().getName()!=null)
 				dataBean.setCrfVersion(ecrf.getCrfVersion().getName());
 				if(collectAudits)
-				dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(),"event_crf", ecrf.getCrfVersion().getOcOid(), null));
+				dataBean.setAuditLogs(fetchAuditLogs(eca.getEventCrf().getEventCrfId(),"event_crf", eca.getEventCrf().getCrfVersion().getOcOid(), null));
+				
 				if(collectDns)
 					dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
 				
@@ -392,6 +437,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if(formVersionOID!=null)formCheck=false;
 				}
 			}
+			}		
 		}
 
 		return (ArrayList<ExportFormDataBean>) formDataBean;
@@ -465,15 +511,29 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	        return stage;
 		
 	}
+	private ArrayList<ImportItemGroupDataBean> fetchItemDataUpdated(AuditLogEvent eca){
+		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
+		HashMap<String, List<ItemData>> oidDNAuditMap = new HashMap<String, List<ItemData>>();
 
+		
+		
+		
+		return populateImportItemGrpBean(oidMap,oidDNAuditMap);	
+	}
+
+	
 	private ArrayList<ImportItemGroupDataBean> fetchItemData(
-			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms, EventCrf eventCrf) {
+			Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms, AuditLogEvent eca) {
 		String groupOID, itemOID;
 		String itemValue = null;
 		String itemDataValue;
 		HashMap<String, ArrayList<String>> oidMap = new HashMap<String, ArrayList<String>>();
 		HashMap<String, List<ItemData>> oidDNAuditMap = new HashMap<String, List<ItemData>>();
-		List<ItemData> itds =  eventCrf.getItemDatas();
+
+		if (eca.getEventCrf().getEventCrfId() != 87 && eca.getEventCrf().getEventCrfId() != 88 && eca.getEventCrf().getEventCrfId() != 90){
+		
+			
+		   List<ItemData> itds =  eca.getEventCrf().getItemDatas();
 		
 		// For each metadata get the group, and then get list of all items in
 		// that group.so we can a data structure of groupOID and list of
@@ -541,7 +601,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 			}
 		}
-
+		   }else{
+			   
+		   }
 		return populateImportItemGrpBean(oidMap,oidDNAuditMap);
 	}
 
