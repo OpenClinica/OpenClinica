@@ -106,18 +106,16 @@
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <!--
-        <a href="ViewTableOfContent?crfVersionId=<c:out value="${version.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		-->
             <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
               name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-
-
+          </td>
+          <td>
+            <a href="ParticipantFormServlet?crfOID=<c:out value="${version.oid}"/>" 
+               onMouseDown="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant_d.gif');"
+               onMouseUp="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant.gif');"><img
+              name="bt_ViewParticipant1" src="images/bt_ViewParticipant.gif" border="0" alt="<fmt:message key="view_participant_form" bundle="${resword}"/>" title="<fmt:message key="view_participant_form" bundle="${resword}"/>" align="left" hspace="6"></a>
           </td>
           <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">
               <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
