@@ -42,4 +42,21 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 	       }
 	        	   return (T) q.list();
 	 }
+
+	 @SuppressWarnings("unchecked")
+	public <T> T findByParamUpdated(AuditLogEvent auditLogEvent, String anotherAuditTable,String itemOID){
+		   getSessionFactory().getStatistics().logSummary();
+		   String query = "";
+		   String buildQuery = "";
+	       	   buildQuery+= "do.entityName =:entity_name ";
+	      	   buildQuery+= " and  do.eventCrfId =:event_crf_id  order by do.auditId ";
+	       
+		    query = "from " + getDomainClassName() +  " do  where "+buildQuery;
+
+		    org.hibernate.Query q = getCurrentSession().createQuery(query);
+
+	           q.setInteger("event_crf_id",auditLogEvent.getEventCrfId().intValue());
+	       	   q.setString("entity_name", auditLogEvent.getEntityName().toString());
+	  	        	   return (T) q.list();
+	 }
 }

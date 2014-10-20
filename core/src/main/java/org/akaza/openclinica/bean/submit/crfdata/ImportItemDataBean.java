@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
 
 public class ImportItemDataBean {
     private String itemOID;
+    private String itemName;
     private String transactionType;
     private String value;
     private String isNull; // boolean, tbh?
@@ -16,7 +17,16 @@ public class ImportItemDataBean {
     
     private boolean hasValueWithNull; //this is just a flag, it is not an attribute/element
 
-    public String getItemOID() {
+    
+    public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public String getItemOID() {
         return itemOID;
     }
 

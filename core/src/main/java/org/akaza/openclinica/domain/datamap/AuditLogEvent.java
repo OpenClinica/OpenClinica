@@ -48,9 +48,9 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	private Integer studyEventId;
 	private Integer eventCrfVersionId;
 	private UserAccount userAccount;
-	private CrfVersion crfVersion;
+	//private CrfVersion crfVersion;
 	private AuditLogEventType auditLogEventType;
-	private EventCrf eventCrf;
+	//private EventCrf eventCrf;
 	
 	public AuditLogEvent() {
 	}
@@ -176,7 +176,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.newValue = newValue;
 	}
 
-/*	@Column(name = "event_crf_id")
+	@Column(name = "event_crf_id")
 	public Integer getEventCrfId() {
 		return this.eventCrfId;
 	}
@@ -184,9 +184,9 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	public void setEventCrfId(Integer eventCrfId) {
 		this.eventCrfId = eventCrfId;
 	}
-*/
+
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+/*	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_crf_id")
 	public EventCrf getEventCrf() {
 		return eventCrf;
@@ -194,7 +194,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 
 	public void setEventCrf(EventCrf eventCrf) {
 		this.eventCrf = eventCrf;
-	}
+	}*/
 
 	@Column(name = "study_event_id")
 	public Integer getStudyEventId() {
@@ -205,7 +205,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.studyEventId = studyEventId;
 	}
 
-	/*
+	
 	@Column(name = "event_crf_version_id")
 	public Integer getEventCrfVersionId() {
 		return eventCrfVersionId;
@@ -213,9 +213,9 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 
 	public void setEventCrfVersionId(Integer eventCrfVersionId) {
 		this.eventCrfVersionId = eventCrfVersionId;
-	}*/
+	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	/*@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_crf_version_id")
 	public CrfVersion getCrfVersion() {
 		return crfVersion;
@@ -226,7 +226,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.crfVersion = crfVersion;
 	}
 
-	
+	*/
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "audit_log_event_type_id", nullable = false)
