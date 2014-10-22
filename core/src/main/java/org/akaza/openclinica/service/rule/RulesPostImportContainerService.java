@@ -359,7 +359,7 @@ public class RulesPostImportContainerService {
             insertActionValidator.setExpressionService(expressionService);
             insertActionValidator.validate(ruleActionBean, errors);
             if (errors.hasErrors()) {
-                ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
+                ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getCode());
             }
         }
         } 	
