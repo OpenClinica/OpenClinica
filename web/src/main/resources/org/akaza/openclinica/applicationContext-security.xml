@@ -28,6 +28,7 @@
     <security:intercept-url pattern="/help/**" filters="none"/>
     <security:intercept-url pattern="/ws/**" filters="none"/>
     <security:intercept-url pattern="/Contact" filters="none"/>
+    <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
     <!--
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
       default-target-url='/MainMenu' always-use-default-target='true' />
@@ -144,5 +145,9 @@
 	<property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
 	<property name="metadataCollectorResource" ref="metadataCollectorResource"/>
     <property name="dataSource" ref="dataSource"/>
+</bean>
+<bean id="openRosaServices" class="org.akaza.openclinica.web.pform.OpenRosaServices">
+    <property name="dataSource" ref="dataSource"></property>
+    <property name="coreResources" ref="coreResources"/>
 </bean>
 </beans>

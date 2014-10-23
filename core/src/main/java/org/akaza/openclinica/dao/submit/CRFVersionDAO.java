@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -131,9 +132,17 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
     }
 
     public Collection findAll() {
-        ArrayList al = new ArrayList();
-
-        return al;
+    	this.setTypesExpected();
+    	
+    	ArrayList al = new ArrayList();
+        ArrayList alist = this.select(digester.getQuery("findAll"));
+    
+	    Iterator it = alist.iterator(); 
+	    while (it.hasNext()) {
+	        CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+	        al.add(eb);
+	    }
+	    return al;
     }
 
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {

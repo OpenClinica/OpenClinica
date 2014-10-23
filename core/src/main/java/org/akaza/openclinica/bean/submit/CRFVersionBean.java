@@ -140,14 +140,6 @@ public class CRFVersionBean extends AuditableEntityBean {
         this.oidGenerator = oidGenerator;
     }
 
-    public String getEnketoURL() {
-		return enketoURL;
-	}
-
-	public void setEnketoURL(String enketoURL) {
-		enketoURL = enketoURL;
-	}
-
 	/* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
