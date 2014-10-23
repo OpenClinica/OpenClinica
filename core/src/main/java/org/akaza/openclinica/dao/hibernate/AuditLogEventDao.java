@@ -1,10 +1,20 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.akaza.openclinica.bean.admin.CrfVersionMappingBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.hibernate.Filter;
 import org.hibernate.impl.FilterImpl;
 
 public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
+	private final static String GROUPOID_ORDINAL_DELIM = ":";
 
 	 @Override
 	    public Class<AuditLogEvent> domainClass() {
@@ -44,19 +54,50 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 	 }
 
 	 @SuppressWarnings("unchecked")
-	public <T> T findByParamUpdated(AuditLogEvent auditLogEvent, String anotherAuditTable,String itemOID){
+	public <T> T findByParamUpdated( ArrayList<CrfVersionMappingBean> arr, ItemData id ,String itemName, HashMap<String, List<ItemData>> oidDNAuditMap	){
 		   getSessionFactory().getStatistics().logSummary();
 		   String query = "";
-		   String buildQuery = "";
-	       	   buildQuery+= "do.entityName =:entity_name ";
-	      	   buildQuery+= " and  do.eventCrfId =:event_crf_id  order by do.auditId ";
+		   String buildQuery = " (   ";
+        	   for (CrfVersionMappingBean ar :arr){
+		       buildQuery+= " ( do.eventCrfId ="+ ar.getEventCrfId()   +")  OR ";        		   
+        	   }
+        	   
+		      buildQuery= buildQuery.substring(0,buildQuery.length()-4);       
+		       buildQuery+= " ) ";
+	
+		       
+	   for (ItemGroupMetadata igm :id.getItem().getItemGroupMetadatas() ){
+		     if (igm.getCrfVersion().getCrfVersionId() == arr.get(0).getCrfVersionId() ){
+	//   System.out.println(id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + GROUPOID_ORDINAL_DELIM + String.valueOf(0));
+		    	 if (igm.isRepeatingGroup()  &&  id.getOrdinal()>1){		    			 
+     			      buildQuery+= " and do.entityId = " + id.getItemDataId();
+
+		    	 }else if(igm.isRepeatingGroup() && id.getOrdinal()==1){
+		    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
+                     buildQuery+= " and do.eventCrfId !="+ id.getEventCrf().getEventCrfId();
+    				      
+	    	 }else{
+	    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
+
+ 
+		    	 } 		    		 
+		     }
+	   }
+		   
+		      
+// 		    			 oidDNAuditMap.containsKey(id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + GROUPOID_ORDINAL_DELIM + String.valueOf(0))){
+
+	   
+
+		       buildQuery+= " and (do.oldValue !='' OR do.newValue != '') ";
+	      	   buildQuery+= " order by do.auditId ";
 	       
 		    query = "from " + getDomainClassName() +  " do  where "+buildQuery;
 
 		    org.hibernate.Query q = getCurrentSession().createQuery(query);
 
-	           q.setInteger("event_crf_id",auditLogEvent.getEventCrfId().intValue());
-	       	   q.setString("entity_name", auditLogEvent.getEntityName().toString());
+	
+	          
 	  	        	   return (T) q.list();
 	 }
 }
