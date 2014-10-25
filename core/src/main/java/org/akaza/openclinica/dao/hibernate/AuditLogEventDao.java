@@ -9,6 +9,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemDataBean;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.hibernate.Filter;
 import org.hibernate.impl.FilterImpl;
@@ -54,8 +55,11 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 	 }
 
 	 @SuppressWarnings("unchecked")
-	public <T> T findByParamUpdated( ArrayList<CrfVersionMappingBean> arr, ItemData id ,String itemName, HashMap<String, List<ItemData>> oidDNAuditMap	){
+	public <T> T findByParamUpdated( ArrayList<CrfVersionMappingBean> arr, ItemDataBean id ,String itemName, HashMap<String, List<ItemDataBean>> oidDNAuditMap	){
 		   getSessionFactory().getStatistics().logSummary();
+		   
+		   
+		   
 		   String query = "";
 		   String buildQuery = " (   ";
         	   for (CrfVersionMappingBean ar :arr){
@@ -68,21 +72,28 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		       
 	   for (ItemGroupMetadata igm :id.getItem().getItemGroupMetadatas() ){
 		     if (igm.getCrfVersion().getCrfVersionId() == arr.get(0).getCrfVersionId() ){
-	//   System.out.println(id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + GROUPOID_ORDINAL_DELIM + String.valueOf(0));
-		    	 if (igm.isRepeatingGroup()  &&  id.getOrdinal()>1){		    			 
+//	  System.out.println( "ocoid : "+id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + "ordinal:   "+id.getOrdinal());
+	     
+		    	 
+		    	 
+		    	 if (igm.isRepeatingGroup()  &&  id.getOrdinal()>0){		    			 
      			      buildQuery+= " and do.entityId = " + id.getItemDataId();
-
-		    	 }else if(igm.isRepeatingGroup() && id.getOrdinal()==1){
+		    	 }
+ 
+		    	 
+		    	 if(igm.isRepeatingGroup() && id.getOrdinal()==0){
+		    		 
 		    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
-                     buildQuery+= " and do.eventCrfId !="+ id.getEventCrf().getEventCrfId();
-    				      
-	    	 }else{
-	    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
+                     buildQuery+= " and do.eventCrfId !="+ id.getEventCrf().getEventCrfId();	      
+	    	      }
 
+		    	 if (!igm.isRepeatingGroup()){
+	    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
+		    	 }
  
 		    	 } 		    		 
 		     }
-	   }
+	   
 		   
 		      
 // 		    			 oidDNAuditMap.containsKey(id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + GROUPOID_ORDINAL_DELIM + String.valueOf(0))){

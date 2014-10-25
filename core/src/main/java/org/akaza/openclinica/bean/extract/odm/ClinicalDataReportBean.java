@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -33,7 +34,7 @@ import java.util.Date;
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
-
+    private boolean auditLogExists;
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
         super();
         this.clinicalData = clinicaldata;
@@ -155,11 +156,30 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
                     for (ImportItemGroupDataBean ig : igs) {
-                        xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
+                                      
+  /////////////////////////                      
+                    		if (ig.getItemRGkey()!=-1){
+
+                    			auditLogExists = false;
+							ArrayList<ImportItemDataBean> loopItems = ig.getItemData();
+							for (ImportItemDataBean loopItem : loopItems) {
+								if (!loopItem.getAuditLogs().getAuditLogs().isEmpty()) {
+									auditLogExists = true;
+								}
+							}
+
+    	                if ( (ig.getItemRGkey()==0 && auditLogExists ) || ig.getItemRGkey()!=0 ) {
+
+                    		//                        	if (!"-1".equals(ig.getItemGroupRepeatKey()) && !"0".equals(ig.getItemGroupRepeatKey())) {
+
+                            	
+                       xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
                             + StringEscapeUtils.escapeXml(ig.getItemGroupOID()) + "\" ");
-                        if (!"-1".equals(ig.getItemGroupRepeatKey())) {
-                            xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
-                        }
+
+                            if (ig.getItemRGkey()==0) ig.setItemRGkey(-1);
+                        	xml.append("ItemGroupRepeatKey=\"" + ig.getItemRGkey() + "\" ");
+                        
+                   
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
@@ -232,6 +252,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
                         xml.append(nls);
                     }
+                    }
+                }
                     //
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                         if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
@@ -294,6 +316,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(indent + "</ClinicalData>");
             xml.append(nls);
         }
+        
     }
     
     protected void addAuditLogs(AuditLogsBean auditLogs, String currentIndent) {
