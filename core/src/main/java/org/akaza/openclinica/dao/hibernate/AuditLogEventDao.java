@@ -72,7 +72,6 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		       
 	   for (ItemGroupMetadata igm :id.getItem().getItemGroupMetadatas() ){
 		     if (igm.getCrfVersion().getCrfVersionId() == arr.get(0).getCrfVersionId() ){
-//	  System.out.println( "ocoid : "+id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + "ordinal:   "+id.getOrdinal());
 	     
 		    	 
 		    	 
@@ -81,7 +80,7 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		    	 }
  
 		    	 
-		    	 if(igm.isRepeatingGroup() && id.getOrdinal()==0){
+		    	 if(igm.isRepeatingGroup() && id.getOrdinal()==-1){
 		    		 
 		    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
                      buildQuery+= " and do.eventCrfId !="+ id.getEventCrf().getEventCrfId();	      

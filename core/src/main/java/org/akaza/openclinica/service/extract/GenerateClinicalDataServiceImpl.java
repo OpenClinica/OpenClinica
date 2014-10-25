@@ -340,7 +340,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	private ArrayList<CrfVersionMappingBean> getCrfVersionMapping(StudyEvent se){
 		
-		System.out.println("count: " + se.getAuditLogEvent().size());
 		crfVersionMappingList.clear();
 		CrfVersionMappingBean crfVersionMappingBean = new CrfVersionMappingBean();
 		
@@ -350,13 +349,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				crfVersionMappingBean.setCrfVersionId(ale.getEventCrfVersionId());
 				crfVersionMappingBean.setEventCrfId(ale.getEventCrfId());
 				crfVersionMappingList.add(crfVersionMappingBean);
-				System.out.println("1st Event_CRFs: " + crfVersionMappingBean.getEventCrfId() + " StudyEvent: " + ale.getStudyEventId()
-						+ " crfVersionId: " + crfVersionMappingBean.getCrfVersionId());
 			}
 			
 			included = false;
 			for (CrfVersionMappingBean crfVersionMapping : crfVersionMappingList) {
-	//			System.out.println("list:  "+list.getEventCrfId() + "ale:  "+ale.getEventCrfId());
 				if (crfVersionMapping.getEventCrfId() == ale.getEventCrfId()) {
 					included = true;
 				}
@@ -366,15 +362,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				crfVersionMappingBean2.setCrfVersionId(ale.getEventCrfVersionId());
 				crfVersionMappingBean2.setEventCrfId(ale.getEventCrfId());
 				crfVersionMappingList.add(crfVersionMappingBean2);
-				System.out.println("New Event_CRFs: " + crfVersionMappingBean2.getEventCrfId() + " StudyEvent: " + ale.getStudyEventId()
-						+ " crfVersionId: " + crfVersionMappingBean2.getCrfVersionId());
 			}
 		}
-		System.out.println("");
-		System.out.println("count: " + se.getEventCrfs().size());
 		for (EventCrf ecrf : se.getEventCrfs()) {
-			System.out.println("Active Event_CRFs: " + ecrf.getEventCrfId() + " StudyEvent: " + ecrf.getStudyEvent().getStudyEventId()
-					+ " crfVersionId " + ecrf.getCrfVersion().getCrfVersionId());
 			activeEventCrfs.add(ecrf);
 		}
 
@@ -396,7 +386,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		ArrayList <CrfVersionMappingBean> crfVersionMappingList = getCrfVersionMapping(se);
 		
 		for ( CrfVersionMappingBean crfVersionMapping : crfVersionMappingList ) {
-			System.out.println("crf version_id:  " + crfVersionMapping.getCrfVersionId() + "  event_crf_id:  "+crfVersionMapping.getEventCrfId());
 			
 			
 		}
@@ -562,7 +551,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
            
            
 		   itds2.add(itemDataBean);
-		   System.out.println("itemData id:  "+ itemDataBean.getItemDataId()+"  Repeating:  "+ itemDataBean.getItem().getItemGroupMetadatas().get(0).isRepeatingGroup()  +"  Ordinal:  "+ itemDataBean.getOrdinal());
 			if (itemData.getItem().getItemGroupMetadatas().get(0).isRepeatingGroup() && itemData.getOrdinal()==1){
 				   ItemDataBean itemDataBean1 =new ItemDataBean();
 				   itemDataBean1.setItemDataId(itemData.getItemDataId());
@@ -574,18 +562,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		           itemDataBean1.setDateCreated(itemData.getDateCreated());
 		           itemDataBean1.setDateUpdated(itemData.getDateUpdated());
 		           itemDataBean1.setUpdateId(itemData.getUpdateId());
-		           itemDataBean1.setOrdinal(0);           
+		           itemDataBean1.setOrdinal(-1);           
 		           itemDataBean1.setDnItemDataMaps(itemData.getDnItemDataMaps());
 
 		           
-					   System.out.println("itemData id:  "+ itemDataBean.getItemDataId()+"  Repeating:  "+ itemDataBean.getItem().getItemGroupMetadatas().get(0).isRepeatingGroup()  +"  Ordinal:  "+ itemDataBean.getOrdinal());
 				itds2.add(itemDataBean1);
 			}
 		}
 		
 		
 		for (ItemDataBean itemData : itds2) {
-		  System.out.println("ordinals:  "+itemData.getOrdinal());
 		}
 		
 		for (ItemDataBean itemData : itds2) {
@@ -643,20 +629,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 								}
 								oidMap.put(groupOIDOrdnl, itemgrps);
 								oidDNAuditMap.put(groupOIDOrdnl, itemDataTemps);
-							/*	if (itemData.getItem().getItemGroupMetadatas().get(0).isRepeatingGroup() && itemData.getOrdinal()==1){
-									oidDNAuditMap.put(groupOID + GROUPOID_ORDINAL_DELIM + "10", itemDataTemps);
-								}
-							*/	
 							} else {
 								oidMap.put(groupOIDOrdnl, itemsValues);
 								itemDatas.add(itemData);
 								oidDNAuditMap.put(groupOIDOrdnl, itemDatas);
-			/*						if (itemData.getItem().getItemGroupMetadatas().get(0).isRepeatingGroup() && itemData.getOrdinal()==1){
-								oidDNAuditMap.put(groupOID + GROUPOID_ORDINAL_DELIM + String.valueOf(0), itemDatas);
-								oidMap.put(groupOID + GROUPOID_ORDINAL_DELIM + String.valueOf(0), itemsValues);
-								
-							}
-			*/			
 								}
 			
 							
@@ -733,7 +709,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	
 		
 		for(ItemDataBean id:list){
-			System.out.println("itemArray: "+id.getItem().getOcOid() +"  ordinal : "+ id.getOrdinal() + "  iiDataBean :"+ iiDataBean.getItemOID());
 			if(id.getItem().getOcOid().toString().equals(iiDataBean.getItemOID().toString())){
 				if(isCollectAudits()){
                   ArrayList<CrfVersionMappingBean> filteredCrfVersionMappingList = new ArrayList();  
@@ -745,13 +720,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 							crfVersionMappingBean.setCrfVersionId(crfVersionMapping.getCrfVersionId());
 							crfVersionMappingBean.setEventCrfId(crfVersionMapping.getEventCrfId());
 							filteredCrfVersionMappingList.add(crfVersionMappingBean);
-				//			System.out.println(	"id from list: "+id.getEventCrf().getCrfVersion().getCrfVersionId()+"event_crf_id : " 
-				//			+id.getEventCrf().getEventCrfId()+"item data id: "+id.getItemDataId()+"  deleted crf version id:  "+deletedEventCrf.getCrfVersionId() +"  deleted Event CRF id : "+ deletedEventCrf.getEventCrfId());
 					}
 		                	
 				}
 			
-                      System.out.println("item data id:   "+id.getItemDataId() + "item data ordinal :" + id.getOrdinal() + " itemKeygrouprep#   ");
 					iiDataBean.setAuditLogs(fetchAuditLogsUpdated(filteredCrfVersionMappingList,id, iiDataBean, null, oidDNAuditMap));
 				
 					

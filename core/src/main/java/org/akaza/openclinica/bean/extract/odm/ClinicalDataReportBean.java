@@ -19,11 +19,13 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -155,28 +157,27 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(nls);
                     //
                     ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
-                    for (ImportItemGroupDataBean ig : igs) {
+                     Collections.sort(igs, ImportItemGroupDataBean.importItemGroupOID);
+                     for (ImportItemGroupDataBean ig : igs) {
                                       
-  /////////////////////////                      
-                    		if (ig.getItemRGkey()!=-1){
+                    		if (ig.getItemRGkey()!=-2){
 
                     			auditLogExists = false;
 							ArrayList<ImportItemDataBean> loopItems = ig.getItemData();
 							for (ImportItemDataBean loopItem : loopItems) {
+
+								System.out.println("RG order: "+ig.getItemRGkey());
+
 								if (!loopItem.getAuditLogs().getAuditLogs().isEmpty()) {
 									auditLogExists = true;
 								}
 							}
 
-    	                if ( (ig.getItemRGkey()==0 && auditLogExists ) || ig.getItemRGkey()!=0 ) {
-
-                    		//                        	if (!"-1".equals(ig.getItemGroupRepeatKey()) && !"0".equals(ig.getItemGroupRepeatKey())) {
-
+    	                if ( (ig.getItemRGkey()==-1 && auditLogExists ) || ig.getItemRGkey()!=-1 ) {
                             	
                        xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
                             + StringEscapeUtils.escapeXml(ig.getItemGroupOID()) + "\" ");
 
-                            if (ig.getItemRGkey()==0) ig.setItemRGkey(-1);
                         	xml.append("ItemGroupRepeatKey=\"" + ig.getItemRGkey() + "\" ");
                         
                    
@@ -318,6 +319,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         
     }
+    
     
     protected void addAuditLogs(AuditLogsBean auditLogs, String currentIndent) {
         if (auditLogs != null) {
