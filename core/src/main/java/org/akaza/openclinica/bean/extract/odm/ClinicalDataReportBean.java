@@ -166,8 +166,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 							ArrayList<ImportItemDataBean> loopItems = ig.getItemData();
 							for (ImportItemDataBean loopItem : loopItems) {
 
-								System.out.println("RG order: "+ig.getItemRGkey());
-
 								if (!loopItem.getAuditLogs().getAuditLogs().isEmpty()) {
 									auditLogExists = true;
 								}

@@ -385,15 +385,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		
 		ArrayList <CrfVersionMappingBean> crfVersionMappingList = getCrfVersionMapping(se);
 		
-		for ( CrfVersionMappingBean crfVersionMapping : crfVersionMappingList ) {
-			
-			
-		}
-		
-		
-		
-		
-		
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
 			hiddenCrfCheckPassed=true;
