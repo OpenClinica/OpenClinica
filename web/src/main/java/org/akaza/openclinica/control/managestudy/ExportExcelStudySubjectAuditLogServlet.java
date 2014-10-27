@@ -629,8 +629,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 						String ordinal="";
 						if(eventCrfAudit.getOrdinal()!=0){
 							ordinal="(" + eventCrfAudit.getOrdinal() + ")" ;
-							
+						}else if(eventCrfAudit.getOrdinal()==0 && eventCrfAudit.getItemDataRepeatKey() != 0){
+							ordinal="(" + eventCrfAudit.getItemDataRepeatKey() + ")" ;
 						}
+						
 						
 						
 						excelRow = new String[] {
