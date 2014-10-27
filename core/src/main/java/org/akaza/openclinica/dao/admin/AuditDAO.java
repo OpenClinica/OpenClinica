@@ -93,8 +93,9 @@ public class AuditDAO extends EntityDAO {
         this.setTypeExpected(17, TypeNames.STRING); // event_crf_Name
         this.setTypeExpected(18, TypeNames.INT); // study_event_id
         this.setTypeExpected(19, TypeNames.INT); // ordinal
-        this.setTypeExpected(20, TypeNames.DATE); // audit_date
-        this.setTypeExpected(21, TypeNames.STRING); // audit_table
+        this.setTypeExpected(20, TypeNames.DATE); // interviewed_date
+        this.setTypeExpected(21, TypeNames.STRING); // interviewer
+        this.setTypeExpected(22, TypeNames.INT); // ordinal from audit_log_event table
     }
 
     /**
@@ -124,7 +125,8 @@ public class AuditDAO extends EntityDAO {
         eb.setAuditEventTypeId(((Integer) hm.get("audit_log_event_type_id")).intValue());
         eb.setUserName((String) hm.get("user_name"));
         eb.setAuditEventTypeName((String) hm.get("name"));
-
+        
+        
         return eb;
     }
 
@@ -143,7 +145,9 @@ public class AuditDAO extends EntityDAO {
         eb.setStudyEventId((Integer) hm.get("study_event_id"));
         eb.setOrdinal((Integer) hm.get("ordinal"));
         eb.setDateInterviewed((java.util.Date) hm.get("date_interviewed"));
-        eb.setInterviewerName((String) hm.get("interviewer_name"));       
+        eb.setInterviewerName((String) hm.get("interviewer_name"));          
+        if (  ((Integer) hm.get("item_data_repeat_key")) != null)
+          eb.setItemDataRepeatKey(((Integer) hm.get("item_data_repeat_key")));
         return eb;
     }
 

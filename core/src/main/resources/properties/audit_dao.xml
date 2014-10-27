@@ -101,7 +101,7 @@
 			SELECT DISTINCT on (joe.event_crf_version_id) ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
         	ale.new_value, ale.event_crf_id, ua.user_name, alet.name, item.item_data_type_id , joe.event_crf_version_id,cv.name crf_version_name,c.name crf_name,  
-        	joe.study_event_id , id.ordinal,ec.date_interviewed , ec.interviewer_name FROM 
+        	joe.study_event_id , id.ordinal,ec.date_interviewed , ec.interviewer_name , ale.item_data_repeat_key FROM 
         	audit_log_event ale 
         	JOIN (SELECT DISTINCT event_crf_id, study_event_id, event_crf_version_id from audit_log_event ale where ale.event_crf_id in 
             	(SELECT DISTINCT ale.event_crf_id from audit_log_event ale
@@ -124,7 +124,7 @@
             SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
         	ale.new_value, ale.event_crf_id, ua.user_name, alet.name, item.item_data_type_id , joe.event_crf_version_id,cv.name crf_version_name, c.name crf_name, 
-        	joe.study_event_id study_event_id, id.ordinal,ec.date_interviewed , ec.interviewer_name FROM 
+        	joe.study_event_id study_event_id, id.ordinal,ec.date_interviewed , ec.interviewer_name , ale.item_data_repeat_key FROM 
         	audit_log_event ale 
         	JOIN (SELECT DISTINCT event_crf_id, study_event_id, event_crf_version_id from audit_log_event ale where ale.event_crf_id in 
             	(SELECT DISTINCT ale.event_crf_id from audit_log_event ale

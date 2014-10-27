@@ -319,8 +319,11 @@
                        <c:choose>
                            <c:when test="${eventCRFAudit.ordinal!=0}">
                                <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
-                           </c:when>
-                           <c:otherwise>
+                           </c:when >
+                           <c:when test="${eventCRFAudit.ordinal==0 && eventCRFAudit.itemDataRepeatKey != 0}">
+                               <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.itemDataRepeatKey}"/>)</td>
+                           </c:when >                      
+                            <c:otherwise>
                                <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/></td>
                            </c:otherwise>
                       </c:choose>                           

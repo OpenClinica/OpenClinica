@@ -34,9 +34,19 @@ public class AuditBean extends EntityBean {
     private String crfVersionName;
     private Date dateInterviewed;
     private String interviewerName;
+    private int itemDataRepeatKey;
+
     
 	
-    public Date getDateInterviewed() {
+    public int getItemDataRepeatKey() {
+		return itemDataRepeatKey;
+	}
+
+	public void setItemDataRepeatKey(int itemDataRepeatKey) {
+		this.itemDataRepeatKey = itemDataRepeatKey;
+	}
+
+	public Date getDateInterviewed() {
 		return dateInterviewed;
 	}
     
