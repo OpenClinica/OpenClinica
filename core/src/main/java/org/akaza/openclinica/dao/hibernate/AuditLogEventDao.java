@@ -77,6 +77,8 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		    	 
 		    	 if (igm.isRepeatingGroup()  &&  id.getOrdinal()>0){		    			 
      			      buildQuery+= " and do.entityId = " + id.getItemDataId();
+     			      buildQuery+= " and do.entityName != \'Status\'";
+    			      
 		    	 }
  
 		    	 
