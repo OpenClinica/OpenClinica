@@ -84,17 +84,13 @@ public class OpenRosaXmlGenerator {
 	    	String preInstance = xformMinusInstance.substring(0,xformMinusInstance.indexOf("<instance>"));
 			String instance = buildInstance(html.getHead().getModel(),crfVersion,crfSections);
 	    	String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>")+"</instance>".length());
-
 	    	System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
-	    	
 	    	return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
         }
     	catch (Exception e)
     	{
     		log.error(e.getMessage());
     		log.error(ExceptionUtils.getStackTrace(e));
-    		System.out.println(e.getMessage());
-    		System.out.println(ExceptionUtils.getStackTrace(e));
     		throw new Exception(e);
     	}
     }
@@ -107,13 +103,16 @@ public class OpenRosaXmlGenerator {
 		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);	
-    	html.getHead().setTitle(crf.getName() + ": " + crfVersion.getName());
+    	html.getHead().setTitle(crf.getName());
 
 		for (SectionBean section:crfSections)
 		{
 			Group group = new Group();
 			group.setUsercontrol(new ArrayList<UserControl>());
 			group.setAppearance("field-list");
+			Label groupLabel = new Label();
+			groupLabel.setLabel(section.getName());
+			group.setLabel(groupLabel);
 			ArrayList<ItemBean> items = section.getItems();
 			for (ItemBean item:items)
 			{

@@ -24,10 +24,10 @@ public class InputWidget extends BaseWidget {
 	public UserControl getUserControl() {
 		Input input = new Input();
 		Label label = new Label();
-		label.setLabel(item.getItemMeta().getLeftItemText());
+		label.setLabel(item.getItemMeta().getHeader());
 		input.setLabel(label);
 		Hint hint = new Hint();
-		hint.setHint(item.getDescription());
+		hint.setHint(item.getItemMeta().getLeftItemText());
 		input.setHint(hint);
 		if (appearance != null) input.setAppearance(appearance);
 		input.setRef("/" + version.getOid() + "/" + item.getOid());

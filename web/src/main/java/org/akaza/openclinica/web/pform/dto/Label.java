@@ -5,20 +5,15 @@ public class Label{
 	private String label;
 	
 	public String getRef() {
-	  return ref;
-  }
+		return ref;
+	}
 	public void setRef(String ref) {
-	  this.ref = ref;
-  }
+		this.ref = ref;
+	}
 	public String getLabel() {
-	  return label;
-  }
+		return label;
+	}
 	public void setLabel(String label) {
-	  this.label = label;
-  }
-	
-	@Override
-	public String toString() {
-			return "<label ref=" +ref+ ">" +label+ "</label>";
+		this.label = label;
 	}
 }

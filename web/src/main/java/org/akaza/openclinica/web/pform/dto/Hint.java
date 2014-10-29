@@ -6,20 +6,15 @@ public class Hint {
 	private String hint;
 	
 	public String getRef() {
-	  return ref;
+		return ref;
   }
 	public void setRef(String ref) {
-	  this.ref = ref;
+		this.ref = ref;
   }
 	public String getHint() {
-	  return hint;
+		return hint;
   }
 	public void setHint(String hint) {
-	  this.hint = hint;
+		this.hint = hint;
   }
-	
-	@Override
-	public String toString() {
-		return "<hint>" +hint+ "</hint>";
-	}
 }

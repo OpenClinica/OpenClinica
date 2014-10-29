@@ -10,27 +10,17 @@ public class Html {
 	public Html(Html html) {
 		setHead(html.getHead());
 		setBody(html.getBody());
-	}
-	
+	}	
 	public Head getHead() {
-	  return head;
-  }
-	
+		return head;
+	}	
 	public void setHead(Head head) {
-	  this.head = head;
-  }
-	
+		this.head = head;
+	}	
 	public Body getBody() {
-	  return body;
-  }
-	
+		return body;
+	}	
 	public void setBody(Body body) {
-	  this.body = body;
-  }
-	
-	
-	@Override
-	public String toString() {
-	  return "<html> "+body.toString()+" </html>";
+		this.body = body;
 	}
 }

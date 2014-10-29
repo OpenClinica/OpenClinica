@@ -29,10 +29,10 @@ public class Select1Widget extends BaseWidget {
 	public UserControl getUserControl() {
 		Select1 select1 = new Select1();
 		Label label = new Label();
-		label.setLabel(item.getItemMeta().getLeftItemText());
+		label.setLabel(item.getItemMeta().getHeader());
 		select1.setLabel(label);
 		Hint hint = new Hint();
-		hint.setHint(item.getDescription());
+		hint.setHint(item.getItemMeta().getLeftItemText());
 		select1.setHint(hint);
 
 		select1.setRef("/" + version.getOid() + "/" + item.getOid());

@@ -8,20 +8,20 @@ public class Model {
 	private String instance = "initialvalueinmodeldto";
 	
 	public String getInstance() {
-	  return instance;
-  }
+		return instance;
+	}
 	
 	public void setInstance(String instance) {
-	  this.instance = instance;
-  }
+		this.instance = instance;
+	}
 	
 	public List<Bind> getBind() {
-	  return bind;
-  }
+		return bind;
+	}
 	
 	public void setBind(List<Bind> bind) {
-	  this.bind = bind;
-  }
+		this.bind = bind;
+	}
 		
 	public Bind getBindByNodeSet(String nodeSet) {
 		if (bind != null) {
@@ -32,17 +32,5 @@ public class Model {
 			}
 		}
 		return null;
-	}
-	
-	@Override
-	public String toString() {
-		String temp = "<model> "+instance;
-		if (bind.size() > 0) {
-			for (int i = 0; i < bind.size(); i++) {
-				temp = temp +" "+bind.get(i).toString();  
-			}
-		}
-		temp = temp +"</model> ";
-	  return temp ;
 	}
 }

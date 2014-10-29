@@ -115,26 +115,6 @@
             <bind-xml name="hint" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
-    <class name="org.akaza.openclinica.web.pform.dto.UserControl">
-        <field name="ref" type="string">
-            <bind-xml name="ref" node="attribute" />
-        </field>
-        <field name="appearance" type="string">
-            <bind-xml name="appearance" node="attribute" />
-        </field>
-        <field name="mediatype" type="string">
-            <bind-xml name="mediatype" node="attribute" />
-        </field>
-        <field name="label" type="org.akaza.openclinica.web.pform.dto.Label">
-            <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>
-        <field name="hint" type="org.akaza.openclinica.web.pform.dto.Hint">
-            <bind-xml name="hint" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>
-        <field name="item" type="org.akaza.openclinica.web.pform.dto.Item" collection="arraylist">
-            <bind-xml name="item" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>
-    </class>
     <class name="org.akaza.openclinica.web.pform.dto.Label">
         <map-to xml="label" />
         <field name="ref" type="string">
@@ -159,7 +139,7 @@
             <bind-xml name="appearance" node="attribute" />
         </field>
         <field name="label" type="org.akaza.openclinica.web.pform.dto.Label">
-            <bind-xml name="label" node="element" />
+            <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
        <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />

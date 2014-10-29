@@ -7,22 +7,14 @@ public class Head {
 
 	public String getTitle() {
 	  return title;
-  }
-
+	}
 	public void setTitle(String title) {
-	  this.title = title;
-  }
-	
+		this.title = title;
+	}
 	public Model getModel() {
-	  return model;
-  }
-
+		return model;
+	}
 	public void setModel(Model model) {
-	  this.model = model;
-  }
-	
-	@Override
-	public String toString() {
-	  return "<head> <title>"+title+"</title> "+model.toString()+ " </head>";
+		this.model = model;
 	}
 }
