@@ -1,9 +1,8 @@
 package org.akaza.openclinica.web.pform.dto;
 
-
-public class HintDTO {
+public class Label{
 	private String ref;
-	private String hint;
+	private String label;
 	
 	public String getRef() {
 	  return ref;
@@ -11,15 +10,15 @@ public class HintDTO {
 	public void setRef(String ref) {
 	  this.ref = ref;
   }
-	public String getHint() {
-	  return hint;
+	public String getLabel() {
+	  return label;
   }
-	public void setHint(String hint) {
-	  this.hint = hint;
+	public void setLabel(String label) {
+	  this.label = label;
   }
 	
 	@Override
 	public String toString() {
-		return "<hint>" +hint+ "</hint>";
+			return "<label ref=" +ref+ ">" +label+ "</label>";
 	}
 }

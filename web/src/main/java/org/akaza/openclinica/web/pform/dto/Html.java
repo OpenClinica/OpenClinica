@@ -1,30 +1,30 @@
 package org.akaza.openclinica.web.pform.dto;
 
-public class HtmlDTO {
+public class Html {
 	
-	private HeadDTO head;
-	private BodyDTO body;
+	private Head head;
+	private Body body;
 	
-	public HtmlDTO() {}
+	public Html() {}
 	
-	public HtmlDTO(HtmlDTO html) {
+	public Html(Html html) {
 		setHead(html.getHead());
 		setBody(html.getBody());
 	}
 	
-	public HeadDTO getHead() {
+	public Head getHead() {
 	  return head;
   }
 	
-	public void setHead(HeadDTO head) {
+	public void setHead(Head head) {
 	  this.head = head;
   }
 	
-	public BodyDTO getBody() {
+	public Body getBody() {
 	  return body;
   }
 	
-	public void setBody(BodyDTO body) {
+	public void setBody(Body body) {
 	  this.body = body;
   }
 	

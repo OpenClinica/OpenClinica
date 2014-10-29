@@ -1,6 +1,6 @@
 package org.akaza.openclinica.web.pform.dto;
 
-public class BindDTO {
+public class Bind {
 	private String nodeSet;
 	private String type;
 	private String readOnly;

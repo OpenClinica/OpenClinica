@@ -3,10 +3,9 @@ package org.akaza.openclinica.web.pform.dto;
 
 import java.util.List;
 
-public class ModelDTO {
-	private List<BindDTO> bind;
+public class Model {
+	private List<Bind> bind;
 	private String instance = "initialvalueinmodeldto";
-	private ITextDTO itext;
 	
 	public String getInstance() {
 	  return instance;
@@ -16,23 +15,15 @@ public class ModelDTO {
 	  this.instance = instance;
   }
 	
-	public List<BindDTO> getBind() {
+	public List<Bind> getBind() {
 	  return bind;
   }
 	
-	public void setBind(List<BindDTO> bind) {
+	public void setBind(List<Bind> bind) {
 	  this.bind = bind;
   }
-	
-	public ITextDTO getItext() {
-	  return itext;
-  }
-	
-	public void setItext(ITextDTO itext) {
-	  this.itext = itext;
-  }
-	
-	public BindDTO getBindByNodeSet(String nodeSet) {
+		
+	public Bind getBindByNodeSet(String nodeSet) {
 		if (bind != null) {
 			for (int i = 0; i < bind.size(); i++) {
 				if (bind.get(i).getNodeSet().equals(nodeSet)) {
@@ -46,9 +37,6 @@ public class ModelDTO {
 	@Override
 	public String toString() {
 		String temp = "<model> "+instance;
-		if (itext != null) {
-			temp = temp + " " + itext.toString();
-		}
 		if (bind.size() > 0) {
 			for (int i = 0; i < bind.size(); i++) {
 				temp = temp +" "+bind.get(i).toString();  

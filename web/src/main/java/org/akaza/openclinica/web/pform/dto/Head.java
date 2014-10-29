@@ -1,9 +1,9 @@
 package org.akaza.openclinica.web.pform.dto;
 
-public class HeadDTO {
+public class Head {
 	
 	private String title;
-	private ModelDTO model;
+	private Model model;
 
 	public String getTitle() {
 	  return title;
@@ -13,11 +13,11 @@ public class HeadDTO {
 	  this.title = title;
   }
 	
-	public ModelDTO getModel() {
+	public Model getModel() {
 	  return model;
   }
 
-	public void setModel(ModelDTO model) {
+	public void setModel(Model model) {
 	  this.model = model;
   }
 	

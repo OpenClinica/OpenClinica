@@ -1,14 +1,14 @@
 package org.akaza.openclinica.web.pform.dto;
 
 
-public class ItemDTO {
-	private LabelDTO label;
+public class Item {
+	private Label label;
 	private String value;
 	
-	public LabelDTO getLabel() {
+	public Label getLabel() {
 	  return label;
   }
-	public void setLabel(LabelDTO label) {
+	public void setLabel(Label label) {
 	  this.label = label;
   }
 	public String getValue() {
