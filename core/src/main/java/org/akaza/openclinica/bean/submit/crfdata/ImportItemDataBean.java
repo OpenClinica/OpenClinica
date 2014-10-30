@@ -3,6 +3,7 @@ package org.akaza.openclinica.bean.submit.crfdata;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
+import org.akaza.openclinica.domain.datamap.ItemDataBean;
 
 public class ImportItemDataBean {
     private String itemOID;
@@ -14,11 +15,19 @@ public class ImportItemDataBean {
     private String reasonForNull;
     private AuditLogsBean auditLogs = new AuditLogsBean();
     private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
-    
+    private ItemDataBean itemDataBean;
     private boolean hasValueWithNull; //this is just a flag, it is not an attribute/element
 
     
-    public String getItemName() {
+    public ItemDataBean getItemDataBean() {
+		return itemDataBean;
+	}
+
+	public void setItemDataBean(ItemDataBean itemDataBean) {
+		this.itemDataBean = itemDataBean;
+	}
+
+	public String getItemName() {
 		return itemName;
 	}
 

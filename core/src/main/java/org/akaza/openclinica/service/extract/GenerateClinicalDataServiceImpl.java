@@ -552,7 +552,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		           itemDataBean1.setValue("");
 		           itemDataBean1.setDateCreated(itemData.getDateCreated());
 		           itemDataBean1.setDateUpdated(itemData.getDateUpdated());
-		           itemDataBean1.setUpdateId(itemData.getUpdateId());
+		           itemDataBean1.setUpdateId(itemData.getUpdateId());		          
 		           itemDataBean1.setOrdinal(-1);           
 		           itemDataBean1.setDnItemDataMaps(itemData.getDnItemDataMaps());
 
@@ -671,8 +671,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			           
 						iiDataBean.setItemName(value.substring(index2 + 1,
 								value.length()));
-
-
 						
 						if(isCollectAudits()||isCollectDns()){
 							
@@ -929,6 +927,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		AuditLogBean auditBean = new AuditLogBean();
 		auditBean.setOid("AL_"+auditLogEvent.getAuditId());
 		auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
+		
+		auditBean.setItemDataRepeatKey(auditLogEvent.getItemDataRepeatKey()==null?"-1" : auditLogEvent.getItemDataRepeatKey());
+		
 		if(auditLogEvent.getEntityName()!=null && auditLogEvent.getEntityName().equals(STATUS))
 		{
 		/*	if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
@@ -967,6 +968,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		auditBean.setValueType(auditLogEvent.getEntityName()==null?"":auditLogEvent.getEntityName());
 		
+		if(auditLogEvent.getItemDataRepeatKey() != null)
+		auditBean.setItemDataRepeatKey(auditLogEvent.getItemDataRepeatKey());
 		
 		if(auditLogEvent.getUserAccount()!=null && auditLogEvent.getUserAccount().getUserId()!=0)
 		{

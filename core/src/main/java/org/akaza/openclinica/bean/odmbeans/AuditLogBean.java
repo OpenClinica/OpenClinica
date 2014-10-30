@@ -27,13 +27,21 @@ public class AuditLogBean extends ElementOIDBean {
     private String userName="";
     private String name="";
     private String valueType="";
-
+    private String itemDataRepeatKey; 
+    
     public int compareTo(Object o) {
         AuditLogBean b = (AuditLogBean) o;
         return this.getDatetimeStamp().compareTo(b.getDatetimeStamp());
     }
     
-    public String getUserId() {
+
+	public String getItemDataRepeatKey() {
+		return itemDataRepeatKey;
+	}
+	public void setItemDataRepeatKey(String itemDataRepeatKey) {
+		this.itemDataRepeatKey = itemDataRepeatKey;
+	}
+	public String getUserId() {
         return userId;
     }
     public void setUserId(String userId) {

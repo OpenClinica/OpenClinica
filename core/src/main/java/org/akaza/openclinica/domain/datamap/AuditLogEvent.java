@@ -51,6 +51,7 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 	//private CrfVersion crfVersion;
 	private AuditLogEventType auditLogEventType;
 	//private EventCrf eventCrf;
+	private String itemDataRepeatKey;
 	
 	public AuditLogEvent() {
 	}
@@ -249,4 +250,16 @@ public class AuditLogEvent extends DataMapDomainObject implements Serializable{
 		this.userAccount = userAccount;
 	}
 
+	@Column(name = "item_data_repeat_key")
+   public String getItemDataRepeatKey() {
+		return itemDataRepeatKey;
+	}
+
+	public void setItemDataRepeatKey(String itemDataRepeatKey) {
+		this.itemDataRepeatKey = itemDataRepeatKey;
+	}
+
+	
+	
+	
 }

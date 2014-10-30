@@ -67,38 +67,15 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
         	   }
         	   
 		      buildQuery= buildQuery.substring(0,buildQuery.length()-4);       
-		       buildQuery+= " ) ";
+		      buildQuery+= " ) ";
 	
 		       
 	   for (ItemGroupMetadata igm :id.getItem().getItemGroupMetadatas() ){
 		     if (igm.getCrfVersion().getCrfVersionId() == arr.get(0).getCrfVersionId() ){
-	     
-		    	 
-		    	 
-		    	 if (igm.isRepeatingGroup()  &&  id.getOrdinal()>0){		    			 
-     			      buildQuery+= " and do.entityId = " + id.getItemDataId();
-     			      buildQuery+= " and do.entityName != \'Status\'";
-    			      
-		    	 }
- 
-		    	 
-		    	 if(igm.isRepeatingGroup() && id.getOrdinal()==-1){
-		    		 
-		    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
-                     buildQuery+= " and do.eventCrfId !="+ id.getEventCrf().getEventCrfId();	      
-	    	      }
-
-		    	 if (!igm.isRepeatingGroup()){
 	    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
-		    	 }
  
 		    	 } 		    		 
 		     }
-	   
-		   
-		      
-// 		    			 oidDNAuditMap.containsKey(id.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid() + GROUPOID_ORDINAL_DELIM + String.valueOf(0))){
-
 	   
 
 		       buildQuery+= " and (do.oldValue !='' OR do.newValue != '') ";
