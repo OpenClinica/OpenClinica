@@ -323,7 +323,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
                 for (AuditLogBean audit : audits) {
                 	
-               System.out.println("repeat key:  "+audit.getItemDataRepeatKey() +"   value of itemRepeatKey:   "+String.valueOf(itemRepeatKey));
                String value =String.valueOf(itemRepeatKey);
               	if (audit.getItemDataRepeatKey().equals(value))
                 	this.addOneAuditLog(audit, currentIndent + indent);
