@@ -53,8 +53,8 @@ public class CrfVersion extends DataMapDomainObject {
 	private List<Section> sections ;
 	private List<EventDefinitionCrf> eventDefinitionCrfs;
 	private Set decisionConditions = new HashSet(0);
-	private Set<ItemGroupMetadata> itemGroupMetadatas ;;
-
+	private Set<ItemGroupMetadata> itemGroupMetadatas ;
+    private List <AuditLogEvent> auditLogEvent;
 	public CrfVersion() {
 	}
 

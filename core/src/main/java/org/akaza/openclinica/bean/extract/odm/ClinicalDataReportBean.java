@@ -19,10 +19,13 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -33,7 +36,7 @@ import java.util.Date;
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
-
+    private boolean auditLogExists;
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
         super();
         this.clinicalData = clinicaldata;
@@ -154,12 +157,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(nls);
                     //
                     ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
-                    for (ImportItemGroupDataBean ig : igs) {
-                        xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
+                     Collections.sort(igs, ImportItemGroupDataBean.importItemGroupOID);
+                     for (ImportItemGroupDataBean ig : igs) {
+
+                       xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
                             + StringEscapeUtils.escapeXml(ig.getItemGroupOID()) + "\" ");
-                        if (!"-1".equals(ig.getItemGroupRepeatKey())) {
-                            xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
-                        }
+
+                        	xml.append("ItemGroupRepeatKey=\"" + ig.getItemRGkey() + "\" ");
+                        
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
@@ -175,7 +180,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                                     xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
                                     if(!printValue) {
-                                        xml.append("/>");
+                                        xml.append("/>");  
                                         xml.append(nls);
                                     }
                                 }
@@ -199,14 +204,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 //
 
                                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                                    if (item.getAuditLogs() != null && item.getAuditLogs().getAuditLogs().size() > 0) {
+                                    if (item.getAuditLogs() != null && item.getAuditLogs().getAuditLogs().size() > 0 ) {   
                                         if (hasElm) {
                                         } else {
                                             xml.append(">");
                                             xml.append(nls);
                                             hasElm = true;
                                         }
-                                        this.addAuditLogs(item.getAuditLogs(), indent + indent + indent + indent + indent + indent + indent);
+                                        this.addAuditLogs(item.getAuditLogs(), indent + indent + indent + indent + indent + indent + indent, ig.getItemRGkey());
                                     }
                                     //
                                     if (item.getDiscrepancyNotes() != null && item.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
@@ -231,11 +236,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
                         xml.append(nls);
-                    }
+                }
                     //
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
-                            this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent);
+                    	if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
+                            this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent,1);
                         }
                         //
                         if (form.getDiscrepancyNotes() != null && form.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
@@ -247,8 +252,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 //
                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                    if (se.getAuditLogs() != null && se.getAuditLogs().getAuditLogs().size() > 0) {
-                        this.addAuditLogs(se.getAuditLogs(), indent + indent + indent + indent);
+                	if (se.getAuditLogs() != null && se.getAuditLogs().getAuditLogs().size() > 0) {
+                        this.addAuditLogs(se.getAuditLogs(), indent + indent + indent + indent,1);
                     }
                     //
                     if (se.getDiscrepancyNotes() != null && se.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
@@ -259,7 +264,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                ArrayList<SubjectGroupDataBean> sgddata = (ArrayList<SubjectGroupDataBean>) sub.getSubjectGroupData();
+            	ArrayList<SubjectGroupDataBean> sgddata = (ArrayList<SubjectGroupDataBean>) sub.getSubjectGroupData();
                 if (sgddata.size() > 0) {
                     for (SubjectGroupDataBean sgd : sgddata) {
                         String cid =
@@ -280,7 +285,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 //
                 if (sub.getAuditLogs() != null && sub.getAuditLogs().getAuditLogs().size() > 0) {
-                    this.addAuditLogs(sub.getAuditLogs(), indent + indent + indent);
+                    this.addAuditLogs(sub.getAuditLogs(), indent + indent + indent ,1);
                 }
                 //
                 if (sub.getDiscrepancyNotes() != null && sub.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
@@ -294,20 +299,36 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(indent + "</ClinicalData>");
             xml.append(nls);
         }
+        
     }
     
-    protected void addAuditLogs(AuditLogsBean auditLogs, String currentIndent) {
+    
+    protected void addAuditLogs(AuditLogsBean auditLogs, String currentIndent, int itemRepeatKey ) {
         if (auditLogs != null) {
+        	Boolean auditExist= false;
             ArrayList<AuditLogBean> audits = auditLogs.getAuditLogs();
-            if (audits != null && audits.size() > 0) {
+			for (AuditLogBean audit : audits) {
+				String value = String.valueOf(itemRepeatKey);
+				if (audit.getItemDataRepeatKey().equals(value)) {
+					
+					auditExist = true;
+				}
+			}       
+            
+            if (audits != null && audits.size() > 0 && auditExist) {
                 StringBuffer xml = this.getXmlOutput();
                 String indent = this.getIndent();
                 String nls = System.getProperty("line.separator");
                 xml.append(currentIndent + "<OpenClinica:AuditLogs EntityID=\"" + auditLogs.getEntityID() + "\">");
                 xml.append(nls);
                 for (AuditLogBean audit : audits) {
-                    this.addOneAuditLog(audit, currentIndent + indent);
+                	
+               String value =String.valueOf(itemRepeatKey);
+              	if (audit.getItemDataRepeatKey().equals(value))
+                	this.addOneAuditLog(audit, currentIndent + indent);
+                			
                 }
+                
                 xml.append(currentIndent + "</OpenClinica:AuditLogs>");
                 xml.append(nls);
             }
@@ -316,7 +337,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
   
 
-    protected void addOneAuditLog(AuditLogBean audit, String currentIndent) {
+    protected void addOneAuditLog(AuditLogBean audit, String currentIndent ) {
         if (audit != null) {
             StringBuffer xml = this.getXmlOutput();
             String indent = this.getIndent();

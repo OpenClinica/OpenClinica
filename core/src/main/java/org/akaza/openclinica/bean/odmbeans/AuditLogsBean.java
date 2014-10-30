@@ -19,6 +19,8 @@ import java.util.ArrayList;
  */
 public class AuditLogsBean {
     private String entityID;
+    private String entityName;
+  
     private ArrayList<AuditLogBean> auditLogs = new ArrayList<AuditLogBean>();
     
     public String getEntityID() {
@@ -27,6 +29,14 @@ public class AuditLogsBean {
     public void setEntityID(String entityID) {
         this.entityID = entityID;
     }
+    
+    public String getEntityName() {
+		return entityName;
+	}
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+	
     public ArrayList<AuditLogBean> getAuditLogs() {
         return auditLogs;
     }

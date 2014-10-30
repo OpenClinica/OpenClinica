@@ -1,10 +1,21 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.akaza.openclinica.bean.admin.CrfVersionMappingBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemDataBean;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.hibernate.Filter;
 import org.hibernate.impl.FilterImpl;
 
 public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
+	private final static String GROUPOID_ORDINAL_DELIM = ":";
 
 	 @Override
 	    public Class<AuditLogEvent> domainClass() {
@@ -41,5 +52,41 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
         	   q.setString("anotherAuditTable", anotherAuditTable);
 	       }
 	        	   return (T) q.list();
+	 }
+
+	 @SuppressWarnings("unchecked")
+	public <T> T findByParamUpdated( ArrayList<CrfVersionMappingBean> arr, ItemDataBean id ,String itemName, HashMap<String, List<ItemDataBean>> oidDNAuditMap	){
+		   getSessionFactory().getStatistics().logSummary();
+		   
+		   
+		   
+		   String query = "";
+		   String buildQuery = " (   ";
+        	   for (CrfVersionMappingBean ar :arr){
+		       buildQuery+= " ( do.eventCrfId ="+ ar.getEventCrfId()   +")  OR ";        		   
+        	   }
+        	   
+		      buildQuery= buildQuery.substring(0,buildQuery.length()-4);       
+		      buildQuery+= " ) ";
+	
+		       
+	   for (ItemGroupMetadata igm :id.getItem().getItemGroupMetadatas() ){
+		     if (igm.getCrfVersion().getCrfVersionId() == arr.get(0).getCrfVersionId() ){
+	    		 buildQuery+= " and do.entityName =\'"+itemName.toString()+"\'";
+ 
+		    	 } 		    		 
+		     }
+	   
+
+		       buildQuery+= " and (do.oldValue !='' OR do.newValue != '') ";
+	      	   buildQuery+= " order by do.auditId ";
+	       
+		    query = "from " + getDomainClassName() +  " do  where "+buildQuery;
+
+		    org.hibernate.Query q = getCurrentSession().createQuery(query);
+
+	
+	          
+	  	        	   return (T) q.list();
 	 }
 }
