@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:jr="http://openrosa.org/javarosa"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns="http://www.w3.org/2002/xforms">
+    <h:head>
+        <h:title>BMI_CRF</h:title>
+        <model>
+            <instance>
+<F_BMI_CRF_TEST5 id="F_BMI_CRF_TEST5">
+   <I_BMI_C_HEIGHT_INCH/>
+   <I_BMI_C_WEIGHT_LBS/>
+   <I_BMI_C_BMI_CALC_1/>
+   <I_BMI_C_BMI_CALC_MIN/>
+   <I_BMI_C_BMI_CALC_MAX/>
+   <I_BMI_C_BMI_CALC_MEAN/>
+   <I_BMI_C_BMI_CALC_MEDIAN/>
+   <I_BMI_C_BMI_CALC_STDEV/>
+   <I_BMI_C_HEIGHT_CM/>
+   <I_BMI_C_WEIGHT_KG/>
+   <I_BMI_C_BMI_CALC_2/>
+   <I_BMI_C_BMI_CALC_MAX_2/>
+   <I_BMI_C_BMI_CALC_MEAN_2/>
+   <I_BMI_C_BMI_CALC_MEDIAN_2/>
+   <I_BMI_C_BMI_CALC_STDEV_2/>
+</F_BMI_CRF_TEST5>
+</instance>
+            <bind nodeset="/F_BMI_CRF_TEST5/I_BMI_C_HEIGHT_INCH" type="float"/>
+            <bind nodeset="/F_BMI_CRF_TEST5/I_BMI_C_WEIGHT_LBS" type="float"/>
+            <bind nodeset="/F_BMI_CRF_TEST5/I_BMI_C_HEIGHT_CM" type="float"/>
+            <bind nodeset="/F_BMI_CRF_TEST5/I_BMI_C_WEIGHT_KG" type="float"/>
+        </model>
+    </h:head>
+    <h:body class="pages">
+        <group appearance="field-list">
+            <label>BMI Calc</label>
+            <input ref="/F_BMI_CRF_TEST5/I_BMI_C_HEIGHT_INCH">
+                <label/>
+                <hint>Height (in)</hint>
+            </input>
+            <input ref="/F_BMI_CRF_TEST5/I_BMI_C_WEIGHT_LBS">
+                <label/>
+                <hint>Weight (lbs)</hint>
+            </input>
+        </group>
+        <group appearance="field-list">
+            <label>BMI Calc 2</label>
+            <input ref="/F_BMI_CRF_TEST5/I_BMI_C_HEIGHT_CM">
+                <label/>
+                <hint>Height (cm)</hint>
+            </input>
+            <input ref="/F_BMI_CRF_TEST5/I_BMI_C_WEIGHT_KG">
+                <label/>
+                <hint>Weight (lbs)</hint>
+            </input>
+        </group>
+    </h:body>
+</h:html>
