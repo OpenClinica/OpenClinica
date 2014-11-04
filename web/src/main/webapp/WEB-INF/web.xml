@@ -934,9 +934,9 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFVersionServlet</servlet-class>
     </servlet>
         <servlet>
-        <servlet-name>PformCreateUserAccountServlet</servlet-name>
-        <display-name>PformCreateUserAccount</display-name>
-        <servlet-class>org.akaza.openclinica.web.pform.submit.PformCreateUserAccountServlet</servlet-class>
+        <servlet-name>PformDataSaveServlet</servlet-name>
+        <display-name>PformDataSave</display-name>
+        <servlet-class>org.akaza.openclinica.web.pform.submit.PformDataSaveServlet</servlet-class>
     </servlet>
     
     <servlet>
@@ -1929,8 +1929,8 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/UpdateSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PformCreateUserAccountServlet</servlet-name>
-        <url-pattern>/PformCreateUserAccount</url-pattern>
+        <servlet-name>PformDataSaveServlet</servlet-name>
+        <url-pattern>/PformDataSave</url-pattern>
     </servlet-mapping>
     
     <servlet-mapping>
