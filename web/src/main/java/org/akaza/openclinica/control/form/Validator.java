@@ -453,7 +453,6 @@ public class Validator {
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
 
     public static final int NO_SEMI_COLONS_OR_COLONS = 43;
-    public static final int USERNAME_UNIQUE_PFORM =44;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -748,9 +747,6 @@ public class Validator {
             case USERNAME_UNIQUE:
                 errorMessage = resexception.getString("username_already_exists");
                 break;
-            case USERNAME_UNIQUE_PFORM:
-                errorMessage = resexception.getString("username_already_exists");
-                break;
             case IS_AN_INTEGER:
                 errorMessage = resexception.getString("input_not_integer");
                 break;
@@ -952,13 +948,6 @@ public class Validator {
             UserAccountDAO udao = (UserAccountDAO) v.getArg(0);
 
             if (!usernameUnique(fieldName, udao)) {
-                addError(fieldName, v);
-            }
-            break;
-        case USERNAME_UNIQUE_PFORM:
-            UserAccountDAO udao1 = (UserAccountDAO) v.getArg(0);
-
-            if (!usernameUniquePform(fieldName, udao1)) {
                 addError(fieldName, v);
             }
             break;
@@ -1598,23 +1587,6 @@ public class Validator {
         return true;
     }
 
-    
-
-    protected boolean usernameUniquePform(String fieldName, UserAccountDAO udao) {
-
-        try {
-            UserAccountBean ub = (UserAccountBean) udao.findByUserName(fieldName);
-
-            if (ub.isActive()) {
-                return false;
-            }
-        } catch (Exception e) {
-            return true;
-        }
-
-        return true;
-    }
-    
     protected boolean usernameUnique(String fieldName, UserAccountDAO udao) {
         String fieldValue = getFieldValue(fieldName);
 

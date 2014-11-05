@@ -7,16 +7,24 @@
  */
 package org.akaza.openclinica.web.pform.submit;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -35,7 +43,9 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -50,9 +60,12 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.domain.user.LdapUser;
@@ -62,6 +75,24 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+
+import com.lowagie.text.pdf.AcroFields.Item;
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Servlet for creating a user account.
@@ -73,15 +104,13 @@ public class PformDataSaveServlet extends SecureController {
 	// < ResourceBundle restext;
 	Locale locale;
 
-	public static String study_oid = "S_BL101A";
-	public static Integer studySubjectId = 1;
-	public static Integer studyId = 4;
+	public static String study_oid = "S_BL101";
+	public static Integer studySubjectId = 2;
+	public static Integer studyId = 3;
 	public static Integer studyEventDefnId = 2;
-	public static Integer studyEventOrdinal =1;
-	public static Integer crfVersionId =11;
-    
-	
-	
+	public static Integer studyEventOrdinal = 1;
+	public static Integer crfVersionId = 11;
+
 	public static final String INPUT_USER_SOURCE = "userSource";
 	public static final String INPUT_USERNAME = study_oid.trim() + studySubjectId;
 	public static final String INPUT_FIRST_NAME = "particiapant";
@@ -100,7 +129,9 @@ public class PformDataSaveServlet extends SecureController {
 	 * 
 	 * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
 	 */
-	
+
+	// ClassLoader.class.getResourceAsStream("/enketoSubmittedData.xml");
+
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
 
@@ -118,24 +149,20 @@ public class PformDataSaveServlet extends SecureController {
 
 	@Override
 	public void processRequest() throws Exception {
-	createUserAccount();
-	createEventCRF();
-	// dataEntrySubmission();
+		readFromFile();
+		// dataEntrySubmission();
 	}
-	
-	
-	public void createUserAccount() throws Exception{
-		FormProcessor fp = new FormProcessor(request);
+
+	public void createUserAccount() throws Exception {
+
 		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-		Validator v = new Validator(request);
+		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(INPUT_USERNAME);
 
 		// username must be unique
-		v.addValidation(INPUT_USERNAME, Validator.USERNAME_UNIQUE_PFORM, udao);
 
-		HashMap errors = v.validate();
-
-		if (errors.isEmpty()) {
+		if (!userAccountBean.isActive()) {
 			UserAccountBean createdUserAccountBean = new UserAccountBean();
+
 			createdUserAccountBean.setName(INPUT_USERNAME);
 			createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
 			createdUserAccountBean.setLastName(INPUT_LAST_NAME);
@@ -150,7 +177,6 @@ public class PformDataSaveServlet extends SecureController {
 			passwordHash = secm.encrytPassword(password, getUserDetails());
 
 			createdUserAccountBean.setPasswd(passwordHash);
-
 			createdUserAccountBean.setPasswdTimestamp(null);
 			createdUserAccountBean.setLastVisitDate(null);
 
@@ -165,27 +191,14 @@ public class PformDataSaveServlet extends SecureController {
 
 			createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, r);
 			UserType type = UserType.get(2);
-			logger.debug("*** found type: " + fp.getInt("type"));
-			logger.debug("*** setting type: " + type.getDescription());
 			createdUserAccountBean.addUserType(type);
 			createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
 			AuthoritiesDao authoritiesDao = (AuthoritiesDao) SpringServletAccess.getApplicationContext(context).getBean("authoritiesDao");
 			authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
-			String displayPwd = fp.getString(INPUT_DISPLAY_PWD);
 
-			if (createdUserAccountBean.isActive()) {
-				addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName() + "\""
-						+ respage.getString("was_created_succesfully"));
-				if ("no".equalsIgnoreCase(displayPwd)) {
-					try {
-						// sendNewAccountEmail(createdUserAccountBean,
-						// password);
-					} catch (Exception e) {
-						addPageMessage(respage.getString("the_user_already_exists_in_the_system") + " :  " + INPUT_USERNAME);
-					}
-				}
-				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
-			}
+			addPageMessage(respage.getString("the_user_account") + "\"" + createdUserAccountBean.getName() + "\""
+					+ respage.getString("was_created_succesfully"));
+			forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 
 		} else {
 			setInputMessages(errors);
@@ -206,7 +219,6 @@ public class PformDataSaveServlet extends SecureController {
 		studyUserRole.setRoleName(r.getName());
 		studyUserRole.setStatus(Status.AVAILABLE);
 		studyUserRole.setOwner(ub);
-
 		createdUserAccountBean.addRole(studyUserRole);
 
 		return createdUserAccountBean;
@@ -214,82 +226,129 @@ public class PformDataSaveServlet extends SecureController {
 
 	@Override
 	protected String getAdminServlet() {
-		return SecureController.ADMIN_SERVLET_CODE;				
+		return SecureController.ADMIN_SERVLET_CODE;
 	}
-	
-	
-	 public EventCRFBean createEventCRF() throws InconsistentStateException {
-	        locale = LocaleResolver.getLocale(request);
-	  
-	        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-	        StudyBean studyBean =(StudyBean) sdao.findByPK(studyId);
-	        
-	        UserAccountDAO udao =new UserAccountDAO(sm.getDataSource());
-	        UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(INPUT_USERNAME);
-	        
-	        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-            StudyEventBean studyEventBean = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectId, studyEventDefnId, studyEventOrdinal);
-	        System.out.println (studyEventBean.getId());
-	        
-	        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-	        StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studySubjectId);
-	        
-	        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-	        CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-	        
-           EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            ArrayList <EventCRFBean> eventCrfList = ecdao.findByEventSubjectVersion(studyEventBean, studySubjectBean , crfVersionBean );
-               
-               EventCRFBean ecBean = new EventCRFBean();
-     	   if (eventCrfList.size()>0){
-	          logger.info("Event CRF Already Exist");
 
-     	   }else{
-             ecBean.setAnnotations("");
-             ecBean.setCreatedDate(new Date());
-             ecBean.setCRFVersionId(crfVersionId);
-             ecBean.setInterviewerName("");
-             ecBean.setDateInterviewed(null);
-             ecBean.setOwner(userAccountBean);
-             ecBean.setStatus(Status.AVAILABLE);
-             ecBean.setCompletionStatusId(1);
-             ecBean.setStudySubjectId(studySubjectBean.getId());
-             ecBean.setStudyEventId(studyEventBean.getId());
-             ecBean.setValidateString("");
-             ecBean.setValidatorAnnotations("");
-             ecBean.setCRFVersionId(crfVersionBean.getId());
+	public EventCRFBean createEventCRF() throws InconsistentStateException {
+		locale = LocaleResolver.getLocale(request);
 
-             ecBean = (EventCRFBean) ecdao.create(ecBean);
-             logger.debug("*********CREATED EVENT CRF");
-             
-     	
-     	   }
-	      
+		StudyDAO sdao = new StudyDAO(sm.getDataSource());
+		StudyBean studyBean = (StudyBean) sdao.findByPK(studyId);
+
+		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(INPUT_USERNAME);
+
+		StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+		StudyEventBean studyEventBean = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectId,
+				studyEventDefnId, studyEventOrdinal);
+		System.out.println(studyEventBean.getId());
+
+		StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+
+		CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+		CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+
+		EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+		ArrayList<EventCRFBean> eventCrfList = ecdao.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+
+		EventCRFBean ecBean = new EventCRFBean();
+		if (eventCrfList.size() > 0) {
+			logger.info("Event CRF Already Exist");
+
+		} else {
+			ecBean.setAnnotations("");
+			ecBean.setCreatedDate(new Date());
+			ecBean.setCRFVersionId(crfVersionId);
+			ecBean.setInterviewerName("");
+			ecBean.setDateInterviewed(null);
+			ecBean.setOwner(userAccountBean);
+			ecBean.setStatus(Status.AVAILABLE);
+			ecBean.setCompletionStatusId(1);
+			ecBean.setStudySubjectId(studySubjectBean.getId());
+			ecBean.setStudyEventId(studyEventBean.getId());
+			ecBean.setValidateString("");
+			ecBean.setValidatorAnnotations("");
+			ecBean.setCRFVersionId(crfVersionBean.getId());
+
+			ecBean = (EventCRFBean) ecdao.create(ecBean);
+			logger.debug("*********CREATED EVENT CRF");
+
+		}
+
 		return ecBean;
-	    }
+	}
 
-	 
-	 
-	 
-    private ItemDataBean createItemData(ItemDataBean iDataBean, EventCRFBean eventCrfBean){	 
-        ItemDataDAO iddao =new ItemDataDAO(sm.getDataSource());
-      
-    	ItemDataBean itemDataBean = new ItemDataBean();
-    	
-    	itemDataBean.setItemId(iDataBean.getItemId());
-    	itemDataBean.setEventCRFId(eventCrfBean.getId());
-    	itemDataBean.setCreatedDate(new Date());
-        itemDataBean.setStatus(iDataBean.getStatus().AVAILABLE);
-        itemDataBean.setOrdinal(iDataBean.getOrdinal());
-        itemDataBean.setOwner(iDataBean.getOwner());
-        
-       itemDataBean =(ItemDataBean) iddao.create(itemDataBean);    	
-       logger.debug("*********CREATED ITEM DATA Record");
-        
-       return itemDataBean;
-    }
+	private void createItemData(String itemOID ,String itemValue, EventCRFBean eventCrfBean , String crfVersionOID) {
+	    ItemDAO idao = new ItemDAO(sm.getDataSource());
+	    List <ItemBean> iBean =  (ArrayList) idao.findByOid(itemOID);
 
+	    ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+		ItemDataBean itemDataBean = new ItemDataBean();
+
+		itemDataBean.setItemId(iBean.get(0).getId());
+		itemDataBean.setEventCRFId(eventCrfBean.getId());
+		itemDataBean.setValue(itemValue);
+		itemDataBean.setCreatedDate(new Date());
+		itemDataBean.setStatus(Status.AVAILABLE);
+		itemDataBean.setOrdinal(1);
+		itemDataBean.setOwner(eventCrfBean.getOwner());
+
+		itemDataBean = (ItemDataBean) iddao.create(itemDataBean);
+		logger.debug("*********CREATED ITEM DATA Record");
+
+	}
+
+	public void readFromFile() throws Exception {
+		createUserAccount();
+		EventCRFBean eventCrfBean = createEventCRF();
+
+		
+		URL url = this.getClass().getResource("enketoSubmittedData.xml");
+		File file = new File(url.toURI());
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+
+		System.out.println("document element:  " + doc.getDocumentElement().getNodeName());
+
+		NodeList nodeList = doc.getElementsByTagName("instance");
+
+		for (int i = 0; i < nodeList.getLength(); i++) {
+
+			// We have encountered an <employee> tag.
+			Node node = nodeList.item(i);
+			System.out.println("node value:  " + node.getNodeName());
+
+			if (node instanceof Element) {
+
+				NodeList childNodes = node.getChildNodes();
+				for (int j = 1; j < childNodes.getLength(); j=j+2) {
+					Node cnode = childNodes.item(j);
+					String crfVersionOID =cnode.getNodeName().trim();
+					System.out.println("crf_version_ :  " + crfVersionOID);
+
+					if (cnode instanceof Element) {
+
+						NodeList childNodes1 = cnode.getChildNodes();
+						
+						System.out.println("lenth of :   " + childNodes1.getLength());
+						for (int k = 1; k < childNodes1.getLength(); k=k+2) {
+							Node cnode1 = childNodes1.item(k);
+							String itemOID = cnode1.getNodeName().trim();
+							String itemValue = cnode1.getTextContent().trim();
+							
+                            createItemData(itemOID, itemValue, eventCrfBean, crfVersionOID);
+							
+							System.out.println("item_data:  " + itemOID + "  ---    " + itemValue);
+						}
+					}
+
+				}
+			}
+		}
+
+	}
 
 }
-
-
