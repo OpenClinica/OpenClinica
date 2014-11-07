@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.pform;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,6 +30,8 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
@@ -151,7 +155,47 @@ public class OpenRosaServices{
 		    
 	}    
 
+	@POST
+	@Path("/{studyOID}/submission")
+	@Produces(MediaType.APPLICATION_XML)
+	public String doSubmission(@Context HttpServletRequest request,
+			@Context HttpServletResponse response)
+	{
+		String output = null;
+		try {
+			
+		if (ServletFileUpload.isMultipartContent(request)) {
+			System.out.println("WARNING: This prototype doesn't support multipart content.");
+		}
+		
+		StringWriter writer = new StringWriter();
+		String body = IOUtils.toString(request.getInputStream(), "UTF-8");
+		System.out.println(body);
+		System.out.println("Successful OpenRosa submission");
 	
+        // Set response headers
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Date currentDate = new Date();
+		cal.setTime(currentDate);
+		SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
+		format.setCalendar(cal);
+		response.setHeader("Date",  format.format(currentDate));
+		response.setHeader("X-OpenRosa-Version", "1.0");
+		response.setContentType("text/xml; charset=utf-8");
+		response.setStatus(201);
+	
+		output = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" +
+			"<message>success</message>" +
+			"</OpenRosaResponse>";
+	  
+		} catch (Exception e) {
+			System.out.println("Unexpected exception: " + e.getMessage());
+			e.printStackTrace();
+			return "<Error>" + e.getMessage() + "</Error>";
+		}
+		return output;
+	}
+
 	
 	public DataSource getDataSource() {
 		return dataSource;
