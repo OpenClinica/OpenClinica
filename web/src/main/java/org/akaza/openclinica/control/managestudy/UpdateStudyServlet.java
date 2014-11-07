@@ -667,6 +667,7 @@ public class UpdateStudyServlet extends SecureController {
      * @param isInterventional
      */
     private void setMaps(boolean isInterventional, ArrayList interventionArray) {
+    	CreateStudyServlet.updateMaps2();
         if (isInterventional) {
             request.setAttribute("interPurposeMap", CreateStudyServlet.interPurposeMap);
             request.setAttribute("allocationMap", CreateStudyServlet.allocationMap);

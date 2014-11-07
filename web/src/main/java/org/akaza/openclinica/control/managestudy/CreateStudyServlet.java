@@ -1018,7 +1018,13 @@ public class CreateStudyServlet extends SecureController {
     private void updateMaps() {
         if (current_maps_locale != resadmin.getLocale()) {
             current_maps_locale = resadmin.getLocale();
-            facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
+            updateMaps2();
+
+     	}
+    }
+    
+    public static void updateMaps2() {
+    	    facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));
             facRecruitStatusMap.put("recruiting", resadmin.getString("recruiting"));
             facRecruitStatusMap.put("no_longer_recruiting", resadmin.getString("no_longer_recruiting"));
             facRecruitStatusMap.put("completed", resadmin.getString("completed"));
@@ -1086,9 +1092,9 @@ public class CreateStudyServlet extends SecureController {
 
             timingMap.put("retrospective", resadmin.getString("retrospective"));
             timingMap.put("prospective", resadmin.getString("prospective"));
-        }
-    }
+    }    	
 
+    
     @Override
     protected String getAdminServlet() {
         return SecureController.ADMIN_SERVLET_CODE;
