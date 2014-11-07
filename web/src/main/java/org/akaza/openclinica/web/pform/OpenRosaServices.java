@@ -185,7 +185,7 @@ public class OpenRosaServices{
 		response.setStatus(201);
 	
 		output = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" +
-			"<message>form submission was successful!</message>" +
+			"<message>success</message>" +
 			"</OpenRosaResponse>";
 	  
 		} catch (Exception e) {
