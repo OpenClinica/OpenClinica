@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -123,7 +124,9 @@ public class PformDataSaveServlet extends SecureController {
 	public static final String INPUT_DISPLAY_PWD = "displayPwd";
 	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-
+   public DataSource datasource;
+   public UserAccountDAO udao;
+   
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -131,6 +134,14 @@ public class PformDataSaveServlet extends SecureController {
 	 */
 
 	// ClassLoader.class.getResourceAsStream("/enketoSubmittedData.xml");
+
+	public DataSource getDatasource() {
+	return datasource;
+}
+
+public void setDatasource(DataSource datasource) {
+	this.datasource = datasource;
+}
 
 	@Override
 	protected void mayProceed() throws InsufficientPermissionException {
@@ -155,7 +166,7 @@ public class PformDataSaveServlet extends SecureController {
 
 	public void createUserAccount() throws Exception {
 
-		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+	//	UserAccountDAO udao = new UserAccountDAO(getDatasource());
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(INPUT_USERNAME);
 
 		// username must be unique
