@@ -27,8 +27,7 @@ public class EhCacheWrapper<K, V> implements CacheWrapper<K, V>
     
     public V get(final K key) 
     {
-//    	String db_type = CoreResources.getField("dbType");
-    	String db_type = "postgres";
+   	String db_type = CoreResources.getField("dbType");
     	if ( db_type.equalsIgnoreCase("postgres")){
 	    	Element element =null;
 		        Ehcache ehCache = getCache();

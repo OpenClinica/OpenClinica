@@ -28,6 +28,11 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.service.crfdata.BeanPropertyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,10 +48,10 @@ import org.w3c.dom.NodeList;
 public class PformSubmissionService {
 
 	public static String study_oid = "S_BL101";
-	public static Integer studySubjectId = 8;
+	public static Integer studySubjectId = 9;
 	public static Integer studyId = 4;
 	public static Integer studyEventDefnId = 4;
-	public static Integer studyEventOrdinal = 1;
+	public static Integer studyEventOrdinal = 2;
 
 	public static final String INPUT_USER_SOURCE = "userSource";
 	public static final String INPUT_USERNAME = study_oid.trim() + studySubjectId;
@@ -60,6 +65,9 @@ public class PformSubmissionService {
 	public static final String INPUT_DISPLAY_PWD = "displayPwd";
 	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+//	 private static final logger logger = loggerFactory.getlogger(PformSubmissionService.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 
 	DataSource ds;
 
@@ -72,9 +80,21 @@ public class PformSubmissionService {
 	ItemDataDAO iddao;
 	ItemDAO idao;
 	AuthoritiesDao authoritiesDao;
+	ApplicationContext applicationContext;
+	
+	public ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
-	public PformSubmissionService(DataSource ds) {
+
+
+	public PformSubmissionService(DataSource ds , AuthoritiesDao authoritiesDao)
+	{
 		this.ds = ds;
+	    this.authoritiesDao=authoritiesDao;
 	}
 
 
@@ -110,9 +130,10 @@ public class PformSubmissionService {
 		createdUserAccountBean.addUserType(type);
 		createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
 
-	//	 AuthoritiesDao authoritiesDao1 = (AuthoritiesDao) getApplicationContext().getBean("pformSubmissionService");
-	//	 authoritiesDao1.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
-
+	//	 AuthoritiesDao authoritiesDao1 = (AuthoritiesDao) getApplicationContext().getBean("authoritiesDao");
+		 authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
+		// System.out.println("username id: "+authoritiesDao.findById(3).getUsername());
+         System.out.println("authorities current session:  "+authoritiesDao.getCurrentSession());
 		return userAccountBean;
 	}
 
@@ -174,10 +195,14 @@ public class PformSubmissionService {
 		if (!userAccountBean.isActive() &&  getStudySubject().isActive()) {		
 			userAccountBean = createUserAccount(userAccountBean);
 			System.out.println("New User Account is created");
+			logger.info("***New User Account is created***");
 		} else if (!getStudySubject().isActive()){
 			System.out.println(" Study Subject Does not exist in the system ");
+			logger.info("***Study Subject Does not exist in the system***");
 		}else{	
 			System.out.println(" User Account already exist in the system ");
+			logger.info("***User Account already exist in the system***");
+
 		}
 
 		StudyEventBean studyEventBean = getStudyEvent();
@@ -185,6 +210,7 @@ public class PformSubmissionService {
 			readDownloadFile();
 		} else {
 			System.out.println("StudyEvent Does not exist... Throw Error Message");
+			logger.info("***StudyEvent Does not exist... Throw Error Message***");
 		}
 
 	}
@@ -204,16 +230,21 @@ public class PformSubmissionService {
 		ecBean.setStudyEventId(getStudyEvent().getId());
 		ecBean.setValidateString("");
 		ecBean.setValidatorAnnotations("");
+        ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
+        ecBean.setUpdatedDate(new Date());
         
 		ecBean = (EventCRFBean) ecdao.create(ecBean);
-		// logger.debug("*********CREATED EVENT CRF");
-
+		ecBean = (EventCRFBean) ecdao.update(ecBean);
+		 logger.debug("*********CREATED EVENT CRF");
+         
 		return ecBean;
 	}
 
 	private void createItemData(String itemOID, String itemValue, EventCRFBean eventCrfBean, String crfVersionOID) {
 		idao = new ItemDAO(ds);
 		System.out.println("item Oid:  " + itemOID + "   itemValue:  " + itemValue);
+		logger.info("item Oid:  " + itemOID + "   itemValue:  " + itemValue);
+
 		ArrayList<ItemBean> iBean = (ArrayList<ItemBean>) idao.findByOid(itemOID);
 
 		ItemDataBean itemDataBean = new ItemDataBean();
@@ -227,7 +258,7 @@ public class PformSubmissionService {
 		itemDataBean.setOwner(getUserAccount(INPUT_USERNAME));
 		iddao = new ItemDataDAO(ds);
 		itemDataBean = (ItemDataBean) iddao.create(itemDataBean);
-		// logger.debug("*********CREATED ITEM DATA Record");
+		 logger.debug("*********CREATED ITEM DATA Record");
 
 	}
 
@@ -251,13 +282,19 @@ public class PformSubmissionService {
 					Node cnode = childNodes.item(j);
 					String crfVersionOID = cnode.getNodeName().trim();
 					System.out.println("crf_version_ :  " + crfVersionOID);
+					logger.info("***crf_version_ :  " + crfVersionOID+ " *** ");
+
 					EventCRFBean eventCrfBean;
 					if (getEventCrf(crfVersionOID).isEmpty()) {
 						eventCrfBean = createEventCRF(crfVersionOID);
 						System.out.println(" New EventCrf is created");
+						logger.info("***New EventCrf is created***");
+
 					} else {
 						eventCrfBean = getEventCrf(crfVersionOID).get(0);
 						System.out.println(" Existing EventCrf ");
+						logger.info("***Existing EventCrf***");
+
 					}
 
 					if (getItemDataRecords(getEventCrf(crfVersionOID).get(0).getId()).isEmpty()) {
@@ -276,6 +313,8 @@ public class PformSubmissionService {
 						}
 					} else {
 						System.out.println(" Existing Item Data , No New Item Data is added.  ");
+						logger.info("***Existing Item Data , No New Item Data is added***");
+
 
 					}
 				}
