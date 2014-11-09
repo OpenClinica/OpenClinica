@@ -51,7 +51,7 @@ public class PformSubmissionService {
 	public static Integer studySubjectId = 9;
 	public static Integer studyId = 4;
 	public static Integer studyEventDefnId = 4;
-	public static Integer studyEventOrdinal = 2;
+	public static Integer studyEventOrdinal = 3;
 
 	public static final String INPUT_USER_SOURCE = "userSource";
 	public static final String INPUT_USERNAME = study_oid.trim() + studySubjectId;
@@ -133,7 +133,7 @@ public class PformSubmissionService {
 	//	 AuthoritiesDao authoritiesDao1 = (AuthoritiesDao) getApplicationContext().getBean("authoritiesDao");
 		 authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
 		// System.out.println("username id: "+authoritiesDao.findById(3).getUsername());
-         System.out.println("authorities current session:  "+authoritiesDao.getCurrentSession());
+    //     System.out.println("authorities current session:  "+authoritiesDao.getCurrentSession());
 		return userAccountBean;
 	}
 
@@ -240,6 +240,18 @@ public class PformSubmissionService {
 		return ecBean;
 	}
 
+	private EventCRFBean updateEventCRF(EventCRFBean ecBean) {
+
+        ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
+        ecBean.setUpdatedDate(new Date());
+        
+		ecBean = (EventCRFBean) ecdao.update(ecBean);
+		 logger.debug("*********UPDATED EVENT CRF");
+         
+		return ecBean;
+	}
+	
+	
 	private void createItemData(String itemOID, String itemValue, EventCRFBean eventCrfBean, String crfVersionOID) {
 		idao = new ItemDAO(ds);
 		System.out.println("item Oid:  " + itemOID + "   itemValue:  " + itemValue);
@@ -292,6 +304,7 @@ public class PformSubmissionService {
 
 					} else {
 						eventCrfBean = getEventCrf(crfVersionOID).get(0);
+						eventCrfBean = updateEventCRF(eventCrfBean);
 						System.out.println(" Existing EventCrf ");
 						logger.info("***Existing EventCrf***");
 
