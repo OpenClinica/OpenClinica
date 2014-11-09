@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
 public class PformSubmissionService {
 
 	public static String study_oid = "S_BL101";
-	public static Integer studySubjectId = 9;
+	public static Integer studySubjectId = 10;
 	public static Integer studyId = 4;
 	public static Integer studyEventDefnId = 4;
 	public static Integer studyEventOrdinal = 3;
@@ -142,7 +142,7 @@ public class PformSubmissionService {
 		StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
 		studyUserRole.setStudyId(studyId);
 		studyUserRole.setRoleName(r.getName());
-		studyUserRole.setStatus(Status.AVAILABLE);
+		studyUserRole.setStatus(Status.AUTO_DELETED);
 		studyUserRole.setOwner(rootUserAccount);
 		createdUserAccountBean.addRole(studyUserRole);
 
