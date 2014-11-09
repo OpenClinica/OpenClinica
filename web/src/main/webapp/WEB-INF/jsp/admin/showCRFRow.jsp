@@ -115,7 +115,7 @@
           </td>
           <c:if test="${study.studyParameterConfig.participantPortal=='enabled'}">          
             <td>
-               <a href="PformDataSave?crfOID=<c:out value="${version.oid}"/>" 
+               <a href="ParticipantFormServlet?crfOID=<c:out value="${version.oid}"/>" 
                  onMouseDown="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant_d.gif');"
                  onMouseUp="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant.gif');"><img
                 name="bt_ViewParticipant1" src="images/bt_ViewParticipant.gif" border="0" alt="<fmt:message key="view_participant_form" bundle="${resword}"/>" title="<fmt:message key="view_participant_form" bundle="${resword}"/>" align="left" hspace="6"></a>

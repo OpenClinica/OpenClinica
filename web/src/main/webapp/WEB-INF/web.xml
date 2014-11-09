@@ -933,12 +933,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>RemoveCRFVersion</display-name>
         <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFVersionServlet</servlet-class>
     </servlet>
-        <servlet>
-        <servlet-name>PformDataSaveServlet</servlet-name>
-        <display-name>PformDataSave</display-name>
-        <servlet-class>org.akaza.openclinica.web.pform.submit.PformDataSaveServlet</servlet-class>
-    </servlet>
-    
     <servlet>
         <servlet-name>RestoreCRFVersionServlet</servlet-name>
         <display-name>RestoreCRFVersion</display-name>
@@ -1928,11 +1922,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>UpdateSubjectServlet</servlet-name>
         <url-pattern>/UpdateSubject</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PformDataSaveServlet</servlet-name>
-        <url-pattern>/PformDataSave</url-pattern>
-    </servlet-mapping>
-    
     <servlet-mapping>
         <servlet-name>ViewStudyServlet</servlet-name>
         <url-pattern>/ViewStudy</url-pattern>
