@@ -1,18 +1,38 @@
 package org.akaza.openclinica.service.rule.expression;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.templates.OcDbTestCase;
 
-public class SampleTest extends OcDbTestCase {
+import java.util.Locale;
 
-    public SampleTest() {
-        super();
-    }
+import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.service.PformSubmissionService;
+import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
-    public void testStatement() {
-        StudyDAO studyDao = new StudyDAO(getDataSource());
-        StudyBean study = (StudyBean) studyDao.findByPK(1);
-        assertNotNull(study);
+import static org.mockito.Mockito.*;
+
+public class SampleTest extends HibernateOcDbTestCase {
+
+
+    
+    public void testStatement() throws Exception {
+ //       org.apache.commons.dbcp.BasicDataSource ds = new org.apache.commons.dbcp.BasicDataSource();
+
+   //     StudyDAO studyDao = new StudyDAO(getDataSource());
+    //    StudyBean study = (StudyBean) studyDao.fitndByPK(1);
+     //   assertNotNull(study);
+        AuthoritiesDao authoritiesDaoMock=mock(AuthoritiesDao.class);
+
+        
+/*    	when(authoritiesDaoMock.saveOrUpdate(new AuthoritiesBean("username"))).thenReturn(new AuthoritiesDao());
+        
+        Datasource ds = new datasource 
+        	    PformSubmissionService pform = new PFormSubm(ds)
+        	    
+        	    
+        	    when(mock.saveOrupdate).then(return new Authorities)
+        	    PformSubmission pFormSubmission = new PformSubmission(getDatasource(), authorititesDao);
+*/    	
+  PformSubmissionService pformSubmissionService = new PformSubmissionService(getDataSource(),authoritiesDaoMock);
+    pformSubmissionService.saveProcess();
     }
 }
