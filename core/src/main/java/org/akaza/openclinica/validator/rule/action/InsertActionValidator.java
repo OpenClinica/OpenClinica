@@ -147,7 +147,7 @@ public class InsertActionValidator implements Validator {
 
                 validateValueExpressionInPropertyBean(propertyBean, e, p);
             } else {
-                if (propertyBean.getValue() == null || propertyBean.getValue().length() > 0) {
+                if (propertyBean.getValue() == null || propertyBean.getValue().length() == 0) {
                     ValidationUtils.rejectIfEmpty(e, p + "value", "value.empty");
                 } else {
                     checkValidity(getExpressionService().getItemBeanFromExpression(propertyBean.getOid()), propertyBean.getValue(), p, e);
@@ -161,7 +161,7 @@ public class InsertActionValidator implements Validator {
         Boolean result = false;
         List<ItemFormMetadataBean> itemFormMetadataBeans = getItemFormMetadataDAO().findAllByItemId(itemBean.getId());
         for (ItemFormMetadataBean itemFormMetadataBean : itemFormMetadataBeans) {
-
+        	
             if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.RADIO)
                 || itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.SELECT)) {
                 if (matchValueWithOptions(value, itemFormMetadataBean.getResponseSet().getOptions()) != null) {
@@ -187,8 +187,12 @@ public class InsertActionValidator implements Validator {
             if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXT)
                 || itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXTAREA)) {
                 if (getEventDefinitionCRFBean() == null) {
-                    result = true;
-                    break;
+                	int errorCount = e.getErrorCount();
+                    checkValidityBasedOnDataType(itemBean, value, index, e);
+                    if (e.getErrorCount() == errorCount) {
+                        result = true;
+                        break;
+                    }
                 } else if (checkValidityBasedonNullValues(value, index, e)) {
                     result = true;
                     break;
@@ -286,17 +290,13 @@ public class InsertActionValidator implements Validator {
             break;
         }
         case 9: { //ItemDataType.DATE
-            if (!ExpressionTreeHelper.isDateyyyyMMdd(value)) {
+            if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
                 e.rejectValue(index + "value", "value.invalid.date");
             }
             break;
         }
         case 10: { //ItemDataType.PDATE
-            try {
-                Float.valueOf(value);
-            } catch (NumberFormatException nfe) {
-                e.rejectValue(index + "value", "value.invalid.float");
-            }
+        	e.rejectValue(index + "value", "value.invalid.pdate");
             break;
         }
         case 11: { //ItemDataType.FILE

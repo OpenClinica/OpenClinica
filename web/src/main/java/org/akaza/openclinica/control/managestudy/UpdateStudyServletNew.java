@@ -24,6 +24,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +38,7 @@ public class UpdateStudyServletNew extends SecureController {
     public static final String INPUT_END_DATE = "endDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";
     public static StudyBean study;
+    private CoreResources core;
 
     /**
      *
@@ -77,6 +79,8 @@ public class UpdateStudyServletNew extends SecureController {
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
+
+        request.setAttribute("portalURL", core.getField("portalURL"));
 
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
@@ -208,9 +212,9 @@ public class UpdateStudyServletNew extends SecureController {
         HashMap vStudy2 = v.validate();
         if (vStudy2 != null && vStudy2.size()>0 ) { errors.putAll(vStudy2 );}
         vStudy2 = null;
-        
+
         logger.info("has validation errors");
-        
+
         if (!StringUtils.isBlank(fp.getString(INPUT_START_DATE))) {
             fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
         }
@@ -251,11 +255,11 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
         v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
-        
+
         HashMap vStudy4 = v.validate();
         if (vStudy4 != null && vStudy4.size()>0 ) { errors.putAll(vStudy4 );}
         vStudy4 = null;
-        
+
         if (fp.getInt("expectedTotalEnrollment") <= 0) {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
         }
@@ -290,11 +294,11 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-      
+
         HashMap vStudy5 = v.validate();
         if (vStudy5 != null && vStudy5.size()>0 ) { errors.putAll(vStudy5 );}
         vStudy5 = null;
-        
+
         study.setFacilityCity(fp.getString("facCity"));
         study.setFacilityContactDegree(fp.getString("facConDrgree"));
         study.setFacilityName(fp.getString("facName"));
@@ -354,6 +358,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
         study.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
         study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
+        study.getStudyParameterConfig().setParticipantPortal(fp.getString("participantPortal"));
         if (!errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
         }
@@ -577,6 +582,12 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setParameter("eventLocationRequired");
         spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
         updateParameter(spvdao, spv);
+
+         //participant Portal
+        spv.setParameter("participantPortal");
+        spv.setValue(study1.getStudyParameterConfig().getParticipantPortal());
+        updateParameter(spvdao, spv);
+
 
         StudyBean curStudy = (StudyBean) session.getAttribute("study");
         if (curStudy != null && study1.getId() == curStudy.getId()) {

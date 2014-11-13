@@ -254,14 +254,14 @@
 		   INSERT INTO study_subject
 		   (LABEL,  SUBJECT_ID,  STUDY_ID, STATUS_ID,
 		    DATE_CREATED, OWNER_ID, ENROLLMENT_DATE, SECONDARY_LABEL, OC_OID)
-		   VALUES (?,?,?,?,NOW(),?,?,?,?)
+		   VALUES (?,?,?,?,now(),?,?,?,?)
 		</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>
 		  UPDATE study_subject SET LABEL=?,  SUBJECT_ID=?,  STUDY_ID=?,
-		  STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=?,
+		  STATUS_ID=?, ENROLLMENT_DATE=?, DATE_UPDATED=now(),
 		  UPDATE_ID=?, SECONDARY_LABEL=? WHERE STUDY_SUBJECT_ID=?
 	    </sql>
 	</query>

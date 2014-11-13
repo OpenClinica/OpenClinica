@@ -5,10 +5,13 @@ package org.akaza.openclinica.control.managestudy;
  */
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListDiscNotesForCRFTableFactory;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -54,6 +57,21 @@ public class ListDiscNotesForCRFServlet extends SecureController {
      *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
+    public static boolean mayViewDN(UserAccountBean ub, StudyUserRoleBean currentRole) {
+    	if (currentRole != null) {
+            Role r = currentRole.getRole();
+
+            if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
+                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2) ||r.equals(Role.MONITOR) )) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    
+    
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
@@ -65,9 +83,8 @@ public class ListDiscNotesForCRFServlet extends SecureController {
             return;
         }
 
-        Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)
-            || r.equals(Role.MONITOR)) {
+        
+        if (ListDiscNotesForCRFServlet.mayViewDN(ub, currentRole)) {
             return;
         }
 

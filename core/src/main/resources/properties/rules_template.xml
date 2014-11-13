@@ -4,21 +4,21 @@
 		<RuleRef OID="">
 			<DiscrepancyNoteAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
-				<Message/>
+                <Message></Message>
 			</DiscrepancyNoteAction>
 			<EmailAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
-				<Message/>
-				<To/>
+                <Message></Message>
+                <To></To>
 			</EmailAction>
 			<ShowAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
-				<Message/>
+                <Message></Message>
 				<DestinationProperty OID=""/>
 			</ShowAction>			
 			<HideAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
-				<Message/>
+                <Message></Message>
 				<DestinationProperty OID=""/>
 			</HideAction>
 			<InsertAction IfExpressionEvaluates="">

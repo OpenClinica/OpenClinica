@@ -349,6 +349,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
 
         DATAINFO.setProperty("ra", "Data_Entry_Person");
+        DATAINFO.setProperty("ra2", "site_Data_Entry_Person2");
         DATAINFO.setProperty("investigator", "Investigator");
         DATAINFO.setProperty("director", "Study_Director");
 
@@ -376,15 +377,19 @@ public class CoreResources implements ResourceLoaderAware {
         if (DATAINFO.getProperty("userAccountNotification") != null)
             DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
         logger.debug("DataInfo..." + DATAINFO);
+
         String designerURL = DATAINFO.getProperty("designerURL");
-        if (designerURL == null || designerURL.isEmpty())
-            // @pgawade 13-April-2011 - Fix for issue #8877: Commented out the
-            // hardcoded rule designer
-            // URL as it is added as a property
-            // in datainfo.properties file
-            // designerURL =
-            // "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
-        DATAINFO.setProperty("designer.url", designerURL);
+        if (designerURL == null || designerURL.isEmpty()) {
+            DATAINFO.setProperty("designer.url", designerURL);
+        }
+
+        String portalURL = DATAINFO.getProperty("portalURL");
+        if (portalURL == null || portalURL.isEmpty()){
+            DATAINFO.setProperty("portal.url", "");
+            logger.debug(" Portal URL NOT Defined in datainfo ");
+        }else{
+            logger.debug("Portal URL IS Defined in datainfo:  "+ portalURL);
+        }
         return DATAINFO;
     }
 
@@ -885,8 +890,10 @@ public class CoreResources implements ResourceLoaderAware {
 
 
     public static String getDBName() {
-        return DB_NAME;
-    }
+            if (null == DB_NAME)
+                return "postgres";
+            return DB_NAME;
+        }
 
     public static String getField(String key) {
         String value = DATAINFO.getProperty(key);
@@ -981,7 +988,7 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
-	public static Properties getDATAINFO() {
+	public Properties getDATAINFO() {
 		return DATAINFO;
 	}
 

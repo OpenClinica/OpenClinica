@@ -74,12 +74,14 @@ public class SetStudyUserRoleServlet extends SecureController {
 
                 ArrayList roles = Role.toArrayList();
                 roles.remove(Role.ADMIN); // admin is not a user role, only used for tomcat
+                roles.remove(Role.RESEARCHASSISTANT2);
 
                 StudyBean studyBean = (StudyBean) sdao.findByPK(uRole.getStudyId());
 
                 if (currentStudy.getParentStudyId() > 0) {
                     roles.remove(Role.COORDINATOR);
                     roles.remove(Role.STUDYDIRECTOR);
+
                 } else if (studyBean.getParentStudyId() > 0) {
                     roles.remove(Role.COORDINATOR);
                     roles.remove(Role.STUDYDIRECTOR);
@@ -88,11 +90,17 @@ public class SetStudyUserRoleServlet extends SecureController {
                     r.setDescription("site_Data_Entry_Person");
                     roles.remove(Role.RESEARCHASSISTANT);
                     roles.add(r);
+
                     Role ri = Role.INVESTIGATOR;
                     ri.setDescription("site_investigator");
                     roles.remove(Role.INVESTIGATOR);
-
                     roles.add(ri);
+
+                    Role r2 = Role.RESEARCHASSISTANT2;
+                    r2.setDescription("site_Data_Entry_Person2");
+                    roles.remove(Role.RESEARCHASSISTANT2);
+                    roles.add(r2);
+
                 }
                 request.setAttribute("roles", roles);
 

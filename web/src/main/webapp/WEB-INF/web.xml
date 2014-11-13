@@ -1308,6 +1308,22 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
        
+    <servlet>
+        <servlet-name>ParticipantFormServlet</servlet-name>
+        <display-name>ParticipantFormServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.submit.ParticipantFormServlet</servlet-class>
+    </servlet>
+
+ 
+    <servlet>
+        <servlet-name>OpenRosaFormDownloadServlet</servlet-name>
+        <display-name>OpenRosaFormDownloadServlet</display-name>
+        <servlet-class>org.akaza.openclinica.web.openrosa.OpenRosaFormDownloadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenRosaFormDownloadServlet</servlet-name>
+        <url-pattern>/openrosa/formXml</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -2170,10 +2186,15 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewItemAuditLogServlet</servlet-name>
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ParticipantFormServlet</servlet-name>
+        <url-pattern>/ParticipantFormServlet</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
-  <servlet-name>urlRewriterServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet
-    </servlet-class>
+        <servlet-name>urlRewriterServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -2196,34 +2217,40 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     
     </error-page>
  
- <servlet>
-    <servlet-name>OpenClinicaJersey</servlet-name>
-    <servlet-class>
-        com.sun.jersey.spi.spring.container.servlet.SpringServlet
-    </servlet-class>
+  <servlet>
+    <servlet-name>OpenClinicaJersey2</servlet-name>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
     <init-param>
-			<param-name>
-                                 com.sun.jersey.config.property.packages
-                        </param-name>
-			<param-value> org.akaza.openclinica.web.restful</param-value>
-							
-		</init-param>
-		<init-param>
-  <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-  <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
-</init-param>
-		<load-on-startup>1</load-on-startup>
-</servlet>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>org.akaza.openclinica.web.pform</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 
+  <servlet-mapping>
+    <servlet-name>OpenClinicaJersey2</servlet-name>
+    <url-pattern>/rest2/*</url-pattern>
+  </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>OpenClinicaJersey</servlet-name>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+    <init-param>
+	  <param-name>com.sun.jersey.config.property.packages</param-name>
+	  <param-value> org.akaza.openclinica.web.restful</param-value>
+	</init-param>
+	<init-param>
+      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+      <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
+    </init-param>
+	<load-on-startup>1</load-on-startup>
+ </servlet>
 
-<!--  	<servlet-mapping> -->
-<!--     <servlet-name>OpenClinicaJersey</servlet-name> -->
-<!--     <url-pattern>/ClinicalData/*</url-pattern> -->
-<!-- </servlet-mapping> -->
- 
-
-<servlet-mapping>
+  <servlet-mapping>
     <servlet-name>OpenClinicaJersey</servlet-name>
     <url-pattern>/rest/*</url-pattern>
-</servlet-mapping>
+  </servlet-mapping>
+
+
+
 </web-app>

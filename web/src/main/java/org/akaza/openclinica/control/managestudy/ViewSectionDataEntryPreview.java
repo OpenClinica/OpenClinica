@@ -80,7 +80,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             return;
         }
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
             return;
         }
 
@@ -248,7 +248,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
         int secBorders = getSectionBordersBySecNum(sectionsMap, tabNum, BORDERS);
 
         DisplaySectionBean displaySection =
-            beanFactory.createDisplaySectionBean(itemsMap, sectionTitle, secLabel, secSubtitle, instructions, crfName, secBorders);
+                beanFactory.createDisplaySectionBean(itemsMap, sectionTitle, secLabel, secSubtitle, instructions, crfName, secBorders);
 
         //
         // the variable hasGroups should only be true if the group appears in
@@ -516,7 +516,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
         // types TEL and ED are not supported yet
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
-            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
+                || rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
             dib = validateDisplayItemBeanText(v, dib, inputName, request);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
@@ -529,7 +529,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
+                                                                      List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
 
         return formGroups;
 
@@ -552,11 +552,11 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
 
     @Override
     protected boolean isAdministrativeEditing() {
-    	return false;
+        return false;
     }
 
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
-    	return false;
+        return false;
     }
 }

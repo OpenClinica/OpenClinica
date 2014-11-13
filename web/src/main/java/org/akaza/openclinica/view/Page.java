@@ -276,6 +276,7 @@ public enum Page {
      */
     VIEW_EVENT_DEFINITION ("/WEB-INF/jsp/managestudy/viewEventDefinition.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_READONLY ("/WEB-INF/jsp/managestudy/viewEventDefinitionReadOnly.jsp", "View Event Definition"),
+    VIEW_EVENT_DEFINITION_NOSIDEBAR ("/WEB-INF/jsp/managestudy/viewEventDefinitionNoSidebar.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_SERVLET ("/ViewEventDefinition", "View Event Definition Servlet"),
 
     /**
@@ -641,8 +642,10 @@ public enum Page {
     VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT ("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
             "View default crf versions print"),
      MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
-     VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL ("/ViewSectionDataEntryRESTUrlServlet", "View Section Data Entry Servlet for REST Url call");
+     VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL ("/ViewSectionDataEntryRESTUrlServlet", "View Section Data Entry Servlet for REST Url call"),
+     PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet");
     
+      	
   //  private final static String path = "/WEB-INF/jsp/";
   //  public final static String servletPath = "/OpenClinica";
     
