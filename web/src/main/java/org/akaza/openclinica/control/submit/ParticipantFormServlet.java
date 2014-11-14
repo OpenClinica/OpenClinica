@@ -25,7 +25,8 @@ public class ParticipantFormServlet extends SecureController {
         {
             EnketoCredentials credentials = getCredentials();
             EnketoAPI enketo = new EnketoAPI(credentials);
-            formURL = enketo.getFormPreviewURL(crf_oid);
+       //     formURL = enketo.getFormPreviewURL(crf_oid);
+            formURL= enketo.getFormURL(crf_oid);
             response.sendRedirect(formURL);
         }
         forwardPage(Page.PARTICIPANT_FORM_SERVLET);

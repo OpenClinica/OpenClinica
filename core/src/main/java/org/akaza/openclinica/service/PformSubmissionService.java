@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,19 +11,25 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -30,15 +37,17 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
+import org.apache.log4j.spi.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-
+import org.xml.sax.InputSource;
 
 /**
  * Servlet for creating a user account.
@@ -47,14 +56,11 @@ import org.w3c.dom.NodeList;
  */
 public class PformSubmissionService {
 
-	public static String study_oid = "S_BL101";
-	public static Integer studySubjectId = 10;
-	public static Integer studyId = 4;
-	public static Integer studyEventDefnId = 4;
-	public static Integer studyEventOrdinal = 3;
+	public static String studySubjectOid = "SS_17";
+	public static String studyEventDefnOid = "SE_NEWEVENT";
+	public static Integer studyEventOrdinal = 1;
 
 	public static final String INPUT_USER_SOURCE = "userSource";
-	public static final String INPUT_USERNAME = study_oid.trim() + studySubjectId;
 	public static final String INPUT_FIRST_NAME = "particiapant";
 	public static final String INPUT_LAST_NAME = "User";
 	public static final String INPUT_EMAIL = "email";
@@ -65,14 +71,20 @@ public class PformSubmissionService {
 	public static final String INPUT_DISPLAY_PWD = "displayPwd";
 	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
 	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-//	 private static final logger logger = loggerFactory.getlogger(PformSubmissionService.class);
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
+	// private static final logger logger =
+	// loggerFactory.getlogger(PformSubmissionService.class);
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	String INPUT_USERNAME;
+	Integer studyId;
+	Integer studySubjectId;
+	Integer studyEventDefnId;
 
 	DataSource ds;
 
+	EventDefinitionCRFDAO edcdao;
 	UserAccountDAO udao;
 	StudyDAO sdao;
+	StudyEventDefinitionDAO seddao;
 	StudySubjectDAO ssdao;
 	StudyEventDAO sedao;
 	EventCRFDAO ecdao;
@@ -81,23 +93,49 @@ public class PformSubmissionService {
 	ItemDAO idao;
 	AuthoritiesDao authoritiesDao;
 	ApplicationContext applicationContext;
-	
+
 	public ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
+
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
-
-
-	public PformSubmissionService(DataSource ds , AuthoritiesDao authoritiesDao)
-	{
+	/*
+	 * public PformSubmissionService(DataSource ds) { StudySubjectBean
+	 * studySubjectBean = getStudySubject(studySubjectOid); this.INPUT_USERNAME
+	 * = studySubjectBean.getStudy().getOid() + studySubjectOid; this.studyId =
+	 * studySubjectBean.getStudyId(); this.studySubjectId =
+	 * studySubjectBean.getId();
+	 * 
+	 * StudyEventDefinitionBean studyEventDefinitionBean =
+	 * getStudyEventDefn(studyEventDefnOid); this.studyEventDefnId =
+	 * studyEventDefinitionBean.getId(); this.ds = ds; }
+	 */
+	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
-	    this.authoritiesDao=authoritiesDao;
+		this.authoritiesDao = authoritiesDao;
+
 	}
 
+	private StudySubjectBean getEntityVariables() {
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectOid);
 
+	       if (studySubjectBean !=null) {
+          StudyBean studyBean = getStudy(studySubjectBean.getStudyId());
+		if (studyBean.getParentStudyId() > 0)
+			studyBean = getStudy(studyBean.getParentStudyId());
+
+		this.INPUT_USERNAME = studyBean.getOid() + studySubjectOid;
+		this.studyId = studySubjectBean.getStudyId();
+		this.studySubjectId = studySubjectBean.getId();
+
+		StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefn(studyEventDefnOid);
+		this.studyEventDefnId = studyEventDefinitionBean.getId();
+	   }
+	   return studySubjectBean;    
+	}
 
 	private UserAccountBean createUserAccount(UserAccountBean userAccountBean) throws Exception {
 		UserAccountBean rootUserAccount = getUserAccount("root");
@@ -130,10 +168,7 @@ public class PformSubmissionService {
 		createdUserAccountBean.addUserType(type);
 		createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
 
-	//	 AuthoritiesDao authoritiesDao1 = (AuthoritiesDao) getApplicationContext().getBean("authoritiesDao");
-		 authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
-		// System.out.println("username id: "+authoritiesDao.findById(3).getUsername());
-    //     System.out.println("authorities current session:  "+authoritiesDao.getCurrentSession());
+		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
 		return userAccountBean;
 	}
 
@@ -149,10 +184,41 @@ public class PformSubmissionService {
 		return createdUserAccountBean;
 	}
 
+	private int getEventCrfCompletedInAStudyEventCount(StudyEventBean seBean) {
+		int count = 0;
+		count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
+		return count;
+	}
+
+	private int getEventDefCrfInAStudyEventDefCount() {
+		int count = 0;
+		edcdao = new EventDefinitionCRFDAO(ds);
+		count = edcdao.findAllByEventDefinitionId(studyEventDefnId).size();
+		return count;
+	}
+
+	private StudyBean getStudy(Integer id) {
+		sdao = new StudyDAO(ds);
+		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+		return studyBean;
+	}
+
+	private StudySubjectBean getStudySubject(String oid) {
+		ssdao = new StudySubjectDAO(ds);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByOid(oid);
+		return studySubjectBean;
+	}
+
 	private UserAccountBean getUserAccount(String userName) {
 		udao = new UserAccountDAO(ds);
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(userName);
 		return userAccountBean;
+	}
+
+	private StudyEventDefinitionBean getStudyEventDefn(String oid) {
+		seddao = new StudyEventDefinitionDAO(ds);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) seddao.findByOid(oid);
+		return studyEventDefinitionBean;
 	}
 
 	private StudyEventBean getStudyEvent() {
@@ -187,19 +253,31 @@ public class PformSubmissionService {
 		return itemDataBeanList;
 	}
 
-	public void saveProcess() throws Exception {
+	public Errors saveProcess(String body) throws Exception {
+	    Errors errors = null;
+		StudySubjectBean studySubjectBean=getEntityVariables();
+		if (studySubjectBean==null) {
+			System.out.println(" Study Subject Does not exist in the system ");
+			errors = instanciateError();
+			errors.reject("Study Subject Does not exist in the system ");
+           return errors;	
+		}
+		
 		UserAccountBean userAccountBean = getUserAccount(INPUT_USERNAME);
 		System.out.println("------------------------------------------------");
 		System.out.println("------------------------------------------------");
-
-		if (!userAccountBean.isActive() &&  getStudySubject().isActive()) {		
+		if (!userAccountBean.isActive() && getStudySubject().isActive()) {
 			userAccountBean = createUserAccount(userAccountBean);
 			System.out.println("New User Account is created");
 			logger.info("***New User Account is created***");
-		} else if (!getStudySubject().isActive()){
+		} else if (!getStudySubject().isActive()) {
 			System.out.println(" Study Subject Does not exist in the system ");
 			logger.info("***Study Subject Does not exist in the system***");
-		}else{	
+			errors = instanciateError();
+			errors.reject("Study Subject Does not exist in the system ");
+			return errors;
+		
+		} else {
 			System.out.println(" User Account already exist in the system ");
 			logger.info("***User Account already exist in the system***");
 
@@ -207,12 +285,15 @@ public class PformSubmissionService {
 
 		StudyEventBean studyEventBean = getStudyEvent();
 		if (studyEventBean.isActive()) {
-			readDownloadFile();
+			errors = readDownloadFile(body);
 		} else {
 			System.out.println("StudyEvent Does not exist... Throw Error Message");
 			logger.info("***StudyEvent Does not exist... Throw Error Message***");
+			errors = instanciateError();
+			errors.reject("StudyEvent Does not exist");
+			return errors;
 		}
-
+		return errors;
 	}
 
 	private EventCRFBean createEventCRF(String crfVersionOid) {
@@ -230,71 +311,94 @@ public class PformSubmissionService {
 		ecBean.setStudyEventId(getStudyEvent().getId());
 		ecBean.setValidateString("");
 		ecBean.setValidatorAnnotations("");
-        ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
-        ecBean.setUpdatedDate(new Date());
-        
+		ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
+		ecBean.setUpdatedDate(new Date());
+
 		ecBean = (EventCRFBean) ecdao.create(ecBean);
-		ecBean = (EventCRFBean) ecdao.update(ecBean);
-		 logger.debug("*********CREATED EVENT CRF");
-         
+		logger.debug("*********CREATED EVENT CRF");
+
 		return ecBean;
+	}
+
+	private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status) {
+
+		seBean.setUpdater(getUserAccount(INPUT_USERNAME));
+		seBean.setUpdatedDate(new Date());
+		seBean.setSubjectEventStatus(status);
+
+		seBean = (StudyEventBean) sedao.update(seBean);
+		logger.debug("*********UPDATED STUDY EVENT ");
+
+		return seBean;
 	}
 
 	private EventCRFBean updateEventCRF(EventCRFBean ecBean) {
 
-        ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
-        ecBean.setUpdatedDate(new Date());
-        
+		ecBean.setUpdater(getUserAccount(INPUT_USERNAME));
+		ecBean.setUpdatedDate(new Date());
+		ecBean.setStatus(Status.UNAVAILABLE);
+
 		ecBean = (EventCRFBean) ecdao.update(ecBean);
-		 logger.debug("*********UPDATED EVENT CRF");
-         
+		logger.debug("*********UPDATED EVENT CRF");
+
 		return ecBean;
 	}
-	
-	
-	private void createItemData(String itemOID, String itemValue, EventCRFBean eventCrfBean, String crfVersionOID) {
-		idao = new ItemDAO(ds);
-		System.out.println("item Oid:  " + itemOID + "   itemValue:  " + itemValue);
-		logger.info("item Oid:  " + itemOID + "   itemValue:  " + itemValue);
 
-		ArrayList<ItemBean> iBean = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, EventCRFBean eventCrfBean) {
+
+		System.out.println("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue);
+		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue);
 
 		ItemDataBean itemDataBean = new ItemDataBean();
-
-		itemDataBean.setItemId(iBean.get(0).getId());
+		itemDataBean.setItemId(itemBean.getId());
 		itemDataBean.setEventCRFId(eventCrfBean.getId());
 		itemDataBean.setValue(itemValue);
 		itemDataBean.setCreatedDate(new Date());
-		itemDataBean.setStatus(Status.AVAILABLE);
+		itemDataBean.setStatus(Status.UNAVAILABLE);
 		itemDataBean.setOrdinal(1);
 		itemDataBean.setOwner(getUserAccount(INPUT_USERNAME));
-		iddao = new ItemDataDAO(ds);
-		itemDataBean = (ItemDataBean) iddao.create(itemDataBean);
-		 logger.debug("*********CREATED ITEM DATA Record");
 
+		return itemDataBean;
 	}
 
-	private void readDownloadFile() throws Exception {
-		HashMap<String, String> hashmap = new HashMap<String, String>();
+	private Errors instanciateError() {
+		DataBinder dataBinder = new DataBinder(null);
+		Errors errors = dataBinder.getBindingResult();
+		return errors;
+	}
+	
+	
+	private Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean) {
+		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean);
+		DataBinder dataBinder = new DataBinder(container);
+		Errors errors = dataBinder.getBindingResult();
+		PformValidator pformValidator = new PformValidator();
+		pformValidator.validate(container, errors);
+		return errors;
+	}
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse("enketoSubmittedData.xml");
+	private Errors readDownloadFile(String body) throws Exception {
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		InputSource is = new InputSource();
+		is.setCharacterStream(new StringReader(body));
+		Document doc = db.parse(is);
+		Errors errors = null;
 
 		NodeList nodeList = doc.getElementsByTagName("instance");
-
-		for (int i = 0; i < nodeList.getLength(); i++) {
+		for (int i = 0; i < nodeList.getLength(); i = i + 1) {
 
 			Node node = nodeList.item(i);
 
 			if (node instanceof Element) {
 
 				NodeList childNodes = node.getChildNodes();
-				for (int j = 1; j < childNodes.getLength(); j = j + 2) {
+				for (int j = 0; j < childNodes.getLength(); j = j + 2) {
 					Node cnode = childNodes.item(j);
 					String crfVersionOID = cnode.getNodeName().trim();
 					System.out.println("crf_version_ :  " + crfVersionOID);
-					logger.info("***crf_version_ :  " + crfVersionOID+ " *** ");
+					logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
 					EventCRFBean eventCrfBean;
 					if (getEventCrf(crfVersionOID).isEmpty()) {
@@ -304,7 +408,7 @@ public class PformSubmissionService {
 
 					} else {
 						eventCrfBean = getEventCrf(crfVersionOID).get(0);
-						eventCrfBean = updateEventCRF(eventCrfBean);
+						// eventCrfBean = updateEventCRF(eventCrfBean);
 						System.out.println(" Existing EventCrf ");
 						logger.info("***Existing EventCrf***");
 
@@ -315,25 +419,55 @@ public class PformSubmissionService {
 						if (cnode instanceof Element) {
 
 							NodeList childNodes1 = cnode.getChildNodes();
+							ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
+							iddao = new ItemDataDAO(ds);
+							// Errors errors = null;
 
 							for (int k = 1; k < childNodes1.getLength(); k = k + 2) {
 								Node cnode1 = childNodes1.item(k);
 								String itemOID = cnode1.getNodeName().trim();
 								String itemValue = cnode1.getTextContent().trim();
 
-								createItemData(itemOID, itemValue, eventCrfBean, crfVersionOID);
+								idao = new ItemDAO(ds);
+								ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+								ItemBean itemBean = itemBeanList.get(0);
+
+								ItemDataBean itemDataBean = createItemData(itemBean, itemValue, eventCrfBean);
+								errors = validateItemData(itemDataBean, itemBean);
+								if (errors.hasErrors()) {
+									break;
+								} else {
+									itemDataBeanList.add(itemDataBean);
+								}
+							}
+							if (!errors.hasErrors()) {
+								for (ItemDataBean itemDataBean : itemDataBeanList) {
+									iddao.create(itemDataBean);
+									eventCrfBean = updateEventCRF(eventCrfBean);
+
+									if (getEventCrfCompletedInAStudyEventCount(getStudyEvent()) == getEventDefCrfInAStudyEventDefCount()) {
+										updateStudyEvent(getStudyEvent(), SubjectEventStatus.COMPLETED);
+									} else {
+										updateStudyEvent(getStudyEvent(), SubjectEventStatus.DATA_ENTRY_STARTED);
+									}
+								}
+							} else {
+								break;
+
 							}
 						}
 					} else {
+						
 						System.out.println(" Existing Item Data , No New Item Data is added.  ");
 						logger.info("***Existing Item Data , No New Item Data is added***");
-
-
+    					errors = instanciateError();
+						errors.reject("Existing Item Data , No New Item Data is added");
 					}
 				}
 			}
-		}
 
+		}
+		return errors;
 	}
 
 }

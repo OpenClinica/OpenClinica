@@ -11,7 +11,7 @@ import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import static org.mockito.Mockito.*;
 
 public class SampleTest extends HibernateOcDbTestCase {
-
+String body;
 
     
     public void testStatement() throws Exception {
@@ -33,6 +33,6 @@ public class SampleTest extends HibernateOcDbTestCase {
         	    PformSubmission pFormSubmission = new PformSubmission(getDatasource(), authorititesDao);
 */    	
   PformSubmissionService pformSubmissionService = new PformSubmissionService(getDataSource(),authoritiesDaoMock);
-    pformSubmissionService.saveProcess();
+    pformSubmissionService.saveProcess(body);
     }
 }
