@@ -1,6 +1,9 @@
 package org.akaza.openclinica.service;
 
+import java.text.MessageFormat;
+
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -11,65 +14,51 @@ public class PformValidator implements Validator {
 		return ItemItemDataContainer.class.equals(clazz);
 	}
 
+
+
 	@Override
-	public void  validate(Object target, Errors errors) {
+	public void  validate(Object target, Errors e) {
 		ItemItemDataContainer container = (ItemItemDataContainer) target;
-        String itemValue=container.getItemDataBean().getValue();
+        String value=container.getItemDataBean().getValue();
 		
         if (container.getItemDataBean().getValue() != null &&  container.getItemDataBean().getValue() != "") {
 			
 			switch (container.getItemBean().getItemDataTypeId()) {
-			   // Boolean
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			   // String      String does not require validation
-			case 5:
-				break;
-			// Integer
-			case 6:
-				try{
-				    int in= Integer.valueOf(itemValue);
-				    if (in==(int)in){
-				      //  System.out.println("integer"+(int)in);
-				    }
-				}catch(Exception e){
-				   // System.out.println(itemValue+ "  is not an INTEGER number");
-				    errors.reject(itemValue);
-				   break; 
-				}
-				// Real
-			case 7:
-				try{
-				    double d= Double.valueOf(itemValue);
-				    if (d==(double)d){
-				    //    System.out.println("double"+(double)d);
-				    }
-				}catch(Exception e){
-				//    System.out.println(itemValue+ "  is not a REAL number");
-				    errors.reject(itemValue);
-				   break; 
-				}
-			case 8:
-				break;
-				// Date      The validation of Date and PDate are covered within ItemDataDAO create EntityBean method 
-			case 9:
-				break;
-				// pDate      The validation of Date and pDate are covered within ItemDataDAO create EntityBean method 
-			case 10:
-				break;
-				// File
-			case 11:
-				break;
-			case 12:
-				break;
+	        case 6: { //ItemDataType.INTEGER
+	            try {
+	                Integer.valueOf(value);
+	            } catch (NumberFormatException nfe) {
+	                e.rejectValue(value, "value.invalid.integer");
+	            }
+	            break;
+	        }
+	        case 7: { //ItemDataType.REAL
+	            try {
+	                Float.valueOf(value);
+	            } catch (NumberFormatException nfe) {
+	                e.rejectValue(value, "value.invalid.float");
+	            }
+	            break;
+	        }
+	        case 9: { //ItemDataType.DATE
+	            if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
+	                e.rejectValue(value, "value.invalid.date");
+	            }
+	            break;
+	        }
+	        case 10: { //ItemDataType.PDATE
+	        	e.rejectValue(value, "value.notSupported.pdate");
+	            break;
+	        }
+	        case 11: { //ItemDataType.FILE
+	            e.rejectValue(value, "value.notSupported.file");
+	            break;
+	        }
 
-			}
-		}
+	        default:
+	            break;
+	        }
+
+	    }
 	}
 }

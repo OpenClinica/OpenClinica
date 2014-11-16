@@ -1,9 +1,11 @@
 package org.akaza.openclinica.service;
 
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -56,7 +58,7 @@ import org.xml.sax.InputSource;
  */
 public class PformSubmissionService {
 
-	public static String studySubjectOid = "SS_17";
+	public static String studySubjectOid = "SS_30";
 	public static String studyEventDefnOid = "SE_NEWEVENT";
 	public static Integer studyEventOrdinal = 1;
 
@@ -76,6 +78,7 @@ public class PformSubmissionService {
 	Integer studyId;
 	Integer studySubjectId;
 	Integer studyEventDefnId;
+	ResourceBundle respage;
 
 	DataSource ds;
 
@@ -90,15 +93,6 @@ public class PformSubmissionService {
 	ItemDataDAO iddao;
 	ItemDAO idao;
 	AuthoritiesDao authoritiesDao;
-	ApplicationContext applicationContext;
-
-	public ApplicationContext getApplicationContext() {
-		return applicationContext;
-	}
-
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
 
 	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
@@ -217,7 +211,7 @@ public class PformSubmissionService {
 
 	private ArrayList<CRFVersionBean> getAllCRFVersionsByCrfId(String crfVersionOid) {
 		cvdao = new CRFVersionDAO(ds);
-		ArrayList<CRFVersionBean> crfVersionBeanList = (ArrayList) cvdao.findAllByCRF(getCRFVersion(crfVersionOid).getCrfId());
+		ArrayList<CRFVersionBean> crfVersionBeanList = (ArrayList) cvdao.findAllByCRF((getCRFVersion(crfVersionOid)).getCrfId());
 		return crfVersionBeanList;
 	}
 
@@ -243,14 +237,13 @@ public class PformSubmissionService {
 	// Main Method to Start Saving Process the Pform Submission
 	public Errors saveProcess(String body) throws Exception {
 		System.out.println("------------------------------------------------");
-		Errors errors = null;
+		Errors errors = instanciateErrors();
 		// Study Subject Validation check
 		StudySubjectBean studySubjectBean = getEntityVariables();
 		if (studySubjectBean == null) {
 			System.out.println(" Study Subject Does not exist in the system ");
-			errors = instanciateError();
 			errors.reject("Study Subject Does not exist in the system ");
-			return errors;
+			 return errors;
 		}
 		// User Account Create or Bypass
 		UserAccountBean userAccountBean = getUserAccount(INPUT_USERNAME);
@@ -258,15 +251,6 @@ public class PformSubmissionService {
 			userAccountBean = createUserAccount(userAccountBean);
 			System.out.println("New User Account is created");
 			logger.info("***New User Account is created***");
-			/*
-			 * } else if (!getStudySubject().isActive()) {
-			 * System.out.println(" Study Subject Does not exist in the system "
-			 * );
-			 * logger.info("***Study Subject Does not exist in the system***");
-			 * errors = instanciateError();
-			 * errors.reject("Study Subject Does not exist in the system ");
-			 * return errors;
-			 */
 		} else {
 			System.out.println(" User Account already exist in the system ");
 			logger.info("***User Account already exist in the system***");
@@ -278,13 +262,12 @@ public class PformSubmissionService {
 		if (studyEventBean.isActive()
 				&& (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED)) {
 			// Read and Parse Payload from Pform
-			errors = readDownloadFile(body);
+			errors=readDownloadFile(body , errors);
 		} else {
-			System.out.println("StudyEvent has a Status Not Scheduled or Not Started ");
-			logger.info("***StudyEvent has a Status Not Scheduled or Not Started ***");
-			errors = instanciateError();
-			errors.reject("StudyEvent has a Status Not Scheduled or Not Started");
-			return errors;
+			System.out.println("StudyEvent has a Status Other than Scheduled or Started ");
+			logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
+			errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
+			// return errors;
 		}
 		return errors;
 	}
@@ -347,12 +330,13 @@ public class PformSubmissionService {
 	}
 
 	// Instantiate an Error object
-	private Errors instanciateError() {
+	private Errors instanciateErrors() {
 		DataBinder dataBinder = new DataBinder(null);
 		Errors errors = dataBinder.getBindingResult();
 		return errors;
 	}
-         //  Errors Object to Validate Item Data
+
+	// Errors Object to Validate Item Data
 	private Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean) {
 		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean);
 		DataBinder dataBinder = new DataBinder(container);
@@ -362,14 +346,81 @@ public class PformSubmissionService {
 		return errors;
 	}
 
-	   // Read from Pform Submission Payload or the Body
-	private Errors readDownloadFile(String body) throws Exception {
+	// Check for CRF Version if exist in system if submitted same version twice
+	// or other versions of the same CRF
+	private EventCRFBean getCrfVersionCheck(String crfVersionOID, Errors errors) {
+		EventCRFBean eventCrfBean = null;
+		boolean isSameCrfVersion = false;
+		boolean isEventCrfInOC = false;
+
+		if (!getEventCrf(crfVersionOID).isEmpty()) {
+			isEventCrfInOC = true;
+			isSameCrfVersion = true;
+		} else {
+			// Removing from the crf version list the version that already in
+			// the system
+			ArrayList<CRFVersionBean> crfVersionBeanList = getAllCRFVersionsByCrfId(crfVersionOID);
+			for (CRFVersionBean crfVersionBean : crfVersionBeanList) {
+				if (crfVersionBean.getOid() == crfVersionOID) {
+					crfVersionBeanList.remove(crfVersionBean);
+				}
+			}
+
+			for (CRFVersionBean crfVersionBean : crfVersionBeanList) {
+				if (!getEventCrf(crfVersionBean.getOid()).isEmpty()) {
+					isEventCrfInOC = true;
+					isSameCrfVersion = false;
+				}
+			}
+
+		}
+
+		eventCrfBean = checkIfEventCrfInOC(isEventCrfInOC, isSameCrfVersion, crfVersionOID, errors);
+		return eventCrfBean;
+	}
+
+	// Check if Event CRF exist or not in the system , if not , create ,
+	private EventCRFBean checkIfEventCrfInOC(boolean isEventCrfInOC, boolean isSameCrfVersion, String crfVersionOID, Errors errors) {
+		EventCRFBean eventCrfBean = null;
+		if (!isEventCrfInOC) {
+			// Execute Creating New Event Crf
+			eventCrfBean = createEventCRF(crfVersionOID);
+			// Continue creating Item Data
+			System.out.println(" New EventCrf is created");
+			logger.info("***New EventCrf is created***");
+
+		} else if (isEventCrfInOC && isSameCrfVersion) {
+			// If Same CRF version is tried to submit to OC for the same subject
+			// , event..
+			eventCrfBean = getEventCrf(crfVersionOID).get(0); // ///////////////
+			System.out.println(" Existing EventCrf with same CRF Version");
+			logger.info("***Existing EventCrf***");
+			// If Item Data Exist in OC , then throw submission Failure
+			if (!getItemDataRecords(eventCrfBean.getId()).isEmpty()) {
+				System.out.println(" Existing Item Data , No New Item Data is added.  ");
+				logger.info("***Existing Item Data , No New Item Data is added***");
+				errors.reject("Existing Item Data , No New Item Data is added");
+                return null;
+			}
+
+		} else {
+			// If Another CRF version is tried to submit to OC for the same
+			// subject , event ..
+			eventCrfBean = null;
+			System.out.println(" Existing EventCrf with other CRF version ");
+			errors.reject("Existing EventCrf with other CRF version");
+           return null;
+		}
+		return eventCrfBean;
+	}
+
+	// Read from Pform Submission Payload or the Body
+	private Errors readDownloadFile(String body , Errors errors) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		InputSource is = new InputSource();
 		is.setCharacterStream(new StringReader(body));
 		Document doc = db.parse(is);
-		Errors errors = null;
 
 		NodeList nodeList = doc.getElementsByTagName("instance");
 		for (int i = 0; i < nodeList.getLength(); i = i + 1) {
@@ -383,90 +434,47 @@ public class PformSubmissionService {
 					System.out.println("crf_version_ :  " + crfVersionOID);
 					logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
-					EventCRFBean eventCrfBean = null;
-					boolean sameCrfVersion = false;
-					boolean isEventCrfInOC = false;
-					ArrayList<CRFVersionBean> crfVersionBeanList = getAllCRFVersionsByCrfId(crfVersionOID);
-					for (CRFVersionBean crfVersionBean : crfVersionBeanList) {
-						if (!getEventCrf(crfVersionBean.getOid()).isEmpty()) {
-							isEventCrfInOC = true;
+					EventCRFBean eventCrfBean = getCrfVersionCheck(crfVersionOID , errors);
+					if (eventCrfBean==null) return errors;
 
-							ArrayList<EventCRFBean> eventCrfBeanList = (ArrayList<EventCRFBean>) getEventCrf(crfVersionBean.getOid());
-							for (EventCRFBean ecBean : eventCrfBeanList) {
-								System.out.println("crf Version 1: " + ecBean.getCrfVersion().getOid());
-								System.out.println("crf Version 2: " + crfVersionBean.getOid());
-								if (ecBean.getCrfVersion().getOid() == crfVersionBean.getOid()) {
-									sameCrfVersion = true;
-								}
-							}
-						}
-					}
+					if (cnode instanceof Element && eventCrfBean != null) {
+						NodeList childNodes1 = cnode.getChildNodes();
+						ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
+						iddao = new ItemDataDAO(ds);
 
-					if (!isEventCrfInOC) {
-						eventCrfBean = createEventCRF(crfVersionOID);
-						System.out.println(" New EventCrf is created");
-						logger.info("***New EventCrf is created***");
+						for (int k = 1; k < childNodes1.getLength(); k = k + 2) {
+							Node cnode1 = childNodes1.item(k);
+							String itemOID = cnode1.getNodeName().trim();
+							String itemValue = cnode1.getTextContent().trim();
 
-					} else if (isEventCrfInOC && sameCrfVersion) {
+							idao = new ItemDAO(ds);
+							ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+							ItemBean itemBean = itemBeanList.get(0);
 
-						eventCrfBean = getEventCrf(crfVersionOID).get(0);
-						// eventCrfBean = updateEventCRF(eventCrfBean);
-						System.out.println(" Existing EventCrf with same CRF Version");
-						logger.info("***Existing EventCrf***");
-
-					} else {
-						System.out.println(" Existing EventCrf with other CRF version ");
-
-					}
-
-					if (sameCrfVersion && getItemDataRecords(getEventCrf(crfVersionOID).get(0).getId()).isEmpty()) {
-
-						if (cnode instanceof Element) {
-
-							NodeList childNodes1 = cnode.getChildNodes();
-							ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
-							iddao = new ItemDataDAO(ds);
-							// Errors errors = null;
-
-							for (int k = 1; k < childNodes1.getLength(); k = k + 2) {
-								Node cnode1 = childNodes1.item(k);
-								String itemOID = cnode1.getNodeName().trim();
-								String itemValue = cnode1.getTextContent().trim();
-
-								idao = new ItemDAO(ds);
-								ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
-								ItemBean itemBean = itemBeanList.get(0);
-
-								ItemDataBean itemDataBean = createItemData(itemBean, itemValue, eventCrfBean);
-								errors = validateItemData(itemDataBean, itemBean);
-								if (errors.hasErrors()) {
-									break;
-								} else {
-									itemDataBeanList.add(itemDataBean);
-								}
-							}
-							if (!errors.hasErrors()) {
-								for (ItemDataBean itemDataBean : itemDataBeanList) {
-									iddao.create(itemDataBean);
-									eventCrfBean = updateEventCRF(eventCrfBean);
-
-									if (getCountCompletedEventCrfsInAStudyEvent(getStudyEvent()) == getCountCrfsInAEventDefCrf()) {
-										updateStudyEvent(getStudyEvent(), SubjectEventStatus.COMPLETED);
-									} else {
-										updateStudyEvent(getStudyEvent(), SubjectEventStatus.DATA_ENTRY_STARTED);
-									}
-								}
+							ItemDataBean itemDataBean = createItemData(itemBean, itemValue, eventCrfBean);
+							errors = validateItemData(itemDataBean, itemBean);
+							if (errors.hasErrors()) {
+								return errors;
 							} else {
-								break;
-
+								itemDataBeanList.add(itemDataBean);
 							}
 						}
-					} else {
-
-						System.out.println(" Existing Item Data , No New Item Data is added.  ");
-						logger.info("***Existing Item Data , No New Item Data is added***");
-						errors = instanciateError();
-						errors.reject("Existing Item Data , No New Item Data is added");
+						if (!errors.hasErrors()) {
+							for (ItemDataBean itemDataBean : itemDataBeanList) {
+								// Create Item Data Bean by inserting one row at
+								// a time to Item Data table
+								iddao.create(itemDataBean);
+								// Update Event Crf Bean and change the status
+								// to Completed
+								eventCrfBean = updateEventCRF(eventCrfBean);
+								// Study Event status update
+								if (getCountCompletedEventCrfsInAStudyEvent(getStudyEvent()) == getCountCrfsInAEventDefCrf()) {
+									updateStudyEvent(getStudyEvent(), SubjectEventStatus.COMPLETED);
+								} else {
+									updateStudyEvent(getStudyEvent(), SubjectEventStatus.DATA_ENTRY_STARTED);
+								}
+							}
+						}
 					}
 				}
 			}

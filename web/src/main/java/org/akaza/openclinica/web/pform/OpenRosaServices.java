@@ -164,9 +164,8 @@ public class OpenRosaServices {
 			body = body.substring(0, body.indexOf("------------"));
 			body = "<instance>" + body + "</instance>";
 			
-			Errors errors = getPformSubmissionService().saveProcess(body);
-
-	//		System.out.println(body);
+		    Errors errors=getPformSubmissionService().saveProcess(body);
+					
 
 			// Set response headers
 			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
