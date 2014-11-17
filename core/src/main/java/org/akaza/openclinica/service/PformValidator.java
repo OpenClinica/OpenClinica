@@ -25,10 +25,9 @@ public class PformValidator implements Validator {
 			
 			switch (container.getItemBean().getItemDataTypeId()) {
 	        case 6: { //ItemDataType.INTEGER
-	            try {
-	                Integer.valueOf(value);
+	            try {	 Integer.valueOf(value);
 	            } catch (NumberFormatException nfe) {
-	                e.rejectValue(value, "value.invalid.integer");
+	                e.reject("value.invalid.Integer");
 	            }
 	            break;
 	        }
@@ -36,22 +35,22 @@ public class PformValidator implements Validator {
 	            try {
 	                Float.valueOf(value);
 	            } catch (NumberFormatException nfe) {
-	                e.rejectValue(value, "value.invalid.float");
+	                e.reject("value.invalid.float");
 	            }
 	            break;
 	        }
 	        case 9: { //ItemDataType.DATE
 	            if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
-	                e.rejectValue(value, "value.invalid.date");
+	                e.reject("value.invalid.date");
 	            }
 	            break;
 	        }
 	        case 10: { //ItemDataType.PDATE
-	        	e.rejectValue(value, "value.notSupported.pdate");
+	        	e.reject("value.notSupported.pdate");
 	            break;
 	        }
 	        case 11: { //ItemDataType.FILE
-	            e.rejectValue(value, "value.notSupported.file");
+	            e.reject("value.notSupported.file");
 	            break;
 	        }
 

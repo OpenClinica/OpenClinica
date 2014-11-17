@@ -94,6 +94,7 @@ public class PformSubmissionService {
 	ItemDAO idao;
 	AuthoritiesDao authoritiesDao;
 
+	
 	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
 		this.authoritiesDao = authoritiesDao;
@@ -330,14 +331,14 @@ public class PformSubmissionService {
 	}
 
 	// Instantiate an Error object
-	private Errors instanciateErrors() {
+	public Errors instanciateErrors() {
 		DataBinder dataBinder = new DataBinder(null);
 		Errors errors = dataBinder.getBindingResult();
 		return errors;
 	}
 
 	// Errors Object to Validate Item Data
-	private Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean) {
+	public Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean) {
 		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean);
 		DataBinder dataBinder = new DataBinder(container);
 		Errors errors = dataBinder.getBindingResult();
