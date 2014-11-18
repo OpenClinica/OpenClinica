@@ -24,28 +24,27 @@ public class PformSubmissionServiceTest extends TestCase {
     ItemDataBean itemDataBean = new ItemDataBean();
     ItemBean itemBean = new ItemBean();
 	
-	
  // item Data Type is Integer , expecting integer value 
 	public void testIntegerValues() throws Exception {
 	    
 		itemDataBean.setValue("123");   // Pass
 		itemBean.setItemDataTypeId(6);
-		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 		assertFalse(errors.hasErrors());
 		
 		itemDataBean.setValue("123be");  //Fail
 		itemBean.setItemDataTypeId(6);
-		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 		assertTrue(errors.hasErrors());
 	
 		itemDataBean.setValue("123.45");   //Fail
 		itemBean.setItemDataTypeId(6);
-		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 		assertTrue(errors.hasErrors());
 
 		itemDataBean.setValue("hello");  //Fail
 		itemBean.setItemDataTypeId(6);
-		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+		errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 		assertTrue(errors.hasErrors());
 	}
 
@@ -55,23 +54,23 @@ public class PformSubmissionServiceTest extends TestCase {
 		
 			itemDataBean.setValue("123.45");  //Pass
 			itemBean.setItemDataTypeId(7);
-			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 			assertFalse(errors.hasErrors());
 
 			itemDataBean.setValue("123");  //Pass
 			itemBean.setItemDataTypeId(7);
-			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 			assertFalse(errors.hasErrors());
 			
 			itemDataBean.setValue("123be");  //Fail
 			itemBean.setItemDataTypeId(7);
-			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 			assertTrue(errors.hasErrors());
 		
 
 			itemDataBean.setValue("hello");  //Fail
 			itemBean.setItemDataTypeId(7);
-			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+			errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 			assertTrue(errors.hasErrors());
 		}
 
@@ -82,47 +81,47 @@ public class PformSubmissionServiceTest extends TestCase {
 
 				itemDataBean.setValue("2014-10-10");  //Pass
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertFalse(errors.hasErrors());
 
 				itemDataBean.setValue("2014-10");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 
 				itemDataBean.setValue("2014-31-31");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 
 				itemDataBean.setValue("01-01-2014");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 
 				itemDataBean.setValue("10-Mar-2014");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 				
 				itemDataBean.setValue("123.45");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 
 				itemDataBean.setValue("123");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 				
 				itemDataBean.setValue("123be");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 
 				itemDataBean.setValue("hello");  //Fail
 				itemBean.setItemDataTypeId(9);
-				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean);
+				errors = pformSubmissionService.validateItemData(itemDataBean, itemBean,1);
 				assertTrue(errors.hasErrors());
 			}
 

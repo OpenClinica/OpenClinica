@@ -164,6 +164,8 @@ public class OpenRosaServices {
 			body = body.substring(0, body.indexOf("------------"));
 			body = "<instance>" + body + "</instance>";
 			
+			System.out.println(body);
+			
 		    Errors errors=getPformSubmissionService().saveProcess(body);
 					
 

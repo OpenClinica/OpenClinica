@@ -19,13 +19,30 @@ public class PformValidator implements Validator {
 	@Override
 	public void  validate(Object target, Errors e) {
 		ItemItemDataContainer container = (ItemItemDataContainer) target;
-        String value=container.getItemDataBean().getValue();
-		
-        if (container.getItemDataBean().getValue() != null &&  container.getItemDataBean().getValue() != "") {
+		String origValue=container.getItemDataBean().getValue();
+	    Integer responseTypeId= container.getResponseTypeId();
+        Integer itemDataTypeId =container.getItemBean().getItemDataTypeId();
+        System.out.println("item data type id:  "+itemDataTypeId);
+        
+	    if (responseTypeId==3 || responseTypeId==7){
+            String[] values = origValue.split(",");            
+            for(String value : values){
+            	subValidator(itemDataTypeId, value, e);
+                System.out.println(value);        
+            }
+            }else{
+            	subValidator(itemDataTypeId, origValue, e);            	
+            }
+	}
+	
+	
+ public void subValidator(Integer itemDataTypeId, String value , Errors e){	
+        if (value != null &&  value != "") {
 			
-			switch (container.getItemBean().getItemDataTypeId()) {
+			switch (itemDataTypeId) {
 	        case 6: { //ItemDataType.INTEGER
 	            try {	 Integer.valueOf(value);
+	                    System.out.println("I'm in Integer data type");
 	            } catch (NumberFormatException nfe) {
 	                e.reject("value.invalid.Integer");
 	            }
@@ -34,12 +51,14 @@ public class PformValidator implements Validator {
 	        case 7: { //ItemDataType.REAL
 	            try {
 	                Float.valueOf(value);
+                    System.out.println("I'm in Real data type");
 	            } catch (NumberFormatException nfe) {
 	                e.reject("value.invalid.float");
 	            }
 	            break;
 	        }
 	        case 9: { //ItemDataType.DATE
+                System.out.println("I'm in Date data type");
 	            if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
 	                e.reject("value.invalid.date");
 	            }
@@ -60,4 +79,11 @@ public class PformValidator implements Validator {
 
 	    }
 	}
+        
+        
+        
+        
+        
+        
+	
 }
