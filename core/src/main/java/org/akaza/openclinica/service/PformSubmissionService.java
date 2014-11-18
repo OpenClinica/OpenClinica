@@ -174,7 +174,7 @@ public class PformSubmissionService {
 	private int getCountCrfsInAEventDefCrf() {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllByEventDefinitionId(getStudyEventDefnId()).size();
+		count = edcdao.findAllActiveByEventDefinitionId(getStudyEventDefnId()).size();
 		return count;
 	}
 
