@@ -36,6 +36,7 @@ import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
@@ -120,6 +121,7 @@ public class OpenRosaServices{
         catch (Exception e)
         {
         	LOGGER.debug(e.getMessage());
+        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
         	return "<Error>" + e.getMessage() + "</Error>";
         }
 	}
@@ -149,6 +151,8 @@ public class OpenRosaServices{
 		} 
 		catch (Exception e) 
 		{
+        	LOGGER.debug(e.getMessage());
+        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
 			return "<error>" + e.getMessage() + "</error>";
 		}
 		
@@ -193,8 +197,8 @@ public class OpenRosaServices{
 			"</OpenRosaResponse>";
 	  
 		} catch (Exception e) {
-			System.out.println("Unexpected exception: " + e.getMessage());
-			e.printStackTrace();
+        	LOGGER.debug(e.getMessage());
+        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
 			return "<Error>" + e.getMessage() + "</Error>";
 		}
 		return output;
@@ -236,6 +240,8 @@ public class OpenRosaServices{
 		} 
 		catch (Exception e) 
 		{
+        	LOGGER.debug(e.getMessage());
+        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
 			return "<error>" + e.getMessage() + "</error>";
 		}
 		
