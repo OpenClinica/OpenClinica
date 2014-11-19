@@ -60,21 +60,31 @@
 		 	AND v1.crf_version_id = ?
 		</sql>
 	</query>
-	<query>
-	 <name>findNotSharedItemsByVersion</name>
-	 <sql>
-	  select v.item_id,i.name,i.owner_id
+    <query>
+     <name>findNotSharedItemsByVersion</name>
+     <sql>
+      select v.item_id,i.name,i.owner_id
       from versioning_map v, item i 
       where v.item_id =i.item_id
       and v.crf_version_id=?
       and v.item_id not in
          (SELECT DISTINCT v.item_id
-	  FROM versioning_map v
-	  WHERE v.crf_version_id != ? )
-	  
-	 </sql>
-	</query>
-	
+      FROM versioning_map v
+      WHERE v.crf_version_id != ? )
+      
+     </sql>
+    </query>
+    
+    <query>
+     <name>findDefCRFVersionsByStudyEvent</name>
+     <sql>
+      SELECT cv.* FROM study_event_definition sed,event_definition_crf edc, crf_version cv
+      WHERE sed.study_event_definition_id = edc.study_event_definition_id
+       AND edc.default_version_id = cv.crf_version_id
+       AND sed.study_event_definition_id = ?
+     </sql>
+    </query>
+    
 	<query>
 		<name>findItemUsedByOtherVersion</name>
 		<sql>select v.item_id, i.name,i.owner_id from versioning_map v, item i 

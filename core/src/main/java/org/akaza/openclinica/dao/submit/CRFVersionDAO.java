@@ -249,6 +249,22 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         }
         return al;
     }
+    
+    public ArrayList findDefCRFVersionsByStudyEvent(int studyEventDefinitionId)
+    {
+    	this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+        String sql = digester.getQuery("findDefCRFVersionsByStudyEvent");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;    	
+    }
 
     public boolean isItemUsedByOtherVersion(int versionId) {
         this.setTypesExpected();
