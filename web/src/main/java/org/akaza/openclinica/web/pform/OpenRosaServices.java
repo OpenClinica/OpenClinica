@@ -51,6 +51,7 @@ import org.akaza.openclinica.service.PformSubmissionService;
 @Component
 public class OpenRosaServices {
 
+	public static final String FORM_CONTEXT = "ecid";
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
 	private DataSource dataSource;
 	private CoreResources coreResources;
@@ -128,7 +129,8 @@ public class OpenRosaServices {
 	@Path("/{studyOID}/formXml")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response,
-			@PathParam("studyOID") String studyOID, @QueryParam("formID") String crfOID,
+			@PathParam("studyOID") String studyOID, 
+			@QueryParam("formID") String crfOID,
 			@RequestHeader("Authorization") String authorization) {
 
 		String xform = null;
@@ -160,7 +162,10 @@ public class OpenRosaServices {
 	@POST
 	@Path("/{studyOID}/submission")
 	@Produces(MediaType.APPLICATION_XML)
-	public String doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+	public String doSubmission(@Context HttpServletRequest request, 
+			@Context HttpServletResponse response,
+			@PathParam("studyOID") String studyOID, 
+			@QueryParam(FORM_CONTEXT) String context) {
 		String output = null;
 		try {
 
