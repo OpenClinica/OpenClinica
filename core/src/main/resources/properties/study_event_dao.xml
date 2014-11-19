@@ -198,6 +198,7 @@
             ORDER BY sed.ordinal asc , se.sample_ordinal asc
         </sql>
     </query>
+
     <query>
         <name>findAllByStudySubjectAndDefinition</name>
         <sql>
@@ -282,5 +283,43 @@
 			and se.study_subject_id = ?
 			and sed.study_event_definition_id = ?
     	</sql>
+    </query>
+    <query>
+        <name>getNextScheduledEvent</name>
+        <sql>
+			SELECT se2.* 
+			FROM study_event se2 join (
+			 -- Retrieves events that are scheduled for this subject.
+			 SELECT se.*,sed.ordinal
+			 FROM study_event se JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			  JOIN study_event_definition sed on se.study_event_definition_id = sed.study_event_definition_id
+			 WHERE ss.oc_oid = ?
+			 AND se.subject_event_status_id = 1
+			
+			 UNION
+			 -- Grabs events that are started but whose crfs are either
+			 -- completed, not started, or started but not saved.
+			 SELECT DISTINCT se.*, sed.ordinal
+			 FROM study_event se, study_subject ss, event_crf ec, study_event_definition sed
+			 WHERE se.study_subject_id = ss.study_subject_id
+			  AND se.study_event_id = ec.study_event_id
+			  AND se.study_event_definition_id = sed.study_event_definition_id
+			  AND se.subject_event_status_id = 3
+			    AND ss.oc_oid = ?
+			  AND (
+			       ec.status_id = 2 OR (
+			                             ec.status_id = 1 AND ec.event_crf_id NOT IN  
+			                     (SELECT DISTINCT ec.event_crf_id 
+			                   FROM study_event se, study_subject ss, event_crf ec,item_data id
+			                   WHERE se.study_subject_id = ss.study_subject_id
+			                    AND se.study_event_id = ec.study_event_id
+			                    AND id.event_crf_id = ec.event_crf_id
+			                    AND se.subject_event_status_id = 3
+			                    AND ss.oc_oid = ?
+			                    AND id.item_data_id IS NOT NULL)))
+			) filter ON se2.study_event_id = filter.study_event_id
+			ORDER BY se2.date_start ASC, filter.ordinal ASC
+			LIMIT 1
+        </sql>
     </query>
 </queries>

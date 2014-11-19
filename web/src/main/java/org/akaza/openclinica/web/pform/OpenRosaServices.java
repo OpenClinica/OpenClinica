@@ -1,13 +1,15 @@
 package org.akaza.openclinica.web.pform;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
@@ -22,10 +24,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
@@ -196,7 +200,51 @@ public class OpenRosaServices{
 		return output;
 	}
 
-	
+	@GET
+	@Path("/{studyOID}/getSchedule")
+	@Produces(MediaType.APPLICATION_XML)
+	public String getSchedule(@Context HttpServletRequest request,
+			@Context HttpServletResponse response,
+			@Context ServletContext context,
+			@PathParam("studyOID") String studyOID,
+			@RequestHeader("Authorization") String authorization)
+	{	
+		
+		String ssoid = request.getParameter("studySubjectOID");
+		HashMap<String,String> urlCache = (HashMap<String,String>) context.getAttribute("pformURLCache");
+		context.getAttribute("subjectContextCache");
+		if (ssoid == null) {
+			return "<error>studySubjectOID is null :(</error>";
+		}
+			
+		try
+		{
+			// Need to retrieve crf's for next event
+			StudyEventDAO eventDAO = new StudyEventDAO(getDataSource());
+			StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
+			System.out.println("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
+			CRFVersionDAO versionDAO = new CRFVersionDAO(getDataSource());
+			ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
+			PFormCache cache = PFormCache.getInstance(context);
+			for (CRFVersionBean crfVersion:crfs)
+			{				
+				String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
+				String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getId()), 
+						String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+				System.out.println("Enketo URL for " + crfVersion.getName() + "= " + enketoURL + "?context=" + contextHash);				
+			}
+		} 
+		catch (Exception e) 
+		{
+			return "<error>" + e.getMessage() + "</error>";
+		}
+		
+		response.setHeader("Content-Type", "text/xml; charset=UTF-8");		
+		response.setHeader("Content-Disposition", "attachment; filename=\"schedule.xml\";");
+		response.setContentType("text/xml; charset=utf-8");
+		return "<result>success</result>";
+		    
+	}    
 	public DataSource getDataSource() {
 		return dataSource;
 	}

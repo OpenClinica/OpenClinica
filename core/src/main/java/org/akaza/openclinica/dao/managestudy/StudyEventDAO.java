@@ -1050,6 +1050,27 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return answer;
     }
 
+    public EntityBean getNextScheduledEvent(String studySubjectOID) {
+        StudyEventBean eb = new StudyEventBean();
+
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), studySubjectOID);
+        variables.put(Integer.valueOf(2), studySubjectOID);
+        variables.put(Integer.valueOf(3), studySubjectOID);
+
+        String sql = digester.getQuery("getNextScheduledEvent");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return eb;
+    }
+
     public ArrayList findAllByStudySubject(StudySubjectBean ssb) {
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), Integer.valueOf(ssb.getId()));
