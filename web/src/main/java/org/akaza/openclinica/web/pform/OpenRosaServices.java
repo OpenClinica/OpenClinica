@@ -164,6 +164,7 @@ public class OpenRosaServices {
 	@Produces(MediaType.APPLICATION_XML)
 	public String doSubmission(@Context HttpServletRequest request, 
 			@Context HttpServletResponse response,
+			@Context ServletContext servletContext,
 			@PathParam("studyOID") String studyOID, 
 			@QueryParam(FORM_CONTEXT) String context) {
 		String output = null;
@@ -172,7 +173,10 @@ public class OpenRosaServices {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				System.out.println("WARNING: This prototype doesn't support multipart content.");
 			}
-
+			
+			PFormCache cache = PFormCache.getInstance(servletContext);
+			HashMap<String,String> userContext = cache.getSubjectContext(context);
+			
 			StringWriter writer = new StringWriter();
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 
