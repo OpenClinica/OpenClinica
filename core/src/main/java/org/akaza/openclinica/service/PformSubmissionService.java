@@ -62,9 +62,9 @@ import org.xml.sax.InputSource;
  */
 public class PformSubmissionService {
 
-	public static String studySubjectOid = "SS_30";
-	public static String studyEventDefnOid = "SE_NEWEVENT";
-	public static Integer studyEventOrdinal = 1;
+//	public static String studySubjectOid = "SS_30";
+//	public static String studyEventDefnOid = "SE_NEWEVENT";
+//	public static Integer studyEventOrdinal = 1;
 
 	public static final String INPUT_USER_SOURCE = "userSource";
 	public static final String INPUT_FIRST_NAME = "particiapant";
@@ -82,6 +82,10 @@ public class PformSubmissionService {
 	Integer studyId;
 	Integer studySubjectId;
 	Integer studyEventDefnId;
+
+	String studySubjectOid;
+	Integer studyEventOrdinal;
+	
 
 	DataSource ds;
 
@@ -106,17 +110,17 @@ public class PformSubmissionService {
 
 	// bunch of Entity variable initialization happens here
 	public StudySubjectBean getEntityVariables() {
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectOid);
+		StudySubjectBean studySubjectBean = getStudySubject(getStudySubjectOid());
 
 		if (studySubjectBean != null) {
 			StudyBean studyBean = getStudy(studySubjectBean.getStudyId());
 			if (studyBean.getParentStudyId() > 0)
 				studyBean = getStudy(studyBean.getParentStudyId());
 
-			this.setINPUT_USERNAME(studyBean.getOid() + "." + studySubjectOid);
+			this.setINPUT_USERNAME(studyBean.getOid() + "." + getStudySubjectOid());
 			this.setStudyId(studySubjectBean.getStudyId());
 			this.setStudySubjectId(studySubjectBean.getId());
-			StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefn(studyEventDefnOid);
+			StudyEventDefinitionBean studyEventDefinitionBean = getStudyEventDefn(getStudyEventDefnId());
 			this.setStudyEventDefnId(studyEventDefinitionBean.getId());
 		}
 		return studySubjectBean;
@@ -196,16 +200,16 @@ public class PformSubmissionService {
 		return userAccountBean;
 	}
 
-	private StudyEventDefinitionBean getStudyEventDefn(String oid) {
+	private StudyEventDefinitionBean getStudyEventDefn(int id) {
 		seddao = new StudyEventDefinitionDAO(ds);
-		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) seddao.findByOid(oid);
+		StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) seddao.findByPK(id);
 		return studyEventDefinitionBean;
 	}
 
 	private StudyEventBean getStudyEvent() {
 		sedao = new StudyEventDAO(ds);
 		StudyEventBean studyEventBean = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(getStudySubjectId(),
-				getStudyEventDefnId(), studyEventOrdinal);
+				getStudyEventDefnId(), getStudyEventOrdinal());
 		return studyEventBean;
 	}
 
@@ -255,7 +259,10 @@ public class PformSubmissionService {
 	
 	
 	// Main Method to Start Saving Process the Pform Submission
-	public Errors saveProcess(String body) throws Exception {
+	public Errors saveProcess(String body ,String studySubjectOid ,Integer studyEventDefnId,Integer studyEventOrdinal ) throws Exception {
+		   setStudySubjectOid(studySubjectOid);
+        setStudyEventDefnId(studyEventDefnId);           
+		   setStudyEventOrdinal(studyEventOrdinal);
 		System.out.println("------------------------------------------------");
 		Errors errors = instanciateErrors();
 		// Study Subject Validation check
@@ -479,7 +486,7 @@ public class PformSubmissionService {
                             	itemValue=itemValue.replaceAll(" ", ",");
                             }
                             
-                            System.out.println("Item OID: "+ itemOID +"     Response type:  " +ifmBean.getResponseSet().getResponseType().getId());
+                        //    System.out.println("Item OID: "+ itemOID +"     Response type:  " +ifmBean.getResponseSet().getResponseType().getId());
                                                          
                              
 
@@ -551,5 +558,22 @@ public class PformSubmissionService {
 	public void setStudyEventDefnId(Integer studyEventDefnId) {
 		this.studyEventDefnId = studyEventDefnId;
 	}
+
+	public String getStudySubjectOid() {
+		return studySubjectOid;
+	}
+
+	public void setStudySubjectOid(String studySubjectOid) {
+		this.studySubjectOid = studySubjectOid;
+	}
+
+	public Integer getStudyEventOrdinal() {
+		return studyEventOrdinal;
+	}
+
+	public void setStudyEventOrdinal(Integer studyEventOrdinal) {
+		this.studyEventOrdinal = studyEventOrdinal;
+	}
+
 
 }

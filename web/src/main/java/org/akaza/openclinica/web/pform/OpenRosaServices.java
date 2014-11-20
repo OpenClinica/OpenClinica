@@ -176,6 +176,20 @@ public class OpenRosaServices {
 			
 			PFormCache cache = PFormCache.getInstance(servletContext);
 			HashMap<String,String> userContext = cache.getSubjectContext(context);
+  			System.out.println("Study Subjecet OID :  "+userContext.get("studySubjectOID"));
+			System.out.println("Study Event Defn id : "+userContext.get("studyEventDefinitionID"));
+			System.out.println("Study Event Defn Ordinal :  "+userContext.get("studyEventOrdinal"));
+			System.out.println("CRF Version OID :  "+userContext.get("crfVersionOID"));
+		    
+			
+			
+			
+			String studySubjectOid = userContext.get("studySubjectOID");
+		    Integer studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID")); 
+		    Integer studyEventOrdinal = Integer.valueOf(userContext.get("studyEventOrdinal"));
+
+
+			
 			
 			StringWriter writer = new StringWriter();
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
@@ -187,7 +201,7 @@ public class OpenRosaServices {
 			
 			System.out.println(body);
 			
-		    Errors errors=getPformSubmissionService().saveProcess(body);
+		    Errors errors=getPformSubmissionService().saveProcess(body,studySubjectOid,studyEventDefnId,studyEventOrdinal);
 					
 
 			// Set response headers

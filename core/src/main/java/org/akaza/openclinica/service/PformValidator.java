@@ -20,18 +20,18 @@ public class PformValidator implements Validator {
 		String origValue = container.getItemDataBean().getValue();
 		Integer responseTypeId = container.getResponseTypeId();
 		Integer itemDataTypeId = container.getItemBean().getItemDataTypeId();
-		System.out.println();
-		System.out.print("Data type id:  " + itemDataTypeId);
+	//	System.out.println();
+	//	System.out.print("Data type id:  " + itemDataTypeId);
 
 		if (responseTypeId == 3 || responseTypeId == 7) {
 			String[] values = origValue.split(",");
 			for (String value : values) {
 				subValidator(itemDataTypeId, value.trim(), e);
-				System.out.print(" " + value);
+	//			System.out.print(" " + value);
 			}
 		} else {
 			subValidator(itemDataTypeId, origValue, e);
-			System.out.print(" " + origValue);
+	//		System.out.print(" " + origValue);
 
 		}
 	}
@@ -43,9 +43,9 @@ public class PformValidator implements Validator {
 			case 6: { // ItemDataType.INTEGER
 				try {
 					Integer.valueOf(value);
-					System.out.print(" Integer type");
+		//			System.out.print(" Integer type");
 				} catch (NumberFormatException nfe) {
-					System.out.print(" Error");
+		//			System.out.print(" Error");
 					e.reject("value.invalid.Integer");
 				}
 				break;
@@ -53,15 +53,15 @@ public class PformValidator implements Validator {
 			case 7: { // ItemDataType.REAL
 				try {
 					Float.valueOf(value);
-					System.out.print(" Real type");
+		//			System.out.print(" Real type");
 				} catch (NumberFormatException nfe) {
-					System.out.print(" Error");
+		//			System.out.print(" Error");
 					e.reject("value.invalid.float");
 				}
 				break;
 			}
 			case 9: { // ItemDataType.DATE
-				System.out.print("  Date type");
+		//		System.out.print("  Date type");
 				if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
 					System.out.print(" Error");
 					e.reject("value.invalid.date");
