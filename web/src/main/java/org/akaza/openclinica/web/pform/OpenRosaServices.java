@@ -253,7 +253,7 @@ public class OpenRosaServices {
 			for (CRFVersionBean crfVersion:crfs)
 			{				
 				String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
-				String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getId()), 
+				String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), 
 						String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
 				System.out.println("Enketo URL for " + crfVersion.getName() + "= " + enketoURL + "?" + FORM_CONTEXT + "=" + contextHash);				
 			}
