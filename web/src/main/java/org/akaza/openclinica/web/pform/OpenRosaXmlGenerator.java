@@ -84,7 +84,7 @@ public class OpenRosaXmlGenerator {
 	    	String preInstance = xformMinusInstance.substring(0,xformMinusInstance.indexOf("<instance>"));
 			String instance = buildInstance(html.getHead().getModel(),crfVersion,crfSections);
 	    	String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>")+"</instance>".length());
-	    	System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
+	//    	System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
 	    	return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
         }
     	catch (Exception e)

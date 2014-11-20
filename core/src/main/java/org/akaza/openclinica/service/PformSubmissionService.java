@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -62,9 +63,9 @@ import org.xml.sax.InputSource;
  */
 public class PformSubmissionService {
 
-//	public static String studySubjectOid = "SS_30";
-//	public static String studyEventDefnOid = "SE_NEWEVENT";
-//	public static Integer studyEventOrdinal = 1;
+	// public static String studySubjectOid = "SS_30";
+	// public static String studyEventDefnOid = "SE_NEWEVENT";
+	// public static Integer studyEventOrdinal = 1;
 
 	public static final String INPUT_USER_SOURCE = "userSource";
 	public static final String INPUT_FIRST_NAME = "particiapant";
@@ -85,7 +86,6 @@ public class PformSubmissionService {
 
 	String studySubjectOid;
 	Integer studyEventOrdinal;
-	
 
 	DataSource ds;
 
@@ -101,7 +101,6 @@ public class PformSubmissionService {
 	ItemDAO idao;
 	ItemFormMetadataDAO ifmdao;
 	AuthoritiesDao authoritiesDao;
-	
 
 	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
@@ -182,6 +181,13 @@ public class PformSubmissionService {
 		return count;
 	}
 
+	private EventDefinitionCRFBean getCrfVersionStatusInAEventDefCrf(String crfVersionOid) {
+		edcdao = new EventDefinitionCRFDAO(ds);
+		EventDefinitionCRFBean eventDefinitionCRFBean = edcdao.findByStudyEventIdAndCRFVersionId(getStudy(getStudyId()), getStudyEvent()
+				.getId(), getCRFVersion(crfVersionOid).getId());
+		return eventDefinitionCRFBean;
+	}
+
 	private StudyBean getStudy(Integer id) {
 		sdao = new StudyDAO(ds);
 		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
@@ -244,9 +250,9 @@ public class PformSubmissionService {
 		return itemDataBeanList;
 	}
 
-	private ArrayList <ItemBean> getItemRecord(String itemOID) {
+	private ArrayList<ItemBean> getItemRecord(String itemOID) {
 		idao = new ItemDAO(ds);
-		ArrayList <ItemBean> itemBean =  (ArrayList<ItemBean>) idao.findByOid(itemOID);
+		ArrayList<ItemBean> itemBean = (ArrayList<ItemBean>) idao.findByOid(itemOID);
 		return itemBean;
 	}
 
@@ -256,13 +262,11 @@ public class PformSubmissionService {
 		return ifmBean;
 	}
 
-	
-	
 	// Main Method to Start Saving Process the Pform Submission
-	public Errors saveProcess(String body ,String studySubjectOid ,Integer studyEventDefnId,Integer studyEventOrdinal ) throws Exception {
-		   setStudySubjectOid(studySubjectOid);
-        setStudyEventDefnId(studyEventDefnId);           
-		   setStudyEventOrdinal(studyEventOrdinal);
+	public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal) throws Exception {
+		setStudySubjectOid(studySubjectOid);
+		setStudyEventDefnId(studyEventDefnId);
+		setStudyEventOrdinal(studyEventOrdinal);
 		System.out.println("------------------------------------------------");
 		Errors errors = instanciateErrors();
 		// Study Subject Validation check
@@ -364,8 +368,8 @@ public class PformSubmissionService {
 	}
 
 	// Errors Object to Validate Item Data
-	public Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean,Integer responseTypeId) {
-		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean,responseTypeId);
+	public Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean, Integer responseTypeId) {
+		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean, responseTypeId);
 		DataBinder dataBinder = new DataBinder(container);
 		Errors errors = dataBinder.getBindingResult();
 		PformValidator pformValidator = new PformValidator();
@@ -379,6 +383,14 @@ public class PformSubmissionService {
 		EventCRFBean eventCrfBean = null;
 		boolean isSameCrfVersion = false;
 		boolean isEventCrfInOC = false;
+
+		// Verify that the Crf Version has an available status in the Study Event Defn 
+		if (getCrfVersionStatusInAEventDefCrf(crfVersionOID).getStatus().getId() != 1) {
+			System.out.println("This Crf Version has a Status Not available in this Study Event Defn");
+			logger.info("This Crf Version has a Status Not available in this Study Event Defn");
+			errors.reject("This Crf Version has a Status Not available in this Study Event Defn");
+			return null;
+		}
 
 		if (!getEventCrf(crfVersionOID).isEmpty()) {
 			isEventCrfInOC = true;
@@ -474,21 +486,21 @@ public class PformSubmissionService {
 							Node cnode1 = childNodes1.item(k);
 							String itemOID = cnode1.getNodeName().trim();
 							String itemValue = cnode1.getTextContent();
-							
-							ArrayList <ItemBean> iBean = getItemRecord(itemOID);
-                            CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
-                            Integer itemId=iBean.get(0).getId();
-                            Integer crfVersionId=cvBean.getId();
-                            ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
-                            Integer responseTypeId =ifmBean.getResponseSet().getResponseType().getId();
-                            
-                            if (responseTypeId==3 ||responseTypeId==7){
-                            	itemValue=itemValue.replaceAll(" ", ",");
-                            }
-                            
-                        //    System.out.println("Item OID: "+ itemOID +"     Response type:  " +ifmBean.getResponseSet().getResponseType().getId());
-                                                         
-                             
+
+							ArrayList<ItemBean> iBean = getItemRecord(itemOID);
+							CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+							Integer itemId = iBean.get(0).getId();
+							Integer crfVersionId = cvBean.getId();
+							ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
+							Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+
+							if (responseTypeId == 3 || responseTypeId == 7) {
+								itemValue = itemValue.replaceAll(" ", ",");
+							}
+
+							// System.out.println("Item OID: "+ itemOID
+							// +"     Response type:  "
+							// +ifmBean.getResponseSet().getResponseType().getId());
 
 							idao = new ItemDAO(ds);
 
@@ -496,7 +508,7 @@ public class PformSubmissionService {
 							ItemBean itemBean = itemBeanList.get(0);
 
 							ItemDataBean itemDataBean = createItemData(itemBean, itemValue, eventCrfBean);
-							errors = validateItemData(itemDataBean, itemBean,responseTypeId);
+							errors = validateItemData(itemDataBean, itemBean, responseTypeId);
 							if (errors.hasErrors()) {
 								return errors;
 							} else {
@@ -574,6 +586,5 @@ public class PformSubmissionService {
 	public void setStudyEventOrdinal(Integer studyEventOrdinal) {
 		this.studyEventOrdinal = studyEventOrdinal;
 	}
-
 
 }

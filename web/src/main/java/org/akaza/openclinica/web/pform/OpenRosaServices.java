@@ -269,7 +269,7 @@ public class OpenRosaServices {
 				String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
 				String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), 
 						String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
-				System.out.println("Enketo URL for " + crfVersion.getName() + "= " + enketoURL + "?" + FORM_CONTEXT + "=" + contextHash);				
+				System.out.println("Enketo URL for " + crfVersion.getOid() + " ,SE_Id="+nextEvent.getId()+ "["+nextEvent.getSampleOrdinal()+"]"+" : " + enketoURL + "?" + FORM_CONTEXT + "=" + contextHash);				
 			}
 		} 
 		catch (Exception e) 
