@@ -31,6 +31,7 @@ public abstract class BaseWidget implements Widget {
 		case "st": return "string";
 		case "int": return "int";
 		case "date": return "date";
+		case "pdate": return "string";
 		case "real": return "float";
 		case "bl": return "boolean";
 		//TODO: "BN","ED","TEL",FILE"

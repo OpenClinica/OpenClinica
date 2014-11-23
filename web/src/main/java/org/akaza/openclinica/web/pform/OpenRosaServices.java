@@ -175,7 +175,7 @@ public class OpenRosaServices {
 			}
 	
 			
-	/*	
+		
 			PFormCache cache = PFormCache.getInstance(servletContext);
 			HashMap<String,String> userContext = cache.getSubjectContext(context);
   			System.out.println("Study Subjecet OID :  "+userContext.get("studySubjectOID"));
@@ -190,13 +190,8 @@ public class OpenRosaServices {
 		    Integer studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID")); 
 		    Integer studyEventOrdinal = Integer.valueOf(userContext.get("studyEventOrdinal"));
 
-*/
 
-			String studySubjectOid = "SS_7";
-		    Integer studyEventDefnId = 6; 
-		    Integer studyEventOrdinal = 1;
 
-			
 			StringWriter writer = new StringWriter();
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 

@@ -47,7 +47,7 @@ public class InputWidget extends BaseWidget {
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid() + "/" + itemGroupBean.getOid() +"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid() +"/" + item.getOid());
 		binding.setType(getDataType(item));
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
