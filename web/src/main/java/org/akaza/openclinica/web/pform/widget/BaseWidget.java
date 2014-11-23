@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.UserControl;
 import org.slf4j.Logger;

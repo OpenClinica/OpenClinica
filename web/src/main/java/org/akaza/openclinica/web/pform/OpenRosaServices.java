@@ -173,7 +173,9 @@ public class OpenRosaServices {
 			if (ServletFileUpload.isMultipartContent(request)) {
 				System.out.println("WARNING: This prototype doesn't support multipart content.");
 			}
+	
 			
+	/*	
 			PFormCache cache = PFormCache.getInstance(servletContext);
 			HashMap<String,String> userContext = cache.getSubjectContext(context);
   			System.out.println("Study Subjecet OID :  "+userContext.get("studySubjectOID"));
@@ -188,12 +190,20 @@ public class OpenRosaServices {
 		    Integer studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID")); 
 		    Integer studyEventOrdinal = Integer.valueOf(userContext.get("studyEventOrdinal"));
 
+*/
 
-			
+			String studySubjectOid = "SS_7";
+		    Integer studyEventDefnId = 6; 
+		    Integer studyEventOrdinal = 1;
+
 			
 			StringWriter writer = new StringWriter();
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 
+			System.out.println(body);
+
+			
+			
 			body = body.substring(body.indexOf("<F_"));
 			body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
 			body = body.substring(0, body.indexOf("------------"));
@@ -232,6 +242,7 @@ public class OpenRosaServices {
 
 		} catch (Exception e) {
         	LOGGER.debug(e.getMessage());
+        	System.out.println(e.getMessage());
         	LOGGER.debug(ExceptionUtils.getStackTrace(e));
 			return "<Error>" + e.getMessage() + "</Error>";
 		}
