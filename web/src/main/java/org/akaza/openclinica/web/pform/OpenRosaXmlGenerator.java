@@ -129,14 +129,36 @@ public class OpenRosaXmlGenerator {
 		WidgetFactory factory = new WidgetFactory(crfVersion);
 		html.getHead().setTitle(crf.getName());
 
+
 		for (SectionBean section : crfSections) {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
+
+			Group group = new Group();
+			group.setUsercontrol(new ArrayList<UserControl>());
+			group.setAppearance("field-list");
+			Label sectionLabel = new Label();
+			sectionLabel.setLabel(section.getLabel() + " ------ ");
+			group.setLabel(sectionLabel);
+
+/*			groupLabel.setLabel(section.getLabel() + " ------ " + itemGroupBean.getOid() + " (" + itemGroupBean.getName() + ") "
+					+ "---" + " " + (x + 1));
+*/
+
+			
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				for (int x = 0; x < groupRepeatNum; x = x + 1) {
+				   
 
-					Group group = new Group();
+					Label groupLabel = new Label();
+				    
+					groupLabel.setLabel(section.getLabel()+ itemGroupBean.getOid() + " (" + itemGroupBean.getName() + ") "
+					+ "---" + " " + (x + 1));
+
+					group.setLabel(groupLabel);
+	
+/*					Group group = new Group();
 					group.setUsercontrol(new ArrayList<UserControl>());
 					group.setAppearance("field-list");
 					Label groupLabel = new Label();
@@ -144,7 +166,7 @@ public class OpenRosaXmlGenerator {
 							+ "---" + " " + (x + 1));
 
 					group.setLabel(groupLabel);
-					ItemDAO itemdao = new ItemDAO(dataSource);
+*/					ItemDAO itemdao = new ItemDAO(dataSource);
 
 					ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
 							crfVersion.getId());
@@ -163,12 +185,13 @@ public class OpenRosaXmlGenerator {
 							log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName()
 									+ "). Skipping.");
 						}
-					} // item
+				    	} // item
 
-					groups.add(group);
-					body.setGroup(groups);
-					html.getHead().getModel().setBind(bindList);
-				} // rep group # if any
+					} // rep group # if any
+
+				groups.add(group);
+				body.setGroup(groups);
+				html.getHead().getModel().setBind(bindList);
 
 			} // multi group
 		} // section
