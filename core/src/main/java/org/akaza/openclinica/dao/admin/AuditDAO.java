@@ -265,7 +265,7 @@ public class AuditDAO extends EntityDAO {
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataType((HashMap) it.next());
+            AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
         return al;

@@ -214,8 +214,11 @@ public class OdmController {
 		if (eventCRFBean == null) {
 			formData.setStatus("Not Started");
 		} else {
-			formData.setStatusChangeTimeStamp(eventCRFBean.getUpdatedDate().toString());
-			formData.setStatus(eventCRFBean.getStatus().getName());
+			AuditDAO auditDAO = new AuditDAO(dataSource);
+			List<AuditBean> auditBeans = (List<AuditBean>) auditDAO.findEventCRFAudit(eventCRFBean.getId());
+			if (auditBeans.size() > 0) {
+				formData.setStatusChangeTimeStamp(auditBeans.get(0).getAuditDate().toString());
+			}
 		}
 		return formData;
 	}
