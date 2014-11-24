@@ -18,23 +18,29 @@ public class InputWidget extends BaseWidget {
 	private ItemFormMetadataBean itemFormMetadataBean=null;
 	private Integer itemGroupRepeatNumber;
 	private boolean isItemRequired;
-	
-	public InputWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired)
+	private boolean isGroupRepeating;
+	public InputWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired,boolean isGroupRepeating)
 	{
 		this.item = item;
 		this.version = version;
 		this.appearance = appearance;
 		this.itemGroupBean=itemGroupBean;
 		this.itemFormMetadataBean=itemFormMetadataBean;
-		this.itemGroupRepeatNumber=this.itemGroupRepeatNumber;
+		this.itemGroupRepeatNumber=itemGroupRepeatNumber;
         this.isItemRequired=isItemRequired;
+	    this.isGroupRepeating=isGroupRepeating;
 	}
 	
 	@Override
 	public UserControl getUserControl() {
 		Input input = new Input();
 		Label label = new Label();
-		label.setLabel(itemFormMetadataBean.getLeftItemText());
+		if (isGroupRepeating) {
+			label.setLabel(itemFormMetadataBean.getLeftItemText() + " (" + itemGroupRepeatNumber + ")");
+		} else {
+			label.setLabel(itemFormMetadataBean.getLeftItemText());
+		}
+
 		input.setLabel(label);
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());

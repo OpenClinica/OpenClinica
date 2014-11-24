@@ -23,16 +23,19 @@ public class SelectWidget extends BaseWidget {
 	private ItemFormMetadataBean itemFormMetadataBean=null;
 	private Integer itemGroupRepeatNumber;
 	private boolean isItemRequired;
+	private boolean isGroupRepeating;
 	
-	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired)
+	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired,boolean isGroupRepeating)
+	
 	{
 		this.item = item;
 		this.version = version;
 		this.appearance = appearance;
 		this.itemGroupBean=itemGroupBean;
 		this.itemFormMetadataBean=itemFormMetadataBean;
-		this.itemGroupRepeatNumber=this.itemGroupRepeatNumber;
+		this.itemGroupRepeatNumber=itemGroupRepeatNumber;
         this.isItemRequired=isItemRequired;
+        this.isGroupRepeating=isGroupRepeating;
 	}
 	
 
@@ -40,7 +43,11 @@ public class SelectWidget extends BaseWidget {
 	public UserControl getUserControl() {
 		Select select = new Select();
 		Label label = new Label();
-		label.setLabel(itemFormMetadataBean.getLeftItemText());
+		if (isGroupRepeating) {
+			label.setLabel(itemFormMetadataBean.getLeftItemText() + " (" + itemGroupRepeatNumber + ")");
+		} else {
+			label.setLabel(itemFormMetadataBean.getLeftItemText());
+		}
 		select.setLabel(label);
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());

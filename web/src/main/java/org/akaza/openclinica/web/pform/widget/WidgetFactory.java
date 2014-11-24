@@ -28,19 +28,19 @@ public class WidgetFactory {
 	{
 		this.version = version;
 	}
-	public Widget getWidget(ItemBean item , Integer widgetType,ItemGroupBean itemGroupBean,ItemFormMetadataBean itemFormMetaDataBean , Integer itemGrouprepeatNumber, boolean isItemRequired)
+	public Widget getWidget(ItemBean item , Integer widgetType,ItemGroupBean itemGroupBean,ItemFormMetadataBean itemFormMetaDataBean , Integer itemGrouprepeatNumber, boolean isItemRequired,boolean isGroupRepeating)
 	{		
 	//	int widgetType = item.getItemMeta().getResponseSet().getResponseType().getId();                                                                                    
        // int widgetType = 1;		
 		
 		switch (widgetType)
 		{
-			case TYPE_TEXT: return new InputWidget(version, item, null,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
-			case TYPE_SINGLE_SELECT: return new Select1Widget(version, item,Widget.APPEARANCE_MINIMAL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
-			case TYPE_RADIO:  return new Select1Widget(version,item,Widget.APPEARANCE_FULL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
-			case TYPE_MULTI_SELECT: return new SelectWidget(version,item,Widget.APPEARANCE_COMPACT,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
-			case TYPE_CHECKBOX: return new SelectWidget(version,item,Widget.APPEARANCE_FULL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
-			case TYPE_TEXTAREA: return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired);
+			case TYPE_TEXT: return new InputWidget(version, item, null,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
+			case TYPE_SINGLE_SELECT: return new Select1Widget(version, item,Widget.APPEARANCE_MINIMAL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
+			case TYPE_RADIO:  return new Select1Widget(version,item,Widget.APPEARANCE_FULL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
+			case TYPE_MULTI_SELECT: return new SelectWidget(version,item,Widget.APPEARANCE_COMPACT,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
+			case TYPE_CHECKBOX: return new SelectWidget(version,item,Widget.APPEARANCE_FULL,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
+			case TYPE_TEXTAREA: return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE,itemGroupBean,itemFormMetaDataBean,itemGrouprepeatNumber,isItemRequired,isGroupRepeating);
 			default: 
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;
