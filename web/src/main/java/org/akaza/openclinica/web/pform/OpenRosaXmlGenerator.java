@@ -139,14 +139,15 @@ public class OpenRosaXmlGenerator {
 			group.setLabel(sectionLabel);
 */
 			Group group = new Group();
+			group.setUsercontrol(new ArrayList<UserControl>());
+			group.setAppearance("field-list");
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-				group.setUsercontrol(new ArrayList<UserControl>());
-				group.setAppearance("field-list");
 				Label groupLabel = new Label();
 				groupLabel.setLabel(section.getLabel() +" -- " +itemGroupBean.getName());
 				group.setLabel(groupLabel);
                boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
-				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
+				
+               int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				for (int x = 0; x < groupRepeatNum; x = x + 1) {
 				   
 
@@ -177,8 +178,8 @@ public class OpenRosaXmlGenerator {
 
 			} // multi group
 			groups.add(group);
+			body.setGroup(groups);
 		} // section
-		body.setGroup(groups);
 		html.getHead().getModel().setBind(bindList);
 
 	} // method
