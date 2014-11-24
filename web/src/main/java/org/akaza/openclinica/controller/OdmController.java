@@ -170,7 +170,7 @@ public class OdmController {
 	private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent,
 			List<EventCRFBean> eventCrfs, CRFDAO crfDAO, String formUrl) {
 		EventCRFBean selectedEventCRFBean = null;
-		CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getCrfId());
+		CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getId());
 		for (EventCRFBean eventCRFBean : eventCrfs) {
 			if (eventCRFBean.getCRFVersionId() == crfVersion.getId()) {
 				selectedEventCRFBean = eventCRFBean;
