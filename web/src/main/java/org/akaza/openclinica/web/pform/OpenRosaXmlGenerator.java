@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -79,6 +80,7 @@ public class OpenRosaXmlGenerator {
 	    	Html html = buildJavaXForm(xform);
 
 	    	mapBeansToDTO(html,crf,crfVersion,crfSections);
+	    	if (crfSections.size() > 1) setFormPaging(html);
 
 	    	String xformMinusInstance =  buildStringXForm(html);
 	    	String preInstance = xformMinusInstance.substring(0,xformMinusInstance.indexOf("<instance>"));
@@ -94,12 +96,22 @@ public class OpenRosaXmlGenerator {
     		throw new Exception(e);
     	}
     }
+    
+    private void setFormPaging(Html html)
+    {
+		html.getBody().setCssClass("pages");
+		List<Group> groups = html.getBody().getGroup();
+		for (Group group:groups)
+		{
+			group.setAppearance("field-list");
+		}
+    }
         
     private void mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion,
 			ArrayList<SectionBean> crfSections) throws Exception
     {
 		Body body = html.getBody();
-		body.setCssClass("pages");
+		//body.setCssClass("pages");
 		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);	
@@ -109,7 +121,7 @@ public class OpenRosaXmlGenerator {
 		{
 			Group group = new Group();
 			group.setUsercontrol(new ArrayList<UserControl>());
-			group.setAppearance("field-list");
+			//group.setAppearance("field-list");
 			Label groupLabel = new Label();
 			groupLabel.setLabel(section.getName());
 			group.setLabel(groupLabel);
