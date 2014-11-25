@@ -133,7 +133,10 @@
         <field name="nodeset" type="string">
             <bind-xml name="nodeset" node="attribute" />
         </field>
-               <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
+        <field name="label" type="org.akaza.openclinica.web.pform.dto.Label">
+            <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />
        </field>
         
@@ -159,7 +162,7 @@
         <field name="repeat" type="org.akaza.openclinica.web.pform.dto.Repeat">
             <bind-xml name="repeat" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
-                 <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
+         <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />
        </field>
   

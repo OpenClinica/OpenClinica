@@ -43,11 +43,7 @@ public class Select1Widget extends BaseWidget {
 	public UserControl getUserControl() {
 		Select1 select1 = new Select1();
 		Label label = new Label();
-		if (isGroupRepeating) {
-			label.setLabel(itemFormMetadataBean.getLeftItemText() + " (" + itemGroupRepeatNumber + ")");
-		} else {
 			label.setLabel(itemFormMetadataBean.getLeftItemText());
-		}
 		select1.setLabel(label);
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());

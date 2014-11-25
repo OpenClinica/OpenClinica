@@ -142,17 +142,22 @@ public class OpenRosaXmlGenerator {
 				Repeat repeat = new Repeat();
         		group.setUsercontrol(new ArrayList<UserControl>());
 				repeat.setUsercontrol(new ArrayList<UserControl>());
-
+				Label repeatLabel = new Label();
+          
 				group.setAppearance("field-list");
 				Label groupLabel = new Label();
-				groupLabel.setLabel(section.getLabel() + " -- " + itemGroupBean.getName());
+				groupLabel.setLabel(section.getLabel());
 				group.setLabel(groupLabel);
 				boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
+				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
+				
 				String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
 				// String count =String.valueOf(groupRepeatNum);
-
+				repeat.setNodeset(nodeset);
+                repeat.setLabel(repeatLabel);
+				repeatLabel.setLabel( itemGroupBean.getName());
 				ItemDAO itemdao = new ItemDAO(dataSource);
 
 				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
@@ -171,9 +176,7 @@ public class OpenRosaXmlGenerator {
 
 						if (isGroupRepeating) {
 							// repeat.setCount(count);
-							repeat.setNodeset(nodeset);
 							repeat.getUsercontrol().add(widget.getUserControl());
-							group.setRepeat(repeat);
 						} else {
 							group.getUsercontrol().add(widget.getUserControl());
 						}
@@ -182,13 +185,15 @@ public class OpenRosaXmlGenerator {
 						log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
 					}
 				} // item
+				if (isGroupRepeating) 
+					group.setRepeat(repeat);
 
 				groups.add(group);
+				body.setGroup(groups);
+				html.getHead().getModel().setBind(bindList);
 
 			} // multi group
 		} // section
-		body.setGroup(groups);
-		html.getHead().getModel().setBind(bindList);
 
 	} // method
 
