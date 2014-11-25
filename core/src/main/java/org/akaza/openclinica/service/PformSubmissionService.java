@@ -464,16 +464,23 @@ public class PformSubmissionService {
 		Integer itemOrdinal = 1;
 		String itemOID;
 		String itemValue;
+		String groupNodeName ="";
+/*      instanceNodeList    instanceNode
+ *      crfNodeList         crfNode
+		groupNodeList       groupNode
+		itemNodeList        itemNode
+*/		
 
-		NodeList nodeList = doc.getElementsByTagName("instance");
-		for (int i = 0; i < nodeList.getLength(); i = i + 1) {
-			Node node = nodeList.item(i);
-			if (node instanceof Element) {
+		NodeList instanceNodeList = doc.getElementsByTagName("instance");
+		for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
+			Node instanceNode = instanceNodeList.item(i); 
+															
+			if (instanceNode instanceof Element) {
 
-				NodeList childNodes = node.getChildNodes();
-				for (int j = 0; j < childNodes.getLength(); j = j + 2) {
-					Node cnode = childNodes.item(j);
-					String crfVersionOID = cnode.getNodeName().trim();
+				NodeList crfNodeList = instanceNode.getChildNodes();
+				for (int j = 0; j < crfNodeList.getLength(); j = j + 2) {
+					Node crfNode = crfNodeList.item(j);
+					String crfVersionOID = crfNode.getNodeName().trim();
 					System.out.println("crf_version_ :  " + crfVersionOID);
 					logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
@@ -481,19 +488,26 @@ public class PformSubmissionService {
 					if (eventCrfBean == null)
 						return errors;
 
-					if (cnode instanceof Element && eventCrfBean != null) {
-						NodeList childNodes1 = cnode.getChildNodes();
+					if (crfNode instanceof Element && eventCrfBean != null) {
+						NodeList groupNodeList = crfNode.getChildNodes();
+
 						ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
 						iddao = new ItemDataDAO(ds);
 
-						for (int k = 1; k < childNodes1.getLength(); k = k + 2) {
-							Node cnode1 = childNodes1.item(k);
-							if (cnode1.getAttributes().getNamedItem("ordinal") != null) {
-								itemOrdinal = Integer.valueOf(cnode1.getAttributes().getNamedItem("ordinal").getNodeValue().toString());
-							} else {
+						for (int m = 1; m < groupNodeList.getLength(); m = m + 1) {
+							Node itemNodeList = groupNodeList.item(m);
 
-								itemOID = cnode1.getNodeName().trim();
-								itemValue = cnode1.getTextContent();
+							if (itemNodeList.getNodeName() != groupNodeName) {
+								itemOrdinal = 1;
+							} else {
+								itemOrdinal++;
+							}
+							groupNodeName =itemNodeList.getNodeName();
+							for (int k = 1; k < itemNodeList.getChildNodes().getLength(); k = k + 2) {
+								Node itemNode = itemNodeList.getChildNodes().item(k);
+
+								itemOID = itemNode.getNodeName().trim();
+								itemValue = itemNode.getTextContent();
 
 								ArrayList<ItemBean> iBean = getItemRecord(itemOID);
 								CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
@@ -525,6 +539,7 @@ public class PformSubmissionService {
 									itemDataBeanList.add(itemDataBean);
 								}
 							}
+
 						}
 						if (!errors.hasErrors()) {
 							for (ItemDataBean itemDataBean : itemDataBeanList) {
