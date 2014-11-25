@@ -154,7 +154,8 @@ public class OpenRosaXmlGenerator {
 				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
 				
 				String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-				// String count =String.valueOf(groupRepeatNum);
+				String count =String.valueOf(groupRepeatNum);
+				repeat.setCount(count);
 				repeat.setNodeset(nodeset);
                 repeat.setLabel(repeatLabel);
 				repeatLabel.setLabel( itemGroupBean.getName());
@@ -189,11 +190,11 @@ public class OpenRosaXmlGenerator {
 					group.setRepeat(repeat);
 
 				groups.add(group);
-				body.setGroup(groups);
-				html.getHead().getModel().setBind(bindList);
 
 			} // multi group
+			body.setGroup(groups);
 		} // section
+		html.getHead().getModel().setBind(bindList);
 
 	} // method
 
