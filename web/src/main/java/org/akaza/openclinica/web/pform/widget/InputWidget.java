@@ -8,6 +8,7 @@ import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.Hint;
 import org.akaza.openclinica.web.pform.dto.Input;
 import org.akaza.openclinica.web.pform.dto.Label;
+import org.akaza.openclinica.web.pform.dto.Repeat;
 import org.akaza.openclinica.web.pform.dto.UserControl;
 
 public class InputWidget extends BaseWidget {
@@ -35,25 +36,21 @@ public class InputWidget extends BaseWidget {
 	public UserControl getUserControl() {
 		Input input = new Input();
 		Label label = new Label();
-		if (isGroupRepeating) {
-			label.setLabel(itemFormMetadataBean.getLeftItemText() + " (" + itemGroupRepeatNumber + ")");
-		} else {
 			label.setLabel(itemFormMetadataBean.getLeftItemText());
-		}
 
 		input.setLabel(label);
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//input.setHint(hint);
 		if (appearance != null) input.setAppearance(appearance);
-	input.setRef("/" + version.getOid() +"/" + item.getOid() );
+	input.setRef("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
 		return input;
 	}
 
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid() +"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
 		binding.setType(getDataType(item));
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;

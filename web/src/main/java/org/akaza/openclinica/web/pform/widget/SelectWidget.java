@@ -53,7 +53,7 @@ public class SelectWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//select.setHint(hint);
 
-		select.setRef("/" + version.getOid() + "/"+ item.getOid() );
+		select.setRef("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
 		select.setAppearance(appearance);
 
 		ArrayList<Item> itemList = new ArrayList<Item>();

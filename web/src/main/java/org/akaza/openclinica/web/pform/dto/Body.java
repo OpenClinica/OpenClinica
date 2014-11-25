@@ -6,7 +6,16 @@ public class Body {
 	private String cssClass = null;
 	private String appearance = null;
 	private List<Group> group;
+	private List<Repeat> repeat;
 
+	
+	
+	public List<Repeat> getRepeat() {
+		return repeat;
+	}
+	public void setRepeat(List<Repeat> repeat) {
+		this.repeat = repeat;
+	}
 	public List<Group> getGroup() {
 		return group;
 	}

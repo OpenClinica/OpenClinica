@@ -4,9 +4,17 @@ import java.util.List;
 
 public class Group {
 	private Label label;
+	private Repeat repeat;
 	private String appearance;
 	private List<UserControl> usercontrol;
 	
+	
+	public Repeat getRepeat() {
+		return repeat;
+	}
+	public void setRepeat(Repeat repeat) {
+		this.repeat = repeat;
+	}
 	public Label getLabel() {
 		return label;
 	}
