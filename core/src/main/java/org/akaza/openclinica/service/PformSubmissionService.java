@@ -346,16 +346,16 @@ public class PformSubmissionService {
 	}
 
 	// Create a single item data bean record , but not insert in table yet
-	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, EventCRFBean eventCrfBean) {
-		System.out.println("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue);
-		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue);
+	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean) {
+		System.out.println("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
+		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
 		ItemDataBean itemDataBean = new ItemDataBean();
 		itemDataBean.setItemId(itemBean.getId());
 		itemDataBean.setEventCRFId(eventCrfBean.getId());
 		itemDataBean.setValue(itemValue);
 		itemDataBean.setCreatedDate(new Date());
 		itemDataBean.setStatus(Status.UNAVAILABLE);
-		itemDataBean.setOrdinal(1);
+		itemDataBean.setOrdinal(itemOrdinal);
 		itemDataBean.setOwner(getUserAccount(getINPUT_USERNAME()));
 		return itemDataBean;
 	}
@@ -384,7 +384,8 @@ public class PformSubmissionService {
 		boolean isSameCrfVersion = false;
 		boolean isEventCrfInOC = false;
 
-		// Verify that the Crf Version has an available status in the Study Event Defn 
+		// Verify that the Crf Version has an available status in the Study
+		// Event Defn
 		if (getCrfVersionStatusInAEventDefCrf(crfVersionOID).getStatus().getId() != 1) {
 			System.out.println("This Crf Version has a Status Not available in this Study Event Defn");
 			logger.info("This Crf Version has a Status Not available in this Study Event Defn");
@@ -460,16 +461,26 @@ public class PformSubmissionService {
 		InputSource is = new InputSource();
 		is.setCharacterStream(new StringReader(body));
 		Document doc = db.parse(is);
+		Integer itemOrdinal = 1;
+		String itemOID;
+		String itemValue;
+		String groupNodeName ="";
+/*      instanceNodeList    instanceNode
+ *      crfNodeList         crfNode
+		groupNodeList       groupNode
+		itemNodeList        itemNode
+*/		
 
-		NodeList nodeList = doc.getElementsByTagName("instance");
-		for (int i = 0; i < nodeList.getLength(); i = i + 1) {
-			Node node = nodeList.item(i);
-			if (node instanceof Element) {
+		NodeList instanceNodeList = doc.getElementsByTagName("instance");
+		for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
+			Node instanceNode = instanceNodeList.item(i); 
+															
+			if (instanceNode instanceof Element) {
 
-				NodeList childNodes = node.getChildNodes();
-				for (int j = 0; j < childNodes.getLength(); j = j + 2) {
-					Node cnode = childNodes.item(j);
-					String crfVersionOID = cnode.getNodeName().trim();
+				NodeList crfNodeList = instanceNode.getChildNodes();
+				for (int j = 0; j < crfNodeList.getLength(); j = j + 2) {
+					Node crfNode = crfNodeList.item(j);
+					String crfVersionOID = crfNode.getNodeName().trim();
 					System.out.println("crf_version_ :  " + crfVersionOID);
 					logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
@@ -477,43 +488,58 @@ public class PformSubmissionService {
 					if (eventCrfBean == null)
 						return errors;
 
-					if (cnode instanceof Element && eventCrfBean != null) {
-						NodeList childNodes1 = cnode.getChildNodes();
+					if (crfNode instanceof Element && eventCrfBean != null) {
+						NodeList groupNodeList = crfNode.getChildNodes();
+
 						ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
 						iddao = new ItemDataDAO(ds);
 
-						for (int k = 1; k < childNodes1.getLength(); k = k + 2) {
-							Node cnode1 = childNodes1.item(k);
-							String itemOID = cnode1.getNodeName().trim();
-							String itemValue = cnode1.getTextContent();
+						for (int m = 1; m < groupNodeList.getLength(); m = m + 1) {
+							Node itemNodeList = groupNodeList.item(m);
 
-							ArrayList<ItemBean> iBean = getItemRecord(itemOID);
-							CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
-							Integer itemId = iBean.get(0).getId();
-							Integer crfVersionId = cvBean.getId();
-							ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
-							Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
-
-							if (responseTypeId == 3 || responseTypeId == 7) {
-								itemValue = itemValue.replaceAll(" ", ",");
-							}
-
-							// System.out.println("Item OID: "+ itemOID
-							// +"     Response type:  "
-							// +ifmBean.getResponseSet().getResponseType().getId());
-
-							idao = new ItemDAO(ds);
-
-							ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
-							ItemBean itemBean = itemBeanList.get(0);
-
-							ItemDataBean itemDataBean = createItemData(itemBean, itemValue, eventCrfBean);
-							errors = validateItemData(itemDataBean, itemBean, responseTypeId);
-							if (errors.hasErrors()) {
-								return errors;
+							if (itemNodeList.getNodeName() != groupNodeName) {
+								itemOrdinal = 1;
 							} else {
-								itemDataBeanList.add(itemDataBean);
+								itemOrdinal++;
 							}
+							groupNodeName =itemNodeList.getNodeName();
+							for (int k = 1; k < itemNodeList.getChildNodes().getLength(); k = k + 2) {
+								Node itemNode = itemNodeList.getChildNodes().item(k);
+
+								itemOID = itemNode.getNodeName().trim();
+								itemValue = itemNode.getTextContent();
+
+								ArrayList<ItemBean> iBean = getItemRecord(itemOID);
+								CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+								Integer itemId = iBean.get(0).getId();
+								Integer crfVersionId = cvBean.getId();
+								ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
+								Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+
+								if (responseTypeId == 3 || responseTypeId == 7) {
+									itemValue = itemValue.replaceAll(" ", ",");
+								}
+
+								/*
+								 * System.out.println("Item OID: "+ itemOID
+								 * +"     Response type:  "
+								 * +ifmBean.getResponseSet
+								 * ().getResponseType().getId());
+								 */
+								idao = new ItemDAO(ds);
+
+								ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+								ItemBean itemBean = itemBeanList.get(0);
+
+								ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean);
+								errors = validateItemData(itemDataBean, itemBean, responseTypeId);
+								if (errors.hasErrors()) {
+									return errors;
+								} else {
+									itemDataBeanList.add(itemDataBean);
+								}
+							}
+
 						}
 						if (!errors.hasErrors()) {
 							for (ItemDataBean itemDataBean : itemDataBeanList) {

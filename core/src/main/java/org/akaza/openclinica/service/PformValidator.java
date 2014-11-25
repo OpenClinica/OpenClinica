@@ -69,7 +69,9 @@ public class PformValidator implements Validator {
 				break;
 			}
 			case 10: { // ItemDataType.PDATE
-				e.reject("value.notSupported.pdate");
+				if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value) && !ExpressionTreeHelper.isDateyyyyMMDashes(value) && !ExpressionTreeHelper.isDateyyyyDashes(value) ) {
+				e.reject("value.invalid.pdate");
+				}
 				break;
 			}
 			case 11: { // ItemDataType.FILE

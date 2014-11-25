@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.UserControl;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ public abstract class BaseWidget implements Widget {
 		case "st": return "string";
 		case "int": return "int";
 		case "date": return "date";
+		case "pdate": return "string";
 		case "real": return "float";
 		case "bl": return "boolean";
 		//TODO: "BN","ED","TEL",FILE"
