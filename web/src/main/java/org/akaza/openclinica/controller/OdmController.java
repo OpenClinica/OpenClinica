@@ -2,20 +2,16 @@ package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
-import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -23,9 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -52,7 +46,6 @@ import javax.xml.bind.Marshaller;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -105,23 +98,38 @@ public class OdmController {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+		ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
 		CRFDAO crfDAO = new CRFDAO(dataSource);
 		List<ODMcomplexTypeDefinitionFormData> formDatas = new ArrayList<>();
 		try {
 			// Retrieve crfs for next event
 			StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
 			logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
-
 			ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
 			List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
 			StudyBean study = studyDAO.findByOid(studyOID);
 			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
 
+			// Only return info for CRFs that are not started, completed, or started but do not have any
+			// saved item data associated with them.
 			for (CRFVersionBean crfVersion : crfs) {
-				String formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
-				formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));
+				boolean itemDataExists = false;
+				boolean validStatus = true;
+				for (EventCRFBean eventCrf:eventCrfs)
+				{
+					if (eventCrf.getCRFVersionId() == crfVersion.getId())
+					{
+						int eventStatus = eventCrf.getStatus().getId();
+						if (eventStatus != 1 && eventStatus != 2) validStatus = false;
+						if (eventStatus == 1 && itemDataDAO.findAllByEventCRFId(eventCrf.getId()).size() > 0) itemDataExists = true;
+					}
+				}
+				if (!itemDataExists && validStatus)
+				{
+					String formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
+					formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));				
+				}
 			}
-
 			return createOdm(study, studySubjectBean, nextEvent, formDatas);
 
 		} catch (Exception e) {
@@ -170,7 +178,7 @@ public class OdmController {
 	private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent,
 			List<EventCRFBean> eventCrfs, CRFDAO crfDAO, String formUrl) {
 		EventCRFBean selectedEventCRFBean = null;
-		CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getCrfId());
+		CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getId());
 		for (EventCRFBean eventCRFBean : eventCrfs) {
 			if (eventCRFBean.getCRFVersionId() == crfVersion.getId()) {
 				selectedEventCRFBean = eventCRFBean;
@@ -214,9 +222,12 @@ public class OdmController {
 		if (eventCRFBean == null) {
 			formData.setStatus("Not Started");
 		} else {
-			formData.setStatusChangeTimeStamp(eventCRFBean.getUpdatedDate().toString());
 			formData.setStatus(eventCRFBean.getStatus().getName());
-		}
+			AuditDAO auditDAO = new AuditDAO(dataSource);
+			List<AuditBean> auditBeans = (List<AuditBean>) auditDAO.findEventCRFAudit(eventCRFBean.getId());
+			if (auditBeans.size() > 0) {
+				formData.setStatusChangeTimeStamp(auditBeans.get(0).getAuditDate().toString());
+			}			}
 		return formData;
 	}
 
