@@ -31,7 +31,8 @@ import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.List;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -77,7 +78,8 @@ public class OpenRosaXmlGenerator {
 			Html html = buildJavaXForm(xform);
 
 			mapBeansToDTO(html, crf, crfVersion, crfSections);
-
+			if (crfSections.size() > 1)
+				setFormPaging(html);
 			String xformMinusInstance = buildStringXForm(html);
 			String preInstance = xformMinusInstance.substring(0, xformMinusInstance.indexOf("<instance>"));
 			String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
@@ -120,10 +122,18 @@ public class OpenRosaXmlGenerator {
 		return itemGroupMetadataBean.get(0);
 	}
 
+	private void setFormPaging(Html html) {
+		html.getBody().setCssClass("pages");
+		List<Group> groups = html.getBody().getGroup();
+		for (Group group : groups) {
+			group.setAppearance("field-list");
+		}
+	}
+
 	private void mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
-		body.setCssClass("pages");
+		// body.setCssClass("pages");
 		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
@@ -140,11 +150,11 @@ public class OpenRosaXmlGenerator {
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 				Group group = new Group();
 				Repeat repeat = new Repeat();
-        		group.setUsercontrol(new ArrayList<UserControl>());
+				group.setUsercontrol(new ArrayList<UserControl>());
 				repeat.setUsercontrol(new ArrayList<UserControl>());
 				Label repeatLabel = new Label();
-          
-				group.setAppearance("field-list");
+
+				// group.setAppearance("field-list");
 				Label groupLabel = new Label();
 				groupLabel.setLabel(section.getLabel());
 				group.setLabel(groupLabel);
@@ -152,13 +162,14 @@ public class OpenRosaXmlGenerator {
 
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
-				
+
 				String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-				String count =String.valueOf(groupRepeatNum);
+				String count = String.valueOf(groupRepeatNum);
+
 				repeat.setCount(count);
 				repeat.setNodeset(nodeset);
-                repeat.setLabel(repeatLabel);
-				repeatLabel.setLabel( itemGroupBean.getName());
+				repeat.setLabel(repeatLabel);
+				repeatLabel.setLabel(itemGroupBean.getName());
 				ItemDAO itemdao = new ItemDAO(dataSource);
 
 				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
@@ -186,7 +197,7 @@ public class OpenRosaXmlGenerator {
 						log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
 					}
 				} // item
-				if (isGroupRepeating) 
+				if (isGroupRepeating)
 					group.setRepeat(repeat);
 
 				groups.add(group);
