@@ -164,9 +164,10 @@ public class OpenRosaXmlGenerator {
 				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
 
 				String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-				String count = String.valueOf(groupRepeatNum);
-
-				repeat.setCount(count);
+				// String count = String.valueOf(groupRepeatNum);
+				Integer count = groupRepeatNum;
+				// repeat.setJrNoAddRemove("true()");
+				// repeat.setJrCount(count.toString());
 				repeat.setNodeset(nodeset);
 				repeat.setLabel(repeatLabel);
 				repeatLabel.setLabel(itemGroupBean.getName());
@@ -220,21 +221,23 @@ public class OpenRosaXmlGenerator {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
-				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
-				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
-				Element groupOid = doc.createElement(itemGroupBean.getOid());
-				// groupOid.setAttribute("ordinal", String.valueOf(1));
-				root.appendChild(groupOid);
-				ItemDAO itemdao = new ItemDAO(dataSource);
-				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
-						crfVersion.getId());
+			//	int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
+			//	for (int x = 0; x < groupRepeatNum; x = x + 1) {
+					Element groupOid = doc.createElement(itemGroupBean.getOid());
+					// groupOid.setAttribute("ordinal", String.valueOf(1));
+					root.appendChild(groupOid);
+					ItemDAO itemdao = new ItemDAO(dataSource);
+					ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
+							crfVersion.getId());
 
-				for (ItemBean item : items) {
-					Element question = doc.createElement(item.getOid());
-					groupOid.appendChild(question);
-				} // end of item
+					for (ItemBean item : items) {
+						Element question = doc.createElement(item.getOid());
+                 // To activate Default Values showing in Pfrom , Uncomment below line     
+				//		setDefaultElement(item,crfVersion,question);
+						groupOid.appendChild(question);
+					} // end of item
 
-				// } // end of repeating group number
+			//	} // end of repeating group number
 			} // end of group
 
 		} // end of section
@@ -249,6 +252,23 @@ public class OpenRosaXmlGenerator {
 		return writer.toString();
 
 	}
+	
+		
+		private void setDefaultElement(ItemBean item, CRFVersionBean crfVersion,Element question ) throws Exception{
+			Integer responseTypeId = getItemFormMetadata(item, crfVersion).getResponseSet().getResponseTypeId();
+
+			if (responseTypeId == 3 || responseTypeId == 7) {
+				String defaultValue = getItemFormMetadata(item, crfVersion).getDefaultValue();
+				defaultValue = defaultValue.replace(" ","");
+				defaultValue = defaultValue.replace(",", " ");
+				question.setTextContent(defaultValue);
+			} else {
+				question.setTextContent(getItemFormMetadata(item, crfVersion).getDefaultValue());
+			}	
+	
+	}
+		
+	
 
 	private Html buildJavaXForm(String content) throws Exception {
 		// XML to Object

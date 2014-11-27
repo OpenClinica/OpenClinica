@@ -63,6 +63,9 @@
         <field name="required" type="string">
             <bind-xml name="required" node="attribute" />
         </field>
+        <field name="relevant" type="string">
+            <bind-xml name="relevant" node="attribute" />
+        </field>
         <field name="jrPreload" type="string" >
             <bind-xml name="jr:preload" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
         </field>
@@ -133,8 +136,11 @@
         <field name="nodeset" type="string">
             <bind-xml name="nodeset" node="attribute" />
         </field>
-        <field name="count" type="string">
-            <bind-xml name="count" node="attribute" />
+        <field name="jrNoAddRemove" type="string" >
+            <bind-xml name="jr:noAddRemove" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
+        </field>
+        <field name="jrCount" type="string" >
+            <bind-xml name="jr:count" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
         </field>
         <field name="label" type="org.akaza.openclinica.web.pform.dto.Label">
             <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />

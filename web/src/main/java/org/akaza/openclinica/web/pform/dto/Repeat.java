@@ -12,27 +12,30 @@ private String nodeset;
 private List<UserControl> usercontrol;
 private Label label;
 private String count;
-public HashMap<String, String> counter = new HashMap<String, String>();
-String key ="jr:count";
-String value="";
-
+private String jrCount;
+private String jrNoAddRemove;
 
 
 public Repeat() {
 }
 
 
-/*public Repeat(HashMap<String, String> counter) {
-	this.counter = counter;
-	counter.put(key, value);
+public String getJrNoAddRemove() {
+	return jrNoAddRemove;
 }
-*/
 
-public HashMap<String, String> getCounter() {
-	return counter;
+
+public void setJrNoAddRemove(String jrNoAddRemove) {
+	this.jrNoAddRemove = jrNoAddRemove;
 }
-public void setCounter(HashMap<String, String> counter) {
-	this.counter = counter;
+
+
+public String getJrCount() {
+	return jrCount;
+}
+
+public void setJrCount(String jrCount) {
+	this.jrCount = jrCount;
 }
 public String getCount() {
 	return count;
