@@ -61,6 +61,14 @@ import org.xml.sax.InputSource;
  *
  * @author ssachs
  */
+/**
+ * @author joekeremian
+ *
+ */
+/**
+ * @author joekeremian
+ *
+ */
 public class PformSubmissionService {
 
 	// public static String studySubjectOid = "SS_30";
@@ -100,6 +108,14 @@ public class PformSubmissionService {
 		this.authoritiesDao = authoritiesDao;
 	}
 
+	/**
+	 * This method will generate new UserName combining Study and Study Subject
+	 * OIDs
+	 * 
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	public String getInputUsername(StudyBean studyBean, StudySubjectBean studySubjectBean) {
 		String inputUserName = null;
 		if (studySubjectBean != null) {
@@ -111,8 +127,16 @@ public class PformSubmissionService {
 		return inputUserName;
 	}
 
-	// Create User Account , insert in User Account table , also insert records
-	// in Authorities table
+	/**
+	 * Create User Account , insert in User Account table , also insert records
+	 * in Authorities table
+	 * 
+	 * @param userAccountBean
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 * @throws Exception
+	 */
 	private UserAccountBean createUserAccount(UserAccountBean userAccountBean, StudyBean studyBean, StudySubjectBean studySubjectBean)
 			throws Exception {
 		UserAccountBean rootUserAccount = getUserAccount("root");
@@ -144,7 +168,15 @@ public class PformSubmissionService {
 		return userAccountBean;
 	}
 
-	// Create StudyUserRole records
+	/**
+	 * Create StudyUserRole records
+	 * 
+	 * @param createdUserAccountBean
+	 * @param studyId
+	 * @param r
+	 * @param rootUserAccount
+	 * @return
+	 */
 	private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r, UserAccountBean rootUserAccount) {
 		StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
 		studyUserRole.setStudyId(studyId);
@@ -257,15 +289,22 @@ public class PformSubmissionService {
 		return ifmBean;
 	}
 
-	// Main Method to Start Saving Process the Pform Submission
+	/**
+	 * Main Method to Start Saving Process the Pform Submission
+	 * 
+	 * @param body
+	 * @param studySubjectOid
+	 * @param studyEventDefnId
+	 * @param studyEventOrdinal
+	 * @return
+	 * @throws Exception
+	 */
 	public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal) throws Exception {
 
-		System.out.println("------------------------------------------------");
 		Errors errors = instanciateErrors();
 		// Study Subject Validation check
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectOid);
 		if (studySubjectBean == null) {
-			System.out.println(" Study Subject Does not exist in the system ");
 			errors.reject("Study Subject Does not exist in the system ");
 			return errors;
 		}
@@ -274,10 +313,8 @@ public class PformSubmissionService {
 		UserAccountBean userAccountBean = getUserAccount(getInputUsername(studyBean, studySubjectBean));
 		if (!userAccountBean.isActive() && studySubjectBean.isActive()) {
 			userAccountBean = createUserAccount(userAccountBean, studyBean, studySubjectBean);
-			System.out.println("New User Account is created");
 			logger.info("***New User Account is created***");
 		} else {
-			System.out.println(" User Account already exist in the system ");
 			logger.info("***User Account already exist in the system***");
 		}
 
@@ -290,7 +327,6 @@ public class PformSubmissionService {
 			// Read and Parse Payload from Pform
 			errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean);
 		} else {
-			System.out.println("StudyEvent has a Status Other than Scheduled or Started ");
 			logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
 			errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
 			// return errors;
@@ -298,7 +334,15 @@ public class PformSubmissionService {
 		return errors;
 	}
 
-	// Update Study Event to Data Entry Started / Completed
+	/**
+	 * Update Study Event to Data Entry Started / Completed
+	 * 
+	 * @param seBean
+	 * @param status
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status, StudyBean studyBean,
 			StudySubjectBean studySubjectBean) {
 		seBean.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
@@ -309,7 +353,15 @@ public class PformSubmissionService {
 		return seBean;
 	}
 
-	// Create Event CRF (Insert a record in event_crf table)
+	/**
+	 * Create Event CRF (Insert a record in event_crf table)
+	 * 
+	 * @param crfVersionOid
+	 * @param studyBean
+	 * @param studyEventBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private EventCRFBean createEventCRF(String crfVersionOid, StudyBean studyBean, StudyEventBean studyEventBean,
 			StudySubjectBean studySubjectBean) {
 		String inputUsername = getInputUsername(studyBean, studySubjectBean);
@@ -333,7 +385,14 @@ public class PformSubmissionService {
 		return ecBean;
 	}
 
-	// Update Status in Event CRF Table
+	/**
+	 * Update Status in Event CRF Table
+	 * 
+	 * @param ecBean
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private EventCRFBean updateEventCRF(EventCRFBean ecBean, StudyBean studyBean, StudySubjectBean studySubjectBean) {
 		String inputUsername = getInputUsername(studyBean, studySubjectBean);
 		ecBean.setUpdater(getUserAccount(inputUsername));
@@ -344,10 +403,19 @@ public class PformSubmissionService {
 		return ecBean;
 	}
 
-	// Create a single item data bean record , but not insert in table yet
+	/**
+	 * Create a single item data bean record , but not insert in table yet
+	 * 
+	 * @param itemBean
+	 * @param itemValue
+	 * @param itemOrdinal
+	 * @param eventCrfBean
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean,
 			StudyBean studyBean, StudySubjectBean studySubjectBean) {
-		System.out.println("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
 		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
 		ItemDataBean itemDataBean = new ItemDataBean();
 		itemDataBean.setItemId(itemBean.getId());
@@ -360,14 +428,25 @@ public class PformSubmissionService {
 		return itemDataBean;
 	}
 
-	// Instantiate an Error object
+	/**
+	 * Instantiate an Error object
+	 * 
+	 * @return
+	 */
 	public Errors instanciateErrors() {
 		DataBinder dataBinder = new DataBinder(null);
 		Errors errors = dataBinder.getBindingResult();
 		return errors;
 	}
 
-	// Errors Object to Validate Item Data
+	/**
+	 * Errors Object to Validate Item Data
+	 * 
+	 * @param itemDataBean
+	 * @param itemBean
+	 * @param responseTypeId
+	 * @return
+	 */
 	public Errors validateItemData(ItemDataBean itemDataBean, ItemBean itemBean, Integer responseTypeId) {
 		ItemItemDataContainer container = new ItemItemDataContainer(itemBean, itemDataBean, responseTypeId);
 		DataBinder dataBinder = new DataBinder(container);
@@ -377,8 +456,17 @@ public class PformSubmissionService {
 		return errors;
 	}
 
-	// Check for CRF Version if exist in system if submitted same version twice
-	// or other versions of the same CRF
+	/**
+	 * Check for CRF Version if exist in system if submitted same version twice
+	 * or other versions of the same CRF
+	 * 
+	 * @param crfVersionOID
+	 * @param errors
+	 * @param studyBean
+	 * @param studyEventBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private EventCRFBean getCrfVersionCheck(String crfVersionOID, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean,
 			StudySubjectBean studySubjectBean) {
 		EventCRFBean eventCrfBean = null;
@@ -388,7 +476,6 @@ public class PformSubmissionService {
 		// Verify that the Crf Version has an available status in the Study
 		// Event Defn
 		if (getCrfVersionStatusInAEventDefCrf(crfVersionOID, studyBean, studyEventBean).getStatus().getId() != 1) {
-			System.out.println("This Crf Version has a Status Not available in this Study Event Defn");
 			logger.info("This Crf Version has a Status Not available in this Study Event Defn");
 			errors.reject("This Crf Version has a Status Not available in this Study Event Defn");
 			return null;
@@ -421,7 +508,18 @@ public class PformSubmissionService {
 		return eventCrfBean;
 	}
 
-	// Check if Event CRF exist or not in the system , if not , create ,
+	/**
+	 * Check if Event CRF exist or not in the system , if not , create ,
+	 * 
+	 * @param isEventCrfInOC
+	 * @param isSameCrfVersion
+	 * @param crfVersionOID
+	 * @param errors
+	 * @param studyBean
+	 * @param studyEventBean
+	 * @param studySubjectBean
+	 * @return
+	 */
 	private EventCRFBean checkIfEventCrfInOC(boolean isEventCrfInOC, boolean isSameCrfVersion, String crfVersionOID, Errors errors,
 			StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean) {
 		EventCRFBean eventCrfBean = null;
@@ -429,18 +527,15 @@ public class PformSubmissionService {
 			// Execute Creating New Event Crf
 			eventCrfBean = createEventCRF(crfVersionOID, studyBean, studyEventBean, studySubjectBean);
 			// Continue creating Item Data
-			System.out.println(" New EventCrf is created");
 			logger.info("***New EventCrf is created***");
 
 		} else if (isEventCrfInOC && isSameCrfVersion) {
 			// If Same CRF version is tried to submit to OC for the same subject
 			// , event..
 			eventCrfBean = getEventCrf(crfVersionOID, studyEventBean, studySubjectBean).get(0); // ///////////////
-			System.out.println(" Existing EventCrf with same CRF Version");
-			logger.info("***Existing EventCrf***");
+			logger.info("***  Existing EventCrf with same CRF Version  ***");
 			// If Item Data Exist in OC , then throw submission Failure
 			if (!getItemDataRecords(eventCrfBean.getId()).isEmpty()) {
-				System.out.println(" Existing Item Data , No New Item Data is added.  ");
 				logger.info("***Existing Item Data , No New Item Data is added***");
 				errors.reject("Existing Item Data , No New Item Data is added");
 				return null;
@@ -450,14 +545,23 @@ public class PformSubmissionService {
 			// If Another CRF version is tried to submit to OC for the same
 			// subject , event ..
 			eventCrfBean = null;
-			System.out.println(" Existing EventCrf with other CRF version ");
 			errors.reject("Existing EventCrf with other CRF version");
 			return null;
 		}
 		return eventCrfBean;
 	}
 
-	// Read from Pform Submission Payload or the Body
+	/**
+	 * Read from Pform Submission Payload or the Body
+	 * 
+	 * @param body
+	 * @param errors
+	 * @param studyBean
+	 * @param studyEventBean
+	 * @param studySubjectBean
+	 * @return
+	 * @throws Exception
+	 */
 	private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean,
 			StudySubjectBean studySubjectBean) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -470,8 +574,8 @@ public class PformSubmissionService {
 		String itemValue;
 		String groupNodeName = "";
 		/*
-		 * instanceNodeList instanceNode crfNodeList crfNode groupNodeList
-		 * groupNode itemNodeList itemNode
+		 * NodeLists and Nodes instanceNodeList instanceNode crfNodeList crfNode
+		 * groupNodeList groupNode itemNodeList itemNode
 		 */
 		NodeList instanceNodeList = doc.getElementsByTagName("instance");
 		for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
@@ -483,14 +587,10 @@ public class PformSubmissionService {
 				for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
 					Node crfNode = crfNodeList.item(j);
 					if (crfNode instanceof Element) {
-
 						String crfVersionOID = crfNode.getNodeName().trim();
-
-						System.out.println("crf_version_ :  " + crfVersionOID);
 						logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
 						EventCRFBean eventCrfBean = getCrfVersionCheck(crfVersionOID, errors, studyBean, studyEventBean, studySubjectBean);
-
 						ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
 						iddao = new ItemDataDAO(ds);
 
@@ -529,12 +629,6 @@ public class PformSubmissionService {
 												itemValue = itemValue.replaceAll(" ", ",");
 											}
 
-											/*
-											 * System.out.println("Item OID: "+
-											 * itemOID +"     Response type:  "
-											 * +ifmBean.getResponseSet
-											 * ().getResponseType().getId());
-											 */
 											idao = new ItemDAO(ds);
 
 											ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
