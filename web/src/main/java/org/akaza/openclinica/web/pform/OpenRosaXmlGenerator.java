@@ -110,7 +110,8 @@ public class OpenRosaXmlGenerator {
 
 		return itemFormMetadataBean;
 	}
-
+   
+	
 	private ItemGroupMetadataBean getItemGroupMetadata(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section)
 			throws Exception {
 		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBean = null;
@@ -181,7 +182,8 @@ public class OpenRosaXmlGenerator {
 					int responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
 					boolean isItemRequred = itemFormMetadataBean.isRequired();
 					int itemGroupRepeatNumber = 1;
-
+                   if (item.getId()==11) responseTypeId=7; 
+                	   
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
 							isItemRequred, isGroupRepeating);
 					if (widget != null) {

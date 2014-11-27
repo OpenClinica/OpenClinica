@@ -73,8 +73,8 @@ public class SelectWidget extends BaseWidget {
 	public Bind getBinding() {
 		Bind binding = new Bind();
 	binding.setNodeSet("/" + version.getOid() + "/" + itemGroupBean.getOid() +"/" + item.getOid());
-		binding.setType(getDataType(item));
-//		binding.setType("string");
+//		binding.setType(getDataType(item));
+		binding.setType("string");
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}
