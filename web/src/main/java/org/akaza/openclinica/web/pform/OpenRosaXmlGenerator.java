@@ -135,7 +135,9 @@ public class OpenRosaXmlGenerator {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
 		// body.setCssClass("pages");
+		ArrayList<Section> sections = new ArrayList<Section>();
 		ArrayList<Group> groups = new ArrayList<Group>();
+		
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
 		html.getHead().setTitle(crf.getName());
@@ -143,7 +145,16 @@ public class OpenRosaXmlGenerator {
 		for (SectionBean section : crfSections) {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 
-			/*
+
+			Section singleSection = new Section();
+			singleSection.setUsercontrol(new ArrayList<UserControl>());
+			Label sectionLabel = new Label();
+            sectionLabel.setLabel(section.getLabel());
+            singleSection.setLabel(sectionLabel);
+			singleSection.setAppearance("field-list");
+
+            
+           /*
 			 * Label sectionLabel = new Label();
 			 * sectionLabel.setLabel(section.getLabel() + " ------ ");
 			 * group.setLabel(sectionLabel);
@@ -155,7 +166,7 @@ public class OpenRosaXmlGenerator {
 				repeat.setUsercontrol(new ArrayList<UserControl>());
 				Label repeatLabel = new Label();
 
-				// group.setAppearance("field-list");
+			  group.setAppearance("field-list");
 				Label groupLabel = new Label();
 				groupLabel.setLabel(section.getLabel());
 				group.setLabel(groupLabel);
@@ -164,9 +175,7 @@ public class OpenRosaXmlGenerator {
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
 
-				String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-				// String count = String.valueOf(groupRepeatNum);
-				Integer count = groupRepeatNum;
+				String nodeset = "/" + crfVersion.getOid() + "/Section/" + itemGroupBean.getOid();
 				// repeat.setJrNoAddRemove("true()");
 				// repeat.setJrCount(count.toString());
 				repeat.setNodeset(nodeset);
@@ -182,11 +191,13 @@ public class OpenRosaXmlGenerator {
 					int responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
 					boolean isItemRequred = itemFormMetadataBean.isRequired();
 					int itemGroupRepeatNumber = 1;
-                   if (item.getId()==11) responseTypeId=7; 
+                    String responseLayout=itemFormMetadataBean.getResponseLayout();
                 	   
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-							isItemRequred, isGroupRepeating);
+							isItemRequred, isGroupRepeating , responseLayout);
 					if (widget != null) {
+
+					
 						bindList.add(widget.getBinding());
 
 						if (isGroupRepeating) {
@@ -204,10 +215,13 @@ public class OpenRosaXmlGenerator {
 					group.setRepeat(repeat);
 
 				groups.add(group);
+				singleSection.setGroup(groups);
 
+				//sectionGroups.add(group);
 			} // multi group
-			body.setGroup(groups);
+			sections.add(singleSection);
 		} // section
+		body.setGroup(groups);;
 		html.getHead().getModel().setBind(bindList);
 
 	} // method
@@ -216,27 +230,30 @@ public class OpenRosaXmlGenerator {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder build = docFactory.newDocumentBuilder();
 		Document doc = build.newDocument();
-		Element root = doc.createElement(crfVersion.getOid());
-		root.setAttribute("id", crfVersion.getOid());
-		doc.appendChild(root);
+		Element crfElement = doc.createElement(crfVersion.getOid());
+		crfElement.setAttribute("id", crfVersion.getOid());
+		doc.appendChild(crfElement);
 		for (SectionBean section : crfSections) {
+			Element sectionElement = doc.createElement("Section");
+			crfElement.appendChild(sectionElement);
+                  
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
 			//	int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 			//	for (int x = 0; x < groupRepeatNum; x = x + 1) {
-					Element groupOid = doc.createElement(itemGroupBean.getOid());
+					Element groupElement = doc.createElement(itemGroupBean.getOid());
 					// groupOid.setAttribute("ordinal", String.valueOf(1));
-					root.appendChild(groupOid);
+					sectionElement.appendChild(groupElement);
 					ItemDAO itemdao = new ItemDAO(dataSource);
 					ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
 							crfVersion.getId());
 
 					for (ItemBean item : items) {
-						Element question = doc.createElement(item.getOid());
+						Element itemElement = doc.createElement(item.getOid());
                  // To activate Default Values showing in Pfrom , Uncomment below line     
 				//		setDefaultElement(item,crfVersion,question);
-						groupOid.appendChild(question);
+						groupElement.appendChild(itemElement);
 					} // end of item
 
 			//	} // end of repeating group number

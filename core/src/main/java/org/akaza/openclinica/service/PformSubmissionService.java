@@ -582,7 +582,6 @@ public class PformSubmissionService {
 			Node instanceNode = instanceNodeList.item(i);
 
 			if (instanceNode instanceof Element) {
-
 				NodeList crfNodeList = instanceNode.getChildNodes();
 				for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
 					Node crfNode = crfNodeList.item(j);
@@ -597,78 +596,93 @@ public class PformSubmissionService {
 						if (eventCrfBean == null)
 							return errors;
 						if (eventCrfBean != null) {
-							NodeList groupNodeList = crfNode.getChildNodes();
-							for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
-								Node groupNode = groupNodeList.item(k);
 
-								if (groupNode.getNodeName() != groupNodeName) {
-									itemOrdinal = 1;
-								} else {
-									itemOrdinal++;
-								}
-								groupNodeName = groupNode.getNodeName();
+							NodeList sectionNodeList = crfNode.getChildNodes();
+							for (int s = 0; s < sectionNodeList.getLength(); s = s + 1) {
+								Node sectionNode = sectionNodeList.item(s);
 
-								if (groupNode instanceof Element) {
-									NodeList itemNodeList = groupNode.getChildNodes();
+								if (sectionNode instanceof Element) {
+									NodeList groupNodeList = sectionNode.getChildNodes();
 
-									for (int m = 0; m < groupNodeList.getLength(); m = m + 1) {
-										Node itemNode = itemNodeList.item(m);
-										if (itemNode instanceof Element) {
+									for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
+										Node groupNode = groupNodeList.item(k);
 
-											itemOID = itemNode.getNodeName().trim();
-											itemValue = itemNode.getTextContent();
 
-											ArrayList<ItemBean> iBean = getItemRecord(itemOID);
-											CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
-											Integer itemId = iBean.get(0).getId();
-											Integer crfVersionId = cvBean.getId();
-											ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
-											Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+										if (groupNode instanceof Element) {
 
-											if (responseTypeId == 3 || responseTypeId == 7) {
-												itemValue = itemValue.replaceAll(" ", ",");
-											}
-
-											idao = new ItemDAO(ds);
-
-											ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
-											ItemBean itemBean = itemBeanList.get(0);
-
-											ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean,
-													studyBean, studySubjectBean);
-											errors = validateItemData(itemDataBean, itemBean, responseTypeId);
-											if (errors.hasErrors()) {
-												return errors;
+											if (groupNode.getNodeName() != groupNodeName) {
+												itemOrdinal = 1;
 											} else {
-												itemDataBeanList.add(itemDataBean);
+												itemOrdinal++;
 											}
-											// }
-										}
+											groupNodeName = groupNode.getNodeName();
+											
+											NodeList itemNodeList = groupNode.getChildNodes();
 
-										if (!errors.hasErrors()) {
-											for (ItemDataBean itemDataBean : itemDataBeanList) {
-												// Create Item Data Bean by
-												// inserting one
-												// row at
-												// a time to Item Data table
-												iddao.create(itemDataBean);
-												// Update Event Crf Bean and
-												// change the
-												// status
-												// to Completed
-												eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-												// Study Event status update
-												if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventBean
-														.getStudyEventDefinition())) {
-													updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean,
-															studySubjectBean);
-												} else {
-													updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean,
-															studySubjectBean);
+											for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
+												Node itemNode = itemNodeList.item(m);
+												if (itemNode instanceof Element) {
+
+													itemOID = itemNode.getNodeName().trim();
+													itemValue = itemNode.getTextContent();
+
+													ArrayList<ItemBean> iBean = getItemRecord(itemOID);
+													CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+													Integer itemId = iBean.get(0).getId();
+													Integer crfVersionId = cvBean.getId();
+													ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
+													Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+
+													if (responseTypeId == 3 || responseTypeId == 7) {
+														itemValue = itemValue.replaceAll(" ", ",");
+													}
+
+													idao = new ItemDAO(ds);
+
+													ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+													ItemBean itemBean = itemBeanList.get(0);
+
+													ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal,
+															eventCrfBean, studyBean, studySubjectBean);
+													errors = validateItemData(itemDataBean, itemBean, responseTypeId);
+													if (errors.hasErrors()) {
+														return errors;
+													} else {
+														itemDataBeanList.add(itemDataBean);
+													}
+													// }
+												//}
+
+												if (!errors.hasErrors()) {
+													for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+														// Create Item Data Bean
+														// by
+														// inserting one
+														// row at
+														// a time to Item Data
+														// table
+														iddao.create(itemDataBean1);
+														// Update Event Crf Bean
+														// and
+														// change the
+														// status
+														// to Completed
+														eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+														// Study Event status
+														// update
+														if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventBean
+																.getStudyEventDefinition())) {
+															updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean,
+																	studySubjectBean);
+														} else {
+															updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED,
+																	studyBean, studySubjectBean);
+														}
+													}
 												}
 											}
 										}
-									}
+									}}
 								}
 							}
 						}

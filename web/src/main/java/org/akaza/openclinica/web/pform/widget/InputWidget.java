@@ -20,16 +20,17 @@ public class InputWidget extends BaseWidget {
 	private Integer itemGroupRepeatNumber;
 	private boolean isItemRequired;
 	private boolean isGroupRepeating;
-	public InputWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired,boolean isGroupRepeating)
-	{
+
+	public InputWidget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
+			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired, boolean isGroupRepeating) {
 		this.item = item;
 		this.version = version;
+		this.itemGroupBean = itemGroupBean;
+		this.itemFormMetadataBean = itemFormMetadataBean;
+		this.itemGroupRepeatNumber = itemGroupRepeatNumber;
+		this.isItemRequired = isItemRequired;
+		this.isGroupRepeating = isGroupRepeating;
 		this.appearance = appearance;
-		this.itemGroupBean=itemGroupBean;
-		this.itemFormMetadataBean=itemFormMetadataBean;
-		this.itemGroupRepeatNumber=itemGroupRepeatNumber;
-        this.isItemRequired=isItemRequired;
-	    this.isGroupRepeating=isGroupRepeating;
 	}
 	
 	@Override
@@ -43,15 +44,16 @@ public class InputWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//input.setHint(hint);
 		if (appearance != null) input.setAppearance(appearance);
-	input.setRef("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
+	input.setRef("/" + version.getOid()+"/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
 		return input;
 	}
 
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid()+ "/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
 		binding.setType(getDataType(item));
+		
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}

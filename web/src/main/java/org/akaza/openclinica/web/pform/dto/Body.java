@@ -7,9 +7,16 @@ public class Body {
 	private String appearance = null;
 	private List<Group> group;
 	private List<Repeat> repeat;
+	private List<Section> sections;
 
 	
 	
+	public List<Section> getSections() {
+		return sections;
+	}
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
+	}
 	public List<Repeat> getRepeat() {
 		return repeat;
 	}

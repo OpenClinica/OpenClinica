@@ -49,7 +49,7 @@ public class SelectWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//select.setHint(hint);
 
-		select.setRef("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
+		select.setRef("/" + version.getOid()+ "/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
 		select.setAppearance(appearance);
 
 		ArrayList<Item> itemList = new ArrayList<Item>();
@@ -72,7 +72,7 @@ public class SelectWidget extends BaseWidget {
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-	binding.setNodeSet("/" + version.getOid() + "/" + itemGroupBean.getOid() +"/" + item.getOid());
+	binding.setNodeSet("/" + version.getOid() +"/Section/" + itemGroupBean.getOid() +"/" + item.getOid());
 //		binding.setType(getDataType(item));
 		binding.setType("string");
 		if (isItemRequired) binding.setRequired("true()");
