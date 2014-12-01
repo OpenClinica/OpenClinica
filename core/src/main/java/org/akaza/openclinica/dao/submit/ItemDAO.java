@@ -303,6 +303,25 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         }
         return beanList;
     }
+
+    
+    public List<ItemBean> findAllItemsByGroupIdAndSectionIdOrdered(int id, int crfVersionId , int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, id);
+        variables.put(2, sectionId);
+        variables.put(3, crfVersionId);
+        String sql = digester.getQuery("findAllItemsByGroupIdAndSectionIdOrdered");
+        List listofMaps = this.select(sql, variables);
+        List<ItemBean> beanList = new ArrayList<ItemBean>();
+        ItemBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
+
     
     public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId,int sectionId) {
         this.setTypesExpected();

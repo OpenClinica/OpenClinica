@@ -163,6 +163,7 @@
   <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetAuditDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleDao" class="org.akaza.openclinica.dao.hibernate.RuleDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="ruleActionPropertyDao" class="org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetRuleDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetRuleAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao" parent="abstractDomainDao" autowire="byName" />
 

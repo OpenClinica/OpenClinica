@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.Hint;
 import org.akaza.openclinica.web.pform.dto.Item;
@@ -24,8 +25,12 @@ public class SelectWidget extends BaseWidget {
 	private Integer itemGroupRepeatNumber;
 	private boolean isItemRequired;
 	private boolean isGroupRepeating;
+	private ItemBean itemTargetBean;
+	private String expression;
 	
-	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance ,ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetadataBean , Integer itemGroupRepeatNumber , boolean isItemRequired,boolean isGroupRepeating)
+	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
+			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired,
+			boolean isGroupRepeating, ItemBean itemTargetBean , String expression )
 	
 	{
 		this.item = item;
@@ -36,6 +41,8 @@ public class SelectWidget extends BaseWidget {
 		this.itemGroupRepeatNumber=itemGroupRepeatNumber;
         this.isItemRequired=isItemRequired;
         this.isGroupRepeating=isGroupRepeating;
+        this.itemTargetBean=itemTargetBean;
+        this.expression=expression;
 	}
 	
 
@@ -72,7 +79,13 @@ public class SelectWidget extends BaseWidget {
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
+		String relevant=null;
+
 	binding.setNodeSet("/" + version.getOid() +"/Section/" + itemGroupBean.getOid() +"/" + item.getOid());
+	if (itemTargetBean!=null){
+		relevant=expression;
+	}
+    	binding.setRelevant(relevant);
 //		binding.setType(getDataType(item));
 		binding.setType("string");
 		if (isItemRequired) binding.setRequired("true()");

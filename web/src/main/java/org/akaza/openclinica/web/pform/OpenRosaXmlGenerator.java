@@ -10,11 +10,21 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.managestudy.CRFVersionMetadataUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.rule.action.RuleActionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.logic.rulerunner.RuleActionContainer;
 import org.akaza.openclinica.web.pform.dto.*;
 import org.akaza.openclinica.web.pform.widget.Widget;
 import org.akaza.openclinica.web.pform.widget.WidgetFactory;
@@ -31,8 +41,11 @@ import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
+
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,9 +60,16 @@ public class OpenRosaXmlGenerator {
 	private XMLContext xmlContext = null;
 	private DataSource dataSource = null;
 	protected final Logger log = LoggerFactory.getLogger(OpenRosaXmlGenerator.class);
+	CoreResources coreResources;
 
-	public OpenRosaXmlGenerator(CoreResources core, DataSource dataSource) throws Exception {
+	private RuleActionPropertyDao ruleActionPropertyDao;
+	private ItemDAO idao;
+	private ItemGroupDAO igdao;
+
+	public OpenRosaXmlGenerator(CoreResources core, DataSource dataSource, RuleActionPropertyDao ruleActionPropertyDao) throws Exception {
 		this.dataSource = dataSource;
+		this.coreResources = core;
+		this.ruleActionPropertyDao=ruleActionPropertyDao;
 
 		try {
 			xmlContext = new XMLContext();
@@ -96,22 +116,45 @@ public class OpenRosaXmlGenerator {
 	private ArrayList<ItemGroupBean> getItemGroupBeans(SectionBean section) throws Exception {
 		ArrayList<ItemGroupBean> itemGroupBeans = null;
 
-		ItemGroupDAO itemGroupDAO = new ItemGroupDAO(dataSource);
-		itemGroupBeans = (ArrayList<ItemGroupBean>) itemGroupDAO.findGroupBySectionId(section.getId());
-
+		 igdao = new ItemGroupDAO(dataSource);
+		itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupBySectionId(section.getId());
 		return itemGroupBeans;
+	}
+
+
+	private ItemGroupBean getItemTargetGroupBean(Integer itemId) {
+		ArrayList <ItemGroupBean> itemGroupBean=null;		
+		igdao = new ItemGroupDAO(dataSource);
+		
+	  itemGroupBean = (ArrayList<ItemGroupBean>) igdao.findGroupsByItemID(itemId);
+		return itemGroupBean.get(0);
+	}
+
+   
+	private ItemBean getItemBean(String itemOid) {
+		ArrayList <ItemBean> itemBean = null;
+		idao = new ItemDAO(dataSource);
+		itemBean = (ArrayList<ItemBean>) idao.findByOid(itemOid);
+		return itemBean.get(0);
+	}
+   
+   
+	private ItemBean getItemBean(int itemId) {
+		ItemBean itemBean = null;
+		idao = new ItemDAO(dataSource);
+		itemBean = (ItemBean) idao.findByPK(itemId);
+		return itemBean;
 	}
 
 	private ItemFormMetadataBean getItemFormMetadata(ItemBean item, CRFVersionBean crfVersion) throws Exception {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 
-		ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
-		itemFormMetadataBean = itemFormMetadataDAO.findByItemIdAndCRFVersionId(item.getId(), crfVersion.getId());
+		ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(dataSource);
+		itemFormMetadataBean = ifmdao.findByItemIdAndCRFVersionId(item.getId(), crfVersion.getId());
 
 		return itemFormMetadataBean;
 	}
-   
-	
+
 	private ItemGroupMetadataBean getItemGroupMetadata(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section)
 			throws Exception {
 		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBean = null;
@@ -121,6 +164,39 @@ public class OpenRosaXmlGenerator {
 				crfVersion.getId(), section.getId());
 
 		return itemGroupMetadataBean.get(0);
+	}
+
+	private ArrayList<PropertyBean> getPropertyBean(String itemOid , String groupOid) {
+		ArrayList<PropertyBean> propertyBeans = null;
+		propertyBeans = getRuleActionPropertyDao().findByOid(itemOid, groupOid);
+		return propertyBeans;
+	}
+
+	private HashMap<String, Object> getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
+		ItemBean itemTargetBean = null;
+		HashMap<String, Object> map = new HashMap();
+		ExpressionBean expressionBean = null;
+		ArrayList<PropertyBean> propertyBeans = getPropertyBean(itemBean.getOid(), itemGroupBean.getOid());
+		
+		if (propertyBeans.size() !=0) {
+			for (PropertyBean propertyBean : propertyBeans) {
+					System.out.println("property bean oid:   " + propertyBean.getOid());
+					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
+					if (ruleActionBean.getActionType().getCode() == 3) {
+						int itemTargetId = ruleActionBean.getRuleSetRule().getRuleSetBean().getItemId();
+                        itemTargetBean=getItemBean(itemTargetId);
+						expressionBean = ruleActionBean.getRuleSetRule().getRuleBean().getExpression();
+						System.out.println("itemTargetBean :   " + itemTargetBean.getOid() + "    ExpressionBean:   "
+								+ expressionBean.getValue());
+						map.put("itemTargetBean", itemTargetBean);
+						map.put("expressionBean", expressionBean);
+                       return map;						
+					}
+			}
+		}
+		map.put("itemTargetBean", null);
+		map.put("expressionBean", null);
+		return map;
 	}
 
 	private void setFormPaging(Html html) {
@@ -137,7 +213,7 @@ public class OpenRosaXmlGenerator {
 		// body.setCssClass("pages");
 		ArrayList<Section> sections = new ArrayList<Section>();
 		ArrayList<Group> groups = new ArrayList<Group>();
-		
+
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
 		html.getHead().setTitle(crf.getName());
@@ -145,16 +221,14 @@ public class OpenRosaXmlGenerator {
 		for (SectionBean section : crfSections) {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 
-
 			Section singleSection = new Section();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
 			Label sectionLabel = new Label();
-            sectionLabel.setLabel(section.getLabel());
-            singleSection.setLabel(sectionLabel);
+			sectionLabel.setLabel(section.getLabel());
+			singleSection.setLabel(sectionLabel);
 			singleSection.setAppearance("field-list");
 
-            
-           /*
+			/*
 			 * Label sectionLabel = new Label();
 			 * sectionLabel.setLabel(section.getLabel() + " ------ ");
 			 * group.setLabel(sectionLabel);
@@ -166,7 +240,7 @@ public class OpenRosaXmlGenerator {
 				repeat.setUsercontrol(new ArrayList<UserControl>());
 				Label repeatLabel = new Label();
 
-			  group.setAppearance("field-list");
+				group.setAppearance("field-list");
 				Label groupLabel = new Label();
 				groupLabel.setLabel(section.getLabel());
 				group.setLabel(groupLabel);
@@ -183,21 +257,28 @@ public class OpenRosaXmlGenerator {
 				repeatLabel.setLabel(itemGroupBean.getName());
 				ItemDAO itemdao = new ItemDAO(dataSource);
 
-				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
-						crfVersion.getId());
+				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdAndSectionIdOrdered(itemGroupBean.getId(),
+						crfVersion.getId(),section.getId());
 				for (ItemBean item : items) {
 
 					itemFormMetadataBean = getItemFormMetadata(item, crfVersion);
 					int responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
 					boolean isItemRequred = itemFormMetadataBean.isRequired();
 					int itemGroupRepeatNumber = 1;
-                    String responseLayout=itemFormMetadataBean.getResponseLayout();
-                	   
+					String responseLayout = itemFormMetadataBean.getResponseLayout();
+					HashMap<String, Object> map = getSkipPattern(item,itemGroupBean);
+                    ItemBean itemTargetBean= (ItemBean)map.get("itemTargetBEan");
+                    String expression=null;
+					ExpressionBean expressionBean = (ExpressionBean) map.get("expressionBean");
+   				 if (expressionBean!=null){
+					expression = expressionBean.getValue();
+				    expression = getExpressionParsedAndSorted(expression,crfVersion);
+   				 }
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-							isItemRequred, isGroupRepeating , responseLayout);
+							isItemRequred, isGroupRepeating, responseLayout, (ItemBean) map.get("itemTargetBean"),
+							expression);
 					if (widget != null) {
 
-					
 						bindList.add(widget.getBinding());
 
 						if (isGroupRepeating) {
@@ -217,14 +298,16 @@ public class OpenRosaXmlGenerator {
 				groups.add(group);
 				singleSection.setGroup(groups);
 
-				//sectionGroups.add(group);
+				// sectionGroups.add(group);
 			} // multi group
 			sections.add(singleSection);
 		} // section
-		body.setGroup(groups);;
+		body.setGroup(groups);
+		
 		html.getHead().getModel().setBind(bindList);
 
 	} // method
+
 
 	private String buildInstance(Model model, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -236,27 +319,28 @@ public class OpenRosaXmlGenerator {
 		for (SectionBean section : crfSections) {
 			Element sectionElement = doc.createElement("Section");
 			crfElement.appendChild(sectionElement);
-                  
+
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
-			//	int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
-			//	for (int x = 0; x < groupRepeatNum; x = x + 1) {
-					Element groupElement = doc.createElement(itemGroupBean.getOid());
-					// groupOid.setAttribute("ordinal", String.valueOf(1));
-					sectionElement.appendChild(groupElement);
-					ItemDAO itemdao = new ItemDAO(dataSource);
-					ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
-							crfVersion.getId());
+				// int groupRepeatNum = getItemGroupMetadata(itemGroupBean,
+				// crfVersion, section).getRepeatNum();
+				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
+				Element groupElement = doc.createElement(itemGroupBean.getOid());
+				// groupOid.setAttribute("ordinal", String.valueOf(1));
+				sectionElement.appendChild(groupElement);
+				ItemDAO itemdao = new ItemDAO(dataSource);
+				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdAndSectionIdOrdered(itemGroupBean.getId(),
+						crfVersion.getId(),section.getId());
+				for (ItemBean item : items) {
+					Element itemElement = doc.createElement(item.getOid());
+					// To activate Default Values showing in Pfrom , Uncomment
+					// below line
+					// setDefaultElement(item,crfVersion,question);
+					groupElement.appendChild(itemElement);
+				} // end of item
 
-					for (ItemBean item : items) {
-						Element itemElement = doc.createElement(item.getOid());
-                 // To activate Default Values showing in Pfrom , Uncomment below line     
-				//		setDefaultElement(item,crfVersion,question);
-						groupElement.appendChild(itemElement);
-					} // end of item
-
-			//	} // end of repeating group number
+				// } // end of repeating group number
 			} // end of group
 
 		} // end of section
@@ -271,23 +355,20 @@ public class OpenRosaXmlGenerator {
 		return writer.toString();
 
 	}
-	
-		
-		private void setDefaultElement(ItemBean item, CRFVersionBean crfVersion,Element question ) throws Exception{
-			Integer responseTypeId = getItemFormMetadata(item, crfVersion).getResponseSet().getResponseTypeId();
 
-			if (responseTypeId == 3 || responseTypeId == 7) {
-				String defaultValue = getItemFormMetadata(item, crfVersion).getDefaultValue();
-				defaultValue = defaultValue.replace(" ","");
-				defaultValue = defaultValue.replace(",", " ");
-				question.setTextContent(defaultValue);
-			} else {
-				question.setTextContent(getItemFormMetadata(item, crfVersion).getDefaultValue());
-			}	
-	
+	private void setDefaultElement(ItemBean item, CRFVersionBean crfVersion, Element question) throws Exception {
+		Integer responseTypeId = getItemFormMetadata(item, crfVersion).getResponseSet().getResponseTypeId();
+
+		if (responseTypeId == 3 || responseTypeId == 7) {
+			String defaultValue = getItemFormMetadata(item, crfVersion).getDefaultValue();
+			defaultValue = defaultValue.replace(" ", "");
+			defaultValue = defaultValue.replace(",", " ");
+			question.setTextContent(defaultValue);
+		} else {
+			question.setTextContent(getItemFormMetadata(item, crfVersion).getDefaultValue());
+		}
+
 	}
-		
-	
 
 	private Html buildJavaXForm(String content) throws Exception {
 		// XML to Object
@@ -313,4 +394,55 @@ public class OpenRosaXmlGenerator {
 		String xform = writer.toString();
 		return xform;
 	}
+
+	
+	private String getFullExpressionToParse(String expression , CRFVersionBean version){
+		ArrayList <String> exprList = (ArrayList<String>) Arrays.asList(expression.split("( and )|( or ) "));
+        for (String expr : exprList){
+        	expression = getExpressionParsedAndSorted(expr, version);       	
+        }  		
+		
+		
+		
+		return expression;
+	}
+	
+	
+	private String getExpressionParsedAndSorted(String expression ,CRFVersionBean version) {
+		String itemOid, operator, value;
+		expression = expression.replaceAll("\\s+", " ").trim();
+		String[] expr = expression.split(" ");
+		if (expr[0].startsWith("I_")) {
+			itemOid = expr[0].trim();
+			value = expr[2].trim();
+		} else {
+			itemOid = expr[2].trim();
+			value = expr[0].trim();
+		}
+		operator = expr[1];
+		if (operator.equalsIgnoreCase("eq"))
+			operator = "=";
+		if (operator.equalsIgnoreCase("lt"))
+			operator = "<";
+		if (operator.equalsIgnoreCase("gt"))
+			operator = ">";
+       
+		ItemBean itemBean=getItemBean(itemOid);
+		ItemGroupBean itemGroupBean = getItemTargetGroupBean(itemBean.getId());
+		 expression ="/" + version.getOid()+ "/Section/"+itemGroupBean.getOid()+"/" + itemOid + " " + operator + " " + value;
+
+		System.out.println(expression);
+
+		return expression;
+	}
+
+	
+	public RuleActionPropertyDao getRuleActionPropertyDao() {
+		return ruleActionPropertyDao;
+	}
+
+	public void setRuleActionPropertyDao(RuleActionPropertyDao ruleActionPropertyDao) {
+		this.ruleActionPropertyDao = ruleActionPropertyDao;
+	}
+
 }

@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -56,7 +57,8 @@ public class OpenRosaServices {
 	private DataSource dataSource;
 	private CoreResources coreResources;
 	PformSubmissionService PformSubmissionService;
-
+    RuleActionPropertyDao ruleActionPropertyDao;
+    
 	@GET
 	@Path("/{studyOID}/formList")
 	@Produces(MediaType.APPLICATION_XML)
@@ -142,7 +144,7 @@ public class OpenRosaServices {
 		}
 
 		try {
-			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource);
+			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource,ruleActionPropertyDao);
 			xform = generator.buildForm(formId);
 		} 
 		catch (Exception e) 
@@ -313,6 +315,14 @@ public class OpenRosaServices {
 
 	public void setPformSubmissionService(PformSubmissionService pformSubmissionService) {
 		PformSubmissionService = pformSubmissionService;
+	}
+
+	public RuleActionPropertyDao getRuleActionPropertyDao() {
+		return ruleActionPropertyDao;
+	}
+
+	public void setRuleActionPropertyDao(RuleActionPropertyDao ruleActionPropertyDao) {
+		this.ruleActionPropertyDao = ruleActionPropertyDao;
 	}
 
 }

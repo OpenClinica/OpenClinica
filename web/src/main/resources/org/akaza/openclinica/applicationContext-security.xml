@@ -150,6 +150,7 @@
 <bean id="openRosaServices" class="org.akaza.openclinica.web.pform.OpenRosaServices">
     <property name="dataSource" ref="dataSource"></property>
     <property name="coreResources" ref="coreResources"/>
+    <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
     <property name="pformSubmissionService" ref="pformSubmissionService" />
 </bean>
 </beans>
