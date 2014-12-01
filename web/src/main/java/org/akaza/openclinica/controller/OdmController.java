@@ -37,10 +37,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
@@ -60,9 +64,17 @@ public class OdmController {
 	@Autowired
 	ServletContext context;
 
+    @Autowired
+    RuleController ruleController;
+
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+    @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
+    public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response) throws Exception {
+        return ruleController.studyMetadata(model,session,studyOid,response);
+    }
 
 	/**
 	 * This URL needs to change ... Right now security disabled on this ... You
