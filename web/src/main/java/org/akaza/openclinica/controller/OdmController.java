@@ -58,14 +58,10 @@ public class OdmController {
 	private BasicDataSource dataSource;
 
 	@Autowired
-	CoreResources coreResources;
-
-	@Autowired
 	ServletContext context;
 
 	public static final String FORM_CONTEXT = "ecid";
 
-	private MessageSource messageSource;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
@@ -79,7 +75,7 @@ public class OdmController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
-	public @ResponseBody ODM createBoom(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid)
+	public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid)
 			throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
@@ -231,7 +227,14 @@ public class OdmController {
 		return formData;
 	}
 
-	private String generateXmlFromObj(Class clazz, ODM odm) throws Exception {
+    /**
+     * Currently not used, but keep here for future unit test
+     * @param clazz
+     * @param odm
+     * @return
+     * @throws Exception
+     */
+    private String generateXmlFromObj(Class clazz, ODM odm) throws Exception {
 
 		JAXBContext context = JAXBContext.newInstance(clazz);
 
@@ -242,33 +245,5 @@ public class OdmController {
 		return w.toString();
 	}
 
-	private UserAccountBean getUserAccount() {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String username = null;
-		if (principal instanceof UserDetails) {
-			username = ((UserDetails) principal).getUsername();
-		} else {
-			username = principal.toString();
-		}
-		UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-		return (UserAccountBean) userAccountDao.findByUserName(username);
-	}
-
-	public static boolean isAjaxRequest(String requestedWith) {
-		return requestedWith != null ? "XMLHttpRequest".equals(requestedWith) : false;
-	}
-
-	public static boolean isAjaxUploadRequest(HttpServletRequest request) {
-		return request.getParameter("ajaxUpload") != null;
-	}
-
-	public MessageSource getMessageSource() {
-		return messageSource;
-	}
-
-	@Autowired
-	public void setMessageSource(MessageSource messageSource) {
-		this.messageSource = messageSource;
-	}
 
 }
