@@ -42,7 +42,7 @@ public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean>{
     public ArrayList<SCDItemMetadataBean> findAllSCDByItemFormMetadataId(Integer itemFormMetadataId) {
         String query = "select scd.* from scd_item_metadata scd where scd.scd_item_form_metadata_id = :itemFormMetadataId)";
         org.hibernate.Query q = this.getCurrentSession().createSQLQuery(query);
-        q.setInteger("itemFormMetadatId", itemFormMetadataId);
+        q.setInteger("itemFormMetadataId", itemFormMetadataId);
         return (ArrayList<SCDItemMetadataBean>) q.list();
     }
 }

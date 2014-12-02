@@ -29,6 +29,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -56,8 +57,9 @@ public class OpenRosaServices {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
 	private DataSource dataSource;
 	private CoreResources coreResources;
-	PformSubmissionService PformSubmissionService;
-    RuleActionPropertyDao ruleActionPropertyDao;
+	private PformSubmissionService PformSubmissionService;
+    private RuleActionPropertyDao ruleActionPropertyDao;
+    private SCDItemMetadataDao scdItemMetadataDao;
     
 	@GET
 	@Path("/{studyOID}/formList")
@@ -144,7 +146,7 @@ public class OpenRosaServices {
 		}
 
 		try {
-			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource,ruleActionPropertyDao);
+			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource,ruleActionPropertyDao,scdItemMetadataDao);
 			xform = generator.buildForm(formId);
 		} 
 		catch (Exception e) 
@@ -325,4 +327,13 @@ public class OpenRosaServices {
 		this.ruleActionPropertyDao = ruleActionPropertyDao;
 	}
 
+	public SCDItemMetadataDao getScdItemMetadataDao() {
+		return scdItemMetadataDao;
+	}
+
+	public void setScdItemMetadataDao(SCDItemMetadataDao scdItemMetadataDao) {
+		this.scdItemMetadataDao = scdItemMetadataDao;
+	}
+
+	
 }
