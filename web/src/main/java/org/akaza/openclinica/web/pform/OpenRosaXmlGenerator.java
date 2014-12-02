@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -89,6 +88,8 @@ public class OpenRosaXmlGenerator {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			log.error(ExceptionUtils.getStackTrace(e));
+			System.out.println(e.getMessage());
+			System.out.println(ExceptionUtils.getStackTrace(e));
 			throw new Exception(e);
 		}
 	}
@@ -133,7 +134,6 @@ public class OpenRosaXmlGenerator {
 	private void mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
-		// body.setCssClass("pages");
 		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
@@ -141,22 +141,31 @@ public class OpenRosaXmlGenerator {
 
 		for (SectionBean section : crfSections) {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
+			
+			Group sectionGroup = new Group();
+			sectionGroup.setUsercontrol(new ArrayList<UserControl>());
+			Label sectionLabel = new Label();
+			sectionLabel.setLabel(section.getTitle());
+			sectionGroup.setLabel(sectionLabel);
+			sectionGroup.setGroup(new ArrayList<Group>());
+			Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
+			Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS, section);
+			sectionGroup.getUsercontrol().add(subtitle.getUserControl());
+			sectionGroup.getUsercontrol().add(instructions.getUserControl());
+			bindList.add(subtitle.getBinding());
+			bindList.add(instructions.getBinding());
 
-			/*
-			 * Label sectionLabel = new Label();
-			 * sectionLabel.setLabel(section.getLabel() + " ------ ");
-			 * group.setLabel(sectionLabel);
-			 */
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
+				ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(dataSource);
+				List<ItemGroupMetadataBean> itemGroupMetadata = itemGroupMetaDAO.findMetaByGroupAndSection(itemGroupBean.getId(),crfVersion.getId(),section.getId());
 				Group group = new Group();
 				Repeat repeat = new Repeat();
 				group.setUsercontrol(new ArrayList<UserControl>());
 				repeat.setUsercontrol(new ArrayList<UserControl>());
 				Label repeatLabel = new Label();
 
-				// group.setAppearance("field-list");
 				Label groupLabel = new Label();
-				groupLabel.setLabel(section.getLabel());
+				groupLabel.setLabel(itemGroupMetadata.get(0).getHeader());
 				group.setLabel(groupLabel);
 				boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
@@ -181,30 +190,46 @@ public class OpenRosaXmlGenerator {
 					boolean isItemRequred = itemFormMetadataBean.isRequired();
 					int itemGroupRepeatNumber = 1;
 
+					//Add the Item Header
+					Widget headerWidget = factory.getHeaderWidget(item,itemFormMetadataBean,itemGroupBean);
+					if (headerWidget != null)
+					{
+						bindList.add(headerWidget.getBinding());
+						if (isGroupRepeating) repeat.getUsercontrol().add(headerWidget.getUserControl());
+						else group.getUsercontrol().add(headerWidget.getUserControl());
+					}
+					else log.debug("Invalid/Missing instructive header text encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+
+					//Add the Item SubHeader
+					Widget subHeaderWidget = factory.getSubHeaderWidget(item,itemFormMetadataBean,itemGroupBean);
+					if (subHeaderWidget != null)
+					{
+						bindList.add(subHeaderWidget.getBinding());
+						if (isGroupRepeating) repeat.getUsercontrol().add(subHeaderWidget.getUserControl());
+						else group.getUsercontrol().add(subHeaderWidget.getUserControl());
+					}
+					else log.debug("Invalid/Missing instructive subheader text encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+
+					//Add the Item itself
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
 							isItemRequred, isGroupRepeating);
 					if (widget != null) {
 						bindList.add(widget.getBinding());
-
-						if (isGroupRepeating) {
-							// repeat.setCount(count);
-							repeat.getUsercontrol().add(widget.getUserControl());
-						} else {
-							group.getUsercontrol().add(widget.getUserControl());
-						}
+						if (isGroupRepeating) repeat.getUsercontrol().add(widget.getUserControl());
+						else group.getUsercontrol().add(widget.getUserControl());
 
 					} else {
 						log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
 					}
 				} // item
-				if (isGroupRepeating)
-					group.setRepeat(repeat);
+				if (isGroupRepeating) group.setRepeat(repeat);
 
-				groups.add(group);
+				sectionGroup.getGroup().add(group);
 
-			} // multi group
-			body.setGroup(groups);
+			} // item group
+			groups.add(sectionGroup);
 		} // section
+		body.setGroup(groups);
 		html.getHead().getModel().setBind(bindList);
 
 	} // method
@@ -221,9 +246,7 @@ public class OpenRosaXmlGenerator {
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
-				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
 				Element groupOid = doc.createElement(itemGroupBean.getOid());
-				// groupOid.setAttribute("ordinal", String.valueOf(1));
 				root.appendChild(groupOid);
 				ItemDAO itemdao = new ItemDAO(dataSource);
 				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
@@ -234,7 +257,6 @@ public class OpenRosaXmlGenerator {
 					groupOid.appendChild(question);
 				} // end of item
 
-				// } // end of repeating group number
 			} // end of group
 
 		} // end of section
