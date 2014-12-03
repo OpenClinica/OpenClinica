@@ -309,6 +309,7 @@ public class OpenRosaXmlGenerator {
 				String nodeset = "/" + crfVersion.getOid() + "/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid();
 				// repeat.setJrNoAddRemove("true()");
 				// repeat.setJrCount(count.toString());
+				group.setRef(nodeset);
 				repeat.setAppearance("field-list");
 				repeat.setNodeset(nodeset);
 				repeat.setLabel(repeatLabel);
