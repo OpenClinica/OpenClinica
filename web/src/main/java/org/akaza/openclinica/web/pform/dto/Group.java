@@ -7,7 +7,7 @@ public class Group {
 	private Repeat repeat;
 	private String appearance;
 	private List<UserControl> usercontrol;
-	
+    private String ref;	
 	
 	public Repeat getRepeat() {
 		return repeat;
@@ -33,4 +33,11 @@ public class Group {
 	public void setUsercontrol(List<UserControl> usercontrol) {
 		this.usercontrol = usercontrol;
 	}
+	public String getRef() {
+		return ref;
+	}
+	public void setRef(String ref) {
+		this.ref = ref;
+	}
+	
 }

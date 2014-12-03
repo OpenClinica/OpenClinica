@@ -15,6 +15,7 @@ private String count;
 private String jrCount;
 private String jrNoAddRemove;
 private String appearance;
+private String ref;
 
 
 public Repeat() {
@@ -71,6 +72,16 @@ public String getAppearance() {
 
 public void setAppearance(String appearance) {
 	this.appearance = appearance;
+}
+
+
+public String getRef() {
+	return ref;
+}
+
+
+public void setRef(String ref) {
+	this.ref = ref;
 }
 
 }
