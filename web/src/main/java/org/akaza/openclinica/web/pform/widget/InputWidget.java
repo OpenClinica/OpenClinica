@@ -6,6 +6,8 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.domain.datamap.Section;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.Hint;
@@ -26,9 +28,11 @@ public class InputWidget extends BaseWidget {
 	private boolean isGroupRepeating;
 	private ItemBean itemTargetBean=null;
     private String expression;
+    private SectionBean section;
+    
 	public InputWidget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
 			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired,
-			boolean isGroupRepeating, ItemBean itemTargetBean , String expression ) {
+			boolean isGroupRepeating, ItemBean itemTargetBean , String expression,SectionBean section ) {
 		this.item = item;
 		this.version = version;
 		this.itemGroupBean = itemGroupBean;
@@ -39,6 +43,7 @@ public class InputWidget extends BaseWidget {
 		this.appearance = appearance;
 		this.itemTargetBean=itemTargetBean;
 		this.expression=expression;
+		this.section=section;
 	}
 	
 	@Override
@@ -52,7 +57,7 @@ public class InputWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//input.setHint(hint);
 		if (appearance != null) input.setAppearance(appearance);
-	input.setRef("/" + version.getOid()+"/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
+	input.setRef("/" + version.getOid()+"/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
 		return input;
 	}
  	
@@ -61,13 +66,15 @@ public class InputWidget extends BaseWidget {
 	public Bind getBinding() {
 		String relevant=null;
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid()+ "/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid()+ "/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
 		
 		if (itemTargetBean!=null){
 			relevant=expression;
 		}
+		binding.setType("string");
+
 		binding.setRelevant(relevant);
-		binding.setType(getDataType(item));
+	//	binding.setType(getDataType(item));
 		
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;

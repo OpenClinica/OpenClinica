@@ -14,6 +14,7 @@ private Label label;
 private String count;
 private String jrCount;
 private String jrNoAddRemove;
+private String appearance;
 
 
 public Repeat() {
@@ -61,4 +62,15 @@ public String getNodeset() {
 public void setNodeset(String nodeset) {
 	this.nodeset = nodeset;
 }
+
+
+public String getAppearance() {
+	return appearance;
+}
+
+
+public void setAppearance(String appearance) {
+	this.appearance = appearance;
+}
+
 }

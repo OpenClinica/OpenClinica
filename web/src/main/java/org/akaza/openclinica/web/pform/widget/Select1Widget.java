@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.Hint;
@@ -27,10 +28,11 @@ public class Select1Widget extends BaseWidget {
 	private boolean isGroupRepeating;
 	private ItemBean itemTargetBean;
 	private String expression;
+	private SectionBean section;
 	
 	public Select1Widget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
 			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired,
-			boolean isGroupRepeating, ItemBean itemTargetBean , String expression)
+			boolean isGroupRepeating, ItemBean itemTargetBean , String expression, SectionBean section)
 	{
 		this.item = item;
 		this.version = version;
@@ -42,6 +44,7 @@ public class Select1Widget extends BaseWidget {
         this.isGroupRepeating=isGroupRepeating;
         this.itemTargetBean=itemTargetBean;
         this.expression=expression;
+        this.section=section;
 	}
 	
 	
@@ -55,7 +58,7 @@ public class Select1Widget extends BaseWidget {
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//select1.setHint(hint);
-		select1.setRef("/" + version.getOid()+ "/Section/"+itemGroupBean.getOid()+"/" + item.getOid());
+		select1.setRef("/" + version.getOid()+ "/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
 		select1.setAppearance(appearance);
 
 		ArrayList<Item> itemList = new ArrayList<Item>();
@@ -79,13 +82,14 @@ public class Select1Widget extends BaseWidget {
 	public Bind getBinding() {
 		Bind binding = new Bind();
 		String relevant=null;
-		binding.setNodeSet("/" + version.getOid() +"/Section/" + itemGroupBean.getOid() +"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid() +"/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid() +"/" + item.getOid());
 		if (itemTargetBean!=null){
 			relevant=expression;
 		}
 	    	binding.setRelevant(relevant);
-		
-		binding.setType(getDataType(item));
+		binding.setType("string");
+
+	//	binding.setType(getDataType(item));
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}
