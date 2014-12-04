@@ -29,12 +29,12 @@ public abstract class BaseWidget implements Widget {
 		switch(type)
 		{
 		case "st": return "string";
-		case "int": return "int";
+		case "int": return "xs:integer";
 		case "date": return "date";
-		case "pdate": return "string";
 		case "real": return "float";
 		case "bl": return "boolean";
 		//TODO: "BN","ED","TEL",FILE"
+		case "pdate":
 		default: 
 			log.debug("Unsupported item data type encountered.  Returning null.");
 			System.out.println("Unsupported item data type encountered: " + type + ".  Returning null.");

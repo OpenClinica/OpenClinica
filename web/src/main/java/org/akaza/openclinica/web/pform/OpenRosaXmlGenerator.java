@@ -213,13 +213,13 @@ public class OpenRosaXmlGenerator {
 					//Add the Item itself
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
 							isItemRequred, isGroupRepeating);
-					if (widget != null) {
+					if (widget != null && widget.getBinding() != null) {
 						bindList.add(widget.getBinding());
 						if (isGroupRepeating) repeat.getUsercontrol().add(widget.getUserControl());
 						else group.getUsercontrol().add(widget.getUserControl());
 
 					} else {
-						log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+						log.debug("Unsupported widget and/or datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
 					}
 				} // item
 				if (isGroupRepeating) group.setRepeat(repeat);
@@ -243,8 +243,19 @@ public class OpenRosaXmlGenerator {
 		doc.appendChild(root);
 		for (SectionBean section : crfSections) {
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
+			Element sectionSubTitle = doc.createElement("SECTION_" + section.getId() + ".SUBTITLE");
+			Element sectionInstructions = doc.createElement("SECTION_" + section.getId() + ".INSTRUCTIONS");
+			root.appendChild(sectionSubTitle);
+			root.appendChild(sectionInstructions);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-
+				//TODO: Need to update this logic since an item group can appear in mulitple sections.
+				//When looping this way, need to see if the node exists already and append if possible.
+				
+				//TODO:  In section loop, add 2 section pieces
+				
+				//TODO:  Consolidate new text widgets into 1, if possible.
+				
+				//TODO:  There can be multiple itemgroup metadata entries. make sure i am pulling data from the correct one.
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				Element groupOid = doc.createElement(itemGroupBean.getOid());
 				root.appendChild(groupOid);
@@ -253,7 +264,17 @@ public class OpenRosaXmlGenerator {
 						crfVersion.getId());
 
 				for (ItemBean item : items) {
-					Element question = doc.createElement(item.getOid());
+					ItemFormMetadataBean itemMetaData = getItemFormMetadata(item,crfVersion); 
+					if (itemMetaData.getHeader() != null && !itemMetaData.getHeader().equals(""))
+					{
+						Element header = doc.createElement(item.getOid() + ".HEADER");
+						groupOid.appendChild(header);
+					}
+					if (itemMetaData.getHeader() != null && !itemMetaData.getSubHeader().equals(""))
+					{
+						Element subHeader = doc.createElement(item.getOid() + ".SUBHEADER");
+						groupOid.appendChild(subHeader);
+					}					Element question = doc.createElement(item.getOid());
 					groupOid.appendChild(question);
 				} // end of item
 

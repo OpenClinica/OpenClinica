@@ -73,7 +73,7 @@ public class Select1Widget extends BaseWidget {
 		Bind binding = new Bind();
 		binding.setNodeSet("/" + version.getOid() + "/" + itemGroupBean.getOid() +"/" + item.getOid());
 		
-		binding.setType(getDataType(item));
+		binding.setType("select1");
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}

@@ -465,11 +465,6 @@ public class PformSubmissionService {
 		String itemOID;
 		String itemValue;
 		String groupNodeName ="";
-/*      instanceNodeList    instanceNode
- *      crfNodeList         crfNode
-		groupNodeList       groupNode
-		itemNodeList        itemNode
-*/		
 
 		NodeList instanceNodeList = doc.getElementsByTagName("instance");
 		for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
@@ -503,40 +498,39 @@ public class PformSubmissionService {
 								itemOrdinal++;
 							}
 							groupNodeName =itemNodeList.getNodeName();
+							//TODO: Add check here to filter out SECTION text widgets.
 							for (int k = 1; k < itemNodeList.getChildNodes().getLength(); k = k + 2) {
 								Node itemNode = itemNodeList.getChildNodes().item(k);
 
 								itemOID = itemNode.getNodeName().trim();
 								itemValue = itemNode.getTextContent();
 
-								ArrayList<ItemBean> iBean = getItemRecord(itemOID);
-								CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
-								Integer itemId = iBean.get(0).getId();
-								Integer crfVersionId = cvBean.getId();
-								ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
-								Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+								// Skip invalid OIDs included in submission like *.HEADER and *.SUBHEADER
+								if (!(itemOID.endsWith(".HEADER") || itemOID.endsWith(".SUBHEADER")))
+								{
+									ArrayList<ItemBean> iBean = getItemRecord(itemOID);
+									CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+									Integer itemId = iBean.get(0).getId();
+									Integer crfVersionId = cvBean.getId();
+									ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
+									Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
+	
+									if (responseTypeId == 3 || responseTypeId == 7) {
+										itemValue = itemValue.replaceAll(" ", ",");
+									}
+	
+									idao = new ItemDAO(ds);
 
-								if (responseTypeId == 3 || responseTypeId == 7) {
-									itemValue = itemValue.replaceAll(" ", ",");
-								}
-
-								/*
-								 * System.out.println("Item OID: "+ itemOID
-								 * +"     Response type:  "
-								 * +ifmBean.getResponseSet
-								 * ().getResponseType().getId());
-								 */
-								idao = new ItemDAO(ds);
-
-								ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
-								ItemBean itemBean = itemBeanList.get(0);
-
-								ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean);
-								errors = validateItemData(itemDataBean, itemBean, responseTypeId);
-								if (errors.hasErrors()) {
-									return errors;
-								} else {
-									itemDataBeanList.add(itemDataBean);
+									ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+									ItemBean itemBean = itemBeanList.get(0);
+	
+									ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean);
+									errors = validateItemData(itemDataBean, itemBean, responseTypeId);
+									if (errors.hasErrors()) {
+										return errors;
+									} else {
+										itemDataBeanList.add(itemDataBean);
+									}
 								}
 							}
 
