@@ -248,14 +248,6 @@ public class OpenRosaXmlGenerator {
 			root.appendChild(sectionSubTitle);
 			root.appendChild(sectionInstructions);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-				//TODO: Need to update this logic since an item group can appear in mulitple sections.
-				//When looping this way, need to see if the node exists already and append if possible.
-				
-				//TODO:  In section loop, add 2 section pieces
-				
-				//TODO:  Consolidate new text widgets into 1, if possible.
-				
-				//TODO:  There can be multiple itemgroup metadata entries. make sure i am pulling data from the correct one.
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				Element groupOid = doc.createElement(itemGroupBean.getOid());
 				root.appendChild(groupOid);

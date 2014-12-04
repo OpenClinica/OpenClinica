@@ -29,7 +29,7 @@ public abstract class BaseWidget implements Widget {
 		switch(type)
 		{
 		case "st": return "string";
-		case "int": return "xs:integer";
+		case "int": return "integer";
 		case "date": return "date";
 		case "real": return "float";
 		case "bl": return "boolean";
