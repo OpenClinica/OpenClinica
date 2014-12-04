@@ -67,7 +67,8 @@ public class InputWidget extends BaseWidget {
 		String relevant=null;
 		Bind binding = new Bind();
 		binding.setNodeSet("/" + version.getOid()+ "/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
-		
+		Integer responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
+        if (responseTypeId ==8 || responseTypeId==9)     binding.setReadOnly("true()");
 		if (itemTargetBean!=null){
 			relevant=expression;
 		}

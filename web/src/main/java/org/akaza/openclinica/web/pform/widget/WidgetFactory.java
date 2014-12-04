@@ -64,6 +64,12 @@ public class WidgetFactory {
 			case TYPE_TEXTAREA:
 				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean,
 						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, itemTargetBean, expression , section);
+			case TYPE_CALCULATION:
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
+						isGroupRepeating, itemTargetBean, expression ,section );
+			case TYPE_GROUP_CALCULATION:
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
+						isGroupRepeating, itemTargetBean, expression ,section );
 			default:
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;
@@ -89,6 +95,12 @@ public class WidgetFactory {
 			case TYPE_TEXTAREA:
 				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean,
 						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, itemTargetBean, expression,section);
+			case TYPE_CALCULATION:
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
+						isGroupRepeating, itemTargetBean, expression ,section );
+			case TYPE_GROUP_CALCULATION:
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
+						isGroupRepeating, itemTargetBean, expression ,section );
 			default:
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;

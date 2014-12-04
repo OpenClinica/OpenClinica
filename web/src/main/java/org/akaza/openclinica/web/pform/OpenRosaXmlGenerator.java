@@ -416,6 +416,8 @@ public class OpenRosaXmlGenerator {
 						crfVersion.getId(), section.getId());
 				for (ItemBean item : items) {
 					Element itemElement = doc.createElement(item.getOid());
+
+  
 					// To activate Default Values showing in Pfrom , Uncomment
 					// below line of code
 					// setDefaultElement(item,crfVersion,question);
