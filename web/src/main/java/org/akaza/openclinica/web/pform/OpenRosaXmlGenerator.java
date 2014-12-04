@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -77,6 +78,7 @@ public class OpenRosaXmlGenerator {
 	private ItemDAO idao;
 	private ItemGroupDAO igdao;
 	private ItemFormMetadataDAO itemFormMetadataDAO;
+	private SectionDAO sdao;
 
 	public OpenRosaXmlGenerator(CoreResources core, DataSource dataSource, RuleActionPropertyDao ruleActionPropertyDao,
 			SCDItemMetadataDao scdItemMetadataDao) throws Exception {
@@ -143,6 +145,12 @@ public class OpenRosaXmlGenerator {
 		return itemGroupBean.get(0);
 	}
 
+	private SectionBean getSectionBean(Integer ID) {
+		sdao = new SectionDAO(dataSource);
+		SectionBean sBean = (SectionBean) sdao.findByPK(ID);
+		return sBean;
+	}
+
 	private ItemBean getItemBean(String itemOid) {
 		ArrayList<ItemBean> itemBean = null;
 		idao = new ItemDAO(dataSource);
@@ -183,7 +191,9 @@ public class OpenRosaXmlGenerator {
 		return itemGroupMetadataBean.get(0);
 	}
 
-	/**  For Skip Pattern;
+	/**
+	 * For Skip Pattern;
+	 * 
 	 * @param itemOid
 	 * @param groupOid
 	 * @return
@@ -194,7 +204,9 @@ public class OpenRosaXmlGenerator {
 		return propertyBeans;
 	}
 
-	/**  For Skip Pattern
+	/**
+	 * For Skip Pattern
+	 * 
 	 * @param itemBean
 	 * @param itemGroupBean
 	 * @return
@@ -226,7 +238,9 @@ public class OpenRosaXmlGenerator {
 		return map;
 	}
 
-	/**   For SCD
+	/**
+	 * For SCD
+	 * 
 	 * @param itemFormMetadataBean
 	 * @return
 	 */
@@ -236,7 +250,9 @@ public class OpenRosaXmlGenerator {
 		return scdItemMetadataBeans;
 	}
 
-	/**       For SCD to get the Option Value for individual item
+	/**
+	 * For SCD to get the Option Value for individual item
+	 * 
 	 * @param itemBean
 	 * @param crfVersionBean
 	 * @return
@@ -288,7 +304,7 @@ public class OpenRosaXmlGenerator {
 			Label sectionLabel = new Label();
 			sectionLabel.setLabel(section.getLabel());
 			singleSection.setLabel(sectionLabel);
-		//	singleSection.setAppearance("field-list");
+			// singleSection.setAppearance("field-list");
 
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 				Group group = new Group();
@@ -306,7 +322,7 @@ public class OpenRosaXmlGenerator {
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
 				int groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax();
 
-				String nodeset = "/" + crfVersion.getOid() + "/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid();
+				String nodeset = "/" + crfVersion.getOid() + "/" + section.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid();
 				// repeat.setJrNoAddRemove("true()");
 				// repeat.setJrCount(count.toString());
 				group.setRef(nodeset);
@@ -340,10 +356,10 @@ public class OpenRosaXmlGenerator {
 					ExpressionBean expressionBean = (ExpressionBean) map.get("expressionBean");
 					if (expressionBean != null) {
 						expression = expressionBean.getValue();
-						expression = getExpressionParsedAndSortedForSkipPattern(expression, crfVersion,section);
+						expression = getExpressionParsedAndSortedForSkipPattern(expression, crfVersion, section);
 					}
 					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-							isItemRequred, isGroupRepeating, responseLayout, itemTargetBean, expression , section);
+							isItemRequred, isGroupRepeating, responseLayout, itemTargetBean, expression, section);
 					if (widget != null) {
 
 						bindList.add(widget.getBinding());
@@ -387,10 +403,11 @@ public class OpenRosaXmlGenerator {
 
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
- 
-				// Uncomment below couple lines to activate a default repeating group numbers at startup
-			//	 int groupRepeatNum = getItemGroupMetadata(itemGroupBean,
-			//	 crfVersion, section).getRepeatNum();
+
+				// Uncomment below couple lines to activate a default repeating
+				// group numbers at startup
+				// int groupRepeatNum = getItemGroupMetadata(itemGroupBean,
+				// crfVersion, section).getRepeatNum();
 				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
 				Element groupElement = doc.createElement(itemGroupBean.getOid());
 				sectionElement.appendChild(groupElement);
@@ -421,7 +438,9 @@ public class OpenRosaXmlGenerator {
 
 	}
 
-	/**  To Set Default Values for Item Fields
+	/**
+	 * To Set Default Values for Item Fields
+	 * 
 	 * @param item
 	 * @param crfVersion
 	 * @param question
@@ -466,60 +485,71 @@ public class OpenRosaXmlGenerator {
 		return xform;
 	}
 
-	/**  To iterate a HashMap for SCD 
+	/**
+	 * To iterate a HashMap for SCD
+	 * 
 	 * @param mp
 	 * @param version
 	 * @return
 	 */
-	private String iterateMap(Map mp, CRFVersionBean version , SectionBean section) {
+	private String iterateMap(Map mp, CRFVersionBean version, SectionBean section) {
 		String expression = null;
 		Iterator it = mp.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
-			expression = getExpressionParsedAndSortedForSCDPattern((ItemBean) pairs.getKey(), pairs.getValue().toString(), version , section);
+			expression = getExpressionParsedAndSortedForSCDPattern((ItemBean) pairs.getKey(), pairs.getValue().toString(), version, section);
 		}
 		return expression;
 	}
 
-	/**  This method is for Skip pattern to build multiple expressions (not complete yet)
+	/**
+	 * This method is for Skip pattern to build multiple expressions (not
+	 * complete yet)
+	 * 
 	 * @param expression
 	 * @param version
 	 * @return
 	 */
-	private String getFullExpressionToParse(String expression, CRFVersionBean version , SectionBean section) {
+	private String getFullExpressionToParse(String expression, CRFVersionBean version, SectionBean section) throws Exception {
 		ArrayList<String> exprList = (ArrayList<String>) Arrays.asList(expression.split("( and )|( or ) "));
 		for (String expr : exprList) {
-			expression = getExpressionParsedAndSortedForSkipPattern(expr, version,section);
+			expression = getExpressionParsedAndSortedForSkipPattern(expr, version, section);
 		}
 
 		return expression;
 	}
 
-	/**  This method is for Simple Conditional Display to build the expression
+	/**
+	 * This method is for Simple Conditional Display to build the expression
+	 * 
 	 * @param itemBean
 	 * @param optionValue
 	 * @param version
 	 * @return
 	 */
-	private String getExpressionParsedAndSortedForSCDPattern(ItemBean itemBean, String optionValue, CRFVersionBean version , SectionBean section) {
+	private String getExpressionParsedAndSortedForSCDPattern(ItemBean itemBean, String optionValue, CRFVersionBean version,
+			SectionBean section) {
 		String expression, operator;
 		operator = "=";
 
 		ItemGroupBean itemGroupBean = getItemTargetGroupBean(itemBean.getId());
-		expression = "/" + version.getOid() + "/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid() + "/" + itemBean.getOid() + " " + operator + " "
-				+ optionValue;
+		expression = "/" + version.getOid() + "/" + section.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/"
+				+ itemBean.getOid() + " " + operator + " " + optionValue;
 
 		System.out.println(expression);
 
 		return expression;
 	}
 
-	/**  This method is for skip pattern to build single expression
+	/**
+	 * This method is for skip pattern to build single expression
+	 * 
 	 * @param expression
 	 * @param version
 	 * @return
 	 */
-	private String getExpressionParsedAndSortedForSkipPattern(String expression, CRFVersionBean version , SectionBean section) {
+	private String getExpressionParsedAndSortedForSkipPattern(String expression, CRFVersionBean version, SectionBean section)
+			throws Exception {
 		String itemOid, operator, value;
 		expression = expression.replaceAll("\\s+", " ").trim();
 		String[] expr = expression.split(" ");
@@ -540,9 +570,16 @@ public class OpenRosaXmlGenerator {
 
 		ItemBean itemBean = getItemBean(itemOid);
 		ItemGroupBean itemGroupBean = getItemTargetGroupBean(itemBean.getId());
-	//	expression = "/" + version.getOid() + "/Section/" + itemGroupBean.getOid() + "/" + itemOid  + operator + value;
-		expression = "selected(/" + version.getOid() + "/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid() + "/" + itemOid +",'"+ value + "')";
-	//	"selected(/widgets/branch, 'n')"
+		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadata(itemBean, version);
+		Integer sectionId = itemFormMetadataBean.getSectionId();
+
+		SectionBean sectionBean = getSectionBean(sectionId);
+
+		// expression = "/" + version.getOid() + "/Section/" +
+		// itemGroupBean.getOid() + "/" + itemOid + operator + value;
+		expression = "selected(/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/"
+				+ itemOid + ",'" + value + "')";
+		// "selected(/widgets/branch, 'n')"
 		System.out.println(expression);
 
 		return expression;
