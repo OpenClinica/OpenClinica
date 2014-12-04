@@ -575,10 +575,9 @@ public class OpenRosaXmlGenerator {
 
 		SectionBean sectionBean = getSectionBean(sectionId);
 
-		// expression = "/" + version.getOid() + "/Section/" +
-		// itemGroupBean.getOid() + "/" + itemOid + operator + value;
-		expression = "selected(/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/"
-				+ itemOid + ",'" + value + "')";
+		expression = "/" + version.getOid() + "/"+ sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/" + itemOid+" " + operator+" " + value;
+		// expression = "selected(/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/"
+	//			+ itemOid + ",'" + value + "')";
 		// "selected(/widgets/branch, 'n')"
 		System.out.println(expression);
 
