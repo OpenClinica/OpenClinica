@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.pform.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
@@ -9,8 +10,9 @@ public class Group {
 	private List<UserControl> usercontrol;
     private String ref;	
 	private List <Group> group;
-    
 	
+    
+
 	public List<Group> getGroup() {
 		return group;
 	}

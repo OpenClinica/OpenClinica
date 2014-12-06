@@ -282,9 +282,10 @@ public class OpenRosaXmlGenerator {
 		html.getBody().setCssClass("pages");
 		List<Group> groups = html.getBody().getGroup();
 		for (Group group : groups) {
-			
-		List <Group> grps = group.getGroup();
-		   for(Group grp : grps){}
+
+			List<Group> grps = group.getGroup();
+			for (Group grp : grps) {
+			}
 			// group.setAppearance("field-list");
 		}
 	}
@@ -293,7 +294,6 @@ public class OpenRosaXmlGenerator {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
 		ArrayList<Group> allSections = new ArrayList<Group>();
-		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
 		html.getHead().setTitle(crf.getName());
@@ -301,15 +301,15 @@ public class OpenRosaXmlGenerator {
 		for (SectionBean section : crfSections) {
 			ArrayList<Group> multiGroups = new ArrayList<Group>();
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
+			ArrayList<Group> groups = new ArrayList<Group>();
 			Group singleSection = new Group();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
-
 
 			Label sectionLabel = new Label();
 			sectionLabel.setLabel(section.getTitle());
 			singleSection.setLabel(sectionLabel);
 			singleSection.setAppearance("field-list");
-		//	singleSection.setGroup(new ArrayList<Group>());
+			// singleSection.setGroup(new ArrayList<Group>());
 
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 				Group group = new Group();
@@ -318,10 +318,11 @@ public class OpenRosaXmlGenerator {
 				repeat.setUsercontrol(new ArrayList<UserControl>());
 				Label repeatLabel = new Label();
 
-				group.setAppearance("field-list");
-				Label groupLabel = new Label();
-				groupLabel.setLabel(section.getLabel());
-				group.setLabel(groupLabel);
+				// group.setAppearance("field-list");
+				Label groupHeader = new Label();
+				String grpHeader = !itemGroupBean.getName().equals("Ungrouped") ? itemGroupBean.getName() : "";
+				groupHeader.setLabel(grpHeader);
+				// group.setLabel(groupHeader);
 				boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
 				int groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum();
@@ -331,10 +332,14 @@ public class OpenRosaXmlGenerator {
 				// repeat.setJrNoAddRemove("true()");
 				// repeat.setJrCount(count.toString());
 				group.setRef(nodeset);
-				repeat.setAppearance("field-list");
+				// repeat.setAppearance("field-list");
 				repeat.setNodeset(nodeset);
-				repeat.setLabel(repeatLabel);
-				repeatLabel.setLabel(itemGroupBean.getName());
+
+				if (isGroupRepeating) {
+					repeat.setLabel(groupHeader);
+				} else {
+					group.setLabel(groupHeader);
+				}
 				ItemDAO itemdao = new ItemDAO(dataSource);
 
 				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdAndSectionIdOrdered(itemGroupBean.getId(),
@@ -384,8 +389,9 @@ public class OpenRosaXmlGenerator {
 
 				groups.add(group);
 
+				singleSection.setGroup(groups);
+
 			} // multi group
-			singleSection.setGroup(groups);
 			allSections.add(singleSection);
 		} // section
 		body.setGroup(allSections);
