@@ -6,23 +6,9 @@ public class Body {
 	private String cssClass = null;
 	private String appearance = null;
 	private List<Group> group;
-	private List<Repeat> repeat;
-	private List<Section> sections;
 
 	
 	
-	public List<Section> getSections() {
-		return sections;
-	}
-	public void setSections(List<Section> sections) {
-		this.sections = sections;
-	}
-	public List<Repeat> getRepeat() {
-		return repeat;
-	}
-	public void setRepeat(List<Repeat> repeat) {
-		this.repeat = repeat;
-	}
 	public List<Group> getGroup() {
 		return group;
 	}

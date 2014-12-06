@@ -282,29 +282,34 @@ public class OpenRosaXmlGenerator {
 		html.getBody().setCssClass("pages");
 		List<Group> groups = html.getBody().getGroup();
 		for (Group group : groups) {
-			group.setAppearance("field-list");
+			
+		List <Group> grps = group.getGroup();
+		   for(Group grp : grps){}
+			// group.setAppearance("field-list");
 		}
 	}
 
 	private void mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
-		ArrayList<Section> sections = new ArrayList<Section>();
+		ArrayList<Group> allSections = new ArrayList<Group>();
 		ArrayList<Group> groups = new ArrayList<Group>();
-
 		ArrayList<Bind> bindList = new ArrayList<Bind>();
 		WidgetFactory factory = new WidgetFactory(crfVersion);
 		html.getHead().setTitle(crf.getName());
 
 		for (SectionBean section : crfSections) {
+			ArrayList<Group> multiGroups = new ArrayList<Group>();
 			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
-
-			Section singleSection = new Section();
+			Group singleSection = new Group();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
+
+
 			Label sectionLabel = new Label();
-			sectionLabel.setLabel(section.getLabel());
+			sectionLabel.setLabel(section.getTitle());
 			singleSection.setLabel(sectionLabel);
-			// singleSection.setAppearance("field-list");
+			singleSection.setAppearance("field-list");
+		//	singleSection.setGroup(new ArrayList<Group>());
 
 			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 				Group group = new Group();
@@ -378,14 +383,12 @@ public class OpenRosaXmlGenerator {
 					group.setRepeat(repeat);
 
 				groups.add(group);
-				singleSection.setGroup(groups);
 
-				// sectionGroups.add(group);
 			} // multi group
-			sections.add(singleSection);
+			singleSection.setGroup(groups);
+			allSections.add(singleSection);
 		} // section
-		body.setGroup(groups);
-
+		body.setGroup(allSections);
 		html.getHead().getModel().setBind(bindList);
 
 	} // method
@@ -417,7 +420,6 @@ public class OpenRosaXmlGenerator {
 				for (ItemBean item : items) {
 					Element itemElement = doc.createElement(item.getOid());
 
-  
 					// To activate Default Values showing in Pfrom , Uncomment
 					// below line of code
 					// setDefaultElement(item,crfVersion,question);
@@ -577,9 +579,12 @@ public class OpenRosaXmlGenerator {
 
 		SectionBean sectionBean = getSectionBean(sectionId);
 
-		expression = "/" + version.getOid() + "/"+ sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/" + itemOid+" " + operator+" " + value;
-		// expression = "selected(/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/"
-	//			+ itemOid + ",'" + value + "')";
+		expression = "/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/" + itemOid
+				+ " " + operator + " " + value;
+		// expression = "selected(/" + version.getOid() + "/" +
+		// sectionBean.getLabel().replace(" ", "_") + "/" +
+		// itemGroupBean.getOid() + "/"
+		// + itemOid + ",'" + value + "')";
 		// "selected(/widgets/branch, 'n')"
 		System.out.println(expression);
 
