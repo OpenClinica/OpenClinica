@@ -79,6 +79,14 @@
 		</sql>
 	</query>
 	<query>
+		<name>findAllBySectionIdOrderedByItemFormMetadataOrdinal</name>
+		<sql>
+			SELECT i.* , ifm.ordinal FROM item i, item_form_metadata ifm 
+			WHERE i.item_id = ifm.item_id				
+			AND ifm.section_id = ? order by ifm.ordinal
+		</sql>
+	</query>
+	<query>
 		<name>findAllUngroupedParentsBySectionId</name>
 		<sql>
 	SELECT DISTINCT i.* FROM item i, item_form_metadata m, item_group ig,
@@ -148,13 +156,13 @@
 	</query>
 	<query>
 		<name>findAllItemsByGroupIdAndSectionIdOrdered</name>
-		<sql>select distinct i.* from item i, item_group ig, item_group_metadata igm, item_form_metadata ifm
+		<sql>select distinct i.* , ifm.ordinal from item i, item_group ig, item_group_metadata igm, item_form_metadata ifm
 		where ig.item_group_id=? and ifm.section_id=?
             and ig.item_group_id=igm.item_group_id
             and igm.crf_version_id=?
             and igm.item_id=i.item_id
             and ifm.item_id =i.item_id
-            order by i.item_id
+            order by ifm.ordinal
 	</sql>
 	</query>
 	

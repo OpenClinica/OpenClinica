@@ -72,10 +72,10 @@ public class InputWidget extends BaseWidget {
 		if (itemTargetBean!=null){
 			relevant=expression;
 		}
-		binding.setType("string");
+	//	binding.setType("string");
 
 		binding.setRelevant(relevant);
-	//	binding.setType(getDataType(item));
+		binding.setType(getDataType(item));
 		
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;

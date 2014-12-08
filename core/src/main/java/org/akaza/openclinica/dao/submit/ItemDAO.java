@@ -242,6 +242,14 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return this.executeFindAllQuery("findAllBySectionId", variables);
     }
 
+    public ArrayList findAllBySectionIdOrderedByItemFormMetadataOrdinal(int sectionId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+
+        return this.executeFindAllQuery("findAllBySectionIdOrderedByItemFormMetadataOrdinal", variables);
+    }
+
+    
     public ArrayList findAllUngroupedParentsBySectionId(int sectionId, int crfVersionId) {
         HashMap variables = new HashMap();
         variables.put(1, sectionId);

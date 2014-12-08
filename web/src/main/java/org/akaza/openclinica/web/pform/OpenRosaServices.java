@@ -146,7 +146,7 @@ public class OpenRosaServices {
 		}
 
 		try {
-			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource,ruleActionPropertyDao,scdItemMetadataDao);
+			OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource,ruleActionPropertyDao);
 			xform = generator.buildForm(formId);
 		} 
 		catch (Exception e) 
