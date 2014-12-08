@@ -622,7 +622,7 @@ public class PformSubmissionService {
 
 													itemOID = itemNode.getNodeName().trim();
 													itemValue = itemNode.getTextContent();
-
+													if (!(itemOID.endsWith(".HEADER") || itemOID.endsWith(".SUBHEADER"))) {
 													ArrayList<ItemBean> iBean = getItemRecord(itemOID);
 													CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
 													Integer itemId = iBean.get(0).getId();
@@ -646,6 +646,7 @@ public class PformSubmissionService {
 														return errors;
 													} else {
 														itemDataBeanList.add(itemDataBean);
+													}
 													}
 													// }
 												//}
