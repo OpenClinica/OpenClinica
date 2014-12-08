@@ -524,8 +524,12 @@ public class OpenRosaXmlGenerator {
 			operator = "=";
 		if (operator.equalsIgnoreCase("lt"))
 			operator = "<";
+		if (operator.equalsIgnoreCase("lte"))
+			operator = "<=";
 		if (operator.equalsIgnoreCase("gt"))
 			operator = ">";
+		if (operator.equalsIgnoreCase("gte"))
+			operator = ">=";
 
 		ItemBean itemBean = getItemBean(itemOid);
 		ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
