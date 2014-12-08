@@ -270,7 +270,7 @@ public class OpenRosaXmlGenerator {
 		String groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum().toString();
 		String groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax().toString();
 
-		String nodeset = "/" + crfVersion.getOid() + "/" + section.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid();
+		String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
 		// repeat.setJrNoAddRemove("true()");
 		 repeat.setJrCount(groupRepeatNum);
 		group.setRef(nodeset);
