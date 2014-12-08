@@ -572,11 +572,8 @@ public class PformSubmissionService {
 		Integer itemOrdinal = 1;
 		String itemOID;
 		String itemValue;
-		String groupNodeName = "";
-		/*
-		 * NodeLists and Nodes instanceNodeList instanceNode crfNodeList crfNode
-		 * groupNodeList groupNode itemNodeList itemNode
-		 */
+		String groupNodeName ="";
+
 		NodeList instanceNodeList = doc.getElementsByTagName("instance");
 		for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
 			Node instanceNode = instanceNodeList.item(i);
