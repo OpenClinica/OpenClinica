@@ -137,7 +137,7 @@ public class OpenRosaXmlGenerator {
 		itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupBySectionId(section.getId());
 		return itemGroupBeans;
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private ArrayList<ItemGroupBean> getItemGroupBeansByCrfVersion(CRFVersionBean crfVersion) throws Exception {
 		ArrayList<ItemGroupBean> itemGroupBeans = null;
@@ -146,7 +146,6 @@ public class OpenRosaXmlGenerator {
 		itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersion.getId());
 		return itemGroupBeans;
 	}
-
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private ItemGroupBean getItemGroupBeanByItemId(Integer itemId) {
@@ -229,7 +228,7 @@ public class OpenRosaXmlGenerator {
 	 */
 	private HashMap<String, Object> getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
 		ItemBean itemTargetBean = null;
-		HashMap<String, Object> map = new HashMap<String,Object>();
+		HashMap<String, Object> map = new HashMap<String, Object>();
 		ExpressionBean expressionBean = null;
 		ArrayList<PropertyBean> propertyBeans = getPropertyBean(itemBean.getOid(), itemGroupBean.getOid());
 
@@ -255,9 +254,10 @@ public class OpenRosaXmlGenerator {
 
 	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section)
 			throws Exception {
-        ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(dataSource);
-        List<ItemGroupMetadataBean> itemGroupMetadata = itemGroupMetaDAO.findMetaByGroupAndSection(itemGroupBean.getId(),crfVersion.getId(),section.getId());
-        
+		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(dataSource);
+		List<ItemGroupMetadataBean> itemGroupMetadata = itemGroupMetaDAO.findMetaByGroupAndSection(itemGroupBean.getId(),
+				crfVersion.getId(), section.getId());
+
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		Group group = new Group();
 		Repeat repeat = new Repeat();
@@ -265,12 +265,8 @@ public class OpenRosaXmlGenerator {
 		repeat.setUsercontrol(new ArrayList<UserControl>());
 		Label repeatLabel = new Label();
 
-		// group.setAppearance("field-list");
 		Label groupHeader = new Label();
-		//String grpHeader = !itemGroupBean.getName().equals("Ungrouped") ? itemGroupBean.getName() : "";
-		//groupHeader.setLabel(grpHeader);
-        groupHeader.setLabel(itemGroupMetadata.get(0).getHeader() );
-		// group.setLabel(groupHeader);
+		groupHeader.setLabel(itemGroupMetadata.get(0).getHeader());
 		boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
 		String groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum().toString();
@@ -278,9 +274,8 @@ public class OpenRosaXmlGenerator {
 
 		String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
 		// repeat.setJrNoAddRemove("true()");
-		 repeat.setJrCount(groupRepeatNum);
+		repeat.setJrCount(groupRepeatNum);
 		group.setRef(nodeset);
-		// repeat.setAppearance("field-list");
 		repeat.setNodeset(nodeset);
 
 		if (isGroupRepeating) {
@@ -296,13 +291,13 @@ public class OpenRosaXmlGenerator {
 
 	}
 
-    private void setFormPaging(Html html) {
-        html.getBody().setCssClass("pages");
-        List<Group> groups = html.getBody().getGroup();
-        for (Group group : groups) {
-            group.setAppearance("field-list");
-        }
-    }
+	private void setFormPaging(Html html) {
+		html.getBody().setCssClass("pages");
+		List<Group> groups = html.getBody().getGroup();
+		for (Group group : groups) {
+			group.setAppearance("field-list");
+		}
+	}
 
 	private void mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		ItemFormMetadataBean itemFormMetadataBean = null;
@@ -323,22 +318,18 @@ public class OpenRosaXmlGenerator {
 			sectionLabel.setLabel(section.getTitle());
 			singleSection.setLabel(sectionLabel);
 
-            singleSection.setGroup(new ArrayList<Group>());
-            Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
-            Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS, section);
+			singleSection.setGroup(new ArrayList<Group>());
+			Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
+			Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS, section);
 
-            if (subtitle!=null)  { 
-            singleSection.getUsercontrol().add(subtitle.getUserControl());
-            bindList.add(subtitle.getBinding());
-            }
-            if (instructions !=null) { 
-             singleSection.getUsercontrol().add(instructions.getUserControl());
-             bindList.add(instructions.getBinding());
-            }
-			// singleSection.setGroup(new ArrayList<Group>());
-
-			// for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-
+			if (subtitle != null) {
+				singleSection.getUsercontrol().add(subtitle.getUserControl());
+				bindList.add(subtitle.getBinding());
+			}
+			if (instructions != null) {
+				singleSection.getUsercontrol().add(instructions.getUserControl());
+				bindList.add(instructions.getBinding());
+			}
 			HashMap<String, Object> groupMap = null;
 			boolean isGroupRepeating = false;
 			Group group = null;
@@ -356,7 +347,6 @@ public class OpenRosaXmlGenerator {
 					isGroupRepeating = (Boolean) groupMap.get("isGroupRepeating");
 					group = (Group) groupMap.get("group");
 					repeat = (Repeat) groupMap.get("repeat");
-					// itemGroupId = itemGroupBean.getId();
 				}
 
 				itemFormMetadataBean = getItemFormMetadata(item, crfVersion);
@@ -373,27 +363,31 @@ public class OpenRosaXmlGenerator {
 					expression = expressionBean.getValue();
 					expression = getExpressionParsedAndSortedForSkipPattern(expression, crfVersion, section);
 				}
-                //Add the Item Header
-                Widget headerWidget = factory.getHeaderWidget(item,itemFormMetadataBean,itemGroupBean);
-                if (headerWidget != null)
-                {
-                    bindList.add(headerWidget.getBinding());
-                    if (isGroupRepeating) repeat.getUsercontrol().add(headerWidget.getUserControl());
-                    else group.getUsercontrol().add(headerWidget.getUserControl());
-                }
-                else log.debug("Invalid/Missing instructive header text encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+				// Add the Item Header
+				Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+				if (headerWidget != null) {
+					bindList.add(headerWidget.getBinding());
+					if (isGroupRepeating)
+						repeat.getUsercontrol().add(headerWidget.getUserControl());
+					else
+						group.getUsercontrol().add(headerWidget.getUserControl());
+				} else
+					log.debug("Invalid/Missing instructive header text encountered while loading PForm (" + item.getDataType().getName()
+							+ "). Skipping.");
 
-                //Add the Item SubHeader
-                Widget subHeaderWidget = factory.getSubHeaderWidget(item,itemFormMetadataBean,itemGroupBean);
-                if (subHeaderWidget != null)
-                {
-                    bindList.add(subHeaderWidget.getBinding());
-                    if (isGroupRepeating) repeat.getUsercontrol().add(subHeaderWidget.getUserControl());
-                    else group.getUsercontrol().add(subHeaderWidget.getUserControl());
-                }
-                else log.debug("Invalid/Missing instructive subheader text encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+				// Add the Item SubHeader
+				Widget subHeaderWidget = factory.getSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+				if (subHeaderWidget != null) {
+					bindList.add(subHeaderWidget.getBinding());
+					if (isGroupRepeating)
+						repeat.getUsercontrol().add(subHeaderWidget.getUserControl());
+					else
+						group.getUsercontrol().add(subHeaderWidget.getUserControl());
+				} else
+					log.debug("Invalid/Missing instructive subheader text encountered while loading PForm (" + item.getDataType().getName()
+							+ "). Skipping.");
 
-                //Add the Item itself
+				// Add the Item itself
 				Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
 						isItemRequred, isGroupRepeating, responseLayout, itemTargetBean, expression, section);
 				if (widget != null) {
@@ -434,43 +428,37 @@ public class OpenRosaXmlGenerator {
 		crfElement.setAttribute("id", crfVersion.getOid());
 		doc.appendChild(crfElement);
 
-        for (SectionBean section : crfSections) {
-            ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
-            Element sectionSubTitle = doc.createElement("SECTION_" + section.getId() + ".SUBTITLE");
-            Element sectionInstructions = doc.createElement("SECTION_" + section.getId() + ".INSTRUCTIONS");
-            crfElement.appendChild(sectionSubTitle);
-            crfElement.appendChild(sectionInstructions);
-        }
+		for (SectionBean section : crfSections) {
+			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
+			Element sectionSubTitle = doc.createElement("SECTION_" + section.getId() + ".SUBTITLE");
+			Element sectionInstructions = doc.createElement("SECTION_" + section.getId() + ".INSTRUCTIONS");
+			crfElement.appendChild(sectionSubTitle);
+			crfElement.appendChild(sectionInstructions);
+		}
 
-			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByCrfVersion(crfVersion);
-			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
+		ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByCrfVersion(crfVersion);
+		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
-				// Uncomment below couple lines to activate a default repeating
-				// group numbers at startup
-				// int groupRepeatNum = getItemGroupMetadata(itemGroupBean,
-				// crfVersion, section).getRepeatNum();
-				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
-				Element groupElement = doc.createElement(itemGroupBean.getOid());
-				crfElement.appendChild(groupElement);
-				ItemDAO itemdao = new ItemDAO(dataSource);
-				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered (itemGroupBean.getId(),
-						crfVersion.getId());
-				for (ItemBean item : items) {
-                    ItemFormMetadataBean itemMetaData = getItemFormMetadata(item,crfVersion);
-                    if (itemMetaData.getHeader() != null && !itemMetaData.getHeader().equals(""))
-                    {
-                        Element header = doc.createElement(item.getOid() + ".HEADER");
-                        groupElement.appendChild(header);
-                    }
-                    if (itemMetaData.getHeader() != null && !itemMetaData.getSubHeader().equals(""))
-                    {
-                        Element subHeader = doc.createElement(item.getOid() + ".SUBHEADER");
-                        groupElement.appendChild(subHeader);
-                    }					Element question = doc.createElement(item.getOid());
-                    groupElement.appendChild(question);
-				} // end of item
+			Element groupElement = doc.createElement(itemGroupBean.getOid());
+			crfElement.appendChild(groupElement);
+			ItemDAO itemdao = new ItemDAO(dataSource);
+			ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
+					crfVersion.getId());
+			for (ItemBean item : items) {
+				ItemFormMetadataBean itemMetaData = getItemFormMetadata(item, crfVersion);
+				if (itemMetaData.getHeader() != null && !itemMetaData.getHeader().equals("")) {
+					Element header = doc.createElement(item.getOid() + ".HEADER");
+					groupElement.appendChild(header);
+				}
+				if (itemMetaData.getHeader() != null && !itemMetaData.getSubHeader().equals("")) {
+					Element subHeader = doc.createElement(item.getOid() + ".SUBHEADER");
+					groupElement.appendChild(subHeader);
+				}
+				Element question = doc.createElement(item.getOid());
+				groupElement.appendChild(question);
+			} // end of item
 
-			} // end of group
+		} // end of group
 
 		TransformerFactory transformFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformFactory.newTransformer();
@@ -586,8 +574,7 @@ public class OpenRosaXmlGenerator {
 
 		SectionBean sectionBean = getSectionBean(sectionId);
 
-		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid
-				+ " " + operator + " " + value;
+		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid + " " + operator + " " + value;
 		logger.info(expression);
 
 		return expression;
