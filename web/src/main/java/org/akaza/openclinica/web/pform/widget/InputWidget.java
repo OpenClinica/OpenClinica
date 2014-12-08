@@ -57,7 +57,7 @@ public class InputWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//input.setHint(hint);
 		if (appearance != null) input.setAppearance(appearance);
-	input.setRef("/" + version.getOid()+"/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
+	input.setRef("/" + version.getOid()+"/"+itemGroupBean.getOid()+"/" + item.getOid());
 		return input;
 	}
  	
@@ -66,7 +66,7 @@ public class InputWidget extends BaseWidget {
 	public Bind getBinding() {
 		String relevant=null;
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid()+ "/"+section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
+		binding.setNodeSet("/" + version.getOid()+ "/"+itemGroupBean.getOid()+"/" + item.getOid());
 		Integer responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
         if (responseTypeId ==8 || responseTypeId==9)     binding.setReadOnly("true()");
 		if (itemTargetBean!=null){

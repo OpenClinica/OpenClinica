@@ -135,6 +135,16 @@ public class OpenRosaXmlGenerator {
 		itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupBySectionId(section.getId());
 		return itemGroupBeans;
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private ArrayList<ItemGroupBean> getItemGroupBeansByCrfVersion(CRFVersionBean crfVersion) throws Exception {
+		ArrayList<ItemGroupBean> itemGroupBeans = null;
+
+		igdao = new ItemGroupDAO(dataSource);
+		itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersion.getId());
+		return itemGroupBeans;
+	}
+
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private ItemGroupBean getItemGroupBeanByItemId(Integer itemId) {
@@ -388,35 +398,32 @@ public class OpenRosaXmlGenerator {
 		Element crfElement = doc.createElement(crfVersion.getOid());
 		crfElement.setAttribute("id", crfVersion.getOid());
 		doc.appendChild(crfElement);
-		for (SectionBean section : crfSections) {
-			Element sectionElement = doc.createElement(section.getLabel().replace(" ", "_"));
-			crfElement.appendChild(sectionElement);
 
-			Element groupElement = null;
+			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByCrfVersion(crfVersion);
+			for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 
-			ItemDAO itemdao = new ItemDAO(dataSource);
-			ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllBySectionIdOrderedByItemFormMetadataOrdinal(section.getId());
+				// Uncomment below couple lines to activate a default repeating
+				// group numbers at startup
+				// int groupRepeatNum = getItemGroupMetadata(itemGroupBean,
+				// crfVersion, section).getRepeatNum();
+				// for (int x = 0; x < groupRepeatNum; x = x + 1) {
+				Element groupElement = doc.createElement(itemGroupBean.getOid());
+				crfElement.appendChild(groupElement);
+				ItemDAO itemdao = new ItemDAO(dataSource);
+				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered (itemGroupBean.getId(),
+						crfVersion.getId());
+				for (ItemBean item : items) {
+					Element itemElement = doc.createElement(item.getOid());
 
-			Integer itemGroupId = 0;
-			for (ItemBean item : items) {
-				ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(item.getId());
-				if (itemGroupId != itemGroupBean.getId()) {
-					groupElement = doc.createElement(itemGroupBean.getOid());
-					sectionElement.appendChild(groupElement);
-					itemGroupId = itemGroupBean.getId();
-				}
+					// To activate Default Values showing in Pfrom , Uncomment
+					// below line of code
+					// setDefaultElement(item,crfVersion,question);
+					groupElement.appendChild(itemElement);
+				} // end of item
 
-				Element itemElement = doc.createElement(item.getOid());
-				groupElement.appendChild(itemElement);
+				// } // end of repeating group number
+			} // end of group
 
-				// To activate Default Values showing in Pfrom , Uncomment
-				// below line of code
-				// setDefaultElement(item,crfVersion,question);
-			} // end of item
-
-			// } // end of group
-
-		} // end of section
 		TransformerFactory transformFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -527,7 +534,7 @@ public class OpenRosaXmlGenerator {
 
 		SectionBean sectionBean = getSectionBean(sectionId);
 
-		expression = "/" + version.getOid() + "/" + sectionBean.getLabel().replace(" ", "_") + "/" + itemGroupBean.getOid() + "/" + itemOid
+		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid
 				+ " " + operator + " " + value;
 		logger.info(expression);
 

@@ -59,7 +59,7 @@ public class SelectWidget extends BaseWidget {
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//select.setHint(hint);
 
-		select.setRef("/" + version.getOid()+ "/" +section.getLabel().replace(" ", "_")+"/"+itemGroupBean.getOid()+"/" + item.getOid());
+		select.setRef("/" + version.getOid()+ "/" +itemGroupBean.getOid()+"/" + item.getOid());
 		select.setAppearance(appearance);
 
 		ArrayList<Item> itemList = new ArrayList<Item>();
@@ -84,7 +84,7 @@ public class SelectWidget extends BaseWidget {
 		Bind binding = new Bind();
 		String relevant=null;
 
-	binding.setNodeSet("/" + version.getOid() +"/"+section.getLabel().replace(" ", "_")+"/" + itemGroupBean.getOid() +"/" + item.getOid());
+	binding.setNodeSet("/" + version.getOid() +"/" + itemGroupBean.getOid() +"/" + item.getOid());
 	if (itemTargetBean!=null){
 		relevant=expression;
 	}
