@@ -89,8 +89,7 @@ public class SelectWidget extends BaseWidget {
 		relevant=expression;
 	}
     	binding.setRelevant(relevant);
-//		binding.setType(getDataType(item));
-		binding.setType("string");
+		binding.setType("select");
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}

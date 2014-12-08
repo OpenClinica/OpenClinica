@@ -6,6 +6,7 @@ import java.util.List;
 public class Group {
 	private Label label;
 	private Repeat repeat;
+	private List<Group> group;
 	private String appearance;
 	private List<UserControl> usercontrol;
     private String ref;	
@@ -24,6 +25,12 @@ public class Group {
 	}
 	public void setRepeat(Repeat repeat) {
 		this.repeat = repeat;
+	}
+	public List<Group> getGroup() {
+		return group;
+	}
+	public void setGroup(List<Group> group) {
+		this.group = group;
 	}
 	public Label getLabel() {
 		return label;

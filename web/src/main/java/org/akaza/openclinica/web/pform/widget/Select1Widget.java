@@ -87,9 +87,8 @@ public class Select1Widget extends BaseWidget {
 			relevant=expression;
 		}
 	    	binding.setRelevant(relevant);
-		binding.setType("string");
+		binding.setType("select1");
 
-	//	binding.setType(getDataType(item));
 		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}
