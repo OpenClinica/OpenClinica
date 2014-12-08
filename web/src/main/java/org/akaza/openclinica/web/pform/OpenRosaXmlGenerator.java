@@ -314,9 +314,12 @@ public class OpenRosaXmlGenerator {
 			Group singleSection = new Group();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
 
-			Label sectionLabel = new Label();
-			sectionLabel.setLabel(section.getTitle());
-			singleSection.setLabel(sectionLabel);
+			if (section.getTitle() != null && !section.getTitle().equals(""))
+			{
+				Label sectionLabel = new Label();
+				sectionLabel.setLabel(section.getTitle());
+				singleSection.setLabel(sectionLabel);
+			}
 
 			singleSection.setGroup(new ArrayList<Group>());
 			Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
