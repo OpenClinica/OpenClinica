@@ -75,8 +75,8 @@ public class WidgetFactory {
 			default:
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;
-		}
-            else {
+			}
+		} else {
                 switch (widgetType) {
                     case TYPE_TEXT:
                         return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
@@ -108,6 +108,7 @@ public class WidgetFactory {
 
                 }
             }
+	
 	}
 	public Widget getHeaderWidget(ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup)
 	{		
@@ -179,5 +180,5 @@ public class WidgetFactory {
 			}
 
 		} 
-	}
+	
 }

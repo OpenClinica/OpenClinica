@@ -594,18 +594,18 @@ public class PformSubmissionService {
 							return errors;
 						if (eventCrfBean != null) {
 
-							NodeList sectionNodeList = crfNode.getChildNodes();
-							for (int s = 0; s < sectionNodeList.getLength(); s = s + 1) {
+							NodeList groupNodeList = crfNode.getChildNodes();
+/*							for (int s = 0; s < sectionNodeList.getLength(); s = s + 1) {
 								Node sectionNode = sectionNodeList.item(s);
 
 								if (sectionNode instanceof Element) {
 									NodeList groupNodeList = sectionNode.getChildNodes();
-
+*/
 									for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
 										Node groupNode = groupNodeList.item(k);
 
 
-										if (groupNode instanceof Element) {
+										if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
 
 											if (groupNode.getNodeName() != groupNodeName) {
 												itemOrdinal = 1;
@@ -679,7 +679,7 @@ public class PformSubmissionService {
 												}
 											}
 										}
-									}}
+		//							}}
 								}
 							}
 						}

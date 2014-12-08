@@ -10,16 +10,9 @@ public class Group {
 	private String appearance;
 	private List<UserControl> usercontrol;
     private String ref;	
-	private List <Group> group;
 	
     
 
-	public List<Group> getGroup() {
-		return group;
-	}
-	public void setGroup(List<Group> group) {
-		this.group = group;
-	}
 	public Repeat getRepeat() {
 		return repeat;
 	}

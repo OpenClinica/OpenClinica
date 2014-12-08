@@ -269,7 +269,7 @@ public class OpenRosaXmlGenerator {
 		Label groupHeader = new Label();
 		//String grpHeader = !itemGroupBean.getName().equals("Ungrouped") ? itemGroupBean.getName() : "";
 		//groupHeader.setLabel(grpHeader);
-        groupHeader.setLabel(itemGroupMetadata.get(0).getHeader());
+        groupHeader.setLabel(itemGroupMetadata.get(0).getHeader() );
 		// group.setLabel(groupHeader);
 		boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
@@ -326,10 +326,15 @@ public class OpenRosaXmlGenerator {
             singleSection.setGroup(new ArrayList<Group>());
             Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
             Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS, section);
+
+            if (subtitle!=null)  { 
             singleSection.getUsercontrol().add(subtitle.getUserControl());
-            singleSection.getUsercontrol().add(instructions.getUserControl());
             bindList.add(subtitle.getBinding());
-            bindList.add(instructions.getBinding());
+            }
+            if (instructions !=null) { 
+             singleSection.getUsercontrol().add(instructions.getUserControl());
+             bindList.add(instructions.getBinding());
+            }
 			// singleSection.setGroup(new ArrayList<Group>());
 
 			// for (ItemGroupBean itemGroupBean : itemGroupBeans) {
