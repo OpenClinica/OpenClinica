@@ -193,10 +193,10 @@ public class PformSubmissionService {
 		return count;
 	}
 
-	private int getCountCrfsInAEventDefCrf(StudyEventDefinitionBean studyEventDefinitionBean) {
+	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllActiveByEventDefinitionId(studyEventDefinitionBean.getId()).size();
+		count = edcdao.findAllActiveByEventDefinitionId(studyEventDefinitionId).size();
 		return count;
 	}
 
@@ -325,7 +325,7 @@ public class PformSubmissionService {
 		if (studyEventBean.isActive()
 				&& (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED)) {
 			// Read and Parse Payload from Pform
-			errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean);
+			errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean);
 		} else {
 			logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
 			errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
@@ -563,7 +563,7 @@ public class PformSubmissionService {
 	 * @throws Exception
 	 */
 	private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean,
-			StudySubjectBean studySubjectBean) throws Exception {
+			StudySubjectBean studySubjectBean, StudyEventDefinitionBean studyEventDefinitionBean) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		InputSource is = new InputSource();
@@ -611,35 +611,35 @@ public class PformSubmissionService {
 
 									for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
 										Node itemNode = itemNodeList.item(m);
-										if (itemNode instanceof Element) {
+										if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
+												&& !itemNode.getNodeName().endsWith(".SUBHEADER")) {
 
 											itemOID = itemNode.getNodeName().trim();
 											itemValue = itemNode.getTextContent();
-											if (!(itemOID.endsWith(".HEADER") || itemOID.endsWith(".SUBHEADER"))) {
-												ArrayList<ItemBean> iBean = getItemRecord(itemOID);
-												CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
-												Integer itemId = iBean.get(0).getId();
-												Integer crfVersionId = cvBean.getId();
-												ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
-												Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
 
-												if (responseTypeId == 3 || responseTypeId == 7) {
-													itemValue = itemValue.replaceAll(" ", ",");
-												}
+											ArrayList<ItemBean> iBean = getItemRecord(itemOID);
+											CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+											Integer itemId = iBean.get(0).getId();
+											Integer crfVersionId = cvBean.getId();
+											ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
+											Integer responseTypeId = ifmBean.getResponseSet().getResponseType().getId();
 
-												idao = new ItemDAO(ds);
+											if (responseTypeId == 3 || responseTypeId == 7) {
+												itemValue = itemValue.replaceAll(" ", ",");
+											}
 
-												ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
-												ItemBean itemBean = itemBeanList.get(0);
+											idao = new ItemDAO(ds);
 
-												ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean,
-														studyBean, studySubjectBean);
-												errors = validateItemData(itemDataBean, itemBean, responseTypeId);
-												if (errors.hasErrors()) {
-													return errors;
-												} else {
-													itemDataBeanList.add(itemDataBean);
-												}
+											ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>) idao.findByOid(itemOID);
+											ItemBean itemBean = itemBeanList.get(0);
+
+											ItemDataBean itemDataBean = createItemData(itemBean, itemValue, itemOrdinal, eventCrfBean,
+													studyBean, studySubjectBean);
+											errors = validateItemData(itemDataBean, itemBean, responseTypeId);
+											if (errors.hasErrors()) {
+												return errors;
+											} else {
+												itemDataBeanList.add(itemDataBean);
 											}
 
 											if (!errors.hasErrors()) {
@@ -659,14 +659,15 @@ public class PformSubmissionService {
 													eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
 													// Study Event status
 													// update
-													if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventBean
-															.getStudyEventDefinition())) {
+													if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+															.getId())) {
 														updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean,
 																studySubjectBean);
 													} else {
 														updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean,
 																studySubjectBean);
 													}
+
 												}
 											}
 										}
