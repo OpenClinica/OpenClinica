@@ -200,12 +200,24 @@ public class OpenRosaXmlGenerator {
 		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBean = null;
 
 		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
-		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndSection(itemGroupBean.getId(),
+		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndSection (itemGroupBean.getId(),
 				crfVersion.getId(), section.getId());
-
+		
 		return itemGroupMetadataBean.get(0);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private ItemGroupMetadataBean getItemGroupMetadataByGroup(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion) throws Exception {
+		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBean = null;
+
+		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
+		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndCrfVersion(itemGroupBean.getId(),
+				crfVersion.getId());
+		
+		return itemGroupMetadataBean.get(0);
+	}
+
+	
 	/**
 	 * For Skip Pattern;
 	 * 
@@ -263,18 +275,15 @@ public class OpenRosaXmlGenerator {
 		Repeat repeat = new Repeat();
 		group.setUsercontrol(new ArrayList<UserControl>());
 		repeat.setUsercontrol(new ArrayList<UserControl>());
-		Label repeatLabel = new Label();
 
 		Label groupHeader = new Label();
 		groupHeader.setLabel(itemGroupMetadata.get(0).getHeader());
 		boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
-		String groupRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatNum().toString();
-		String groupMaxRepeatNum = getItemGroupMetadata(itemGroupBean, crfVersion, section).getRepeatMax().toString();
 
 		String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-		// repeat.setJrNoAddRemove("true()");
-		repeat.setJrCount(groupRepeatNum);
+	//	repeat.setJrNoAddRemove("true()");
+		repeat.setJrCount(nodeset);
 		group.setRef(nodeset);
 		repeat.setNodeset(nodeset);
 
@@ -354,7 +363,7 @@ public class OpenRosaXmlGenerator {
 
 				itemFormMetadataBean = getItemFormMetadata(item, crfVersion);
 				int responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
-				boolean isItemRequred = itemFormMetadataBean.isRequired();
+				boolean isItemRequired = itemFormMetadataBean.isRequired();
 				int itemGroupRepeatNumber = 1;
 				String responseLayout = itemFormMetadataBean.getResponseLayout();
 
@@ -392,7 +401,7 @@ public class OpenRosaXmlGenerator {
 
 				// Add the Item itself
 				Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-						isItemRequred, isGroupRepeating, responseLayout, itemTargetBean, expression, section);
+						isItemRequired, isGroupRepeating, responseLayout, itemTargetBean, expression, section);
 				if (widget != null) {
 
 					bindList.add(widget.getBinding());
@@ -441,8 +450,14 @@ public class OpenRosaXmlGenerator {
 
 		ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByCrfVersion(crfVersion);
 		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
+			ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
-			Element groupElement = doc.createElement(itemGroupBean.getOid());
+			//    boolean isGroupRepeating= itemGroupMetadataBean.isRepeatingGroup();
+		    String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
+		    String repeatGroupMax = itemGroupMetadataBean.getRepeatMax().toString();
+			
+			Element groupElement = doc.createElement(itemGroupBean.getOid() );
+        	groupElement.setTextContent(repeatGroupMin);
 			crfElement.appendChild(groupElement);
 			ItemDAO itemdao = new ItemDAO(dataSource);
 			ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
@@ -573,9 +588,9 @@ public class OpenRosaXmlGenerator {
 		ItemBean itemBean = getItemBean(itemOid);
 		ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
 		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadata(itemBean, version);
-		Integer sectionId = itemFormMetadataBean.getSectionId();
+		//Integer sectionId = itemFormMetadataBean.getSectionId();
 
-		SectionBean sectionBean = getSectionBean(sectionId);
+		//SectionBean sectionBean = getSectionBean(sectionId);
 
 		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid + " " + operator + " " + value;
 		logger.info(expression);
