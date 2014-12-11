@@ -25,11 +25,19 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.logic.expressionTree.ConditionalOpNode;
+import org.akaza.openclinica.logic.expressionTree.EqualityOpNode;
+import org.akaza.openclinica.logic.expressionTree.ExpressionNode;
+import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.RuleActionContainer;
+import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.web.pform.dto.*;
 import org.akaza.openclinica.web.pform.widget.Widget;
 import org.akaza.openclinica.web.pform.widget.WidgetFactory;
@@ -200,9 +208,9 @@ public class OpenRosaXmlGenerator {
 		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBean = null;
 
 		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
-		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndSection (itemGroupBean.getId(),
+		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndSection(itemGroupBean.getId(),
 				crfVersion.getId(), section.getId());
-		
+
 		return itemGroupMetadataBean.get(0);
 	}
 
@@ -213,11 +221,10 @@ public class OpenRosaXmlGenerator {
 		ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
 		itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndCrfVersion(itemGroupBean.getId(),
 				crfVersion.getId());
-		
+
 		return itemGroupMetadataBean.get(0);
 	}
 
-	
 	/**
 	 * For Skip Pattern;
 	 * 
@@ -280,9 +287,8 @@ public class OpenRosaXmlGenerator {
 		groupHeader.setLabel(itemGroupMetadata.get(0).getHeader());
 		boolean isGroupRepeating = getItemGroupMetadata(itemGroupBean, crfVersion, section).isRepeatingGroup();
 
-
 		String nodeset = "/" + crfVersion.getOid() + "/" + itemGroupBean.getOid();
-	//	repeat.setJrNoAddRemove("true()");
+		// repeat.setJrNoAddRemove("true()");
 		repeat.setJrCount(nodeset);
 		group.setRef(nodeset);
 		repeat.setNodeset(nodeset);
@@ -323,8 +329,7 @@ public class OpenRosaXmlGenerator {
 			Group singleSection = new Group();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
 
-			if (section.getTitle() != null && !section.getTitle().equals(""))
-			{
+			if (section.getTitle() != null && !section.getTitle().equals("")) {
 				Label sectionLabel = new Label();
 				sectionLabel.setLabel(section.getTitle());
 				singleSection.setLabel(sectionLabel);
@@ -373,7 +378,7 @@ public class OpenRosaXmlGenerator {
 				ExpressionBean expressionBean = (ExpressionBean) map.get("expressionBean");
 				if (expressionBean != null) {
 					expression = expressionBean.getValue();
-					expression = getExpressionParsedAndSortedForSkipPattern(expression, crfVersion, section);
+					expression = getFullExpressionToParse(expression, crfVersion);
 				}
 				// Add the Item Header
 				Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
@@ -452,12 +457,13 @@ public class OpenRosaXmlGenerator {
 		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 			ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
-			//    boolean isGroupRepeating= itemGroupMetadataBean.isRepeatingGroup();
-		    String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
-		    String repeatGroupMax = itemGroupMetadataBean.getRepeatMax().toString();
-			
-			Element groupElement = doc.createElement(itemGroupBean.getOid() );
-        	groupElement.setTextContent(repeatGroupMin);
+			// boolean isGroupRepeating=
+			// itemGroupMetadataBean.isRepeatingGroup();
+			String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
+			String repeatGroupMax = itemGroupMetadataBean.getRepeatMax().toString();
+
+			Element groupElement = doc.createElement(itemGroupBean.getOid());
+			groupElement.setTextContent(repeatGroupMin);
 			crfElement.appendChild(groupElement);
 			ItemDAO itemdao = new ItemDAO(dataSource);
 			ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
@@ -545,12 +551,23 @@ public class OpenRosaXmlGenerator {
 	 * @param version
 	 * @return
 	 */
-	private String getFullExpressionToParse(String expression, CRFVersionBean version, SectionBean section) throws Exception {
-		ArrayList<String> exprList = (ArrayList<String>) Arrays.asList(expression.split("( and )|( or ) "));
-		for (String expr : exprList) {
-			expression = getExpressionParsedAndSortedForSkipPattern(expr, version, section);
-		}
-
+	private String getFullExpressionToParse(String expression, CRFVersionBean version) throws Exception {
+		System.out.println("expression:  " + expression);
+		
+          expression = " "+expression;		
+          expression = expression.replaceAll("\\(", "\\( ");		
+	      expression = expression.replaceAll(" eq "," = ");
+	      expression = expression.replaceAll(" ct "," = ");      // converting 'contain' into 'equal'
+	      expression = expression.replaceAll(" ne "," != ");
+	      expression = expression.replaceAll(" gt "," > ");
+	      expression = expression.replaceAll(" gte "," >= ");
+	      expression = expression.replaceAll(" lt "," < ");
+	      expression = expression.replaceAll(" lte "," <= ");
+	      expression = expression.replaceAll("_CURRENT_DATE"," today() ");     // today returns date and time and will not work with 'eq' operator, but it will work with 'gt' or 'lt'
+	      expression = expression.replaceAll(" I_", " ../I_");
+	      expression = expression.replaceAll("\\S*/I_", " ../I_");    // This statement will remove all (SE_ , F_ , IG_  ) entities and leave only Item_oid entities, by neglecting the whole path
+	                          
+	      
 		return expression;
 	}
 
@@ -561,8 +578,7 @@ public class OpenRosaXmlGenerator {
 	 * @param version
 	 * @return
 	 */
-	private String getExpressionParsedAndSortedForSkipPattern(String expression, CRFVersionBean version, SectionBean section)
-			throws Exception {
+	private String getExpressionParsedAndSortedForSkipPattern(String expression, CRFVersionBean version) throws Exception {
 		String itemOid, operator, value;
 		expression = expression.replaceAll("\\s+", " ").trim();
 		String[] expr = expression.split(" ");
@@ -574,8 +590,14 @@ public class OpenRosaXmlGenerator {
 			value = expr[0].trim();
 		}
 		operator = expr[1];
+		ItemBean itemBean = getItemBean(itemOid);
+		ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
+		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadata(itemBean, version);
+
 		if (operator.equalsIgnoreCase("eq"))
 			operator = "=";
+		if (operator.equalsIgnoreCase("ne"))
+			operator = "!=";
 		if (operator.equalsIgnoreCase("lt"))
 			operator = "<";
 		if (operator.equalsIgnoreCase("lte"))
@@ -584,15 +606,12 @@ public class OpenRosaXmlGenerator {
 			operator = ">";
 		if (operator.equalsIgnoreCase("gte"))
 			operator = ">=";
+		if (value.equalsIgnoreCase("_CURRENT_DATE"))
+			value = "today()";
 
-		ItemBean itemBean = getItemBean(itemOid);
-		ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
-		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadata(itemBean, version);
-		//Integer sectionId = itemFormMetadataBean.getSectionId();
+//		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid + " " + operator + " " + value;
+		expression = "../" + itemOid + " " + operator + " " + value;
 
-		//SectionBean sectionBean = getSectionBean(sectionId);
-
-		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid + " " + operator + " " + value;
 		logger.info(expression);
 
 		return expression;
