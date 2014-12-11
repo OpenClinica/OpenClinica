@@ -9,7 +9,14 @@ public class Bind {
 	private String constraintMsg;
 	private String required;
 	private String jrPreload;
+	private String relevant;
 	
+	public String getRelevant() {
+		return relevant;
+	}
+	public void setRelevant(String relevant) {
+		this.relevant = relevant;
+	}
 	public String getNodeSet() {
 		return nodeSet;
 	}

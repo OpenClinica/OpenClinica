@@ -20,7 +20,7 @@ public class PropertyBean extends AbstractMutableDomainObject {
     private String oid;
     private String value;
     private ExpressionBean valueExpression;
-    
+    private RuleActionBean ruleActionBean;
     private String property;
     
 
@@ -51,7 +51,17 @@ public class PropertyBean extends AbstractMutableDomainObject {
         this.valueExpression = valueExpression;
     }
 
-    @Override
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rule_action_id")
+    public RuleActionBean getRuleActionBean() {
+		return ruleActionBean;
+	}
+
+	public void setRuleActionBean(RuleActionBean ruleActionBean) {
+		this.ruleActionBean = ruleActionBean;
+	}
+
+	@Override
     public String toString() {
         return "PropertyBean [oid=" + oid + ", value=" + value + ", property=" + property + ", valueExpression=" + valueExpression + "]";
     }

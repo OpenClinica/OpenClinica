@@ -14,10 +14,10 @@ public class ItemGroupBean extends AuditableEntityBean {
     private ItemGroupMetadataBean meta = new ItemGroupMetadataBean();
     private ArrayList itemGroupMetaBeans = new ArrayList();
     // change 07-08-07, tbh
-
+    private ArrayList items = new ArrayList();
     private String oid;
     private OidGenerator oidGenerator;
-
+    
     public ItemGroupBean() {
         super();
         crfId = 0;
@@ -26,6 +26,10 @@ public class ItemGroupBean extends AuditableEntityBean {
         oidGenerator = new ItemGroupOidGenerator();
     }
 
+    
+    
+    
+    
     /**
      * @return the crfId
      */
@@ -79,4 +83,13 @@ public class ItemGroupBean extends AuditableEntityBean {
     public void setItemGroupMetaBeans(ArrayList itemGroupMetaBeans) {
         this.itemGroupMetaBeans = itemGroupMetaBeans;
     }
+
+	public ArrayList getItems() {
+		return items;
+	}
+
+	public void setItems(ArrayList items) {
+		this.items = items;
+	}
+    
 }

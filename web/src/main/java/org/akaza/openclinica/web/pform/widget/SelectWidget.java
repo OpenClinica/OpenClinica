@@ -4,7 +4,11 @@ import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.Hint;
 import org.akaza.openclinica.web.pform.dto.Item;
@@ -17,31 +21,51 @@ public class SelectWidget extends BaseWidget {
 	private ItemBean item = null;
 	private CRFVersionBean version = null;
 	private String appearance = null;
-
-	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance)
+	private ItemGroupBean itemGroupBean =null;
+	private ItemFormMetadataBean itemFormMetadataBean=null;
+	private Integer itemGroupRepeatNumber;
+	private boolean isItemRequired;
+	private boolean isGroupRepeating;
+	private ItemBean itemTargetBean;
+	private String expression;
+	private SectionBean section;
+	
+	public SelectWidget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
+			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired,
+			boolean isGroupRepeating, ItemBean itemTargetBean , String expression ,SectionBean section)
+	
 	{
 		this.item = item;
 		this.version = version;
 		this.appearance = appearance;
+		this.itemGroupBean=itemGroupBean;
+		this.itemFormMetadataBean=itemFormMetadataBean;
+		this.itemGroupRepeatNumber=itemGroupRepeatNumber;
+        this.isItemRequired=isItemRequired;
+        this.isGroupRepeating=isGroupRepeating;
+        this.itemTargetBean=itemTargetBean;
+        this.expression=expression;
+        this.section=section;
 	}
+	
 
 	@Override
 	public UserControl getUserControl() {
 		Select select = new Select();
 		Label label = new Label();
-		label.setLabel(item.getItemMeta().getLeftItemText());
+			label.setLabel(itemFormMetadataBean.getLeftItemText());
 		select.setLabel(label);
 		//Hint hint = new Hint();
 		//hint.setHint(item.getItemMeta().getLeftItemText());
 		//select.setHint(hint);
 
-		select.setRef("/" + version.getOid() + "/" + item.getOid());
+		select.setRef("/" + version.getOid()+ "/" +itemGroupBean.getOid()+"/" + item.getOid());
 		select.setAppearance(appearance);
 
 		ArrayList<Item> itemList = new ArrayList<Item>();
 		select.setItem(itemList);
 
-		ArrayList<ResponseOptionBean> options = item.getItemMeta().getResponseSet().getOptions();
+		ArrayList<ResponseOptionBean> options = itemFormMetadataBean.getResponseSet().getOptions();
 		for (ResponseOptionBean option:options)
 		{
 			Item item = new Item();
@@ -58,9 +82,15 @@ public class SelectWidget extends BaseWidget {
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-		binding.setNodeSet("/" + version.getOid() + "/" + item.getOid());
-		binding.setType(getDataType(item));
-		if (item.getItemMeta().isRequired()) binding.setRequired("true()");
+		String relevant=null;
+
+	binding.setNodeSet("/" + version.getOid() +"/" + itemGroupBean.getOid() +"/" + item.getOid());
+	if (itemTargetBean!=null){
+		relevant=expression;
+	}
+    	binding.setRelevant(relevant);
+		binding.setType("select");
+		if (isItemRequired) binding.setRequired("true()");
 		return binding;
 	}
 }

@@ -45,9 +45,9 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	}
 	@Override
 	public void update(Listener lstnr) {
-	System.out.println("Triggering the rules based on event updates");
+//	System.out.println("Triggering the rules based on event updates");
 	
-		System.out.println("RuleSetDao"+ruleSetDao);
+//		System.out.println("RuleSetDao"+ruleSetDao);
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
 
 		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();

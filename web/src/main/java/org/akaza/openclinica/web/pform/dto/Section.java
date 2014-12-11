@@ -1,24 +1,14 @@
 package org.akaza.openclinica.web.pform.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+public class Section {
 	private Label label;
-	private Repeat repeat;
 	private List<Group> group;
 	private String appearance;
 	private List<UserControl> usercontrol;
-    private String ref;	
 	
-    
-
-	public Repeat getRepeat() {
-		return repeat;
-	}
-	public void setRepeat(Repeat repeat) {
-		this.repeat = repeat;
-	}
+	
 	public List<Group> getGroup() {
 		return group;
 	}
@@ -43,11 +33,4 @@ public class Group {
 	public void setUsercontrol(List<UserControl> usercontrol) {
 		this.usercontrol = usercontrol;
 	}
-	public String getRef() {
-		return ref;
-	}
-	public void setRef(String ref) {
-		this.ref = ref;
-	}
-	
 }
