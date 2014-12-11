@@ -95,7 +95,7 @@ public class OdmController {
 	}
 
 	private ODM getODM(String studyOID, String subjectKey) {
-
+		ODM odm = new ODM();
 		String ssId = subjectKey;
 		if (ssId == null) {
 			return null;
@@ -148,7 +148,7 @@ public class OdmController {
 			logger.debug(e.getMessage());
 			logger.debug(ExceptionUtils.getStackTrace(e));
 		}
-		return null;
+		return odm;
 	}
 
 	private StudyEventDefinitionBean getStudyEventDefinitionBean(int ID) {
