@@ -642,38 +642,39 @@ public class PformSubmissionService {
 												itemDataBeanList.add(itemDataBean);
 											}
 
-											if (!errors.hasErrors()) {
-												for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-													// Create Item Data Bean
-													// by
-													// inserting one
-													// row at
-													// a time to Item Data
-													// table
-													iddao.create(itemDataBean1);
-													// Update Event Crf Bean
-													// and
-													// change the
-													// status
-													// to Completed
-													eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-													// Study Event status
-													// update
-													if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-															.getId())) {
-														updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean,
-																studySubjectBean);
-													} else {
-														updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean,
-																studySubjectBean);
-													}
-
-												}
-											}
 										}
 									}
+
 								}
 							}
+
+							if (!errors.hasErrors()) {
+								for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+									// Create Item Data Bean
+									// by
+									// inserting one
+									// row at
+									// a time to Item Data
+									// table
+									iddao.create(itemDataBean1);
+									// Update Event Crf Bean
+									// and
+									// change the
+									// status
+									// to Completed
+									eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+									// Study Event status
+									// update
+									if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+											.getId())) {
+										updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
+									} else {
+										updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+									}
+
+								}
+							}
+
 						}
 					}
 				}
