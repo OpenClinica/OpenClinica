@@ -232,9 +232,15 @@ public class OpenRosaXmlGenerator {
 	 * @param groupOid
 	 * @return
 	 */
-	private ArrayList<PropertyBean> getPropertyBean(String itemOid, String groupOid) {
+	private ArrayList<PropertyBean> getItemGroupPropertyBean(String itemOid, String groupOid) {
 		ArrayList<PropertyBean> propertyBeans = null;
 		propertyBeans = getRuleActionPropertyDao().findByOid(itemOid, groupOid);
+		return propertyBeans;
+	}
+
+	private ArrayList<PropertyBean> getGroupPropertyBean(String groupOid) {
+		ArrayList<PropertyBean> propertyBeans = null;
+		propertyBeans = getRuleActionPropertyDao().findByGroupOid(groupOid);
 		return propertyBeans;
 	}
 
@@ -248,7 +254,12 @@ public class OpenRosaXmlGenerator {
 	private String getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
 		String expression = null;
 		ExpressionBean expressionBean = null;
-		ArrayList<PropertyBean> propertyBeans = getPropertyBean(itemBean.getOid(), itemGroupBean.getOid());
+		ArrayList<PropertyBean> propertyBeans = null;
+		if (itemBean == null) {
+			propertyBeans = getGroupPropertyBean(itemGroupBean.getOid());
+		} else {
+			propertyBeans = getItemGroupPropertyBean(itemBean.getOid(), itemGroupBean.getOid());
+		}
 
 		if (propertyBeans.size() != 0) {
 			for (PropertyBean propertyBean : propertyBeans) {
@@ -268,8 +279,8 @@ public class OpenRosaXmlGenerator {
 		return expression;
 	}
 
-	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section)
-			throws Exception {
+	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section,
+			WidgetFactory factory, ArrayList<Bind> bindList) throws Exception {
 		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(dataSource);
 		List<ItemGroupMetadataBean> itemGroupMetadata = itemGroupMetaDAO.findMetaByGroupAndSection(itemGroupBean.getId(),
 				crfVersion.getId(), section.getId());
@@ -288,13 +299,23 @@ public class OpenRosaXmlGenerator {
 		// repeat.setJrNoAddRemove("true()");
 		repeat.setJrCount(nodeset);
 		group.setRef(nodeset);
+		// repeat.setRef(nodeset);
 		repeat.setNodeset(nodeset);
 
-		if (isGroupRepeating) {
-			repeat.setLabel(groupHeader);
-		} else {
-			group.setLabel(groupHeader);
+		String expression = getSkipPattern(null, itemGroupBean);
+		if (expression != null)
+			expression = getFullExpressionToParse(expression, crfVersion);
+
+		Widget groupWidget = factory.getGroupWidget(itemGroupBean, crfVersion, expression);
+		bindList.add(groupWidget.getBinding());
+		if (groupWidget != null) {
+			if (isGroupRepeating) {
+				repeat.setLabel(groupHeader);
+			} else {
+				group.setLabel(groupHeader);
+			}
 		}
+
 		map.put("group", group);
 		map.put("repeat", repeat);
 		map.put("isGroupRepeating", isGroupRepeating);
@@ -357,7 +378,7 @@ public class OpenRosaXmlGenerator {
 			for (ItemBean item : items) {
 				ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(item.getId());
 				if (itemGroupId != itemGroupBean.getId()) {
-					groupMap = getGroupInfo(itemGroupBean, crfVersion, section);
+					groupMap = getGroupInfo(itemGroupBean, crfVersion, section, factory, bindList);
 					isGroupRepeating = (Boolean) groupMap.get("isGroupRepeating");
 					group = (Group) groupMap.get("group");
 					repeat = (Repeat) groupMap.get("repeat");

@@ -174,4 +174,8 @@ public class WidgetFactory {
 
 	}
 
+	public Widget getGroupWidget(ItemGroupBean itemGroup, CRFVersionBean version, String expression) {
+		return new GroupWidget(itemGroup, version, expression);
+	}
+
 }
