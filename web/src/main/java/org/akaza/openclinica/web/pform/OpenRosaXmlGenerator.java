@@ -245,9 +245,8 @@ public class OpenRosaXmlGenerator {
 	 * @param itemGroupBean
 	 * @return
 	 */
-	private HashMap<String, Object> getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
-		ItemBean itemTargetBean = null;
-		HashMap<String, Object> map = new HashMap<String, Object>();
+	private String getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
+		String expression = null;
 		ExpressionBean expressionBean = null;
 		ArrayList<PropertyBean> propertyBeans = getPropertyBean(itemBean.getOid(), itemGroupBean.getOid());
 
@@ -256,19 +255,17 @@ public class OpenRosaXmlGenerator {
 				logger.info("property bean oid:   " + propertyBean.getOid());
 				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-					int itemTargetId = ruleActionBean.getRuleSetRule().getRuleSetBean().getItemId();
-					itemTargetBean = getItemBean(itemTargetId);
 					expressionBean = ruleActionBean.getRuleSetRule().getRuleBean().getExpression();
-					logger.info("itemTargetBean :   " + itemTargetBean.getOid() + "    ExpressionBean:   " + expressionBean.getValue());
-					map.put("itemTargetBean", itemTargetBean);
-					map.put("expressionBean", expressionBean);
-					return map;
+					logger.info("    ExpressionBean:   " + expressionBean.getValue());
+					if (expression != null) {
+						expression = expression + " and " + expressionBean.getValue();
+					} else {
+						expression = expressionBean.getValue();
+					}
 				}
 			}
 		}
-		map.put("itemTargetBean", null);
-		map.put("expressionBean", null);
-		return map;
+		return expression;
 	}
 
 	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section)
@@ -372,14 +369,11 @@ public class OpenRosaXmlGenerator {
 				int itemGroupRepeatNumber = 1;
 				String responseLayout = itemFormMetadataBean.getResponseLayout();
 
-				HashMap<String, Object> map = getSkipPattern(item, itemGroupBean);
-				ItemBean itemTargetBean = (ItemBean) map.get("itemTargetBean");
-				String expression = null;
-				ExpressionBean expressionBean = (ExpressionBean) map.get("expressionBean");
-				if (expressionBean != null) {
-					expression = expressionBean.getValue();
+				String expression = getSkipPattern(item, itemGroupBean);
+
+				if (expression != null)
 					expression = getFullExpressionToParse(expression, crfVersion);
-				}
+
 				// Add the Item Header
 				Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
 				if (headerWidget != null) {
@@ -406,7 +400,7 @@ public class OpenRosaXmlGenerator {
 
 				// Add the Item itself
 				Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-						isItemRequired, isGroupRepeating, responseLayout, itemTargetBean, expression, section);
+						isItemRequired, isGroupRepeating, responseLayout, expression, section);
 				if (widget != null) {
 
 					bindList.add(widget.getBinding());
@@ -553,22 +547,72 @@ public class OpenRosaXmlGenerator {
 	 */
 	private String getFullExpressionToParse(String expression, CRFVersionBean version) throws Exception {
 		System.out.println("expression:  " + expression);
-		
-          expression = " "+expression;		
-          expression = expression.replaceAll("\\(", "\\( ");		
-	      expression = expression.replaceAll(" eq "," = ");
-	      expression = expression.replaceAll(" ct "," = ");      // converting 'contain' into 'equal'
-	      expression = expression.replaceAll(" ne "," != ");
-	      expression = expression.replaceAll(" gt "," > ");
-	      expression = expression.replaceAll(" gte "," >= ");
-	      expression = expression.replaceAll(" lt "," < ");
-	      expression = expression.replaceAll(" lte "," <= ");
-	      expression = expression.replaceAll("_CURRENT_DATE"," today() ");     // today returns date and time and will not work with 'eq' operator, but it will work with 'gt' or 'lt'
-	      expression = expression.replaceAll(" I_", " ../I_");
-	      expression = expression.replaceAll("\\S*/I_", " ../I_");    // This statement will remove all (SE_ , F_ , IG_  ) entities and leave only Item_oid entities, by neglecting the whole path
-	                          
-	      
-		return expression;
+		String result = "";
+		expression = " " + expression;
+		expression = expression.replaceAll("\\(", "\\( ");
+		expression = expression.replaceAll(" eq ", " = ");
+		expression = expression.replaceAll(" ct ", " = "); // converting
+															// 'contain' into
+															// 'equal'
+		expression = expression.replaceAll(" ne ", " != ");
+		expression = expression.replaceAll(" gt ", " > ");
+		expression = expression.replaceAll(" gte ", " >= ");
+		expression = expression.replaceAll(" lt ", " < ");
+		expression = expression.replaceAll(" lte ", " <= ");
+		expression = expression.replaceAll("_CURRENT_DATE", " today() "); // today
+																			// returns
+																			// date
+																			// and
+																			// time
+																			// and
+																			// will
+																			// not
+																			// work
+																			// with
+																			// 'eq'
+																			// operator,
+																			// but
+																			// it
+																			// will
+																			// work
+																			// with
+																			// 'gt'
+																			// or
+																			// 'lt'
+		expression = expression.replaceAll(" I_", " ../I_");
+		expression = expression.replaceAll("\\S*/I_", " ../I_"); // This
+																	// statement
+																	// will
+																	// remove
+																	// all (SE_
+																	// , F_ ,
+																	// IG_ )
+																	// entities
+																	// and leave
+																	// only
+																	// Item_oid
+																	// entities,
+																	// by
+																	// neglecting
+																	// the whole
+																	// path
+
+		System.out.println("full express:  " + expression);
+		String[] exprs = expression.split(" ");
+		for (String expr : exprs) {
+			if (expr.contains("../I_")) {
+				String itemOid = expr.substring(3);
+				System.out.println("itemOid:  " + itemOid);
+
+				ItemBean itemBean = getItemBean(itemOid);
+				ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
+				expr = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid;
+			}
+
+			result = result + " " + expr;
+		}
+		System.out.println("result:  " + result);
+		return result;
 	}
 
 	/**
@@ -609,7 +653,8 @@ public class OpenRosaXmlGenerator {
 		if (value.equalsIgnoreCase("_CURRENT_DATE"))
 			value = "today()";
 
-//		expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid + " " + operator + " " + value;
+		// expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() +
+		// "/" + itemOid + " " + operator + " " + value;
 		expression = "../" + itemOid + " " + operator + " " + value;
 
 		logger.info(expression);
