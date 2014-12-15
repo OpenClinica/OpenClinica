@@ -177,5 +177,11 @@ public class WidgetFactory {
 	public Widget getGroupWidget(ItemGroupBean itemGroup, CRFVersionBean version, String expression) {
 		return new GroupWidget(itemGroup, version, expression);
 	}
+	
+	public Widget getSectionWidget(SectionBean section, CRFVersionBean version, String expression) {
+		return new SectionWidget(section, version, expression);
+	}
 
+	
+	
 }

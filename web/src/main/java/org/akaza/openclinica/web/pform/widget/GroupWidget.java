@@ -24,8 +24,6 @@ public class GroupWidget extends BaseWidget {
 	@Override
 	public Bind getBinding() {
 		Bind binding = new Bind();
-		// String
-		// relevant="/F_LASTITEMHIDD_1/IG_LASTI_UNGROUPED/I_LASTI_SECOND  != &quot;&quot;";
 		String relevant = expression;
 		if (relevant != null)
 			binding.setRelevant(relevant);
