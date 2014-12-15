@@ -95,7 +95,7 @@ public class OdmController {
 	}
 
 	private ODM getODM(String studyOID, String subjectKey) {
-
+        ODM odm = new ODM();
 		String ssoid = subjectKey;
 		if (ssoid == null) {
 			return null;
@@ -145,7 +145,7 @@ public class OdmController {
 			logger.debug(ExceptionUtils.getStackTrace(e));
 		}
 
-		return null;
+		return odm;
 
 	}
 
