@@ -23,25 +23,19 @@ public class Select1Widget extends BaseWidget {
 	private String appearance = null;
 	private ItemGroupBean itemGroupBean = null;
 	private ItemFormMetadataBean itemFormMetadataBean = null;
-	private Integer itemGroupRepeatNumber;
 	private boolean isItemRequired;
-	private boolean isGroupRepeating;
 	private String expression;
-	private SectionBean section;
 
 	public Select1Widget(CRFVersionBean version, ItemBean item, String appearance, ItemGroupBean itemGroupBean,
-			ItemFormMetadataBean itemFormMetadataBean, Integer itemGroupRepeatNumber, boolean isItemRequired, boolean isGroupRepeating,
-			String expression, SectionBean section) {
+			ItemFormMetadataBean itemFormMetadataBean, boolean isItemRequired, 
+			String expression) {
 		this.item = item;
 		this.version = version;
 		this.appearance = appearance;
 		this.itemGroupBean = itemGroupBean;
 		this.itemFormMetadataBean = itemFormMetadataBean;
-		this.itemGroupRepeatNumber = itemGroupRepeatNumber;
 		this.isItemRequired = isItemRequired;
-		this.isGroupRepeating = isGroupRepeating;
 		this.expression = expression;
-		this.section = section;
 	}
 
 	@Override

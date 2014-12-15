@@ -38,36 +38,32 @@ public class WidgetFactory {
 		this.version = version;
 	}
 
-	public Widget getWidget(ItemBean item, Integer widgetType, ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetaDataBean,
-			Integer itemGrouprepeatNumber, boolean isItemRequired, boolean isGroupRepeating, String responseLayout, String expression,
-			SectionBean section) {
+	public Widget getItemWidget(ItemBean item, Integer widgetType, ItemGroupBean itemGroupBean, ItemFormMetadataBean itemFormMetaDataBean,
+			boolean isItemRequired, String responseLayout, String expression) {
 
 		if (responseLayout.equalsIgnoreCase("vertical")) {
 			switch (widgetType) {
 			case TYPE_TEXT:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			case TYPE_SINGLE_SELECT:
-				return new Select1Widget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new Select1Widget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_RADIO:
-				return new Select1Widget(version, item, Widget.APPEARANCE_FULL, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber,
-						isItemRequired, isGroupRepeating, expression, section);
+				return new Select1Widget(version, item, Widget.APPEARANCE_FULL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_MULTI_SELECT:
-				return new SelectWidget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new SelectWidget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_CHECKBOX:
-				return new SelectWidget(version, item, Widget.APPEARANCE_FULL, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber,
-						isItemRequired, isGroupRepeating, expression, section);
+				return new SelectWidget(version, item, Widget.APPEARANCE_FULL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_TEXTAREA:
-				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_CALCULATION:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			case TYPE_GROUP_CALCULATION:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			default:
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;
@@ -75,29 +71,26 @@ public class WidgetFactory {
 		} else {
 			switch (widgetType) {
 			case TYPE_TEXT:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			case TYPE_SINGLE_SELECT:
-				return new Select1Widget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new Select1Widget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_RADIO:
 				return new Select1Widget(version, item, Widget.APPEARANCE_HORIZONTAL_COMPACT, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+						isItemRequired, expression);
 			case TYPE_MULTI_SELECT:
-				return new SelectWidget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new SelectWidget(version, item, Widget.APPEARANCE_MINIMAL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_CHECKBOX:
-				return new SelectWidget(version, item, Widget.APPEARANCE_HORIZONTAL, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new SelectWidget(version, item, Widget.APPEARANCE_HORIZONTAL, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_TEXTAREA:
-				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean,
-						itemGrouprepeatNumber, isItemRequired, isGroupRepeating, expression, section);
+				return new InputWidget(version, item, Widget.APPEARANCE_MULTILINE, itemGroupBean, itemFormMetaDataBean, isItemRequired,
+						expression);
 			case TYPE_CALCULATION:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			case TYPE_GROUP_CALCULATION:
-				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, itemGrouprepeatNumber, isItemRequired,
-						isGroupRepeating, expression, section);
+				return new InputWidget(version, item, null, itemGroupBean, itemFormMetaDataBean, isItemRequired, expression);
 			default:
 				log.debug("Unsupported form widget: " + widgetType + "  Skipping.");
 				return null;
@@ -177,11 +170,9 @@ public class WidgetFactory {
 	public Widget getGroupWidget(ItemGroupBean itemGroup, CRFVersionBean version, String expression) {
 		return new GroupWidget(itemGroup, version, expression);
 	}
-	
+
 	public Widget getSectionWidget(SectionBean section, CRFVersionBean version, String expression) {
 		return new SectionWidget(section, version, expression);
 	}
 
-	
-	
 }

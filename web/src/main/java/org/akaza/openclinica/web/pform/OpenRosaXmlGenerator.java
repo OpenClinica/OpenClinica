@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.managestudy.CRFVersionMetadataUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -106,6 +107,11 @@ public class OpenRosaXmlGenerator {
 		}
 	}
 
+	/**
+	 * @param formId
+	 * @return
+	 * @throws Exception
+	 */
 	public String buildForm(String formId) throws Exception {
 		try {
 			CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
@@ -132,8 +138,6 @@ public class OpenRosaXmlGenerator {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			log.error(ExceptionUtils.getStackTrace(e));
-			System.out.println(e.getMessage());
-			System.out.println(ExceptionUtils.getStackTrace(e));
 			throw new Exception(e);
 		}
 	}
@@ -280,11 +284,20 @@ public class OpenRosaXmlGenerator {
 		return expression;
 	}
 
+	/**
+	 * @param itemGroupBean
+	 * @param crfVersion
+	 * @param section
+	 * @param factory
+	 * @param bindList
+	 * @return
+	 * @throws Exception
+	 */
 	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section,
 			WidgetFactory factory, ArrayList<Bind> bindList) throws Exception {
-		ItemGroupMetadataDAO itemGroupMetaDAO = new ItemGroupMetadataDAO(dataSource);
-		List<ItemGroupMetadataBean> itemGroupMetadata = itemGroupMetaDAO.findMetaByGroupAndSection(itemGroupBean.getId(),
-				crfVersion.getId(), section.getId());
+		igmdao = new ItemGroupMetadataDAO(dataSource);
+		List<ItemGroupMetadataBean> itemGroupMetadata = igmdao.findMetaByGroupAndSection(itemGroupBean.getId(), crfVersion.getId(),
+				section.getId());
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		Group group = new Group();
@@ -300,22 +313,13 @@ public class OpenRosaXmlGenerator {
 		// repeat.setJrNoAddRemove("true()");
 		repeat.setJrCount(nodeset);
 		group.setRef(nodeset);
-		// repeat.setRef(nodeset);
 		repeat.setNodeset(nodeset);
+		String groupExpression = null;
+		groupExpression = getSkipPattern(null, itemGroupBean);
+		if (groupExpression != null)
+			groupExpression = getFullExpressionToParse(groupExpression, crfVersion);
 
-		String expression = getSkipPattern(null, itemGroupBean);
-		if (expression != null)
-			expression = getFullExpressionToParse(expression, crfVersion);
-
-		Widget groupWidget = factory.getGroupWidget(itemGroupBean, crfVersion, expression);
-		bindList.add(groupWidget.getBinding());
-		if (groupWidget != null) {
-			if (isGroupRepeating) {
-				repeat.setLabel(groupHeader);
-			} else {
-				group.setLabel(groupHeader);
-			}
-		}
+		setGroupWidget(section, crfVersion, groupExpression, bindList, factory, itemGroupBean, group, repeat, isGroupRepeating, groupHeader);
 
 		map.put("group", group);
 		map.put("repeat", repeat);
@@ -333,6 +337,14 @@ public class OpenRosaXmlGenerator {
 		}
 	}
 
+	/**
+	 * @param html
+	 * @param crf
+	 * @param crfVersion
+	 * @param crfSections
+	 * @return
+	 * @throws Exception
+	 */
 	private Integer mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		int sectionCount = 0;
 		ItemFormMetadataBean itemFormMetadataBean = null;
@@ -343,14 +355,13 @@ public class OpenRosaXmlGenerator {
 		html.getHead().setTitle(crf.getName());
 
 		for (SectionBean section : crfSections) {
-			ArrayList<Group> multiGroups = new ArrayList<Group>();
-			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			ArrayList<Group> groups = new ArrayList<Group>();
 			Group singleSection = new Group();
 			singleSection.setUsercontrol(new ArrayList<UserControl>());
 			String ref = "/" + crfVersion.getOid() + "/" + "SECTION_" + section.getLabel().replaceAll("\\W", "_");
 			singleSection.setRef(ref);
-			String expression = null;
+			String sectionExpression = null;
+
 			igdao = new ItemGroupDAO(dataSource);
 			ArrayList<ItemGroupBean> groupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupBySectionId(section.getId());
 			int count = 0;
@@ -358,52 +369,31 @@ public class OpenRosaXmlGenerator {
 				for (ItemGroupBean groupBean : groupBeans) {
 					String expr = getSkipPattern(null, groupBean);
 					if (expr != null) {
-						if (expression != null) {
-							expression = expression + " and " + expr;
+						if (sectionExpression != null) {
+							sectionExpression = sectionExpression + " and " + expr;
 							count++;
 						} else {
-							expression = expr;
+							sectionExpression = expr;
 							count++;
 						}
 					}
 				}
 
-				if (count > 0 && groupBeans.size() == count) {
-					expression = getFullExpressionToParse(expression, crfVersion);
+				if (sectionExpression != null && groupBeans.size() == count) {
+					sectionExpression = getFullExpressionToParse(sectionExpression, crfVersion);
 				} else {
-					expression = null;
-				}
-				Widget sectionWidget = factory.getSectionWidget(section, crfVersion, expression);
-				bindList.add(sectionWidget.getBinding());
-
-				if (section.getTitle() != null && !section.getTitle().equals("")) {
-					Label sectionLabel = new Label();
-					sectionLabel.setLabel(section.getTitle());
-					singleSection.setLabel(sectionLabel);
+					sectionExpression = null;
 				}
 
-				singleSection.setGroup(new ArrayList<Group>());
-				Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
-				Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS,
-						section);
+				setSectionWidget(section, crfVersion, sectionExpression, bindList, factory, singleSection);
 
-				if (subtitle != null) {
-					singleSection.getUsercontrol().add(subtitle.getUserControl());
-					bindList.add(subtitle.getBinding());
-				}
-				if (instructions != null) {
-					singleSection.getUsercontrol().add(instructions.getUserControl());
-					bindList.add(instructions.getBinding());
-				}
 				HashMap<String, Object> groupMap = null;
 				boolean isGroupRepeating = false;
 				Group group = null;
 				Repeat repeat = null;
 
-				ItemDAO itemdao = new ItemDAO(dataSource);
-
-				ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllBySectionIdOrderedByItemFormMetadataOrdinal(section
-						.getId());
+				idao = new ItemDAO(dataSource);
+				ArrayList<ItemBean> items = (ArrayList<ItemBean>) idao.findAllBySectionIdOrderedByItemFormMetadataOrdinal(section.getId());
 
 				Integer itemGroupId = 0;
 				for (ItemBean item : items) {
@@ -418,75 +408,46 @@ public class OpenRosaXmlGenerator {
 					itemFormMetadataBean = getItemFormMetadata(item, crfVersion);
 					int responseTypeId = itemFormMetadataBean.getResponseSet().getResponseTypeId();
 					boolean isItemRequired = itemFormMetadataBean.isRequired();
-					int itemGroupRepeatNumber = 1;
 					String responseLayout = itemFormMetadataBean.getResponseLayout();
-					expression = null;
-					expression = getSkipPattern(item, itemGroupBean);
+					String itemExpression = null;
+					itemExpression = getSkipPattern(item, itemGroupBean);
 
-					if (expression != null)
-						expression = getFullExpressionToParse(expression, crfVersion);
+					if (itemExpression != null)
+						itemExpression = getFullExpressionToParse(itemExpression, crfVersion);
 
 					// Add the Item Header
-					Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
-					if (headerWidget != null) {
-						bindList.add(headerWidget.getBinding());
-						if (isGroupRepeating)
-							repeat.getUsercontrol().add(headerWidget.getUserControl());
-						else
-							group.getUsercontrol().add(headerWidget.getUserControl());
-					} else
-						log.debug("Invalid/Missing instructive header text encountered while loading PForm ("
-								+ item.getDataType().getName() + "). Skipping.");
-
+					setHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group);
 					// Add the Item SubHeader
-					Widget subHeaderWidget = factory.getSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
-					if (subHeaderWidget != null) {
-						bindList.add(subHeaderWidget.getBinding());
-						if (isGroupRepeating)
-							repeat.getUsercontrol().add(subHeaderWidget.getUserControl());
-						else
-							group.getUsercontrol().add(subHeaderWidget.getUserControl());
-					} else
-						log.debug("Invalid/Missing instructive subheader text encountered while loading PForm ("
-								+ item.getDataType().getName() + "). Skipping.");
-
+					setSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group);
 					// Add the Item itself
-					Widget widget = factory.getWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, itemGroupRepeatNumber,
-							isItemRequired, isGroupRepeating, responseLayout, expression, section);
-					if (widget != null) {
+					setItemWidget(item, responseTypeId, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat,
+							group, isItemRequired, responseLayout, itemExpression);
 
-						bindList.add(widget.getBinding());
-
-						if (isGroupRepeating) {
-							repeat.getUsercontrol().add(widget.getUserControl());
-							group.setRepeat(repeat);
-						} else {
-							group.getUsercontrol().add(widget.getUserControl());
-						}
-
-					} else {
-						log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
-					}
 					if (itemGroupId != itemGroupBean.getId()) {
 						groups.add(group);
 						itemGroupId = itemGroupBean.getId();
 					}
 
-				} // item
-
-				// } // multi group
+				} // end of item loop
 
 				singleSection.setGroup(groups);
 				allSections.add(singleSection);
-			}
+			} // end of groups per section if exist
 			sectionCount = allSections.size();
-		} // section
+		} // end of section loop
 
 		body.setGroup(allSections);
 		html.getHead().getModel().setBind(bindList);
 		return sectionCount;
 	} // method
 
+	/**
+	 * @param model
+	 * @param crfVersion
+	 * @param crfSections
+	 * @return
+	 * @throws Exception
+	 */
 	private String buildInstance(Model model, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder build = docFactory.newDocumentBuilder();
@@ -496,7 +457,6 @@ public class OpenRosaXmlGenerator {
 		doc.appendChild(crfElement);
 
 		for (SectionBean section : crfSections) {
-			ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeans(section);
 			Element sectionSubTitle = doc.createElement("SECTION_" + section.getId() + ".SUBTITLE");
 			Element sectionInstructions = doc.createElement("SECTION_" + section.getId() + ".INSTRUCTIONS");
 			Element sectionElm = doc.createElement("SECTION_" + section.getLabel().replaceAll("\\W", "_"));
@@ -509,17 +469,14 @@ public class OpenRosaXmlGenerator {
 		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 			ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
-			// boolean isGroupRepeating=
-			// itemGroupMetadataBean.isRepeatingGroup();
 			String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
-			String repeatGroupMax = itemGroupMetadataBean.getRepeatMax().toString();
 
 			Element groupElement = doc.createElement(itemGroupBean.getOid());
 			groupElement.setTextContent(repeatGroupMin);
 			crfElement.appendChild(groupElement);
-			ItemDAO itemdao = new ItemDAO(dataSource);
-			ArrayList<ItemBean> items = (ArrayList<ItemBean>) itemdao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(),
-					crfVersion.getId());
+
+			idao = new ItemDAO(dataSource);
+			ArrayList<ItemBean> items = (ArrayList<ItemBean>) idao.findAllItemsByGroupIdOrdered(itemGroupBean.getId(), crfVersion.getId());
 			for (ItemBean item : items) {
 				ItemFormMetadataBean itemMetaData = getItemFormMetadata(item, crfVersion);
 				if (itemMetaData.getHeader() != null && !itemMetaData.getHeader().equals("")) {
@@ -604,63 +561,34 @@ public class OpenRosaXmlGenerator {
 	 * @return
 	 */
 	private String getFullExpressionToParse(String expression, CRFVersionBean version) throws Exception {
-		System.out.println("expression:  " + expression);
 		String result = "";
 		expression = " " + expression;
 		expression = expression.replaceAll("\\(", "\\( ");
 		expression = expression.replaceAll(" eq ", " = ");
-		expression = expression.replaceAll(" ct ", " = "); // converting
-															// 'contain' into
-															// 'equal'
+		expression = expression.replaceAll(" ct ", " = "); // convert contains
+															// into equal
 		expression = expression.replaceAll(" ne ", " != ");
 		expression = expression.replaceAll(" gt ", " > ");
 		expression = expression.replaceAll(" gte ", " >= ");
 		expression = expression.replaceAll(" lt ", " < ");
 		expression = expression.replaceAll(" lte ", " <= ");
-		expression = expression.replaceAll("_CURRENT_DATE", " today() "); // today
-		// returns
-		// date
-		// and
-		// time
-		// and
-		// will
-		// not
-		// work
-		// with
-		// 'eq'
-		// operator,
-		// but
-		// it
-		// will
-		// work
-		// with
-		// 'gt'
-		// or
-		// 'lt'
+		expression = expression.replaceAll("_CURRENT_DATE", " today() ");
+		/*
+		 * today() function returns date and time and will not work with 'eq'
+		 * operator. But it will work with 'gt' or 'lt' operators
+		 */
 		expression = expression.replaceAll(" I_", " ../I_");
-		expression = expression.replaceAll("\\S*/I_", " ../I_"); // This
-																	// statement
-																	// will
-																	// remove
-																	// all (SE_
-																	// , F_ ,
-																	// IG_ )
-																	// entities
-																	// and leave
-																	// only
-																	// Item_oid
-																	// entities,
-																	// by
-																	// neglecting
-																	// the whole
-																	// path
+		expression = expression.replaceAll("\\S*/I_", " ../I_");
 
-		System.out.println("full express:  " + expression);
+		/*
+		 * This statement will remove all (SE_ , F_, IG_) entities and will
+		 * leave only Item_Oid entities. And will neglect the whole path
+		 */
 		String[] exprs = expression.split(" ");
 		for (String expr : exprs) {
 			if (expr.contains("../I_")) {
 				String itemOid = expr.substring(3);
-				System.out.println("itemOid:  " + itemOid);
+				logger.info("itemOid:  " + itemOid);
 
 				ItemBean itemBean = getItemBean(itemOid);
 				ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
@@ -669,55 +597,156 @@ public class OpenRosaXmlGenerator {
 
 			result = result + " " + expr;
 		}
-		System.out.println("result:  " + result);
+		logger.info("Full Expression is:  " + result);
 		return result;
 	}
 
 	/**
-	 * This method is for skip pattern to build single expression
-	 * 
-	 * @param expression
-	 * @param version
-	 * @return
+	 * @param item
+	 * @param itemFormMetadataBean
+	 * @param itemGroupBean
+	 * @param bindList
+	 * @param factory
+	 * @param isGroupRepeating
+	 * @param repeat
+	 * @param group
 	 */
-	private String getExpressionParsedAndSortedForSkipPattern(String expression, CRFVersionBean version) throws Exception {
-		String itemOid, operator, value;
-		expression = expression.replaceAll("\\s+", " ").trim();
-		String[] expr = expression.split(" ");
-		if (expr[0].startsWith("I_")) {
-			itemOid = expr[0].trim();
-			value = expr[2].trim();
+	private void setHeaderWidget(ItemBean item, ItemFormMetadataBean itemFormMetadataBean, ItemGroupBean itemGroupBean,
+			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group) {
+		Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+		if (headerWidget != null) {
+			bindList.add(headerWidget.getBinding());
+			if (isGroupRepeating)
+				repeat.getUsercontrol().add(headerWidget.getUserControl());
+			else
+				group.getUsercontrol().add(headerWidget.getUserControl());
 		} else {
-			itemOid = expr[2].trim();
-			value = expr[0].trim();
+			log.debug("Invalid/Missing instructive header text encountered while loading PForm (" + item.getDataType().getName()
+					+ "). Skipping.");
 		}
-		operator = expr[1];
-		ItemBean itemBean = getItemBean(itemOid);
-		ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
-		ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadata(itemBean, version);
+	}
 
-		if (operator.equalsIgnoreCase("eq"))
-			operator = "=";
-		if (operator.equalsIgnoreCase("ne"))
-			operator = "!=";
-		if (operator.equalsIgnoreCase("lt"))
-			operator = "<";
-		if (operator.equalsIgnoreCase("lte"))
-			operator = "<=";
-		if (operator.equalsIgnoreCase("gt"))
-			operator = ">";
-		if (operator.equalsIgnoreCase("gte"))
-			operator = ">=";
-		if (value.equalsIgnoreCase("_CURRENT_DATE"))
-			value = "today()";
+	/**
+	 * @param item
+	 * @param itemFormMetadataBean
+	 * @param itemGroupBean
+	 * @param bindList
+	 * @param factory
+	 * @param isGroupRepeating
+	 * @param repeat
+	 * @param group
+	 */
+	private void setSubHeaderWidget(ItemBean item, ItemFormMetadataBean itemFormMetadataBean, ItemGroupBean itemGroupBean,
+			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group) {
+		Widget subHeaderWidget = factory.getSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+		if (subHeaderWidget != null) {
+			bindList.add(subHeaderWidget.getBinding());
+			if (isGroupRepeating)
+				repeat.getUsercontrol().add(subHeaderWidget.getUserControl());
+			else
+				group.getUsercontrol().add(subHeaderWidget.getUserControl());
+		} else {
+			log.debug("Invalid/Missing instructive subheader text encountered while loading PForm (" + item.getDataType().getName()
+					+ "). Skipping.");
+		}
 
-		// expression = "/" + version.getOid() + "/" + itemGroupBean.getOid() +
-		// "/" + itemOid + " " + operator + " " + value;
-		expression = "../" + itemOid + " " + operator + " " + value;
+	}
 
-		logger.info(expression);
+	/**
+	 * @param item
+	 * @param responseTypeId
+	 * @param itemFormMetadataBean
+	 * @param itemGroupBean
+	 * @param bindList
+	 * @param factory
+	 * @param isGroupRepeating
+	 * @param repeat
+	 * @param group
+	 * @param isItemRequired
+	 * @param responseLayout
+	 * @param itemExpression
+	 */
+	private void setItemWidget(ItemBean item, int responseTypeId, ItemFormMetadataBean itemFormMetadataBean, ItemGroupBean itemGroupBean,
+			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group, boolean isItemRequired,
+			String responseLayout, String itemExpression) {
 
-		return expression;
+		Widget widget = factory.getItemWidget(item, responseTypeId, itemGroupBean, itemFormMetadataBean, isItemRequired, responseLayout,
+				itemExpression);
+		if (widget != null) {
+
+			bindList.add(widget.getBinding());
+
+			if (isGroupRepeating) {
+				repeat.getUsercontrol().add(widget.getUserControl());
+				group.setRepeat(repeat);
+			} else {
+				group.getUsercontrol().add(widget.getUserControl());
+			}
+
+		} else {
+			log.debug("Unsupported datatype encountered while loading PForm (" + item.getDataType().getName() + "). Skipping.");
+		}
+
+	}
+
+	/**
+	 * @param section
+	 * @param crfVersion
+	 * @param sectionExpression
+	 * @param bindList
+	 * @param factory
+	 * @param singleSection
+	 */
+	private void setSectionWidget(SectionBean section, CRFVersionBean crfVersion, String sectionExpression, ArrayList<Bind> bindList,
+			WidgetFactory factory, Group singleSection) {
+		Widget sectionWidget = factory.getSectionWidget(section, crfVersion, sectionExpression);
+		bindList.add(sectionWidget.getBinding());
+
+		if (section.getTitle() != null && !section.getTitle().equals("")) {
+			Label sectionLabel = new Label();
+			sectionLabel.setLabel(section.getTitle());
+			singleSection.setLabel(sectionLabel);
+		}
+
+		singleSection.setGroup(new ArrayList<Group>());
+		Widget subtitle = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_SUBTITLE, section);
+		Widget instructions = factory.getSectionTextWidget(crfVersion.getOid(), WidgetFactory.SECTION_TEXT_TYPE_INSTRUCTIONS, section);
+
+		if (subtitle != null) {
+			singleSection.getUsercontrol().add(subtitle.getUserControl());
+			bindList.add(subtitle.getBinding());
+		}
+		if (instructions != null) {
+			singleSection.getUsercontrol().add(instructions.getUserControl());
+			bindList.add(instructions.getBinding());
+		}
+
+	}
+
+	/**
+	 * @param section
+	 * @param crfVersion
+	 * @param groupExpression
+	 * @param bindList
+	 * @param factory
+	 * @param itemGroupBean
+	 * @param group
+	 * @param repeat
+	 * @param isGroupRepeating
+	 * @param groupHeader
+	 */
+	private void setGroupWidget(SectionBean section, CRFVersionBean crfVersion, String groupExpression, ArrayList<Bind> bindList,
+			WidgetFactory factory, ItemGroupBean itemGroupBean, Group group, Repeat repeat, boolean isGroupRepeating, Label groupHeader) {
+		Widget groupWidget = factory.getGroupWidget(itemGroupBean, crfVersion, groupExpression);
+		bindList.add(groupWidget.getBinding());
+		if (groupWidget != null) {
+			if (isGroupRepeating) {
+				repeat.setLabel(groupHeader);
+			} else {
+				group.setLabel(groupHeader);
+			}
+		}
+
 	}
 
 	public RuleActionPropertyDao getRuleActionPropertyDao() {
