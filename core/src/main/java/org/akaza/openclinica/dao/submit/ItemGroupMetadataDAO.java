@@ -179,6 +179,21 @@ public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends 
         return beanList;
     }
 
+    public List<ItemGroupMetadataBean> findMetaByGroupAndCrfVersion(int itemGroupId, int crfVersionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, itemGroupId);
+        variables.put(2, crfVersionId);
+        List listofMaps = this.select(digester.getQuery("findMetaByGroupAndCrfVersion"), variables);
+
+        List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
+        ItemGroupMetadataBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
     
     
     public List<ItemGroupMetadataBean> findMetaByGroupAndSectionForPrint(int itemGroupId, int crfVersionId, int sectionId) {
