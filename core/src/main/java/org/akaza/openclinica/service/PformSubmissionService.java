@@ -51,6 +51,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
+import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
@@ -658,69 +659,77 @@ public class PformSubmissionService {
 												itemDataBeanList.add(itemDataBean);
 											}
 
-											if (!errors.hasErrors()) {
-												for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-													// Create Item Data Bean
-													// by
-													// inserting one
-													// row at
-													// a time to Item Data
-													// table
-													iddao.create(itemDataBean1);
-
-													// Update Event Crf Bean
-													// and
-													// change the
-													// status
-													// to Completed
-													setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1);
-
-												}
-												eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-												// Study Event status
-												// update
-												if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-														.getId())) {
-													updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean,
-															studySubjectBean);
-												} else {
-													updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean,
-															studySubjectBean);
-												
-											  }
-											}
 										}
 
 									}
 								}
 							}
 						}
-						setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
+
+						if (!errors.hasErrors()) {
+							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+								// Create Item Data Bean
+								// by
+								// inserting one
+								// row at
+								// a time to Item Data
+								// table
+								iddao.create(itemDataBean1);
+
+								// Update Event Crf Bean
+								// and
+								// change the
+								// status
+								// to Completed
+
+							}
+
+							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+							// Study Event status
+							// update
+							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+									.getId())) {
+								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
+							} else {
+								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+
+							}
+							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+								setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1);
+							}
+
+							setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
+
+						}
 					}
 				}
 			}
-
 		}
-
 		return errors;
 	}
 
+	@SuppressWarnings("null")
 	private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
 		iddao = new ItemDataDAO(ds);
+		ArrayList<Integer> ruleList = new ArrayList<Integer>();
 
-		ItemBean itemBean = (ItemBean) iddao.findByPK(itemDataBean.getId());
+		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
 		ArrayList<PropertyBean> propertyBeans = null;
 		propertyBeans = getGroupPropertyBean(itemBean.getOid());
-
+		RuleBean ruleBean;
 		if (propertyBeans.size() != 0) {
 			for (PropertyBean propertyBean : propertyBeans) {
 				logger.info("property bean oid:   " + propertyBean.getOid());
 				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
+					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
 					// Add a method to insert dyn_item_group_metadata table
 					// with records
-					getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
+					if (ruleList.size() == 0 || !ruleList.contains(ruleBean.getId())) {
 
+						ruleList.add(ruleBean.getId());
+						getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
+					}
 				}
 
 			}
@@ -730,6 +739,8 @@ public class PformSubmissionService {
 
 	private void setDynItemGroupMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean) {
 		igdao = new ItemGroupDAO(ds);
+		ArrayList<Integer> ruleList = new ArrayList<Integer>();
+		RuleBean ruleBean;
 		ArrayList<ItemGroupBean> itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersionBean.getId());
 		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 			ArrayList<PropertyBean> propertyBeans = null;
@@ -740,10 +751,14 @@ public class PformSubmissionService {
 					logger.info("property bean oid:   " + propertyBean.getOid());
 					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 					if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
+						ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
 						// Add a method to insert dyn_item_group_metadata table
 						// with records
-						getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
+						if (ruleList.size() == 0 || !ruleList.contains(ruleBean.getId())) {
 
+							ruleList.add(ruleBean.getId());
+							getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
+						}
 					}
 				}
 			}
@@ -766,6 +781,7 @@ public class PformSubmissionService {
 			CRFVersionBean crfVersionBean) {
 		DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = null;
 		dynamicsItemFormMetadataBean = createDynamicsItemFormMetadataBean(itemDataBean, itemGroupBean, eventCrfBean, crfVersionBean);
+
 		saveDynamicItemFormMeta(dynamicsItemFormMetadataBean);
 	}
 
@@ -780,7 +796,7 @@ public class PformSubmissionService {
 		dynamicsItemFormMetadataBean.setItemFormMetadataId(itemFormMetadataBean.getId());
 		dynamicsItemFormMetadataBean.setItemId(itemBean.getId());
 		dynamicsItemFormMetadataBean.setShowItem(true);
-	    dynamicsItemFormMetadataBean.setItemDataId(itemDataBean.getId());
+		dynamicsItemFormMetadataBean.setItemDataId(itemDataBean.getId());
 		dynamicsItemFormMetadataBean.setVersion(0);
 		dynamicsItemFormMetadataBean.setPassedDde(0);
 
