@@ -245,7 +245,7 @@ public class OpenRosaXmlGenerator {
 
 	private ArrayList<PropertyBean> getGroupPropertyBean(String groupOid) {
 		ArrayList<PropertyBean> propertyBeans = null;
-		propertyBeans = getRuleActionPropertyDao().findByGroupOid(groupOid);
+		propertyBeans = getRuleActionPropertyDao().findByOid(groupOid);
 		return propertyBeans;
 	}
 
