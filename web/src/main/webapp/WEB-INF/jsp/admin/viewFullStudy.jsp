@@ -662,6 +662,9 @@
         <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
         <td class="table_cell">
             <fmt:message key="${studyToView.studyParameterConfig.participantPortal}" bundle="${resword}"/>
+            Steve
+            ${participantPortalRegStatus}
+            End
        </td>
     </tr>
 
