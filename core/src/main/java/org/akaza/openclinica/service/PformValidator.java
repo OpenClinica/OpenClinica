@@ -2,6 +2,9 @@ package org.akaza.openclinica.service;
 
 import java.text.MessageFormat;
 
+import javax.validation.Validation;
+
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.slf4j.Logger;
@@ -46,6 +49,13 @@ public class PformValidator implements Validator {
 		if (value != null && value != "") {
 
 			switch (itemDataTypeId) {
+			case 5: { // ItemDataType.STRING
+                    if (value.length()>3999){					
+					e.reject("value.invalid.STRING");
+					logger.info(value +"  ***   value.invalid.STRING    ** TEXT VALUE IS OVER 3999 Characters*");
+                    }
+				break;
+			}
 			case 6: { // ItemDataType.INTEGER
 				try {
 					Integer.valueOf(value);
@@ -66,7 +76,6 @@ public class PformValidator implements Validator {
 			}
 			case 9: { // ItemDataType.DATE
 				if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
-					System.out.print(" Error");
 					e.reject("value.invalid.date");
 					logger.info(value +"   ***value.invalid.DATE***");
 				}
