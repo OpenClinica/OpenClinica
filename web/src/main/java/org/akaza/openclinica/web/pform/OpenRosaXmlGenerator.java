@@ -256,7 +256,9 @@ public class OpenRosaXmlGenerator {
 	 * @param itemGroupBean
 	 * @return
 	 */
-	private String getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
+	private ExpressionExpressionEvaluate getSkipPattern(ItemBean itemBean, ItemGroupBean itemGroupBean) {
+		ExpressionExpressionEvaluate eev = new ExpressionExpressionEvaluate();
+		boolean expressionEvaluate = true;
 		String expression = null;
 		ExpressionBean expressionBean = null;
 		ArrayList<PropertyBean> propertyBeans = null;
@@ -272,16 +274,20 @@ public class OpenRosaXmlGenerator {
 				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 					expressionBean = ruleActionBean.getRuleSetRule().getRuleBean().getExpression();
+					expressionEvaluate = ruleActionBean.getExpressionEvaluatesTo();
 					logger.info("    ExpressionBean:   " + expressionBean.getValue());
 					if (expression != null) {
 						expression = expression + " and " + expressionBean.getValue();
+						
 					} else {
 						expression = expressionBean.getValue();
 					}
 				}
 			}
 		}
-		return expression;
+		eev.setExpressionEvaluate(expressionEvaluate);
+		eev.setExpression(expression);
+		return eev;
 	}
 
 	/**
@@ -295,6 +301,7 @@ public class OpenRosaXmlGenerator {
 	 */
 	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section,
 			WidgetFactory factory, ArrayList<Bind> bindList) throws Exception {
+		boolean expressionEvaluate=true;
 		igmdao = new ItemGroupMetadataDAO(dataSource);
 		List<ItemGroupMetadataBean> itemGroupMetadata = igmdao.findMetaByGroupAndSection(itemGroupBean.getId(), crfVersion.getId(),
 				section.getId());
@@ -315,9 +322,12 @@ public class OpenRosaXmlGenerator {
 		group.setRef(nodeset);
 		repeat.setNodeset(nodeset);
 		String groupExpression = null;
-		groupExpression = getSkipPattern(null, itemGroupBean);
+		
+		ExpressionExpressionEvaluate eev = getSkipPattern(null, itemGroupBean);
+		groupExpression = eev.getExpression();
+		expressionEvaluate = eev.isExpressionEvaluate();
 		if (groupExpression != null)
-			groupExpression = getFullExpressionToParse(groupExpression, crfVersion);
+			groupExpression = getFullExpressionToParse(groupExpression, crfVersion , expressionEvaluate);
 
 		setGroupWidget(section, crfVersion, groupExpression, bindList, factory, itemGroupBean, group, repeat, isGroupRepeating, groupHeader);
 
@@ -346,6 +356,7 @@ public class OpenRosaXmlGenerator {
 	 * @throws Exception
 	 */
 	private Integer mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
+		boolean expressionEvaluate=true;
 		int sectionCount = 0;
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
@@ -367,7 +378,11 @@ public class OpenRosaXmlGenerator {
 			int count = 0;
 			if (groupBeans.size() > 0) {
 				for (ItemGroupBean groupBean : groupBeans) {
-					String expr = getSkipPattern(null, groupBean);
+					
+					ExpressionExpressionEvaluate eev = getSkipPattern(null, groupBean);
+					String expr = eev.getExpression();
+					expressionEvaluate=eev.isExpressionEvaluate();
+					
 					if (expr != null) {
 						if (sectionExpression != null) {
 							sectionExpression = sectionExpression + " and " + expr;
@@ -380,7 +395,7 @@ public class OpenRosaXmlGenerator {
 				}
 
 				if (sectionExpression != null && groupBeans.size() == count) {
-					sectionExpression = getFullExpressionToParse(sectionExpression, crfVersion);
+					sectionExpression = getFullExpressionToParse(sectionExpression, crfVersion,expressionEvaluate);
 				} else {
 					sectionExpression = null;
 				}
@@ -410,10 +425,12 @@ public class OpenRosaXmlGenerator {
 					boolean isItemRequired = itemFormMetadataBean.isRequired();
 					String responseLayout = itemFormMetadataBean.getResponseLayout();
 					String itemExpression = null;
-					itemExpression = getSkipPattern(item, itemGroupBean);
+					ExpressionExpressionEvaluate eev = getSkipPattern(item, itemGroupBean);
+					itemExpression = eev.getExpression();
+					expressionEvaluate= eev.isExpressionEvaluate();
 
 					if (itemExpression != null)
-						itemExpression = getFullExpressionToParse(itemExpression, crfVersion);
+						itemExpression = getFullExpressionToParse(itemExpression, crfVersion,expressionEvaluate);
 
 					// Add the Item Header
 					setHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group);
@@ -560,18 +577,10 @@ public class OpenRosaXmlGenerator {
 	 * @param version
 	 * @return
 	 */
-	private String getFullExpressionToParse(String expression, CRFVersionBean version) throws Exception {
+	private String getFullExpressionToParse(String expression, CRFVersionBean version, boolean expressionEvaluates) throws Exception {
 		String result = "";
 		expression = " " + expression;
 		expression = expression.replaceAll("\\(", "\\( ");
-		expression = expression.replaceAll(" eq ", " = ");
-		expression = expression.replaceAll(" ct ", " = "); // convert contains
-															// into equal
-		expression = expression.replaceAll(" ne ", " != ");
-		expression = expression.replaceAll(" gt ", " > ");
-		expression = expression.replaceAll(" gte ", " >= ");
-		expression = expression.replaceAll(" lt ", " < ");
-		expression = expression.replaceAll(" lte ", " <= ");
 		expression = expression.replaceAll("_CURRENT_DATE", " today() ");
 		/*
 		 * today() function returns date and time and will not work with 'eq'
@@ -580,6 +589,32 @@ public class OpenRosaXmlGenerator {
 		expression = expression.replaceAll(" I_", " ../I_");
 		expression = expression.replaceAll("\\S*/I_", " ../I_");
 
+//		if (expressionEvaluates){
+		expression = expression.replaceAll(" eq ", " = ");
+		expression = expression.replaceAll(" ct ", " = "); // convert contains 
+		expression = expression.replaceAll(" ne ", " != ");
+		expression = expression.replaceAll(" gt ", " > ");
+		expression = expression.replaceAll(" gte ", " >= ");
+		expression = expression.replaceAll(" lt ", " < ");
+		expression = expression.replaceAll(" lte ", " <= ");
+		
+	/*	}else{
+			
+		expression = expression.replaceAll(" and ", "___and___");
+		expression = expression.replaceAll(" or ", "___or___");
+
+		expression = expression.replaceAll("___and___", " or ");
+		expression = expression.replaceAll("___or___", " and ");
+
+		expression = expression.replaceAll(" eq ", " != ");
+		expression = expression.replaceAll(" ct ", " != "); 
+		expression = expression.replaceAll(" ne ", " = ");
+		expression = expression.replaceAll(" gt ", " <= ");
+		expression = expression.replaceAll(" gte ", " < ");
+		expression = expression.replaceAll(" lt ", " >= ");
+		expression = expression.replaceAll(" lte ", " > ");
+		}
+*/
 		/*
 		 * This statement will remove all (SE_ , F_, IG_) entities and will
 		 * leave only Item_Oid entities. And will neglect the whole path
