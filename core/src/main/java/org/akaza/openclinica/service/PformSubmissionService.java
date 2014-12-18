@@ -658,9 +658,7 @@ public class PformSubmissionService {
 											} else {
 												itemDataBeanList.add(itemDataBean);
 											}
-
 										}
-
 									}
 								}
 							}
@@ -683,7 +681,6 @@ public class PformSubmissionService {
 								// to Completed
 
 							}
-
 							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
 							// Study Event status
 							// update
@@ -692,12 +689,11 @@ public class PformSubmissionService {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
 							} else {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-
 							}
+							ArrayList<Integer> ruleList = new ArrayList<Integer>();
 							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-								setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1);
+								setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
 							}
-
 							setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
 
 						}
@@ -709,10 +705,9 @@ public class PformSubmissionService {
 	}
 
 	@SuppressWarnings("null")
-	private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+	private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean,
+			ArrayList<Integer> ruleList) {
 		iddao = new ItemDataDAO(ds);
-		ArrayList<Integer> ruleList = new ArrayList<Integer>();
-
 		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
 		ArrayList<PropertyBean> propertyBeans = null;
 		propertyBeans = getGroupPropertyBean(itemBean.getOid());
@@ -725,8 +720,7 @@ public class PformSubmissionService {
 					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
 					// Add a method to insert dyn_item_group_metadata table
 					// with records
-					if (ruleList.size() == 0 || !ruleList.contains(ruleBean.getId())) {
-
+					if (!ruleList.contains(ruleBean.getId())) {
 						ruleList.add(ruleBean.getId());
 						getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
 					}
