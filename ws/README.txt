@@ -17,7 +17,7 @@ This is OpenClinica release ${project.version}.
 
 Please check the following URL for the latest release notes:
 
-https://docs.openclinica.com/release-notes/release-notes-openclinica-3.2
+https://docs.openclinica.com/release-notes/
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 
