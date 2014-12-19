@@ -278,7 +278,7 @@ public class OpenRosaXmlGenerator {
 					logger.info("    ExpressionBean:   " + expressionBean.getValue());
 					if (expression != null) {
 						expression = expression + " and " + expressionBean.getValue();
-						
+
 					} else {
 						expression = expressionBean.getValue();
 					}
@@ -301,7 +301,7 @@ public class OpenRosaXmlGenerator {
 	 */
 	private HashMap<String, Object> getGroupInfo(ItemGroupBean itemGroupBean, CRFVersionBean crfVersion, SectionBean section,
 			WidgetFactory factory, ArrayList<Bind> bindList) throws Exception {
-		boolean expressionEvaluate=true;
+		boolean expressionEvaluate = true;
 		igmdao = new ItemGroupMetadataDAO(dataSource);
 		List<ItemGroupMetadataBean> itemGroupMetadata = igmdao.findMetaByGroupAndSection(itemGroupBean.getId(), crfVersion.getId(),
 				section.getId());
@@ -322,12 +322,12 @@ public class OpenRosaXmlGenerator {
 		group.setRef(nodeset);
 		repeat.setNodeset(nodeset);
 		String groupExpression = null;
-		
+
 		ExpressionExpressionEvaluate eev = getSkipPattern(null, itemGroupBean);
 		groupExpression = eev.getExpression();
 		expressionEvaluate = eev.isExpressionEvaluate();
 		if (groupExpression != null)
-			groupExpression = getFullExpressionToParse(groupExpression, crfVersion , expressionEvaluate);
+			groupExpression = getFullExpressionToParse(groupExpression, crfVersion, expressionEvaluate);
 
 		setGroupWidget(section, crfVersion, groupExpression, bindList, factory, itemGroupBean, group, repeat, isGroupRepeating, groupHeader);
 
@@ -356,7 +356,7 @@ public class OpenRosaXmlGenerator {
 	 * @throws Exception
 	 */
 	private Integer mapBeansToDTO(Html html, CRFBean crf, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
-		boolean expressionEvaluate=true;
+		boolean expressionEvaluate = true;
 		int sectionCount = 0;
 		ItemFormMetadataBean itemFormMetadataBean = null;
 		Body body = html.getBody();
@@ -378,11 +378,11 @@ public class OpenRosaXmlGenerator {
 			int count = 0;
 			if (groupBeans.size() > 0) {
 				for (ItemGroupBean groupBean : groupBeans) {
-					
+
 					ExpressionExpressionEvaluate eev = getSkipPattern(null, groupBean);
 					String expr = eev.getExpression();
-					expressionEvaluate=eev.isExpressionEvaluate();
-					
+					expressionEvaluate = eev.isExpressionEvaluate();
+
 					if (expr != null) {
 						if (sectionExpression != null) {
 							sectionExpression = sectionExpression + " and " + expr;
@@ -395,7 +395,7 @@ public class OpenRosaXmlGenerator {
 				}
 
 				if (sectionExpression != null && groupBeans.size() == count) {
-					sectionExpression = getFullExpressionToParse(sectionExpression, crfVersion,expressionEvaluate);
+					sectionExpression = getFullExpressionToParse(sectionExpression, crfVersion, expressionEvaluate);
 				} else {
 					sectionExpression = null;
 				}
@@ -427,15 +427,17 @@ public class OpenRosaXmlGenerator {
 					String itemExpression = null;
 					ExpressionExpressionEvaluate eev = getSkipPattern(item, itemGroupBean);
 					itemExpression = eev.getExpression();
-					expressionEvaluate= eev.isExpressionEvaluate();
+					expressionEvaluate = eev.isExpressionEvaluate();
 
 					if (itemExpression != null)
-						itemExpression = getFullExpressionToParse(itemExpression, crfVersion,expressionEvaluate);
+						itemExpression = getFullExpressionToParse(itemExpression, crfVersion, expressionEvaluate);
 
 					// Add the Item Header
-					setHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group);
+					setHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group,
+							itemExpression);
 					// Add the Item SubHeader
-					setSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group);
+					setSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group,
+							itemExpression);
 					// Add the Item itself
 					setItemWidget(item, responseTypeId, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat,
 							group, isItemRequired, responseLayout, itemExpression);
@@ -589,32 +591,14 @@ public class OpenRosaXmlGenerator {
 		expression = expression.replaceAll(" I_", " ../I_");
 		expression = expression.replaceAll("\\S*/I_", " ../I_");
 
-//		if (expressionEvaluates){
 		expression = expression.replaceAll(" eq ", " = ");
-		expression = expression.replaceAll(" ct ", " = "); // convert contains 
+		expression = expression.replaceAll(" ct ", " = "); // convert contains
 		expression = expression.replaceAll(" ne ", " != ");
 		expression = expression.replaceAll(" gt ", " > ");
 		expression = expression.replaceAll(" gte ", " >= ");
 		expression = expression.replaceAll(" lt ", " < ");
 		expression = expression.replaceAll(" lte ", " <= ");
-		
-	/*	}else{
-			
-		expression = expression.replaceAll(" and ", "___and___");
-		expression = expression.replaceAll(" or ", "___or___");
 
-		expression = expression.replaceAll("___and___", " or ");
-		expression = expression.replaceAll("___or___", " and ");
-
-		expression = expression.replaceAll(" eq ", " != ");
-		expression = expression.replaceAll(" ct ", " != "); 
-		expression = expression.replaceAll(" ne ", " = ");
-		expression = expression.replaceAll(" gt ", " <= ");
-		expression = expression.replaceAll(" gte ", " < ");
-		expression = expression.replaceAll(" lt ", " >= ");
-		expression = expression.replaceAll(" lte ", " > ");
-		}
-*/
 		/*
 		 * This statement will remove all (SE_ , F_, IG_) entities and will
 		 * leave only Item_Oid entities. And will neglect the whole path
@@ -647,8 +631,8 @@ public class OpenRosaXmlGenerator {
 	 * @param group
 	 */
 	private void setHeaderWidget(ItemBean item, ItemFormMetadataBean itemFormMetadataBean, ItemGroupBean itemGroupBean,
-			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group) {
-		Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group, String itemExpression) {
+		Widget headerWidget = factory.getHeaderWidget(item, itemFormMetadataBean, itemGroupBean, itemExpression);
 		if (headerWidget != null) {
 			bindList.add(headerWidget.getBinding());
 			if (isGroupRepeating)
@@ -672,8 +656,8 @@ public class OpenRosaXmlGenerator {
 	 * @param group
 	 */
 	private void setSubHeaderWidget(ItemBean item, ItemFormMetadataBean itemFormMetadataBean, ItemGroupBean itemGroupBean,
-			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group) {
-		Widget subHeaderWidget = factory.getSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean);
+			ArrayList<Bind> bindList, WidgetFactory factory, boolean isGroupRepeating, Repeat repeat, Group group, String itemExpression) {
+		Widget subHeaderWidget = factory.getSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean, itemExpression);
 		if (subHeaderWidget != null) {
 			bindList.add(subHeaderWidget.getBinding());
 			if (isGroupRepeating)

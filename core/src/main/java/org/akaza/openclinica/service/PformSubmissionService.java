@@ -718,12 +718,7 @@ public class PformSubmissionService {
 				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-					// Add a method to insert dyn_item_group_metadata table
-					// with records
-					if (!ruleList.contains(ruleBean.getId())) {
-						ruleList.add(ruleBean.getId());
-						getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
-					}
+					getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
 				}
 
 			}
@@ -746,8 +741,6 @@ public class PformSubmissionService {
 					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 					if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 						ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-						// Add a method to insert dyn_item_group_metadata table
-						// with records
 						if (ruleList.size() == 0 || !ruleList.contains(ruleBean.getId())) {
 
 							ruleList.add(ruleBean.getId());
