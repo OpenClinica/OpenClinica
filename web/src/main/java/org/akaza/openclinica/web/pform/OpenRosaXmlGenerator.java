@@ -599,6 +599,10 @@ public class OpenRosaXmlGenerator {
 		expression = expression.replaceAll(" lt ", " < ");
 		expression = expression.replaceAll(" lte ", " <= ");
 
+		if (expressionEvaluates==false){
+			expression  = "not(" + expression +")";
+		}
+		
 		/*
 		 * This statement will remove all (SE_ , F_, IG_) entities and will
 		 * leave only Item_Oid entities. And will neglect the whole path
