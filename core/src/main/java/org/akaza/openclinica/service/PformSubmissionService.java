@@ -660,8 +660,11 @@ public class PformSubmissionService {
 											}
 										}
 									}
+
 								}
 							}
+
+
 						}
 
 						if (!errors.hasErrors()) {

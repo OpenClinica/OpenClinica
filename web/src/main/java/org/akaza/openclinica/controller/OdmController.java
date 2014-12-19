@@ -86,18 +86,18 @@ public class OdmController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectId}/events", method = RequestMethod.GET)
-	public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId)
+	@RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
+	public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid)
 			throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-		return getODM(studyOid, studySubjectId);
+		return getODM(studyOid, studySubjectOid);
 	}
 
 	private ODM getODM(String studyOID, String subjectKey) {
-		ODM odm = new ODM();
-		String ssId = subjectKey;
-		if (ssId == null) {
+        ODM odm = new ODM();
+		String ssoid = subjectKey;
+		if (ssoid == null) {
 			return null;
 		}
 
@@ -111,14 +111,12 @@ public class OdmController {
 		List<ODMcomplexTypeDefinitionFormData> formDatas = new ArrayList<>();
 		try {
 			// Retrieve crfs for next event
-			StudyBean study = studyDAO.findByOid(studyOID);
-			StudySubjectBean studySubjectBean = studySubjectDAO.findByLabelAndStudy(ssId,study);
-			if (studySubjectBean!=null && studySubjectBean.getId()!=0){
-			
-			StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(studySubjectBean.getOid());
+			StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
 			logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 			ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
 			List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
+			StudyBean study = studyDAO.findByOid(studyOID);
+			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
 
 			// Only return info for CRFs that are not started, completed, or started but do not have any
 			// saved item data associated with them.
@@ -136,19 +134,19 @@ public class OdmController {
 				}
 				if (!itemDataExists && validStatus)
 				{
-					String formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, studySubjectBean.getOid());
+					String formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
 					formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));				
 				}
-			
 			}
 			return createOdm(study, studySubjectBean, nextEvent, formDatas);
-			
-			}	
+
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 			logger.debug(ExceptionUtils.getStackTrace(e));
 		}
+
 		return odm;
+
 	}
 
 	private StudyEventDefinitionBean getStudyEventDefinitionBean(int ID) {
