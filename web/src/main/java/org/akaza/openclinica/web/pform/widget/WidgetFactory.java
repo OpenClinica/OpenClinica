@@ -100,7 +100,7 @@ public class WidgetFactory {
 
 	}
 
-	public Widget getHeaderWidget(ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup) {
+	public Widget getHeaderWidget(ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup , String expression) {
 		int widgetType = itemMetaData.getResponseSet().getResponseType().getId();
 
 		switch (widgetType) {
@@ -111,7 +111,7 @@ public class WidgetFactory {
 		case TYPE_CHECKBOX:
 		case TYPE_TEXTAREA:
 			if (itemMetaData.getHeader() != null && !itemMetaData.getHeader().equals(""))
-				return new HeaderWidget(version, item, itemMetaData, itemGroup, null);
+				return new HeaderWidget(version, item, itemMetaData, itemGroup, null,expression);
 			else {
 				log.debug("No header found for widget: " + widgetType + ". Skipping.");
 				return null;
@@ -144,7 +144,7 @@ public class WidgetFactory {
 		}
 	}
 
-	public Widget getSubHeaderWidget(ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup) {
+	public Widget getSubHeaderWidget(ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup , String expression) {
 		int widgetType = itemMetaData.getResponseSet().getResponseType().getId();
 
 		switch (widgetType) {
@@ -155,7 +155,7 @@ public class WidgetFactory {
 		case TYPE_CHECKBOX:
 		case TYPE_TEXTAREA:
 			if (itemMetaData.getSubHeader() != null && !itemMetaData.getSubHeader().equals(""))
-				return new SubHeaderWidget(version, item, itemMetaData, itemGroup, null);
+				return new SubHeaderWidget(version, item, itemMetaData, itemGroup, null,expression);
 			else {
 				log.debug("No SubHeader found for widget: " + widgetType + ". Skipping.");
 				return null;
