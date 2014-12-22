@@ -732,7 +732,6 @@ public class PformSubmissionService {
 	private void setDynItemGroupMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean) {
 		igdao = new ItemGroupDAO(ds);
 		ArrayList<Integer> ruleList = new ArrayList<Integer>();
-		RuleBean ruleBean;
 		ArrayList<ItemGroupBean> itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersionBean.getId());
 		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
 			ArrayList<PropertyBean> propertyBeans = null;
@@ -743,12 +742,7 @@ public class PformSubmissionService {
 					logger.info("property bean oid:   " + propertyBean.getOid());
 					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 					if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-						ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-						if (ruleList.size() == 0 || !ruleList.contains(ruleBean.getId())) {
-
-							ruleList.add(ruleBean.getId());
 							getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
-						}
 					}
 				}
 			}
