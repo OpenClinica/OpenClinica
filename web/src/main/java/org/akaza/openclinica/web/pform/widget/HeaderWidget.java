@@ -15,16 +15,18 @@ public class HeaderWidget extends BaseWidget {
 	private ItemGroupBean itemGroup = null;
 	private CRFVersionBean version = null;
 	private String appearance = null;
+	private String expression = null;
 
-	public HeaderWidget(CRFVersionBean version, ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup, String appearance)
-	{
+	public HeaderWidget(CRFVersionBean version, ItemBean item, ItemFormMetadataBean itemMetaData, ItemGroupBean itemGroup,
+			String appearance, String expression) {
 		this.item = item;
 		this.itemMetaData = itemMetaData;
 		this.itemGroup = itemGroup;
 		this.version = version;
 		this.appearance = appearance;
+		this.expression = expression;
 	}
-	
+
 	@Override
 	public UserControl getUserControl() {
 		Input input = new Input();
@@ -41,6 +43,11 @@ public class HeaderWidget extends BaseWidget {
 		binding.setNodeSet("/" + version.getOid() + "/" + itemGroup.getOid() + "/" + item.getOid() + ".HEADER");
 		binding.setType("string");
 		binding.setReadOnly("true()");
+		String relevant = null;
+		relevant = expression;
+		if (relevant != null)
+			binding.setRelevant(relevant);
+
 		return binding;
 	}
 
