@@ -474,6 +474,7 @@ public class OpenRosaXmlGenerator {
 		Element crfElement = doc.createElement(crfVersion.getOid());
 		crfElement.setAttribute("id", crfVersion.getOid());
 		doc.appendChild(crfElement);
+		crfElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:jr", "http://openrosa.org/javarosa");
 
 		for (SectionBean section : crfSections) {
 			Element sectionSubTitle = doc.createElement("SECTION_" + section.getId() + ".SUBTITLE");
@@ -492,6 +493,7 @@ public class OpenRosaXmlGenerator {
 
 			Element groupElement = doc.createElement(itemGroupBean.getOid());
 			groupElement.setTextContent(repeatGroupMin);
+			groupElement.setAttribute("jr:template", "");
 			crfElement.appendChild(groupElement);
 
 			idao = new ItemDAO(dataSource);
@@ -583,7 +585,7 @@ public class OpenRosaXmlGenerator {
 		String result = "";
 		expression = " " + expression;
 		expression = expression.replaceAll("\\(", "\\( ");
-		expression = expression.replaceAll("_CURRENT_DATE", " today() ");
+		expression = expression.replaceAll("_CURRENT_DATE", " format-date(today(), \"%Y-%n-%e\") ");
 		/*
 		 * today() function returns date and time and will not work with 'eq'
 		 * operator. But it will work with 'gt' or 'lt' operators
@@ -598,6 +600,10 @@ public class OpenRosaXmlGenerator {
 		expression = expression.replaceAll(" gte ", " >= ");
 		expression = expression.replaceAll(" lt ", " < ");
 		expression = expression.replaceAll(" lte ", " <= ");
+
+		if (expressionEvaluates == false) {
+			expression = "not(" + expression + ")";
+		}
 
 		/*
 		 * This statement will remove all (SE_ , F_, IG_) entities and will
