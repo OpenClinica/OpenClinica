@@ -51,6 +51,7 @@ public class PformValidator implements Validator {
 					Integer.valueOf(value);
 				} catch (NumberFormatException nfe) {
 					e.reject("value.invalid.Integer");
+					logger.info(value +"  ***value.invalid.INTEGER***");
 				}
 				break;
 			}
@@ -59,6 +60,7 @@ public class PformValidator implements Validator {
 					Float.valueOf(value);
 				} catch (NumberFormatException nfe) {
 					e.reject("value.invalid.float");
+					logger.info(value +"   ***value.invalid.REAL***");
 				}
 				break;
 			}
@@ -66,6 +68,7 @@ public class PformValidator implements Validator {
 				if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value)) {
 					System.out.print(" Error");
 					e.reject("value.invalid.date");
+					logger.info(value +"   ***value.invalid.DATE***");
 				}
 				break;
 			}
@@ -73,6 +76,7 @@ public class PformValidator implements Validator {
 				if (!ExpressionTreeHelper.isDateyyyyMMddDashes(value) && !ExpressionTreeHelper.isDateyyyyMMDashes(value)
 						&& !ExpressionTreeHelper.isDateyyyyDashes(value)) {
 					e.reject("value.invalid.pdate");
+					logger.info(value +"  ***value.invalid.PDATE***");
 				}
 				break;
 			}

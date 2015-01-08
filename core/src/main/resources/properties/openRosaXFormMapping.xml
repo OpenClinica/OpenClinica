@@ -148,6 +148,9 @@
         <field name="usercontrol" type="org.akaza.openclinica.web.pform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />
        </field>
+                <field name="ref" type="string">
+            <bind-xml name="ref" node="attribute" />
+        </field>
         
     </class>
 
@@ -177,6 +180,10 @@
         <field name="group" type="org.akaza.openclinica.web.pform.dto.Group" collection="arraylist">
             <bind-xml name="group" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>  
+                <field name="ref" type="string">
+            <bind-xml name="ref" node="attribute" />
+        </field>
+        
     </class>
     
     <class name="org.akaza.openclinica.web.pform.dto.Item">
