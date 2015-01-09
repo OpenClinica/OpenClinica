@@ -95,6 +95,11 @@ public class CoreResources implements ResourceLoaderAware {
 	public Properties getPropValues(Properties prop, String propFileName) throws IOException {
 //		System.out.println(propFileName);
         
+		String x = String.format("getPropValues: Loading config from (if it exists): %s", propFileName);
+		// As the logger configuration is within the config file this should be printed to stderr so that results go to catalina.out
+		//logger.error(x);
+		System.err.println(x); 
+
 		prop = new Properties();
 		File file = new File(propFileName);
            if (!file.exists()) return null;

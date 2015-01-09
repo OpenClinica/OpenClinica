@@ -16,6 +16,9 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.ResourceLoaderAware;
@@ -31,16 +34,28 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
 
     private static final long serialVersionUID = -5730668649244361127L;
 
+    protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.QueryStore");
+    
     private DataSource dataSource;
 
     private ResourceLoader resourceLoader;
 
     private final Map<String, Properties> fileByName = new HashMap<String, Properties>();
 
+    private final void debugPropMap() {
+    	logger.debug("SQL QueryStore debugPropMap dump start");
+    	for (Map.Entry<String, Properties> entry : fileByName.entrySet()) {
+    		for (Map.Entry<Object, Object> prop : entry.getValue().entrySet() ) {
+    			logger.debug(String.format("fileByName %s : %s = %s\n", entry.getKey(), prop.getKey().toString(), prop.getValue().toString()));
+    		}
+    	}
+    	logger.debug("SQL QueryStore debugPropMap dump complete");
+    }
+
     public void init() {
         String dbFolder = resolveDbFolder();
-        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
         try {
+            PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
             Resource resources[] = resourceResolver.getResources("classpath:queries/" + dbFolder + "/**/*.properties");
             for (Resource r : resources) {
                 Properties p = new Properties();
@@ -85,8 +100,12 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
                 return "oracle";
             }
             throw new BeanInitializationException("Unrecognized JDBC url " + url);
+       	// } catch (java.sql.SQLException e) { // org.apache.commons.dbcp.SQLNestedException is deprecated, but extends SQLException
+      	// 	throw e;
         } catch (SQLException e) {
-            throw new BeanInitializationException("Unable to read datasource information", e);
+        	debugPropMap();
+        	logger.error("SQL %d : %s\n", e.getErrorCode(), e.getSQLState());
+        	throw new BeanInitializationException("Unable to read datasource information", e);
         }
     }
 
