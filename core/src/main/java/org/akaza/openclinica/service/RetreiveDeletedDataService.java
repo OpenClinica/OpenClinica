@@ -122,7 +122,7 @@ public class RetreiveDeletedDataService {
 
 	@SuppressWarnings("null")
 	public void retrieveProcess(Integer studyEventId) throws IllegalArgumentException, IllegalAccessException {
-
+       System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - ");
 		AuditLogEvent auditLog = new AuditLogEvent();
 		AuditLogEventType auditLogEventType = new AuditLogEventType();
 		auditLogEventType.setAuditLogEventTypeId(13);
@@ -152,11 +152,11 @@ public class RetreiveDeletedDataService {
 					+ "  studyEventId:  " + studyEventId);
 		}
 
-		if (auditLogEvents != null) {
+		if (auditLogEvents.size()!=0) {
 			ArrayList<Integer> listOfCrfIds = new ArrayList<Integer>();
 			for (AuditLogEvent auditEvent : auditLogEvents) {
 
-				if (listOfCrfIds == null) {
+				if (listOfCrfIds.size() == 0) {
 					listOfCrfIds.add(auditEvent.getCrfId());
 				} else if (!listOfCrfIds.contains(auditEvent.getCrfId())) {
 					listOfCrfIds.add(auditEvent.getCrfId());
@@ -198,7 +198,7 @@ public class RetreiveDeletedDataService {
 				}
 
 			}
-		}
+		}else{ System.out.println("No Deleted Crfs has been detected...");}
 	}
 
 	// Loop List of item_data records AL table that requires to be updated its
@@ -214,11 +214,13 @@ public class RetreiveDeletedDataService {
 				ale1.setAuditTable("item_data");
 				ArrayList<AuditLogEvent> listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated = getAuditLogEventDao()
 						.findByParamForEventCrf(ale1);
+				if (listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated.size()!=0)
 				updateEventCrfIdsInALEventCrfFieldandSetRepeatKeyTo1(listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated, eCrfBean,ecId);
 
 				ale1.setAuditTable("event_crf");
 				ArrayList<AuditLogEvent> listOfEntityIdRecordsInAuditLogTableToBeUpdated = getAuditLogEventDao().findByParamForEventCrf(
 						ale1);
+				if (listOfEntityIdRecordsInAuditLogTableToBeUpdated.size()!=0)
 				updateEventCrfIdsInALEntityIdField(listOfEntityIdRecordsInAuditLogTableToBeUpdated, eCrfBean, ecId);
 
 			}
@@ -233,8 +235,8 @@ public class RetreiveDeletedDataService {
 			if (eventCRFBean.getId() != ecId) {
 				ale.setEntityId(eventCRFBean.getId());
 				getAuditLogEventDao().saveOrUpdate(ale);
-				System.out.println("Updating EventCRF Ids in Entity Id field of AL");
-			}
+				System.out.println("Updating EventCRF Ids in Entity Id field of AL " + eventCRFBean.getId());
+			}else{	System.out.println("No Updates to Entity Id field of AL for eventCrfId= " + ecId );}
 		}
 
 	}
@@ -248,8 +250,8 @@ public class RetreiveDeletedDataService {
 				if (ale.getItemDataRepeat() == null)
 					ale.setItemDataRepeat(1);
 				getAuditLogEventDao().saveOrUpdate(ale);
-				System.out.println("Updating EventCRF Ids in Event_crf field,also setting repeat key number to 1 for null values");
-			}
+				System.out.println("Updating EventCRF Ids in Event_crf field  " + eventCRFBean.getId());
+			}else{	System.out.println("No Updates to Event_CRF and repeat # field of AL for eventCrfId= " + ecId );}
 		}
 	}
 
@@ -273,7 +275,7 @@ public class RetreiveDeletedDataService {
 		ecBean.setUpdatedDate(new Date());
 		ecBean = (EventCRFBean) ecdao.create(ecBean);
 		logger.debug("*********CREATED EVENT CRF");
-		System.out.println("Saving a new EventCRF record in Event CRF TAble ");
+		System.out.println("Saving a new EventCRF record in Event CRF TAble with event_crf_id = " + ecBean.getId());
 
 		return ecBean;
 	}
