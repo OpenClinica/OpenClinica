@@ -121,6 +121,12 @@
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
     
+    <bean id="RetreiveDeletedDataService" class="org.akaza.openclinica.service.RetreiveDeletedDataService" autowire="byName">
+      <constructor-arg ref="dataSource"/>
+       <constructor-arg ref="auditLogEventDaoDomain"/>
+    </bean>
+
+    
     <!-- 
 <bean id="expressionBeanService" class="org.akaza.openclinica.service.rule.expression.ExpressionBeanService" autowire="byName">
      
