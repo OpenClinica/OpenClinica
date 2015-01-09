@@ -64,7 +64,6 @@
 			WHERE (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0) AND
 			dn.discrepancy_note_id
 			= totals.parent_dn_id;
-			ALTER TABLE view_dn_stats OWNER TO clinica;
 			--------------------------------------------------------------------
 			-- View: dn_age_days
 			-- DROP VIEW dn_age_days;
@@ -93,7 +92,6 @@
 			END AS age
 			FROM discrepancy_note dn
 			WHERE dn.parent_dn_id IS NULL;
-			ALTER TABLE dn_age_days OWNER TO clinica;
 			--------------------------------------------------------------------
 			-- View: view_dn_item_data
 			-- DROP VIEW view_dn_item_data;
@@ -144,7 +142,6 @@
 			JOIN study s ON ss.study_id = s.study_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
 			WHERE map.study_subject_id = ss.study_subject_id;
-			ALTER TABLE view_dn_item_data OWNER TO clinica;
 			-----------------------------------------------------------------
 			-- View: view_dn_event_crf
 			-- DROP VIEW view_dn_event_crf;
@@ -200,7 +197,6 @@
 			JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
 			JOIN study s ON ss.study_id = s.study_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id;
-			ALTER TABLE view_dn_event_crf OWNER TO clinica;
 			--------------------------------------------------------------------
 			-- View: view_dn_study_event
 			-- DROP VIEW view_dn_study_event;
@@ -240,7 +236,6 @@
 			JOIN study_event_definition sed ON se.study_event_definition_id =
 			sed.study_event_definition_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id;
-			ALTER TABLE view_dn_study_event OWNER TO clinica;
 			---------------------------------------------------------------------
 			-- View: view_dn_study_subject
 			-- DROP VIEW view_dn_study_subject;
@@ -271,7 +266,6 @@
 			JOIN study_subject ss ON map.study_subject_id = ss.study_subject_id
 			JOIN study s ON ss.study_id = s.study_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id;
-			ALTER TABLE view_dn_study_subject OWNER TO clinica;
 			-----------------------------------------------------------------
 			-- View: view_dn_subject
 			-- DROP VIEW view_dn_subject;
@@ -309,7 +303,6 @@
 			JOIN study_subject ss ON su.subject_id = ss.subject_id
 			JOIN study s ON ss.study_id = s.study_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id;
-			ALTER TABLE view_dn_subject OWNER TO clinica;
 			--------------------------------------------------------------------
 			-- View: view_site_hidden_event_definition_crf
 			-- DROP VIEW view_site_hidden_event_definition_crf;
@@ -326,7 +319,6 @@
 			WHERE event_definition_crf.parent_id IS NOT NULL OR
 			event_definition_crf.parent_id != 0))
 			JOIN crf_version cv ON edc.crf_id = cv.crf_id;
-			ALTER TABLE view_site_hidden_event_definition_crf OWNER TO clinica;
 			---------------------------------------------------------------
 			-- View: view_study_hidden_event_definition_crf
 			-- DROP VIEW view_study_hidden_event_definition_crf;
@@ -338,7 +330,6 @@
 			JOIN study_event se ON edc.study_event_definition_id =
 			se.study_event_definition_id AND edc.parent_id IS NULL
 			JOIN crf_version cv ON edc.crf_id = cv.crf_id;
-			ALTER TABLE view_study_hidden_event_definition_crf OWNER TO clinica;
 			-----------------------------------------------------------
 			-- View: view_discrepancy_note
 			-- DROP VIEW view_discrepancy_note;
@@ -452,7 +443,6 @@
 			view_dn_subject.owner_first_name, view_dn_subject.owner_last_name,
 			view_dn_subject.owner_user_name
 			FROM view_dn_subject;
-			ALTER TABLE view_discrepancy_note OWNER TO clinica;
 		</sql>
 		<rollback>
 			<sql></sql>
