@@ -91,7 +91,7 @@ import org.xml.sax.InputSource;
  * @author joekeremian
  *
  */
-public class RetreiveDeletedDataService {
+public class RetrieveDeletedDataService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -108,10 +108,10 @@ public class RetreiveDeletedDataService {
 	AuthoritiesDao authoritiesDao;
 	AuditLogEventDao auditLogEventDao;
 
-	public RetreiveDeletedDataService() {
+	public RetrieveDeletedDataService() {
 	}
 
-	public RetreiveDeletedDataService(DataSource ds, AuditLogEventDao auditLogEventDao) {
+	public RetrieveDeletedDataService(DataSource ds, AuditLogEventDao auditLogEventDao) {
 		this.ds = ds;
 		this.auditLogEventDao = auditLogEventDao;
 	}
