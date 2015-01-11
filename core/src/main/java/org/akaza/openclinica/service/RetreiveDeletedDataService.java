@@ -4,8 +4,10 @@ import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.lang.reflect.Field;
 
@@ -254,18 +256,31 @@ public class RetreiveDeletedDataService {
 	}
 
 	private void insertItemDataRecordsInItemDataTable(ArrayList<AuditLogEvent> ales, Integer crfId, Integer createrOrOwnerUserId, Integer updaterUserId) {
+		//Collections.sort
+		
+		ArrayList <ItemDataBean> idBeans = new ArrayList();
 		for (AuditLogEvent ale : ales) {
 			idao = new ItemDAO(ds);
 			ItemBean iBean = (ItemBean) idao.findByNameAndCRFId(ale.getEntityName(), crfId);
 			ItemDataBean itemDataBean = buildItemDataBean(ale.getItemDataRepeat(), ale.getEventCrfId(), iBean.getId(), createrOrOwnerUserId);
-			iddao = new ItemDataDAO(ds);
-			iddao.create(itemDataBean);
-			ItemDataBean itemDataBean2 = updateItemDataBean(itemDataBean, updaterUserId);
-			iddao.update(itemDataBean2);
-
-			System.out.println("Inserting Item Data record in Item Data Table " + itemDataBean.getId());
-
+		    idBeans.add(itemDataBean);   
 		}
+			// Sort ItemDataBean List by item_id and ordinal
+            sortList(idBeans);		
+		
+		for (ItemDataBean idBean : idBeans){
+			iddao = new ItemDataDAO(ds);
+			iddao.create(idBean);
+			System.out.println("Inserting Item Data record in Item Data Table " + idBean.getId());
+		}
+
+		for (ItemDataBean idBean : idBeans){
+			updateItemDataBean(idBean, updaterUserId);
+			iddao = new ItemDataDAO(ds);
+			iddao.update(idBean);
+		}
+
+
 	}
 
 	// method#4 update event_crf_Ids in entity_id column in Audit Log table
@@ -433,4 +448,27 @@ public class RetreiveDeletedDataService {
 		this.auditLogEventDao = auditLogEventDao;
 	}
 
-}
+	@SuppressWarnings("unchecked")
+	private void sortList(ArrayList<ItemDataBean> idBeans) {
+
+	    Collections.sort(idBeans, new Comparator() {
+
+	        public int compare(Object o1, Object o2) {
+
+	            Integer x1 = ((ItemDataBean) o1).getItemId();
+	            Integer x2 = ((ItemDataBean) o2).getItemId();
+	            int sComp = x1.compareTo(x2);
+
+	            if (sComp != 0) {
+	               return sComp;
+	            } else {
+	                x1 = ((ItemDataBean) o1).getOrdinal();
+	                x2 = ((ItemDataBean) o2).getOrdinal();
+	               return x1.compareTo(x2);
+	            }
+	            }
+	    });
+	}
+
+	}
+
