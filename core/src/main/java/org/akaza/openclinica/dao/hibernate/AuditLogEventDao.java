@@ -63,7 +63,7 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 				
 				if (auditLogEvent.getAuditTable()!=null)
 				query = query + " do.auditTable =:audit_table and " ;
-				query = query + " do.eventCrfId =:eventCrfId";
+				query = query + " do.eventCrfId =:eventCrfId order by auditDate";
 		org.hibernate.Query q = getCurrentSession().createQuery(query);
 
 		q.setString( "audit_table", auditLogEvent.getAuditTable());
@@ -72,4 +72,21 @@ public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 		return (T) q.list();
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T findByParamForItemData(String audit_table ,Integer eventCrfId) {
+		getSessionFactory().getStatistics().logSummary();
+		
+		String query = "Select do.eventCrfId, do.entityName ,do.itemDataRepeat from "
+				+ getDomainClassName()
+				+ " do  where do.auditTable =:audit_table and do.eventCrfId =:eventCrfId GROUP BY do.eventCrfId, do.entityName ,do.itemDataRepeat";
+		org.hibernate.Query q = getCurrentSession().createQuery(query);
+
+		q.setInteger( "eventCrfId", eventCrfId);
+		q.setString( "audit_table", audit_table);
+
+		return (T) q.list();
+	}
+
+
+	
 }

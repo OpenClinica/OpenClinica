@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -61,6 +62,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.apache.log4j.spi.ErrorCode;
 import org.slf4j.Logger;
@@ -92,24 +94,16 @@ public class RetreiveDeletedDataService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	DataSource ds;
-	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
-	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 
 	EventDefinitionCRFDAO edcdao;
 	UserAccountDAO udao;
-	StudyDAO sdao;
-	StudyEventDefinitionDAO seddao;
-	StudySubjectDAO ssdao;
 	StudyEventDAO sedao;
 	EventCRFDAO ecdao;
 	CRFVersionDAO cvdao;
 	CRFDAO cdao;
 	ItemDataDAO iddao;
 	ItemDAO idao;
-	ItemFormMetadataDAO ifmdao;
 	AuthoritiesDao authoritiesDao;
-	ItemGroupDAO igdao;
-	ItemGroupMetadataDAO igmdao;
 	AuditLogEventDao auditLogEventDao;
 
 	public RetreiveDeletedDataService() {
@@ -120,39 +114,17 @@ public class RetreiveDeletedDataService {
 		this.auditLogEventDao = auditLogEventDao;
 	}
 
+	// start point
+
 	@SuppressWarnings("null")
 	public void retrieveProcess(Integer studyEventId) throws IllegalArgumentException, IllegalAccessException {
-       System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-		AuditLogEvent auditLog = new AuditLogEvent();
-		AuditLogEventType auditLogEventType = new AuditLogEventType();
-		auditLogEventType.setAuditLogEventTypeId(13);
-		auditLog.setAuditLogEventType(auditLogEventType);
-		auditLog.setStudyEventId(studyEventId);
-		auditLog.setAuditTable("item_data");
-		ArrayList<Object> objects = (ArrayList<Object>) getAuditLogEventDao().findByParam(auditLog);
+		System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - ");
 
-		ArrayList<AuditLogEvent> auditLogEvents = new ArrayList<AuditLogEvent>();
-		AuditLogEvent auditLogEvent;
+		AuditLogEvent auditLogEvent = prepareForAGroupList(studyEventId);
+		ArrayList<Object> crfObjects = (ArrayList<Object>) getAuditLogEventDao().findByParam(auditLogEvent);
+		ArrayList<AuditLogEvent> auditLogEvents = parseCrfObjects(crfObjects, studyEventId);
 
-		for (Object obj : objects) {
-			Object[] row = (Object[]) obj;
-			int eventCrfId = Integer.valueOf(row[0].toString());
-			int eventCrfVersionId = Integer.valueOf(row[1].toString());
-			cdao = new CRFDAO(ds);
-			int crfId = cdao.findByVersionId(eventCrfVersionId).getId();
-
-			auditLogEvent = new AuditLogEvent();
-			auditLogEvent.setEventCrfId(eventCrfId);
-			auditLogEvent.setEventCrfVersionId(eventCrfVersionId);
-			auditLogEvent.setCrfId(crfId);
-			auditLogEvent.setStudyEventId(studyEventId);
-
-			auditLogEvents.add(auditLogEvent);
-			System.out.println("eventCrfId: " + eventCrfId + "  eventCrfVersionId: " + eventCrfVersionId + "  crfId:  " + crfId
-					+ "  studyEventId:  " + studyEventId);
-		}
-
-		if (auditLogEvents.size()!=0) {
+		if (auditLogEvents.size() != 0) {
 			ArrayList<Integer> listOfCrfIds = new ArrayList<Integer>();
 			for (AuditLogEvent auditEvent : auditLogEvents) {
 
@@ -162,10 +134,7 @@ public class RetreiveDeletedDataService {
 					listOfCrfIds.add(auditEvent.getCrfId());
 				}
 			}
-			System.out.println("List of CRF ID count:  " + listOfCrfIds.size());
-			for (Integer individualCrfId : listOfCrfIds) {
-				System.out.println("CRF ID in the List of CRFs  " + individualCrfId);
-			}
+			System.out.println("List of CRF_ID count:  " + listOfCrfIds.size());
 
 			sedao = new StudyEventDAO(ds);
 			StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(studyEventId);
@@ -183,75 +152,151 @@ public class RetreiveDeletedDataService {
 					ecdao = new EventCRFDAO(ds);
 					EventCRFBean eventCRFBean = ecdao.findByEventCrfVersion(studyEventBean, crfVersionBean);
 					if (eventCRFBean != null) {
-						System.out.println("For crfId= " + crfId + "  crfVersionId = " + crfVersionBean.getId()
-								+ "    Event CRF exists in EventCRF Table " + eventCRFBean.getId() + "  for crfVersionId= "
-								+ eventCRFBean.getCRFVersionId());
+						System.out.println("For crfId= " + crfId + "  cv= " + crfVersionBean.getId() + "    Event CRF exists in eCRF Table: ecId= " + eventCRFBean.getId());
 
-						loopListOfALRecords(auditLogEvents, eventCRFBean, crfId);
+						// update AL item_data records)
+						loopListOfALRecords(auditLogEvents, eventCRFBean, crfId, null, null);
+
 						break;
 					} else if (eventCRFBean == null && crfVersionsCount == count) {
 						System.out.println("For crfId= " + crfId + "    Event CRF does not exist");
-						EventCRFBean eventCRF = createEventCRF(crfVersionBean, studyEventBean, userAccountBean);
-						loopListOfALRecords(auditLogEvents, eventCRF, crfId);
+						// EventCRFBean eventCRF =
+						// createEventCRF(crfVersionBean, studyEventBean,
+						// userAccountBean);
+						loopListOfALRecords(auditLogEvents, null, crfId, crfVersionBean, studyEventBean);
 
+						// update AL item_data records
 					}
 				}
-
 			}
-		}else{ System.out.println("No Deleted Crfs has been detected...");}
+		} else {
+			System.out.println("No Deleted Crfs has been detected...");
+		}
 	}
 
 	// Loop List of item_data records AL table that requires to be updated its
 	// fields
-	private void loopListOfALRecords(ArrayList<AuditLogEvent> auditLogEvents, EventCRFBean eCrfBean, Integer crfId) {
+	private void loopListOfALRecords(ArrayList<AuditLogEvent> auditLogEvents, EventCRFBean eCrfBean, Integer crfId, CRFVersionBean crfVersionBean, StudyEventBean studyEventBean) {
+		Integer createrOrOwnerUserId = 1;
+		Integer updaterUserId = 1;
 
 		for (AuditLogEvent ale : auditLogEvents) {
 			if (ale.getCrfId() == crfId) {
-				AuditLogEvent ale1 = new AuditLogEvent();
-				Integer ecId = ale.getEventCrfId();
-				ale1.setEventCrfId(ecId);
 
-				ale1.setAuditTable("item_data");
-				ArrayList<AuditLogEvent> listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated = getAuditLogEventDao()
-						.findByParamForEventCrf(ale1);
-				if (listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated.size()!=0)
-				updateEventCrfIdsInALEventCrfFieldandSetRepeatKeyTo1(listOfEventCrfIdandRepeatKeyRecordsInAuditLogToBeUpdated, eCrfBean,ecId);
+				ale.setAuditTable("item_data");
+				ArrayList<AuditLogEvent> listOfEventCrfRecordsInAuditLogToBeUpdated = getAuditLogEventDao().findByParamForEventCrf(ale);
+				if (listOfEventCrfRecordsInAuditLogToBeUpdated.size() != 0) {
+					int listSize = listOfEventCrfRecordsInAuditLogToBeUpdated.size();
+					createrOrOwnerUserId = listOfEventCrfRecordsInAuditLogToBeUpdated.get(0).getUserAccount().getUserId();
+					updaterUserId = listOfEventCrfRecordsInAuditLogToBeUpdated.get(listSize - 1).getUserAccount().getUserId();
+					udao = new UserAccountDAO(ds);
+					UserAccountBean uBean = (UserAccountBean) udao.findByPK(createrOrOwnerUserId);
+					// create New Event_CRF record in Event_crf Table if it does not exist
+					if (eCrfBean == null)
+						eCrfBean = createEventCRF(crfVersionBean, studyEventBean, uBean);
+					updateEventCrfIdsInAL(listOfEventCrfRecordsInAuditLogToBeUpdated, eCrfBean, ale.getEventCrfId());
 
-				ale1.setAuditTable("event_crf");
-				ArrayList<AuditLogEvent> listOfEntityIdRecordsInAuditLogTableToBeUpdated = getAuditLogEventDao().findByParamForEventCrf(
-						ale1);
-				if (listOfEntityIdRecordsInAuditLogTableToBeUpdated.size()!=0)
-				updateEventCrfIdsInALEntityIdField(listOfEntityIdRecordsInAuditLogTableToBeUpdated, eCrfBean, ecId);
-
+					ale.setAuditTable("event_crf");
+					ArrayList<AuditLogEvent> listOfEntityIdInALToBeUpdated = getAuditLogEventDao().findByParamForEventCrf(ale);
+					if (listOfEntityIdInALToBeUpdated.size() != 0)
+						updateEntityIdInAL(listOfEntityIdInALToBeUpdated, eCrfBean, ale.getEventCrfId());
+				}
 			}
 		}
 
+		// Check ItemData Table for available records
+		iddao = new ItemDataDAO(ds);
+		ArrayList<ItemDataBean> listOfitemDataBeans = iddao.findAllByEventCRFId(eCrfBean.getId());
+		ArrayList<Object> itemObjects = (ArrayList<Object>) getAuditLogEventDao().findByParamForItemData("item_data", eCrfBean.getId());
+		ArrayList<AuditLogEvent> uniqueListOfItemRecordsInAL = parseItemObjects(itemObjects);
+
+		for (AuditLogEvent itemRecordInAL : uniqueListOfItemRecordsInAL) {
+			if (listOfitemDataBeans.size() != 0) {
+				idao = new ItemDAO(ds);
+				ItemBean iBean = (ItemBean) idao.findByNameAndCRFId(itemRecordInAL.getEntityName(), crfId);
+
+				for (ItemDataBean itemDataBean : listOfitemDataBeans) {
+
+					if (itemRecordInAL.getEventCrfId() == itemDataBean.getEventCRFId() && iBean.getId() == itemDataBean.getItemId() && itemRecordInAL.getItemDataRepeat() == itemDataBean.getOrdinal()) {
+						uniqueListOfItemRecordsInAL.remove(itemRecordInAL);
+					}
+				}
+			}
+		}
+
+		insertItemDataRecordsInItemDataTable(uniqueListOfItemRecordsInAL, crfId, createrOrOwnerUserId, updaterUserId);
+
+		// Update ItemData Ids in AL Table getting its values from ItemData item_data_id
+		ArrayList<ItemDataBean> listOfitemDataBeansAfterInsert = iddao.findAllByEventCRFId(eCrfBean.getId());
+
+		AuditLogEvent auditEvent = new AuditLogEvent();
+		auditEvent.setAuditTable("item_data");
+		auditEvent.setEventCrfId(eCrfBean.getId());
+		ArrayList<AuditLogEvent> auditEventList = null;
+		ArrayList<AuditLogEvent> listOfItemRecordsInAL = getAuditLogEventDao().findByParamForEventCrf(auditEvent);
+		updaterUserId = listOfItemRecordsInAL.get(listOfItemRecordsInAL.size() - 1).getUserAccount().getUserId();
+
+		idao = new ItemDAO(ds);
+
+		for (ItemDataBean itemDataBean : listOfitemDataBeansAfterInsert) {
+			for (AuditLogEvent itemRecordInAL : listOfItemRecordsInAL) {
+				ItemBean iBean = (ItemBean) idao.findByNameAndCRFId(itemRecordInAL.getEntityName(), crfId);
+				if (itemRecordInAL.getEventCrfId() == itemDataBean.getEventCRFId() && iBean.getId() == itemDataBean.getItemId() && itemRecordInAL.getItemDataRepeat() == itemDataBean.getOrdinal()) {
+					// update AL
+					itemRecordInAL.setEntityId(itemDataBean.getId());
+					getAuditLogEventDao().saveOrUpdate(itemRecordInAL);
+					System.out.println("Updating ItemData Ids in  AL ");
+				}
+			}
+		}
+
+		updateEventCRF(eCrfBean, updaterUserId);
+	}
+
+	private void insertItemDataRecordsInItemDataTable(ArrayList<AuditLogEvent> ales, Integer crfId, Integer createrOrOwnerUserId, Integer updaterUserId) {
+		for (AuditLogEvent ale : ales) {
+			idao = new ItemDAO(ds);
+			ItemBean iBean = (ItemBean) idao.findByNameAndCRFId(ale.getEntityName(), crfId);
+			ItemDataBean itemDataBean = buildItemDataBean(ale.getItemDataRepeat(), ale.getEventCrfId(), iBean.getId(), createrOrOwnerUserId);
+			iddao = new ItemDataDAO(ds);
+			iddao.create(itemDataBean);
+			ItemDataBean itemDataBean2 = updateItemDataBean(itemDataBean, updaterUserId);
+			iddao.update(itemDataBean2);
+
+			System.out.println("Inserting Item Data record in Item Data Table " + itemDataBean.getId());
+
+		}
 	}
 
 	// method#4 update event_crf_Ids in entity_id column in Audit Log table
 	// where audit_table=event_crf
-	private void updateEventCrfIdsInALEntityIdField(ArrayList<AuditLogEvent> ales, EventCRFBean eventCRFBean, Integer ecId) {
+	private void updateEntityIdInAL(ArrayList<AuditLogEvent> ales, EventCRFBean eventCRFBean, Integer ecId) {
 		for (AuditLogEvent ale : ales) {
 			if (eventCRFBean.getId() != ecId) {
 				ale.setEntityId(eventCRFBean.getId());
+				ale.setEventCrfId(eventCRFBean.getId());
 				getAuditLogEventDao().saveOrUpdate(ale);
 				System.out.println("Updating EventCRF Ids in Entity Id field of AL " + eventCRFBean.getId());
-			}else{	System.out.println("No Updates to Entity Id field of AL for eventCrfId= " + ecId );}
+			} else {
+				System.out.println("No Updates to Entity Id field of AL for eventCrfId= " + ecId);
+			}
 		}
 
 	}
 
 	// method#1 update event_crf_Ids in Audit Log table also set repeat key to 1
 	// for null values where audit_table =item_data
-	private void updateEventCrfIdsInALEventCrfFieldandSetRepeatKeyTo1(ArrayList<AuditLogEvent> ales, EventCRFBean eventCRFBean, Integer ecId) {
+	private void updateEventCrfIdsInAL(ArrayList<AuditLogEvent> ales, EventCRFBean eventCRFBean, Integer ecId) {
 		for (AuditLogEvent ale : ales) {
 			if (eventCRFBean.getId() != ecId) {
 				ale.setEventCrfId(eventCRFBean.getId());
 				if (ale.getItemDataRepeat() == null)
 					ale.setItemDataRepeat(1);
 				getAuditLogEventDao().saveOrUpdate(ale);
-				System.out.println("Updating EventCRF Ids in Event_crf field  " + eventCRFBean.getId());
-			}else{	System.out.println("No Updates to Event_CRF and repeat # field of AL for eventCrfId= " + ecId );}
+				System.out.println("Updating EventCRF Ids in Event_crf field of AL Table " + ale.getEventCrfId() + "  To  " + eventCRFBean.getId());
+			} else {
+				System.out.println("No Updates to Event_CRF and repeat # field of AL for eventCrfId= " + ecId);
+			}
 		}
 	}
 
@@ -260,7 +305,7 @@ public class RetreiveDeletedDataService {
 
 		EventCRFBean ecBean = new EventCRFBean();
 		ecBean.setAnnotations("");
-		ecBean.setCreatedDate(new Date());
+		// ecBean.setCreatedDate(new Date());
 		ecBean.setCRFVersionId(crfVersionBean.getId());
 		ecBean.setInterviewerName("");
 		ecBean.setDateInterviewed(null);
@@ -271,8 +316,8 @@ public class RetreiveDeletedDataService {
 		ecBean.setStudyEventId(studyEventBean.getId());
 		ecBean.setValidateString("");
 		ecBean.setValidatorAnnotations("");
-		ecBean.setUpdater(userAccountBean);
-		ecBean.setUpdatedDate(new Date());
+		// ecBean.setUpdater(userAccountBean);
+		// ecBean.setUpdatedDate(new Date());
 		ecBean = (EventCRFBean) ecdao.create(ecBean);
 		logger.debug("*********CREATED EVENT CRF");
 		System.out.println("Saving a new EventCRF record in Event CRF TAble with event_crf_id = " + ecBean.getId());
@@ -280,47 +325,104 @@ public class RetreiveDeletedDataService {
 		return ecBean;
 	}
 
-	private UserAccountBean getUserAccount(String userName) {
-		udao = new UserAccountDAO(ds);
-		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(userName);
-		return userAccountBean;
-	}
+	private EventCRFBean updateEventCRF(EventCRFBean ecBean, Integer updaterUserId) {
 
-	private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status, StudyBean studyBean,
-			StudySubjectBean studySubjectBean) {
-		// seBean.setUpdater(getUserAccount(getInputUsername(studyBean,
-		// studySubjectBean)));
-		seBean.setUpdatedDate(new Date());
-		seBean.setSubjectEventStatus(status);
-		seBean = (StudyEventBean) sedao.update(seBean);
-		logger.debug("*********UPDATED STUDY EVENT ");
-		return seBean;
-	}
-
-	private EventCRFBean updateEventCRF(EventCRFBean ecBean, StudyBean studyBean, StudySubjectBean studySubjectBean) {
-		String inputUsername = ""; // getInputUsername(studyBean,
-									// studySubjectBean);
-		ecBean.setUpdater(getUserAccount(inputUsername));
-		ecBean.setUpdatedDate(new Date());
-		ecBean.setStatus(Status.UNAVAILABLE);
+		UserAccountBean uBean = new UserAccountBean();
+		uBean.setId(updaterUserId);
+		ecBean.setUpdater(uBean);
+		ecBean.setOldStatus(ecBean.getStatus());
+		System.out.println("Updating Event CRF Updater User_id");
 		ecBean = (EventCRFBean) ecdao.update(ecBean);
+
 		logger.debug("*********UPDATED EVENT CRF");
 		return ecBean;
 	}
 
-	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean,
-			StudyBean studyBean, StudySubjectBean studySubjectBean) {
-		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
-		ItemDataBean itemDataBean = new ItemDataBean();
-		itemDataBean.setItemId(itemBean.getId());
-		itemDataBean.setEventCRFId(eventCrfBean.getId());
-		itemDataBean.setValue(itemValue);
-		itemDataBean.setCreatedDate(new Date());
-		itemDataBean.setStatus(Status.UNAVAILABLE);
-		itemDataBean.setOrdinal(itemOrdinal);
-		// itemDataBean.setOwner(getUserAccount(getInputUsername(studyBean,
-		// studySubjectBean)));
+	private ItemDataBean updateItemDataBean(ItemDataBean itemDataBean, Integer updaterUserId) {
+
+		UserAccountBean uBean = new UserAccountBean();
+
+		uBean.setId(updaterUserId);
+		itemDataBean.setUpdater(uBean);
+
+		itemDataBean.setOldStatus(itemDataBean.getStatus());
+		System.out.println("  Updating Item Data  updater User_Id");
+
 		return itemDataBean;
+	}
+
+	private ItemDataBean buildItemDataBean(Integer itemRepeatKey, Integer eventCrfId, Integer itemId, Integer createrOrOwnerUserId) {
+
+		ItemDataBean itemDataBean = new ItemDataBean();
+		UserAccountBean uBean = new UserAccountBean();
+
+		uBean.setId(createrOrOwnerUserId);
+		itemDataBean.setOwner(uBean);
+
+		itemDataBean.setUpdater(uBean);
+
+		itemDataBean.setItemId(itemId);
+		itemDataBean.setEventCRFId(eventCrfId);
+		itemDataBean.setValue("");
+		itemDataBean.setCreatedDate(new Date());
+		itemDataBean.setStatus(Status.AVAILABLE);
+		itemDataBean.setOrdinal(itemRepeatKey);
+
+		return itemDataBean;
+	}
+
+	private ArrayList<AuditLogEvent> parseCrfObjects(ArrayList<Object> crfObjects, Integer studyEventId) {
+		ArrayList<AuditLogEvent> auditLogEvents = new ArrayList<AuditLogEvent>();
+		AuditLogEvent auditLogEvent;
+
+		for (Object obj : crfObjects) {
+			Object[] row = (Object[]) obj;
+			int eventCrfId = Integer.valueOf(row[0].toString());
+			int eventCrfVersionId = Integer.valueOf(row[1].toString());
+			cdao = new CRFDAO(ds);
+			int crfId = cdao.findByVersionId(eventCrfVersionId).getId();
+
+			auditLogEvent = new AuditLogEvent();
+			auditLogEvent.setEventCrfId(eventCrfId);
+			auditLogEvent.setEventCrfVersionId(eventCrfVersionId);
+			auditLogEvent.setCrfId(crfId);
+			auditLogEvent.setStudyEventId(studyEventId);
+
+			auditLogEvents.add(auditLogEvent);
+			System.out.println("eventCrfId: " + eventCrfId + "  eventCrfVersionId: " + eventCrfVersionId + "  crfId:  " + crfId + "  studyEventId:  " + studyEventId);
+		}
+		return auditLogEvents;
+	}
+
+	private ArrayList<AuditLogEvent> parseItemObjects(ArrayList<Object> itemObjects) {
+		ArrayList<AuditLogEvent> auditLogEvents = new ArrayList<AuditLogEvent>();
+		AuditLogEvent auditLogEvent;
+
+		for (Object obj : itemObjects) {
+			Object[] row = (Object[]) obj;
+			int eventCrfId = Integer.valueOf(row[0].toString());
+			String entityName = row[1].toString();
+			int itemDataRepeat = Integer.valueOf(row[2].toString());
+
+			auditLogEvent = new AuditLogEvent();
+			auditLogEvent.setEventCrfId(eventCrfId);
+			auditLogEvent.setEntityName(entityName);
+			auditLogEvent.setItemDataRepeat(itemDataRepeat);
+
+			auditLogEvents.add(auditLogEvent);
+			System.out.println("eventCrfId: " + eventCrfId + "  entityName: " + entityName + "  itemDataRepeat:  " + itemDataRepeat);
+		}
+		return auditLogEvents;
+	}
+
+	private AuditLogEvent prepareForAGroupList(Integer studyEventId) {
+		AuditLogEvent auditLogEvent = new AuditLogEvent();
+		AuditLogEventType auditLogEventType = new AuditLogEventType();
+		auditLogEventType.setAuditLogEventTypeId(13);
+		auditLogEvent.setAuditLogEventType(auditLogEventType);
+		auditLogEvent.setStudyEventId(studyEventId);
+		auditLogEvent.setAuditTable("item_data");
+		return auditLogEvent;
 	}
 
 	public AuditLogEventDao getAuditLogEventDao() {
