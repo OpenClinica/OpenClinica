@@ -156,18 +156,13 @@ public class RetrieveDeletedDataService {
 					if (eventCRFBean != null) {
 						System.out.println("For crfId= " + crfId + "  cv= " + crfVersionBean.getId() + "    Event CRF exists in eCRF Table: ecId= " + eventCRFBean.getId());
 
-						// update AL item_data records)
 						loopListOfALRecords(auditLogEvents, eventCRFBean, crfId, null, null);
 
 						break;
 					} else if (eventCRFBean == null && crfVersionsCount == count) {
 						System.out.println("For crfId= " + crfId + "    Event CRF does not exist");
-						// EventCRFBean eventCRF =
-						// createEventCRF(crfVersionBean, studyEventBean,
-						// userAccountBean);
 						loopListOfALRecords(auditLogEvents, null, crfId, crfVersionBean, studyEventBean);
 
-						// update AL item_data records
 					}
 				}
 			}
@@ -211,8 +206,9 @@ public class RetrieveDeletedDataService {
 		ArrayList<ItemDataBean> listOfitemDataBeans = iddao.findAllByEventCRFId(eCrfBean.getId());
 		ArrayList<Object> itemObjects = (ArrayList<Object>) getAuditLogEventDao().findByParamForItemData("item_data", eCrfBean.getId());
 		ArrayList<AuditLogEvent> uniqueListOfItemRecordsInAL = parseItemObjects(itemObjects);
-
-		for (AuditLogEvent itemRecordInAL : uniqueListOfItemRecordsInAL) {
+        ArrayList <AuditLogEvent> listToRemoveFromUniqueList = new ArrayList();
+		
+        for (AuditLogEvent itemRecordInAL : uniqueListOfItemRecordsInAL) {
 			if (listOfitemDataBeans.size() != 0) {
 				idao = new ItemDAO(ds);
 				ItemBean iBean = (ItemBean) idao.findByNameAndCRFId(itemRecordInAL.getEntityName(), crfId);
@@ -220,12 +216,12 @@ public class RetrieveDeletedDataService {
 				for (ItemDataBean itemDataBean : listOfitemDataBeans) {
 
 					if (itemRecordInAL.getEventCrfId() == itemDataBean.getEventCRFId() && iBean.getId() == itemDataBean.getItemId() && itemRecordInAL.getItemDataRepeat() == itemDataBean.getOrdinal()) {
-						uniqueListOfItemRecordsInAL.remove(itemRecordInAL);
+						listToRemoveFromUniqueList.add(itemRecordInAL);
 					}
 				}
 			}
 		}
-
+        uniqueListOfItemRecordsInAL.removeAll(listToRemoveFromUniqueList);
 		insertItemDataRecordsInItemDataTable(uniqueListOfItemRecordsInAL, crfId, createrOrOwnerUserId, updaterUserId);
 
 		// Update ItemData Ids in AL Table getting its values from ItemData item_data_id

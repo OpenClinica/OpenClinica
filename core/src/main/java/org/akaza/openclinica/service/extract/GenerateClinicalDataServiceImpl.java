@@ -348,7 +348,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				Integer parentStudyId =0;
 				if(ss.getStudy()!=null)
 				{
-					parentStudyId= ss.getStudy().getStudy().getStudyId();
+		//			parentStudyId= ss.getStudy().getStudy().getStudyId();
+					parentStudyId= ss.getStudy().getStudyId();
 				
 				}
 				

@@ -169,7 +169,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append(nls);
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
           
-                        sortImportItemDataBeanList(items);
+                       sortImportItemDataBeanList(items);
                         
                         for (ImportItemDataBean item : items) {
 
