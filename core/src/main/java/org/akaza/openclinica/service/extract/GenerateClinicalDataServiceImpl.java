@@ -274,11 +274,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(
-			StudySubject ss,List<StudyEvent>studyEvents,String formVersionOID) {
+			StudySubject ss,List<StudyEvent>sEvents,String formVersionOID) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
-
+           
+		  
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		for (StudyEvent se : studyEvents) {
+		for (StudyEvent se : ss.getStudyEvents()) {
 			if(se!=null){
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			
