@@ -181,7 +181,7 @@ public class PformSubmissionService {
 		createdUserAccountBean.addUserType(type);
 
 		createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
-		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
+//		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
 		return userAccountBean;
 	}
 
