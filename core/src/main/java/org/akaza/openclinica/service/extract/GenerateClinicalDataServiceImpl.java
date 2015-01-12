@@ -494,6 +494,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 				for (ItemGroupMetadata itemGrpMetada : allItemsInAGroup) {
 					itemOID = itemGrpMetada.getItem().getOcOid();
+					int itemId =itemGrpMetada.getItem().getItemId();
 					itemsValues = new ArrayList<String>();
 				/*	List<ItemData> itds = itemGrpMetada.getItem()
 							.getItemDatas();*/
@@ -509,7 +510,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						itemDataValue = fetchItemDataValue(itemData,
 								itemData.getItem());
 						itemDatas =  new ArrayList<ItemData>();
-						itemValue = itemOID + DELIMITER + itemDataValue;
+						itemValue = itemOID + DELIMITER+itemId+DELIMITER + itemDataValue;
 						itemsValues.add(itemValue);
 						groupOIDOrdnl = groupOID + GROUPOID_ORDINAL_DELIM
 								+ itemData.getOrdinal();
@@ -572,9 +573,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				for (String value : vals) {
 					ImportItemDataBean iiDataBean = new ImportItemDataBean();
 					int index = value.indexOf(DELIMITER);
+					int index2 = value.indexOf(DELIMITER, index+1);
 					if (!value.trim().equalsIgnoreCase(DELIMITER)) {
 						iiDataBean.setItemOID(value.substring(0, index));
-						iiDataBean.setValue(value.substring(index + 1,
+						iiDataBean.setItemId(Integer.valueOf(value.substring(index+1, index2)));
+						iiDataBean.setValue(value.substring(index2 + 1,
 								value.length()));
 						if(isCollectAudits()||isCollectDns()){
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID),iiDataBean);

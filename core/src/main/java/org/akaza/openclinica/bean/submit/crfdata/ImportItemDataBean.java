@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
 
 public class ImportItemDataBean {
     private String itemOID;
+    private Integer itemId;
     private String transactionType;
     private String value;
     private String isNull; // boolean, tbh?
@@ -87,4 +88,13 @@ public class ImportItemDataBean {
     public void setHasValueWithNull(boolean hasValueWithNull) {
         this.hasValueWithNull = hasValueWithNull;
     }
+
+	public Integer getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Integer itemId) {		
+		this.itemId = itemId;
+	}
+    
 }

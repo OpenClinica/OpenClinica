@@ -2244,6 +2244,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
                         itprev = key;
                         ImportItemDataBean it = new ImportItemDataBean();
                         it.setItemOID(itOID);
+                        it.setItemId(itId);
                         it.setTransactionType("Insert");
                         String nullKey = study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
                         if (ClinicalDataUtil.isNull(itValue, nullKey, nullValueCVs)) {

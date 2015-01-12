@@ -587,11 +587,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
 	        public int compare(Object o1, Object o2) {
 
-	              String  i1 = ((ImportItemDataBean) o1).getItemOID();
-	              String  i2 = ((ImportItemDataBean) o2).getItemOID();
-
-	         //     Integer  i1 = ((ImportItemDataBean) o1).getItemId();
-	         //     Integer  i2 = ((ImportItemDataBean) o2).getItemId();
+	              Integer  i1 = ((ImportItemDataBean) o1).getItemId();
+	              Integer  i2 = ((ImportItemDataBean) o2).getItemId();
 
 	               return i1.compareTo(i2);
 	            }
