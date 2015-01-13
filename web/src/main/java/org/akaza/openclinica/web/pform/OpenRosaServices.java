@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
@@ -63,7 +65,7 @@ public class OpenRosaServices {
     
 	@GET
 	@Path("/{studyOID}/formList")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.TEXT_XML)
 	public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, @QueryParam("formID") String crfOID,
 			@RequestHeader("Authorization") String authorization) {
@@ -116,15 +118,15 @@ public class OpenRosaServices {
 			cal.setTime(currentDate);
 			SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
 			format.setCalendar(cal);
+			response.setHeader("Content-Type", "text/xml; charset=UTF-8");
 			response.setHeader("Date", format.format(currentDate));
 			response.setHeader("X-OpenRosa-Version", "1.0");
-
 			return writer.toString();
         }
         catch (Exception e)
         {
-        	LOGGER.debug(e.getMessage());
-        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
+        	LOGGER.error(e.getMessage());
+        	LOGGER.error(ExceptionUtils.getStackTrace(e));
         	return "<Error>" + e.getMessage() + "</Error>";
         }
 	}
@@ -151,8 +153,8 @@ public class OpenRosaServices {
 		} 
 		catch (Exception e) 
 		{
-        	LOGGER.debug(e.getMessage());
-        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
+        	LOGGER.error(e.getMessage());
+        	LOGGER.error(ExceptionUtils.getStackTrace(e));
 			return "<error>" + e.getMessage() + "</error>";
 		}
 
@@ -241,9 +243,9 @@ public class OpenRosaServices {
 			
 
 		} catch (Exception e) {
-        	LOGGER.debug(e.getMessage());
+        	LOGGER.error(e.getMessage());
         	System.out.println(e.getMessage());
-        	LOGGER.debug(ExceptionUtils.getStackTrace(e));
+        	LOGGER.error(ExceptionUtils.getStackTrace(e));
 			return "<Error>" + e.getMessage() + "</Error>";
 		}
 		return output;
