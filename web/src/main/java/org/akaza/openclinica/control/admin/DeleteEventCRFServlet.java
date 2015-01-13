@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -135,13 +136,21 @@ public class DeleteEventCRFServlet extends SecureController {
                         DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) discrepancyList.get(b);
                         dnDao.deleteNotes(noteBean.getId());
                     }
+                    item.setValue("");
+                    item.setOldStatus(item.getStatus());
+                    item.setOwner(ub);
+                    item.setStatus(Status.AVAILABLE);
                     item.setUpdater(ub);
                     iddao.updateUser(item);
-                    iddao.delete(item.getId());
+                    iddao.update(item);
+                    //   iddao.delete(item.getId());
                 }
                 // delete event crf
-                ecdao.delete(eventCRF.getId());
-
+           //     ecdao.delete(eventCRF.getId());
+                eventCRF.setOldStatus(eventCRF.getStatus());
+                eventCRF.setStatus(Status.AVAILABLE);
+                eventCRF.setUpdater(ub);
+                ecdao.update(eventCRF); 
                 String emailBody =
                     respage.getString("the_event_CRF") + cb.getName() + respage.getString("has_been_deleted_from_the_event")
                         + event.getStudyEventDefinition().getName() + ".";
