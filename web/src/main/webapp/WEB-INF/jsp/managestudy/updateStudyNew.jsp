@@ -1033,15 +1033,12 @@
       <td>
         <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" onClick="togglePManage(true)" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
         <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" onClick="togglePManage(false)" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
-        <span id="pManageDiv" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> style="display: none;" </c:if> >
+        <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}">
           <c:choose>
-            <c:when test="${pmanageRegStatus==''}">
-              <a href="pages/pmanage/regSubmit?studyoid=${studyToView.oid}" onClick="registerPManage(); return false;"><fmt:message key="register" bundle="${resword}"/></a>
-            </c:when>
-            <c:when test="${pmanageRegStatus=='NULLAUTH'}">Registration Status: RECEIVED</c:when>
-            <c:otherwise>Registration Status: ${pmanageRegStatus}</c:otherwise>
+            <c:when test="${pmanageRegStatus != null && pmanageRegStatus!=''}"><fmt:message key="participant_portal_registration_status" bundle="${resword}"/>: ${pmanageRegStatus}</c:when>
+            <c:otherwise><fmt:message key="participant_portal_registration_status" bundle="${resword}"/>: <fmt:message key="participant_portal_status_notfound" bundle="${resword}"/></c:otherwise>
           </c:choose>
-        </span>
+        </c:if>
       </td>
     </tr>
   </c:if>

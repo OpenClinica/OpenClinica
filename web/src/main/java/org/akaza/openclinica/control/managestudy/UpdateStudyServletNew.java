@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -89,10 +90,13 @@ public class UpdateStudyServletNew extends SecureController {
         request.setAttribute("studyToView", study);
 
         String portalURL = CoreResources.getField("portalURL");
+        String portalStatus = study.getStudyParameterConfig().getParticipantPortal();
         request.setAttribute("portalURL", portalURL);
-        if (portalURL != null && !portalURL.equals(""))
-        	request.setAttribute("pmanageRegStatus",getPManageRegStatus(study.getOid()));
-
+        if (portalURL != null && !portalURL.equals("") && portalStatus.equals("enabled"))
+        {
+        	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+        	request.setAttribute("pmanageRegStatus",registrar.getRegistrationStatus(study.getOid()));
+        }
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
         ArrayList statuses = Status.toStudyUpdateMembersList();
@@ -148,6 +152,11 @@ public class UpdateStudyServletNew extends SecureController {
             validateStudy5(fp, new Validator(request));
             validateStudy6(fp, new Validator(request));
             confirmWholeStudy(fp);
+            if (portalStatus.equals("disabled") && fp.getString("participantPortal").equals("enabled"))
+            {
+            	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+            	registrar.registerStudy(study.getOid());
+            }
 
             request.setAttribute("studyToView", study);
             if (!errors.isEmpty()) {
@@ -658,40 +667,6 @@ public class UpdateStudyServletNew extends SecureController {
             studyParameterValueBean.setStudyId(siteBean.getId());
             updateParameter(studyParameterValueDAO, studyParameterValueBean);
         }
-
-    }
-    private String getPManageRegStatus(String studyOid) throws Exception
-    {
-		String pManageUrl = CoreResources.getField("portalURL");
-		String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-		URL eURL = new URL(pManageUrl + "/app/rest/oc/authorizations" + "?studyoid=" + studyOid + "&instanceurl=" + ocUrl);
-		HttpURLConnection con = null;
-		DataInputStream input = null;
-		String response = null;
-		try
-		{
-			con = (HttpURLConnection)eURL.openConnection();		
-			con.setConnectTimeout(5000);
-			con.setReadTimeout(5000);
-			con.setRequestMethod("GET");	
-	
-			input = new DataInputStream( con.getInputStream());
-			response = IOUtils.toString(input, "UTF-8");
-		}
-		catch (Exception e)
-		{
-			logger.error(e.getMessage());
-			logger.error(ExceptionUtils.getStackTrace(e));
-		}
-		finally{
-			input.close();
-		}
-
-		JSONArray jsonArray = JSONArray.fromObject(response);
-		if (jsonArray.size() == 0) return "";
-		JSONObject authStatus = jsonArray.getJSONObject(0).getJSONObject("authorizationStatus");
-		if (!authStatus.isNullObject()) return authStatus.getString("status");
-		else return "NULLAUTH";
 
     }
 }
