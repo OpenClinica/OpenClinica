@@ -257,5 +257,18 @@ public class OdmController {
 		return w.toString();
 	}
 
+    @RequestMapping(value = "/study/{studyOid}/user/{username}", method = RequestMethod.GET)
+    public @ResponseBody UserAccountBean getUser(@PathVariable("studyOid") String studyOid, @PathVariable("username") String username)
+            throws Exception {
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+
+        return getUserAccount(username);
+    }
+
+    private UserAccountBean getUserAccount(String username) {
+        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+        return (UserAccountBean) userAccountDao.findByUserName(username);
+    }
+
 
 }

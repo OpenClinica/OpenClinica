@@ -18,8 +18,8 @@
 			email, active_study, institutional_affiliation,
 			status_id, owner_id, date_created,
 			passwd_challenge_question, passwd_challenge_answer,
-			phone, user_type_id,run_webservices)
-			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?)</sql>
+			phone, user_type_id,run_webservices,login_name)
+			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>insertStudyUserRole</name>
@@ -38,7 +38,7 @@
 			email=?, active_study=?, institutional_affiliation=?,
 			status_id=?, update_id=?, date_updated=now(), date_lastvisit=?,
 			passwd_timestamp=?, passwd_challenge_question=?,
-			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?
+			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,login_name=?
 			where user_id=?</sql>
 	</query>
 	<query>
@@ -81,6 +81,10 @@
 	<query>
 		<name>findByUserName</name>
 		<sql>select * from user_account where user_name=?</sql>
+	</query>
+	<query>
+		<name>findByLoginName</name>
+		<sql>select * from user_account where login_name=?</sql>
 	</query>
 	<query>
 		<name>findAllRolesByUserName</name>

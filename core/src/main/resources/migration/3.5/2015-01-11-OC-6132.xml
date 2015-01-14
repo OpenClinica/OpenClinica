@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+    <changeSet author="jkeremian" id="2015-01-11-OC-6132-1">
+        <comment>Add login_name column to user Account table</comment>
+        <addColumn tableName="user_account" >
+            <column name="login_name"  type="VARCHAR(64)">
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+	<changeSet author="jkeremian" id="2015-01-11-OC-6132-2" dbms="postgresql">
+		<comment>Update user_account table by setting login name same as username</comment>
+		<sql>update user_account set login_name = user_name;
+       </sql>
+	</changeSet>
+
+</databaseChangeLog>
+    
+    
