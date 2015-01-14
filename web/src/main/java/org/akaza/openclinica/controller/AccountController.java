@@ -69,7 +69,6 @@ public class AccountController {
 	@Autowired
 	ServletContext context;
 
-
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -80,72 +79,116 @@ public class AccountController {
 	StudySubjectDAO ssdao;
 	String message;
 
-	/**
-	 *
-	 * @param studyOid
-	 * @return
-	 * @throws Exception
-	 */
-	
-
-	
-	
-	@RequestMapping(value = "/study/{studyOid}/studysubjectoid/{studySubjectOid}/fname/{fName}/lname/{lName}/mobile/{mobile}/login/{loginName}/crc/{crcUserName}", method = RequestMethod.GET)
-	public @ResponseBody UserAccountBean getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid, @PathVariable("fName") String fName,
-			@PathVariable("lName") String lName, @PathVariable("mobile") String mobile, @PathVariable("loginName") String loginName,@PathVariable("crcUserName") String crcUserName) throws Exception {
+	@RequestMapping(value = "/register/study/{studyOid}/studysubjectid/{studySubjectId}/fname/{fName}/lname/{lName}/mobile/{mobile}/login/{loginName}/crc/{crcUserName}", method = RequestMethod.GET)
+	public @ResponseBody UserAccountBean getUserAccount(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId, @PathVariable("fName") String fName,
+			@PathVariable("lName") String lName, @PathVariable("mobile") String mobile, @PathVariable("loginName") String loginName, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-  System.out.println("******************     You are in the Rest Service   *****************");
-	System.out.println(studyOid + "  " +studySubjectOid + "  "+ fName +" "+ lName );	
-  
-  
-  String userName = studyOid + "." + studySubjectOid;
+		System.out.println("******************     You are in the Rest Service   *****************");
+
 		UserAccountBean uBean = null;
 
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectOid);
-		if (studySubjectBean != null) {
+		
+		// Verify Study if Exist !!
+		StudyBean studyBean = getStudy(studyOid);
+		if (studyBean == null) {
+			logger.info("***Study  Does Not Exist ***");
+			System.out.println("***Study  Does Not Exist ***");
+			message = "Study  Does Not Exist";
+			return null;
+		}
 
-			UserAccountBean loginAccountBean = getLoginAccount(loginName);
-			if (!loginAccountBean.isActive()) {
+		
+		// Verify Study Subject Exist !!
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+		if (studySubjectBean == null || !studySubjectBean.isActive()) {
+			logger.info("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL   ***");
+			System.out.println("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL    ***");
+			message = "Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid  in the URL   ";
+			return uBean;
+		}
 
-				UserAccountBean userAccountBean = getUserAccount(userName);
+		
+		// Verify Login_Name already exist in table
+		UserAccountBean loginAccountBean = getLoginAccount(loginName);
+		if (loginAccountBean.isActive()) {
+			logger.info("***LoginName already Exist in the User Table ***");
+			System.out.println("***LoginName already Exist in the User Table ***");
+			message = "LoginName already Exist in the User Table";
+			return uBean;
+		}
 
-				if (!userAccountBean.isActive() && studySubjectBean.isActive()) {
-					uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, loginName, crcUserName);
-					createUserAccount(uBean);
-					logger.info("***New User Account is created***");
-				} else {
-					uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, loginName, crcUserName);
-					 uBean.setId(getUserAccount(uBean.getName()).getId());
-					 uBean.setUpdater(uBean.getOwner());
-					updateUserAccount(uBean);
-					logger.info("***User Account already exist in the system and is Updated ***");
-					System.out.println("***User Account already exist in the system and is Updated ***");
-				}
+		// Build pUserName
+		String studySubjectOid = studySubjectBean.getOid();
+		Integer studyId = studySubjectBean.getStudyId();
+		StudyBean study = (StudyBean) sdao.findByPK(studyId);
+		Integer pStudyId = 0;
 
-			} else {
-				logger.info("***LoginName already Exist in the User Table ***");
-				System.out.println("***LoginName already Exist in the User Table ***");
-				message = "LoginName already Exist in the User Table";
-				return uBean;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		String pUserName = study.getOid() + "." + studySubjectOid;
+		System.out.println(pUserName);
+
+
+
+		// Verify CRC_user has the appropriate role as 'data entry person'or 'data entry person 2' and have access to the specific study/site
+		// This also verifies that fact that the CRC and the Participant both have access to same study/site
+
+		boolean found = false;
+		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
+		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
+		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
+
+			System.out.println(studyUserRoleBean.getStudyId());
+			System.out.println("-------------");
+
+			System.out.println("     " + studyId);
+			System.out.println("     " + pStudyId);
+
+			System.out.println(studyUserRoleBean.getRoleName());
+			System.out.println("-------------");
+
+			if ((studyUserRoleBean.getStudyId() == studyId || studyUserRoleBean.getStudyId() == pStudyId)
+					&& (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))) {
+				found = true;
+				break;
 			}
+		}
+		if (!found) {
+			logger.info("*** CRC Does not have access to the study/site OR CRC Does not have 'Data Entry Person' role ***");
+			System.out.println("*** CRC Does not have access to the study/site  OR CRC Does not have 'Data Entry Person' role  ***");
+			message = "*** CRC Does not have access to the study/site  OR  CRC Does not have 'Data Entry Person' role   ***";
+			return uBean;
+
+		}
+
+		
+		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
+		uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, loginName, ownerUserAccount, pUserName);
+		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
+		if (!participantUserAccountBean.isActive()) {
+			createUserAccount(uBean);
+			logger.info("***New User Account is created***");
 
 		} else {
-			logger.info("***Study Subject Does Not Exist ***");
-			message = "Study Subject Does Not Exist";
-			return uBean;
+			uBean.setId(getUserAccount(uBean.getName()).getId());
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			logger.info("***User Account already exist in the system and is Updated ***");
+			System.out.println("***User Account already exist in the system and is Updated ***");
 		}
 
 		return uBean;
 	}
 
-	
-	
-	
-	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String loginName, String crcUserName) throws Exception {
-		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
+	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String loginName, UserAccountBean ownerUserAccount, String pUserName)
+			throws Exception {
+
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
 
-		createdUserAccountBean.setName(studyOid + "." + studySubjectOid);
+		createdUserAccountBean.setName(pUserName);
 		createdUserAccountBean.setFirstName(fName);
 		createdUserAccountBean.setLastName(lName);
 		createdUserAccountBean.setEmail(INPUT_EMAIL);
@@ -206,19 +249,24 @@ public class AccountController {
 		return studyBean;
 	}
 
+	private StudySubjectBean getStudySubject(String label, StudyBean study) {
+		ssdao = new StudySubjectDAO(dataSource);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByLabelAndStudy(label, study);
+		return studySubjectBean;
+	}
+
 	private StudySubjectBean getStudySubject(String oid) {
 		ssdao = new StudySubjectDAO(dataSource);
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByOid(oid);
 		return studySubjectBean;
 	}
 
-    @RequestMapping(value = "/study/{studyOid}/user/{username}", method = RequestMethod.GET)
-    public @ResponseBody UserAccountBean getUser(@PathVariable("studyOid") String studyOid, @PathVariable("username") String username)
-            throws Exception {
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+	@RequestMapping(value = "/study/{studyOid}/user/{username}", method = RequestMethod.GET)
+	public @ResponseBody UserAccountBean getUser(@PathVariable("studyOid") String studyOid, @PathVariable("username") String username) throws Exception {
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-        return getUserAccount(username);
-    }
+		return getUserAccount(username);
+	}
 
 	private String generateXmlFromObj(Class clazz, ODM odm) throws Exception {
 
