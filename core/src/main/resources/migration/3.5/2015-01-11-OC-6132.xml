@@ -8,7 +8,9 @@
     <changeSet author="jkeremian" id="2015-01-11-OC-6132-1">
         <comment>Add login_name column to user Account table</comment>
         <addColumn tableName="user_account" >
-            <column name="login_name"  type="VARCHAR(64)">
+            <column name="login_name"  type="VARCHAR(64)" defaultValue="No Text" >
+            <constraints nullable="false"/>
+
             </column>
         </addColumn>
     </changeSet>

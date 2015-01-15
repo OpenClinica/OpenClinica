@@ -30,7 +30,7 @@
     <security:intercept-url pattern="/Contact" filters="none"/>
     <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
-    <security:intercept-url pattern="/pages/accounts/register" filters="none"/>
+    <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
     <!--
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
       default-target-url='/MainMenu' always-use-default-target='true' />
