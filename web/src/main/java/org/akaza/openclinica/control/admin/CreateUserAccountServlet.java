@@ -247,7 +247,7 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setPhone("");
                 createdUserAccountBean.setOwner(ub);
                 createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-                createdUserAccountBean.setLoginName(fp.getString(INPUT_USERNAME));
+                createdUserAccountBean.setAccessCode("null");
                 
                 int studyId = fp.getInt(INPUT_STUDY);
                 Role r = Role.get(fp.getInt(INPUT_ROLE));

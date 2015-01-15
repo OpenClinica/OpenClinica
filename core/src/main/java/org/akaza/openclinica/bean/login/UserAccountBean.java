@@ -46,7 +46,7 @@ public class UserAccountBean extends AuditableEntityBean {
     private Boolean accountNonLocked;
     private Integer lockCounter;
     private Boolean runWebservices;
-    private String loginName;
+    private String accessCode;
 
     /**
      * Counts the number of times the user visited Main Menu servlet.
@@ -526,12 +526,13 @@ public class UserAccountBean extends AuditableEntityBean {
         return this.passwd.equals("*");
     }
 
-	public String getLoginName() {
-		return loginName;
+	public String getAccessCode() {
+		return accessCode;
 	}
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
+	public void setAccessCode(String accessCode) {
+		this.accessCode = accessCode;
 	}
+
 
 }

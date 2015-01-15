@@ -182,7 +182,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), uab.getAccountNonLocked());
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
-        variables.put(new Integer(19), uab.getLoginName());
+        variables.put(new Integer(19), uab.getAccessCode());
 
         variables.put(new Integer(20), new Integer(uab.getId()));
 
@@ -287,7 +287,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         }
 
         variables.put(new Integer(15), uab.getRunWebservices());
-        variables.put(new Integer(16), uab.getLoginName());
+        variables.put(new Integer(16), uab.getAccessCode());
 
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
@@ -408,7 +408,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer userTypeId = (Integer) hm.get("user_type_id");
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
-        String loginName = (String) hm.get("login_name");
+        String accessCode = (String) hm.get("access_code");
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -425,7 +425,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setAccountNonLocked(((Boolean) hm.get("account_non_locked")).booleanValue());
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
-        eb.setLoginName((String) hm.get("loginName"));
+        eb.setAccessCode((String) hm.get("access_code"));
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -447,7 +447,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setName(userName);
         eb.setPasswdChallengeQuestion(passwdChallengeQuestion);
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
-        eb.setLoginName(userName);
+        eb.setAccessCode("NoText");
 
         // pull out the roles and privs here, tbh
         ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
@@ -555,13 +555,13 @@ public class UserAccountDAO extends AuditableEntityDAO {
     }
 
 
-    public EntityBean findByLoginName(String name) {
+    public EntityBean findByAccessCode(String name) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
 
         variables.put(new Integer(1), name);
 
-        ArrayList alist = this.select(digester.getQuery("findByLoginName"), variables);
+        ArrayList alist = this.select(digester.getQuery("findByAccessCode"), variables);
         UserAccountBean eb = new UserAccountBean();
         Iterator it = alist.iterator();
         if (it.hasNext()) {

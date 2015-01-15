@@ -6,7 +6,7 @@ private String fName ;
 private String lName ;
 private String mobile;
 private String userName;
-private String loginName;
+private String accessCode;
 
 
 
@@ -34,12 +34,13 @@ public String getUserName() {
 public void setUserName(String userName) {
 	this.userName = userName;
 }
-public String getLoginName() {
-	return loginName;
+public String getAccessCode() {
+	return accessCode;
 }
-public void setLoginName(String loginName) {
-	this.loginName = loginName;
+public void setAccessCode(String accessCode) {
+	this.accessCode = accessCode;
 }
-	
+
+
 	
 }

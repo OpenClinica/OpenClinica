@@ -82,15 +82,8 @@ public class AccountController {
 	UserAccountDAO udao;
 	StudyDAO sdao;
 	StudySubjectDAO ssdao;
-	String message;
 	UserDTO uDTO;
 
-	/*
-	 * @RequestMapping(value = "/register/study/{studyOid}/studysubjectid/{studySubjectId}/fname/{fName}/lname/{lName}/mobile/{mobile}/login/{loginName}/crc/{crcUserName}", method = RequestMethod.GET)
-	 * public @ResponseBody UserAccountBean getUserInfo(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId, @PathVariable("fName") String fName,
-	 * 
-	 * @PathVariable("lName") String lName, @PathVariable("mobile") String mobile, @PathVariable("loginName") String loginName, @PathVariable("crcUserName") String crcUserName) throws Exception {
-	 */
 
 	@RequestMapping(value = "/joe", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> getUserInfo(@RequestBody HashMap<String, String> map) throws Exception {
@@ -100,7 +93,7 @@ public class AccountController {
 		String fName = map.get("fName");
 		String lName = map.get("lName");
 		String mobile = map.get("mobile");
-		String loginName = map.get("loginName");
+		String accessCode = map.get("accessCode");
 		String crcUserName = map.get("crcUserName");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
@@ -113,7 +106,6 @@ public class AccountController {
 		if (studyBean == null) {
 			logger.info("***Study  Does Not Exist ***");
 			System.out.println("***Study  Does Not Exist ***");
-			message = "Study  Does Not Exist";
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -122,7 +114,6 @@ public class AccountController {
 		if (studySubjectBean == null || !studySubjectBean.isActive()) {
 			logger.info("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL   ***");
 			System.out.println("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL    ***");
-			message = "Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid  in the URL   ";
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -130,7 +121,6 @@ public class AccountController {
 		if (fName.length() < 3) {
 			logger.info("***     First Name length is less than 2 characters    ***");
 			System.out.println("***     First Name length is less than 2 characters    ***");
-			message = "***     First Name length is less than 2 characters    ***";
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -138,16 +128,14 @@ public class AccountController {
 		if (mobile.length() == 0) {
 			logger.info("***     Phone # is a Required Field   ***");
 			System.out.println("***     Phone # is a Required Field   ***");
-			message = "***     Phone # is a Required Field   ***";
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
-		// Verify Login_Name already exist in table
-		UserAccountBean loginAccountBean = getLoginAccount(loginName);
+		// Verify Access Code already exist in table
+		UserAccountBean loginAccountBean = getAccessCodeAccount(accessCode);
 		if (loginAccountBean.isActive()) {
-			logger.info("***LoginName already Exist in the User Table ***");
-			System.out.println("***LoginName already Exist in the User Table ***");
-			message = "LoginName already Exist in the User Table";
+			logger.info("***Access Code already Exist in the User Table ***");
+			System.out.println("***Access Code already Exist in the User Table ***");
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -170,7 +158,6 @@ public class AccountController {
 		if (!ownerUserAccount.isActive()) {
 			logger.info("***  CRC user acount does not Exist in the User Table ***");
 			System.out.println("***  CRC user acount does not Exist in the User Table ***");
-			message = "***  CRC user acount does not Exist in the User Table ***";
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -204,11 +191,12 @@ public class AccountController {
 		}
 
 		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
-		uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, loginName, ownerUserAccount, pUserName);
+		uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName);
 		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
 		if (!participantUserAccountBean.isActive()) {
 			createUserAccount(uBean);
 			logger.info("***New User Account is created***");
+			System.out.println("***New User Account is created***");
 			  uDTO =buildUserDTO(uBean);
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 
@@ -232,14 +220,14 @@ public class AccountController {
 		uDTO.setlName(userAccountBean.getLastName());
 		uDTO.setMobile(userAccountBean.getPhone());
 		uDTO.setUserName(userAccountBean.getName());
-		uDTO.setLoginName(userAccountBean.getLoginName());
+		uDTO.setAccessCode(userAccountBean.getAccessCode());
 		return uDTO;
 	}
 
 	
 	
 	
-	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String loginName, UserAccountBean ownerUserAccount, String pUserName)
+	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String accessCode, UserAccountBean ownerUserAccount, String pUserName)
 			throws Exception {
 
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
@@ -258,7 +246,7 @@ public class AccountController {
 		createdUserAccountBean.setOwner(ownerUserAccount);
 		createdUserAccountBean.setRunWebservices(false);
 		createdUserAccountBean.setPhone(mobile);
-		createdUserAccountBean.setLoginName(loginName);
+		createdUserAccountBean.setAccessCode(accessCode);
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
@@ -293,9 +281,9 @@ public class AccountController {
 		return userAccountBean;
 	}
 
-	private UserAccountBean getLoginAccount(String loginName) {
+	private UserAccountBean getAccessCodeAccount(String accessCode) {
 		udao = new UserAccountDAO(dataSource);
-		UserAccountBean userAccountBean = (UserAccountBean) udao.findByLoginName(loginName);
+		UserAccountBean userAccountBean = (UserAccountBean) udao.findByAccessCode(accessCode);
 		return userAccountBean;
 	}
 
