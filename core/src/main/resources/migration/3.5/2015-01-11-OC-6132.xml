@@ -8,9 +8,7 @@
     <changeSet author="jkeremian" id="2015-01-11-OC-6132-1">
         <comment>Add access_code column to user Account table</comment>
         <addColumn tableName="user_account" >
-            <column name="access_code"  type="VARCHAR(64)" defaultValue="NoText" >
-            <constraints nullable="false"/>
-
+            <column name="access_code"  type="VARCHAR(64)" >
             </column>
         </addColumn>
     </changeSet>

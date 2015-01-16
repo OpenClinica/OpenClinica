@@ -99,6 +99,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(21, TypeNames.BOOL);
         this.setTypeExpected(22, TypeNames.INT);
         this.setTypeExpected(23, TypeNames.BOOL);
+        this.setTypeExpected(24, TypeNames.STRING);    // access_doe
     }
 
     public void setPrivilegeTypesExpected() {
@@ -425,7 +426,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setAccountNonLocked(((Boolean) hm.get("account_non_locked")).booleanValue());
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
-        eb.setAccessCode((String) hm.get("access_code"));
+        eb.setAccessCode(accessCode);
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -447,7 +448,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setName(userName);
         eb.setPasswdChallengeQuestion(passwdChallengeQuestion);
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
-        eb.setAccessCode("NoText");
 
         // pull out the roles and privs here, tbh
         ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());

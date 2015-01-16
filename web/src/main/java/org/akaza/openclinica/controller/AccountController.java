@@ -131,9 +131,15 @@ public class AccountController {
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 
+		// Verify Access Code is a Required Field
+		if (accessCode.length() ==0) {
+			logger.info("***Access Code is a Required field and can't be null ***");
+			System.out.println("***Access Code is a Required field and can't be null ***");
+	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		}
 		// Verify Access Code already exist in table
-		UserAccountBean loginAccountBean = getAccessCodeAccount(accessCode);
-		if (loginAccountBean.isActive()) {
+		UserAccountBean accessCodeAccountBean = getAccessCodeAccount(accessCode);
+		if (accessCodeAccountBean.isActive()) {
 			logger.info("***Access Code already Exist in the User Table ***");
 			System.out.println("***Access Code already Exist in the User Table ***");
 	        return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
