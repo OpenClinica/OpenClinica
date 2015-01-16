@@ -85,7 +85,7 @@ public class AccountController {
 	UserDTO uDTO;
 
 
-	@RequestMapping(value = "/joe", method = RequestMethod.POST)
+	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> getUserInfo(@RequestBody HashMap<String, String> map) throws Exception {
         uDTO = null;
 		String studyOid = map.get("studyOid");
