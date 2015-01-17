@@ -6,6 +6,7 @@ private String fName ;
 private String lName ;
 private String mobile;
 private String userName;
+private String password;
 private String accessCode;
 
 
@@ -39,6 +40,12 @@ public String getAccessCode() {
 }
 public void setAccessCode(String accessCode) {
 	this.accessCode = accessCode;
+}
+public String getPassword() {
+	return password;
+}
+public void setPassword(String password) {
+	this.password = password;
 }
 
 
