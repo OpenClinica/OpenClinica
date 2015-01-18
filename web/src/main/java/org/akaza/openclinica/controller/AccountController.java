@@ -79,7 +79,7 @@ public class AccountController {
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	public static final String INPUT_EMAIL = "email";
+	public static final String INPUT_EMAIL = "";
 	public static final String INPUT_INSTITUTION = "PFORM";
 	UserAccountDAO udao;
 	StudyDAO sdao;
@@ -210,6 +210,9 @@ public class AccountController {
 		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
 		if (!participantUserAccountBean.isActive()) {
 			createUserAccount(uBean);
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			disableUserAccount(uBean);
 			logger.info("***New User Account is created***");
 			System.out.println("***New User Account is created***");
 			uDTO = buildUserDTO(uBean);
@@ -249,7 +252,6 @@ public class AccountController {
 		createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
 		createdUserAccountBean.setLastVisitDate(null);
 		createdUserAccountBean.setActiveStudyId(getStudy(studyOid).getId());
-		createdUserAccountBean.setStatus(Status.DELETED);
 		createdUserAccountBean.setPasswdTimestamp(null);
 		createdUserAccountBean.setPasswdChallengeQuestion("");
 		createdUserAccountBean.setPasswdChallengeAnswer("");
@@ -275,7 +277,10 @@ public class AccountController {
 
 	private void updateUserAccount(UserAccountBean userAccountBean) {
 		udao.update(userAccountBean);
+	}
 
+	private void disableUserAccount(UserAccountBean userAccountBean) {
+		udao.delete(userAccountBean);
 	}
 
 	private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r, UserAccountBean ownerUserAccount) {
@@ -285,6 +290,8 @@ public class AccountController {
 		studyUserRole.setStatus(Status.AUTO_DELETED);
 		studyUserRole.setOwner(ownerUserAccount);
 		createdUserAccountBean.addRole(studyUserRole);
+		createdUserAccountBean.setLockCounter(3);
+		createdUserAccountBean.setAccountNonLocked(false);
 		return createdUserAccountBean;
 	}
 
