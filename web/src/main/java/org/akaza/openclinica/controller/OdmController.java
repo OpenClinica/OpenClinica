@@ -177,7 +177,7 @@ public class OdmController {
 		String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
 				String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
 
-		String url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
+		String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
 		logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
 		return url;
 
