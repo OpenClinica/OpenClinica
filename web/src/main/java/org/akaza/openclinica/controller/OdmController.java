@@ -178,15 +178,17 @@ public class OdmController {
 			for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
 				found = false;
 				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
+					found = false;
 					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) {              //
 						found = true;
-          				if (!(parentEventDefinitionCrf.isHideCrf() && eventDefinitionCrf.isHideCrf())){
-						netEventDefinitionCrfs.add(eventDefinitionCrf);
+          				if (parentEventDefinitionCrf.isHideCrf() || eventDefinitionCrf.isHideCrf()){
+          				}else{
+          					netEventDefinitionCrfs.add(eventDefinitionCrf);
           				}
 						break;
 					}
 				}
-				if (found = false) {
+				if (!found) {
 					netEventDefinitionCrfs.add(parentEventDefinitionCrf);
 				}
 			}
