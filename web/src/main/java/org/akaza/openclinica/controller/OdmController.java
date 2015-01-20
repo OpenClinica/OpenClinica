@@ -178,7 +178,6 @@ public class OdmController {
 			for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
 				found = false;
 				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
-					found = false;
 					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) {              //
 						found = true;
           				if (parentEventDefinitionCrf.isHideCrf() || eventDefinitionCrf.isHideCrf()){
@@ -189,6 +188,7 @@ public class OdmController {
 					}
 				}
 				if (!found) {
+					if (!parentEventDefinitionCrf.isHideCrf())
 					netEventDefinitionCrfs.add(parentEventDefinitionCrf);
 				}
 			}
