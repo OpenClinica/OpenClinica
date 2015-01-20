@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -86,6 +87,7 @@ public class AccountController {
 	StudySubjectDAO ssdao;
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
+	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
@@ -470,11 +472,14 @@ public class AccountController {
 		return study;
 	}
 
-	private boolean mayProceed(String studyOid) {
+	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
 		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
+				&& (pManageStatus=="active")) {
 			accessPermission = true;
 		}
 		return accessPermission;

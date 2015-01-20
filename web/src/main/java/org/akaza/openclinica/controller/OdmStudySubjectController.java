@@ -28,6 +28,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_api.ODM;
@@ -72,6 +73,7 @@ public class OdmStudySubjectController {
 	ServletContext context;
 
 	public static final String FORM_CONTEXT = "ecid";
+	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	private MessageSource messageSource;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -94,7 +96,7 @@ public class OdmStudySubjectController {
 		return getODM(studyOid, studySubjectLabel);
 	}
 
-	private ODM getODM(String studyOID, String studySubjectLabel) {
+	private ODM getODM(String studyOID, String studySubjectLabel) throws Exception {
 		if (!mayProceed(studyOID)) return null;
 		
 		StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -188,15 +190,19 @@ public class OdmStudySubjectController {
 		return study;
 	}
 
-	private boolean mayProceed(String studyOid) {
+	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
 		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
+				&& (pManageStatus=="active")) {
 			accessPermission = true;
 		}
 		return accessPermission;
 	}
+
 
 	
 }

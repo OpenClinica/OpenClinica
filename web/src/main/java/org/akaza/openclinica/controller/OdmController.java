@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_api.ODM;
@@ -70,7 +71,7 @@ public class OdmController {
     RuleController ruleController;
 
 	public static final String FORM_CONTEXT = "ecid";
-
+	ParticipantPortalRegistrar participantPortalRegistrar;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
@@ -96,7 +97,7 @@ public class OdmController {
 		return getODM(studyOid, studySubjectOid);
 	}
 
-	private ODM getODM(String studyOID, String subjectKey) {
+	private ODM getODM(String studyOID, String subjectKey) throws Exception {
         ODM odm = new ODM();
 		String ssoid = subjectKey;
 		if (ssoid == null) {
@@ -293,11 +294,14 @@ public class OdmController {
 		return study;
 	}
 
-	private boolean mayProceed(String studyOid) {
+	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
 		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
+				&& (pManageStatus=="active")) {
 			accessPermission = true;
 		}
 		return accessPermission;

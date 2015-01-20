@@ -36,6 +36,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -61,6 +62,7 @@ public class OpenRosaServices {
 	private PformSubmissionService PformSubmissionService;
     private RuleActionPropertyDao ruleActionPropertyDao;
     private SCDItemMetadataDao scdItemMetadataDao;
+	ParticipantPortalRegistrar participantPortalRegistrar;
     StudyDAO sdao; 
     
 	@GET
@@ -68,7 +70,7 @@ public class OpenRosaServices {
 	@Produces(MediaType.APPLICATION_XML)
 	public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, @QueryParam("formID") String crfOID,
-			@RequestHeader("Authorization") String authorization) {
+			@RequestHeader("Authorization") String authorization) throws Exception {
 		if (!mayProceed(studyOID)) return null;
 
 		sdao = new StudyDAO(getDataSource());
@@ -138,7 +140,7 @@ public class OpenRosaServices {
 	public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, 
 			@QueryParam("formID") String crfOID,
-			@RequestHeader("Authorization") String authorization) {
+			@RequestHeader("Authorization") String authorization) throws Exception {
 		if (!mayProceed(studyOID)) return null;
 
 		String xform = null;
@@ -174,9 +176,9 @@ public class OpenRosaServices {
 			@Context HttpServletResponse response,
 			@Context ServletContext servletContext,
 			@PathParam("studyOID") String studyOID, 
-			@QueryParam(FORM_CONTEXT) String context) {
+			@QueryParam(FORM_CONTEXT) String context) throws Exception {
 		String output = null;
-		if (!mayProceed(studyOID)) return null;
+		if (!mayProceedSubmission(studyOID)) return null;
 
 		try {
 
@@ -262,7 +264,7 @@ public class OpenRosaServices {
 			@Context HttpServletResponse response,
 			@Context ServletContext context,
 			@PathParam("studyOID") String studyOID,
-			@RequestHeader("Authorization") String authorization)
+			@RequestHeader("Authorization") String authorization) throws Exception
 	{	
 		
 		if (!mayProceed(studyOID)) return null;
@@ -361,15 +363,31 @@ public class OpenRosaServices {
 		return study;
 	}
 
-	private boolean mayProceed(String studyOid) {
+	private boolean mayProceedSubmission(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
 		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
+				&& (pManageStatus=="active")) {
 			accessPermission = true;
 		}
 		return accessPermission;
 	}
 
+	private boolean mayProceed(String studyOid) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
+		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
+				&& (pManageStatus=="pending" || pManageStatus=="active" || pManageStatus=="inactive" )) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
+	
 	
 }
