@@ -91,6 +91,10 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
+
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -119,6 +123,9 @@ public class AccountController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
 
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -137,6 +144,9 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		StudyBean studyBean = getStudy(studyOid);
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
 		if (isStudyDoesNotExist(studyOid))
@@ -160,6 +170,7 @@ public class AccountController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> createOrUpdateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
+
 		String studyOid = map.get("studyOid");
 		String studySubjectId = map.get("studySubjectId");
 		String fName = map.get("fName");
@@ -167,6 +178,9 @@ public class AccountController {
 		String mobile = map.get("mobile");
 		String accessCode = map.get("accessCode");
 		String crcUserName = map.get("crcUserName");
+
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		System.out.println("******************     You are in the Rest Service   *****************");
@@ -444,5 +458,26 @@ public class AccountController {
 		return false;
 	}
 
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		Integer studyId = study.getId();
+		Integer pStudyId = 0;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		return study;
+	}
+
+	private boolean mayProceed(String studyOid) {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
 
 }

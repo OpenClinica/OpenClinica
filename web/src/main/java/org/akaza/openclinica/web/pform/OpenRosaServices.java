@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -60,6 +61,7 @@ public class OpenRosaServices {
 	private PformSubmissionService PformSubmissionService;
     private RuleActionPropertyDao ruleActionPropertyDao;
     private SCDItemMetadataDao scdItemMetadataDao;
+    StudyDAO sdao; 
     
 	@GET
 	@Path("/{studyOID}/formList")
@@ -67,8 +69,9 @@ public class OpenRosaServices {
 	public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, @QueryParam("formID") String crfOID,
 			@RequestHeader("Authorization") String authorization) {
+		if (!mayProceed(studyOID)) return null;
 
-		StudyDAO sdao = new StudyDAO(getDataSource());
+		sdao = new StudyDAO(getDataSource());
 		StudyBean study = sdao.findByOid(studyOID);
 
 		CRFDAO cdao = new CRFDAO(getDataSource());
@@ -136,6 +139,7 @@ public class OpenRosaServices {
 			@PathParam("studyOID") String studyOID, 
 			@QueryParam("formID") String crfOID,
 			@RequestHeader("Authorization") String authorization) {
+		if (!mayProceed(studyOID)) return null;
 
 		String xform = null;
 
@@ -172,6 +176,8 @@ public class OpenRosaServices {
 			@PathParam("studyOID") String studyOID, 
 			@QueryParam(FORM_CONTEXT) String context) {
 		String output = null;
+		if (!mayProceed(studyOID)) return null;
+
 		try {
 
 			if (ServletFileUpload.isMultipartContent(request)) {
@@ -259,6 +265,8 @@ public class OpenRosaServices {
 			@RequestHeader("Authorization") String authorization)
 	{	
 		
+		if (!mayProceed(studyOID)) return null;
+
 		String ssoid = request.getParameter("studySubjectOID");
 		HashMap<String,String> urlCache = (HashMap<String,String>) context.getAttribute("pformURLCache");
 		context.getAttribute("subjectContextCache");
@@ -334,6 +342,33 @@ public class OpenRosaServices {
 
 	public void setScdItemMetadataDao(SCDItemMetadataDao scdItemMetadataDao) {
 		this.scdItemMetadataDao = scdItemMetadataDao;
+	}
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
+
+    private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		Integer studyId = study.getId();
+		Integer pStudyId = 0;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		return study;
+	}
+
+	private boolean mayProceed(String studyOid) {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+			accessPermission = true;
+		}
+		return accessPermission;
 	}
 
 	

@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -60,6 +61,7 @@ public class OdmController {
 	@Autowired
 	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
+	StudyDAO sdao;
 
 	@Autowired
 	ServletContext context;
@@ -100,6 +102,8 @@ public class OdmController {
 		if (ssoid == null) {
 			return null;
 		}
+
+		if (!mayProceed(studyOID)) return odm;
 
 		StudyEventDAO eventDAO = new StudyEventDAO(dataSource);
 		CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
@@ -261,6 +265,7 @@ public class OdmController {
     public @ResponseBody UserAccountBean getUser(@PathVariable("studyOid") String studyOid, @PathVariable("username") String username)
             throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		if (!mayProceed(studyOid)) return null;
 
         return getUserAccount(username);
     }
@@ -270,5 +275,32 @@ public class OdmController {
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
+
+    private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		Integer studyId = study.getId();
+		Integer pStudyId = 0;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		return study;
+	}
+
+	private boolean mayProceed(String studyOid) {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
 
 }

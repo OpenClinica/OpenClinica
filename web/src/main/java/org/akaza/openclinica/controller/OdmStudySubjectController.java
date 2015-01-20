@@ -63,6 +63,7 @@ public class OdmStudySubjectController {
 	@Autowired
 	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
+	StudyDAO sdao;
 
 	@Autowired
 	CoreResources coreResources;
@@ -94,7 +95,8 @@ public class OdmStudySubjectController {
 	}
 
 	private ODM getODM(String studyOID, String studySubjectLabel) {
-
+		if (!mayProceed(studyOID)) return null;
+		
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 		StudyBean studyBean = null;
@@ -123,6 +125,7 @@ public class OdmStudySubjectController {
 
 	private ODM createOdm(StudyBean studyBean, StudySubjectBean studySubjectBean) {
 		ODM odm = new ODM();
+		
 		ODMcomplexTypeDefinitionClinicalData clinicalData = null;
 		if (studyBean != null) {
 			clinicalData = generateClinicalData(studyBean);
@@ -167,5 +170,33 @@ public class OdmStudySubjectController {
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
 
+    private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		Integer studyId = study.getId();
+		Integer pStudyId = 0;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		return study;
+	}
+
+	private boolean mayProceed(String studyOid) {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
+				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
+
+	
 }
