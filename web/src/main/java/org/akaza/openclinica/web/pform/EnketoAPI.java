@@ -29,7 +29,7 @@ public class EnketoAPI {
 
     public String getFormURL(String crfOID) throws Exception
     {
-        URL eURL = new URL(enketoURL + "/api/v1/survey");
+        URL eURL = new URL(enketoURL + "/api/v1/survey/iframe");
         return getURL(eURL,crfOID,"url");
     }
 

@@ -15,10 +15,12 @@
 		<jsp:include page="../include/home-header.jsp"/>
 	</c:when>
 	<c:otherwise>
+	
 		<jsp:include page="../include/admin-header.jsp"/>
 	</c:otherwise>
 </c:choose>
 
+  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
 
 
 <!-- move the alert message to the sidebar-->
@@ -97,7 +99,21 @@
 		       }
 	         }
            }
-
+       
+           function registerPManage(event){
+               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
+               jQuery.ajax({
+        	       type:'GET',
+        	       url: regURL,
+        	       success: function(data){
+                       jQuery('#pManageDiv').html('Registration: ' + data);
+        	    }});
+           }
+           
+           function togglePManage(show){
+        	   if (show) jQuery('#pManageDiv').show();
+        	   else jQuery('#pManageDiv').hide();
+           }
        //-->
  </script>
 
@@ -1012,13 +1028,20 @@
   </tr>
 
 
-<c:if test="${portalURL!= '' && portalURL!= null}"><tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
-  <a href="https://www.openclinica.com/participant-portal-registration" target="def_win" onClick="openDefWindow('https://www.openclinica.com/participant-portal-registration'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td></c:if>
-
-  </tr>
-
+  <c:if test="${portalURL!= '' && portalURL!= null}">
+    <tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td>
+      <td>
+        <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" onClick="togglePManage(true)" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
+        <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" onClick="togglePManage(false)" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
+        <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}">
+          <c:choose>
+            <c:when test="${pmanageRegStatus != null && pmanageRegStatus!=''}"><fmt:message key="participant_portal_registration_status" bundle="${resword}"/>: ${pmanageRegStatus}</c:when>
+            <c:otherwise><fmt:message key="participant_portal_registration_status" bundle="${resword}"/>: <fmt:message key="participant_portal_status_notfound" bundle="${resword}"/></c:otherwise>
+          </c:choose>
+        </c:if>
+      </td>
+    </tr>
+  </c:if>
 
 </table>
 </div>
