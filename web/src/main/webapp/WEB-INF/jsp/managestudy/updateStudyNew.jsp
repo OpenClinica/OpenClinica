@@ -15,12 +15,10 @@
 		<jsp:include page="../include/home-header.jsp"/>
 	</c:when>
 	<c:otherwise>
-	
 		<jsp:include page="../include/admin-header.jsp"/>
 	</c:otherwise>
 </c:choose>
 
-  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
 
 
 <!-- move the alert message to the sidebar-->
@@ -99,21 +97,7 @@
 		       }
 	         }
            }
-       
-           function registerPManage(event){
-               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
-               jQuery.ajax({
-        	       type:'GET',
-        	       url: regURL,
-        	       success: function(data){
-                       jQuery('#pManageDiv').html('Registration: ' + data);
-        	    }});
-           }
-           
-           function togglePManage(show){
-        	   if (show) jQuery('#pManageDiv').show();
-        	   else jQuery('#pManageDiv').hide();
-           }
+
        //-->
  </script>
 

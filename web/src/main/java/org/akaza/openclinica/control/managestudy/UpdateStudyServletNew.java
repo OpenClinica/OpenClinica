@@ -7,9 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -26,15 +23,9 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.akaza.openclinica.dao.core.CoreResources;
 
-import java.io.DataInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,14 +80,8 @@ public class UpdateStudyServletNew extends SecureController {
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
 
-        String portalURL = CoreResources.getField("portalURL");
-        String portalStatus = study.getStudyParameterConfig().getParticipantPortal();
-        request.setAttribute("portalURL", portalURL);
-        if (portalURL != null && !portalURL.equals("") && portalStatus.equals("enabled"))
-        {
-        	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-        	request.setAttribute("pmanageRegStatus",registrar.getRegistrationStatus(study.getOid()));
-        }
+        request.setAttribute("portalURL", core.getField("portalURL"));
+
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
         ArrayList statuses = Status.toStudyUpdateMembersList();
@@ -152,11 +137,6 @@ public class UpdateStudyServletNew extends SecureController {
             validateStudy5(fp, new Validator(request));
             validateStudy6(fp, new Validator(request));
             confirmWholeStudy(fp);
-            if (portalStatus.equals("disabled") && fp.getString("participantPortal").equals("enabled"))
-            {
-            	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            	registrar.registerStudy(study.getOid());
-            }
 
             request.setAttribute("studyToView", study);
             if (!errors.isEmpty()) {
