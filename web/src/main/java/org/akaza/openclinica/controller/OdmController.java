@@ -142,9 +142,8 @@ public class OdmController {
 			return createOdm(study, studySubjectBean, nextEvent, formDatas);
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			logger.debug(e.getMessage());
-			logger.debug(ExceptionUtils.getStackTrace(e));
+			logger.error(e.getMessage());
+			logger.error(ExceptionUtils.getStackTrace(e));
 		}
 
 		return odm;
