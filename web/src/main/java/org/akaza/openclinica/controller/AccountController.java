@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -24,6 +25,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -146,11 +148,12 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		if (!mayProceed(studyOid))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
 		StudyBean studyBean = getStudy(studyOid);
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+
+		if (!mayProceed(studyOid,studySubjectBean))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isStudySubjectDoesNotExist(studySubjectBean))
@@ -181,7 +184,9 @@ public class AccountController {
 		String accessCode = map.get("accessCode");
 		String crcUserName = map.get("crcUserName");
 
-		if (!mayProceed(studyOid))
+		StudyBean studyBean = getStudy(studyOid);
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+		if (!mayProceed(studyOid,studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
@@ -189,8 +194,6 @@ public class AccountController {
 
 		UserAccountBean uBean = null;
 
-		StudyBean studyBean = getStudy(studyOid);
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
 
 		if (isStudyDoesNotExist(studyOid))
@@ -472,16 +475,39 @@ public class AccountController {
 		return study;
 	}
 
-	private boolean mayProceed(String studyOid) throws Exception {
+	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
 		 participantPortalRegistrar=new ParticipantPortalRegistrar();
-		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
-		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
-				&& (pManageStatus=="active")) {
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		if (participantStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
 			accessPermission = true;
 		}
+		
+		return accessPermission;
+	}
+
+	private boolean mayProceed(String studyOid ) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		if (participantStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") ) {
+			accessPermission = true;
+		}
+		
 		return accessPermission;
 	}
 

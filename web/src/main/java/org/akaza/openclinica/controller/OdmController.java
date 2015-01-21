@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -18,9 +19,11 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
@@ -76,6 +79,8 @@ public class OdmController {
 
     @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
     public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response) throws Exception {
+		if (!mayProceed(studyOid)) return null;
+
         return ruleController.studyMetadata(model,session,studyOid,response);
     }
 
@@ -104,7 +109,6 @@ public class OdmController {
 			return null;
 		}
 
-		if (!mayProceed(studyOID)) return odm;
 
 		StudyEventDAO eventDAO = new StudyEventDAO(dataSource);
 		CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
@@ -122,6 +126,8 @@ public class OdmController {
 			List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
 			StudyBean study = studyDAO.findByOid(studyOID);
 			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
+
+			if (!mayProceed(studyOID,studySubjectBean)) return odm;
 
 			// Only return info for CRFs that are not started, completed, or started but do not have any
 			// saved item data associated with them.
@@ -262,14 +268,6 @@ public class OdmController {
 		return w.toString();
 	}
 
-    @RequestMapping(value = "/study/{studyOid}/user/{username}", method = RequestMethod.GET)
-    public @ResponseBody UserAccountBean getUser(@PathVariable("studyOid") String studyOid, @PathVariable("username") String username)
-            throws Exception {
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		if (!mayProceed(studyOid)) return null;
-
-        return getUserAccount(username);
-    }
 
     private UserAccountBean getUserAccount(String username) {
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
@@ -294,14 +292,35 @@ public class OdmController {
 		return study;
 	}
 
+	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		if (participantStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
+
 	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
 		 participantPortalRegistrar=new ParticipantPortalRegistrar();
-		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid);
-		if (study.getStudyParameterConfig().getParticipantPortal() == "enabled"
-				&& (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.UNAVAILABLE || study.getStatus() == Status.FROZEN || study.getStatus() == Status.LOCKED)
-				&& (pManageStatus=="active")) {
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
+		if (participantStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") ) {
 			accessPermission = true;
 		}
 		return accessPermission;
