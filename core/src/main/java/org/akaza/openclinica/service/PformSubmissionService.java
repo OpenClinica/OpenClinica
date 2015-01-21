@@ -181,7 +181,7 @@ public class PformSubmissionService {
 		createdUserAccountBean.addUserType(type);
 
 		createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
-		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
+//		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
 		return userAccountBean;
 	}
 
@@ -660,11 +660,8 @@ public class PformSubmissionService {
 											}
 										}
 									}
-
 								}
 							}
-
-
 						}
 
 						if (!errors.hasErrors()) {
@@ -721,7 +718,7 @@ public class PformSubmissionService {
 				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-					getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
+						getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
 				}
 
 			}
