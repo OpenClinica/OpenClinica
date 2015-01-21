@@ -382,11 +382,11 @@ public class OpenRosaServices {
 				StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
 				 participantPortalRegistrar=new ParticipantPortalRegistrar();
 				String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-				String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+				String participateStatus = pStatus.getValue().toString();         // enabled , disabled
 				String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-				System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
-				logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
-				if (participantStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+				logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+				System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+				if (participateStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
 					accessPermission = true;
 				}
 				return accessPermission;
@@ -400,11 +400,11 @@ public class OpenRosaServices {
 			StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
 			 participantPortalRegistrar=new ParticipantPortalRegistrar();
 			String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-			String participantStatus = pStatus.getValue().toString();         // enabled , disabled
+			String participateStatus = pStatus.getValue().toString();         // enabled , disabled
 			String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-			System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
-			logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participantStatus+ "   studyStatus: " + studyStatus);
-			if (participantStatus.equals("enabled") && (studyStatus.equals("available") || studyStatus.equals("pending")  || studyStatus.equals("frozen") || studyStatus.equals("locked")) 
+			System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+			logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+			if (participateStatus.equals("enabled") && (studyStatus.equals("available") || studyStatus.equals("pending")  || studyStatus.equals("frozen") || studyStatus.equals("locked")) 
 					&& (pManageStatus.equals("ACTIVE") || pManageStatus.equals("PENDING") || pManageStatus.equals("INACTIVE"))) {
 				accessPermission = true;
 			}
