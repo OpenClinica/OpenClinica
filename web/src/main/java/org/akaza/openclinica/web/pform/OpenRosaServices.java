@@ -182,7 +182,7 @@ public class OpenRosaServices {
 		
 			PFormCache cache = PFormCache.getInstance(servletContext);
 			HashMap<String,String> userContext = cache.getSubjectContext(context);
-  			System.out.println("Study Subjecet OID :  "+userContext.get("studySubjectOID"));
+  			System.out.println("Study Subject OID :  "+userContext.get("studySubjectOID"));
 			System.out.println("Study Event Defn id : "+userContext.get("studyEventDefinitionID"));
 			System.out.println("Study Event Defn Ordinal :  "+userContext.get("studyEventOrdinal"));
 			System.out.println("CRF Version OID :  "+userContext.get("crfVersionOID"));
@@ -204,8 +204,9 @@ public class OpenRosaServices {
 			
 			
 			body = body.substring(body.indexOf("<F_"));
+			int length = body.indexOf(" ");
 			body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
-			body = body.substring(0, body.indexOf("------------"));
+			body = body.substring(0, body.indexOf("</F_")+length+2);
 			body = "<instance>" + body + "</instance>";
 			
 			System.out.println(body);

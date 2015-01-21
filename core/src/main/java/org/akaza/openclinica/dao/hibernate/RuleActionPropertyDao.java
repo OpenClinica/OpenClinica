@@ -19,10 +19,10 @@ public class RuleActionPropertyDao extends AbstractDomainDao<PropertyBean> {
         return (ArrayList <PropertyBean>) q.list();
     }
 
-    public ArrayList <PropertyBean> findByGroupOid(String groupOid) {
-        String query = "from " + getDomainClassName() +  "  where oc_oid=:groupOid ";
+    public ArrayList <PropertyBean> findByOid(String Oid) {
+        String query = "from " + getDomainClassName() +  "  where oc_oid=:Oid ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("groupOid", groupOid);
+        q.setString("Oid", Oid);
         return (ArrayList <PropertyBean>) q.list();
     }
 

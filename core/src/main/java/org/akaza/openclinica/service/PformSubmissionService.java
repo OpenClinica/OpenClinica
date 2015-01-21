@@ -29,8 +29,13 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -42,6 +47,13 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.apache.log4j.spi.ErrorCode;
@@ -89,6 +101,9 @@ public class PformSubmissionService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	DataSource ds;
+	private RuleActionPropertyDao ruleActionPropertyDao;
+	private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
+	private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 
 	EventDefinitionCRFDAO edcdao;
 	UserAccountDAO udao;
@@ -102,6 +117,8 @@ public class PformSubmissionService {
 	ItemDAO idao;
 	ItemFormMetadataDAO ifmdao;
 	AuthoritiesDao authoritiesDao;
+	ItemGroupDAO igdao;
+	ItemGroupMetadataDAO igmdao;
 
 	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
@@ -641,47 +658,191 @@ public class PformSubmissionService {
 											} else {
 												itemDataBeanList.add(itemDataBean);
 											}
-
 										}
 									}
 
 								}
 							}
 
-							if (!errors.hasErrors()) {
-								for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-									// Create Item Data Bean
-									// by
-									// inserting one
-									// row at
-									// a time to Item Data
-									// table
-									iddao.create(itemDataBean1);
-									// Update Event Crf Bean
-									// and
-									// change the
-									// status
-									// to Completed
-									eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-									// Study Event status
-									// update
-									if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-											.getId())) {
-										updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-									} else {
-										updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-									}
 
-								}
+						}
+
+						if (!errors.hasErrors()) {
+							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+								// Create Item Data Bean
+								// by
+								// inserting one
+								// row at
+								// a time to Item Data
+								// table
+								iddao.create(itemDataBean1);
+
+								// Update Event Crf Bean
+								// and
+								// change the
+								// status
+								// to Completed
+
 							}
+							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+							// Study Event status
+							// update
+							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+									.getId())) {
+								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
+							} else {
+								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+							}
+							ArrayList<Integer> ruleList = new ArrayList<Integer>();
+							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+								setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
+							}
+							setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
 
 						}
 					}
 				}
 			}
-
 		}
 		return errors;
+	}
+
+	@SuppressWarnings("null")
+	private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean,
+			ArrayList<Integer> ruleList) {
+		iddao = new ItemDataDAO(ds);
+		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
+		ArrayList<PropertyBean> propertyBeans = null;
+		propertyBeans = getGroupPropertyBean(itemBean.getOid());
+		RuleBean ruleBean;
+		if (propertyBeans.size() != 0) {
+			for (PropertyBean propertyBean : propertyBeans) {
+				logger.info("property bean oid:   " + propertyBean.getOid());
+				RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
+				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
+					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
+					getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
+				}
+
+			}
+		}
+
+	}
+
+	private void setDynItemGroupMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean) {
+		igdao = new ItemGroupDAO(ds);
+		ArrayList<Integer> ruleList = new ArrayList<Integer>();
+		ArrayList<ItemGroupBean> itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersionBean.getId());
+		for (ItemGroupBean itemGroupBean : itemGroupBeans) {
+			ArrayList<PropertyBean> propertyBeans = null;
+			propertyBeans = getGroupPropertyBean(itemGroupBean.getOid());
+
+			if (propertyBeans.size() != 0) {
+				for (PropertyBean propertyBean : propertyBeans) {
+					logger.info("property bean oid:   " + propertyBean.getOid());
+					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
+					if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
+							getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
+					}
+				}
+			}
+		}
+
+	}
+
+	private void getItemGroupMetaDataList(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
+		igmdao = new ItemGroupMetadataDAO(ds);
+		ArrayList<ItemGroupMetadataBean> itemGroupMetadataBeans = (ArrayList<ItemGroupMetadataBean>) igmdao.findMetaByGroupAndCrfVersion(
+				itemGroupBean.getId(), crfVersionBean.getId());
+		DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = null;
+		for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
+			dynamicsItemGroupMetadataBean = createDynamicsItemGroupMetadataBean(itemGroupBean, eventCrfBean, itemGroupMetadataBean);
+			saveDynamicGroupMeta(dynamicsItemGroupMetadataBean);
+		}
+	}
+
+	private void getItemFormMetaDataList(ItemDataBean itemDataBean, ItemBean itemGroupBean, EventCRFBean eventCrfBean,
+			CRFVersionBean crfVersionBean) {
+		DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = null;
+		dynamicsItemFormMetadataBean = createDynamicsItemFormMetadataBean(itemDataBean, itemGroupBean, eventCrfBean, crfVersionBean);
+
+		saveDynamicItemFormMeta(dynamicsItemFormMetadataBean);
+	}
+
+	private DynamicsItemFormMetadataBean createDynamicsItemFormMetadataBean(ItemDataBean itemDataBean, ItemBean itemBean,
+			EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
+
+		ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
+
+		DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = new DynamicsItemFormMetadataBean();
+		dynamicsItemFormMetadataBean.setEventCrfId(eventCrfBean.getId());
+		dynamicsItemFormMetadataBean.setCrfVersionId(crfVersionBean.getId());
+		dynamicsItemFormMetadataBean.setItemFormMetadataId(itemFormMetadataBean.getId());
+		dynamicsItemFormMetadataBean.setItemId(itemBean.getId());
+		dynamicsItemFormMetadataBean.setShowItem(true);
+		dynamicsItemFormMetadataBean.setItemDataId(itemDataBean.getId());
+		dynamicsItemFormMetadataBean.setVersion(0);
+		dynamicsItemFormMetadataBean.setPassedDde(0);
+
+		return dynamicsItemFormMetadataBean;
+	}
+
+	private DynamicsItemGroupMetadataBean createDynamicsItemGroupMetadataBean(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean,
+			ItemGroupMetadataBean itemGroupMetadataBean) {
+
+		DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = new DynamicsItemGroupMetadataBean();
+		dynamicsItemGroupMetadataBean.setEventCrfId(eventCrfBean.getId());
+		dynamicsItemGroupMetadataBean.setItemGroupId(itemGroupBean.getId());
+		dynamicsItemGroupMetadataBean.setItemGroupMetadataId(itemGroupMetadataBean.getId());
+		dynamicsItemGroupMetadataBean.setShowGroup(true);
+		dynamicsItemGroupMetadataBean.setVersion(0);
+		dynamicsItemGroupMetadataBean.setPassedDde(0);
+
+		return dynamicsItemGroupMetadataBean;
+	}
+
+	private void saveDynamicItemFormMeta(DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean) {
+		getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsItemFormMetadataBean);
+	}
+
+	private void saveDynamicGroupMeta(DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean) {
+		getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsItemGroupMetadataBean);
+	}
+
+	private ArrayList<PropertyBean> getGroupPropertyBean(String groupOid) {
+		ArrayList<PropertyBean> propertyBeans = null;
+		propertyBeans = getRuleActionPropertyDao().findByOid(groupOid);
+		return propertyBeans;
+	}
+
+	private ArrayList<PropertyBean> getItemPropertyBean(String itemOid) {
+		ArrayList<PropertyBean> propertyBeans = null;
+		propertyBeans = getRuleActionPropertyDao().findByOid(itemOid);
+		return propertyBeans;
+	}
+
+	public RuleActionPropertyDao getRuleActionPropertyDao() {
+		return ruleActionPropertyDao;
+	}
+
+	public void setRuleActionPropertyDao(RuleActionPropertyDao ruleActionPropertyDao) {
+		this.ruleActionPropertyDao = ruleActionPropertyDao;
+	}
+
+	public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
+		return dynamicsItemGroupMetadataDao;
+	}
+
+	public void setDynamicsItemGroupMetadataDao(DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao) {
+		this.dynamicsItemGroupMetadataDao = dynamicsItemGroupMetadataDao;
+	}
+
+	public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
+		return dynamicsItemFormMetadataDao;
+	}
+
+	public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
+		this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
 	}
 
 }
