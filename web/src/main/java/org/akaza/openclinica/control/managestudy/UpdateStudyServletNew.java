@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -23,9 +26,14 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.akaza.openclinica.dao.core.CoreResources;
 
+import java.io.DataInputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,7 +88,10 @@ public class UpdateStudyServletNew extends SecureController {
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
 
-        request.setAttribute("portalURL", core.getField("portalURL"));
+        String portalURL = CoreResources.getField("portalURL");
+        request.setAttribute("portalURL", portalURL);
+        if (portalURL != null && !portalURL.equals(""))
+        	request.setAttribute("pmanageRegStatus",getPManageRegStatus(study.getOid()));
 
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
@@ -647,6 +658,40 @@ public class UpdateStudyServletNew extends SecureController {
             studyParameterValueBean.setStudyId(siteBean.getId());
             updateParameter(studyParameterValueDAO, studyParameterValueBean);
         }
+
+    }
+    private String getPManageRegStatus(String studyOid) throws Exception
+    {
+		String pManageUrl = CoreResources.getField("portalURL");
+		String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+		URL eURL = new URL(pManageUrl + "/app/rest/oc/authorizations" + "?studyoid=" + studyOid + "&instanceurl=" + ocUrl);
+		HttpURLConnection con = null;
+		DataInputStream input = null;
+		String response = null;
+		try
+		{
+			con = (HttpURLConnection)eURL.openConnection();		
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+			con.setRequestMethod("GET");	
+	
+			input = new DataInputStream( con.getInputStream());
+			response = IOUtils.toString(input, "UTF-8");
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getMessage());
+			logger.error(ExceptionUtils.getStackTrace(e));
+		}
+		finally{
+			input.close();
+		}
+
+		JSONArray jsonArray = JSONArray.fromObject(response);
+		if (jsonArray.size() == 0) return "";
+		JSONObject authStatus = jsonArray.getJSONObject(0).getJSONObject("authorizationStatus");
+		if (!authStatus.isNullObject()) return authStatus.getString("status");
+		else return "NULLAUTH";
 
     }
 }
