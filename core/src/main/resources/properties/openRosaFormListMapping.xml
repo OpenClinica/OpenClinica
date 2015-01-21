@@ -13,7 +13,7 @@
     </class>
     
     <class name="org.akaza.openclinica.web.pform.formlist.XForm">
-        <map-to xml="xform"/>
+        <map-to xml="xform" ns-uri="http://openrosa.org/xforms/xformsList"/>
        
        <field name="FormID"
                type="java.lang.String">

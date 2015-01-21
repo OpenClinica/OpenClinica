@@ -490,10 +490,13 @@ public class OpenRosaXmlGenerator {
 			ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
 			String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
+			Boolean isrepeating = itemGroupMetadataBean.isRepeatingGroup();
 
 			Element groupElement = doc.createElement(itemGroupBean.getOid());
+			if (isrepeating){
 			groupElement.setTextContent(repeatGroupMin);
 			groupElement.setAttribute("jr:template", "");
+			}
 			crfElement.appendChild(groupElement);
 
 			idao = new ItemDAO(dataSource);

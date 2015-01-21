@@ -6,11 +6,11 @@
 	</query>
 	<query>
 		<name>findAll</name>
-		<sql>SELECT * FROM USER_ACCOUNT</sql>
+		<sql>SELECT * FROM USER_ACCOUNT WHERE USER_NAME NOT LIKE '%.SS_%'</sql>
 	</query>
 	<query>
 		<name>findAllByLimit</name>
-		<sql>SELECT * FROM USER_ACCOUNT limit 5</sql>
+		<sql>SELECT * FROM USER_ACCOUNT WHERE USER_NAME NOT LIKE '%.SS_%' limit 5</sql>
 	</query>
 	<query>
 		<name>insert</name>
@@ -192,6 +192,7 @@
 				AND ua.status_id=1
 				AND sur.status_id=1
 				AND (s.study_id=? OR s.parent_study_id=?)
+				AND  ua.user_name NOT LIKE '%.SS_%'
 			ORDER BY ua.date_created ASC
 		</sql>
 	</query>
@@ -219,6 +220,7 @@
                 AND ua.status_id=1
                 AND sur.status_id=1
                 AND (s.study_id=? OR s.study_id=?
+               	AND  ua.user_name NOT LIKE '%.SS_%'
 			        OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                 )
                 ORDER BY ua.last_name ASC
