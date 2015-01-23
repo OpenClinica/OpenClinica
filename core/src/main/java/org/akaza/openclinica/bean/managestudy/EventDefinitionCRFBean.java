@@ -176,7 +176,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     //private SourceDataVerification sourceDataVerification = SourceDataVerification.NOTREQUIRED;
     private String selectedVersionIds = "";
     private int parentId = 0;
-    private boolean participantCrf =false;
+    private boolean participantForm =false;
 
     //Not in db
     private String eventName;
@@ -584,12 +584,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 		this.defaultCRF = defaultCRF;
 	}
 
-	public boolean isParticipantCrf() {
-		return participantCrf;
+	public boolean isParticipantForm() {
+		return participantForm;
 	}
 
-	public void setParticipantCrf(boolean participantCrf) {
-		this.participantCrf = participantCrf;
+	public void setParticipantForm(boolean participantForm) {
+		this.participantForm = participantForm;
 	}
+
 	
 }
