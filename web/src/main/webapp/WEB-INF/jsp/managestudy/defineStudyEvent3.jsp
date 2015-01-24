@@ -81,15 +81,15 @@
 
                         <tr valign="top">
 
-                            <td class="table_cell"><fmt:message key="required" bundle="${resword}"/>:<input type="checkbox" checked name="requiredCRF<c:out value="${count}"/>" value="yes"></td>
+                            <td class="table_cell" colspan="1"><fmt:message key="required" bundle="${resword}"/>:<input type="checkbox" checked name="requiredCRF<c:out value="${count}"/>" value="yes"></td>
 
-                            <td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:<input type="checkbox" name="doubleEntry<c:out value="${count}"/>" value="yes"></td>
+                            <td class="table_cell" colspan="1"><fmt:message key="double_data_entry" bundle="${resword}"/>:<input type="checkbox" name="doubleEntry<c:out value="${count}"/>" value="yes"></td>
 
-                            <td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:<input type="checkbox" name="electronicSignature<c:out value="${count}"/>" value="yes"></td>
+                            <td class="table_cell" colspan="1"><fmt:message key="password_required" bundle="${resword}"/>:<input type="checkbox" name="electronicSignature<c:out value="${count}"/>" value="yes"></td>
 
                                 <%-- <td class="table_cell"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/>:<input type="checkbox" name="decisionCondition<c:out value="${count}"/>"  checked value="yes"></td>--%>
 
-                            <td class="table_cell" colspan="2"><fmt:message key="default_version" bundle="${resword}"/>:
+                            <td class="table_cell" colspan="1"><fmt:message key="default_version" bundle="${resword}"/>:
 
                                 <select name="defaultVersionId<c:out value="${count}"/>">
                                     <c:forEach var="version" items="${crf.versions}">
@@ -98,9 +98,10 @@
                                 </select>
                             </td></tr>
                         <tr valign="top">
-                            <td class="table_cell" colspan="2"><fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes"></td>
+                            <td class="table_cell" colspan="1"><fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes"></td>
+                            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
                     		
-                            <td class="table_cell" colspan="6"><fmt:message key="sdv_option" bundle="${resword}"/>:
+                            <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>">
 						        	<c:set var="index" value="1"/>
 						            <c:forEach var="sdv" items="${sdvOptions}">
