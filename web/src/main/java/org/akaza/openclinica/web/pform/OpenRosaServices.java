@@ -202,8 +202,6 @@ public class OpenRosaServices {
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 
 			System.out.println(body);
-
-			
 			
 			body = body.substring(body.indexOf("<F_"));
 			int length = body.indexOf(" ");
@@ -212,6 +210,7 @@ public class OpenRosaServices {
 			body = "<instance>" + body + "</instance>";
 			
 			System.out.println(body);
+			LOGGER.info(body);
 			
 		    Errors errors=getPformSubmissionService().saveProcess(body,studySubjectOid,studyEventDefnId,studyEventOrdinal);
 					
