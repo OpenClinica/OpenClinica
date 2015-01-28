@@ -358,16 +358,9 @@ public class OdmController {
 
 	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
 		boolean accessPermission = false;
-		StudyBean study = getParentStudy(studyOid);
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
-		 participantPortalRegistrar=new ParticipantPortalRegistrar();
-		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-		String participateStatus = pStatus.getValue().toString();         // enabled , disabled
-		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
-		System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
-		if (participateStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+		logger.info( "  studySubjectStatus: "+ssBean.getStatus().getName());
+		System.out.println( "  studySubjectStatus: "+ssBean.getStatus().getName());
+		if (mayProceed(studyOid) && ssBean.getStatus()==Status.AVAILABLE) {
 			accessPermission = true;
 		}
 		return accessPermission;
