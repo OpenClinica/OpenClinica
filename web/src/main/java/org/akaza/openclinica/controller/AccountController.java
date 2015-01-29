@@ -497,7 +497,7 @@ public class AccountController {
 		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
 		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
 		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
-		if (participateStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") ) {
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") ) {
 			accessPermission = true;
 		}
 		

@@ -385,7 +385,7 @@ public class OpenRosaServices {
 				String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
 				logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
 				System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
-				if (participateStatus.equals("enabled") && studyStatus.equals("available") && pManageStatus.equals("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+				if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
 					accessPermission = true;
 				}
 				return accessPermission;
@@ -403,8 +403,8 @@ public class OpenRosaServices {
 			String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
 			System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
 			logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
-			if (participateStatus.equals("enabled") && (studyStatus.equals("available") || studyStatus.equals("pending")  || studyStatus.equals("frozen") || studyStatus.equals("locked")) 
-					&& (pManageStatus.equals("ACTIVE") || pManageStatus.equals("PENDING") || pManageStatus.equals("INACTIVE"))) {
+			if (participateStatus.equalsIgnoreCase("enabled") && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending")  || studyStatus.equalsIgnoreCase("frozen") || studyStatus.equalsIgnoreCase("locked")) 
+					&& (pManageStatus.equalsIgnoreCase("ACTIVE") || pManageStatus.equalsIgnoreCase("PENDING") || pManageStatus.equalsIgnoreCase("INACTIVE"))) {
 				accessPermission = true;
 			}
 			return accessPermission;
