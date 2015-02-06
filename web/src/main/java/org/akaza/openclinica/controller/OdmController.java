@@ -186,15 +186,11 @@ public class OdmController {
 				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
 					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) {              //
 						found = true;
-          				if (parentEventDefinitionCrf.isHideCrf() || eventDefinitionCrf.isHideCrf()){
-          				}else{
           					netEventDefinitionCrfs.add(eventDefinitionCrf);
-          				}
 						break;
 					}
 				}
 				if (!found) {
-					if (!parentEventDefinitionCrf.isHideCrf())
 					netEventDefinitionCrfs.add(parentEventDefinitionCrf);
 				}
 			}

@@ -259,7 +259,7 @@
 
 <tr valign="top">
     <td class="table_cell" colspan="1">
-        <fmt:message key="hidden_crf" bundle="${resword}"/> :
+        <fmt:message key="hidden_crf" bundle="${resword}"/>:
         <c:choose>
             <c:when test="${! edc.hideCrf}">
                 <input type="checkbox" name="hideCRF<c:out value="${count}"/>" value="yes">

@@ -139,9 +139,19 @@
 
                         <td class="table_cell"><c:out value="${crf.status.name}"/></td>
 
-                        <td class="table_cell"><c:out value="${crf.hideCrf}"/></td>
+                        <td class="table_cell">
+                            <c:choose>
+                                <c:when test="${crf.hideCrf == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+                                <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td class="table_cell">
+                            <c:choose>
+                                <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+                                <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+                            </c:choose>
+                        </td>
 
-                        <td class="table_cell"><c:out value="${crf.participantForm}"/></td>
 
 						<td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td> 
 						
