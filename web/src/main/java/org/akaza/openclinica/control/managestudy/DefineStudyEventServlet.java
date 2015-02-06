@@ -290,6 +290,7 @@ public class DefineStudyEventServlet extends SecureController {
             String doubleEntry = fp.getString("doubleEntry" + i);
             String decisionCondition = fp.getString("decisionCondition" + i);
             String electronicSignature = fp.getString("electronicSignature" + i);
+            String participantForm = fp.getString("participantForm" + i);
 
             // issue 312 BWP<<
             String hiddenCrf = fp.getString("hiddenCrf" + i);
@@ -307,6 +308,11 @@ public class DefineStudyEventServlet extends SecureController {
                 edcBean.setRequiredCRF(true);
             } else {
                 edcBean.setRequiredCRF(false);
+            }
+            if (!StringUtils.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim())) {
+                edcBean.setParticipantForm(true);
+            } else {
+                edcBean.setParticipantForm(false);
             }
             if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);

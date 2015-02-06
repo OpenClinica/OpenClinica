@@ -90,6 +90,7 @@
                     <td class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
 
                 </tr>
@@ -139,6 +140,8 @@
                         <td class="table_cell"><c:out value="${crf.status.name}"/></td>
 
                         <td class="table_cell"><c:out value="${crf.hideCrf}"/></td>
+
+                        <td class="table_cell"><c:out value="${crf.participantForm}"/></td>
 
 						<td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td> 
 						

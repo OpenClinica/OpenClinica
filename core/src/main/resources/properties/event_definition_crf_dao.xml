@@ -109,7 +109,7 @@
 		<name>findAllActiveByEventDefinitionIdandStudyId</name>
 		<sql>
           SELECT * FROM event_definition_crf
-          WHERE study_event_definition_id=? and study_id=? and status_id=1
+          WHERE study_event_definition_id=? and study_id=? and status_id=1 and participant_form=true
           order by ordinal asc
         </sql>
 	</query>
