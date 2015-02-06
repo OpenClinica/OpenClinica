@@ -557,6 +557,7 @@ public class OpenRosaXmlGenerator {
 		Reader reader = new StringReader(content);
 		Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
 		unmarshaller.setClass(Html.class);
+		unmarshaller.setWhitespacePreserve(false);
 		Html html = (Html) unmarshaller.unmarshal(reader);
 		reader.close();
 		return html;
