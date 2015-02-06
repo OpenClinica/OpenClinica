@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -24,12 +25,14 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -86,11 +89,16 @@ public class AccountController {
 	StudySubjectDAO ssdao;
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
+	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
+		
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -118,6 +126,10 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
+		
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -139,6 +151,10 @@ public class AccountController {
 		uDTO = null;
 		StudyBean studyBean = getStudy(studyOid);
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+
+		if (!mayProceed(studyOid,studySubjectBean))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isStudySubjectDoesNotExist(studySubjectBean))
@@ -176,6 +192,9 @@ public class AccountController {
 		StudyBean studyBean = getStudy(studyOid);
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
+
+		if (!mayProceed(studyOid,studySubjectBean))
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -446,5 +465,45 @@ public class AccountController {
 		return false;
 	}
 
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		Integer studyId = study.getId();
+		Integer pStudyId = 0;
+		if (!sdao.isAParent(studyId)) {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			pStudyId = parentStudy.getId();
+			study = (StudyBean) sdao.findByPK(pStudyId);
+		}
+		return study;
+	}
+
+	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
+		boolean accessPermission = false;
+		logger.info("  studySubjectStatus: "+ssBean.getStatus().getName());
+		System.out.println("  studySubjectStatus: "+ssBean.getStatus().getName());
+		if (mayProceed(studyOid) && ssBean.getStatus()==Status.AVAILABLE) {
+			accessPermission = true;
+		}
+		
+		return accessPermission;
+	}
+
+	private boolean mayProceed(String studyOid ) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+		participantPortalRegistrar = new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participateStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") ) {
+			accessPermission = true;
+		}
+		
+		return accessPermission;
+	}
 
 }
