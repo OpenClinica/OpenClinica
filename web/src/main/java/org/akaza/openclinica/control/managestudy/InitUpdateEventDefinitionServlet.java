@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
@@ -98,6 +99,9 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             // definition id
             int defId = Integer.valueOf(idString.trim()).intValue();
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
 
             if (currentStudy.getId() != sed.getStudyId()) {
                 addPageMessage(respage.getString("no_have_correct_privilege_current_study")

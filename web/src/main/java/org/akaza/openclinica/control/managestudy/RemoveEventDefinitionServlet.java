@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -108,6 +109,10 @@ public class RemoveEventDefinitionServlet extends SecureController {
                     forwardPage(Page.LIST_DEFINITION_SERVLET);
                     return;
                 }
+                StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+                String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            
+                request.setAttribute("participateFormStatus",participateFormStatus );
 
                 request.setAttribute("definitionToRemove", sed);
                 request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);

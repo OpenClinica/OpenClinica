@@ -16,6 +16,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 
@@ -70,6 +71,10 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
             edc.setDefaultVersionName(defaultVersion.getName());
         }
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+    
+        request.setAttribute("participateFormStatus",participateFormStatus );
 
         request.setAttribute("definition", sed);
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);

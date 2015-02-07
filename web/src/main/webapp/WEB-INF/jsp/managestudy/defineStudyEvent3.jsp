@@ -99,7 +99,15 @@
                             </td></tr>
                         <tr valign="top">
                             <td class="table_cell" colspan="1"><fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes"></td>
-                            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
+
+
+  <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
+            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
+   </c:when>  
+ </c:choose>
+
+
                     		
                             <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>">
