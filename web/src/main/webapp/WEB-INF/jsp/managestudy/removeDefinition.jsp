@@ -111,12 +111,22 @@
   
    <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:    
     <c:out value="${crf.defaultVersionName}"/>     
+  
+  
+  
+    <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
     <td class="table_cell"><fmt:message key="participant_form" bundle="${resword}"/>:
      <c:choose>
       <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
    </td>
+   </c:when>  
+ </c:choose>
+  
+  
+  
    <td class="table_cell"><fmt:message key="null_values" bundle="${resword}"/>:    
     <c:out value="${crf.nullValues}"/>     
   </td>
