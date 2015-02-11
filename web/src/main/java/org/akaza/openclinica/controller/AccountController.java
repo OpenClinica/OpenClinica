@@ -109,10 +109,9 @@ public class AccountController {
 		Integer studyId = study.getId();
 		Integer pStudyId = 0;
 
-		if (!sdao.isAParent(studyId)) {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-			pStudyId = parentStudy.getId();
-		}
+		StudyBean parentStudy = getParentStudy(studyOid);
+		pStudyId = parentStudy.getId();
+
 
 		if (doesCRCNotHaveStudyAccessRole(crcUserName, studyId, pStudyId))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -425,11 +424,9 @@ public class AccountController {
 		StudyBean study = (StudyBean) sdao.findByPK(studyId);
 		Integer pStudyId = 0;
 
-		if (!sdao.isAParent(studyId)) {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-			pStudyId = parentStudy.getId();
-			study = (StudyBean) sdao.findByPK(pStudyId);
-		}
+		StudyBean parentStudy = getParentStudy(study.getOid());
+		pStudyId = parentStudy.getId();
+
 
 		String pUserName = study.getOid() + "." + studySubjectOid;
 		map.put("pUserName", pUserName);
@@ -467,14 +464,13 @@ public class AccountController {
 
 	private StudyBean getParentStudy(String studyOid) {
 		StudyBean study = getStudy(studyOid);
-		Integer studyId = study.getId();
-		Integer pStudyId = 0;
-		if (!sdao.isAParent(studyId)) {
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
 			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-			pStudyId = parentStudy.getId();
-			study = (StudyBean) sdao.findByPK(pStudyId);
+			return parentStudy;
 		}
-		return study;
+
 	}
 
 	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
