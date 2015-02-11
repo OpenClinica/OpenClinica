@@ -36,7 +36,9 @@ public class EnketoCredentials {
 
 		BufferedReader inputReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String response = IOUtils.toString(con.getInputStream(), "UTF-8");
-		JSONObject json = JSONArray.fromObject(response).getJSONObject(0);
+
+		JSONObject json = JSONObject.fromObject(response);
+	//	JSONObject json = JSONArray.fromObject(response).getJSONObject(0);
 		credentials.setServerUrl(json.getString("pformUrl"));
 		credentials.setApiKey(json.getString("pformApiKey"));
 		credentials.setOcInstanceUrl(ocUrl);		

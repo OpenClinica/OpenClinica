@@ -738,10 +738,10 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
      * @return a boolean
      */
     public boolean isAParent(int studyId) {
-        boolean ret = false;
+        boolean ret = true;
         Collection col = findAllByParent(studyId);
         if (col != null && col.size() > 0) {
-            ret = true;
+            ret = false;
         }
         return ret;
     }

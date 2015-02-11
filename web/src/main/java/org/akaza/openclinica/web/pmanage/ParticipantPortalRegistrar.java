@@ -48,10 +48,11 @@ public class ParticipantPortalRegistrar {
 		finally{
 			input.close();
 		}
+		if (response.isEmpty()) return "";
+		JSONObject json = JSONObject.fromObject(response);
+        if (json.isEmpty()) return "";
+    	JSONObject authStatus = json.getJSONObject("authorizationStatus");
 		
-		JSONArray jsonArray = JSONArray.fromObject(response);
-		if (jsonArray.size() == 0) return "";
-		JSONObject authStatus = jsonArray.getJSONObject(0).getJSONObject("authorizationStatus");
 		if (!authStatus.isNullObject()) return authStatus.getString("status");
 		else return "";
 	}
@@ -91,7 +92,7 @@ public class ParticipantPortalRegistrar {
 			output.flush();
 			
 			input = new DataInputStream( con.getInputStream());
-			response = IOUtils.toString(input, "UTF-8");			
+			response = IOUtils.toString(input, "UTF-8");	
 		}
 		catch (Exception e)
 		{
@@ -100,7 +101,7 @@ public class ParticipantPortalRegistrar {
 		}
 		finally{
 			output.close();
-			input.close();
+		//	input.close();
 		}
 		
 		JSONObject json = JSONObject.fromObject(response);
