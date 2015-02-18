@@ -52,11 +52,7 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
 
 </head>
-<body class="aka_bodywidth" onload=document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'"  onunload="javascript:clsWin();">
-<%-- BWP:  onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
-  alert(self.screen.availWidth);
-margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
+<body class="aka_bodywidth" onload="document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();">
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em;background-color: white; color:black;">
 
@@ -303,8 +299,47 @@ function kp(e){ky=e?e.which:event.keyCode;if(ky==88||ky==120)hm();return false}
 function inf(h){tag=document.getElementsByTagName('select');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('iframe');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('object');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;}
 function sm(obl, chkbox, wd, ht){if(chkbox.checked==false){checkboxObject=chkbox;return;} checkboxObject=chkbox;  var h='hidden';var b='block';var p='px';var obol=$('ol'); var obbxd = $('mbd');obbxd.innerHTML = $(obl).innerHTML;obol.style.height=pageHeight()+p;obol.style.width=pageWidth()+p;obol.style.top=posTop()+p;obol.style.left=posLeft()+p;obol.style.display=b;var tp=posTop()+((pageHeight()-ht)/2)-12;var lt=posLeft()+((pageWidth()-wd)/2)-12;var obbx=$('mbox');obbx.style.top=(tp<0?0:tp)+p;obbx.style.left=(lt<0?0:lt)+p;obbx.style.width=wd+p;obbx.style.height=ht+p;inf(h);obbx.style.display=b;return false;}
 function hm(){var v='visible';var n='none';$('ol').style.display=n;$('mbox').style.display=n;inf(v);document.onkeypress=''}
-function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
-    window.onscroll = scrollFix; window.onresize = sizeFix;
+function initmb(){
+    var ab='absolute';
+    var n='none';
+    var obody=document.getElementsByTagName('body')[0];
+    var frag=document.createDocumentFragment();
+    var obol=document.createElement('div');
+    obol.setAttribute('id','ol');
+    obol.style.display=n;
+    obol.style.position=ab;
+    obol.style.top=0;
+    obol.style.left=0;
+    obol.style.zIndex=998;
+    obol.style.width='100%';
+    frag.appendChild(obol);
+
+    var obbx=document.createElement('div');
+    obbx.setAttribute('id','mbox');
+    obbx.style.display=n;
+    obbx.style.position=ab;
+    obbx.style.zIndex=999;
+
+    var obl=document.createElement('span');
+    obbx.appendChild(obl);
+
+    var obbxd=document.createElement('div');
+    obbxd.setAttribute('id','mbd');
+    obl.appendChild(obbxd);
+    frag.insertBefore(obbx,obol.nextSibling);
+    obody.insertBefore(frag,obody.firstChild);
+
+    window.onscroll = scrollFix;
+    window.onresize = sizeFix;
+
+    var srh = document.getElementById('srh');
+    var srl = document.getElementById('srl');
+    var seh = document.getElementById('seh');
+    var sel = document.getElementById('sel');
+    srh.disabled = false;
+    srl.disabled = false;
+    seh.disabled = false;
+    sel.disabled = false;
 }
 window.onload = initmb;
 
@@ -447,9 +482,9 @@ window.onload = initmb;
                                     </c:otherwise>
                                 </c:choose>
 
-                                <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
+                                <td><input type="submit" id="srh" disabled name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                                <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
+                                <td><input type="submit" id="seh" disabled name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
 
                                 <c:choose>
@@ -1242,9 +1277,9 @@ table-->
                             <td colspan="2">&nbsp;</td>
                         </c:otherwise>
                     </c:choose>
-                    <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
+                    <td><input type="submit" id="srl" disabled name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
-                    <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
+                    <td><input type="submit" id="sel" disabled name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
 
                     <c:choose>
                         <c:when test="${! empty formMessages}">
