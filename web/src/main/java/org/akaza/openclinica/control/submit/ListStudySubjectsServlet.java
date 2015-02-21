@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -49,6 +50,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private boolean showMoreLink;
+    private StudyParameterValueDAO studyParameterValueDAO;
     Locale locale;
 
     /*
@@ -134,7 +136,9 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
+        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         String findSubjectsHtml = factory.createTable(request, response).render();
+
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
         // A. Hamid.
         // For event definitions and group class list in the add subject popup
@@ -151,8 +155,17 @@ public class ListStudySubjectsServlet extends SecureController {
     protected String getAdminServlet() {
         return SecureController.ADMIN_SERVLET_CODE;
     }
+    
+    public StudyParameterValueDAO getStudyParameterValueDAO() {
+        studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
+		return studyParameterValueDAO;
+	}
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+		this.studyParameterValueDAO = studyParameterValueDAO;
+	}
+
+	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
         studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
         return studyEventDefinitionDAO;
     }
