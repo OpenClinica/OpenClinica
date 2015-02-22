@@ -829,13 +829,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         System.out.println("URL:  "+ url);
 
     	HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();
+     //   actionLink.a().href("url?id=" + studySubject.getId());
+        actionLink.a().href(url);
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_Lock_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_Lock.gif');\"").close();      
+        actionLink.img().name("bt_View1").src("images/bt_Lock.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();        
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
-
     }
 
     
