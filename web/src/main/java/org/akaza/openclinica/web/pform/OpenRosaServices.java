@@ -361,16 +361,15 @@ public class OpenRosaServices {
 		return studyBean;
 	}
 
-    private StudyBean getParentStudy(String studyOid) {
+	private StudyBean getParentStudy(String studyOid) {
 		StudyBean study = getStudy(studyOid);
-		Integer studyId = study.getId();
-		Integer pStudyId = 0;
-		if (!sdao.isAParent(studyId)) {
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
 			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-			pStudyId = parentStudy.getId();
-			study = (StudyBean) sdao.findByPK(pStudyId);
+			return parentStudy;
 		}
-		return study;
+
 	}
 
 			private boolean mayProceedSubmission(String studyOid , StudySubjectBean ssBean) throws Exception {
