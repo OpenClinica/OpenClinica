@@ -68,6 +68,7 @@ public class ChangeStudyServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
+    private StudyParameterValueDAO studyParameterValueDAO;
 
     // < ResourceBundlerestext;
 
@@ -374,6 +375,7 @@ public class ChangeStudyServlet extends SecureController {
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
+        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         String findSubjectsHtml = factory.createTable(request, response).render();
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
     }
@@ -437,4 +439,14 @@ public class ChangeStudyServlet extends SecureController {
         return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
     }
 
+	public StudyParameterValueDAO getStudyParameterValueDAO() {
+	     studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
+		return studyParameterValueDAO;
+	}
+
+	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+		this.studyParameterValueDAO = studyParameterValueDAO;
+	}
+
+    
 }
