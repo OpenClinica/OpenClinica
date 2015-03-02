@@ -339,6 +339,13 @@ public class AccountController {
 		return studyBean;
 	}
 
+	private StudyBean getStudy(Integer id) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+		return studyBean;
+	}
+
+	
 	private StudySubjectBean getStudySubject(String label, StudyBean study) {
 		ssdao = new StudySubjectDAO(dataSource);
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByLabelAndStudy(label, study);
@@ -439,18 +446,22 @@ public class AccountController {
 	}
 
 	private Boolean doesCRCNotHaveStudyAccessRole(String crcUserName, Integer studyId, Integer pStudyId) {
-		boolean found = false;
+    		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
-			System.out.println(studyUserRoleBean.getStudyId());
+            StudyBean study = getParentStudy(studyUserRoleBean.getStudyId());
 			System.out.println("-------------");
-			System.out.println("     " + studyId);
-			System.out.println("     " + pStudyId);
-			System.out.println(studyUserRoleBean.getRoleName());
-			System.out.println("-------------");
-			if ((studyUserRoleBean.getStudyId() == studyId || studyUserRoleBean.getStudyId() == pStudyId)
-					&& (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))) {
+			System.out.println("Study Id to compare: "+studyUserRoleBean.getStudyId());
+			System.out.println("parent study Id to compare: " +study.getId());
+			System.out.println("Parent Study Id    " + pStudyId);
+			System.out.println("Role: "+studyUserRoleBean.getRoleName());
+			System.out.println("Status :"+ studyUserRoleBean.getStatus().getId());
+
+            
+			if ((study.getId() == pStudyId)
+					&& (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))&& studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
+	            System.out.println("if found :" + found);			
 				break;
 			}
 		}
@@ -462,6 +473,17 @@ public class AccountController {
 		return false;
 	}
 
+	private StudyBean getParentStudy(Integer studyId) {
+		StudyBean study = getStudy(studyId);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+
+	}
+	
 	private StudyBean getParentStudy(String studyOid) {
 		StudyBean study = getStudy(studyOid);
 		if (study.getParentStudyId() == 0) {
