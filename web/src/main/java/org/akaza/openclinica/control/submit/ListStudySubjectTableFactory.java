@@ -54,6 +54,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Properties;
+import java.lang.Exception;
+import java.io.InputStream;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -80,13 +89,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ResourceBundle resword;
     private ResourceBundle resformat;
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
-
+    private Properties dataInfo;
+    private Properties dataInfoProp;
+    private Connection connection = null;
+    private Statement statement = null;
+    private ResultSet result = null;
+    private HttpServletRequest servletRequest;
+    private String ocuiUrl;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
     @Override
 //To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
+        servletRequest = request;
+        setOcuiParameter();
          locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
@@ -747,6 +764,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         && getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
+
+                    if ((getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2) 
+                        && getCurrentRole().getStatus().equals(Status.AVAILABLE) && getStudyBean().getStatus() == Status.AVAILABLE 
+                        && studySubjectBean.getStatus() == Status.AVAILABLE) {
+                        url.append(participantLinkBuilder(studySubjectBean));
+                    }
                 }
                 value = url.toString();
             }
@@ -765,6 +788,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
+    }
+
+    private String participantLinkBuilder(StudySubjectBean studySubject) {
+        HtmlBuilder actionLink = new HtmlBuilder();
+        actionLink.a().href(ocuiUrl).close();
+        actionLink.img().name("bt_Ocui").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();
+        actionLink.append("&nbsp;&nbsp;&nbsp;");
+        return actionLink.toString();
     }
 
     private String removeStudySubjectLinkBuilder(StudySubjectBean studySubject) {
@@ -1332,6 +1363,49 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String format = resformat.getString("date_format_string");
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
+    }
+
+    public String getPortalURL() {
+        Properties p = new Properties();
+        InputStream inpStream = null;
+        try {
+                inpStream = this.getClass().getClassLoader().getResourceAsStream("datainfo.properties");
+                p.load(inpStream);
+                inpStream.close();
+        } catch (Exception e) {}
+        return p.getProperty("portalURL");
+         
+    }
+
+    public void setOcuiParameter() {
+        String host = null;
+        String currentAddress = servletRequest.getRequestURL().toString().split("OpenClinica")[0];
+        String tmpAddress = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+
+            /* need to be modified based on database location */
+            connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/epro", "epro","epro");
+            statement = connection.createStatement();
+            result = statement.executeQuery("select * from study where study_oid='" + studyBean.getOid() + "'");
+            while(result.next()) { 
+                tmpAddress = result.getString("instance_url").split("OpenClinica")[0];
+                if (tmpAddress.equals(currentAddress)) {
+                    host = result.getString("host");
+                    ocuiUrl = host + "." + getPortalURL() + "/#/login";
+                }
+            }
+            if (host == null) {
+                ocuiUrl = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":8081/#/login";
+            }
+
+            statement.close();
+            connection.close();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }
