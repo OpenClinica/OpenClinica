@@ -9,3 +9,4 @@ release.properties
 .settings/
 .idea/
 OpenClinica.iml
+web/src/main/resources/datainfo.properties

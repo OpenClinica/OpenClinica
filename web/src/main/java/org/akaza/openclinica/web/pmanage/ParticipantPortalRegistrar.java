@@ -51,8 +51,8 @@ public class ParticipantPortalRegistrar {
 		}
 		if (response.isEmpty()) return "";
 		JSONObject json = JSONObject.fromObject(response);
-        if (json.isEmpty()) return "";
-    	JSONObject authStatus = json.getJSONObject("authorizationStatus");
+		if (json.isEmpty()) return "";
+		JSONObject authStatus = json.getJSONObject("authorizationStatus");
 		if (!authStatus.isNullObject()) return authStatus.getString("status");
 		else return "";
 	}
@@ -80,8 +80,8 @@ public class ParticipantPortalRegistrar {
 			
 			con.setConnectTimeout(5000);
 			con.setReadTimeout(5000);
-	        con.setRequestProperty("Accept-Charset", "UTF-8");
-	        con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Accept-Charset", "UTF-8");
+			con.setRequestProperty("Content-Type", "application/json");
 			con.setRequestMethod("POST");	
 	
 			con.setDoOutput(true);
@@ -142,38 +142,44 @@ public class ParticipantPortalRegistrar {
 		}
 		if (response.isEmpty()) return "";
 		JSONObject json = JSONObject.fromObject(response);
-        if (json.isEmpty()) return "";
-        
-    	JSONObject studyHost = json.getJSONObject("study");
-    	String[] arrayUrl = pManageUrl.split(":");
-    	String tmpProtocol = arrayUrl[0];
-    	String tmpUrl = arrayUrl[1];
-    	String tmpPort = arrayUrl[2];
-    	tmpUrl = tmpUrl.substring(2);
-    	String[] tmpArr = tmpUrl.split("\\.");
-    	String[] tmpMore = new String[tmpArr.length + 1];
-    	if (tmpArr.length > 2) {
-    		tmpArr[0] = studyHost.getString("host");
-    	} else {
-    		tmpMore[0] = studyHost.getString("host");
-    		System.arraycopy(tmpArr, 0, tmpMore, 1, tmpArr.length);
-    		tmpArr = tmpMore;
-    	}
-    	StringBuffer urlBuilder = new StringBuffer();
-    	for (int i = 0; i < tmpArr.length; i++) {
-    		urlBuilder.append(tmpArr[i]);
-    		if (i != tmpArr.length - 1) {
-    			urlBuilder.append(".");
-    		} else {
-    			urlBuilder.append(":" + tmpPort);
-    		}
-    	}
+		if (json.isEmpty()) return "";
+		
+		JSONObject studyHost = json.getJSONObject("study");
+		StringBuffer urlBuilder = buildUrl(pManageUrl, studyHost);
 
 		if (!studyHost.isNullObject()) 
-			return  "http://"+urlBuilder.toString()+ "/#/login";
+			return  "http://" + urlBuilder.toString() + "/#/login";
 		else return "";
 	}
 
+	public StringBuffer buildUrl(String pManageUrl, JSONObject studyHost)
+			throws Exception {
+
+		String[] arrayUrl = pManageUrl.split(":");
+		String tmpProtocol = arrayUrl[0];
+		String tmpUrl = arrayUrl[1];
+		String tmpPort = arrayUrl[2];
+		tmpUrl = tmpUrl.substring(2);
+		String[] tmpArr = tmpUrl.split("\\.");
+		String[] tmpMore = new String[tmpArr.length + 1];
+		if (tmpArr.length > 2) {
+			tmpArr[0] = studyHost.getString("host");
+		} else {
+			tmpMore[0] = studyHost.getString("host");
+			System.arraycopy(tmpArr, 0, tmpMore, 1, tmpArr.length);
+			tmpArr = tmpMore;
+		}
+		StringBuffer urlBuilder = new StringBuffer();
+		for (int i = 0; i < tmpArr.length; i++) {
+			urlBuilder.append(tmpArr[i]);
+			if (i != tmpArr.length - 1) {
+				urlBuilder.append(".");
+			} else {
+				urlBuilder.append(":" + tmpPort);
+			}
+		}
+		return urlBuilder;
+	}
 	
 }
 
