@@ -25,8 +25,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -34,9 +37,12 @@ import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -62,14 +68,17 @@ public class OpenRosaServices {
 	private PformSubmissionService PformSubmissionService;
     private RuleActionPropertyDao ruleActionPropertyDao;
     private SCDItemMetadataDao scdItemMetadataDao;
-    
+	ParticipantPortalRegistrar participantPortalRegistrar;
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    StudyDAO sdao;     
 	@GET
 	@Path("/{studyOID}/formList")
 	@Produces(MediaType.TEXT_XML)
 	public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, @QueryParam("formID") String crfOID,
-			@RequestHeader("Authorization") String authorization) {
-
+			@RequestHeader("Authorization") String authorization) throws Exception {
+		if (!mayProceedPreview(studyOID)) return null;
+		
 		StudyDAO sdao = new StudyDAO(getDataSource());
 		StudyBean study = sdao.findByOid(studyOID);
 
@@ -137,7 +146,8 @@ public class OpenRosaServices {
 	public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response,
 			@PathParam("studyOID") String studyOID, 
 			@QueryParam("formID") String crfOID,
-			@RequestHeader("Authorization") String authorization) {
+			@RequestHeader("Authorization") String authorization) throws Exception {
+		if (!mayProceedPreview(studyOID)) return null;
 
 		String xform = null;
 
@@ -184,7 +194,12 @@ public class OpenRosaServices {
 		
 			PFormCache cache = PFormCache.getInstance(servletContext);
 			HashMap<String,String> userContext = cache.getSubjectContext(context);
-  			System.out.println("Study Subject OID :  "+userContext.get("studySubjectOID"));
+			StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
+			StudySubjectBean ssBean = ssdao.findByOid(userContext.get("studySubjectOID"));
+
+			if (!mayProceedSubmission(studyOID,ssBean)) return null;
+			
+			System.out.println("Study Subject OID :  "+userContext.get("studySubjectOID"));
 			System.out.println("Study Event Defn id : "+userContext.get("studyEventDefinitionID"));
 			System.out.println("Study Event Defn Ordinal :  "+userContext.get("studyEventOrdinal"));
 			System.out.println("CRF Version OID :  "+userContext.get("crfVersionOID"));
@@ -202,8 +217,6 @@ public class OpenRosaServices {
 			String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 
 			System.out.println(body);
-
-			
 			
 			body = body.substring(body.indexOf("<F_"));
 			int length = body.indexOf(" ");
@@ -212,6 +225,7 @@ public class OpenRosaServices {
 			body = "<instance>" + body + "</instance>";
 			
 			System.out.println(body);
+			LOGGER.info(body);
 			
 		    Errors errors=getPformSubmissionService().saveProcess(body,studySubjectOid,studyEventDefnId,studyEventOrdinal);
 					
@@ -258,11 +272,15 @@ public class OpenRosaServices {
 			@Context HttpServletResponse response,
 			@Context ServletContext context,
 			@PathParam("studyOID") String studyOID,
-			@RequestHeader("Authorization") String authorization)
+			@RequestHeader("Authorization") String authorization) throws Exception
 	{	
 		
 		String ssoid = request.getParameter("studySubjectOID");
-		HashMap<String,String> urlCache = (HashMap<String,String>) context.getAttribute("pformURLCache");
+		StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
+		StudySubjectBean ssBean = ssdao.findByOid(ssoid);
+	if (!mayProceedSubmission(studyOID,ssBean)) return null;
+
+	HashMap<String,String> urlCache = (HashMap<String,String>) context.getAttribute("pformURLCache");
 		context.getAttribute("subjectContextCache");
 		if (ssoid == null) {
 			return "<error>studySubjectOID is null :(</error>";
@@ -337,6 +355,58 @@ public class OpenRosaServices {
 	public void setScdItemMetadataDao(SCDItemMetadataDao scdItemMetadataDao) {
 		this.scdItemMetadataDao = scdItemMetadataDao;
 	}
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
+
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+
+	}
+
+			private boolean mayProceedSubmission(String studyOid , StudySubjectBean ssBean) throws Exception {
+				boolean accessPermission = false;
+				StudyBean study = getParentStudy(studyOid);
+				StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+				StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+				 participantPortalRegistrar=new ParticipantPortalRegistrar();
+				String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+				String participateStatus = pStatus.getValue().toString();         // enabled , disabled
+				String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+				logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+				System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+				if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+					accessPermission = true;
+				}
+				return accessPermission;
+			}
+
+		private boolean mayProceedPreview(String studyOid) throws Exception {
+			boolean accessPermission = false;
+			StudyBean study = getParentStudy(studyOid);
+			StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+			
+			StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+			 participantPortalRegistrar=new ParticipantPortalRegistrar();
+			String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+			String participateStatus = pStatus.getValue().toString();         // enabled , disabled
+			String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+			System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+			logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
+			if (participateStatus.equalsIgnoreCase("enabled") && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending")  || studyStatus.equalsIgnoreCase("frozen") || studyStatus.equalsIgnoreCase("locked")) 
+					&& (pManageStatus.equalsIgnoreCase("ACTIVE") || pManageStatus.equalsIgnoreCase("PENDING") || pManageStatus.equalsIgnoreCase("INACTIVE"))) {
+				accessPermission = true;
+			}
+			return accessPermission;
+		}
 
 	
 }

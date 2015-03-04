@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
@@ -26,11 +27,13 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -66,10 +69,11 @@ import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
-    private StudyEventDefinitionDAO studyEventDefinitionDao;
+	private StudyEventDefinitionDAO studyEventDefinitionDao;
     private StudySubjectDAO studySubjectDAO;
     private SubjectDAO subjectDAO;
     private StudyEventDAO studyEventDAO;
@@ -89,22 +93,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ResourceBundle resword;
     private ResourceBundle resformat;
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
-    private Properties dataInfo;
-    private Properties dataInfoProp;
-    private Connection connection = null;
-    private Statement statement = null;
-    private ResultSet result = null;
-    private HttpServletRequest servletRequest;
-    private String ocuiUrl;
+    private StudyParameterValueDAO studyParameterValueDAO;
+	private ParticipantPortalRegistrar	participantPortalRegistrar = new ParticipantPortalRegistrar();
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
     @Override
 //To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-        servletRequest = request;
-        setOcuiParameter();
-         locale = LocaleResolver.getLocale(request);
+        locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         setDataAndLimitVariables(tableFacade);
@@ -439,7 +436,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return studyGroupClasses;
     }
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+    
+	public StudyParameterValueDAO getStudyParameterValueDAO() {
+		return studyParameterValueDAO;
+	}
+	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+		this.studyParameterValueDAO = studyParameterValueDAO;
+	}
+	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
         return studyEventDefinitionDao;
     }
 
@@ -736,6 +740,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private class ActionsCellEditor implements CellEditor {
+
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -765,11 +770,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if ((getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2) 
-                        && getCurrentRole().getStatus().equals(Status.AVAILABLE) && getStudyBean().getStatus() == Status.AVAILABLE 
-                        && studySubjectBean.getStatus() == Status.AVAILABLE) {
-                        url.append(participantLinkBuilder(studySubjectBean));
-                    }
+                    try {
+						if (getStudyBean().getStatus() == Status.AVAILABLE && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
+						        && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE") && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
+							url.append(viewParticipateBuilder(studySubjectBean));
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 }
                 value = url.toString();
             }
@@ -779,6 +788,36 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     }
 
+    private String participateStatus(StudySubjectBean studySubjectBean){
+	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());	        	
+    	 String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
+       return participateFormStatus;
+    }
+    
+    
+    private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception{
+	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());	    
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(pStudy.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
+    return pManageStatus;  	
+    }
+    
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+	}
+
+	private StudyBean getStudy(String oid) {
+		StudyBean studyBean = (StudyBean) studyDAO.findByOid(oid);
+		return studyBean;
+	}
+    
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
@@ -790,10 +829,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private String participantLinkBuilder(StudySubjectBean studySubject) {
-        HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href(ocuiUrl).close();
-        actionLink.img().name("bt_Ocui").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();
+    private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
+	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubject.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());	    
+        String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
+        System.out.println("URL:  "+ url);
+
+    	HtmlBuilder actionLink = new HtmlBuilder();
+     //   actionLink.a().href("url?id=" + studySubject.getId());
+        actionLink.a().href(url);
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_Lock_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_Lock.gif');\"").close();      
+        actionLink.img().name("bt_View1").src("images/bt_Lock.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();        
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
@@ -1364,48 +1411,4 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
     }
-
-    public String getPortalURL() {
-        Properties p = new Properties();
-        InputStream inpStream = null;
-        try {
-                inpStream = this.getClass().getClassLoader().getResourceAsStream("datainfo.properties");
-                p.load(inpStream);
-                inpStream.close();
-        } catch (Exception e) {}
-        return p.getProperty("portalURL");
-         
-    }
-
-    public void setOcuiParameter() {
-        String host = null;
-        String currentAddress = servletRequest.getRequestURL().toString().split("OpenClinica")[0];
-        String tmpAddress = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-
-            /* need to be modified based on database location */
-            connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/epro", "epro","epro");
-            statement = connection.createStatement();
-            result = statement.executeQuery("select * from study where study_oid='" + studyBean.getOid() + "'");
-            while(result.next()) { 
-                tmpAddress = result.getString("instance_url").split("OpenClinica")[0];
-                if (tmpAddress.equals(currentAddress)) {
-                    host = result.getString("host");
-                    ocuiUrl = host + "." + getPortalURL() + "/#/login";
-                }
-            }
-            if (host == null) {
-                ocuiUrl = servletRequest.getScheme() + "://" + servletRequest.getServerName() + ":8081/#/login";
-            }
-
-            statement.close();
-            connection.close();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

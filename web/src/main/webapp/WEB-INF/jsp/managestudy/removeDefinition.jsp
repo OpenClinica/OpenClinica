@@ -83,7 +83,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">  
   <c:forEach var ="crf" items="${eventDefinitionCRFs}">   
    <tr valign="top" bgcolor="#F5F5F5">             
-    <td class="table_header_column" colspan="4"><c:out value="${crf.crfName}"/></td> 
+    <td class="table_header_column" colspan="5"><c:out value="${crf.crfName}"/></td> 
     <td class="table_header_column" colspan="1"><c:out value="${crf.status.name}"/></td>      
   </tr>  
    <tr valign="top">   
@@ -111,7 +111,22 @@
   
    <td class="table_cell"><fmt:message key="default_version" bundle="${resword}"/>:    
     <c:out value="${crf.defaultVersionName}"/>     
+  
+  
+  
+    <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
+    <td class="table_cell"><fmt:message key="participant_form" bundle="${resword}"/>:
+     <c:choose>
+      <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
    </td>
+   </c:when>  
+ </c:choose>
+  
+  
+  
    <td class="table_cell"><fmt:message key="null_values" bundle="${resword}"/>:    
     <c:out value="${crf.nullValues}"/>     
   </td>

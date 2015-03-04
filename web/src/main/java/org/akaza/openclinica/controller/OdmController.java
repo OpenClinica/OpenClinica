@@ -2,12 +2,14 @@ package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -19,12 +21,14 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_api.ODM;
@@ -73,11 +77,15 @@ public class OdmController {
 	RuleController ruleController;
 
 	public static final String FORM_CONTEXT = "ecid";
+	ParticipantPortalRegistrar participantPortalRegistrar;
+	StudyDAO sdao;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
 	public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response) throws Exception {
+		if (!mayProceed(studyOid))
+			return null;
 		return ruleController.studyMetadata(model, session, studyOid, response);
 	}
 
@@ -115,11 +123,12 @@ public class OdmController {
 			StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
 			logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 			StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
-            ArrayList<CRFVersionBean> crfs =getCRFVersionBean(studySubjectBean, nextEvent);
+			ArrayList<CRFVersionBean> crfs = getCRFVersionBean(studySubjectBean, nextEvent);
 
 			List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
 			StudyBean study = studyDAO.findByOid(studyOID);
-
+			if (!mayProceed(studyOID, studySubjectBean))
+				return odm;
 			// Only return info for CRFs that are not started, completed, or started but do not have any
 			// saved item data associated with them.
 			for (CRFVersionBean crfVersion : crfs) {
@@ -149,11 +158,10 @@ public class OdmController {
 		return odm;
 
 	}
-	
-	
-	private ArrayList <CRFVersionBean>  getCRFVersionBean(StudySubjectBean studySubjectBean , StudyEventBean nextEvent)    {
+
+	private ArrayList<CRFVersionBean> getCRFVersionBean(StudySubjectBean studySubjectBean, StudyEventBean nextEvent) {
 		EventDefinitionCRFDAO edcdao;
-		
+
 		Integer studyId = studySubjectBean.getStudyId();
 		StudyDAO sdao = new StudyDAO<String, ArrayList>(dataSource);
 		StudyBean studyBean = (StudyBean) sdao.findByPK(studyId);
@@ -164,36 +172,29 @@ public class OdmController {
 		ArrayList<CRFVersionBean> crfs = new ArrayList<CRFVersionBean>();
 		Integer pStudyId = 0;
 		edcdao = new EventDefinitionCRFDAO(dataSource);
-
 		eventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(), studyId);
 
-		if (!sdao.isAParent(studyId)) {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
+		StudyBean parentStudy = getParentStudy(studyBean.getOid());
 			pStudyId = parentStudy.getId();
-			edcdao = new EventDefinitionCRFDAO(dataSource);
-			parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(), pStudyId);
+       	
+		edcdao = new EventDefinitionCRFDAO(dataSource);
+		parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(), pStudyId);
 
 			boolean found;
 			for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
 				found = false;
 				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
-					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) {              //
+					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) { //
 						found = true;
-          				if (parentEventDefinitionCrf.isHideCrf() || eventDefinitionCrf.isHideCrf()){
-          				}else{
-          					netEventDefinitionCrfs.add(eventDefinitionCrf);
-          				}
+						netEventDefinitionCrfs.add(eventDefinitionCrf);
 						break;
 					}
 				}
 				if (!found) {
-					if (!parentEventDefinitionCrf.isHideCrf())
 					netEventDefinitionCrfs.add(parentEventDefinitionCrf);
 				}
 			}
-		} else {
-			netEventDefinitionCrfs = eventDefCrfs;
-		}
+	//		netEventDefinitionCrfs = eventDefCrfs;
 
 		sortList(netEventDefinitionCrfs);
 
@@ -205,8 +206,6 @@ public class OdmController {
 
 		return crfs;
 	}
-	
-	
 
 	private StudyEventDefinitionBean getStudyEventDefinitionBean(int ID) {
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
@@ -328,6 +327,50 @@ public class OdmController {
 				return sComp;
 			}
 		});
+	}
+
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
+
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+
+	}
+
+	private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
+		boolean accessPermission = false;
+		logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
+		System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
+		if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
+
+	private boolean mayProceed(String studyOid) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+		participantPortalRegistrar = new ParticipantPortalRegistrar();
+		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
+		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
+		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+			accessPermission = true;
+		}
+		return accessPermission;
 	}
 
 }

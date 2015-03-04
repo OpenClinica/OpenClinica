@@ -46,12 +46,13 @@ public class ParticipantPortalRegistrar {
 			logger.error(ExceptionUtils.getStackTrace(e));
 		}
 		finally{
-			input.close();
+		//	input.close();
 		}
+		if (response.isEmpty()) return "";
+		JSONObject json = JSONObject.fromObject(response);
+        if (json.isEmpty()) return "";
+    	JSONObject authStatus = json.getJSONObject("authorizationStatus");
 		
-		JSONArray jsonArray = JSONArray.fromObject(response);
-		if (jsonArray.size() == 0) return "";
-		JSONObject authStatus = jsonArray.getJSONObject(0).getJSONObject("authorizationStatus");
 		if (!authStatus.isNullObject()) return authStatus.getString("status");
 		else return "";
 	}
@@ -91,7 +92,7 @@ public class ParticipantPortalRegistrar {
 			output.flush();
 			
 			input = new DataInputStream( con.getInputStream());
-			response = IOUtils.toString(input, "UTF-8");			
+			response = IOUtils.toString(input, "UTF-8");	
 		}
 		catch (Exception e)
 		{
@@ -100,7 +101,7 @@ public class ParticipantPortalRegistrar {
 		}
 		finally{
 			output.close();
-			input.close();
+		//	input.close();
 		}
 		
 		JSONObject json = JSONObject.fromObject(response);
@@ -111,5 +112,45 @@ public class ParticipantPortalRegistrar {
 		
 	}
 
+	public String getStudyHost(String studyOid)
+			throws Exception {
+		
+		String pManageUrl = CoreResources.getField("portalURL");
+		String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+		URL eURL = new URL(pManageUrl + "/app/rest/oc/authorizations" + "?studyoid=" + studyOid + "&instanceurl=" + ocUrl);
+		HttpURLConnection con = null;
+		DataInputStream input = null;
+		String response = null;
+		
+		try
+		{					
+			con = (HttpURLConnection)eURL.openConnection();		
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+			con.setRequestMethod("GET");	
+	
+			input = new DataInputStream( con.getInputStream());
+			response = IOUtils.toString(input, "UTF-8");
+		}
+		catch (Exception e)
+		{
+			logger.error(e.getMessage());
+			logger.error(ExceptionUtils.getStackTrace(e));
+		}
+		finally{
+		//	input.close();
+		}
+		if (response.isEmpty()) return "";
+		JSONObject json = JSONObject.fromObject(response);
+        if (json.isEmpty()) return "";
+        
+    	JSONObject studyHost = json.getJSONObject("study");
+		
+		if (!studyHost.isNullObject()) 
+			return  "http://"+studyHost.getString("host")+ "."+pManageUrl.substring(7)+ "#/login ";
+		else return "";
+	}
+
+	
 }
 

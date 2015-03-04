@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -87,6 +88,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
 
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+    
+        request.setAttribute("participateFormStatus",participateFormStatus );
 
         v.addValidation("name", Validator.NO_BLANKS);
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
@@ -127,6 +132,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     String electronicSignature = fp.getString("electronicSignature" + i);
                     String hideCRF = fp.getString("hideCRF" + i);
                     int sdvId = fp.getInt("sdvOption" + i);
+                    String participantForm = fp.getString("participantForm"+i);
 
                     if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
                         edcBean.setHideCrf(true);
@@ -156,6 +162,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     } else {
                         edcBean.setDecisionCondition(false);
                     }
+                    if (!StringUtil.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim())) {
+                        edcBean.setParticipantForm(true);
+                    } else {
+                        edcBean.setParticipantForm(false);
+                    }
+
                     String nullString = "";
                     // process null values
                     ArrayList nulls = NullValue.toArrayList();

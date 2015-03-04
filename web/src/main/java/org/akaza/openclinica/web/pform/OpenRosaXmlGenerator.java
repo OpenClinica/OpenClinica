@@ -134,6 +134,7 @@ public class OpenRosaXmlGenerator {
 			String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
 			String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
 			System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
+			logger.info(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
 			return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -556,6 +557,7 @@ public class OpenRosaXmlGenerator {
 		Reader reader = new StringReader(content);
 		Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
 		unmarshaller.setClass(Html.class);
+		unmarshaller.setWhitespacePreserve(false);
 		Html html = (Html) unmarshaller.unmarshal(reader);
 		reader.close();
 		return html;

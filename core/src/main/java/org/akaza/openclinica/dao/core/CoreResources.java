@@ -1,3 +1,4 @@
+
 package org.akaza.openclinica.dao.core;
 
 import java.io.ByteArrayInputStream;
@@ -359,11 +360,11 @@ public class CoreResources implements ResourceLoaderAware {
 
         String rss_url = DATAINFO.getProperty("rssUrl");
         if (rss_url == null || rss_url.isEmpty())
-            rss_url = "http://clinicalresearch.wordpress.com/feed/";
+            rss_url = "http://blog.openclinica.com/feed/";
         DATAINFO.setProperty("rss.url", rss_url);
         String rss_more = DATAINFO.getProperty("rssMore");
         if (rss_more == null || rss_more.isEmpty())
-            rss_more = "http://clinicalresearch.wordpress.com/";
+            rss_more = "http://blog.openclinica.com/";
         DATAINFO.setProperty("rss.more", rss_more);
 
         String supportURL = DATAINFO.getProperty("supportURL");

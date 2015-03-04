@@ -9,6 +9,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.admin.AuditDAO;
@@ -21,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -28,6 +30,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_api.ODM;
@@ -70,6 +73,8 @@ public class OdmStudySubjectController {
 	@Autowired
 	ServletContext context;
 
+	StudyDAO sdao;
+	ParticipantPortalRegistrar participantPortalRegistrar;
 	public static final String FORM_CONTEXT = "ecid";
 
 	private MessageSource messageSource;
@@ -104,6 +109,8 @@ public class OdmStudySubjectController {
 			studyBean = studyDAO.findByOid(studyOID);
 			if (studyBean != null) {
 				studySubjectBean = (StudySubjectBean) studySubjectDAO.findByLabelAndStudy(studySubjectLabel, studyBean);
+				if (!mayProceed(studyOID,studySubjectBean)) return null;
+
 				if (studySubjectBean.getId() != 0) {
 					return createOdm(studyBean, studySubjectBean);
 				} else {
@@ -167,5 +174,39 @@ public class OdmStudySubjectController {
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
+	private StudyBean getStudy(String oid) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
 
+	private StudyBean getParentStudy(String studyOid) {
+		StudyBean study = getStudy(studyOid);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+
+	}
+
+	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
+		boolean accessPermission = false;
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+		 participantPortalRegistrar=new ParticipantPortalRegistrar();
+		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+		String participateStatus = pStatus.getValue().toString();         // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+		System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus + "  studySubjectStatus: "+ssBean.getStatus().getName());
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") && ssBean.getStatus()==Status.AVAILABLE) {
+			accessPermission = true;
+		}
+		return accessPermission;
+	}
+
+	
 }

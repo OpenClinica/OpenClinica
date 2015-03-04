@@ -122,6 +122,7 @@
             <element name="doubleDataEntry" type="boolean"/>
             <element name="passwordRequired" type="boolean"/>
             <element name="hideCrf" type="boolean"/>
+            <element name="participantForm" type="boolean"/>
             <element name="sourceDataVerificaiton" type="beans:customStringType"/>
             <element name="crf" type="beans:crfObjType" minOccurs="1"/>
             <element name="defaultCrfVersion" type="beans:crfVersionType" minOccurs="1"/>

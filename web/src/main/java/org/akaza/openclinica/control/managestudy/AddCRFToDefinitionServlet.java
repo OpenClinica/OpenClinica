@@ -18,6 +18,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
@@ -208,17 +209,24 @@ public class AddCRFToDefinitionServlet extends SecureController {
             }
         }
         session.removeAttribute("tmpCRFIdMap");
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
 
         if (crfArray.size() == 0) {// no crf seleted
             addPageMessage(respage.getString("no_new_CRF_added"));
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             sed.setCrfs(new ArrayList());
             session.setAttribute("definition", sed);
             forwardPage(Page.UPDATE_EVENT_DEFINITION1);
         } else {
 
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
             int ordinalForNewCRF = edcs.size();
             for(int i=0; i<crfArray.size(); i++){

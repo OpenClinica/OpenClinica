@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -21,6 +22,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
@@ -95,7 +97,10 @@ public class ViewEventDefinitionServlet extends SecureController {
                 CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
                 edc.setDefaultVersionName(defaultVersion.getName());
             }
-
+            
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();       
+            request.setAttribute("participateFormStatus",participateFormStatus );            
             request.setAttribute("definition", sed);
             request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
             request.setAttribute("defSize", new Integer(eventDefinitionCRFs.size()));

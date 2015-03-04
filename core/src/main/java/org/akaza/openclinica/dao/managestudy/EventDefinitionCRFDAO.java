@@ -88,6 +88,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(19, TypeNames.INT); // source_data_verification_id
         this.setTypeExpected(20, TypeNames.STRING); // selected_version_ids
         this.setTypeExpected(21, TypeNames.INT); // parent_id
+        this.setTypeExpected(22, TypeNames.BOOL);  // participant_crf
     }
 
     /**
@@ -123,6 +124,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         eb.setSelectedVersionIds(selectedVersionIds != null ? selectedVersionIds : "");
         int parentId = (Integer) hm.get("parent_id");
         eb.setParentId(parentId > 0 ? parentId : 0);
+        eb.setParticipantForm(((Boolean) hm.get("participant_form")).booleanValue());
         return eb;
     }
 
@@ -300,6 +302,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
+        variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
         this.execute(digester.getQuery("create"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -347,7 +350,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
-        variables.put(new Integer(19), new Integer(sb.getId()));
+        variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
+        variables.put(new Integer(20), new Integer(sb.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
