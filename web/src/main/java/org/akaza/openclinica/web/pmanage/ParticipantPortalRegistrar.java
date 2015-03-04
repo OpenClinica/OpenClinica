@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -52,7 +53,6 @@ public class ParticipantPortalRegistrar {
 		JSONObject json = JSONObject.fromObject(response);
         if (json.isEmpty()) return "";
     	JSONObject authStatus = json.getJSONObject("authorizationStatus");
-		
 		if (!authStatus.isNullObject()) return authStatus.getString("status");
 		else return "";
 	}
@@ -145,9 +145,32 @@ public class ParticipantPortalRegistrar {
         if (json.isEmpty()) return "";
         
     	JSONObject studyHost = json.getJSONObject("study");
-		
+    	String[] arrayUrl = pManageUrl.split(":");
+    	String tmpProtocol = arrayUrl[0];
+    	String tmpUrl = arrayUrl[1];
+    	String tmpPort = arrayUrl[2];
+    	tmpUrl = tmpUrl.substring(2);
+    	String[] tmpArr = tmpUrl.split("\\.");
+    	String[] tmpMore = new String[tmpArr.length + 1];
+    	if (tmpArr.length > 2) {
+    		tmpArr[0] = studyHost.getString("host");
+    	} else {
+    		tmpMore[0] = studyHost.getString("host");
+    		System.arraycopy(tmpArr, 0, tmpMore, 1, tmpArr.length);
+    		tmpArr = tmpMore;
+    	}
+    	StringBuffer urlBuilder = new StringBuffer();
+    	for (int i = 0; i < tmpArr.length; i++) {
+    		urlBuilder.append(tmpArr[i]);
+    		if (i != tmpArr.length - 1) {
+    			urlBuilder.append(".");
+    		} else {
+    			urlBuilder.append(":" + tmpPort);
+    		}
+    	}
+
 		if (!studyHost.isNullObject()) 
-			return  "http://"+studyHost.getString("host")+ "."+pManageUrl.substring(7)+ "#/login ";
+			return  "http://"+urlBuilder.toString()+ "/#/login";
 		else return "";
 	}
 
