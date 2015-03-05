@@ -95,7 +95,7 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		
+
 		if (!mayProceed(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -112,7 +112,6 @@ public class AccountController {
 		StudyBean parentStudy = getParentStudy(studyOid);
 		pStudyId = parentStudy.getId();
 
-
 		if (doesCRCNotHaveStudyAccessRole(crcUserName, studyId, pStudyId))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -125,10 +124,9 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		
+
 		if (!mayProceed(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
 
 		if (isStudyDoesNotExist(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -151,7 +149,7 @@ public class AccountController {
 		StudyBean studyBean = getStudy(studyOid);
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
 
-		if (!mayProceed(studyOid,studySubjectBean))
+		if (!mayProceed(studyOid, studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		if (isStudyDoesNotExist(studyOid))
@@ -192,7 +190,7 @@ public class AccountController {
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
 
-		if (!mayProceed(studyOid,studySubjectBean))
+		if (!mayProceed(studyOid, studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		if (isStudyDoesNotExist(studyOid))
@@ -279,7 +277,6 @@ public class AccountController {
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
 
-		
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
 		UserType type = UserType.get(2);
@@ -336,6 +333,12 @@ public class AccountController {
 	private StudyBean getStudy(String oid) {
 		sdao = new StudyDAO(dataSource);
 		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+		return studyBean;
+	}
+
+	private StudyBean getStudy(Integer id) {
+		sdao = new StudyDAO(dataSource);
+		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
 		return studyBean;
 	}
 
@@ -427,7 +430,6 @@ public class AccountController {
 		StudyBean parentStudy = getParentStudy(study.getOid());
 		pStudyId = parentStudy.getId();
 
-
 		String pUserName = study.getOid() + "." + studySubjectOid;
 		map.put("pUserName", pUserName);
 		map.put("studyId", studyId.toString());
@@ -442,15 +444,17 @@ public class AccountController {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
-			System.out.println(studyUserRoleBean.getStudyId());
+			StudyBean study = getParentStudy(studyUserRoleBean.getStudyId());
 			System.out.println("-------------");
-			System.out.println("     " + studyId);
-			System.out.println("     " + pStudyId);
-			System.out.println(studyUserRoleBean.getRoleName());
-			System.out.println("-------------");
-			if ((studyUserRoleBean.getStudyId() == studyId || studyUserRoleBean.getStudyId() == pStudyId)
-					&& (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))) {
+			System.out.println("Study Id to compare: " + studyUserRoleBean.getStudyId());
+			System.out.println("parent study Id to compare: " + study.getId());
+			System.out.println("Parent Study Id    " + pStudyId);
+			System.out.println("Role: " + studyUserRoleBean.getRoleName());
+			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
+
+			if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
+				System.out.println("if found :" + found);
 				break;
 			}
 		}
@@ -460,6 +464,17 @@ public class AccountController {
 			return true;
 		}
 		return false;
+	}
+
+	private StudyBean getParentStudy(Integer studyId) {
+		StudyBean study = getStudy(studyId);
+		if (study.getParentStudyId() == 0) {
+			return study;
+		} else {
+			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			return parentStudy;
+		}
+
 	}
 
 	private StudyBean getParentStudy(String studyOid) {
@@ -473,32 +488,32 @@ public class AccountController {
 
 	}
 
-	private boolean mayProceed(String studyOid , StudySubjectBean ssBean) throws Exception {
+	private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
 		boolean accessPermission = false;
-		logger.info("  studySubjectStatus: "+ssBean.getStatus().getName());
-		System.out.println("  studySubjectStatus: "+ssBean.getStatus().getName());
-		if (mayProceed(studyOid) && ssBean.getStatus()==Status.AVAILABLE) {
+		logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
+		System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
+		if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
 			accessPermission = true;
 		}
-		
+
 		return accessPermission;
 	}
 
-	private boolean mayProceed(String studyOid ) throws Exception {
+	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
 		StudyBean study = getParentStudy(studyOid);
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
-		String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-		String participateStatus = pStatus.getValue().toString();         // enabled , disabled
-		String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-		System.out.println ("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
-		logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus);
-		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE") ) {
+		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
+		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
+		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
 		}
-		
+
 		return accessPermission;
 	}
 

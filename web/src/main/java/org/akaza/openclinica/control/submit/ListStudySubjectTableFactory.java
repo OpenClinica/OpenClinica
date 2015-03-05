@@ -57,6 +57,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Properties;
+import java.lang.Exception;
+import java.io.InputStream;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,7 +101,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
 //To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-         locale = LocaleResolver.getLocale(request);
+        locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         setDataAndLimitVariables(tableFacade);
@@ -770,7 +779,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                    
                 }
                 value = url.toString();
             }
@@ -809,7 +817,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		StudyBean studyBean = (StudyBean) studyDAO.findByOid(oid);
 		return studyBean;
 	}
-
     
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
@@ -830,15 +837,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     	HtmlBuilder actionLink = new HtmlBuilder();
      //   actionLink.a().href("url?id=" + studySubject.getId());
-        actionLink.a().href(url);
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_Lock_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_Lock.gif');\"").close();      
-        actionLink.img().name("bt_View1").src("images/bt_Lock.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();        
+        actionLink.a().href(url + "?ssid=" +studySubject.getLabel());
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_Ocui_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_Ocui.gif');\"").close();      
+        actionLink.img().name("bt_View1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();        
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
 
-    
     private String removeStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href(
@@ -1405,5 +1411,4 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
     }
-
 }
