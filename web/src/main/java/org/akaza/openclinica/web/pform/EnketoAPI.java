@@ -55,8 +55,10 @@ public class EnketoAPI {
             HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
-            // TODO: Check for bad response here.
-            return response.getBody();
+            if (response != null)
+                return response.getBody();
+            else
+                return null;
 
         } catch (Exception e) {
             logger.error(e.getMessage());
