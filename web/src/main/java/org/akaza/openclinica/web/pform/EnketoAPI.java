@@ -1,17 +1,16 @@
 package org.akaza.openclinica.web.pform;
 
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 public class EnketoAPI {
 
@@ -20,63 +19,50 @@ public class EnketoAPI {
     private String ocURL = null;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public EnketoAPI (EnketoCredentials credentials)
-    {
+    public EnketoAPI(EnketoCredentials credentials) {
         this.enketoURL = credentials.getServerUrl();
         this.token = credentials.getApiKey();
         this.ocURL = credentials.getOcInstanceUrl();
     }
 
-    public String getFormURL(String crfOID) throws Exception
-    {
+    public String getFormURL(String crfOID) throws Exception {
         URL eURL = new URL(enketoURL + "/api/v1/survey/iframe");
-        return getURL(eURL,crfOID,"url");
+        EnketoURLResponse response = getURL(eURL, crfOID);
+        if (response != null)
+            return response.getUrl();
+        else
+            return "";
     }
 
-    public String getFormPreviewURL(String crfOID) throws Exception
-    {
+    public String getFormPreviewURL(String crfOID) throws Exception {
         URL eURL = new URL(enketoURL + "/api/v1/survey/preview");
-        return getURL(eURL,crfOID,"preview_url");
+        EnketoURLResponse response = getURL(eURL, crfOID);
+        if (response != null)
+            return response.getPreview_url();
+        else
+            return "";
     }
 
-    private String getURL(URL url, String crfOID, String responseName) throws Exception
-    {
-        String crfURL = "";
-
-        try
-        {
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+    private EnketoURLResponse getURL(URL url, String crfOID) {
+        try {
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Authorization", "Basic " + userPasswdCombo);
-            con.setRequestProperty("Accept-Charset", "UTF-8");
-            con.setDoOutput(true);
-            con.setDoInput(true);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Basic " + userPasswdCombo);
+            headers.add("Accept-Charset", "UTF-8");
+            EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
+            HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
+            // TODO: Check for bad response here.
+            return response.getBody();
 
-            String openClinicaURL = "server_url=" + ocURL + "&form_id=" + crfOID;
-            DataOutputStream output = new DataOutputStream(con.getOutputStream());
-            output.writeBytes(openClinicaURL);
-            output.flush();
-            output.close();
-
-            String response = IOUtils.toString(con.getInputStream(), "UTF-8");
-            JSONObject json = JSONObject.fromObject(response);
-            if (json.getString("code") != null && Integer.valueOf(json.getString("code")) > 204) throw new Exception("Error retrieving Enketo URL.  Received error code: " + json.getString("code"));
-            else if (json.getString(responseName) != null) crfURL = json.getString(responseName);
-            else throw new Exception("Error retrieving Enketo URL.  Did not receive a valid response from server.");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
         }
-        catch (Exception e)
-        {
-            logger.debug(e.getMessage());
-            logger.debug(ExceptionUtils.getStackTrace(e));
-            throw new Exception(e);
-        }
-        return crfURL;
+        return null;
     }
-    
-    
 
 }
