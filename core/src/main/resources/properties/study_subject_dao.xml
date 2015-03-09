@@ -178,7 +178,7 @@
 		<sql>
 			SELECT ss.*
 			FROM study_subject ss, study st
-			WHERE ss.label=?
+			WHERE UPPER(ss.label)=?
 				AND ss.study_id=st.study_id
 				AND (st.study_id=? or st.parent_study_id=?)
 		</sql>
