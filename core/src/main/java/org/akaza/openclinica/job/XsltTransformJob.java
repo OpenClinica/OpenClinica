@@ -81,13 +81,12 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String XML_FILE_PATH = "xmlFilePath";
     public static final String POST_FILE_PATH = "postFilePath";
     public static final String POST_FILE_NAME = "postFileName";
-    public static final String EXTRACT_PROPERTY = "extractProperty";
+
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
     public static final String ZIPPED = "zipped";
     public static final String DELETE_OLD = "deleteOld";
-    public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
-    public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
+
     public static final String XSLT_PATH="XSLT_PATH";
     public static final String EP_BEAN = "epBean";
 
@@ -484,7 +483,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 successMsg =" ";
             }
 
-
+            ExportLogger.logExport(currentStudy, userBean, datasetBean);
            postSuccessMessage(successMsg, context);
         } catch (JobInterruptedException e) {
             logger.info("Job was cancelled by the user");
