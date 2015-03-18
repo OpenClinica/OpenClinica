@@ -96,23 +96,21 @@ public class AccountController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
 
-		if (!mayProceed(studyOid))
+		StudyBean parentStudy = getParentStudy(studyOid);
+		Integer pStudyId = parentStudy.getId();
+        String oid = parentStudy.getOid();
+		
+		if (!mayProceed(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
-		if (isStudyDoesNotExist(studyOid))
+		if (isStudyDoesNotExist(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		if (isCRCUserAccountDoesNotExist(crcUserName))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
-		StudyBean study = getStudy(studyOid);
-		Integer studyId = study.getId();
-		Integer pStudyId = 0;
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		pStudyId = parentStudy.getId();
-
-		if (doesCRCNotHaveStudyAccessRole(crcUserName, studyId, pStudyId))
+		if (doesCRCNotHaveStudyAccessRole(crcUserName, pStudyId))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(crcUserName);
@@ -124,11 +122,14 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
+		StudyBean parentStudy = getParentStudy(studyOid);
+        String oid = parentStudy.getOid();
 
-		if (!mayProceed(studyOid))
+		
+		if (!mayProceed(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
-		if (isStudyDoesNotExist(studyOid))
+		if (isStudyDoesNotExist(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		if (isAccessCodeIsNull(accessCode))
@@ -146,13 +147,16 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		StudyBean studyBean = getStudy(studyOid);
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+	
+		StudyBean parentStudy = getParentStudy(studyOid);
+        String oid = parentStudy.getOid();
 
-		if (!mayProceed(studyOid, studySubjectBean))
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+
+		if (!mayProceed(oid, studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
-		if (isStudyDoesNotExist(studyOid))
+		if (isStudyDoesNotExist(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isStudySubjectDoesNotExist(studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -173,7 +177,11 @@ public class AccountController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> createOrUpdateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
-		String studyOid = map.get("studyOid");
+		
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+        String oid = parentStudy.getOid();
+	
+		
 		String studySubjectId = map.get("studySubjectId");
 		String fName = map.get("fName");
 		String lName = map.get("lName");
@@ -186,14 +194,13 @@ public class AccountController {
 
 		UserAccountBean uBean = null;
 
-		StudyBean studyBean = getStudy(studyOid);
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, studyBean);
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
 
-		if (!mayProceed(studyOid, studySubjectBean))
+		if (!mayProceed(oid, studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
-		if (isStudyDoesNotExist(studyOid))
+		if (isStudyDoesNotExist(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isStudySubjectDoesNotExist(studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -210,7 +217,6 @@ public class AccountController {
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 		String studySubjectOid = mapValues.get("studySubjectOid");
-		Integer studyId = Integer.valueOf(mapValues.get("studyId"));
 		Integer pStudyId = Integer.valueOf(mapValues.get("pStudyId"));
 
 		if (isCRCUserAccountDoesNotExist(crcUserName))
@@ -218,11 +224,11 @@ public class AccountController {
 
 		// Verify CRC_user has the appropriate role as 'data entry person'or 'data entry person 2' and have access to the specific study/site
 		// This also verifies that fact that the CRC and the Participant both have access to same study/site
-		if (doesCRCNotHaveStudyAccessRole(crcUserName, studyId, pStudyId))
+		if (doesCRCNotHaveStudyAccessRole(crcUserName, pStudyId))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
-		uBean = buildUserAccount(studyOid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName);
+		uBean = buildUserAccount(oid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName);
 		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
 		if (!participantUserAccountBean.isActive()) {
 			createUserAccount(uBean);
@@ -424,23 +430,19 @@ public class AccountController {
 		HashMap<String, String> map = new HashMap();
 		String studySubjectOid = studySubjectBean.getOid();
 		Integer studyId = studySubjectBean.getStudyId();
-		StudyBean study = (StudyBean) sdao.findByPK(studyId);
-		Integer pStudyId = 0;
-
-		StudyBean parentStudy = getParentStudy(study.getOid());
-		pStudyId = parentStudy.getId();
+		StudyBean study = getParentStudy(studyId);
+		Integer pStudyId = study.getId();
 
 		String pUserName = study.getOid() + "." + studySubjectOid;
+		System.out.println ("participate Username: "+ pUserName);
 		map.put("pUserName", pUserName);
-		map.put("studyId", studyId.toString());
 		map.put("pStudyId", pStudyId.toString());
 		map.put("studySubjectOid", studySubjectOid);
 
-		System.out.println(pUserName);
 		return map;
 	}
 
-	private Boolean doesCRCNotHaveStudyAccessRole(String crcUserName, Integer studyId, Integer pStudyId) {
+	private Boolean doesCRCNotHaveStudyAccessRole(String crcUserName, Integer pStudyId) {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
