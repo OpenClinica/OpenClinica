@@ -45,7 +45,7 @@
 </head>
 <body class="aka_bodywidth" onload="
         <c:if test='${popUpURL != ""}'>
-        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'" onunload="javascript:clsWin();">
+        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';javascript:enableSubmit();" onunload="javascript:clsWin();">
 
 <%-- BWP:
  onload=
@@ -322,18 +322,32 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     //-->
 
     function disableSubmit(strImageName) {
-		var srh = document.getElementById('srh');
-		var srm = document.getElementById('srm');
-		var srl = document.getElementById('srl');
-		var seh = document.getElementById('seh');
-		var sem = document.getElementById('sem');
-		var sel = document.getElementById('sel');
-		if(srh!=null) {srh.disabled = true;}
-		if(srm!=null) {srm.disabled = true;}
-		if(srl!=null) {srl.disabled = true;}
-		if(seh!=null) {seh.disabled = true;}
-		if(sem!=null) {sem.disabled = true;}
-		if(sel!=null) {sel.disabled = true;}
+        var srh = document.getElementById('srh');
+        var srm = document.getElementById('srm');
+        var srl = document.getElementById('srl');
+        var seh = document.getElementById('seh');
+        var sem = document.getElementById('sem');
+        var sel = document.getElementById('sel');
+        if(srh!=null) {srh.disabled = true;}
+        if(srm!=null) {srm.disabled = true;}
+        if(srl!=null) {srl.disabled = true;}
+        if(seh!=null) {seh.disabled = true;}
+        if(sem!=null) {sem.disabled = true;}
+        if(sel!=null) {sel.disabled = true;}
+}
+    function enableSubmit() {
+        var srh = document.getElementById('srh');
+        var srm = document.getElementById('srm');
+        var srl = document.getElementById('srl');
+        var seh = document.getElementById('seh');
+        var sem = document.getElementById('sem');
+        var sel = document.getElementById('sel');
+        if(srh!=null) {srh.disabled = false;}
+        if(srm!=null) {srm.disabled = false;}
+        if(srl!=null) {srl.disabled = false;}
+        if(seh!=null) {seh.disabled = false;}
+        if(sem!=null) {sem.disabled = false;}
+        if(sel!=null) {sel.disabled = false;}
 }
 </script>
 
