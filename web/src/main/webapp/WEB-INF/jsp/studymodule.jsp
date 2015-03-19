@@ -6,6 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 
@@ -74,6 +76,17 @@
             document.forms[1].submit();
         }
     }
+    
+    jQuery(document).ready(function() {
+        jQuery('#requestParticipateAccess').click(function() {
+            jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
+        });
+
+        jQuery('#cancelParticipateAccessRequest').click(function() {
+            jQuery.unblockUI();
+            //return false;
+        });
+    });
 </script>
 
 
@@ -410,21 +423,6 @@
 				
             </td>
         </tr>
-      </tbody>
-  </table>
-  <br>
-  <br>
-  <%-- <c:if test="${studyModuleStatus.study == 3 && studyModuleStatus.crf == 3 && studyModuleStatus.eventDefinition == 3 && studyModuleStatus.subjectGroup == 3 && studyModuleStatus.rule == 3}"> --%>
-  <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
-      <thead>
-        <td width="20"></td>
-        <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
-        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
-        <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
-        <td width="85"><b><fmt:message key="mark_complete" bundle="${resword}"/></b></td>
-        <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
-      </thead>
-      <tbody>
         <tr>
             <td>6</td>
             <td><fmt:message key="create_sites" bundle="${resword}"/></td>
@@ -478,21 +476,6 @@
                 </c:choose>
             </td>
         </tr>
-      </tbody>
-  </table>
-  <br>
-  <br>
-
-  <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
-        <thead>
-        <td width="20"></td>
-        <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
-        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
-        <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
-        <td width="85"><b><fmt:message key="mark_complete" bundle="${resword}"/></b></td>
-        <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
-      </thead>
-      <tbody>
         <tr>
             <td>7</td>
             <td><fmt:message key="assign_users" bundle="${resword}"/></td>
@@ -551,12 +534,55 @@
                 </c:choose>
             </td>
         </tr>
-
       </tbody>
   </table>
   <br>
   <br>
+
+    <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
+      <thead>
+        <td width="20"></td>
+        <td width="200"><b><fmt:message key="modules" bundle="${resword}"/></b></td>
+        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
+        <td width="155"><b><fmt:message key="url" bundle="${resword}"/></b></td>
+        <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
+      </thead>
+      <tbody>
+        <tr>
+           <td> </td>
+           <td><fmt:message key="participate" bundle="${resword}"/></td>
+            <td>
+              <c:choose>
+              <c:when test="${participateOCStatus == 'disabled'}"><fmt:message key="participant_portal_status_deactivated" bundle="${resword}"/></c:when>
+              <c:when test="${empty participateStatus}"><fmt:message key="participant_portal_status_notfound" bundle="${resword}"/></c:when>
+              <c:otherwise>${pManageAuthorization.authorizationStatus.status}</c:otherwise>
+              </c:choose>
+            </td>
+            <!-- td><c:if test="${not empty pManageAuthorization.study && not empty pManageAuthorization.study.host}">${pManageAuthorization.study.host}</c:if></td-->
+            <td><c:if test="${participateOCStatus != 'disabled'}">${participateURL}</c:if></td>
+            <td>
+                <c:url var="reactivateParticipate" value="studymodule/${currentStudy.oid}/reactivate"/>
+                <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
+                <c:choose>
+                <c:when test="${participateOCStatus == 'disabled' && !empty participateStatus}">
+                  <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="request_access" bundle="${resword}"/>" title="<fmt:message key="request_access" bundle="${resword}"/>"/></a>
+                </c:when>
+                <c:when test="${participateOCStatus == 'disabled'}">
+                  <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="request_access" bundle="${resword}"/>" title="<fmt:message key="request_access" bundle="${resword}"/>"/></a>
+                </c:when>
+                <c:otherwise>
+                  <a href="${deactivateParticipate}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="deactivate" bundle="${resword}"/>" title="<fmt:message key="deactivate" bundle="${resword}"/>"/></a>
+                </c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+      </tbody>
+  </table>
+  <br>
+  <br>
+   
   
+
   <%-- additional table added tbh, 09/05/2009 --%>
   <c:if test="${!empty childStudyUserCount }">
   <table width="4%" style="border-left: 0px; border-top: 0px; border-bottom: 0px; border-right: 0px;" align="left" cellspacing="0" cellpadding="0">
@@ -585,4 +611,18 @@
       <input type="button" onclick="confirmCancel('${pageContext.request.contextPath}/MainMenu');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long">
   </div>
 </form>
+
+<div id="requestParticipateForm" style="display:none;">
+  <form action="studymodule/${currentStudy.oid}/register" method="post">
+      <p>
+          <fmt:message key="participant_portal_reg_hostname" bundle="${resword}"/>
+          <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
+      </p>
+      <input type="text" name="hostName" id="hostName"/>
+      <br>
+      <input type="submit" id="submitParticipateAccessRequest" name="submitParticipateAccessRequest" class="button_medium" value="Request Access"/>
+      <input type="button" id="cancelParticipateAccessRequest" name="cancelParticipateAccessRequest" class="button" value="Cancel"/>
+  </form>
+</div>
+
 <jsp:include page="include/footer.jsp"/>
