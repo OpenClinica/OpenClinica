@@ -140,20 +140,26 @@ public class StudyModuleController {
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
 
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundleProvider.updateLocale(locale);
+        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+
         // Send OCUI registration request
-        String status;
+        String status = "";
         String hostName = request.getParameter("hostName");
-        if (hostName != null && !hostName.equals(""))
+        if (hostName == null || hostName.equals("")) {
+            addPageMessage(request, respage.getString("participate_hostname_invalid"));
+            return "redirect:/pages/studymodule";
+        } else if (!registrar.getHostNameAvailability(hostName).equals(ParticipantPortalRegistrar.AVAILABLE)) {
+            addPageMessage(request, respage.getString("participate_hostname_not_available"));
+            return "redirect:/pages/studymodule";
+        } else {
             status = registrar.registerStudy(study.getOid(), hostName);
-        else
-            status = registrar.registerStudy(study.getOid());
+        }
+
         // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
         // parameter.
         if (status.equals("")) {
-            // addPageMessage(request, "Hi Steve.  Couldn't reach Participate!");
-            Locale locale = LocaleResolver.getLocale(request);
-            ResourceBundleProvider.updateLocale(locale);
-            respage = ResourceBundleProvider.getPageMessagesBundle(locale);
             addPageMessage(request, respage.getString("participate_not_available"));
         } else {
             // Update OC Study configuration
@@ -282,30 +288,31 @@ public class StudyModuleController {
 
         // Load Participate registration information
         String portalURL = CoreResources.getField("portalURL");
-        String participateOCStatus = currentStudy.getStudyParameterConfig().getParticipantPortal();
-        ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-        Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-        String participateStatus = "";
-        if (pManageAuthorization != null && pManageAuthorization.getAuthorizationStatus() != null
-                && pManageAuthorization.getAuthorizationStatus().getStatus() != null)
-            participateStatus = pManageAuthorization.getAuthorizationStatus().getStatus();
         map.addAttribute("portalURL", portalURL);
-        map.addAttribute("pManageAuthorization", pManageAuthorization);
-        map.addAttribute("participateOCStatus", participateOCStatus);
-        map.addAttribute("participateStatus", participateStatus);
+        if (portalURL != null && !portalURL.equals("")) {
+            String participateOCStatus = currentStudy.getStudyParameterConfig().getParticipantPortal();
+            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+            Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+            String participateStatus = "";
+            if (pManageAuthorization != null && pManageAuthorization.getAuthorizationStatus() != null
+                    && pManageAuthorization.getAuthorizationStatus().getStatus() != null)
+                participateStatus = pManageAuthorization.getAuthorizationStatus().getStatus();
+            map.addAttribute("participateOCStatus", participateOCStatus);
+            map.addAttribute("participateStatus", participateStatus);
 
-        String url = "";
-        try {
-            if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
-                    && !pManageAuthorization.getStudy().getHost().equals("")) {
-                URL pManageUrl = new URL(portalURL);
-                url = pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost();
+            String url = "";
+            try {
+                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
+                        && !pManageAuthorization.getStudy().getHost().equals("")) {
+                    URL pManageUrl = new URL(portalURL);
+                    url = pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost();
+                }
+            } catch (MalformedURLException e) {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
             }
-        } catch (MalformedURLException e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
+            map.addAttribute("participateURL", url);
         }
-        map.addAttribute("participateURL", url);
 
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
