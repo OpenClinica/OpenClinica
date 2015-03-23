@@ -8,11 +8,31 @@ import org.akaza.openclinica.web.pmanage.Study;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class ParticipantPortalRegistrar {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String AVAILABLE = "available";
+    public static final String UNAVAILABLE = "unavailable";
+    public static final String UNKNOWN = "unknown";
+
+    public Authorization getAuthorization(String studyOid) {
+        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
+        RestTemplate rest = new RestTemplate();
+        try {
+            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
+            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
+                return response[0];
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
+        return null;
+    }
 
     public String getRegistrationStatus(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
@@ -29,13 +49,35 @@ public class ParticipantPortalRegistrar {
         return "";
     }
 
+    public String getHostNameAvailability(String hostName) {
+        // String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+        String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/current?hostName=" + hostName;
+        RestTemplate rest = new RestTemplate();
+        try {
+            ResponseEntity response = rest.getForEntity(pManageUrl, null);
+            if (response.getStatusCode().equals(HttpStatus.OK))
+                return AVAILABLE;
+            else
+                return UNAVAILABLE;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
+        return UNKNOWN;
+    }
+
     public String registerStudy(String studyOid) {
+        return registerStudy(studyOid, null);
+    }
+
+    public String registerStudy(String studyOid, String hostName) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         Authorization authRequest = new Authorization();
         Study authStudy = new Study();
         authStudy.setStudyOid(studyOid);
         authStudy.setInstanceUrl(ocUrl);
+        authStudy.setHost(hostName);
         authRequest.setStudy(authStudy);
 
         RestTemplate rest = new RestTemplate();

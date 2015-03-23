@@ -7,9 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -26,15 +23,9 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.akaza.openclinica.dao.core.CoreResources;
 
-import java.io.DataInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,7 +69,7 @@ public class UpdateStudyServletNew extends SecureController {
         boolean isInterventional = false;
 
         study = (StudyBean) sdao.findByPK(studyId);
-        if(study.getId() != currentStudy.getId()){
+        if (study.getId() != currentStudy.getId()) {
             addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"));
             forwardPage(Page.MENU_SERVLET);
             return;
@@ -88,15 +79,6 @@ public class UpdateStudyServletNew extends SecureController {
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
-
-        String portalURL = CoreResources.getField("portalURL");
-        String portalStatus = study.getStudyParameterConfig().getParticipantPortal();
-        request.setAttribute("portalURL", portalURL);
-        if (portalURL != null && !portalURL.equals("") && portalStatus.equals("enabled"))
-        {
-        	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-        	request.setAttribute("pmanageRegStatus",registrar.getRegistrationStatus(study.getOid()));
-        }
         request.setAttribute("studyId", studyId + "");
         request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
         ArrayList statuses = Status.toStudyUpdateMembersList();
@@ -109,8 +91,8 @@ public class UpdateStudyServletNew extends SecureController {
         request.setAttribute("isInterventional", isInterventional ? "1" : "0");
         String protocolType = study.getProtocolTypeKey();
 
-        //A. Hamid. 5001
-        if(study.getParentStudyId() > 0){
+        // A. Hamid. 5001
+        if (study.getParentStudyId() > 0) {
             StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
             request.setAttribute("parentStudy", parentStudy);
         }
@@ -152,11 +134,6 @@ public class UpdateStudyServletNew extends SecureController {
             validateStudy5(fp, new Validator(request));
             validateStudy6(fp, new Validator(request));
             confirmWholeStudy(fp);
-            if (portalStatus.equals("disabled") && fp.getString("participantPortal").equals("enabled"))
-            {
-            	ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            	registrar.registerStudy(study.getOid());
-            }
 
             request.setAttribute("studyToView", study);
             if (!errors.isEmpty()) {
@@ -217,20 +194,23 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
         if (!StringUtils.isBlank(fp.getString(INPUT_END_DATE))) {
             v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
-            //validation for end >= start should be provided here, but outside the scope
-            //it would be great  to write all validation as one function, the solution provided now is a bad patch
-//            Date end = fp.getDateTime(INPUT_END_DATE);
-//            Date start = fp.getDateTime(INPUT_START_DATE);
-//            if (end.before(start)) {
-//                Validator.addError(errors, INPUT_END_DATE, resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
-//            }
+            // validation for end >= start should be provided here, but outside the scope
+            // it would be great to write all validation as one function, the solution provided now is a bad patch
+            // Date end = fp.getDateTime(INPUT_END_DATE);
+            // Date start = fp.getDateTime(INPUT_START_DATE);
+            // if (end.before(start)) {
+            // Validator.addError(errors, INPUT_END_DATE,
+            // resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+            // }
         }
         if (!StringUtils.isBlank(fp.getString(INPUT_VER_DATE))) {
             v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
         }
 
         HashMap vStudy2 = v.validate();
-        if (vStudy2 != null && vStudy2.size()>0 ) { errors.putAll(vStudy2 );}
+        if (vStudy2 != null && vStudy2.size() > 0) {
+            errors.putAll(vStudy2);
+        }
         vStudy2 = null;
 
         logger.info("has validation errors");
@@ -277,7 +257,9 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
 
         HashMap vStudy4 = v.validate();
-        if (vStudy4 != null && vStudy4.size()>0 ) { errors.putAll(vStudy4 );}
+        if (vStudy4 != null && vStudy4.size() > 0) {
+            errors.putAll(vStudy4);
+        }
         vStudy4 = null;
 
         if (fp.getInt("expectedTotalEnrollment") <= 0) {
@@ -292,7 +274,6 @@ public class UpdateStudyServletNew extends SecureController {
             Validator.addError(errors, "ageMax", respage.getString("condition_eligibility_3"));
         }
         study.setAgeMax(fp.getString("ageMax"));
-
 
         study.setAgeMin(fp.getString("ageMin"));
         study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
@@ -316,7 +297,9 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
         HashMap vStudy5 = v.validate();
-        if (vStudy5 != null && vStudy5.size()>0 ) { errors.putAll(vStudy5 );}
+        if (vStudy5 != null && vStudy5.size() > 0) {
+            errors.putAll(vStudy5);
+        }
         vStudy5 = null;
 
         study.setFacilityCity(fp.getString("facCity"));
@@ -331,7 +314,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.setFacilityState(fp.getString("facState"));
         study.setFacilityZip(fp.getString("facZip"));
 
-        if ( !errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
             request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
         }
@@ -343,8 +326,10 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
         HashMap vStudy6 = v.validate();
-        if (vStudy6 != null && vStudy6.size()>0 ) { errors.putAll(vStudy6 );}
-        vStudy6=null;
+        if (vStudy6 != null && vStudy6.size() > 0) {
+            errors.putAll(vStudy6);
+        }
+        vStudy6 = null;
 
         study.setMedlineIdentifier(fp.getString("medlineIdentifier"));
         study.setResultsReference(fp.getBoolean("resultsReference"));
@@ -378,7 +363,6 @@ public class UpdateStudyServletNew extends SecureController {
         study.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
         study.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
         study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
-        study.getStudyParameterConfig().setParticipantPortal(fp.getString("participantPortal"));
         if (!errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
         }
@@ -598,16 +582,10 @@ public class UpdateStudyServletNew extends SecureController {
         updateParameter(spvdao, spv);
         // >>
 
-        //AH 08/26/2010 5732
+        // AH 08/26/2010 5732
         spv.setParameter("eventLocationRequired");
         spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
         updateParameter(spvdao, spv);
-
-         //participant Portal
-        spv.setParameter("participantPortal");
-        spv.setValue(study1.getStudyParameterConfig().getParticipantPortal());
-        updateParameter(spvdao, spv);
-
 
         StudyBean curStudy = (StudyBean) session.getAttribute("study");
         if (curStudy != null && study1.getId() == curStudy.getId()) {
