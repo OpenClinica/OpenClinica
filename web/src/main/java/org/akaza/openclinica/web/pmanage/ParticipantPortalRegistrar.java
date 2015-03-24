@@ -51,7 +51,7 @@ public class ParticipantPortalRegistrar {
 
     public String getHostNameAvailability(String hostName) {
         // String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/current?hostName=" + hostName;
+        String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/name?hostName=" + hostName;
         RestTemplate rest = new RestTemplate();
         try {
             ResponseEntity response = rest.getForEntity(pManageUrl, null);
