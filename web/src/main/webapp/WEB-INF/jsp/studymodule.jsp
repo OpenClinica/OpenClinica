@@ -162,7 +162,7 @@
   &nbsp;&nbsp;&nbsp;
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
       <thead>
-        <td width="20"></td>
+        <td width="20">&nbsp;</td>
         <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
         <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
         <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
@@ -545,15 +545,17 @@
   <c:if test="${portalURL!= '' && portalURL!= null}">
       <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
           <thead>
-              <td width="20"></td>
+          <tr>
+              <td width="20">&nbsp;</td>
               <td width="200"><b><fmt:message key="modules" bundle="${resword}"/></b></td>
               <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
               <td width="155"><b><fmt:message key="url" bundle="${resword}"/></b></td>
               <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
+              </tr>
           </thead>
           <tbody>
               <tr>
-                  <td> </td>
+                  <td>&nbsp;</td>
                   <td><fmt:message key="participate" bundle="${resword}"/></td>
                   <td>
                       <c:choose>
@@ -562,7 +564,12 @@
                           <c:otherwise>${participateStatus}</c:otherwise>
                       </c:choose>
                   </td>
-                  <td><c:if test="${participateOCStatus != 'disabled'}">${participateURL}</c:if></td>
+                  <td>
+                      <c:choose>
+                          <c:when test="${participateOCStatus != 'disabled'}">${participateURL}</c:when>
+                          <c:otherwise>&nbsp;</c:otherwise>
+                      </c:choose>
+                  </td>
                   <td>
                       <c:url var="reactivateParticipate" value="studymodule/${currentStudy.oid}/reactivate"/>
                       <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
