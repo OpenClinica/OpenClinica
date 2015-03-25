@@ -102,6 +102,8 @@ public class StudyModuleController {
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        spv.setStudyId(study.getId());
+        spv.setParameter("participantPortal");
         spv.setValue("disabled");
 
         if (spv.getId() > 0)
@@ -120,6 +122,8 @@ public class StudyModuleController {
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        spv.setStudyId(study.getId());
+        spv.setParameter("participantPortal");
         spv.setValue("enabled");
 
         if (spv.getId() > 0)
@@ -163,6 +167,8 @@ public class StudyModuleController {
             addPageMessage(request, respage.getString("participate_not_available"));
         } else {
             // Update OC Study configuration
+            spv.setStudyId(study.getId());
+            spv.setParameter("participantPortal");
             spv.setValue("enabled");
             if (spv.getId() > 0)
                 spvdao.update(spv);
