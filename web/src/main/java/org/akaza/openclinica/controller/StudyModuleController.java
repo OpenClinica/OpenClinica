@@ -1,9 +1,13 @@
 package org.akaza.openclinica.controller;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +17,8 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
@@ -22,12 +28,17 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.rule.RuleDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
+import org.akaza.openclinica.web.pmanage.Authorization;
+import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.cdisc.ns.odm.v130_api.ODM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +49,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -62,10 +75,6 @@ public class StudyModuleController {
     @Qualifier("ruleSetService")
     private RuleSetServiceInterface ruleSetService;
 
-    // @Autowired
-    // @Qualifier("ruleSetDao")
-    // private RuleSetDao ruleSetDao;
-
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
@@ -78,6 +87,8 @@ public class StudyModuleController {
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String PAGE_MESSAGE = "pageMessages";
+    public static ResourceBundle respage;
     @Autowired
     CoreResources coreResources;
 
@@ -85,16 +96,101 @@ public class StudyModuleController {
 
     }
 
+    @RequestMapping(value = "/{study}/deactivate", method = RequestMethod.GET)
+    public String deactivateParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        spv.setStudyId(study.getId());
+        spv.setParameter("participantPortal");
+        spv.setValue("disabled");
+
+        if (spv.getId() > 0)
+            spvdao.update(spv);
+        else
+            spvdao.create(spv);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        currentStudy.getStudyParameterConfig().setParticipantPortal("disabled");
+
+        return "redirect:/pages/studymodule";
+    }
+
+    @RequestMapping(value = "/{study}/reactivate", method = RequestMethod.GET)
+    public String reactivateParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        spv.setStudyId(study.getId());
+        spv.setParameter("participantPortal");
+        spv.setValue("enabled");
+
+        if (spv.getId() > 0)
+            spvdao.update(spv);
+        else
+            spvdao.create(spv);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+
+        return "redirect:/pages/studymodule";
+    }
+
+    @RequestMapping(value = "/{study}/register", method = RequestMethod.POST)
+    public String registerParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundleProvider.updateLocale(locale);
+        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+
+        // Send OCUI registration request
+        String status = "";
+        String hostName = request.getParameter("hostName");
+        if (hostName == null || hostName.equals("")) {
+            addPageMessage(request, respage.getString("participate_hostname_invalid"));
+            return "redirect:/pages/studymodule";
+        } else if (!registrar.getHostNameAvailability(hostName).equals(ParticipantPortalRegistrar.AVAILABLE)) {
+            addPageMessage(request, respage.getString("participate_hostname_not_available"));
+            return "redirect:/pages/studymodule";
+        } else {
+            status = registrar.registerStudy(study.getOid(), hostName);
+        }
+
+        // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
+        // parameter.
+        if (status.equals("")) {
+            addPageMessage(request, respage.getString("participate_not_available"));
+        } else {
+            // Update OC Study configuration
+            spv.setStudyId(study.getId());
+            spv.setParameter("participantPortal");
+            spv.setValue("enabled");
+            if (spv.getId() > 0)
+                spvdao.update(spv);
+            else
+                spvdao.create(spv);
+            StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+            currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+        }
+
+        return "redirect:/pages/studymodule";
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
         ModelMap map = new ModelMap();
         // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
-		 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-        if(!mayProceed(request)){
-            try{
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
@@ -196,17 +292,46 @@ public class StudyModuleController {
         map.addAttribute("studyId", currentStudy.getId());
         map.addAttribute("currentStudy", currentStudy);
 
+        // Load Participate registration information
+        String portalURL = CoreResources.getField("portalURL");
+        map.addAttribute("portalURL", portalURL);
+        if (portalURL != null && !portalURL.equals("")) {
+            String participateOCStatus = currentStudy.getStudyParameterConfig().getParticipantPortal();
+            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+            Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+            String participateStatus = "";
+            if (pManageAuthorization != null && pManageAuthorization.getAuthorizationStatus() != null
+                    && pManageAuthorization.getAuthorizationStatus().getStatus() != null)
+                participateStatus = pManageAuthorization.getAuthorizationStatus().getStatus();
+            map.addAttribute("participateOCStatus", participateOCStatus);
+            map.addAttribute("participateStatus", participateStatus);
+
+            String url = "";
+            try {
+                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
+                        && !pManageAuthorization.getStudy().getHost().equals("")) {
+                    URL pManageUrl = new URL(portalURL);
+                    url = pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost();
+                }
+            } catch (MalformedURLException e) {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+            map.addAttribute("participateURL", url);
+        }
+
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
             map.addAttribute("contextPath", getContextPath(request));
-            logMe("before checking getHostPath url = "+request.getRequestURL());
-            //JN: for the eclinicalhosting the https is not showing up in the request path, going for a fix of taking the hostpath from sysurl
-            //map.addAttribute("hostPath", getHostPath(request));
-            map.addAttribute("hostPath", getHostPathFromSysUrl(coreResources.getField("sysURL.base"),request.getContextPath()));
+            logMe("before checking getHostPath url = " + request.getRequestURL());
+            // JN: for the eclinicalhosting the https is not showing up in the request path, going for a fix of taking
+            // the hostpath from sysurl
+            // map.addAttribute("hostPath", getHostPath(request));
+            map.addAttribute("hostPath", getHostPathFromSysUrl(coreResources.getField("sysURL.base"), request.getContextPath()));
             map.addAttribute("path", "pages/studymodule");
         }
-       // UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        // UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
         ArrayList statusMap = Status.toStudyUpdateMembersList();
         // statusMap.add(Status.PENDING);
@@ -218,14 +343,13 @@ public class StudyModuleController {
         }
 
         ArrayList pageMessages = new ArrayList();
-        if (request.getSession().getAttribute("pageMessages") != null) {
-            pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages);
-            request.getSession().removeAttribute("pageMessages");
+        if (request.getSession().getAttribute(PAGE_MESSAGE) != null) {
+            pageMessages.addAll((ArrayList) request.getSession().getAttribute(PAGE_MESSAGE));
+            request.setAttribute(PAGE_MESSAGE, pageMessages);
+            request.getSession().removeAttribute(PAGE_MESSAGE);
         }
         return map;
     }
-
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
@@ -263,6 +387,17 @@ public class StudyModuleController {
             return "redirect:/MainMenu";
         }
         throw ex;
+    }
+
+    private void addPageMessage(HttpServletRequest request, String message) {
+        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(PAGE_MESSAGE);
+        if (pageMessages == null) {
+            pageMessages = new ArrayList();
+        }
+
+        pageMessages.add(message);
+        logger.debug(message);
+        request.getSession().setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
     private void setUpSidebar(HttpServletRequest request) {
@@ -305,22 +440,22 @@ public class StudyModuleController {
 
     public String getRequestURLMinusServletPath(HttpServletRequest request) {
         String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
-        logMe("processing.."+requestURLMinusServletPath);
+        logMe("processing.." + requestURLMinusServletPath);
         return requestURLMinusServletPath;
     }
 
     public String getHostPath(HttpServletRequest request) {
-        logMe("into the getHostPath/....URL = "+request.getRequestURL()+"URI="+request.getRequestURI()+"PROTOCOL=");
+        logMe("into the getHostPath/....URL = " + request.getRequestURL() + "URI=" + request.getRequestURI() + "PROTOCOL=");
         String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
         String hostPath = "";
 
         if (null != requestURLMinusServletPath) {
             String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
-            logMe("processing2..."+tmpPath);
+            logMe("processing2..." + tmpPath);
             hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
-            logMe("processing2..."+hostPath);
+            logMe("processing2..." + hostPath);
         }
-        logMe("after all the stripping returning"+hostPath);
+        logMe("after all the stripping returning" + hostPath);
         return hostPath;
     }
 
@@ -333,8 +468,8 @@ public class StudyModuleController {
         return webAppName;
     }
 
-	    private boolean mayProceed(HttpServletRequest request) {
-        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
+    private boolean mayProceed(HttpServletRequest request) {
+        StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role r = currentRole.getRole();
 
         if (r.equals(Role.ADMIN) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
@@ -344,14 +479,12 @@ public class StudyModuleController {
         return false;
     }
 
-    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
-        return sysURL.replaceAll(contextPath+"/", "");
-       }
+    private String getHostPathFromSysUrl(String sysURL, String contextPath) {
+        return sysURL.replaceAll(contextPath + "/", "");
+    }
 
-
-       private void logMe(String msg){
-            logger.debug(msg);
-        }
-
+    private void logMe(String msg) {
+        logger.debug(msg);
+    }
 
 }

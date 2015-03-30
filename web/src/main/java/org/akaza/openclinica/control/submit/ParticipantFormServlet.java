@@ -1,4 +1,3 @@
-
 package org.akaza.openclinica.control.submit;
 
 import java.util.HashMap;
@@ -20,15 +19,18 @@ public class ParticipantFormServlet extends SecureController {
         String crf_oid = request.getParameter(CRF_ID);
         String formURL = null;
 
-        //Build Enketo URL  for CRF version.
-        if (currentStudy.getStudyParameterConfig().getParticipantPortal().equals("enabled"))
-        {
+        // Build Enketo URL for CRF version.
+        if (currentStudy.getStudyParameterConfig().getParticipantPortal().equals("enabled")) {
             EnketoCredentials credentials = getCredentials();
             EnketoAPI enketo = new EnketoAPI(credentials);
             formURL = enketo.getFormPreviewURL(crf_oid);
-            response.sendRedirect(formURL);
+            if (!formURL.equals(""))
+                response.sendRedirect(formURL);
+            else {
+                addPageMessage(respage.getString("participate_not_available"));
+                forwardPage(Page.MENU_SERVLET);
+            }
         }
-        forwardPage(Page.PARTICIPANT_FORM_SERVLET);
     }
 
     @Override
@@ -39,23 +41,19 @@ public class ParticipantFormServlet extends SecureController {
         return;
     }
 
-    private EnketoCredentials getCredentials() throws Exception
-    {
+    private EnketoCredentials getCredentials() throws Exception {
         EnketoCredentials credentials = null;
-        Map<String,EnketoCredentials> credentialsMap = (Map<String,EnketoCredentials>) session.getAttribute("EnketoCredentialsMap");
-        if (credentialsMap == null)
-        {
-            credentialsMap = new HashMap<String,EnketoCredentials>();
+        Map<String, EnketoCredentials> credentialsMap = (Map<String, EnketoCredentials>) session.getAttribute("EnketoCredentialsMap");
+        if (credentialsMap == null) {
+            credentialsMap = new HashMap<String, EnketoCredentials>();
             credentials = EnketoCredentials.getInstance(currentStudy.getOid());
             credentialsMap.put(currentStudy.getOid(), credentials);
             session.setAttribute("EnketoCredentialsMap", credentialsMap);
-        }
-        else if (credentialsMap.get(currentStudy.getOid()) == null)
-        {
+        } else if (credentialsMap.get(currentStudy.getOid()) == null) {
             credentials = EnketoCredentials.getInstance(currentStudy.getOid());
             credentialsMap.put(currentStudy.getOid(), credentials);
-        }
-        else credentials = credentialsMap.get(currentStudy.getOid());
+        } else
+            credentials = credentialsMap.get(currentStudy.getOid());
 
         return credentials;
     }
