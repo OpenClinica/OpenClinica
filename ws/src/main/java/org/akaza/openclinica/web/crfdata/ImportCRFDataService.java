@@ -365,8 +365,8 @@ public class ImportCRFDataService {
                                     DisplayItemBean displayItemBean = new DisplayItemBean();
                                     displayItemBean.setItem(itemBean);
 
-                                    ArrayList<ItemFormMetadataBean> metadataBeans = itemFormMetadataDAO.findAllByItemId(itemBean.getId());
-                                    logger.debug("      found metadata item beans: " + metadataBeans.size());
+                                    ItemFormMetadataBean metadataVersionBean = itemFormMetadataDAO.findByItemIdAndCRFVersionId(itemBean.getId(), crfVersion.getId());
+                                    logger.debug(String.format("      found metadata version specific item beans: %s", metadataVersionBean));
                                     // groupOrdinal = the ordinal in item
                                     // groups,
                                     // for repeating items
@@ -392,8 +392,8 @@ public class ImportCRFDataService {
                                             + subjectDataBean.getSubjectOID();
                                     blankCheck.put(newKey, itemDataBean);
                                     logger.info("adding " + newKey + " to blank checks");
-                                    if (!metadataBeans.isEmpty()) {
-                                        ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                    if (null != metadataVersionBean) {
+                                        ItemFormMetadataBean metadataBean = metadataVersionBean;
                                         // also
                                         // possible
                                         // nullpointer
