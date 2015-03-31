@@ -95,15 +95,15 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-        System.out.println("I'm in getAccount1");
+		System.out.println("I'm in getAccount1");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
 		Integer pStudyId = parentStudy.getId();
-        String oid = parentStudy.getOid();
+		String oid = parentStudy.getOid();
 
-        if (isStudyASiteLevelStudy(studyOid))
+		if (isStudyASiteLevelStudy(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-        
+
 		if (!mayProceed(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -112,7 +112,6 @@ public class AccountController {
 
 		if (isCRCUserAccountDoesNotExist(crcUserName))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
 
 		if (doesCRCNotHaveStudyAccessRole(crcUserName, pStudyId))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -122,73 +121,31 @@ public class AccountController {
 		return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}/studysubject/{studySubjectId}", method = RequestMethod.GET)
-	public ResponseEntity<UserDTO> getAccount4(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName,@PathVariable("studySubjectId") String studySubjectId) throws Exception {
-		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+	public Boolean isCRCHasAccessToStudySubject(String studyOid, String crcUserName, String studySubjectId) {
 		uDTO = null;
-          System.out.println("I'm in getAccount4");
+		System.out.println("I'm in getAccount4");
 		StudyBean parentStudy = getParentStudy(studyOid);
 		Integer pStudyId = parentStudy.getId();
-        String oid = parentStudy.getOid();
-		
-        
-		if (isStudyASiteLevelStudy(studyOid))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-        
-		if (!mayProceed(oid))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		String oid = parentStudy.getOid();
 
-		if (isStudyDoesNotExist(oid))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		if (isStudySubjecAndCRCRolesMatch(studySubjectId, crcUserName, studyOid))
+			return true;
 
-		if (isCRCUserAccountDoesNotExist(crcUserName))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-
-		if (doesCRCNotHaveStudyAccessRole(crcUserName, pStudyId))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-	    StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
-
-		if (!mayProceed(oid, studySubjectBean))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-		if (isStudySubjectDoesNotExist(studySubjectBean))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		
-		if (isStudySubjecAndCRCRolesMatch(studySubjectId,crcUserName,studyOid))
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		
-		
-		// build UserName
-		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
-		String pUserName = mapValues.get("pUserName"); // Participant User Name
-
-		udao = new UserAccountDAO(dataSource);
-//		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(crcUserName);
-		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
-		if (!userAccountBean.isActive()) {
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		} else {
-			buildUserDTO(userAccountBean);
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
-		}
-		
+		return false;
 	}
 
-	
 	@RequestMapping(value = "/study/{studyOid}/accesscode/{accessCode}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-        System.out.println("I'm in getAccount2");
+		System.out.println("I'm in getAccount2");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
-        String oid = parentStudy.getOid();
+		String oid = parentStudy.getOid();
 
 		if (isStudyASiteLevelStudy(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-	
+
 		if (!mayProceed(oid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
@@ -210,10 +167,10 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-        System.out.println("I'm in getAccount3");
+		System.out.println("I'm in getAccount3");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
-        String oid = parentStudy.getOid();
+		String oid = parentStudy.getOid();
 
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 
@@ -244,12 +201,11 @@ public class AccountController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> createOrUpdateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
-        System.out.println("I'm in createOrUpdateAccount");
+		System.out.println("I'm in createOrUpdateAccount");
 
 		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
-        String oid = parentStudy.getOid();
-	
-		
+		String oid = parentStudy.getOid();
+
 		String studySubjectId = map.get("studySubjectId");
 		String fName = map.get("fName");
 		String lName = map.get("lName");
@@ -440,7 +396,7 @@ public class AccountController {
 
 	private Boolean isStudyASiteLevelStudy(String studyOid) {
 		StudyBean studyBean = getStudy(studyOid);
-		if (studyBean.getParentStudyId()!=0) {
+		if (studyBean.getParentStudyId() != 0) {
 			logger.info("***Study provided in the URL is a Site study***");
 			System.out.println("***Study provided in the URL is a Site study***");
 			return true;
@@ -512,7 +468,7 @@ public class AccountController {
 		Integer pStudyId = study.getId();
 
 		String pUserName = study.getOid() + "." + studySubjectOid;
-		System.out.println ("participate Username: "+ pUserName);
+		System.out.println("participate Username: " + pUserName);
 		map.put("pUserName", pUserName);
 		map.put("pStudyId", pStudyId.toString());
 		map.put("studySubjectOid", studySubjectOid);
@@ -546,23 +502,24 @@ public class AccountController {
 		return false;
 	}
 
-	private Boolean doesCRCNotHaveStudySubjectAccessRole(String crcUserName, Integer subjectStudyId) {
+	private Boolean doesStudySubjecAndCRCRolesMatch(String crcUserName, Integer subjectStudyId) {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
 			System.out.println("-------------");
 			System.out.println("StudySubject Study Id to compare to   " + subjectStudyId);
-			
-			if (studyUserRoleBean.getStudyId()==getParentStudy(subjectStudyId).getId()){
-				 subjectStudyId = getParentStudy(subjectStudyId).getId();
-					System.out.println("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
+
+			if (studyUserRoleBean.getStudyId() == getParentStudy(subjectStudyId).getId()) {
+				subjectStudyId = getParentStudy(subjectStudyId).getId();
+				System.out.println("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
 			}
 
 			System.out.println("CRC Study Id to compare to : " + studyUserRoleBean.getStudyId());
 			System.out.println("Role: " + studyUserRoleBean.getRoleName());
 			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
 
-			if ((studyUserRoleBean.getStudyId() == subjectStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
+			if ((studyUserRoleBean.getStudyId() == subjectStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))
+					&& studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
 				System.out.println("if found :" + found);
 				break;
@@ -576,31 +533,30 @@ public class AccountController {
 		return false;
 	}
 
-	private Boolean isStudySubjecAndCRCRolesMatch(String studySubjectId , String crcUserName , String studyOid){
-		//  crc is siteA  studySubject is siteA   , pass   (same site) 
-		//  crc is siteA  studySubject is siteB   , Fail   
-		//  crc is siteA  studySubject is study   , Fail   
-	
-		//  crc is study  studySubject is siteA   , pass    
-		//  crc is study  studySubject is siteB   , pass    
-		//  crc is study  studySubject is study   , pass    
-	
-		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer studyIdFromStudyOid = parentStudy.getId();      
-	    StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
-		Integer studyIdFromStudySubjectId = studySubjectBean.getStudyId();
-		
-     System.out.println("    ------------------     ");
-	 System.out.println("studyIdFromStudyOid :  "+  studyIdFromStudyOid);
+	private Boolean isStudySubjecAndCRCRolesMatch(String studySubjectId, String crcUserName, String studyOid) {
+		// crc is siteA studySubject is siteA , pass (same site)
+		// crc is siteA studySubject is siteB , Fail
+		// crc is siteA studySubject is study , Fail
 
-      System.out.println("studySubjectId:  "+studySubjectId);
-      System.out.println("studyIdFromStudySubjectId:  "+studyIdFromStudySubjectId);
-      
-		return 		doesCRCNotHaveStudySubjectAccessRole(crcUserName, studyIdFromStudySubjectId);
+		// crc is study studySubject is siteA , pass
+		// crc is study studySubject is siteB , pass
+		// crc is study studySubject is study , pass
+
+		StudyBean parentStudy = getParentStudy(studyOid);
+		Integer studyIdFromStudyOid = parentStudy.getId();
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+		Integer studyIdFromStudySubjectId = studySubjectBean.getStudyId();
+
+		System.out.println("    ------------------     ");
+		System.out.println("studyIdFromStudyOid :  " + studyIdFromStudyOid);
+
+		System.out.println("studySubjectId:  " + studySubjectId);
+		System.out.println("studyIdFromStudySubjectId:  " + studyIdFromStudySubjectId);
+
+		return doesStudySubjecAndCRCRolesMatch(crcUserName, studyIdFromStudySubjectId);
 
 	}
-	
-	
+
 	private StudyBean getParentStudy(Integer studyId) {
 		StudyBean study = getStudy(studyId);
 		if (study.getParentStudyId() == 0) {
@@ -625,12 +581,13 @@ public class AccountController {
 
 	private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
 		boolean accessPermission = false;
-		logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
-		System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
-		if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
-			accessPermission = true;
+		if (ssBean.isActive()) {
+			logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
+			System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
+			if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
+				accessPermission = true;
+			}
 		}
-
 		return accessPermission;
 	}
 
