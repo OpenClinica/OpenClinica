@@ -105,15 +105,40 @@ public class ParticipantPortalRegistrar {
             if (response.length > 0 && response[0].getStudy() != null && response[0].getStudy().getHost() != null
                     && !response[0].getStudy().getHost().equals("")) {
                 URL url = new URL(pManageUrl);
-                String port = "";
-                if (url.getPort() > 0)
-                    port = ":" + String.valueOf(url.getPort());
-                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/login";
+                return buildUrl(url, response);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
         return "";
+    }
+
+    public String buildUrl(URL url, Authorization[] response) throws Exception {
+
+        String[] arrayUrl = url.getHost().split("\\.");
+        String[] tmpArrayUrl = new String[arrayUrl.length + 1];
+        if (arrayUrl.length > 2) {
+            arrayUrl[0] = response[0].getStudy().getHost();
+        } else {
+            tmpArrayUrl[0] = response[0].getStudy().getHost();
+            System.arraycopy(arrayUrl, 0, tmpArrayUrl, 1, arrayUrl.length);
+            arrayUrl = tmpArrayUrl;
+        }        
+
+        StringBuffer urlBuilder = new StringBuffer();
+        urlBuilder.append(url.getProtocol() + "://");
+        for (int i = 0; i < arrayUrl.length; i++) {
+            urlBuilder.append(arrayUrl[i]);
+            if (i != arrayUrl.length - 1) {
+                urlBuilder.append(".");
+            } else {
+                String port = "";
+                if (url.getPort() > 0) {
+                    urlBuilder.append(":" + String.valueOf(url.getPort()));
+                }
+            }
+        }
+        return urlBuilder.toString();
     }
 }
