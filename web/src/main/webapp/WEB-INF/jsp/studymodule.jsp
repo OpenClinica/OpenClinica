@@ -6,10 +6,10 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<jsp:include page="include/managestudy_top_pages.jsp"/>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
 
-<jsp:include page="include/managestudy_top_pages.jsp"/>
 
 
 <!-- move the alert message to the sidebar-->
@@ -46,6 +46,7 @@
     .contenttable{
             border-left: 1px solid #ccc;
             border-top: 1px solid #ccc;
+            table-layout:fixed;
 
     }
     .contenttable tbody tr td, .contenttable thead td {
@@ -57,6 +58,7 @@
             vertical-align:top;
             text-align: left;
             padding: 4px;
+            word-wrap:break-word;
         }
     .contenttable.hiddencontent td {
         border-left: 0px;
@@ -76,6 +78,7 @@
             document.forms[1].submit();
         }
     }
+    
 </script>
     
 <c:if test="${portalURL!= '' && portalURL!= null}">
@@ -87,7 +90,21 @@
 
             jQuery('#cancelParticipateAccessRequest').click(function() {
                 jQuery.unblockUI();
+                $('#participateWarnings').empty();
             });
+            // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
+            var warnings = "${validationMessages}";
+            if (warnings.length > 0) { 
+            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } }); 
+            }
+        });
+        
+        // Hide the popup window if the escape key is pressed
+        jQuery(document).keyup(function(keyPressed) {
+            if(keyPressed.keyCode === 27) {
+                $('#participateWarnings').empty();
+                jQuery.unblockUI();
+            }
         });
     </script>
 </c:if>
@@ -497,7 +514,7 @@
 
             </td>
             <td>
-                <fmt:message key="total" bundle="${resword}"/> : <c:out value="${userCount}"/><br><br>
+                <fmt:message key="total" bundle="${resword}"/> : <c:out value="${userCount}"/>
                 <%-- changed tbh, 09/05/2009 --%>
                 <%-- <c:forEach var="childStudy" items="${childStudyUserCount}">
                     <c:out value="${childStudy.key}"></c:out> :
@@ -549,7 +566,7 @@
               <td width="20">&nbsp;</td>
               <td width="200"><b><fmt:message key="modules" bundle="${resword}"/></b></td>
               <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
-              <td width="155"><b><fmt:message key="url" bundle="${resword}"/></b></td>
+              <td width="164"><b><fmt:message key="url" bundle="${resword}"/></b></td>
               <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
               </tr>
           </thead>
@@ -559,14 +576,19 @@
                   <td><fmt:message key="participate" bundle="${resword}"/></td>
                   <td>
                       <c:choose>
-                          <c:when test="${participateOCStatus == 'disabled'}"><fmt:message key="participant_portal_status_deactivated" bundle="${resword}"/></c:when>
-                          <c:when test="${empty participateStatus}"><fmt:message key="participant_portal_status_notfound" bundle="${resword}"/></c:when>
-                          <c:otherwise>${participateStatus}</c:otherwise>
+                          <c:when test="${participateOCStatus == 'disabled'}"><fmt:message key="participate_status_deactivated" bundle="${resword}"/></c:when>
+                          <c:when test="${empty participateStatus}"><fmt:message key="participate_status_notfound" bundle="${resword}"/></c:when>
+                          <c:when test="${participateStatus == 'PENDING'}"><fmt:message key="participate_status_pending" bundle="${resword}"/></c:when>
+                          <c:when test="${participateStatus == 'ACTIVE'}"><fmt:message key="participate_status_active" bundle="${resword}"/></c:when>
+                          <c:when test="${participateStatus == 'INACTIVE'}"><fmt:message key="participate_status_inactive" bundle="${resword}"/></c:when>
                       </c:choose>
                   </td>
                   <td>
                       <c:choose>
-                          <c:when test="${participateOCStatus != 'disabled'}">${participateURL}</c:when>
+                          <c:when test="${!empty participateURLDisplay && !empty participateStatus && participateStatus == 'ACTIVE'}">
+                              <a href="<c:url value="${participateURLFull}"/>" target="_blank">${participateURLDisplay}</a>
+                          </c:when>
+                          <c:when test="${!empty participateURLDisplay}">${participateURLDisplay}</c:when>
                           <c:otherwise>&nbsp;</c:otherwise>
                       </c:choose>
                   </td>
@@ -575,10 +597,10 @@
                       <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
                       <c:choose>
                           <c:when test="${participateOCStatus == 'disabled' && !empty participateStatus}">
-                              <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="request_access" bundle="${resword}"/>" title="<fmt:message key="request_access" bundle="${resword}"/>"/></a>
+                              <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${participateOCStatus == 'disabled'}">
-                              <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="request_access" bundle="${resword}"/>" title="<fmt:message key="request_access" bundle="${resword}"/>"/></a>
+                              <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
                               <a href="${deactivateParticipate}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
@@ -625,13 +647,29 @@
     <div id="requestParticipateForm" style="display:none;">
         <form action="studymodule/${currentStudy.oid}/register" method="post">
             <p>
-                <fmt:message key="participant_portal_reg_hostname" bundle="${resword}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
+                <fmt:message key="participate_reg_hostname" bundle="${resword}"/>
+                <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
+                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
+                </a>
             </p>
+            <span class="participate-text"><c:out value="${participateURL.protocol}"/>:// </span>
             <input type="text" name="hostName" id="hostName"/>
+            <span class="participate-text"> .<c:out value="${participateURL.host}"/><c:if test="${participateURL.port > 0}">:<c:out value="${participateURL.port}"/></c:if></span>
             <br>
+            <div class="participate-sample-url">
+                <c:out value="${participateURL.protocol}"/>://<fmt:message key="participate_example_hostname" bundle="${resword}"/>.<c:out value="${participateURL.host}"/><c:if test="${participateURL.port > 0}">:<c:out value="${participateURL.port}"/></c:if>
+            </div>
+            <c:if test="${!empty validationMessages}">
+                <div id="participateWarnings" class="participate-warnings">
+                    <c:forEach var="message" items="${validationMessages}">
+                        <c:out value="${message}" escapeXml="false"/> 
+                        <br>
+                    </c:forEach>
+                </div>
+            </c:if>
             <input type="submit" id="submitParticipateAccessRequest" name="submitParticipateAccessRequest" class="button_medium" value="Request Access"/>
             <input type="button" id="cancelParticipateAccessRequest" name="cancelParticipateAccessRequest" class="button" value="Cancel"/>
+            <br><br>
         </form>
     </div>
 </c:if>
