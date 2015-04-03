@@ -93,7 +93,7 @@
                 $('#participateWarnings').empty();
             });
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
-            var warnings = "${validationMessages}";
+            var warnings = "${regMessages}";
             if (warnings.length > 0) { 
             	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } }); 
             }
@@ -659,9 +659,9 @@
             <div class="participate-sample-url">
                 <c:out value="${participateURL.protocol}"/>://<fmt:message key="participate_example_hostname" bundle="${resword}"/>.<c:out value="${participateURL.host}"/><c:if test="${participateURL.port > 0}">:<c:out value="${participateURL.port}"/></c:if>
             </div>
-            <c:if test="${!empty validationMessages}">
+            <c:if test="${!empty regMessages}">
                 <div id="participateWarnings" class="participate-warnings">
-                    <c:forEach var="message" items="${validationMessages}">
+                    <c:forEach var="message" items="${regMessages}">
                         <c:out value="${message}" escapeXml="false"/> 
                         <br>
                     </c:forEach>

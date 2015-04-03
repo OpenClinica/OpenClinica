@@ -87,8 +87,7 @@ public class StudyModuleController {
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static final String PAGE_MESSAGE = "pageMessages";
-    public static final String VALIDATION_MESSAGE = "validationMessages";
+    public static final String REG_MESSAGE = "regMessages";
     public static ResourceBundle respage;
     @Autowired
     CoreResources coreResources;
@@ -152,16 +151,16 @@ public class StudyModuleController {
         // Check if desired hostName is available. If so, send OCUI registration request
         String hostName = request.getParameter("hostName");
         if (hostName == null || hostName.equals("")) {
-            addPageMessage(request, respage.getString("participate_hostname_invalid"));
+            addRegMessage(request, respage.getString("participate_hostname_invalid"));
             return "redirect:/pages/studymodule";
         }
         String status = "";
         String nameAvailability = registrar.getHostNameAvailability(hostName);
         if (nameAvailability.equals(ParticipantPortalRegistrar.UNAVAILABLE)) {
-            addPageMessage(request, respage.getString("participate_hostname_not_available"));
+            addRegMessage(request, respage.getString("participate_hostname_not_available"));
             return "redirect:/pages/studymodule";
         } else if (nameAvailability.equals(ParticipantPortalRegistrar.UNKNOWN)) {
-            addPageMessage(request, respage.getString("participate_not_available"));
+            addRegMessage(request, respage.getString("participate_not_available"));
             return "redirect:/pages/studymodule";
         } else {
             // Returned status was 'available'. Proceed with registration.
@@ -171,7 +170,7 @@ public class StudyModuleController {
         // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
         // parameter.
         if (status.equals("")) {
-            addPageMessage(request, respage.getString("participate_not_available"));
+            addRegMessage(request, respage.getString("participate_not_available"));
         } else {
             // Update OC Study configuration
             spv.setStudyId(study.getId());
@@ -354,10 +353,10 @@ public class StudyModuleController {
         }
 
         ArrayList pageMessages = new ArrayList();
-        if (request.getSession().getAttribute(PAGE_MESSAGE) != null) {
-            pageMessages.addAll((ArrayList) request.getSession().getAttribute(PAGE_MESSAGE));
-            request.setAttribute(VALIDATION_MESSAGE, pageMessages);
-            request.getSession().removeAttribute(PAGE_MESSAGE);
+        if (request.getSession().getAttribute(REG_MESSAGE) != null) {
+            pageMessages.addAll((ArrayList) request.getSession().getAttribute(REG_MESSAGE));
+            request.setAttribute(REG_MESSAGE, pageMessages);
+            request.getSession().removeAttribute(REG_MESSAGE);
         }
         return map;
     }
@@ -400,15 +399,15 @@ public class StudyModuleController {
         throw ex;
     }
 
-    private void addPageMessage(HttpServletRequest request, String message) {
-        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(PAGE_MESSAGE);
+    private void addRegMessage(HttpServletRequest request, String message) {
+        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(REG_MESSAGE);
         if (pageMessages == null) {
             pageMessages = new ArrayList();
         }
 
         pageMessages.add(message);
         logger.debug(message);
-        request.getSession().setAttribute(PAGE_MESSAGE, pageMessages);
+        request.getSession().setAttribute(REG_MESSAGE, pageMessages);
     }
 
     private void setUpSidebar(HttpServletRequest request) {
