@@ -87,7 +87,7 @@ public class StudyModuleController {
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static final String PAGE_MESSAGE = "pageMessages";
+    public static final String REG_MESSAGE = "regMessages";
     public static ResourceBundle respage;
     @Autowired
     CoreResources coreResources;
@@ -148,23 +148,29 @@ public class StudyModuleController {
         ResourceBundleProvider.updateLocale(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 
-        // Send OCUI registration request
-        String status = "";
+        // Check if desired hostName is available. If so, send OCUI registration request
         String hostName = request.getParameter("hostName");
         if (hostName == null || hostName.equals("")) {
-            addPageMessage(request, respage.getString("participate_hostname_invalid"));
+            addRegMessage(request, respage.getString("participate_hostname_invalid"));
             return "redirect:/pages/studymodule";
-        } else if (!registrar.getHostNameAvailability(hostName).equals(ParticipantPortalRegistrar.AVAILABLE)) {
-            addPageMessage(request, respage.getString("participate_hostname_not_available"));
+        }
+        String status = "";
+        String nameAvailability = registrar.getHostNameAvailability(hostName);
+        if (nameAvailability.equals(ParticipantPortalRegistrar.UNAVAILABLE)) {
+            addRegMessage(request, respage.getString("participate_hostname_not_available"));
+            return "redirect:/pages/studymodule";
+        } else if (nameAvailability.equals(ParticipantPortalRegistrar.UNKNOWN)) {
+            addRegMessage(request, respage.getString("participate_not_available"));
             return "redirect:/pages/studymodule";
         } else {
+            // Returned status was 'available'. Proceed with registration.
             status = registrar.registerStudy(study.getOid(), hostName);
         }
 
         // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
         // parameter.
         if (status.equals("")) {
-            addPageMessage(request, respage.getString("participate_not_available"));
+            addRegMessage(request, respage.getString("participate_not_available"));
         } else {
             // Update OC Study configuration
             spv.setStudyId(study.getId());
@@ -300,24 +306,28 @@ public class StudyModuleController {
             ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
             Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
             String participateStatus = "";
-            if (pManageAuthorization != null && pManageAuthorization.getAuthorizationStatus() != null
-                    && pManageAuthorization.getAuthorizationStatus().getStatus() != null)
-                participateStatus = pManageAuthorization.getAuthorizationStatus().getStatus();
-            map.addAttribute("participateOCStatus", participateOCStatus);
-            map.addAttribute("participateStatus", participateStatus);
-
             String url = "";
             try {
+                URL pManageUrl = new URL(portalURL);
+                if (pManageAuthorization != null && pManageAuthorization.getAuthorizationStatus() != null
+                        && pManageAuthorization.getAuthorizationStatus().getStatus() != null)
+                    participateStatus = pManageAuthorization.getAuthorizationStatus().getStatus();
+                map.addAttribute("participateURL", pManageUrl);
+                map.addAttribute("participateOCStatus", participateOCStatus);
+                map.addAttribute("participateStatus", participateStatus);
+
                 if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
                         && !pManageAuthorization.getStudy().getHost().equals("")) {
-                    URL pManageUrl = new URL(portalURL);
-                    url = pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost();
+                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
                 }
             } catch (MalformedURLException e) {
                 logger.error(e.getMessage());
                 logger.error(ExceptionUtils.getStackTrace(e));
             }
-            map.addAttribute("participateURL", url);
+            map.addAttribute("participateURLDisplay", url);
+            map.addAttribute("participateURLFull", url + "/#/login");
         }
 
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
@@ -343,10 +353,10 @@ public class StudyModuleController {
         }
 
         ArrayList pageMessages = new ArrayList();
-        if (request.getSession().getAttribute(PAGE_MESSAGE) != null) {
-            pageMessages.addAll((ArrayList) request.getSession().getAttribute(PAGE_MESSAGE));
-            request.setAttribute(PAGE_MESSAGE, pageMessages);
-            request.getSession().removeAttribute(PAGE_MESSAGE);
+        if (request.getSession().getAttribute(REG_MESSAGE) != null) {
+            pageMessages.addAll((ArrayList) request.getSession().getAttribute(REG_MESSAGE));
+            request.setAttribute(REG_MESSAGE, pageMessages);
+            request.getSession().removeAttribute(REG_MESSAGE);
         }
         return map;
     }
@@ -389,15 +399,15 @@ public class StudyModuleController {
         throw ex;
     }
 
-    private void addPageMessage(HttpServletRequest request, String message) {
-        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(PAGE_MESSAGE);
+    private void addRegMessage(HttpServletRequest request, String message) {
+        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(REG_MESSAGE);
         if (pageMessages == null) {
             pageMessages = new ArrayList();
         }
 
         pageMessages.add(message);
         logger.debug(message);
-        request.getSession().setAttribute(PAGE_MESSAGE, pageMessages);
+        request.getSession().setAttribute(REG_MESSAGE, pageMessages);
     }
 
     private void setUpSidebar(HttpServletRequest request) {
