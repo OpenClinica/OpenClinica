@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.admin.AuditBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -9,62 +7,30 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.dao.admin.AuditDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.cdisc.ns.odm.v130_api.ODM;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionClinicalData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionSubjectData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionStudyEventData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionFormData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -228,7 +194,7 @@ public class AccountController {
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isStudySubjectDoesNotExist(studySubjectBean))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		if (isFistName2orLessCharacters(fName))
+		if (isFistNameInValid(fName))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isPhoneFieldIsNull(mobile))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -413,10 +379,10 @@ public class AccountController {
 		return false;
 	}
 
-	private Boolean isFistName2orLessCharacters(String fName) {
-		if (fName.length() < 3) {
-			logger.info("***     First Name length is less than 2 characters    ***");
-			System.out.println("***     First Name length is less than 2 characters    ***");
+	private Boolean isFistNameInValid(String fName) {
+		if (fName.length() < 1) {
+			logger.info("***     First Name length is less than 1 characters    ***");
+			System.out.println("***     First Name length is less than 1 characters    ***");
 			return true;
 		}
 		return false;
