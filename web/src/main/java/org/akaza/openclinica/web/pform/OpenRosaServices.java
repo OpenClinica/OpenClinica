@@ -190,6 +190,7 @@ public class OpenRosaServices {
 				System.out.println("WARNING: This prototype doesn't support multipart content.");
 			}
 	
+			if (!mayProceedSubmission(studyOID)) return null;
 			
 		
 			PFormCache cache = PFormCache.getInstance(servletContext);
@@ -372,6 +373,23 @@ public class OpenRosaServices {
 
 	}
 
+			private boolean mayProceedSubmission(String studyOid) throws Exception {
+				boolean accessPermission = false;
+				StudyBean study = getParentStudy(studyOid);
+				StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+				StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
+				 participantPortalRegistrar=new ParticipantPortalRegistrar();
+				String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
+				String participateStatus = pStatus.getValue().toString();         // enabled , disabled
+				String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
+				logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
+				System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
+				if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+					accessPermission = true;
+				}
+				return accessPermission;
+			}
+
 			private boolean mayProceedSubmission(String studyOid , StudySubjectBean ssBean) throws Exception {
 				boolean accessPermission = false;
 				StudyBean study = getParentStudy(studyOid);
@@ -389,7 +407,8 @@ public class OpenRosaServices {
 				return accessPermission;
 			}
 
-		private boolean mayProceedPreview(String studyOid) throws Exception {
+			
+			private boolean mayProceedPreview(String studyOid) throws Exception {
 			boolean accessPermission = false;
 			StudyBean study = getParentStudy(studyOid);
 			StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
