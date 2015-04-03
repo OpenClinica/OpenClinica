@@ -43,7 +43,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.web.pmanage.PmanageSubmissionNotification;
 import org.akaza.openclinica.web.pmanage.Study;
 import org.akaza.openclinica.web.pmanage.Submission;
 import org.apache.commons.codec.digest.DigestUtils;
