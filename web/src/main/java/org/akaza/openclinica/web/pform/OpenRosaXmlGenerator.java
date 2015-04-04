@@ -590,7 +590,7 @@ public class OpenRosaXmlGenerator {
 		String result = "";
 		expression = " " + expression;
 		expression = expression.replaceAll("\\(", "\\( ");
-		expression = expression.replaceAll("_CURRENT_DATE", " format-date(today(), \"%Y-%n-%e\") ");
+		expression = expression.replaceAll("_CURRENT_DATE", "today()");
 		/*
 		 * today() function returns date and time and will not work with 'eq'
 		 * operator. But it will work with 'gt' or 'lt' operators
