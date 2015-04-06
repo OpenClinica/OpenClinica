@@ -356,11 +356,19 @@ public class StudyModuleController {
         }
 
         ArrayList pageMessages = new ArrayList();
+        if (request.getSession().getAttribute("pageMessages") != null) {
+            pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
+            request.setAttribute("pageMessages", pageMessages);
+            request.getSession().removeAttribute("pageMessages");
+        }
+
+        ArrayList regMessages = new ArrayList();
         if (request.getSession().getAttribute(REG_MESSAGE) != null) {
-            pageMessages.addAll((ArrayList) request.getSession().getAttribute(REG_MESSAGE));
-            request.setAttribute(REG_MESSAGE, pageMessages);
+            regMessages.addAll((ArrayList) request.getSession().getAttribute(REG_MESSAGE));
+            request.setAttribute(REG_MESSAGE, regMessages);
             request.getSession().removeAttribute(REG_MESSAGE);
         }
+
         return map;
     }
 
@@ -403,14 +411,14 @@ public class StudyModuleController {
     }
 
     private void addRegMessage(HttpServletRequest request, String message) {
-        ArrayList pageMessages = (ArrayList) request.getSession().getAttribute(REG_MESSAGE);
-        if (pageMessages == null) {
-            pageMessages = new ArrayList();
+        ArrayList regMessages = (ArrayList) request.getSession().getAttribute(REG_MESSAGE);
+        if (regMessages == null) {
+            regMessages = new ArrayList();
         }
 
-        pageMessages.add(message);
+        regMessages.add(message);
         logger.debug(message);
-        request.getSession().setAttribute(REG_MESSAGE, pageMessages);
+        request.getSession().setAttribute(REG_MESSAGE, regMessages);
     }
 
     private void setUpSidebar(HttpServletRequest request) {
