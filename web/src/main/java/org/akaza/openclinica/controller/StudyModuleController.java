@@ -162,6 +162,9 @@ public class StudyModuleController {
         } else if (nameAvailability.equals(ParticipantPortalRegistrar.UNKNOWN)) {
             addRegMessage(request, respage.getString("participate_not_available"));
             return "redirect:/pages/studymodule";
+        } else if (nameAvailability.equals(ParticipantPortalRegistrar.INVALID)) {
+            addRegMessage(request, respage.getString("participate_hostname_invalid"));
+            return "redirect:/pages/studymodule";
         } else {
             // Returned status was 'available'. Proceed with registration.
             status = registrar.registerStudy(study.getOid(), hostName);

@@ -18,6 +18,7 @@ public class ParticipantPortalRegistrar {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String AVAILABLE = "available";
     public static final String UNAVAILABLE = "unavailable";
+    public static final String INVALID = "invalid";
     public static final String UNKNOWN = "unknown";
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
@@ -61,12 +62,15 @@ public class ParticipantPortalRegistrar {
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
+        String response = null;
         try {
-            ResponseEntity response = rest.getForEntity(pManageUrl, null);
-            if (response.getStatusCode().equals(HttpStatus.OK))
-                return AVAILABLE;
-            else if (response.getStatusCode().equals(HttpStatus.CONFLICT))
+            response = rest.getForObject(pManageUrl, String.class);
+            if (response.equals("UNAVAILABLE"))
                 return UNAVAILABLE;
+            else if (response.equals("INVALID"))
+                return INVALID;
+            else if (response.equals("AVAILABLE"))
+                return AVAILABLE;
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
