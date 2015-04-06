@@ -46,7 +46,6 @@
     .contenttable{
             border-left: 1px solid #ccc;
             border-top: 1px solid #ccc;
-            table-layout:fixed;
 
     }
     .contenttable tbody tr td, .contenttable thead td {
@@ -58,7 +57,6 @@
             vertical-align:top;
             text-align: left;
             padding: 4px;
-            word-wrap:break-word;
         }
     .contenttable.hiddencontent td {
         border-left: 0px;
@@ -576,21 +574,23 @@
                   <td><fmt:message key="participate" bundle="${resword}"/></td>
                   <td>
                       <c:choose>
-                          <c:when test="${participateOCStatus == 'disabled'}"><fmt:message key="participate_status_deactivated" bundle="${resword}"/></c:when>
-                          <c:when test="${empty participateStatus}"><fmt:message key="participate_status_notfound" bundle="${resword}"/></c:when>
-                          <c:when test="${participateStatus == 'PENDING'}"><fmt:message key="participate_status_pending" bundle="${resword}"/></c:when>
-                          <c:when test="${participateStatus == 'ACTIVE'}"><fmt:message key="participate_status_active" bundle="${resword}"/></c:when>
-                          <c:when test="${participateStatus == 'INACTIVE'}"><fmt:message key="participate_status_inactive" bundle="${resword}"/></c:when>
+                          <c:when test="${participateOCStatus == 'disabled'}"><span id="participateStatus" class="participate-inactive-status"><fmt:message key="participate_status_deactivated" bundle="${resword}"/></span></c:when>
+                          <c:when test="${empty participateStatus}"><span id="participateStatus"><fmt:message key="participate_status_notfound" bundle="${resword}"/></span></c:when>
+                          <c:when test="${participateStatus == 'PENDING'}"><span id="participateStatus"><fmt:message key="participate_status_pending" bundle="${resword}"/></span></c:when>
+                          <c:when test="${participateStatus == 'ACTIVE'}"><span id="participateStatus" class="participate-active-status"><fmt:message key="participate_status_active" bundle="${resword}"/></span></c:when>
+                          <c:when test="${participateStatus == 'INACTIVE'}"><span id="participateStatus" class="participate-inactive-status"><fmt:message key="participate_status_inactive" bundle="${resword}"/></span></c:when>
                       </c:choose>
                   </td>
                   <td>
-                      <c:choose>
-                          <c:when test="${!empty participateURLDisplay && !empty participateStatus && participateStatus == 'ACTIVE'}">
-                              <a href="<c:url value="${participateURLFull}"/>" target="_blank">${participateURLDisplay}</a>
-                          </c:when>
-                          <c:when test="${!empty participateURLDisplay}">${participateURLDisplay}</c:when>
-                          <c:otherwise>&nbsp;</c:otherwise>
-                      </c:choose>
+                      <span id="participateURL">
+                          <c:choose>
+                              <c:when test="${!empty participateURLDisplay && !empty participateStatus && participateStatus == 'ACTIVE'}">
+                                  <a href="<c:url value="${participateURLFull}"/>" target="_blank">${participateURLDisplay}</a>
+                              </c:when>
+                              <c:when test="${!empty participateURLDisplay}">${participateURLDisplay}</c:when>
+                              <c:otherwise>&nbsp;</c:otherwise>
+                          </c:choose>
+                      </span>
                   </td>
                   <td>
                       <c:url var="reactivateParticipate" value="studymodule/${currentStudy.oid}/reactivate"/>
@@ -667,8 +667,8 @@
                     </c:forEach>
                 </div>
             </c:if>
-            <input type="submit" id="submitParticipateAccessRequest" name="submitParticipateAccessRequest" class="button_medium" value="Request Access"/>
-            <input type="button" id="cancelParticipateAccessRequest" name="cancelParticipateAccessRequest" class="button" value="Cancel"/>
+            <input type="submit" id="submitParticipateAccessRequest" class="button_medium" value="Request Access"/>
+            <input type="button" id="cancelParticipateAccessRequest" class="button" value="Cancel"/>
             <br><br>
         </form>
     </div>
