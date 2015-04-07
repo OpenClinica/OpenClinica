@@ -644,7 +644,7 @@
 </form>
 
 <c:if test="${portalURL!= '' && portalURL!= null}">
-    <div align="left" id="requestParticipateForm" style="padding-left:10px;padding-bottom:10px;padding-right:10px;display:none;">
+    <div align="left" id="requestParticipateForm" class="participate-registration-div">
         <form action="studymodule/${currentStudy.oid}/register" method="post">
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
