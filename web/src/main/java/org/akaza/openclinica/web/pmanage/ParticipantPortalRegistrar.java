@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class ParticipantPortalRegistrar {
@@ -18,11 +19,15 @@ public class ParticipantPortalRegistrar {
     public static final String AVAILABLE = "available";
     public static final String UNAVAILABLE = "unavailable";
     public static final String UNKNOWN = "unknown";
+    public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
     public Authorization getAuthorization(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        RestTemplate rest = new RestTemplate();
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
+
         try {
             Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
             if (response.length > 0 && response[0].getAuthorizationStatus() != null)
@@ -37,7 +42,9 @@ public class ParticipantPortalRegistrar {
     public String getRegistrationStatus(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        RestTemplate rest = new RestTemplate();
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
         try {
             Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
             if (response.length > 0 && response[0].getAuthorizationStatus() != null)
@@ -50,14 +57,15 @@ public class ParticipantPortalRegistrar {
     }
 
     public String getHostNameAvailability(String hostName) {
-        // String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/name?hostName=" + hostName;
-        RestTemplate rest = new RestTemplate();
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
         try {
             ResponseEntity response = rest.getForEntity(pManageUrl, null);
             if (response.getStatusCode().equals(HttpStatus.OK))
                 return AVAILABLE;
-            else
+            else if (response.getStatusCode().equals(HttpStatus.CONFLICT))
                 return UNAVAILABLE;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -80,7 +88,9 @@ public class ParticipantPortalRegistrar {
         authStudy.setHost(hostName);
         authRequest.setStudy(authStudy);
 
-        RestTemplate rest = new RestTemplate();
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
 
         try {
             Authorization response = rest.postForObject(pManageUrl, authRequest, Authorization.class);
@@ -99,7 +109,9 @@ public class ParticipantPortalRegistrar {
         String pManageUrl = CoreResources.getField("portalURL");
         String pManageUrlFull = pManageUrl + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
 
-        RestTemplate rest = new RestTemplate();
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
         try {
             Authorization[] response = rest.getForObject(pManageUrlFull, Authorization[].class);
             if (response.length > 0 && response[0].getStudy() != null && response[0].getStudy().getHost() != null
@@ -139,6 +151,7 @@ public class ParticipantPortalRegistrar {
                 }
             }
         }
+        urlBuilder.append("/#/login");
         return urlBuilder.toString();
     }
 }
