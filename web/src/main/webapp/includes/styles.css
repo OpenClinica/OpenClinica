@@ -2053,3 +2053,10 @@ margin: 2px;;
 .participate-active-status {
 	color: #006633;
 }
+
+.participate-registration-div {
+	padding-left:10px;
+	padding-bottom:10px;
+	padding-right:10px;
+	display:none;
+}

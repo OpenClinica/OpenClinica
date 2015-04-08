@@ -644,21 +644,20 @@
 </form>
 
 <c:if test="${portalURL!= '' && portalURL!= null}">
-    <div id="requestParticipateForm" style="display:none;">
+    <div align="left" id="requestParticipateForm" class="participate-registration-div">
         <form action="studymodule/${currentStudy.oid}/register" method="post">
-            <p>
-                <fmt:message key="participate_reg_hostname" bundle="${resword}"/>
+            <h1>
+                <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
                     <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
                 </a>
-            </p>
+            </h1>
+            <p class="participate-text"><fmt:message key="participate_reg_instructions_part1" bundle="${resword}"/></p>
+            <p class="participate-text"><fmt:message key="participate_reg_instructions_part2" bundle="${resword}"/></p>
             <span class="participate-text"><c:out value="${participateURL.protocol}"/>:// </span>
             <input type="text" name="hostName" id="hostName"/>
             <span class="participate-text"> .<c:out value="${participateURL.host}"/><c:if test="${participateURL.port > 0}">:<c:out value="${participateURL.port}"/></c:if></span>
             <br>
-            <div class="participate-sample-url">
-                <c:out value="${participateURL.protocol}"/>://<fmt:message key="participate_example_hostname" bundle="${resword}"/>.<c:out value="${participateURL.host}"/><c:if test="${participateURL.port > 0}">:<c:out value="${participateURL.port}"/></c:if>
-            </div>
             <c:if test="${!empty regMessages}">
                 <div id="participateWarnings" class="participate-warnings">
                     <c:forEach var="message" items="${regMessages}">
@@ -669,7 +668,6 @@
             </c:if>
             <input type="submit" id="submitParticipateAccessRequest" class="button_medium" value="Request Access"/>
             <input type="button" id="cancelParticipateAccessRequest" class="button" value="Cancel"/>
-            <br><br>
         </form>
     </div>
 </c:if>
