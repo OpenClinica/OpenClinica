@@ -22,6 +22,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
@@ -187,7 +188,7 @@ public class DefineStudyEventServlet extends SecureController {
     private void confirmDefinition1() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-
+        
         v.addValidation("name", Validator.NO_BLANKS);
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
@@ -290,6 +291,7 @@ public class DefineStudyEventServlet extends SecureController {
             String doubleEntry = fp.getString("doubleEntry" + i);
             String decisionCondition = fp.getString("decisionCondition" + i);
             String electronicSignature = fp.getString("electronicSignature" + i);
+            String participantForm = fp.getString("participantForm" + i);
 
             // issue 312 BWP<<
             String hiddenCrf = fp.getString("hiddenCrf" + i);
@@ -307,6 +309,11 @@ public class DefineStudyEventServlet extends SecureController {
                 edcBean.setRequiredCRF(true);
             } else {
                 edcBean.setRequiredCRF(false);
+            }
+            if (!StringUtils.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim())) {
+                edcBean.setParticipantForm(true);
+            } else {
+                edcBean.setParticipantForm(false);
             }
             if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);
@@ -341,6 +348,12 @@ public class DefineStudyEventServlet extends SecureController {
             edcBean.setStudyId(ub.getActiveStudyId());
             eventDefinitionCRFs.add(edcBean);
         }
+        
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+             request.setAttribute("participateFormStatus",participateFormStatus );
+
+        
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
         session.setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
         forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM);
@@ -443,13 +456,16 @@ public class DefineStudyEventServlet extends SecureController {
             }
         }
         session.removeAttribute("tmpCRFIdMap");
-
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        
         if (crfArray.size() == 0) {// no crf seleted
             // addPageMessage("At least one CRF must be selected.");
             // request.setAttribute("crfs", crfs);
             addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"));
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
             sed.setCrfs(new ArrayList());
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+             request.setAttribute("participateFormStatus",participateFormStatus );
             session.setAttribute("definition", sed);
             request.setAttribute("eventDefinitionCRFs", new ArrayList());
             session.setAttribute("edCRFs", new ArrayList());// not used on page
@@ -460,6 +476,8 @@ public class DefineStudyEventServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
             sed.setCrfs(crfArray);// crfs selected by user
             session.setAttribute("definition", sed);
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
 
             ArrayList<String> sdvOptions = new ArrayList<String>();
             sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());

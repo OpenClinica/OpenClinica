@@ -85,6 +85,12 @@
     <!-- <td valign="top" class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/></td>-->
     <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>     
+    <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
+     <td valign="top" class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>     
+    </c:when>  
+   </c:choose>
+
      <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>    
      <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
@@ -135,9 +141,26 @@
    <td class="table_cell">   
     <c:out value="${crf.defaultVersionName}"/>     
    </td>
+
+    <td class="table_cell">
+     <c:choose>
+      <c:when test="${crf.hideCrf == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+    </td>
+
+
+  <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
    <td class="table_cell">
-    <c:out value="${crf.hideCrf}"/>
-   </td>
+     <c:choose>
+      <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+    </td>
+   </c:when>  
+ </c:choose>
+
    <td class="table_cell"> 
     <c:out value="${crf.nullValues}"/> &nbsp;    
   </td>          

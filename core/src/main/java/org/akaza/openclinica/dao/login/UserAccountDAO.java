@@ -99,6 +99,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(21, TypeNames.BOOL);
         this.setTypeExpected(22, TypeNames.INT);
         this.setTypeExpected(23, TypeNames.BOOL);
+        this.setTypeExpected(24, TypeNames.STRING);    // access_doe
     }
 
     public void setPrivilegeTypesExpected() {
@@ -182,8 +183,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), uab.getAccountNonLocked());
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
+        variables.put(new Integer(19), uab.getAccessCode());
 
-        variables.put(new Integer(19), new Integer(uab.getId()));
+        variables.put(new Integer(20), new Integer(uab.getId()));
+
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
@@ -285,6 +288,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         }
 
         variables.put(new Integer(15), uab.getRunWebservices());
+        variables.put(new Integer(16), uab.getAccessCode());
 
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
@@ -405,6 +409,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer userTypeId = (Integer) hm.get("user_type_id");
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
+        String accessCode = (String) hm.get("access_code");
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -421,6 +426,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setAccountNonLocked(((Boolean) hm.get("account_non_locked")).booleanValue());
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
+        eb.setAccessCode(accessCode);
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -548,6 +554,21 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+
+    public EntityBean findByAccessCode(String name) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+
+        variables.put(new Integer(1), name);
+
+        ArrayList alist = this.select(digester.getQuery("findByAccessCode"), variables);
+        UserAccountBean eb = new UserAccountBean();
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            eb = (UserAccountBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+        }
+        return eb;
+    }
 
 
     /**

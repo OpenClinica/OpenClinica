@@ -173,6 +173,8 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.BOOL);// hide_crf
         ++i;
+        this.setTypeExpected(i, TypeNames.BOOL);// participant_form
+        ++i;
         this.setTypeExpected(i, TypeNames.INT);// source_data_verification_code
     }
 
@@ -1457,6 +1459,7 @@ public class OdmExtractDAO extends DatasetDAO {
             Boolean pwdRequired = (Boolean) row.get("electronic_signature");
             Boolean doubleEntry = (Boolean) row.get("double_entry");
             Boolean hideCrf = (Boolean) row.get("hide_crf");
+            Boolean participantForm = (Boolean) row.get("participant_form");
             Integer sdvId = (Integer) row.get("source_data_verification_code");
 
             if(sedDetails.containsKey(sedOID)) {
@@ -1475,6 +1478,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 p.setStudyEventOid(sedOID);
                 p.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
                 p.setHideCrf(hideCrf==false?"No":"Yes");
+                p.setParticipantForm(participantForm==false?"No":"Yes");
                 p.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
                 p.setNullValues(nullValue);
                 p.setPasswordRequired(pwdRequired==false?"No":"Yes");
@@ -1492,6 +1496,7 @@ public class OdmExtractDAO extends DatasetDAO {
                p.setStudyEventOid(sedOID);
                p.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
                p.setHideCrf(hideCrf==false?"No":"Yes");
+               p.setParticipantForm(participantForm==false?"No":"Yes");
                p.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
                p.setNullValues(nullValue);
                p.setPasswordRequired(pwdRequired==false?"No":"Yes");
@@ -3204,7 +3209,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
             + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
             + " crf.oc_oid as crf_oid, edc.null_values, edc.default_version_id, edc.electronic_signature,"
-            + " edc.double_entry, edc.hide_crf, edc.source_data_verification_code"
+            + " edc.double_entry, edc.hide_crf, edc.participant_form, edc.source_data_verification_code"
             + " from " + this.studyEventAndFormMetaTables()
             + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite);
     }

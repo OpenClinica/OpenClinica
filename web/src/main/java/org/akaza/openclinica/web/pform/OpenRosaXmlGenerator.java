@@ -134,6 +134,7 @@ public class OpenRosaXmlGenerator {
 			String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
 			String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
 			System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
+			logger.info(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
 			return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -490,10 +491,13 @@ public class OpenRosaXmlGenerator {
 			ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
 			String repeatGroupMin = itemGroupMetadataBean.getRepeatNum().toString();
+			Boolean isrepeating = itemGroupMetadataBean.isRepeatingGroup();
 
 			Element groupElement = doc.createElement(itemGroupBean.getOid());
+			if (isrepeating){
 			groupElement.setTextContent(repeatGroupMin);
 			groupElement.setAttribute("jr:template", "");
+			}
 			crfElement.appendChild(groupElement);
 
 			idao = new ItemDAO(dataSource);
@@ -553,6 +557,7 @@ public class OpenRosaXmlGenerator {
 		Reader reader = new StringReader(content);
 		Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
 		unmarshaller.setClass(Html.class);
+		unmarshaller.setWhitespacePreserve(false);
 		Html html = (Html) unmarshaller.unmarshal(reader);
 		reader.close();
 		return html;
@@ -585,7 +590,7 @@ public class OpenRosaXmlGenerator {
 		String result = "";
 		expression = " " + expression;
 		expression = expression.replaceAll("\\(", "\\( ");
-		expression = expression.replaceAll("_CURRENT_DATE", " format-date(today(), \"%Y-%n-%e\") ");
+		expression = expression.replaceAll("_CURRENT_DATE", "today()");
 		/*
 		 * today() function returns date and time and will not work with 'eq'
 		 * operator. But it will work with 'gt' or 'lt' operators

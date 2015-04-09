@@ -2024,3 +2024,39 @@ margin: 2px;;
     vertical-align: middle;
     margin-right: 5px;
 }
+
+.participate-text {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #4D4D4D;	
+}
+
+.participate-sample-url {
+	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #B6B6B4;
+}
+
+.participate-warnings {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #D00000;
+}
+
+.participate-inactive-status {
+	color: #FF0000;
+}
+
+.participate-active-status {
+	color: #006633;
+}
+
+.participate-registration-div {
+	padding-left:10px;
+	padding-bottom:10px;
+	padding-right:10px;
+	display:none;
+}

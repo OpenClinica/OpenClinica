@@ -80,7 +80,7 @@
      <sql>
       SELECT cv.* FROM study_event_definition sed,event_definition_crf edc, crf_version cv
       WHERE sed.study_event_definition_id = edc.study_event_definition_id
-       AND edc.default_version_id = cv.crf_version_id
+       AND edc.default_version_id = cv.crf_version_id AND edc.participant_form = true
        AND sed.study_event_definition_id = ?
      </sql>
     </query>

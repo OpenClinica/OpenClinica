@@ -15,10 +15,12 @@
 		<jsp:include page="../include/home-header.jsp"/>
 	</c:when>
 	<c:otherwise>
+	
 		<jsp:include page="../include/admin-header.jsp"/>
 	</c:otherwise>
 </c:choose>
 
+  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
 
 
 <!-- move the alert message to the sidebar-->
@@ -97,7 +99,21 @@
 		       }
 	         }
            }
-
+       
+           function registerPManage(event){
+               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
+               jQuery.ajax({
+        	       type:'GET',
+        	       url: regURL,
+        	       success: function(data){
+                       jQuery('#pManageDiv').html('Registration: ' + data);
+        	    }});
+           }
+           
+           function togglePManage(show){
+        	   if (show) jQuery('#pManageDiv').show();
+        	   else jQuery('#pManageDiv').hide();
+           }
        //-->
  </script>
 
@@ -1010,15 +1026,6 @@
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'not_used'}"> checked </c:if> name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
   </tr>
-
-
-<c:if test="${portalURL!= '' && portalURL!= null}"><tr valign="top"><td class="formlabel"><fmt:message key="participant_portal" bundle="${resword}"/></td><td>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'enabled'}"> checked </c:if> name="participantPortal" value="enabled"><fmt:message key="enabled" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.participantPortal== 'disabled'}"> checked </c:if> name="participantPortal" value="disabled"><fmt:message key="disabled" bundle="${resword}"/>
-  <a href="https://www.openclinica.com/participant-portal-registration" target="def_win" onClick="openDefWindow('https://www.openclinica.com/participant-portal-registration'); return false;"><fmt:message key="register" bundle="${resword}"/></a></td></c:if>
-
-  </tr>
-
 
 </table>
 </div>
