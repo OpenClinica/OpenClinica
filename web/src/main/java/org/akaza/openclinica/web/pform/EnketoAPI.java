@@ -28,8 +28,13 @@ public class EnketoAPI {
     public String getFormURL(String crfOID) throws Exception {
         URL eURL = new URL(enketoURL + "/api/v1/survey/iframe");
         EnketoURLResponse response = getURL(eURL, crfOID);
-        if (response != null)
-            return response.getUrl();
+        if (response != null) {
+            String myUrl = response.getUrl();
+            if(enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")){
+                myUrl = myUrl.replaceFirst("http","https");
+            }
+            return myUrl;
+        }
         else
             return "";
     }
