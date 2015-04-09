@@ -131,10 +131,10 @@ public class DeleteEventCRFServlet extends SecureController {
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
-                    iddao.deleteDnMap(item.getId());
+               //     iddao.deleteDnMap(item.getId());
                     for (int b = 0; b < discrepancyList.size(); b++) {
                         DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) discrepancyList.get(b);
-                        dnDao.deleteNotes(noteBean.getId());
+                   //     dnDao.deleteNotes(noteBean.getId());
                     }
                     item.setValue("");
                     item.setOldStatus(item.getStatus());
