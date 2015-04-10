@@ -1881,6 +1881,23 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
     }
 
+    public ArrayList<DiscrepancyNoteBean> findParentNotesOnlyByItemData(int itemDataId) {
+        this.setTypesExpected();
+        ArrayList alist = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
+        alist = this.select(digester.getQuery("findParentNotesOnlyByItemData"), variables);
+        ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+            al.add(eb);
+        }
+        return al;
+    }
+
+    
     public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
         this.setTypesExpected();
         ArrayList alist = new ArrayList();
