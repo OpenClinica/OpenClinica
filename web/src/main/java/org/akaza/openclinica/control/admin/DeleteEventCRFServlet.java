@@ -152,8 +152,8 @@ public class DeleteEventCRFServlet extends SecureController {
 					ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = getDnDao().findParentNotesOnlyByItemData(itemdata.getId());
 					for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
 						if (parentDiscrepancyNote.getResolutionStatusId() != 4) { // if the DN's resolution status is not set to Closed
-							String description = "description";
-							String detailedNotes = "detailedNotes";
+							String description = resword.getString("dn_auto-closed_description");
+							String detailedNotes =resword.getString("dn_auto_closed_detailed_notes");
 							// create new DN record , new DN Map record , also update the parent record
 							createDiscrepancyNoteBean(description, detailedNotes, itemdata.getId(), study, ub, parentDiscrepancyNote);
 						}
@@ -164,8 +164,21 @@ public class DeleteEventCRFServlet extends SecureController {
 
 					ItemFormMetadataBean ifmBean = ifmdao.findByItemIdAndCRFVersionId(idBean.getItemId(), crfVersionId);
 
+					// Updating Dn_item_data_map actovated column into false for the existing DNs
+					ArrayList<DiscrepancyNoteBean> dnBeans = getDnDao().findExistingNotesForItemData(itemdata.getId());
+					if (dnBeans.size() != 0) {
+						DiscrepancyNoteBean dnBean = new DiscrepancyNoteBean();
+						dnBean.setEntityId(itemdata.getId());
+						dnBean.setActivated(false);
+						getDnDao().updateDnMapActivation(dnBean);
+					}
+
 					// OC-6363 Set Item Value into Default Values
-					itemdata.setValue(ifmBean.getDefaultValue());
+					if (ifmBean.getResponseSetId()==1 || ifmBean.getResponseSetId()==2){
+						itemdata.setValue(ifmBean.getDefaultValue());
+					}else{
+						itemdata.setValue("");
+					}
 					itemdata.setOldStatus(itemdata.getStatus());
 					itemdata.setOwner(ub);
 					itemdata.setStatus(Status.AVAILABLE);
@@ -202,7 +215,7 @@ public class DeleteEventCRFServlet extends SecureController {
 		dnb.setAssignedUserId(ub.getId());
 		dnb.setOwner(ub);
 		dnb.setParentDnId(parentDiscrepancyNote.getId());
-
+		dnb.setActivated(false);
 		dnb = (DiscrepancyNoteBean) getDnDao().create(dnb); // create child DN
 		getDnDao().createMapping(dnb); // create DN mapping
 

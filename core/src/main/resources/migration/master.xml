@@ -7,5 +7,6 @@
        <include  file="migration/3.3/release.xml"/>  
        <include  file="migration/3.4/release.xml"/>  
        <include  file="migration/3.5/release.xml"/>  
+       <include  file="migration/3.6/release.xml"/>  
 <include  file="migration/customDevelopment/release.xml"/>   
 </databaseChangeLog> 
