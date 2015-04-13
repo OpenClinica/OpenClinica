@@ -11,8 +11,17 @@ public class DeletedEventCRFBean {
     private String crfVersion;
     private String deletedBy;
     private Date deletedDate;
+    private int deletedEventCrfId;
+    
+    public int getDeletedEventCrfId() {
+		return deletedEventCrfId;
+	}
 
-    public int getStudyEventId() {
+	public void setDeletedEventCrfId(int deletedEventCrfId) {
+		this.deletedEventCrfId = deletedEventCrfId;
+	}
+
+	public int getStudyEventId() {
         return studyEventId;
     }
 
