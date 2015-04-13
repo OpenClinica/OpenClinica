@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.pmanage;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -64,6 +65,8 @@ public class ParticipantPortalRegistrar {
         RestTemplate rest = new RestTemplate(requestFactory);
         String response = null;
         try {
+            if (!validHostNameCheck(hostName))
+                return INVALID;
             response = rest.getForObject(pManageUrl, String.class);
             if (response.equals("UNAVAILABLE"))
                 return UNAVAILABLE;
@@ -76,6 +79,28 @@ public class ParticipantPortalRegistrar {
             logger.error(ExceptionUtils.getStackTrace(e));
         }
         return UNKNOWN;
+    }
+
+    public boolean validHostNameCheck(String hostName) {
+        String pManageBaseUrl = CoreResources.getField("portalURL");
+        if (hostName.contains("."))
+            return false;
+        try {
+            URL baseUrl = new URL(pManageBaseUrl);
+            String port = "";
+            if (baseUrl.getPort() > 0)
+                port = ":" + String.valueOf(baseUrl.getPort());
+            // Check that hostname makes a valid URL
+            URL customerUrl = new URL(baseUrl.getProtocol() + "://" + hostName + "." + baseUrl.getHost() + port);
+            // Check that hostname only contains alphanumeric characters and/or hyphens
+            if (hostName.matches("^[A-Za-z0-9-]+$"))
+                return true;
+        } catch (MalformedURLException mue) {
+            logger.error("Error validating customer selected Participate subdomain.");
+            logger.error(mue.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(mue));
+        }
+        return false;
     }
 
     public String registerStudy(String studyOid) {
