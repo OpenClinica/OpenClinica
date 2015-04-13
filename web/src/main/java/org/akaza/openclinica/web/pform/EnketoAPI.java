@@ -42,8 +42,13 @@ public class EnketoAPI {
     public String getFormPreviewURL(String crfOID) throws Exception {
         URL eURL = new URL(enketoURL + "/api/v1/survey/preview");
         EnketoURLResponse response = getURL(eURL, crfOID);
-        if (response != null)
-            return response.getPreview_url();
+        if (response != null) {
+            String myUrl = response.getPreview_url();
+            if(enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")){
+                myUrl = myUrl.replaceFirst("http","https");
+            }
+            return myUrl;
+        }
         else
             return "";
     }
