@@ -149,18 +149,16 @@ public class DeleteEventCRFServlet extends SecureController {
 			} else {
 				logger.info("submit to delete the event CRF from event");
 
+				// OC-6303  Deleting Event CRF resets Show / Hide logic
+				// delete records from DynamicItemForm and DynamicItemGroup
+				getDynamicsItemFormMetadataDao().delete(eventCRFId);
+		        getDynamicsItemGroupMetadataDao().delete(eventCRFId);
+
 				for (ItemDataBean itemdata : itemData) {
 					// OC-6343 Rule behaviour must be reset if an Event CRF is deleted
 					// delete the records from ruleActionRunLogDao
 					getRuleActionRunLogDao().delete(itemdata.getId());
 
-					// OC-6303  Deleting Event CRF resets Show / Hide logic
-					// delete records from DynamicItemForm and DynamicItemGroup
-					igmdao = new ItemGroupMetadataDAO(sm.getDataSource());
-					ItemGroupMetadataBean igmBean =  (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itemdata.getItemId(), crfVersionId);
-
-					getDynamicsItemFormMetadataDao().delete(itemdata.getId());
-					getDynamicsItemGroupMetadataDao().delete(igmBean.getItemGroupId());
 					
 					// OC-6344 Notes & Discrepancies must be set to "closed" when event CRF is deleted
 					// parentDiscrepancyNoteList is the list of the parent DNs records only

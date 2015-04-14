@@ -210,10 +210,10 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         return HibernateUtil.queryIDsList(q);
     }
     
-    public  void delete(int itemDataId){
-        String query = " delete from " + getDomainClassName() +  "  where itemDataId =:itemDataId ";
+    public  void delete(int eventCrfId){
+        String query = " delete from " + getDomainClassName() +  "  where eventCrfId =:eventCrfId ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("itemDataId", itemDataId);
+        q.setInteger("eventCrfId", eventCrfId);
         q.executeUpdate();
     }
 
