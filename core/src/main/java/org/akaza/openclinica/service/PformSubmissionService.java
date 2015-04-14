@@ -694,6 +694,7 @@ public class PformSubmissionService {
 							}
 							ArrayList<Integer> ruleList = new ArrayList<Integer>();
 							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
+								if(itemDataBean1.getValue() !="")
 								setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
 							}
 							setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
@@ -721,6 +722,7 @@ public class PformSubmissionService {
 				if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 					ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
 						getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
+				        break;
 				}
 
 			}
@@ -742,6 +744,7 @@ public class PformSubmissionService {
 					RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
 					if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
 							getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
+							break;
 					}
 				}
 			}
