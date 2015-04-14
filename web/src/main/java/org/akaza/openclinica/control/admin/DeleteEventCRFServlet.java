@@ -22,11 +22,14 @@ import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -38,6 +41,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
@@ -57,8 +61,11 @@ public class DeleteEventCRFServlet extends SecureController {
 	public static String EVENT_CRF_ID = "ecId";
 	DiscrepancyNoteDAO dnDao;
 	RuleActionRunLogDao ruleActionRunLogDao;
+	DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+	DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
 	ItemFormMetadataDAO ifmdao;
 	ItemDataDAO iddao;
+	ItemGroupMetadataDAO igmdao;
 
 	/**
      * 
@@ -147,6 +154,14 @@ public class DeleteEventCRFServlet extends SecureController {
 					// delete the records from ruleActionRunLogDao
 					getRuleActionRunLogDao().delete(itemdata.getId());
 
+					// OC-6303  Deleting Event CRF resets Show / Hide logic
+					// delete records from DynamicItemForm and DynamicItemGroup
+					igmdao = new ItemGroupMetadataDAO(sm.getDataSource());
+					ItemGroupMetadataBean igmBean =  (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itemdata.getItemId(), crfVersionId);
+
+					getDynamicsItemFormMetadataDao().delete(itemdata.getId());
+					getDynamicsItemGroupMetadataDao().delete(igmBean.getItemGroupId());
+					
 					// OC-6344 Notes & Discrepancies must be set to "closed" when event CRF is deleted
 					// parentDiscrepancyNoteList is the list of the parent DNs records only
 					ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = getDnDao().findParentNotesOnlyByItemData(itemdata.getId());
@@ -234,10 +249,21 @@ public class DeleteEventCRFServlet extends SecureController {
 	public void setDnDao(DiscrepancyNoteDAO dnDao) {
 		this.dnDao = dnDao;
 	}
+	
+
 
 	private RuleActionRunLogDao getRuleActionRunLogDao() {
 		ruleActionRunLogDao = this.ruleActionRunLogDao != null ? ruleActionRunLogDao : (RuleActionRunLogDao) SpringServletAccess.getApplicationContext(context).getBean("ruleActionRunLogDao");
 		return ruleActionRunLogDao;
 	}
+	private DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
+		dynamicsItemFormMetadataDao = this.dynamicsItemFormMetadataDao != null ? dynamicsItemFormMetadataDao : (DynamicsItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("dynamicsItemFormMetadataDao");
+		return dynamicsItemFormMetadataDao;
+	}
+	private DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
+		dynamicsItemGroupMetadataDao = this.dynamicsItemGroupMetadataDao != null ? dynamicsItemGroupMetadataDao : (DynamicsItemGroupMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("dynamicsItemGroupMetadataDao");
+		return dynamicsItemGroupMetadataDao;
+	}
 
+	
 }
