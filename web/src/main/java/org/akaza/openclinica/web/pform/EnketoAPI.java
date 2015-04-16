@@ -26,6 +26,8 @@ public class EnketoAPI {
     }
 
     public String getFormURL(String crfOID) throws Exception {
+        if (enketoURL == null)
+            return "";
         URL eURL = new URL(enketoURL + "/api/v1/survey/iframe");
         EnketoURLResponse response = getURL(eURL, crfOID);
         if (response != null) {
@@ -40,6 +42,8 @@ public class EnketoAPI {
     }
 
     public String getFormPreviewURL(String crfOID) throws Exception {
+        if (enketoURL == null)
+            return "";
         URL eURL = new URL(enketoURL + "/api/v1/survey/preview");
         EnketoURLResponse response = getURL(eURL, crfOID);
         if (response != null)
