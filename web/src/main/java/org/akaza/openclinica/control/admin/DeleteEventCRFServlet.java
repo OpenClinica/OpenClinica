@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -66,7 +67,7 @@ public class DeleteEventCRFServlet extends SecureController {
 	ItemFormMetadataDAO ifmdao;
 	ItemDataDAO iddao;
 	ItemGroupMetadataDAO igmdao;
-
+    StudyEventDAO sedao;
 	/**
      * 
      */
@@ -154,6 +155,11 @@ public class DeleteEventCRFServlet extends SecureController {
 				getDynamicsItemFormMetadataDao().delete(eventCRFId);
 		        getDynamicsItemGroupMetadataDao().delete(eventCRFId);
 
+				eventCRF.setOldStatus(eventCRF.getStatus());
+				eventCRF.setStatus(Status.RESET);
+				eventCRF.setUpdater(ub);
+				ecdao.update(eventCRF);
+
 				for (ItemDataBean itemdata : itemData) {
 					// OC-6343 Rule behaviour must be reset if an Event CRF is deleted
 					// delete the records from ruleActionRunLogDao
@@ -186,24 +192,31 @@ public class DeleteEventCRFServlet extends SecureController {
 						getDnDao().updateDnMapActivation(dnBean);
 					}
 
-					// OC-6363 Set Item Value into Default Values
-					if (ifmBean.getResponseSetId()==1 || ifmBean.getResponseSetId()==2){
-						itemdata.setValue(ifmBean.getDefaultValue());
-					}else{
-						itemdata.setValue("");
-					}
+					// Default Values are not addressed
+
+					
+					itemdata.setValue("");
 					itemdata.setOldStatus(itemdata.getStatus());
 					itemdata.setOwner(ub);
 					itemdata.setStatus(Status.AVAILABLE);
 					itemdata.setUpdater(ub);
 					iddao.updateUser(itemdata);
-					iddao.update(itemdata);
+					iddao.update(itemdata);					
+					
 				}
 				// OC-6291 event_crf status change
+	
 				eventCRF.setOldStatus(eventCRF.getStatus());
 				eventCRF.setStatus(Status.AVAILABLE);
 				eventCRF.setUpdater(ub);
 				ecdao.update(eventCRF);
+								
+				if(event.getSubjectEventStatus().isCompleted()){
+					event.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+                   sedao = new StudyEventDAO(sm.getDataSource());
+                   sedao.update(event);
+				}
+				
 				String emailBody = respage.getString("the_event_CRF") + cb.getName() + respage.getString("has_been_deleted_from_the_event") + event.getStudyEventDefinition().getName() + ".";
 
 				addPageMessage(emailBody);
@@ -248,8 +261,7 @@ public class DeleteEventCRFServlet extends SecureController {
 		this.dnDao = dnDao;
 	}
 	
-
-
+	
 	private RuleActionRunLogDao getRuleActionRunLogDao() {
 		ruleActionRunLogDao = this.ruleActionRunLogDao != null ? ruleActionRunLogDao : (RuleActionRunLogDao) SpringServletAccess.getApplicationContext(context).getBean("ruleActionRunLogDao");
 		return ruleActionRunLogDao;

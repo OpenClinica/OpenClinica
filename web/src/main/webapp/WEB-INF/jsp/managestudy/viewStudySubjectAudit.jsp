@@ -163,10 +163,10 @@
                     <c:if test="${deletedEventCRF.studyEventId==event.id}">
 
                         <tr>
-                            <td class="table_header_column" ><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
-                            <td class="table_header_column" ><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
-                            <td class="table_header_column" ><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
-                            <td class="table_header_column" ><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
+                            <td class="table_header_column"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
+                            <td class="table_header_column"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
+                            <td class="table_header_column"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
+                            <td class="table_header_column"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
                         </tr>
                     </c:if>
                 </c:forEach>
@@ -265,10 +265,8 @@
     </td>
 </tr>
 
-<%-- Deleted Event CRFs for this Study Event --%>
-<c:forEach var="eventCRF" items="${allEventCRFs}">
-    <c:if test="${eventCRF.studyEventId==event.id}">
-
+    <%-- Event CRFs for this Study Event --%>
+<c:forEach var="eventCRF" items="${event.eventCRFs}">
     <tr>
         <td colspan="2">
             <table border="0" cellpadding="0" cellspacing="0" width="550" style="border-style: solid; border-width: 1px; border-color: #CCCCCC;">
@@ -280,21 +278,21 @@
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="owner" bundle="${resword}"/></b></td>
                 </tr>
                 <tr>
-                    <td class="table_header_column" ><c:out value="${eventCRF.crfName}"/>&nbsp;</td>
-                    <td class="table_header_column" ><c:out value="${eventCRF.crfVersionName}"/>&nbsp;</td>
-                                    <td class="table_header_column" >
+                    <td class="table_header_column"><c:out value="${eventCRF.crf.name}"/>&nbsp;</td>
+                    <td class="table_header_column"><c:out value="${eventCRF.crfVersion.name}"/>&nbsp;</td>
+                    <td class="table_header_column">
 						<fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
-                   <%--                     	<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;    --%>					</td>
-                    <td class="table_header_column"><c:out value="${eventCRF.interviewerName}"/>&nbsp;</td>  
-                    
-                    <td class="table_header_column"><c:out value="${eventCRF.userName}"/>&nbsp;</td>
-                 </tr>
+                    	<%--<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;--%>
+					</td>
+                    <td class="table_header_column"><c:out value="${eventCRF.interviewerName}"/>&nbsp;</td>
+                    <td class="table_header_column"><c:out value="${eventCRF.owner.name}"/>&nbsp;</td>
+                </tr>
             </table>
         </td>
     </tr>
     <tr>
     <tr><td colspan="2">&nbsp;</td></tr>
-					<td colspan="2">
+    <td colspan="2">
 
             <%-- Event CRFs Audit Events --%>
         <table border="0"><tr><td width="20">&nbsp;</td><td><%-- Margin --%>
@@ -307,16 +305,18 @@
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="old" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="new" bundle="${resword}"/></b></td>
                 </tr>
-      <c:forEach var="eventCRFAudit" items="${allEventCRFItems}">
-                     <c:if test="${eventCRFAudit.studyEventId == event.id && eventCRFAudit.eventCrfVersionId==eventCRF.eventCrfVersionId}">
+
+                <c:forEach var="eventCRFAudit" items="${eventCRFAudits}">
+                    <c:if test="${eventCRFAudit.eventCRFId==eventCRF.id}">
                         <tr>
             <c:set var="string1" value="${eventCRFAudit.auditEventTypeName}"/>
             <c:set var="string2" value="${fn:toLowerCase(fn:substring(string1,0,1))}${fn:substring(string1, 1,fn:length(string1))}"/>
-            <td class="table_header_column" ><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_column"><fmt:message  key="${fn:replace(string2,' ','_')}" bundle="${resword}"/>&nbsp;</td>
                 
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>                        
-                       <c:choose>
+                            <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
+                       
+                         <c:choose>
                            <c:when test="${eventCRFAudit.ordinal!=0}">
                                <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
                            </c:when >
@@ -327,6 +327,7 @@
                                <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/></td>
                            </c:otherwise>
                       </c:choose>                           
+                       
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
@@ -338,6 +339,7 @@
                                         <c:if test="${eventCRFAudit.oldValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '11'}">reset</c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                     	<c:choose>
@@ -370,6 +372,7 @@
                                         <c:if test="${eventCRFAudit.newValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '11'}">reset</c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                     	<c:choose>
@@ -399,10 +402,10 @@
     </td>
     </tr>
 	<!-- Return to Root -->
-					<tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
-</c:if>
-</c:forEach>
+    <tr><td colspan="2" class="table_header_column_top" style="color: #789EC5"><a href="#root"><fmt:message key="return_to_top" bundle="${resword}"/></a>&nbsp;</td></tr>
+	
 
+</c:forEach>
 </table>
 <br>
 </c:forEach>

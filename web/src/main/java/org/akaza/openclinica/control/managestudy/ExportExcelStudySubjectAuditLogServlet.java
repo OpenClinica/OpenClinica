@@ -257,7 +257,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 				studySubject.getStatus().getName() 
 			};
 		for (int i = 0; i < excelRow.length; i++) {
-			Label label = new Label(i, row, excelRow[i]);
+			Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 			excelSheet.addCell(label);
 		}
 		row++;
@@ -288,7 +288,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 					audit.getNewValue()
 				};
 			for (int i = 0; i < excelRow.length; i++) {
-				Label label = new Label(i, row, excelRow[i]);
+				Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 				excelSheet.addCell(label);
 			}
 			row++;
@@ -325,7 +325,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 					Integer.toString(event.getSampleOrdinal())};
 				}
 			for (int i = 0; i < excelRow.length; i++) {
-				Label label = new Label(i, row, excelRow[i]);
+				Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 				excelSheet.addCell(label);
 			}
 			row++;
@@ -402,7 +402,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 						dateFormat(deletedEventCRF.getDeletedDate())
 					};
 				for (int i = 0; i < excelRow.length; i++) {
-					label = new Label(i, row, excelRow[i]);
+					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
 				}
 				row++;
@@ -487,7 +487,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 						newValue						
 					};
 					for (int i = 0; i < excelRow.length; i++) {
-						label = new Label(i, row, excelRow[i]);
+						label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 						excelSheet.addCell(label);
 					}
 				row++;
@@ -528,7 +528,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                        auditBean.getUserName()
 					};
 				for (int i = 0; i < excelRow.length; i++) {
-					label = new Label(i, row, excelRow[i]);
+					label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 					excelSheet.addCell(label);
 				}
 				row++;
@@ -644,7 +644,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 								newValue
 							};
 							for (int i = 0; i < excelRow.length; i++) {
-								label = new Label(i, row, excelRow[i]);
+								label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
 								excelSheet.addCell(label);
 							}
 						row++;
