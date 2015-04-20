@@ -56,6 +56,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String entityName = "";
     private String entityValue = "";
     private boolean isSaved = true;
+    private boolean activated= true;
 
     private StudySubjectBean studySub = new StudySubjectBean();
 
@@ -139,6 +140,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     // YW >>
 
     public DiscrepancyNoteBean() {
+    	activated = true;
         disType = DiscrepancyNoteType.QUERY;
         resStatus = ResolutionStatus.OPEN;
         children = new ArrayList();
@@ -618,4 +620,14 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     public void setItemGroupName(String itemGroupName) {
         this.itemGroupName = itemGroupName;
     }
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+
+
 }
