@@ -122,6 +122,34 @@
             </bind-xml>
         </field>
      </class>
+     <class name="org.akaza.openclinica.domain.rule.action.NotificationActionBean">
+        <map-to xml="NotificationAction" ns-prefix="OpenClinicaRules"/>
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element">
+            	<class name="java.lang.String">
+            		<map-to ns-prefix="OpenClinicaRules"/>
+            	</class>
+            </bind-xml>
+        </field>
+        <field name="To"
+               type="java.lang.String" handler="emailHandler" >
+            <bind-xml name="To" node="element">
+            	<class name="java.lang.String">
+            		<map-to ns-prefix="OpenClinicaRules"/>
+            	</class>
+            </bind-xml>
+        </field>
+     </class>
+
      <class name="org.akaza.openclinica.domain.rule.action.ShowActionBean">
         <map-to xml="ShowAction" ns-prefix="OpenClinicaRules"/>
         <field name="ExpressionEvaluatesTo"

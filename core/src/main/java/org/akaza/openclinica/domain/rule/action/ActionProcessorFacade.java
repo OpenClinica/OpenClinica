@@ -19,6 +19,8 @@ public class ActionProcessorFacade {
             return new DiscrepancyNoteActionProcessor(ds, ruleActionRunLogDao, ruleSetRule);
         case EMAIL:
             return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule);
+        case NOTIFICATION:
+            return new NotificationActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule);
         case SHOW:
             return new ShowActionProcessor(ds, itemMetadataService, ruleSet);
         case HIDE:

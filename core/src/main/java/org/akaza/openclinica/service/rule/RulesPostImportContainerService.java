@@ -305,6 +305,9 @@ public class RulesPostImportContainerService {
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean)
 			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
 
+		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.NotificationActionBean)
+			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
+
 		if (ruleActionBean instanceof DiscrepancyNoteActionBean)
 			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);              	
               	
