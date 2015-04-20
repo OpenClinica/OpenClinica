@@ -275,6 +275,27 @@ public class AuditDAO extends EntityDAO {
 
     }
 
+    /*
+    * Find audit log events type for an EventCrf
+    *
+    */
+    public Collection findEventCRFAudit(int eventCRFId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCRFId));
+
+        String sql = digester.getQuery("findEventCrfAuditLog");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
     
 
     public Collection findAllEventCRFAuditEvents(int studyEventId) {
