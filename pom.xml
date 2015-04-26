@@ -526,13 +526,13 @@
 			</snapshots>
 			<id>central</id>
 			<name>libs-release</name>
-			<url>https://dev.openclinica.com/artifactory/libs-release</url>
+			<url>http://dev.openclinica.com/artifactory/libs-release</url>
 		</repository>
 		<repository>
 			<snapshots />
 			<id>snapshots</id>
 			<name>libs-snapshot</name>
-			<url>https://dev.openclinica.com/artifactory/libs-snapshot</url>
+			<url>http://dev.openclinica.com/artifactory/libs-snapshot</url>
 		</repository>
 		<repository>
 			<id>jboss-public-repository-group</id>
@@ -556,13 +556,13 @@
 			</snapshots>
 			<id>central</id>
 			<name>plugins-release</name>
-			<url>https://dev.openclinica.com/artifactory/plugins-release</url>
+			<url>http://dev.openclinica.com/artifactory/plugins-release</url>
 		</pluginRepository>
 		<pluginRepository>
 			<snapshots />
 			<id>snapshots</id>
 			<name>plugins-snapshot</name>
-			<url>https://dev.openclinica.com/artifactory/plugins-snapshot</url>
+			<url>http://dev.openclinica.com/artifactory/plugins-snapshot</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>jboss-public-repository-group</id>
@@ -581,12 +581,12 @@
 		<repository>
 			<id>openclinica-artifactory</id>
 			<name>dev.openclinica.com-releases</name>
-			<url>https://dev.openclinica.com/artifactory/libs-release-local</url>
+			<url>http://dev.openclinica.com/artifactory/libs-release-local</url>
 		</repository>
 		<snapshotRepository>
 			<id>openclinica-artifactory</id>
 			<name>dev.openclinica.com-snapshots</name>
-			<url>https://dev.openclinica.com/artifactory/libs-snapshot-local</url>
+			<url>http://dev.openclinica.com/artifactory/libs-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 

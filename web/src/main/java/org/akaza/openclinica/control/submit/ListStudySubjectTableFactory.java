@@ -838,9 +838,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     	HtmlBuilder actionLink = new HtmlBuilder();
      //   actionLink.a().href("url?id=" + studySubject.getId());
         actionLink.a().href(url + "?ssid=" +studySubject.getLabel());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_Ocui_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_Ocui.gif');\"").close();      
-        actionLink.img().name("bt_View1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();        
+        actionLink.append("target=\"_blank\"");
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_Participate1','images/bt_Ocui_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_Participate1','images/bt_Ocui.gif');\"").close();
+        actionLink.img().name("bt_Participate1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
