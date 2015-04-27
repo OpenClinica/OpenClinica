@@ -89,21 +89,6 @@ public class NotificationActionProcessor implements ActionProcessor {
 		}
 	}
 
-	private InternetAddress[] processMultipleImailAddresses(String to) throws MessagingException {
-		ArrayList<String> recipientsArray = new ArrayList<String>();
-		StringTokenizer st = new StringTokenizer(to, ",");
-		while (st.hasMoreTokens()) {
-			recipientsArray.add(st.nextToken());
-		}
-
-		int sizeTo = recipientsArray.size();
-		InternetAddress[] addressTo = new InternetAddress[sizeTo];
-		for (int i = 0; i < sizeTo; i++) {
-			addressTo[i] = new InternetAddress(recipientsArray.get(i).toString());
-		}
-		return addressTo;
-
-	}
 
 	@Override
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
@@ -113,7 +98,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 	}
 
 	public void runNotificationAction(RuleActionBean ruleActionBean, StudyBean currentStudy) {
-		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
+		String emailList = ((NotificationActionBean) ruleActionBean).getEmailTo();
 		StudyBean parentStudy = getParentStudy(ds, currentStudy);
 		String[] listOfEmails = emailList.split(",");
 		for (String email : listOfEmails) {
@@ -124,7 +109,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 					String msg = pDTO.getMessage().toString();
 					msg = msg.replaceAll("\\$eventName", "'" + pDTO.getEventName().toString() + "'");
 					msg = msg.replaceAll("\\$studyName", "'" + pDTO.getStudyName().toString() + "'");
-					msg = msg.replaceAll("\\$accessCode", "'" + pDTO.getAccessCode().toString() + "'");
+					msg = msg.replaceAll("\\$accessCode", "'" + pDTO.getAccessCode() + "'");
 					msg = msg.replaceAll("\\$firstName", "'" + pDTO.getfName().toString() + "'");
 					pDTO.setMessage(msg);
 					execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, parentStudy, pDTO);
@@ -152,7 +137,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 				eventName = eventName + "(" + ordinal + ")";
 
 			pDTO = getParticipantInfo(ds, ssBean, currentStudy);
-			if (pDTO.getAccessCode() != null || !seBean.isActive()) {
+			if (pDTO.getAccessCode() != null && seBean.isActive()) {
 				pDTO.setMessage(((NotificationActionBean) ruleActionBean).getMessage());
 				pDTO.setEventName(eventName);
 				pDTOList.add(pDTO);
@@ -170,12 +155,13 @@ public class NotificationActionProcessor implements ActionProcessor {
 		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
 		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
 		if (uBean != null || uBean.isActive()) {
+			if (uBean.getEmail()==null)  return null;
 			pDTO = new ParticipantDTO();
 			pDTO.setAccessCode(uBean.getAccessCode());
 			pDTO.setfName(uBean.getFirstName());
 			pDTO.setEmailAccount(uBean.getEmail());
 			pDTO.setStudyName(parentStudyBean.getName());
-		} else {
+		 } else {
 			return null;
 		}
 

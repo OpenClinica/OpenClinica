@@ -13,11 +13,19 @@ import javax.persistence.Transient;
 public class NotificationActionBean extends RuleActionBean {
 
     private String message;
-    private String to;
+    private String emailTo;
 
-    public NotificationActionBean() {
+    @Column(name = "email_to")
+    public String getEmailTo() {
+		return emailTo;
+	}
+
+	public void setEmailTo(String emailTo) {
+		this.emailTo = emailTo;
+	}
+
+	public NotificationActionBean() {
         setActionType(ActionType.NOTIFICATION);
-        setRuleActionRun(new RuleActionRunBean(true, true, true, false, true));
     }
 
     public String getMessage() {
@@ -26,15 +34,6 @@ public class NotificationActionBean extends RuleActionBean {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Column(name = "email_to")
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 
     @Override
@@ -48,7 +47,7 @@ public class NotificationActionBean extends RuleActionBean {
     public HashMap<String, Object> getPropertiesForDisplay() {
         LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
         p.put("rule_action_type", getActionType().getDescription());
-        p.put("rule_action_to", getTo());
+        p.put("rule_action_to", getEmailTo());
         p.put("rule_action_message", "\"" + getMessage() + "\"");
 
         return p;
@@ -59,7 +58,7 @@ public class NotificationActionBean extends RuleActionBean {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result + ((to == null) ? 0 : to.hashCode());
+        result = prime * result + ((emailTo == null) ? 0 : emailTo.hashCode());
         return result;
     }
 
@@ -77,10 +76,10 @@ public class NotificationActionBean extends RuleActionBean {
                 return false;
         } else if (!message.equals(other.message))
             return false;
-        if (to == null) {
-            if (other.to != null)
+        if (emailTo == null) {
+            if (other.emailTo != null)
                 return false;
-        } else if (!to.equals(other.to))
+        } else if (!emailTo.equals(other.emailTo))
             return false;
         return true;
     }
