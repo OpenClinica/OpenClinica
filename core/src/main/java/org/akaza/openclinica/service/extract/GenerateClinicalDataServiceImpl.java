@@ -187,18 +187,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		for(StudySubject studySubj:studySubjs)
 		{
-		if(studyEvents==null)
-			{
 			studyEvents = (ArrayList<StudyEvent>)getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
 			
+			if(studyEvents!=null)
+			{
 			expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents,formVersionOID);
+			exportSubjDataBeanList.add(expSubjectBean);
+			
+			odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
+			odmClinicalDataBean.setStudyOID(study.getOc_oid());
 			}
-		else
-			 expSubjectBean = setExportSubjectDataBean(studySubj, study,studyEvents,formVersionOID);
-		exportSubjDataBeanList.add(expSubjectBean);
-		
-		odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
-		odmClinicalDataBean.setStudyOID(study.getOc_oid());
 		}
 		
 		return odmClinicalDataBean;
@@ -279,7 +277,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
            
 		  
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		for (StudyEvent se : ss.getStudyEvents()) {
+		for (StudyEvent se : sEvents) {
 			if(se!=null){
 			ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 			
