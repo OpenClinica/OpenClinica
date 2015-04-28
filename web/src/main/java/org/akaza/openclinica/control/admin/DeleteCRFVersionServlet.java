@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -20,6 +21,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -71,19 +74,28 @@ public class DeleteCRFVersionServlet extends SecureController {
             }
 
             // find event crfs using this version
+            		
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ArrayList<ItemDataBean> idBeans = iddao.findByCRFVersion(version);
+            
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList eventCRFs = ecdao.findAllByCRFVersion(versionId);
             boolean canDelete = true;
             if (!definitions.isEmpty()) {// used in definition
                 canDelete = false;
                 request.setAttribute("definitions", definitions);
-                addPageMessage(respage.getString("this_CRF_version") + version.getName()
+                addPageMessage(respage.getString("this_CRF_version") + " "+ version.getName()
                     + respage.getString("has_associated_study_events_definitions_cannot_delete"));
 
+            } else if (!idBeans.isEmpty()) {
+                canDelete = false;
+                request.setAttribute("itemDataForVersion", idBeans);
+                addPageMessage(respage.getString("this_CRF_version") +" "+ version.getName() + respage.getString("has_associated_item_data_cannot_delete"));
+            
             } else if (!eventCRFs.isEmpty()) {
                 canDelete = false;
                 request.setAttribute("eventsForVersion", eventCRFs);
-                addPageMessage(respage.getString("this_CRF_version") + version.getName() + respage.getString("has_associated_study_events_cannot_delete"));
+                addPageMessage(respage.getString("this_CRF_version") + " "+ version.getName() + respage.getString("has_associated_study_events_cannot_delete"));
             }
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute(VERSION_TO_DELETE, version);

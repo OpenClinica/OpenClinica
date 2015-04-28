@@ -36,6 +36,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
+<jsp:useBean scope='request' id='itemDataForVersion' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='eventsForVersion' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -126,8 +127,37 @@
 </div>
 </c:if>
 <br/>
+<c:if test="${!empty itemDataForVersion}">
+<span class="table_title_Admin">
+<fmt:message key="associated_item_Data" bundle="${resword}"/></span>
+<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+
+<div class="tablebox_center" align="center">
+ <table border="0" cellpadding="0" cellspacing="0" width="100%">
+   <tr valign="top">
+    <td class="table_header_row_left"><fmt:message key="event_crf_Id" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="item_id" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="item_value" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="item_ordinal" bundle="${resword}"/></td>
+   </tr>
+  <c:forEach var="itemData" items="${itemDataForVersion}">
+    <tr valign="top">
+    <td class="table_cell_left"><c:out value="${itemData.eventCRFId}"/></td>
+    <td class="table_cell"><c:out value="${itemData.itemId}"/></td>
+    <td class="table_cell"><c:out value="${itemData.value}"/></td>
+    <td class="table_cell"><c:out value="${itemData.ordinal}"/></td>
+    </tr>
+ </c:forEach>
+</table>
+</div>
+</div></div></div></div></div></div></div></div>
+</div>
+</c:if>
+
+<br/>
 <c:choose>
- <c:when test="${empty eventsForVersion && empty definitions}">
+ <c:when test="${empty eventsForVersion && empty definitions && empty itemDataForVersion}">
   <form action='DeleteCRFVersion?action=submit&verId=<c:out value="${version.id}"/>' method="POST">
    <input type="submit" name="submit" value="<fmt:message key="delete_CRF_version" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="if_you_delete_this_CRF_version" bundle="${restext}"/>");'>
       &nbsp;
