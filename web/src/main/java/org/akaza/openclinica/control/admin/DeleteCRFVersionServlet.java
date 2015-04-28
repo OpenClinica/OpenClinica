@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -14,13 +15,17 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.view.Page;
@@ -62,9 +67,14 @@ public class DeleteCRFVersionServlet extends SecureController {
             forwardPage(Page.CRF_LIST_SERVLET);
         } else {
             CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-            CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+            CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
 
             // find definitions using this version
             ArrayList definitions = edcdao.findByDefaultVersion(version.getId());
@@ -75,10 +85,18 @@ public class DeleteCRFVersionServlet extends SecureController {
 
             // find event crfs using this version
             		
-            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ArrayList<ItemDataBean> idBeans = iddao.findByCRFVersion(version);
+            ArrayList <EventCRFBean> eCRFs = ecdao.findAllByCRF(version.getCrfId());
+               for(EventCRFBean eCRF : eCRFs){
+            	   
+            	   StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eCRF.getStudySubjectId());
+            	   eCRF.setStudySubject(ssBean);
+                   StudyEventBean seBean = (StudyEventBean) seDao.findByPK(eCRF.getStudyEventId());
+                   StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) sedDao.findByPK(seBean.getStudyEventDefinitionId());
+                   seBean.setStudyEventDefinition(sedBean);
+                   eCRF.setStudyEvent(seBean);
+               }
             
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList eventCRFs = ecdao.findAllByCRFVersion(versionId);
             boolean canDelete = true;
             if (!definitions.isEmpty()) {// used in definition
@@ -89,6 +107,7 @@ public class DeleteCRFVersionServlet extends SecureController {
 
             } else if (!idBeans.isEmpty()) {
                 canDelete = false;
+                request.setAttribute("eventCRFs", eCRFs);
                 request.setAttribute("itemDataForVersion", idBeans);
                 addPageMessage(respage.getString("this_CRF_version") +" "+ version.getName() + respage.getString("has_associated_item_data_cannot_delete"));
             

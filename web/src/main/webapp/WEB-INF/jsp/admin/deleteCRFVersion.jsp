@@ -36,6 +36,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
+<jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='itemDataForVersion' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='eventsForVersion' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
@@ -136,17 +137,15 @@
 <div class="tablebox_center" align="center">
  <table border="0" cellpadding="0" cellspacing="0" width="100%">
    <tr valign="top">
-    <td class="table_header_row_left"><fmt:message key="event_crf_Id" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="item_id" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="item_value" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="item_ordinal" bundle="${resword}"/></td>
+    <td class="table_header_row_left"><fmt:message key="study_event_definition" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="event_ordinal" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="study_subject" bundle="${resword}"/></td>
    </tr>
-  <c:forEach var="itemData" items="${itemDataForVersion}">
+  <c:forEach var="eCRF" items="${eventCRFs}">
     <tr valign="top">
-    <td class="table_cell_left"><c:out value="${itemData.eventCRFId}"/></td>
-    <td class="table_cell"><c:out value="${itemData.itemId}"/></td>
-    <td class="table_cell"><c:out value="${itemData.value}"/></td>
-    <td class="table_cell"><c:out value="${itemData.ordinal}"/></td>
+    <td class="table_cell_left"><c:out value="${eCRF.studyEvent.studyEventDefinition.name}"/></td>
+    <td class="table_cell"><c:out value="${eCRF.studyEvent.sampleOrdinal}"/></td>
+    <td class="table_cell"><c:out value="${eCRF.studySubject.label}"/></td>
     </tr>
  </c:forEach>
 </table>
