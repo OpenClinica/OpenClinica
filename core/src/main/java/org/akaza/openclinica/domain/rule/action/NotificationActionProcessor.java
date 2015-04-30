@@ -65,6 +65,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 	EventCRFDAO ecdao;
 	StudySubjectDAO ssdao;
 	UserAccountDAO udao;
+	StudyEventDefinitionDAO seddao;
 
 	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule) {
 		this.ds = ds;
@@ -76,6 +77,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 		ecdao = new EventCRFDAO(ds);
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
+		seddao = new StudyEventDefinitionDAO(ds);
 
 	}
 
@@ -124,7 +126,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, int studySubjectBeanId, int eventOrdinal) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 
@@ -132,100 +134,41 @@ public class NotificationActionProcessor implements ActionProcessor {
 		int studyId = ruleSet.getStudyId();
 
 		String eventName = getStudyEventDefnBean(sed_Id).getName();
+		if (eventOrdinal != 1)
+			eventName = eventName + "(" + eventOrdinal + ")";
+
 		String studyName = getStudyBean(studyId).getName();
-		message = message.replaceAll("\\$event.name", "'" + eventName + "'");
-		message = message.replaceAll("\\$study.name", "'" + studyName + "'");
+		message = message.replaceAll("\\$\\{event.name}", "'" + eventName + "'");
+		message = message.replaceAll("\\$\\{study.name}", "'" + studyName + "'");
 
 		System.out.println("eventName:  " + eventName);
 		System.out.println("studyName:  " + studyName);
 		ParticipantDTO pDTO = null;
 		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
+		StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(studySubjectBeanId);
+
 		for (String email : listOfEmails) {
 
-			if (email.trim().equals("$participant")) {
-
-				ArrayList<EventDefinitionCRFBean> edcList = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(sed_Id, studyId);
-				int count = edcList.size();
-				ArrayList<StudyEventBean> seBeans = sedao.findAllByStudyAndEventDefinitionId(studyBean, sed_Id);
-				for (StudyEventBean seBean : seBeans) {
-					ArrayList<EventCRFBean> ecBeans = ecdao.findAllByStudyEventInParticipantForm(seBean, sed_Id, studyId);
-					int noItemDataInEventCRFCount = 0;
-					for (EventCRFBean ecBean : ecBeans) {
-						ItemDataDAO iddao = new ItemDataDAO(ds);
-						ArrayList<ItemDataBean> idBean = iddao.findAllByEventCRFId(ecBean.getId());
-						if (idBean.isEmpty())
-							noItemDataInEventCRFCount++;
-					}
-
-					StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(seBean.getStudySubjectId());
-
-					if (ecBeans.size() - noItemDataInEventCRFCount != count) {
-						pDTO = getParticipantInfo(ds, ssBean, studyBean);
-						if (pDTO != null && pDTO.getAccessCode() != null && pDTO.getEmailAccount() != null) {
-							String msg = null;
-							msg = message.replaceAll("\\$participant.accessCode", "'" + pDTO.getAccessCode() + "'");
-							msg = msg.replaceAll("\\$participant.firstname", "'" + pDTO.getfName() + "'");
-							pDTO.setMessage(msg);
-							System.out.println(pDTO.getMessage());
-							// execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
-						}
-					}
-				}
-
-			} else {
-				pDTO = new ParticipantDTO();
-				String msg = null;
-				msg = message.replaceAll("\\$participant.accessCode", " ");
-				msg = msg.replaceAll("\\$participant.firstname", " ");
-				pDTO.setMessage(msg);
-				pDTO.setEmailAccount(email);
-				System.out.println(pDTO.getMessage());
-				// execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
-			}
-		}
-	}
-
-	public void runNotificationActionOld(RuleActionBean ruleActionBean, StudyBean currentStudy) {
-		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
-		StudyBean parentStudy = getParentStudy(ds, currentStudy);
-		String[] listOfEmails = emailList.split(",");
-		for (String email : listOfEmails) {
-
-			if (email.trim().equals("$participant")) {
-				ArrayList<ParticipantDTO> pDTOList = getAllParticipantPerStudy(ds, currentStudy, ruleSetRule, ruleActionBean);
-				for (ParticipantDTO pDTO : pDTOList) {
-					String msg = pDTO.getMessage().toString();
-					msg = msg.replaceAll("\\$event.name", "'" + pDTO.getEventName() + "'");
-					msg = msg.replaceAll("\\$study.name", "'" + pDTO.getStudyName() + "'");
-					msg = msg.replaceAll("\\$participant.accessCode", "'" + pDTO.getAccessCode() + "'");
-					msg = msg.replaceAll("\\$participant.firstname", "'" + pDTO.getfName() + "'");
+			if (email.trim().equals("${participant}")) {
+				pDTO = getParticipantInfo(ds, ssBean, studyBean);
+				if (pDTO != null ) {
+					String msg = null;
+					msg = message.replaceAll("\\$\\{participant.accessCode}", "'" + pDTO.getAccessCode() + "'");
+					msg = msg.replaceAll("\\$\\{participant.firstname}", "'" + pDTO.getfName() + "'");
 					pDTO.setMessage(msg);
-					execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, parentStudy, pDTO);
-
-					RestTemplate rt = new RestTemplate();
-					String pUrl = CoreResources.getField("portalURL") + "/rest/oc/email";
-
-					// rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-
-					rt.getMessageConverters().add(new StringHttpMessageConverter());
-
-					try {
-						ParticipantDTO returns = rt.postForObject(pUrl, pDTO, ParticipantDTO.class);
-					} catch (Exception e) {
-
-					}
-
+					System.out.println(pDTO.getMessage() + "   Email Send to Participant :  " + pDTO.getEmailAccount());
+					 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
 				}
+
 			} else {
-				String message = ((NotificationActionBean) ruleActionBean).getMessage();
-				ParticipantDTO pDTO = new ParticipantDTO();
-				pDTO.setMessage(message);
-				pDTO.setEmailAccount(email);
-				execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, parentStudy, pDTO);
+				pDTO.setEmailAccount(email.trim());
+				System.out.println(pDTO.getMessage() + "   Email sent to Hard Coded email address :  " + pDTO.getEmailAccount());
+				 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
 			}
 		}
 	}
+
 
 	public ArrayList<ParticipantDTO> getAllParticipantPerStudy(DataSource ds, StudyBean currentStudy, RuleSetRuleBean ruleSetRule, RuleActionBean ruleActionBean) {
 		ParticipantDTO pDTO = null;

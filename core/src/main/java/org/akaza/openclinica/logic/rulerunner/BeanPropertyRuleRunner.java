@@ -69,7 +69,7 @@ public class BeanPropertyRuleRunner {
 	                        		beanPropertyService.runAction(ruleActionBean,eow,userId);
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
                                     notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule); 
-                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet);
+                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studySubjectBeanId,eventOrdinal);
 	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {

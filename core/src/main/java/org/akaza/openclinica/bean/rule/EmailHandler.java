@@ -45,7 +45,7 @@ public class EmailHandler extends GeneralizedFieldHandler {
 		String[] emails = ((String) value).split(",");
 		for (String str : emails) {
 
-			if (str.trim().startsWith("$") && !str.trim().equals("$participant")) {
+			if (str.trim().startsWith("$") && !str.trim().equals("${participant}")) {
 				throw new OpenClinicaSystemException("The  \"" + value + " \" you provided is not Valid, Please provide valid comma seperated addresses.");
 
 			} else if (!str.trim().startsWith("$")) {
