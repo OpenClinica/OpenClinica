@@ -121,7 +121,7 @@
                type="java.lang.String">
             <bind-xml name="Message" node="element"/>
         </field>
-        <field name="EmailTo"
+        <field name="To"
                type="java.lang.String" handler="emailHandler">
             <bind-xml name="To" node="element"/>
         </field>
