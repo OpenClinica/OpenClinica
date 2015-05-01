@@ -158,13 +158,19 @@ public class NotificationActionProcessor implements ActionProcessor {
 					msg = msg.replaceAll("\\$\\{participant.firstname}", "'" + pDTO.getfName() + "'");
 					pDTO.setMessage(msg);
 					System.out.println(pDTO.getMessage() + "   Email Send to Participant :  " + pDTO.getEmailAccount());
-					 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
+			//		 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
+				}else{
+					pDTO = new ParticipantDTO();
+					String msg = null;
+					msg = message.replaceAll("\\$\\{participant.accessCode}", "''");
+					msg = msg.replaceAll("\\$\\{participant.firstname}", "''");
+					pDTO.setMessage(msg);
 				}
-
+                
 			} else {
 				pDTO.setEmailAccount(email.trim());
 				System.out.println(pDTO.getMessage() + "   Email sent to Hard Coded email address :  " + pDTO.getEmailAccount());
-				 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
+			//	 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
 			}
 		}
 	}
@@ -197,7 +203,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
 		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
 		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
-		if (uBean != null || uBean.isActive()) {
+		if (uBean != null && uBean.isActive()) {
 			if (uBean.getEmail() == null)
 				return null;
 			pDTO = new ParticipantDTO();
