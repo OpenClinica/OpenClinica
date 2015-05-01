@@ -636,7 +636,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
  
            if(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS)))
            	{
-                appendRunOnForEventAction(builder,ruleAction);
+             if (ruleAction.getActionType().getCode()!=7)
+        	   appendRunOnForEventAction(builder,ruleAction);
           	}else{
                 appendRunOn(builder,ruleAction);
            	}                

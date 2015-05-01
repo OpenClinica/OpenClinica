@@ -9,7 +9,7 @@ public class ParticipantDTO {
 	private String message;
 	private String eventName;
 	private String emailAccount;
-	private String emailSubject = "This is the Email Subject";
+	private String emailSubject;
 	
 	
 	

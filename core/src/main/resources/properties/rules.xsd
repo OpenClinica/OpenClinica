@@ -67,9 +67,9 @@
     <xs:element name="NotificationAction" type="NotificationActionType"/>
     <xs:complexType name="NotificationActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
-            <xs:element name="Message" type="xs:string"/>
             <xs:element name="To" type="xs:string"/>
+            <xs:element name="Subject" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>

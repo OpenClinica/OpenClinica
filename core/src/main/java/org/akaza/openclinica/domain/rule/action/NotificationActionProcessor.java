@@ -14,6 +14,7 @@ import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -31,7 +32,9 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
+import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,7 @@ import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
@@ -59,25 +63,17 @@ public class NotificationActionProcessor implements ActionProcessor {
 	EmailEngine emailEngine;
 	JavaMailSenderImpl mailSender;
 	RuleSetRuleBean ruleSetRule;
-	EventDefinitionCRFDAO edcdao;
-	StudyEventDAO sedao;
-	CRFDAO cdao;
-	EventCRFDAO ecdao;
 	StudySubjectDAO ssdao;
 	UserAccountDAO udao;
-	StudyEventDefinitionDAO seddao;
-
+    RuleSetService ruleSetService;
+    RuleSetDao ruleSetDao;
+	
 	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule) {
 		this.ds = ds;
 		this.mailSender = mailSender;
 		this.ruleSetRule = ruleSetRule;
-		edcdao = new EventDefinitionCRFDAO(ds);
-		sedao = new StudyEventDAO(ds);
-		cdao = new CRFDAO(ds);
-		ecdao = new EventCRFDAO(ds);
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
-		seddao = new StudyEventDefinitionDAO(ds);
 
 	}
 
@@ -129,6 +125,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, int studySubjectBeanId, int eventOrdinal) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
+		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
 
 		int sed_Id = ruleSet.getStudyEventDefinitionId();
 		int studyId = ruleSet.getStudyId();
@@ -138,11 +135,11 @@ public class NotificationActionProcessor implements ActionProcessor {
 			eventName = eventName + "(" + eventOrdinal + ")";
 
 		String studyName = getStudyBean(studyId).getName();
-		message = message.replaceAll("\\$\\{event.name}", "'" + eventName + "'");
-		message = message.replaceAll("\\$\\{study.name}", "'" + studyName + "'");
+		message = message.replaceAll("\\$\\{event.name}",   eventName );
+		message = message.replaceAll("\\$\\{study.name}",   studyName );
 
-		System.out.println("eventName:  " + eventName);
-		System.out.println("studyName:  " + studyName);
+//		System.out.println("eventName:  " + eventName);
+//		System.out.println("studyName:  " + studyName);
 		ParticipantDTO pDTO = null;
 		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
@@ -154,50 +151,46 @@ public class NotificationActionProcessor implements ActionProcessor {
 				pDTO = getParticipantInfo(ds, ssBean, studyBean);
 				if (pDTO != null ) {
 					String msg = null;
-					msg = message.replaceAll("\\$\\{participant.accessCode}", "'" + pDTO.getAccessCode() + "'");
-					msg = msg.replaceAll("\\$\\{participant.firstname}", "'" + pDTO.getfName() + "'");
+					msg = message.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
+					msg = msg.replaceAll("\\$\\{participant.firstname}",  pDTO.getfName());
 					pDTO.setMessage(msg);
-					System.out.println(pDTO.getMessage() + "   Email Send to Participant :  " + pDTO.getEmailAccount());
-			//		 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
+					pDTO.setEmailSubject(emailSubject);
+					System.out.println(pDTO.getMessage() + "   (Email Send to Participant :  " + pDTO.getEmailAccount()+")");
+					 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
 				}else{
 					pDTO = new ParticipantDTO();
 					String msg = null;
-					msg = message.replaceAll("\\$\\{participant.accessCode}", "''");
-					msg = msg.replaceAll("\\$\\{participant.firstname}", "''");
+					msg = message.replaceAll("\\$\\{participant.accessCode}", "");
+					msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 					pDTO.setMessage(msg);
+					pDTO.setEmailSubject(emailSubject);
 				}
                 
 			} else {
 				pDTO.setEmailAccount(email.trim());
-				System.out.println(pDTO.getMessage() + "   Email sent to Hard Coded email address :  " + pDTO.getEmailAccount());
-			//	 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
+				System.out.println();
+				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address :  " + pDTO.getEmailAccount()+")");
+				 execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleActionBean, studyBean, pDTO);
 			}
 		}
 	}
 
 
-	public ArrayList<ParticipantDTO> getAllParticipantPerStudy(DataSource ds, StudyBean currentStudy, RuleSetRuleBean ruleSetRule, RuleActionBean ruleActionBean) {
-		ParticipantDTO pDTO = null;
-		ArrayList<ParticipantDTO> pDTOList = new ArrayList<>();
-		ArrayList<StudySubjectBean> ssBeans = getAllParticipantStudySubjectsPerStudy(currentStudy.getId(), ds);
-		for (StudySubjectBean ssBean : ssBeans) {
-			StudyEventBean seBean = getStudyEvent(ssBean, ds);
-			int ordinal = seBean.getSampleOrdinal();
-			StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-			String eventName = seddao.findByPK(seBean.getStudyEventDefinitionId()).getName();
-			if (ordinal != 1)
-				eventName = eventName + "(" + ordinal + ")";
 
-			pDTO = getParticipantInfo(ds, ssBean, currentStudy);
-			if (pDTO.getAccessCode() != null && seBean.isActive()) {
-				pDTO.setMessage(((NotificationActionBean) ruleActionBean).getMessage());
-				pDTO.setEventName(eventName);
-				pDTOList.add(pDTO);
-			}
-		}
-		return pDTOList;
+	public void runInBatch(final OnStudyEventUpdated event , StudyBean studyBean) {
+
+		//seBeans for loop
+		
+		Integer studyEventDefId = 1;
+		Integer studyEventOrdinal = 1;
+		Integer studySubjectId = 1;
+		Integer userId = 1;
+		
+		if(userId==null && event.getContainer().getEvent().getUserAccount()!=null )userId=  event.getContainer().getEvent().getUserAccount().getUserId();
+		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal,event.getContainer().getChangeDetails());
 	}
 
+	
 	public ParticipantDTO getParticipantInfo(DataSource ds, StudySubjectBean ssBean, StudyBean studyBean) {
 		ParticipantDTO pDTO = null;
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
@@ -249,6 +242,19 @@ public class NotificationActionProcessor implements ActionProcessor {
 		StudyDAO sdao = new StudyDAO(ds);
 		return (StudyBean) sdao.findByPK(studyId);
 
-	};
+	}
+
+	public RuleSetService getRuleSetService() {
+		return ruleSetService;
+	}
+	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {
+		return getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
+		
+	}
+
+	public RuleSetDao getRuleSetDao() {
+		return ruleSetDao;
+	}
+
 
 }

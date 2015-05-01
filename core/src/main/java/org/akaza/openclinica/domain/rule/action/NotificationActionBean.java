@@ -12,8 +12,9 @@ import javax.persistence.Transient;
 @DiscriminatorValue("7")
 public class NotificationActionBean extends RuleActionBean {
 
-    private String message;
     private String to;
+    private String Subject;
+    private String message;
 
     public NotificationActionBean() {
         setActionType(ActionType.NOTIFICATION);
@@ -37,7 +38,16 @@ public class NotificationActionBean extends RuleActionBean {
         this.to = to;
     }
 
-    @Override
+    @Column(name = "email_subject")
+    public String getSubject() {
+		return Subject;
+	}
+
+	public void setSubject(String subject) {
+		Subject = subject;
+	}
+
+	@Override
     @Transient
     public String getSummary() {
         return this.message;
@@ -49,6 +59,7 @@ public class NotificationActionBean extends RuleActionBean {
         LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
         p.put("rule_action_type", getActionType().getDescription());
         p.put("rule_action_to", getTo());
+        p.put("rule_action_subject", getSubject());
         p.put("rule_action_message", "\"" + getMessage() + "\"");
 
         return p;
