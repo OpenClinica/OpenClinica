@@ -38,6 +38,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -88,6 +89,7 @@ public class ImportSpringJob extends QuartzJobBean {
     public static final String DIR_PATH = "scheduled_data_import";
 
     ResourceBundle respage;
+    ResourceBundle resword;
 
     Locale locale;
     /*
@@ -231,7 +233,8 @@ public class ImportSpringJob extends QuartzJobBean {
                 // which are non-usable files for import.
                 destination = removeNullElements(destination);
                 // do everything else here with 'destination'
-                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory, triggerBean, ruleSetService);
+                ArrayList<String> auditMessages = processData(destination, dataSource, respage, resword, ub, studyBean, destDirectory, triggerBean,
+                        ruleSetService);
 
                 auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
                 try {
@@ -295,8 +298,8 @@ public class ImportSpringJob extends QuartzJobBean {
      * processData, a method which should take in all XML files, check to see if they were imported previously, ? insert
      * them into the database if not, and return a message which will go to audit and to the end user.
      */
-    private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, UserAccountBean ub, StudyBean studyBean,
-            File destDirectory, TriggerBean triggerBean, RuleSetServiceInterface ruleSetService) throws Exception {
+    private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, ResourceBundle resword, UserAccountBean ub,
+            StudyBean studyBean, File destDirectory, TriggerBean triggerBean, RuleSetServiceInterface ruleSetService) throws Exception {
         StringBuffer msg = new StringBuffer();
         StringBuffer auditMsg = new StringBuffer();
         Mapping myMap = new Mapping();
@@ -429,9 +432,12 @@ public class ImportSpringJob extends QuartzJobBean {
             ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
             logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
+            Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
+            // The following map is used for setting the EventCRF status post import.
             HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer);
 
             // -- does the event already exist? if not, fail
@@ -503,6 +509,12 @@ public class ImportSpringJob extends QuartzJobBean {
                     out.write(oce1.getOpenClinicaMessage() + "<br/>");
 
                 }
+            } else if (!eventCRFStatusesValid) {
+                fail = true;
+                msg.append(respage.getString("the_event_crf_not_correct_status"));
+                out.write(respage.getString("the_event_crf_not_correct_status"));
+                out.close();
+                continue;
             } else {
                 // fail = true;
                 // break here with an exception
@@ -566,7 +578,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // otherwise, we generate the other two: validation errors and
                 // valid data
                 logger.debug("found total validation errors: " + totalValidationErrors.size());
-                SummaryStatsBean ssBean = getImportCRFDataService(dataSource).generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
+                SummaryStatsBean ssBean = getImportCRFDataService(dataSource).generateSummaryStatsBean(odmContainer, displayItemBeanWrappers, importCrfInfo);
                 // msg.append("===+");
                 // the above is a special key that we will use to split the
                 // message into two parts
@@ -581,6 +593,8 @@ public class ImportSpringJob extends QuartzJobBean {
                 // forwardPage(Page.VERIFY_IMPORT_SERVLET);
                 // instead of forwarding, go ahead and save it all, sending a
                 // message at the end
+
+                msg.append(triggerService.generateSkippedCRFMessage(importCrfInfo, resword) + "<br/>");
 
                 // setup ruleSets to run if applicable
                 List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);

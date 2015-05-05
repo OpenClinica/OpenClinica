@@ -29,6 +29,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -266,10 +267,15 @@ public class ImportCRFDataServlet extends SecureController {
             // (and the event should be independent, ie not affected by other
             // events)
 
+            Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub);
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
+            // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
+            // doesn't match upsert, it won't be created.
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
+            // The following map is used for setting the EventCRF status post import.
             HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService().fetchEventCRFStatuses(odmContainer);
             // @pgawade 17-May-2011 Fix for issue#9590 - collection of
             // eventCRFBeans is returned as null
@@ -361,6 +367,7 @@ public class ImportCRFDataServlet extends SecureController {
                         // what if you have 2 event crfs but the third is a fake?
                         fail = true;
                         logger.debug("threw a NPE after calling lookup validation errors");
+                        System.out.println(ExceptionUtils.getStackTrace(npe1));
                         addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
                         // npe1.printStackTrace();
                     } catch (OpenClinicaException oce1) {
@@ -368,6 +375,9 @@ public class ImportCRFDataServlet extends SecureController {
                         logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                         addPageMessage(oce1.getOpenClinicaMessage());
                     }
+                } else if (!eventCRFStatusesValid) {
+                    fail = true;
+                    addPageMessage(respage.getString("the_event_crf_not_correct_status"));
                 } else {
                     fail = true;
                     addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
@@ -391,12 +401,13 @@ public class ImportCRFDataServlet extends SecureController {
                 session.setAttribute("validationErrors", totalValidationErrors);
                 session.setAttribute("hardValidationErrors", hardValidationErrors);
                 session.setAttribute("importedCRFStatuses", importedCRFStatuses);
+                session.setAttribute("importCrfInfo", importCrfInfo);
                 // above are updated 'statically' by the method that originally
                 // generated the wrappers; soon the only thing we will use
                 // wrappers for is the 'overwrite' flag
 
                 logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
-                SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
+                SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers, importCrfInfo);
                 session.setAttribute("summaryStats", ssBean);
                 // will have to set hard edit checks here as well
                 session.setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());

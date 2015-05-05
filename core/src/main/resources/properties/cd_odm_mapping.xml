@@ -20,27 +20,49 @@
             <bind-xml name="SubjectData"/>
         </field>
         
+        <field name="UpsertOn"
+            type="org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean">
+            <bind-xml name="UpsertOn"/>
+        </field>
+        
         <field name="StudyOID"
         		type="java.lang.String">
         		<bind-xml name="StudyOID" node="attribute"/>
-        </field>
-        
-        
+        </field>                
     </class>
 
-	<class name="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"> 
-		<map-to xml="SubjectData"/>
-		
-		<field name="SubjectOID"
+    <class name="org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean"> 
+        <map-to xml="UpsertOn"/>
+        
+        <field name="NotStarted"
+               type="java.lang.Boolean">
+            <bind-xml name="NotStarted" node="attribute"/>
+       </field>
+       
+        <field name="DataEntryStarted"
+               type="java.lang.Boolean">
+            <bind-xml name="DataEntryStarted" node="attribute"/>
+       </field>
+       
+        <field name="DataEntryComplete"
+               type="java.lang.Boolean">
+            <bind-xml name="DataEntryComplete" node="attribute"/>
+       </field>
+       
+    </class>
+    <class name="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"> 
+        <map-to xml="SubjectData"/>
+        
+        <field name="SubjectOID"
                type="java.lang.String">
             <bind-xml name="SubjectKey" node="attribute"/>
        </field>
        
        <field name="StudyEventData"
-       		type="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean"
-       		collection="arraylist">
-       		<bind-xml name="StudyEventData"/>
-       	</field>
+            type="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean"
+            collection="arraylist">
+            <bind-xml name="StudyEventData"/>
+        </field>
     </class>
     
     <class name="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean">
