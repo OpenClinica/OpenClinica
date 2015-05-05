@@ -279,9 +279,9 @@ public class ViewStudyEventsServlet extends SecureController {
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(3);
             HashMap args = new HashMap();
-            args.put("sedId", new Integer(sed.getId()).toString());
-            args.put("definitionId", new Integer(definitionId).toString());
-            args.put("statusId", new Integer(statusId).toString());
+            args.put("sedId", Integer.valueOf(sed.getId()).toString());
+            args.put("definitionId", Integer.valueOf(definitionId).toString());
+            args.put("statusId", Integer.valueOf(statusId).toString());
             args.put("startDate", local_df.format(startDate));
             args.put("endDate", local_df.format(endDate));
             table.setQuery("ViewStudyEvents", args);

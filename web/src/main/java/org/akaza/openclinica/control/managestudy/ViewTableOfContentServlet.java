@@ -58,7 +58,7 @@ public class ViewTableOfContentServlet extends SecureController {
         int crfVersionId = fp.getInt("crfVersionId");
         // YW <<
         int sedId = fp.getInt("sedId");
-        request.setAttribute("sedId", new Integer(sedId) + "");
+        request.setAttribute("sedId", Integer.valueOf(sedId) + "");
         // YW >>
         DisplayTableOfContentsBean displayBean = getDisplayBean(sm.getDataSource(), crfVersionId);
         request.setAttribute("toc", displayBean);
@@ -97,7 +97,7 @@ public class ViewTableOfContentServlet extends SecureController {
             SectionBean sb = (SectionBean) sections.get(i);
 
             int sectionId = sb.getId();
-            Integer key = new Integer(sectionId);
+            Integer key = Integer.valueOf(sectionId);
             sb.setNumItems(TableOfContentsServlet.getIntById(numItemsBySectionId, key));
             sections.set(i, sb);
         }

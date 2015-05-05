@@ -56,7 +56,7 @@ public class FormDiscrepancyNotes {
         if (notes != null) {
             notes.add(field);
         }
-        idNotes.put(new Integer(entityId), notes);
+        idNotes.put(Integer.valueOf(entityId), notes);
     }
 
     public boolean hasNote(String field) {
@@ -79,7 +79,7 @@ public class FormDiscrepancyNotes {
     }
 
     public void setNumExistingFieldNotes(String field, int num) {
-        numExistingFieldNotes.put(field, new Integer(num));
+        numExistingFieldNotes.put(field, Integer.valueOf(num));
     }
 
     public int getNumExistingFieldNotes(String field) {

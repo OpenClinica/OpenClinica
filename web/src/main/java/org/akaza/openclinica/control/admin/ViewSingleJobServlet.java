@@ -114,11 +114,11 @@ public class ViewSingleJobServlet extends SecureController {
                 logger.debug("found email: " + contactEmail);
                 // String datasetId =
                 // dataMap.getString(ExampleSpringJob.DATASET_ID);
-                // int dsId = new Integer(datasetId).intValue();
+                // int dsId = Integer.valueOf(datasetId).intValue();
                 if (gName.equals("") || gName.equals("0")) {
                     String exportFormat = dataMap.getString(XsltTriggerService.EXPORT_FORMAT);
                     String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
-                    // int userId = new Integer(userAcctId).intValue();
+                    // int userId = Integer.valueOf(userAcctId).intValue();
                     int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
                     triggerBean.setExportFormat(exportFormat);
                     triggerBean.setPeriodToRun(periodToRun);

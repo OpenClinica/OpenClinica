@@ -89,7 +89,7 @@ public class ListStudySubjectsServlet extends SecureController {
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             //Shaoyu Su
             // int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-            // request.setAttribute("label", new Integer(nextLabel).toString());
+            // request.setAttribute("label", Integer.valueOf(nextLabel).toString());
             request.setAttribute("label", resword.getString("id_generated_Save_Add"));
             fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
         }
@@ -109,7 +109,7 @@ public class ListStudySubjectsServlet extends SecureController {
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {
             StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
             if (studySubject.getId() > 0) {
-                request.setAttribute("id", new Integer(studySubject.getId()).toString());
+                request.setAttribute("id", Integer.valueOf(studySubject.getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
                 createTable();

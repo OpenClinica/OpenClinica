@@ -113,7 +113,7 @@ public class SubjectTransferDAO extends EntityDAO {
 
         this.setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), id);
+        variables.put(Integer.valueOf(1), id);
 
         String sql = digester.getQuery("findByPK");
         ArrayList<?> alist = this.select(sql, variables);
@@ -131,7 +131,7 @@ public class SubjectTransferDAO extends EntityDAO {
 
         this.setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), ruleSet.getId());
+        variables.put(Integer.valueOf(1), ruleSet.getId());
 
         String sql = digester.getQuery("findAllByRuleSet");
         ArrayList<?> alist = this.select(sql, variables);
@@ -153,18 +153,18 @@ public class SubjectTransferDAO extends EntityDAO {
         HashMap<Integer, Object> nullVars = new HashMap<Integer, Object>();
 
         if (subjectTransferBean.getDateOfBirth() == null) {
-            nullVars.put(new Integer(1), new Integer(Types.DATE));
-            variables.put(new Integer(1), null);
+            nullVars.put(Integer.valueOf(1), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(1), null);
         } else {
-            variables.put(new Integer(1), subjectTransferBean.getDateOfBirth());
+            variables.put(Integer.valueOf(1), subjectTransferBean.getDateOfBirth());
         }
 
         if (subjectTransferBean.getGender() != 'm' && subjectTransferBean.getGender() != 'f') {
-            nullVars.put(new Integer(2), new Integer(Types.CHAR));
-            variables.put(new Integer(2), null);
+            nullVars.put(Integer.valueOf(2), Integer.valueOf(Types.CHAR));
+            variables.put(Integer.valueOf(2), null);
         } else {
             char[] ch = { subjectTransferBean.getGender() };
-            variables.put(new Integer(2), new String(ch));
+            variables.put(Integer.valueOf(2), new String(ch));
         }
 
         variables.put(3, subjectTransferBean.getPersonId());

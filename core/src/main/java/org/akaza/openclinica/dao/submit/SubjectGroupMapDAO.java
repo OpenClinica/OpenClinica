@@ -130,7 +130,7 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         this.setTypeExpected(11, TypeNames.STRING);
         this.setTypeExpected(12, TypeNames.STRING);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studySubjectId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studySubjectId));
         ArrayList alist = this.select(digester.getQuery("findAllByStudySubject"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -149,8 +149,8 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         this.setTypeExpected(11, TypeNames.STRING);
         this.setTypeExpected(12, TypeNames.STRING);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studySubjectId));
-        variables.put(new Integer(2), new Integer(studyGroupClassId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studySubjectId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyGroupClassId));
         ArrayList alist = this.select(digester.getQuery("findByStudySubjectAndStudyGroupClass"), variables);
         SubjectGroupMapBean eb = null;
         Iterator it = alist.iterator();
@@ -174,7 +174,7 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);
@@ -197,12 +197,12 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         // study_subject_id, study_group_id,
         // status_id, owner_id,date_created,
         // notes) VALUES (?,?,?,?,?,NOW(),?)
-        variables.put(new Integer(1), new Integer(sb.getStudyGroupClassId()));
-        variables.put(new Integer(2), new Integer(sb.getStudySubjectId()));
-        variables.put(new Integer(3), new Integer(sb.getStudyGroupId()));
-        variables.put(new Integer(4), new Integer(sb.getStatus().getId()));
-        variables.put(new Integer(5), new Integer(sb.getOwner().getId()));
-        variables.put(new Integer(6), sb.getNotes());
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyGroupClassId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(sb.getStudyGroupId()));
+        variables.put(Integer.valueOf(4), Integer.valueOf(sb.getStatus().getId()));
+        variables.put(Integer.valueOf(5), Integer.valueOf(sb.getOwner().getId()));
+        variables.put(Integer.valueOf(6), sb.getNotes());
         // DATE_CREATED is now()
 
         this.execute(digester.getQuery("create"), variables);
@@ -223,15 +223,15 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         // STUDY_SUBJECT_ID=?,STUDY_GROUP_ID=?,
         // STATUS_ID=?,DATE_UPDATED=?, UPDATE_ID=? , notes = ?
         // WHERE SUBJECT_GROUP_MAP_ID=?
-        variables.put(new Integer(1), new Integer(sb.getStudyGroupClassId()));
-        variables.put(new Integer(2), new Integer(sb.getStudySubjectId()));
-        variables.put(new Integer(3), new Integer(sb.getStudyGroupId()));
-        variables.put(new Integer(4), new Integer(sb.getStatus().getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyGroupClassId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStudySubjectId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(sb.getStudyGroupId()));
+        variables.put(Integer.valueOf(4), Integer.valueOf(sb.getStatus().getId()));
 
-        variables.put(new Integer(5), new java.util.Date());
-        variables.put(new Integer(6), new Integer(sb.getUpdater().getId()));
-        variables.put(new Integer(8), new Integer(sb.getId()));
-        variables.put(new Integer(7), sb.getNotes());
+        variables.put(Integer.valueOf(5), new java.util.Date());
+        variables.put(Integer.valueOf(6), Integer.valueOf(sb.getUpdater().getId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(7), sb.getNotes());
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables);
@@ -243,8 +243,8 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
         setTypesExpected();
         this.setTypeExpected(11, TypeNames.STRING);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyGroupClassId));
-        variables.put(new Integer(2), new Integer(studyGroupId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyGroupClassId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyGroupId));
         ArrayList alist = this.select(digester.getQuery("findAllByStudyGroupClassAndGroup"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -271,14 +271,14 @@ public class SubjectGroupMapDAO extends AuditableEntityDAO {
 
     public ArrayList findAllByStudyGroupId(int studyGroupId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyGroupId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyGroupId));
 
         return executeFindAllQuery("findAllByStudyGroupId", variables);
     }
 
     public ArrayList findAllByStudyGroupClassId(int studyGroupClassId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyGroupClassId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyGroupClassId));
 
         return executeFindAllQuery("findAllByStudyGroupClassId", variables);
     }

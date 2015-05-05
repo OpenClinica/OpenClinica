@@ -125,7 +125,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                    }
 		                 /*   else
 		                    	{
-		                    	request.setAttribute("tabId", new Integer(1));
+		                    	request.setAttribute("tabId", Integer.valueOf(1));
 		                    	}*/
 		                    if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
 		                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());

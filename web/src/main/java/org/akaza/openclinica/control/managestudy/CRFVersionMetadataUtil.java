@@ -44,7 +44,7 @@ public class CRFVersionMetadataUtil {
             HashMap versionMap = new HashMap();
             for (int i = 0; i < sections.size(); i++) {
                 SectionBean section = (SectionBean) sections.get(i);
-                versionMap.put(new Integer(section.getId()), section.getItems());
+                versionMap.put(Integer.valueOf(section.getId()), section.getItems());
                 // YW 08-21-2007, add group metadata
                 ArrayList<ItemGroupBean> igs = (ArrayList<ItemGroupBean>) igdao.findGroupBySectionId(section.getId());
                 for (int j = 0; j < igs.size(); ++j) {
@@ -77,7 +77,7 @@ public class CRFVersionMetadataUtil {
                     item.setItemMeta(ifm);
                     // logger.info("option******" +
                     // ifm.getResponseSet().getOptions().size());
-                    ArrayList its = (ArrayList) versionMap.get(new Integer(ifm.getSectionId()));
+                    ArrayList its = (ArrayList) versionMap.get(Integer.valueOf(ifm.getSectionId()));
                     its.add(item);
                 }
             } else {
@@ -88,14 +88,14 @@ public class CRFVersionMetadataUtil {
                     item.setItemMeta(ifm);
                     // logger.info("option******" +
                     // ifm.getResponseSet().getOptions().size());
-                    ArrayList its = (ArrayList) versionMap.get(new Integer(ifm.getSectionId()));
+                    ArrayList its = (ArrayList) versionMap.get(Integer.valueOf(ifm.getSectionId()));
                     its.add(item);
                 }
             }
 
             for (int i = 0; i < sections.size(); i++) {
                 SectionBean section = (SectionBean) sections.get(i);
-                section.setItems((ArrayList) versionMap.get(new Integer(section.getId())));
+                section.setItems((ArrayList) versionMap.get(Integer.valueOf(section.getId())));
             }
             return sections;
         }

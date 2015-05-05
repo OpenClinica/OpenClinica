@@ -271,7 +271,7 @@ public class OdmFileCreation {
 //
 //        }   // return ODMXMLFileName;
 
-        answerMap.put(ODMXMLFileName, new Integer(fId));
+        answerMap.put(ODMXMLFileName, Integer.valueOf(fId));
     //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
 
         return answerMap;

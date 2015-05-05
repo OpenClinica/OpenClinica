@@ -278,14 +278,14 @@ public class ChangeCRFVersionController {
 	        //put in hash 
 	        
 	        for (ItemGroupMetadataBean bn : beans_item_form_mdata){
-	        	hash_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+	        	hash_item_form_mdata.put(Integer.valueOf(bn.getItemId()), bn);
 	        }
 	        List<ItemGroupMetadataBean> bn_new_item_form_mdata = dao_item_form_mdata.findByCrfVersion( selectedVersionId);
 	        HashMap<Integer, ItemGroupMetadataBean> hash_new_item_form_mdata = new HashMap<Integer, ItemGroupMetadataBean>(bn_new_item_form_mdata.size());
 	        //put in hash 
 	        
 	        for (ItemGroupMetadataBean bn : bn_new_item_form_mdata){
-	        	hash_new_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+	        	hash_new_item_form_mdata.put(Integer.valueOf(bn.getItemId()), bn);
 	        }
 	        //get items description
 	        ArrayList<ItemBean> cur_items_with_data = item_dao.findAllWithItemDataByCRFVersionId(crfVersionId, eventCRFId);
@@ -322,11 +322,11 @@ public class ChangeCRFVersionController {
 	        	
 	        	if (cur_counter < cur_items.size() ){
 		        	cur_element = cur_items.get(cur_counter);
-	        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
+	        		bn_mdata = hash_item_form_mdata.get( Integer.valueOf(cur_element.getId()));
 	        	}
 	        	if ( new_counter < new_items.size() ){
 	        		new_element = new_items.get(new_counter);
-	        		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
+	        		bn_new_mdata = hash_new_item_form_mdata.get( Integer.valueOf(new_element.getId()));
 	        	}
         		
 	        	if (cur_counter < cur_items.size() && new_counter < new_items.size() &&  new_element.getId() == cur_element.getId() ){

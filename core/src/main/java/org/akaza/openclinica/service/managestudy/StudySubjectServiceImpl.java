@@ -215,8 +215,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         for (i = 0; i < eventDefinitionCRFs.size(); i++) {
             EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            completed.put(new Integer(edcrf.getCrfId()), Boolean.FALSE);
-            startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
+            completed.put(Integer.valueOf(edcrf.getCrfId()), Boolean.FALSE);
+            startedButIncompleted.put(Integer.valueOf(edcrf.getCrfId()), new EventCRFBean());
         }
 
         for (i = 0; i < eventCRFs.size(); i++) {
@@ -227,9 +227,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             int crfId = crfVersionById.get(ecrf.getCRFVersionId()).getCrfId();
             if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data
                                                           // already
-                completed.put(new Integer(crfId), Boolean.TRUE);
+                completed.put(Integer.valueOf(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
-                startedButIncompleted.put(new Integer(crfId), ecrf);
+                startedButIncompleted.put(Integer.valueOf(crfId), ecrf);
             }
         }
 
@@ -246,8 +246,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 if (status.equals(SubjectEventStatus.LOCKED)) {
                     dedc.setStatus(Status.LOCKED);
                 }
-                Boolean b = completed.get(new Integer(edcrf.getCrfId()));
-                EventCRFBean ev = startedButIncompleted.get(new Integer(edcrf.getCrfId()));
+                Boolean b = completed.get(Integer.valueOf(edcrf.getCrfId()));
+                EventCRFBean ev = startedButIncompleted.get(Integer.valueOf(edcrf.getCrfId()));
                 if (b == null || !b.booleanValue()) {
                     dedc.setEventCRF(ev);
                     answer.add(dedc);

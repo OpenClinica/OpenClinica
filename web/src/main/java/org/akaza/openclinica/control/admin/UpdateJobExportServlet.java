@@ -161,7 +161,7 @@ public class UpdateJobExportServlet extends SecureController {
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
-                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(Integer.valueOf(datasetId).intValue());
                 String[] files = epBean.getFileName();
                 String exportFileName;
                 int fileSize = files.length;

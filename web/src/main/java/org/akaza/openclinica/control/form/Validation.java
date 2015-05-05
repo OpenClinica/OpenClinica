@@ -62,11 +62,11 @@ public class Validation {
     }
 
     public void addArgument(int arg) {
-        arguments.add(new Integer(arg));
+        arguments.add(Integer.valueOf(arg));
     }
 
     public void addArgument(boolean b) {
-        arguments.add(new Boolean(b));
+        arguments.add(Boolean.valueOf(b));
     }
 
     public void addArgument(float arg) {

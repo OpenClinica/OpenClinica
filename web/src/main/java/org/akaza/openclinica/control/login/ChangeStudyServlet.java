@@ -142,7 +142,7 @@ public class ChangeStudyServlet extends SecureController {
             for (int i = 0; i < studies.size(); i++) {
                 StudyUserRoleBean studyWithRole = (StudyUserRoleBean) studies.get(i);
                 if (studyWithRole.getStudyId() == studyId) {
-                    request.setAttribute("studyId", new Integer(studyId));
+                    request.setAttribute("studyId", Integer.valueOf(studyId));
                     session.setAttribute("studyWithRole", studyWithRole);
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
@@ -176,7 +176,7 @@ public class ChangeStudyServlet extends SecureController {
         String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
-            request.setAttribute("label", new Integer(nextLabel).toString());
+            request.setAttribute("label", Integer.valueOf(nextLabel).toString());
         }
 
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());

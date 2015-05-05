@@ -177,7 +177,7 @@ public class CreateCRFVersionServlet extends SecureController {
                                 int previousVersionId = version1.getId();
                                 version.setId(previousVersionId);
                                 session.setAttribute("version", version);
-                                session.setAttribute("previousVersionId", new Integer(previousVersionId));
+                                session.setAttribute("previousVersionId", Integer.valueOf(previousVersionId));
                                 forwardPage(Page.REMOVE_CRF_VERSION_CONFIRM);
                                 return;
                             }
@@ -287,7 +287,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     }
                     // Not needed; crfVersionId will be autoboxed in Java 5
                     // this was added for the old CVS java compiler
-                    Integer cfvID = new Integer(crfVersionId);
+                    Integer cfvID = Integer.valueOf(crfVersionId);
                     if (cfvID == 0) {
                         cfvID = cvdao.findCRFVersionId(nib1.getCrfId(), nib1.getVersionName());
                     }

@@ -294,7 +294,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
         try {
             request.setAttribute("tabId", Integer.toString(tabNum));
         } catch (NumberFormatException nfe) {
-            request.setAttribute("tabId", new Integer("1"));
+            request.setAttribute("tabId", Integer.valueOf("1"));
         }
         if (hasGroups) {
             LOGGER.debug("has group, new_table is true");
@@ -331,7 +331,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
         // if the borders property is null, return 0; otherwise return the value stored
         // in the HashMap
         if (tempBorder != null) {
-            return new Integer(tempBorder);
+            return Integer.valueOf(tempBorder);
 
         } else {
             return 0;
@@ -347,7 +347,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
      * Integer(sectionNum)); return (String)innerMap.get("section_label"); }
      * private String getSectionSubtitleBySecNum(Map sectionsMap, int
      * sectionNum){ if(sectionsMap==null) return ""; Map innerMap =
-     * (Map)sectionsMap.get(new Integer(sectionNum)); return
+     * (Map)sectionsMap.get(Integer.valueOf(sectionNum)); return
      * (String)innerMap.get("subtitle"); } private String
      * getInstructionsBySecNum(Map sectionsMap, int sectionNum){
      * if(sectionsMap==null) return ""; Map innerMap = (Map)sectionsMap.get(new

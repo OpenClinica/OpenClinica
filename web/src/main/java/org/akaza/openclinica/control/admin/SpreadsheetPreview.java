@@ -117,7 +117,7 @@ public final class SpreadsheetPreview implements Preview {
                     }
                     // item_name
 
-                    allRows.put(new Integer(j), rowCells);
+                    allRows.put(Integer.valueOf(j), rowCells);
                 }// end inner for loop
             }// end if
         }// end outer for
@@ -177,7 +177,7 @@ public final class SpreadsheetPreview implements Preview {
         case HSSFCell.CELL_TYPE_NUMERIC:
             return Double.toString(cell.getNumericCellValue());
         case HSSFCell.CELL_TYPE_BOOLEAN:
-            return new Boolean(cell.getBooleanCellValue()).toString();
+            return Boolean.valueOf(cell.getBooleanCellValue()).toString();
         case HSSFCell.CELL_TYPE_FORMULA:
             return cell.getCellFormula().toString();
         }
@@ -245,7 +245,7 @@ public final class SpreadsheetPreview implements Preview {
                             val = Double.toString(cell.getNumericCellValue());
                             break;
                         case HSSFCell.CELL_TYPE_BOOLEAN:
-                            val = new Boolean(cell.getBooleanCellValue()).toString();
+                            val = Boolean.valueOf(cell.getBooleanCellValue()).toString();
                             break;
                         case HSSFCell.CELL_TYPE_FORMULA:
                             cell.getCellFormula().toString();

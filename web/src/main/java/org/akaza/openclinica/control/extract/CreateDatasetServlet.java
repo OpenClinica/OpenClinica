@@ -324,7 +324,7 @@ public class CreateDatasetServlet extends SecureController {
                         // TODO make findAllByProject
                         // request.setAttribute("filters",filters);
                         EntityBeanTable table = getFilterTable();
-                        session.setAttribute("partOfCreateDataset", new Integer(1));
+                        session.setAttribute("partOfCreateDataset", Integer.valueOf(1));
                         // to be used in createFiltersThree servlet, tbh
                         request.setAttribute("table", table);
                         forwardPage(Page.APPLY_FILTER);
@@ -527,8 +527,8 @@ public class CreateDatasetServlet extends SecureController {
         // we decide not to touch groups here, except in call from 'view
         // selected'
         ArrayList allItems = (ArrayList) session.getAttribute("allItems");
-        if (defId > 0 && !db.getEventIds().contains(new Integer(defId))) {
-            db.getEventIds().add(new Integer(defId));
+        if (defId > 0 && !db.getEventIds().contains(Integer.valueOf(defId))) {
+            db.getEventIds().add(Integer.valueOf(defId));
         }
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -553,7 +553,7 @@ public class CreateDatasetServlet extends SecureController {
                 ItemBean item = (ItemBean) allItems.get(i);
                 item.setSelected(false);
                 if (db.getItemMap().containsKey(defId + "_" + item.getId())) {
-                    db.getItemIds().remove(new Integer(item.getId()));
+                    db.getItemIds().remove(Integer.valueOf(item.getId()));
                     db.getItemMap().remove(defId + "_" + item.getId());
                     for (int j = 0; j < db.getItemDefCrf().size(); ++j) {
                         ItemBean ib = (ItemBean) db.getItemDefCrf().get(j);
@@ -593,7 +593,7 @@ public class CreateDatasetServlet extends SecureController {
                     if (!db.getItemMap().containsKey(selectedItem.getDatasetItemMapKey())) {
                         // logger.info("one item selected");
                         logger.info("one item selected");
-                        db.getItemIds().add(new Integer(selectedItem.getId()));
+                        db.getItemIds().add(Integer.valueOf(selectedItem.getId()));
                         if (selectedItem.getDefId() == 0) {
                             db.getItemMap().put(defId + "_" + selectedItem.getId(), selectedItem);
                         } else {
@@ -611,7 +611,7 @@ public class CreateDatasetServlet extends SecureController {
                                     db.getItemDefCrf().remove(j);
                                 }
                             }
-                            db.getItemIds().remove(new Integer(selectedItem.getId()));
+                            db.getItemIds().remove(Integer.valueOf(selectedItem.getId()));
                             db.getItemMap().remove(selectedItem.getDatasetItemMapKey());
                 		}
                 	}
@@ -945,7 +945,7 @@ public class CreateDatasetServlet extends SecureController {
                 // YW, 2-26-2008 << let subjectGroupIds contain only selected
                 // StudyGroupClass_id <<
                 if (db.getSubjectGroupIds() != null && !db.getSubjectGroupIds().contains(sgclass.getId())) {
-                    db.getSubjectGroupIds().add(new Integer(sgclass.getId()));
+                    db.getSubjectGroupIds().add(Integer.valueOf(sgclass.getId()));
                 }
                 // YW >>
             } else {
@@ -954,12 +954,12 @@ public class CreateDatasetServlet extends SecureController {
                 // YW, 2-26-2008 << delete StudyGroupClass_id from
                 // subjectGroupIds if appliable<<
                 if (db.getSubjectGroupIds() != null && db.getSubjectGroupIds().contains(sgclass.getId())) {
-                    db.getSubjectGroupIds().remove(new Integer(sgclass.getId()));
+                    db.getSubjectGroupIds().remove(Integer.valueOf(sgclass.getId()));
                 }
                 // YW >>
             }
             allSelectedGroups.add(sgclass);
-            // db.getSubjectGroupIds().add(new Integer(sgclass.getId()));
+            // db.getSubjectGroupIds().add(Integer.valueOf(sgclass.getId()));
             logger.info("just added subject group ids: " + sgclass.getId());
         }
         session.setAttribute("allSelectedGroups", allSelectedGroups);

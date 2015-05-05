@@ -50,10 +50,10 @@ public class AuditEventRow extends EntityBeanRow {
             answer = thisBean.getAuditTable().toLowerCase().compareTo(argBean.getAuditTable().toLowerCase());
             break;
         case AUDIT_STUDY_NAME:
-            answer = new Integer(thisBean.getStudyName()).compareTo(new Integer(argBean.getStudyName()));
+            answer = Integer.valueOf(thisBean.getStudyName()).compareTo(Integer.valueOf(argBean.getStudyName()));
             break;
         case AUDIT_SUBJECT_NAME:
-            answer = new Integer(thisBean.getSubjectName()).compareTo(new Integer(argBean.getSubjectName()));
+            answer = Integer.valueOf(thisBean.getSubjectName()).compareTo(Integer.valueOf(argBean.getSubjectName()));
             break;
         case AUDIT_CHANGES:
             // LEAVE THIS BLANK?

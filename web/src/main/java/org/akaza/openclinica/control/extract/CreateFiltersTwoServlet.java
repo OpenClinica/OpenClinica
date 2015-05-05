@@ -331,7 +331,7 @@ public class CreateFiltersTwoServlet extends SecureController {
             String title = (String) en.nextElement();
             if (title.startsWith("ID")) {
                 String newId = title.replaceAll("ID", "");
-                Integer ifmId = new Integer(newId);
+                Integer ifmId = Integer.valueOf(newId);
                 // TODO throw an error here if it's not applicable?
                 retMe.add(ifmId);
             }

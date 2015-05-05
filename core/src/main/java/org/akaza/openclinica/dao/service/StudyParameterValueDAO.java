@@ -57,9 +57,9 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         StudyParameterValueBean spvb = (StudyParameterValueBean) eb;
         HashMap variables = new HashMap();
 
-        variables.put(new Integer(1), new Integer(spvb.getStudyId()));
-        variables.put(new Integer(2), spvb.getValue());
-        variables.put(new Integer(3), spvb.getParameter());
+        variables.put(Integer.valueOf(1), Integer.valueOf(spvb.getStudyId()));
+        variables.put(Integer.valueOf(2), spvb.getValue());
+        variables.put(Integer.valueOf(3), spvb.getParameter());
 
         this.execute(digester.getQuery("create"), variables);
         return spvb;
@@ -70,9 +70,9 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         StudyParameterValueBean spvb = (StudyParameterValueBean) eb;
         HashMap variables = new HashMap();
 
-        variables.put(new Integer(1), spvb.getValue());
-        variables.put(new Integer(2), new Integer(spvb.getStudyId()));
-        variables.put(new Integer(3), spvb.getParameter());
+        variables.put(Integer.valueOf(1), spvb.getValue());
+        variables.put(Integer.valueOf(2), Integer.valueOf(spvb.getStudyId()));
+        variables.put(Integer.valueOf(3), spvb.getParameter());
 
         this.execute(digester.getQuery("update"), variables);
         return spvb;
@@ -153,8 +153,8 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), handle);
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), handle);
 
         String sql = digester.getQuery("findByStudyAndHandle");
         ArrayList alist = this.select(sql, variables);
@@ -171,7 +171,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), handle);
+        variables.put(Integer.valueOf(1), handle);
 
         String sql = digester.getQuery("findParameterByHandle");
         ArrayList alist = this.select(sql, variables);
@@ -205,7 +205,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
     public ArrayList findAllParameterValuesByStudy(StudyBean study) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllParameterValuesByStudy"), variables);
         ArrayList al = new ArrayList();
@@ -231,7 +231,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         this.setTypeExpected(10, TypeNames.BOOL);
         this.setTypeExpected(11, TypeNames.BOOL);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
 
         ArrayList alist = this.select(digester.getQuery("findParamConfigByStudy"), variables);
         ArrayList al = new ArrayList();

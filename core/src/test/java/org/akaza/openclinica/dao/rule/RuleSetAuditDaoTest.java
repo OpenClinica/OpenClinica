@@ -63,7 +63,7 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
         List<RuleSetAuditBean> ruleSetAudits = ruleSetAuditDao.findAllByRuleSet(ruleSet);
 
         assertNotNull("ruleSetAudits is null", ruleSetAudits);
-        assertEquals("The size of the ruleSetAudits is not 2", new Integer(2), Integer.valueOf(ruleSetAudits.size()));
+        assertEquals("The size of the ruleSetAudits is not 2", Integer.valueOf(2), Integer.valueOf(ruleSetAudits.size()));
 
     }
 
@@ -73,7 +73,7 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
         RuleSetAuditBean ruleSetAuditBean = ruleSetAuditDao.findById(-1);
 
         assertNotNull("ruleSetRuleAuditBean is null", ruleSetAuditBean);
-        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", new Integer(-1), Integer.valueOf(ruleSetAuditBean.getRuleSetBean().getId()));
+        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", Integer.valueOf(-1), Integer.valueOf(ruleSetAuditBean.getRuleSetBean().getId()));
 
     }
 

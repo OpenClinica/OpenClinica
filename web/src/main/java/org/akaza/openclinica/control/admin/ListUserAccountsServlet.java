@@ -72,7 +72,7 @@ public class ListUserAccountsServlet extends SecureController {
         panel.setStudyInfoShown(false);
         panel.setOrderedData(true);
         if (allUsers.size() > 0) {
-            setToPanel(resword.getString("users"), new Integer(allUsers.size()).toString());
+            setToPanel(resword.getString("users"), Integer.valueOf(allUsers.size()).toString());
         }
 
         forwardPage(Page.LIST_USER_ACCOUNTS);
@@ -99,7 +99,7 @@ public class ListUserAccountsServlet extends SecureController {
         int i;
         for (i = 0; i < allStudies.size(); i++) {
             StudyBean sb = (StudyBean) allStudies.get(i);
-            studiesById.put(new Integer(sb.getId()), sb);
+            studiesById.put(Integer.valueOf(sb.getId()), sb);
         }
 
         for (i = 0; i < users.size(); i++) {
@@ -108,7 +108,7 @@ public class ListUserAccountsServlet extends SecureController {
 
             for (int j = 0; j < roles.size(); j++) {
                 StudyUserRoleBean surb = (StudyUserRoleBean) roles.get(j);
-                StudyBean sb = (StudyBean) studiesById.get(new Integer(surb.getStudyId()));
+                StudyBean sb = (StudyBean) studiesById.get(Integer.valueOf(surb.getStudyId()));
                 if (sb != null) {
                     surb.setStudyName(sb.getName());
                     surb.setParentStudyId(sb.getParentStudyId());

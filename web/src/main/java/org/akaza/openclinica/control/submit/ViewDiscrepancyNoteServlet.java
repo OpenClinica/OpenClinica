@@ -124,7 +124,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
 
         int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
-        request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
+        request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, Integer.valueOf(eventCRFId));
         
         request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
@@ -497,7 +497,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                     note.setDisType(DiscrepancyNoteType.get(note.getDiscrepancyNoteTypeId()));
                     note.setResStatus(ResolutionStatus.get(note.getResolutionStatusId()));
-                    DiscrepancyNoteBean parent = noteTree.get(new Integer(pId));
+                    DiscrepancyNoteBean parent = noteTree.get(Integer.valueOf(pId));
                     if (parent != null) {
                         parent.getChildren().add(note);
                     }
@@ -522,7 +522,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             note.setDisType(DiscrepancyNoteType.get(note.getDiscrepancyNoteTypeId()));
             note.setResStatus(ResolutionStatus.get(note.getResolutionStatusId()));
             if (pId == 0) {
-                noteTree.put(new Integer(note.getId()), note);
+                noteTree.put(Integer.valueOf(note.getId()), note);
             }
         }
 
@@ -544,7 +544,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             note.setDisType(DiscrepancyNoteType.get(note.getDiscrepancyNoteTypeId()));
             note.setResStatus(ResolutionStatus.get(note.getResolutionStatusId()));
             if (pId > 0) {
-                DiscrepancyNoteBean parent = noteTree.get(new Integer(pId));
+                DiscrepancyNoteBean parent = noteTree.get(Integer.valueOf(pId));
                 if (parent != null) {
                     parent.getChildren().add(note);
                     if (!note.getCreatedDate().before(parent.getLastDateUpdated())) {

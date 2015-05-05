@@ -414,7 +414,7 @@ public class FormProcessor {
     }
 
     public void addPresetValue(String fieldName, int value) {
-        Integer fieldValue = new Integer(value);
+        Integer fieldValue = Integer.valueOf(value);
         presetValues.put(fieldName, fieldValue);
     }
 
@@ -424,7 +424,7 @@ public class FormProcessor {
     }
 
     public void addPresetValue(String fieldName, boolean value) {
-        Boolean fieldValue = new Boolean(value);
+        Boolean fieldValue = Boolean.valueOf(value);
         presetValues.put(fieldName, fieldValue);
     }
 
@@ -442,7 +442,7 @@ public class FormProcessor {
      */
     public void addPresetValue(String fieldName, EntityBean value) {
         int id = value.getId();
-        // Integer fieldValue = new Integer(id);
+        // Integer fieldValue = Integer.valueOf(id);
         // presetValues.put(fieldName, fieldValue);
         presetValues.put(fieldName, value);
     }

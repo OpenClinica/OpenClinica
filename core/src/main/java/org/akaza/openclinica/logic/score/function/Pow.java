@@ -33,7 +33,7 @@ public class Pow extends AbstractFunction {
                 try {
                     values[i] = Double.parseDouble(arg);
                 } catch (Exception e) {
-                    errors.put(new Integer(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Pow(); ");
+                    errors.put(Integer.valueOf(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Pow(); ");
                 }
             }
             if (errors.size() > 0) {

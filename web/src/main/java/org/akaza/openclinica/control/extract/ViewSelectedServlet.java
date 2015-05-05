@@ -100,12 +100,12 @@ public class ViewSelectedServlet extends SecureController {
         // crfdao, idao);
         // for (int j = 0; j < allItemsInStudy.size(); j++) {
         // ItemBean item = (ItemBean) allItemsInStudy.get(j);
-        // Integer itemId = new Integer(item.getId());
+        // Integer itemId = Integer.valueOf(item.getId());
         // if (!ids.contains(itemId)) {
         // ids.add(itemId);
         // }
         // }
-        session.setAttribute("numberOfStudyItems", new Integer(ids.size()).toString());
+        session.setAttribute("numberOfStudyItems", Integer.valueOf(ids.size()).toString());
 
         ArrayList items = new ArrayList();
         if (db == null || db.getItemIds().size() == 0) {

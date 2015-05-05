@@ -86,15 +86,15 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
     public EntityBean update(EntityBean eb) {
         ItemBean ib = (ItemBean) eb;
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), ib.getName());
-        variables.put(new Integer(2), ib.getDescription());
-        variables.put(new Integer(3), ib.getUnits());
-        variables.put(new Integer(4), new Boolean(ib.isPhiStatus()));
-        variables.put(new Integer(5), new Integer(ib.getItemDataTypeId()));
-        variables.put(new Integer(6), new Integer(ib.getItemReferenceTypeId()));
-        variables.put(new Integer(7), new Integer(ib.getStatus().getId()));
-        variables.put(new Integer(8), new Integer(ib.getUpdaterId()));
-        variables.put(new Integer(9), new Integer(ib.getId()));
+        variables.put(Integer.valueOf(1), ib.getName());
+        variables.put(Integer.valueOf(2), ib.getDescription());
+        variables.put(Integer.valueOf(3), ib.getUnits());
+        variables.put(Integer.valueOf(4), Boolean.valueOf(ib.isPhiStatus()));
+        variables.put(Integer.valueOf(5), Integer.valueOf(ib.getItemDataTypeId()));
+        variables.put(Integer.valueOf(6), Integer.valueOf(ib.getItemReferenceTypeId()));
+        variables.put(Integer.valueOf(7), Integer.valueOf(ib.getStatus().getId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(ib.getUpdaterId()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(ib.getId()));
         this.execute(digester.getQuery("update"), variables);
         return eb;
     }
@@ -103,14 +103,14 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         ItemBean ib = (ItemBean) eb;
         // per the create sql statement
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), ib.getName());
-        variables.put(new Integer(2), ib.getDescription());
-        variables.put(new Integer(3), ib.getUnits());
-        variables.put(new Integer(4), new Boolean(ib.isPhiStatus()));
-        variables.put(new Integer(5), new Integer(ib.getItemDataTypeId()));
-        variables.put(new Integer(6), new Integer(ib.getItemReferenceTypeId()));
-        variables.put(new Integer(7), new Integer(ib.getStatus().getId()));
-        variables.put(new Integer(8), new Integer(ib.getOwnerId()));
+        variables.put(Integer.valueOf(1), ib.getName());
+        variables.put(Integer.valueOf(2), ib.getDescription());
+        variables.put(Integer.valueOf(3), ib.getUnits());
+        variables.put(Integer.valueOf(4), Boolean.valueOf(ib.isPhiStatus()));
+        variables.put(Integer.valueOf(5), Integer.valueOf(ib.getItemDataTypeId()));
+        variables.put(Integer.valueOf(6), Integer.valueOf(ib.getItemReferenceTypeId()));
+        variables.put(Integer.valueOf(7), Integer.valueOf(ib.getStatus().getId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(ib.getOwnerId()));
         // date_created=now() in Postgres
         this.execute(digester.getQuery("create"), variables);
         // set the id here????
@@ -223,28 +223,28 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
     public ArrayList findAllParentsBySectionId(int sectionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
 
         return this.executeFindAllQuery("findAllParentsBySectionId", variables);
     }
 
     public ArrayList findAllNonRepeatingParentsBySectionId(int sectionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
 
         return this.executeFindAllQuery("findAllNonRepeatingParentsBySectionId", variables);
     }
 
     public ArrayList findAllBySectionId(int sectionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
 
         return this.executeFindAllQuery("findAllBySectionId", variables);
     }
 
     public ArrayList findAllBySectionIdOrderedByItemFormMetadataOrdinal(int sectionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
 
         return this.executeFindAllQuery("findAllBySectionIdOrderedByItemFormMetadataOrdinal", variables);
     }
@@ -260,14 +260,14 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
     public ArrayList findAllItemsByVersionId(int versionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(versionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(versionId));
 
         return this.executeFindAllQuery("findAllItemsByVersionId", variables);
     }
 
     public ArrayList findAllVersionsByItemId(int itemId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(itemId));
         String sql = digester.getQuery("findAllVersionsByItemId");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
@@ -371,7 +371,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypesExpected();
         this.setTypeExpected(14, TypeNames.INT);// crf_version_id
         this.setTypeExpected(15, TypeNames.STRING);// version name
-        variables.put(new Integer(1), new Integer(crf.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crf.getId()));
         String sql = digester.getQuery("findAllActiveByCRF");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
@@ -397,7 +397,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         
@@ -415,7 +415,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
+        variables.put(Integer.valueOf(1), name);
 
         String sql = digester.getQuery("findByName");
         ArrayList alist = this.select(sql, variables);
@@ -432,8 +432,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
-        variables.put(new Integer(2), new Integer(crfId));
+        variables.put(Integer.valueOf(1), name);
+        variables.put(Integer.valueOf(2), Integer.valueOf(crfId));
 
         String sql = digester.getQuery("findByNameAndCRFId");
         ArrayList alist = this.select(sql, variables);
@@ -472,8 +472,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
      */
     public ArrayList findAllByParentIdAndCRFVersionId(int parentId, int crfVersionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(parentId));
-        variables.put(new Integer(2), new Integer(crfVersionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(crfVersionId));
 
         return this.executeFindAllQuery("findAllByParentIdAndCRFVersionId", variables);
     }
@@ -484,7 +484,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         int answer = 0;
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
         String sql = digester.getQuery("findAllRequiredByCRFVersionId");
 
         ArrayList rows = select(sql, variables);
@@ -499,7 +499,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
     public ArrayList findAllRequiredBySectionId(int sectionId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
 
         return this.executeFindAllQuery("findAllRequiredBySectionId", variables);
     }
@@ -510,7 +510,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypeExpected(1, TypeNames.INT); //item_id
         this.setTypeExpected(2, TypeNames.STRING); //(item)name
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
         String sql = digester.getQuery("findIdAndNamesInSection");
         ArrayList rows = select(sql, variables);
         Iterator it = rows.iterator();
@@ -531,8 +531,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypeExpected(3, TypeNames.STRING);//parent_name
         this.setTypeExpected(4, TypeNames.INT);//parent_id
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sectionId));
-        variables.put(new Integer(2), new Integer(sectionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sectionId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sectionId));
         String sql = digester.getQuery("findChildAndParentNamesInSection");
         ArrayList rows = select(sql, variables);
         Iterator it = rows.iterator();
@@ -621,8 +621,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         ArrayList<ItemBean> answer = new ArrayList<ItemBean>();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crfVersionId));
-        variables.put(new Integer(2), new Integer(eventCRFId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(eventCRFId));
         
         String sql = digester.getQuery("findAllWithItemDataByCRFVersionId");
 

@@ -581,16 +581,16 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                         case TypeNames.BOOL:
                             // BADS FLAG
                             if (CoreResources.getDBName().equals("oracle")) {
-                                hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+                                hm.put(column, rs.getString(i).equals("1") ? Boolean.TRUE : Boolean.FALSE);
                                 if (rs.wasNull()) {
                                     if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                        hm.put(column, new Boolean(false));
+                                        hm.put(column, Boolean.FALSE);
                                     } else {
-                                        hm.put(column, new Boolean(true));
+                                        hm.put(column, Boolean.TRUE);
                                     }
                                 }
                             } else {
-                                hm.put(column, new Boolean(rs.getBoolean(i)));
+                                hm.put(column, Boolean.valueOf(rs.getBoolean(i)));
                                 if (rs.wasNull()) {
                                     // YW 08-17-2007 << Since I didn't
                                     // investigate
@@ -601,9 +601,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                                     // the
                                     // table study_event
                                     if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                        hm.put(column, new Boolean(false));
+                                        hm.put(column, Boolean.FALSE);
                                     } else {
-                                        hm.put(column, new Boolean(true));
+                                        hm.put(column, Boolean.TRUE);
                                     }
                                     // bad idea? what to put, then?
                                 }
@@ -1063,7 +1063,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
                 // Date of birth
                 if (CoreResources.getDBName().equals("oracle")) {
-                    obj.setDobCollected(new Boolean(rs.getString("dob_collected").equals("1") ? true : false));
+                    obj.setDobCollected(rs.getString("dob_collected").equals("1") ? Boolean.TRUE : Boolean.FALSE);
                 } else {
                     obj.setDobCollected(rs.getBoolean("dob_collected"));
                 }
@@ -1613,17 +1613,17 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 // start_time_flag
                 Boolean vstart_time_flag;
                 if (CoreResources.getDBName().equals("oracle")) {
-                    vstart_time_flag = new Boolean(rs.getString("start_time_flag").equals("1") ? true : false);
+                    vstart_time_flag = rs.getString("start_time_flag").equals("1") ? Boolean.TRUE : Boolean.FALSE;
                     if (rs.wasNull()) {
                         // if (column.equalsIgnoreCase("start_time_flag") ||
                         // column.equalsIgnoreCase("end_time_flag")) {
-                        vstart_time_flag = new Boolean(false);
+                        vstart_time_flag = Boolean.FALSE;
                         // } else {
-                        // hm.put(column, new Boolean(true));
+                        // hm.put(column, Boolean.TRUE);
                         // }
                     }
                 } else {
-                    vstart_time_flag = new Boolean(rs.getBoolean("start_time_flag"));
+                    vstart_time_flag = Boolean.valueOf(rs.getBoolean("start_time_flag"));
                     if (rs.wasNull()) {
                         // YW 08-17-2007 << Since I didn't investigate
                         // what's the impact if changing true to false,
@@ -1632,9 +1632,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                         // table study_event
                         // if (column.equalsIgnoreCase("start_time_flag") ||
                         // column.equalsIgnoreCase("end_time_flag")) {
-                        vstart_time_flag = new Boolean(false);
+                        vstart_time_flag = Boolean.FALSE;
                         // } else {
-                        // hm.put(column, new Boolean(true));
+                        // hm.put(column, Boolean.TRUE);
                         // }
                         // bad idea? what to put, then?
                     }
@@ -1643,17 +1643,17 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 // end_time_flag
                 Boolean vend_time_flag;
                 if (CoreResources.getDBName().equals("oracle")) {
-                    vend_time_flag = new Boolean(rs.getString("end_time_flag").equals("1") ? true : false);
+                    vend_time_flag = rs.getString("end_time_flag").equals("1") ? Boolean.TRUE : Boolean.FALSE;
                     if (rs.wasNull()) {
                         // if (column.equalsIgnoreCase("start_time_flag") ||
                         // column.equalsIgnoreCase("end_time_flag")) {
-                        vend_time_flag = new Boolean(false);
+                        vend_time_flag = Boolean.FALSE;
                         // } else {
-                        // hm.put(column, new Boolean(true));
+                        // hm.put(column, Boolean.TRUE);
                         // }
                     }
                 } else {
-                    vend_time_flag = new Boolean(rs.getBoolean("end_time_flag"));
+                    vend_time_flag = Boolean.valueOf(rs.getBoolean("end_time_flag"));
                     if (rs.wasNull()) {
                         // YW 08-17-2007 << Since I didn't investigate
                         // what's the impact if changing true to false,
@@ -1662,9 +1662,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                         // table study_event
                         // if (column.equalsIgnoreCase("start_time_flag") ||
                         // column.equalsIgnoreCase("end_time_flag")) {
-                        vend_time_flag = new Boolean(false);
+                        vend_time_flag = Boolean.FALSE;
                         // } else {
-                        // hm.put(column, new Boolean(true));
+                        // hm.put(column, Boolean.TRUE);
                         // }
                         // bad idea? what to put, then?
                     }
@@ -2633,7 +2633,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 String key = stsed + "_" + stso + "_" + stcrf + "_" + stitem + "_" + stgn;
 
                 // add
-                al.put(key, new Boolean(true));
+                al.put(key, Boolean.TRUE);
 
             }// while
         } catch (SQLException sqle) {

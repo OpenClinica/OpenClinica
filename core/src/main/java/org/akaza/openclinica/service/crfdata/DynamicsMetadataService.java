@@ -810,11 +810,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null) {
                         showItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-                        // itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
+                        // itemsAlreadyShown.add(Integer.valueOf(oidBasedItemData.getId()));
                     } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                         dynamicsMetadataBean.setShowItem(true);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
-                        // itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
+                        // itemsAlreadyShown.add(Integer.valueOf(oidBasedItemData.getId()));
                     } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         logger.debug("hit DDE here: idb " + oidBasedItemData.getId());
                         // need a guard clause to guarantee DDE

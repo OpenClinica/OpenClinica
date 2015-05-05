@@ -72,8 +72,8 @@ public class UpdateJobImportServlet extends SecureController {
         request.setAttribute(ImportSpringJob.STUDY_NAME, studyName);
         request.setAttribute("filePath", directory);
         request.setAttribute("firstFilePath", IMPORT_DIR);
-        request.setAttribute("hours", new Integer(hours).toString());
-        request.setAttribute("minutes", new Integer(minutes).toString());
+        request.setAttribute("hours", Integer.valueOf(hours).toString());
+        request.setAttribute("minutes", Integer.valueOf(minutes).toString());
 
         Date jobDate = trigger.getNextFireTime();
 

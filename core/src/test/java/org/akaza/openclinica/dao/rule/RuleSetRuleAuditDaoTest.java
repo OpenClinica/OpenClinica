@@ -65,7 +65,7 @@ private static RuleSetRuleDao ruleSetRuleDao;
         List<RuleSetRuleAuditBean> ruleSetRuleAudits = ruleSetRuleAuditDao.findAllByRuleSet(ruleSet);
 
         assertNotNull("ruleSetAudits is null", ruleSetRuleAudits);
-        assertEquals("The size of the ruleSetRuleAudits is not 2", new Integer(2), Integer.valueOf(ruleSetRuleAudits.size()));
+        assertEquals("The size of the ruleSetRuleAudits is not 2", Integer.valueOf(2), Integer.valueOf(ruleSetRuleAudits.size()));
 
     }
 
@@ -75,7 +75,7 @@ private static RuleSetRuleDao ruleSetRuleDao;
         RuleSetRuleAuditBean ruleSetRuleAuditBean = ruleSetRuleAuditDao.findById(-1);
 
         assertNotNull("ruleSetRuleAuditBean is null", ruleSetRuleAuditBean);
-        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", new Integer(3), Integer.valueOf(ruleSetRuleAuditBean.getRuleSetRuleBean()
+        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", Integer.valueOf(3), Integer.valueOf(ruleSetRuleAuditBean.getRuleSetRuleBean()
                 .getId()));
 
     }

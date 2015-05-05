@@ -108,8 +108,8 @@ public class CreateJobImportServlet extends SecureController {
         request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
         request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
         request.setAttribute(EMAIL, fp2.getString(EMAIL));
-        request.setAttribute(HOURS, new Integer(fp2.getInt(HOURS)).toString());
-        request.setAttribute(MINUTES, new Integer(fp2.getInt(MINUTES)).toString());
+        request.setAttribute(HOURS, Integer.valueOf(fp2.getInt(HOURS)).toString());
+        request.setAttribute(MINUTES, Integer.valueOf(fp2.getInt(MINUTES)).toString());
 
     }
 

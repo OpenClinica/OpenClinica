@@ -103,7 +103,7 @@ public class ViewEventDefinitionServlet extends SecureController {
             request.setAttribute("participateFormStatus",participateFormStatus );            
             request.setAttribute("definition", sed);
             request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
-            request.setAttribute("defSize", new Integer(eventDefinitionCRFs.size()));
+            request.setAttribute("defSize", Integer.valueOf(eventDefinitionCRFs.size()));
             // request.setAttribute("eventDefinitionCRFs", new
             // ArrayList(tm.values()));
             forwardPage(Page.VIEW_EVENT_DEFINITION);

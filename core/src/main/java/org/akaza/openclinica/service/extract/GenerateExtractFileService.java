@@ -103,7 +103,7 @@ public class GenerateExtractFileService {
         logger.info("created txt file");
         // return TXTFileName;
         HashMap answerMap = new HashMap<String, Integer>();
-        answerMap.put(TXTFileName, new Integer(fId));
+        answerMap.put(TXTFileName, Integer.valueOf(fId));
         return answerMap;
     }
 
@@ -240,7 +240,7 @@ public class GenerateExtractFileService {
         }
         // return DDLFileName;
         HashMap answerMap = new HashMap<String, Integer>();
-        answerMap.put(DDLFileName, new Integer(fId));
+        answerMap.put(DDLFileName, Integer.valueOf(fId));
         return answerMap;
     }
 

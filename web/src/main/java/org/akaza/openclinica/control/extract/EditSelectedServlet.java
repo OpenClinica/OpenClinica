@@ -170,7 +170,7 @@ public class EditSelectedServlet extends SecureController {
         }
         ArrayList allSelectItems = selectAll ? selectAll(events, crfdao, idao) : ViewSelectedServlet.getAllSelected(db, idao, imfdao);
         // >> tbh
-        session.setAttribute("numberOfStudyItems", new Integer(ids.size()).toString());
+        session.setAttribute("numberOfStudyItems", Integer.valueOf(ids.size()).toString());
         // << tbh 11/2009
         session.setAttribute("allSelectedItems", allSelectItems);
         setUpStudyGroups();
@@ -191,8 +191,8 @@ public class EditSelectedServlet extends SecureController {
         Iterator it = events.keySet().iterator();
         while (it.hasNext()) {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) it.next();
-            if (!db.getEventIds().contains(new Integer(sed.getId()))) {
-                db.getEventIds().add(new Integer(sed.getId()));
+            if (!db.getEventIds().contains(Integer.valueOf(sed.getId()))) {
+                db.getEventIds().add(Integer.valueOf(sed.getId()));
             }
         }
 
@@ -200,7 +200,7 @@ public class EditSelectedServlet extends SecureController {
         // ItemBean item = (ItemBean) allItems.get(j);
         // ArrayList ids = db.getItemIds();
         // ArrayList itemDefCrfs = db.getItemDefCrf();
-        // Integer itemId = new Integer(item.getId());
+        // Integer itemId = Integer.valueOf(item.getId());
         // if (!ids.contains(itemId)) {
         // ids.add(itemId);
         // itemDefCrfs.add(item);

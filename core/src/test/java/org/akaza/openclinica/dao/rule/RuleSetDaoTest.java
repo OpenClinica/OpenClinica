@@ -73,20 +73,20 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
 
         // Test RuleSet
         assertNotNull("RuleSet is null", ruleSet);
-        assertEquals("The id of the retrieved RuleSet should be 1", new Integer(-1), ruleSet.getId());
+        assertEquals("The id of the retrieved RuleSet should be 1", Integer.valueOf(-1), ruleSet.getId());
         assertNotNull("The Expression is null", ruleSet.getTarget());
         assertNotNull("The Context is null", ruleSet.getTarget().getContext());
-        assertEquals("The context should be 1", new Integer(1), ruleSet.getTarget().getContext().getCode());
+        assertEquals("The context should be 1", Integer.valueOf(1), ruleSet.getTarget().getContext().getCode());
 
         // Test RuleSetRules
-        assertEquals("The size of the RuleSetRules is not 1", new Integer(1), Integer.valueOf(ruleSet.getRuleSetRules().size()));
+        assertEquals("The size of the RuleSetRules is not 1", Integer.valueOf(1), Integer.valueOf(ruleSet.getRuleSetRules().size()));
 
         // Test RuleActions in RuleSetRules
         assertEquals("The ActionType should be FILE_DISCREPANCY_NOTE", ActionType.FILE_DISCREPANCY_NOTE, ruleSet.getRuleSetRules().get(0).getActions().get(0)
                 .getActionType());
         assertEquals("The type of the Action should be DiscrepancyNoteAction", "org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean", ruleSet
                 .getRuleSetRules().get(0).getActions().get(0).getClass().getName());
-        assertEquals("The size of the RuleSetRules is not 2", new Integer(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
+        assertEquals("The size of the RuleSetRules is not 2", Integer.valueOf(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
     }
 
     //JN:The following commented out tests are failing, suspicion is and arnd studyid and the way it is set, TODO:revisit
@@ -157,7 +157,7 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
      //   RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleSetBean persistentRuleSet = ruleSetDao.findByExpression(ruleSet);
         assertNotNull("The returned ruleSet was null", persistentRuleSet);
-        assertEquals("The id of returned object should be -1 ", persistentRuleSet.getId(), new Integer(-1));
+        assertEquals("The id of returned object should be -1 ", persistentRuleSet.getId(), Integer.valueOf(-1));
 
     }
 

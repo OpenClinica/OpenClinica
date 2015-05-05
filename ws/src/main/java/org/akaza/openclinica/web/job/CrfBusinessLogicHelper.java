@@ -326,7 +326,7 @@ public class CrfBusinessLogicHelper {
          * (!edcBean.isRequiredCRF()) { logger.info("found one non required CRF:
          * " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " +
          * edcBean.getDefaultVersionName()); allRequired = false;
-         * nonRequiredCrfIds.add(new Integer(edcBean.getCrfId())); allEDCsize--;
+         * nonRequiredCrfIds.add(Integer.valueOf(edcBean.getCrfId())); allEDCsize--;
          * } } logger.info("non required crf ids: " +
          * nonRequiredCrfIds.toString()); // go through all the crfs and check
          * their status // add an additional check to see if it is required or

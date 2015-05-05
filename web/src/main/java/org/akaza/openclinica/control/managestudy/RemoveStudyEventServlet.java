@@ -77,7 +77,7 @@ public class RemoveStudyEventServlet extends SecureController {
 
         if (studyEventId == 0) {
             addPageMessage(respage.getString("please_choose_a_SE_to_remove"));
-            request.setAttribute("id", new Integer(studySubId).toString());
+            request.setAttribute("id", Integer.valueOf(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
@@ -166,7 +166,7 @@ public class RemoveStudyEventServlet extends SecureController {
 
                 addPageMessage(emailBody);
 //                sendEmail(emailBody);
-                request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("id", Integer.valueOf(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }
@@ -189,7 +189,7 @@ public class RemoveStudyEventServlet extends SecureController {
         int i;
         for (i = 0; i < eventDefinitionCRFs.size(); i++) {
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
+            definitionsById.put(Integer.valueOf(edc.getStudyEventDefinitionId()), edc);
         }
 
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
@@ -212,7 +212,7 @@ public class RemoveStudyEventServlet extends SecureController {
             int studyEventId = ecb.getStudyEventId();
             int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
 
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
+            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(Integer.valueOf(studyEventDefinitionId));
 
             DisplayEventCRFBean dec = new DisplayEventCRFBean();
             dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());

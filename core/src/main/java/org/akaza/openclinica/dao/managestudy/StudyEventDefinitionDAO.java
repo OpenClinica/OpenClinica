@@ -91,7 +91,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
      */
     public int findNextKey() {
         this.unsetTypeExpected();
-        Integer keyInt = new Integer(0);
+        Integer keyInt = Integer.valueOf(0);
         this.setTypeExpected(1, TypeNames.INT);
         ArrayList alist = this.select(digester.getQuery("findNextKey"));
         Iterator it = alist.iterator();
@@ -133,17 +133,17 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         sedb.setId(this.findNextKey());
         logger.debug("***id:" + sedb.getId());
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sedb.getId()));
-        variables.put(new Integer(2), new Integer(sedb.getStudyId()));
-        variables.put(new Integer(3), sedb.getName());
-        variables.put(new Integer(4), sedb.getDescription());
-        variables.put(new Integer(5), new Boolean(sedb.isRepeating()));
-        variables.put(new Integer(6), sedb.getType());
-        variables.put(new Integer(7), sedb.getCategory());
-        variables.put(new Integer(8), new Integer(sedb.getOwnerId()));
-        variables.put(new Integer(9), new Integer(sedb.getStatus().getId()));
-        variables.put(new Integer(10), new Integer(sedb.getOrdinal()));
-        variables.put(new Integer(11), getValidOid(sedb));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sedb.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sedb.getStudyId()));
+        variables.put(Integer.valueOf(3), sedb.getName());
+        variables.put(Integer.valueOf(4), sedb.getDescription());
+        variables.put(Integer.valueOf(5), Boolean.valueOf(sedb.isRepeating()));
+        variables.put(Integer.valueOf(6), sedb.getType());
+        variables.put(Integer.valueOf(7), sedb.getCategory());
+        variables.put(Integer.valueOf(8), Integer.valueOf(sedb.getOwnerId()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(sedb.getStatus().getId()));
+        variables.put(Integer.valueOf(10), Integer.valueOf(sedb.getOrdinal()));
+        variables.put(Integer.valueOf(11), getValidOid(sedb));
         this.execute(digester.getQuery("create"), variables);
 
         return sedb;
@@ -152,16 +152,16 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     public EntityBean update(EntityBean eb) {
         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) eb;
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sedb.getStudyId()));
-        variables.put(new Integer(2), sedb.getName());
-        variables.put(new Integer(3), sedb.getDescription());
-        variables.put(new Integer(4), new Boolean(sedb.isRepeating()));
-        variables.put(new Integer(5), sedb.getType());
-        variables.put(new Integer(6), sedb.getCategory());
-        variables.put(new Integer(7), new Integer(sedb.getStatus().getId()));
-        variables.put(new Integer(8), new Integer(sedb.getUpdaterId()));
-        variables.put(new Integer(9), new Integer(sedb.getOrdinal()));
-        variables.put(new Integer(10), new Integer(sedb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sedb.getStudyId()));
+        variables.put(Integer.valueOf(2), sedb.getName());
+        variables.put(Integer.valueOf(3), sedb.getDescription());
+        variables.put(Integer.valueOf(4), Boolean.valueOf(sedb.isRepeating()));
+        variables.put(Integer.valueOf(5), sedb.getType());
+        variables.put(Integer.valueOf(6), sedb.getCategory());
+        variables.put(Integer.valueOf(7), Integer.valueOf(sedb.getStatus().getId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(sedb.getUpdaterId()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(sedb.getOrdinal()));
+        variables.put(Integer.valueOf(10), Integer.valueOf(sedb.getId()));
         this.execute(digester.getQuery("update"), variables);
         return eb;
     }
@@ -208,7 +208,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
+        variables.put(Integer.valueOf(1), oid);
         String sql = digester.getQuery("findByOid");
 
         ArrayList rows = this.select(sql, variables);
@@ -241,9 +241,9 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
-        variables.put(new Integer(2), new Integer(studyId));
-        variables.put(new Integer(3), new Integer(studyId));
+        variables.put(Integer.valueOf(1), oid);
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(3), Integer.valueOf(studyId));
         String sql = digester.getQuery("findByOidAndStudy");
 
         ArrayList rows = this.select(sql, variables);
@@ -281,8 +281,8 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
 
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(currentStudy.getId()));
-        variables.put(new Integer(2), new Integer(currentStudy.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(currentStudy.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(currentStudy.getId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllWithStudyEvent"), variables);
 
@@ -300,7 +300,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
 
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crf.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crf.getId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllByCrf"), variables);
 
@@ -337,7 +337,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
 
@@ -361,7 +361,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
+        variables.put(Integer.valueOf(1), name);
 
         String sql = digester.getQuery("findByName");
 
@@ -397,7 +397,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(eventDefinitionCRFId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(eventDefinitionCRFId));
 
         String sql = digester.getQuery("findByEventDefinitionCRFId");
         ArrayList alist = this.select(sql, variables);
@@ -413,8 +413,8 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     public Collection findAllByStudyAndLimit(int studyId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
         ArrayList alist = this.select(digester.getQuery("findAllByStudyAndLimit"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -429,7 +429,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     public ArrayList<StudyEventDefinitionBean> findAllActiveByParentStudyId(int parentStudyId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(parentStudyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentStudyId));
         ArrayList alist = this.select(digester.getQuery("findAllActiveByParentStudyId"), variables);
         ArrayList<StudyEventDefinitionBean> al = new ArrayList<StudyEventDefinitionBean>();
         Iterator it = alist.iterator();

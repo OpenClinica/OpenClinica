@@ -129,7 +129,7 @@ public class EditStudyUserRoleServlet extends SecureController {
                 request.setAttribute("userName", uName);
                 request.setAttribute("studyUserRole", studyUserRole);
                 request.setAttribute("roles", roleMap);
-                request.setAttribute("chosenRoleId", new Integer(studyUserRole.getRole().getId()));
+                request.setAttribute("chosenRoleId", Integer.valueOf(studyUserRole.getRole().getId()));
                 forwardPage(Page.EDIT_STUDY_USER_ROLE);
             }
 
@@ -156,7 +156,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 
                     request.setAttribute("userName", uName);
                     request.setAttribute("studyUserRole", studyUserRole);
-                    request.setAttribute("chosenRoleId", new Integer(fp.getInt(INPUT_ROLE)));
+                    request.setAttribute("chosenRoleId", Integer.valueOf(fp.getInt(INPUT_ROLE)));
                     request.setAttribute("roles", roleMap);
                     forwardPage(Page.EDIT_STUDY_USER_ROLE);
                 }
@@ -236,7 +236,7 @@ public class EditStudyUserRoleServlet extends SecureController {
     //
     // request.setAttribute("userName", uName);
     // request.setAttribute("studyUserRole", studyUserRole);
-    // request.setAttribute("chosenRoleId", new Integer(fp.getInt(INPUT_ROLE)));
+    // request.setAttribute("chosenRoleId", Integer.valueOf(fp.getInt(INPUT_ROLE)));
     // request.setAttribute("roles", getRoles());
     // forwardPage(Page.EDIT_STUDY_USER_ROLE, request, response);
     // }

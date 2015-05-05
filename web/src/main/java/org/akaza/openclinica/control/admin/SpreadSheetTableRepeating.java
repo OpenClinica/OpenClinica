@@ -1869,7 +1869,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // igMeta.setRepeatArray(groupRepeatArray);
                         igMeta.setShowGroup(isShowGroup);
                         try {
-                            igMeta.setRepeatMax(new Integer(Integer.parseInt(groupRepeatMax)));
+                            igMeta.setRepeatMax(Integer.valueOf(Integer.parseInt(groupRepeatMax)));
                             //mantiss 13917
                             
                             if (igMeta.getRepeatMax() < 1){
@@ -1890,7 +1890,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
                         try {
-                            igMeta.setRepeatNum(new Integer(Integer.parseInt(groupRepeatNumber)));
+                            igMeta.setRepeatNum(Integer.valueOf(Integer.parseInt(groupRepeatNumber)));
                             if(igMeta.getRepeatNum() < 1){ //mantiss 13917
 	                            errors.add(resPageMsg.getString("the") + " "+resPageMsg.getString("GROUP_REPEAT_NUM_column")+" "
 	                                    + resPageMsg.getString("must_be_a_positive_integer_or_blank") + ". " + groupRepeatNumber + " "
@@ -2083,9 +2083,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String strBorder = getValue(cell);
                         strBorder = strBorder.replaceAll("<[^>]*>", "");
 
-                        Integer intBorder = new Integer(0);
+                        Integer intBorder = Integer.valueOf(0);
                         try {
-                            intBorder = new Integer(strBorder);
+                            intBorder = Integer.valueOf(strBorder);
                         } catch (NumberFormatException npe) {
                             // let it pass here, tbh 06/18/2007
                         }

@@ -54,7 +54,7 @@ public class AuditLogUserServlet extends SecureController {
             Integer userIntId = (Integer) session.getAttribute(ARG_USERID);
             userId = userIntId.intValue();
         } else {
-            session.setAttribute(ARG_USERID, new Integer(userId));
+            session.setAttribute(ARG_USERID, Integer.valueOf(userId));
         }
         AuditEventDAO aeDAO = new AuditEventDAO(sm.getDataSource());
         ArrayList al = aeDAO.findAllByUserId(userId);

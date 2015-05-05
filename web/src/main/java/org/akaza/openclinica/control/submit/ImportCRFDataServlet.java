@@ -317,7 +317,7 @@ public class ImportCRFDataServlet extends SecureController {
                             // need to create a list and inform that one is blocked
                             // and the rest are not...
                             //
-                            permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+                            permittedEventCRFIds.add(Integer.valueOf(eventCRFBean.getId()));
                         } else {
                             // fail = true;
                             // addPageMessage(respage.getString(

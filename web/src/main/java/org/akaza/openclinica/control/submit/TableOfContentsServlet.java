@@ -596,7 +596,7 @@ public class TableOfContentsServlet extends SecureController {
             SectionBean sb = (SectionBean) sections.get(i);
 
             int sectionId = sb.getId();
-            Integer key = new Integer(sectionId);
+            Integer key = Integer.valueOf(sectionId);
             // YW 10-11-2007 << handle number of item completion on tab.
             int numItems = getIntById(numItemsBySectionId, key);
             List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);

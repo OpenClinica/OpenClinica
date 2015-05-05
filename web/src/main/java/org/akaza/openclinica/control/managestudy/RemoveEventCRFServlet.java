@@ -72,7 +72,7 @@ public class RemoveEventCRFServlet extends SecureController {
 
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"));
-            request.setAttribute("id", new Integer(studySubId).toString());
+            request.setAttribute("id", Integer.valueOf(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
             EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
@@ -124,7 +124,7 @@ public class RemoveEventCRFServlet extends SecureController {
                 if (eventCRF.getStatus().equals(Status.DELETED) || eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
                     addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "
                         + respage.getString("please_contact_sysadmin_for_more_information"));
-                    request.setAttribute("id", new Integer(studySubId).toString());
+                    request.setAttribute("id", Integer.valueOf(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     return;
                 }
@@ -185,7 +185,7 @@ public class RemoveEventCRFServlet extends SecureController {
 
                 addPageMessage(emailBody);
                 sendEmail(emailBody);
-                request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("id", Integer.valueOf(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }

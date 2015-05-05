@@ -90,8 +90,8 @@ public class UpdateSubjectServlet extends SecureController {
             SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
              
             if (action.equals("show") || action.equals("confirm") ){
-	            request.setAttribute("studySubId", new Integer(studySubId));
-	            request.setAttribute("id", new Integer(subjectId));
+	            request.setAttribute("studySubId", Integer.valueOf(studySubId));
+	            request.setAttribute("id", Integer.valueOf(subjectId));
  	            request.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 	        }
             if ("show".equalsIgnoreCase(action)) {
@@ -143,7 +143,7 @@ public class UpdateSubjectServlet extends SecureController {
                 addPageMessage(respage.getString("subject_updated_succcesfully"));
                 
                 if (studySubId > 0) {
-                    request.setAttribute("id", new Integer(studySubId).toString());
+                    request.setAttribute("id", Integer.valueOf(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                 } else {
                     forwardPage(Page.LIST_SUBJECT_SERVLET);

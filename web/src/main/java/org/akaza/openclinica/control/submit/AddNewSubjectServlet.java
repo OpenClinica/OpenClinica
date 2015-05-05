@@ -197,7 +197,7 @@ public class AddNewSubjectServlet extends SecureController {
                 if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                     //Shaoyu Su
                     // int nextLabel = ssd.findTheGreatestLabel() + 1;
-                    // fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                    // fp.addPresetValue(INPUT_LABEL, Integer.valueOf(nextLabel).toString());
                     fp.addPresetValue(INPUT_LABEL, resword.getString("id_generated_Save_Add"));
                 }
 
@@ -808,7 +808,7 @@ public class AddNewSubjectServlet extends SecureController {
                     if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                         //Shaoyu Su
                         //int nextLabel = ssd.findTheGreatestLabel() + 1;
-                        //fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                        //fp.addPresetValue(INPUT_LABEL, Integer.valueOf(nextLabel).toString());
                         fp.addPresetValue(INPUT_LABEL, resword.getString("id_generated_Save_Add"));
                     }
 

@@ -264,12 +264,12 @@ public class TestRuleServlet extends SecureController {
                 	if(entry.getKey().contains(ExpressionService.STARTDATE))
                 	{
                 		request.setAttribute(entry.getKey() + "-tooltip", sed.getName() + ": " + "date");
-                		request.setAttribute("studyEventProperty", new Integer(9));
+                		request.setAttribute("studyEventProperty", Integer.valueOf(9));
                 	}
                 	else if(entry.getKey().contains(ExpressionService.STATUS))
                 	{
                 		request.setAttribute(entry.getKey() + "-tooltip", sed.getName() + ": " + "status");
-                		request.setAttribute("studyEventProperty", new Integer(5));
+                		request.setAttribute("studyEventProperty", Integer.valueOf(5));
                 	}
                 }
                 if ((item!=null &&item.getItemDataTypeId() == 9)||(item==null&&entry.getKey().contains(ExpressionService.STARTDATE))) {//so enter this in case if the rules are event action based or if item has date type

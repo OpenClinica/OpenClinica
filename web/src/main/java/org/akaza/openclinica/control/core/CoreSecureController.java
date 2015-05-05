@@ -210,7 +210,7 @@ public abstract class CoreSecureController extends HttpServlet {
             addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"), request);
             // + "<a href=\"UpdateProfile\">" +
             // respage.getString("user_profile") + " </a>");
-            int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+            int pwdChangeRequired = Integer.valueOf(SQLInitServlet.getField("change_passwd_required")).intValue();
             if (pwdChangeRequired == 1) {
                 request.setAttribute("mustChangePass", "yes");
                 forwardPage(Page.RESET_PASSWORD, request, response);

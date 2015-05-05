@@ -177,7 +177,7 @@ public class ImportCRFDataService {
                         // below to prevent duplicates
 
                         for (EventCRFBean ecb : eventCrfBeans) {
-                            Integer ecbId = new Integer(ecb.getId());
+                            Integer ecbId = Integer.valueOf(ecb.getId());
 
                             if (!eventCRFBeanIds.contains(ecbId)) {
                                 eventCRFBeans.add(ecb);
@@ -275,7 +275,7 @@ public class ImportCRFDataService {
 
                 int ordinal = 1;
                 try {
-                    ordinal = new Integer(studyEventDataBean.getStudyEventRepeatKey()).intValue();
+                    ordinal = Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()).intValue();
                 } catch (Exception e) {
                     // trying to catch NPEs, because tags can be without the
                     // repeat key
@@ -316,7 +316,7 @@ public class ImportCRFDataService {
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF =
                         eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
-                    if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
+                    if (permittedEventCRFIds.contains(Integer.valueOf(eventCRFBean.getId()))) {
                         // if and only if it's in the correct status do we need
                         // to generate the beans
                         // <<tbh, 09/2008
@@ -373,7 +373,7 @@ public class ImportCRFDataService {
                                     int groupOrdinal = 1;
                                     if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
                                         try {
-                                            groupOrdinal = new Integer(itemGroupDataBean.getItemGroupRepeatKey()).intValue();
+                                            groupOrdinal = Integer.valueOf(itemGroupDataBean.getItemGroupRepeatKey()).intValue();
                                             if (groupOrdinal > maxOrdinal) {
                                                 maxOrdinal = groupOrdinal;
                                             }
@@ -629,7 +629,7 @@ public class ImportCRFDataService {
             // what if it's a number? should be only numbers
             else if (displayItemBean.getItem().getDataType().equals(ItemDataType.INTEGER)) {
                 try {
-                    Integer testInt = new Integer(displayItemBean.getData().getValue());
+                    Integer testInt = Integer.valueOf(displayItemBean.getData().getValue());
                     int width = Validator.parseWidth(widthDecimal);
                     if (width > 0 && displayItemBean.getData().getValue().length() > width) {
                         hardv.put(itemOid, "This value exceeds required width=" + width);

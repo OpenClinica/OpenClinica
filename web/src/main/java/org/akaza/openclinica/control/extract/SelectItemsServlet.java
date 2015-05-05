@@ -162,7 +162,7 @@ public class SelectItemsServlet extends SecureController {
         // save current def id in the seesion to avoid duplicated def id in
         // dataset
         // bean
-        // session.setAttribute(CURRENT_DEF_ID, new Integer(defId));
+        // session.setAttribute(CURRENT_DEF_ID, Integer.valueOf(defId));
 
         ArrayList items = idao.findAllActiveByCRF(crf);
         for (int i = 0; i < items.size(); i++) {
@@ -189,7 +189,7 @@ public class SelectItemsServlet extends SecureController {
                     item.setDatasetItemMapKey(defId + "_" + item.getId());
                     // logger.info("Item got selected already11");
                 }
-                // itemMap.put(new Integer(item.getId()), item);
+                // itemMap.put(Integer.valueOf(item.getId()), item);
                 itemMap.put(defId + "_" + item.getId(), item);
             } else {
                 // same item,combine the metadata

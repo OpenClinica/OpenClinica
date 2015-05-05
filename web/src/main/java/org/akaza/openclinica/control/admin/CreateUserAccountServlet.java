@@ -281,7 +281,7 @@ public class CreateUserAccountServlet extends SecureController {
                         + respage.getString("could_not_created_due_database_error"));
                 }
                 if (createdUserAccountBean.isActive()) {
-                    request.setAttribute(ViewUserAccountServlet.ARG_USER_ID, new Integer(createdUserAccountBean.getId()).toString());
+                    request.setAttribute(ViewUserAccountServlet.ARG_USER_ID, Integer.valueOf(createdUserAccountBean.getId()).toString());
                     forwardPage(Page.VIEW_USER_ACCOUNT_SERVLET);
                 } else {
                     forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);

@@ -90,9 +90,9 @@ public class ExtractController {
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         CoreResources cr =  new CoreResources();
 
-        ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(),datasetId);
+        ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(Integer.valueOf(id).intValue(),datasetId);
 
-        DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+        DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(Integer.valueOf(datasetId).intValue());
         // set the job in motion
         String[] files = epBean.getFileName();
         String exportFileName;
@@ -184,7 +184,7 @@ public class ExtractController {
         if(simpleTrigger!= null)
         request.getSession().setAttribute("groupName", this.TRIGGER_GROUP_NAME);
 
-        request.getSession().setAttribute("datasetId", new Integer(dsBean.getId()));
+        request.getSession().setAttribute("datasetId", Integer.valueOf(dsBean.getId()));
         return map;
     }
 

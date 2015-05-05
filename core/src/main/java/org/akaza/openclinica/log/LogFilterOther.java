@@ -23,7 +23,7 @@ public class LogFilterOther extends LogFilterBase {
     public FilterReply decide(LoggingEvent event) {
         MDC.remove(FACILITY_CODE_KEY);
         int logFacilityCode = getLogFacilityCode(event.getLoggerName());
-        MDC.put(FACILITY_CODE_KEY, new Integer(logFacilityCode).toString());// This
+        MDC.put(FACILITY_CODE_KEY, Integer.valueOf(logFacilityCode).toString());// This
                                                                             // is
                                                                             // done
                                                                 // only once

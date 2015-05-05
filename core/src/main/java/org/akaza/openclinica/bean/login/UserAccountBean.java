@@ -7,10 +7,7 @@
  */
 package org.akaza.openclinica.bean.login;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -69,7 +66,7 @@ public class UserAccountBean extends AuditableEntityBean {
     private boolean sysAdmin; // this is true if the user is the business
     // dmin, false otherwise
     private boolean techAdmin;
-    private final ArrayList userTypes;
+    private final List<UserType> userTypes;
 
     //
     // the following invariant is maintained at all times:
@@ -86,11 +83,11 @@ public class UserAccountBean extends AuditableEntityBean {
     //
 
     // elements are StudyUserRoleBeans
-    private ArrayList roles = new ArrayList();
+    private ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
 
     // key is Integer whose intValue is a studyId, value is StudyUserRoleBean
     // for that study
-    private final HashMap rolesByStudy = new HashMap();
+    private final Map<Integer, Integer> rolesByStudy = new HashMap<Integer, Integer>();
 
     private String notes; // not in the DB, only for showing some notes for
 
@@ -112,7 +109,7 @@ public class UserAccountBean extends AuditableEntityBean {
         sysAdmin = false;
         techAdmin = false;
 
-        userTypes = new ArrayList();
+        userTypes = new ArrayList<UserType>();
         status = Status.AVAILABLE;
         numVisitsToMainMenu = 0;
         notes = "";
@@ -346,10 +343,10 @@ public class UserAccountBean extends AuditableEntityBean {
     }
 
     public boolean hasUserType(UserType u) {
-        Iterator userTypesIt = userTypes.iterator();
+        Iterator<UserType> userTypesIt = userTypes.iterator();
 
         while (userTypesIt.hasNext()) {
-            UserType myType = (UserType) userTypesIt.next();
+            UserType myType = userTypesIt.next();
             if (myType.equals(u)) {
                 return true;
             }
@@ -379,13 +376,13 @@ public class UserAccountBean extends AuditableEntityBean {
             return;
         }
 
-        Integer key = new Integer(sur.getStudyId());
+        Integer key = Integer.valueOf(sur.getStudyId());
         if (rolesByStudy.containsKey(key)) {
-            Integer index = (Integer) rolesByStudy.get(key);
+            Integer index = rolesByStudy.get(key);
             roles.set(index.intValue(), sur);
         } else {
             roles.add(sur);
-            rolesByStudy.put(key, new Integer(roles.size() - 1));
+            rolesByStudy.put(key, Integer.valueOf(roles.size() - 1));
         }
     }
 
@@ -394,11 +391,11 @@ public class UserAccountBean extends AuditableEntityBean {
     }
 
     public StudyUserRoleBean getRoleByStudy(int studyId) {
-        Integer key = new Integer(studyId);
+        Integer key = Integer.valueOf(studyId);
 
         if (rolesByStudy.containsKey(key)) {
-            Integer index = (Integer) rolesByStudy.get(key);
-            StudyUserRoleBean s = (StudyUserRoleBean) roles.get(index.intValue());
+            Integer index = rolesByStudy.get(key);
+            StudyUserRoleBean s = roles.get(index.intValue());
 
             if (s != null && !s.getStatus().equals(Status.DELETED) && !s.getStatus().equals(Status.AUTO_DELETED)) {
                 return s;
@@ -454,7 +451,7 @@ public class UserAccountBean extends AuditableEntityBean {
      *            The roles to set.
      */
     public void setRoles(ArrayList roles) {
-        this.roles = new ArrayList();
+        this.roles = new ArrayList<StudyUserRoleBean>();
         rolesByStudy.clear();
 
         for (int i = 0; i < roles.size(); i++) {
@@ -467,8 +464,8 @@ public class UserAccountBean extends AuditableEntityBean {
 
             this.roles.add(sur);
 
-            Integer key = new Integer(sur.getStudyId());
-            Integer value = new Integer(this.roles.size() - 1);
+            Integer key = Integer.valueOf(sur.getStudyId());
+            Integer value = Integer.valueOf(this.roles.size() - 1);
             rolesByStudy.put(key, value);
         }
     }

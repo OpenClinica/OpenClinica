@@ -136,9 +136,9 @@ public class ExampleSpringJob extends QuartzJobBean {
             int studyId = dataMap.getInt(STUDY_ID);
 
             // String datasetId = dataMap.getString(DATASET_ID);
-            // int dsId = new Integer(datasetId).intValue();
+            // int dsId = Integer.valueOf(datasetId).intValue();
             // String userAcctId = dataMap.getString(USER_ID);
-            // int userId = new Integer(userAcctId).intValue();
+            // int userId = Integer.valueOf(userAcctId).intValue();
             // why the flip-flop? if one property is set to 'true' we can
             // see jobs in another screen but all properties have to be
             // strings
@@ -390,7 +390,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 
     private int getFileIdInt(HashMap fileName) {
         // String fileNameStr = "";
-        Integer fileID = new Integer(0);
+        Integer fileID = Integer.valueOf(0);
         for (Iterator it = fileName.entrySet().iterator(); it.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
             Object key = entry.getKey();

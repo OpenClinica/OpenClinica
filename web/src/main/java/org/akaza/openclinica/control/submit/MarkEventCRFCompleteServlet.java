@@ -94,7 +94,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
         for (int i = 0; i < sections.size(); i++) {
             SectionBean sb = (SectionBean) sections.get(i);
-            Integer key = new Integer(sb.getId());
+            Integer key = Integer.valueOf(sb.getId());
 
             int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
             int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);

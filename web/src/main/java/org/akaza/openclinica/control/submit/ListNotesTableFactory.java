@@ -85,7 +85,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private String module;
     private Integer resolutionStatus;
     private Integer discNoteType;
-    private Boolean studyHasDiscNotes = new Boolean(false);
+    private Boolean studyHasDiscNotes = Boolean.FALSE;
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
     private DiscrepancyNotesSummary notesSummary;

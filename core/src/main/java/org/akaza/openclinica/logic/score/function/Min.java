@@ -34,7 +34,7 @@ public class Min extends AbstractFunction {
             try {
                 values[i] = Double.parseDouble(arg);
             } catch (Exception e) {
-                errors.put(new Integer(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Min(); ");
+                errors.put(Integer.valueOf(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Min(); ");
             }
         }
         if (errors.size() > 0) {

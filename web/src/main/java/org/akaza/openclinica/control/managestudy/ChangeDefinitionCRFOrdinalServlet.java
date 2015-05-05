@@ -40,11 +40,11 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         int siteId = fp.getInt("siteId");
         if (siteId > 0) {
-            request.setAttribute("idToSort", new Integer(definitionId).toString());
+            request.setAttribute("idToSort", Integer.valueOf(definitionId).toString());
             request.setAttribute("siteId", siteId);
             forwardPage(Page.VIEW_SITE_SERVLET);
         } else {
-            request.setAttribute("id", new Integer(definitionId).toString());
+            request.setAttribute("id", Integer.valueOf(definitionId).toString());
             forwardPage(Page.VIEW_EVENT_DEFINITION_SERVLET);
         }
     }

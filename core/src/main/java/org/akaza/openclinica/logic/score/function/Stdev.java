@@ -34,7 +34,7 @@ public class Stdev extends AbstractFunction {
             try {
                 values[i] = Double.parseDouble(arg);
             } catch (Exception e) {
-                errors.put(new Integer(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Stdev(); ");
+                errors.put(Integer.valueOf(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Stdev(); ");
             }
         }
         if (errors.size() > 0) {

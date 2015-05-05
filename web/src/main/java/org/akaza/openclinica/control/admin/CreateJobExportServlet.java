@@ -165,7 +165,7 @@ public class CreateJobExportServlet extends SecureController {
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
-                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(Integer.valueOf(datasetId).intValue());
 
                 // set the job in motion
                 String[] files = epBean.getFileName();

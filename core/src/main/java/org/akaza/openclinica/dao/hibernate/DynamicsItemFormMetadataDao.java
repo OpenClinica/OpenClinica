@@ -33,10 +33,10 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         		"metadata.itemId = :item_id and metadata.eventCrfId = :event_crf_id and " +
         		"metadata.itemDataId = :item_data_id ";
         Query q = getCurrentSession().createQuery(query);
-        q.setInteger("id", new Integer(metadataBean.getId()));
-        q.setInteger("item_id", new Integer(metadataBean.getItemId()));
-        q.setInteger("event_crf_id", new Integer(eventCrfBean.getId()));
-        q.setInteger("item_data_id", new Integer(itemDataBean.getId()));
+        q.setInteger("id", Integer.valueOf(metadataBean.getId()));
+        q.setInteger("item_id", Integer.valueOf(metadataBean.getItemId()));
+        q.setInteger("event_crf_id", Integer.valueOf(eventCrfBean.getId()));
+        q.setInteger("item_data_id", Integer.valueOf(itemDataBean.getId()));
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 
@@ -44,7 +44,7 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         String query = "from " + getDomainClassName() + " metadata where metadata.itemDataId = :item_data_id ";
         Query q = getCurrentSession().createQuery(query);
 
-        q.setInteger("item_data_id", new Integer(itemDataBean.getId()));
+        q.setInteger("item_data_id", Integer.valueOf(itemDataBean.getId()));
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 

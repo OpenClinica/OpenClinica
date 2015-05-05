@@ -100,10 +100,10 @@ public class ListStudyServlet extends SecureController {
         panel.setOrderedData(true);
         setToPanel(resword.getString("in_the_application"), "");
         if (parents.size() > 0) {
-            setToPanel(resword.getString("studies"), new Integer(parents.size()).toString());
+            setToPanel(resword.getString("studies"), Integer.valueOf(parents.size()).toString());
         }
         if (studies.size() > 0) {
-            setToPanel(resword.getString("sites"), new Integer(studies.size() - parents.size()).toString());
+            setToPanel(resword.getString("sites"), Integer.valueOf(studies.size() - parents.size()).toString());
         }
         forwardPage(Page.STUDY_LIST);
 

@@ -1796,23 +1796,23 @@ public class Validator {
         ArrayList args;
 
         HashMap numArgsByFunction = new HashMap();
-        numArgsByFunction.put("range", new Integer(2));
-        numArgsByFunction.put("gt", new Integer(1));
-        numArgsByFunction.put("lt", new Integer(1));
-        numArgsByFunction.put("gte", new Integer(1));
-        numArgsByFunction.put("lte", new Integer(1));
-        numArgsByFunction.put("ne", new Integer(1));
-        numArgsByFunction.put("eq", new Integer(1));
-        numArgsByFunction.put("getExternalValue", new Integer(3));
+        numArgsByFunction.put("range", Integer.valueOf(2));
+        numArgsByFunction.put("gt", Integer.valueOf(1));
+        numArgsByFunction.put("lt", Integer.valueOf(1));
+        numArgsByFunction.put("gte", Integer.valueOf(1));
+        numArgsByFunction.put("lte", Integer.valueOf(1));
+        numArgsByFunction.put("ne", Integer.valueOf(1));
+        numArgsByFunction.put("eq", Integer.valueOf(1));
+        numArgsByFunction.put("getExternalValue", Integer.valueOf(3));
 
         HashMap valTypeByFunction = new HashMap();
-        valTypeByFunction.put("range", new Integer(Validator.IS_IN_RANGE));
-        valTypeByFunction.put("gt", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-        valTypeByFunction.put("lt", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-        valTypeByFunction.put("gte", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-        valTypeByFunction.put("lte", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-        valTypeByFunction.put("ne", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
-        valTypeByFunction.put("eq", new Integer(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("range", Integer.valueOf(Validator.IS_IN_RANGE));
+        valTypeByFunction.put("gt", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("lt", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("gte", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("lte", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("ne", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
+        valTypeByFunction.put("eq", Integer.valueOf(Validator.COMPARES_TO_STATIC_VALUE));
 
         HashMap compareOpByFunction = new HashMap();
         compareOpByFunction.put("gt", NumericComparisonOperator.GREATER_THAN);

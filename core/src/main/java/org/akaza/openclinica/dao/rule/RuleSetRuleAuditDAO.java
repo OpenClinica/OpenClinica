@@ -116,7 +116,7 @@ public class RuleSetRuleAuditDAO extends EntityDAO {
 
         this.setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), id);
+        variables.put(Integer.valueOf(1), id);
 
         String sql = digester.getQuery("findByPK");
         ArrayList<?> alist = this.select(sql, variables);
@@ -134,7 +134,7 @@ public class RuleSetRuleAuditDAO extends EntityDAO {
 
         this.setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), ruleSet.getId());
+        variables.put(Integer.valueOf(1), ruleSet.getId());
 
         String sql = digester.getQuery("findAllByRuleSet");
         ArrayList<?> alist = this.select(sql, variables);

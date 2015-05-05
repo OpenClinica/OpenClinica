@@ -229,14 +229,14 @@ public class ScoreValidator {
         logger.debug("found height: " + height);
         String width = values[3];
         try {
-        	Integer neightInt = new Integer(height);
+        	Integer neightInt = Integer.valueOf(height);
         } catch (NumberFormatException npe) {
         	errors.append("Your expression in getExternalValues is incorrect: the third value should be a number, not '" + height + "'; ");
         }
         width = width.replace(")", "");
         logger.debug("found width: " + width);
         try {
-        	Integer widthInt = new Integer(width);
+        	Integer widthInt = Integer.valueOf(width);
         } catch (NumberFormatException npe) {
         	errors.append("Your expression in getExternalValues is incorrect: the fourth value should be a number, not '" + width + "'; ");
         }

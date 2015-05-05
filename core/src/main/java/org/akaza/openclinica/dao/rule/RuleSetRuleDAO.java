@@ -105,9 +105,9 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         RuleSetBean ruleSetBean = eb;
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 
-        variables.put(new Integer(1), ruleSetBean.getUpdaterId());
-        variables.put(new Integer(2), Status.DELETED.getId());
-        variables.put(new Integer(3), ruleSetBean.getId());
+        variables.put(Integer.valueOf(1), ruleSetBean.getUpdaterId());
+        variables.put(Integer.valueOf(2), Status.DELETED.getId());
+        variables.put(Integer.valueOf(3), ruleSetBean.getId());
         execute(digester.getQuery("updateStatusByRuleSet"), variables);
 
     }
@@ -117,10 +117,10 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         RuleSetBean ruleSetBean = eb;
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 
-        variables.put(new Integer(1), ruleSetBean.getUpdaterId());
-        variables.put(new Integer(2), Status.AUTO_DELETED.getId());
-        variables.put(new Integer(3), ruleSetBean.getId());
-        variables.put(new Integer(4), Status.AVAILABLE.getId());
+        variables.put(Integer.valueOf(1), ruleSetBean.getUpdaterId());
+        variables.put(Integer.valueOf(2), Status.AUTO_DELETED.getId());
+        variables.put(Integer.valueOf(3), ruleSetBean.getId());
+        variables.put(Integer.valueOf(4), Status.AVAILABLE.getId());
         execute(digester.getQuery("updateStatusByRuleSetAuto"), variables);
 
     }
@@ -130,10 +130,10 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         RuleSetBean ruleSetBean = eb;
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 
-        variables.put(new Integer(1), ub.getId());
-        variables.put(new Integer(2), Status.AVAILABLE.getId());
-        variables.put(new Integer(3), ruleSetBean.getId());
-        variables.put(new Integer(4), Status.AUTO_DELETED.getId());
+        variables.put(Integer.valueOf(1), ub.getId());
+        variables.put(Integer.valueOf(2), Status.AVAILABLE.getId());
+        variables.put(Integer.valueOf(3), ruleSetBean.getId());
+        variables.put(Integer.valueOf(4), Status.AUTO_DELETED.getId());
         execute(digester.getQuery("updateStatusByRuleSetAuto"), variables);
 
     }
@@ -143,9 +143,9 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         RuleSetRuleBean ruleSetRuleBean = eb;
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 
-        variables.put(new Integer(1), ub.getId());
-        variables.put(new Integer(2), Status.DELETED.getId());
-        variables.put(new Integer(3), ruleSetRuleBean.getId());
+        variables.put(Integer.valueOf(1), ub.getId());
+        variables.put(Integer.valueOf(2), Status.DELETED.getId());
+        variables.put(Integer.valueOf(3), ruleSetRuleBean.getId());
         execute(digester.getQuery("updateStatus"), variables);
         if (isQuerySuccessful()) {
             ruleSetRuleBean.setStatus(Status.DELETED);
@@ -159,9 +159,9 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         RuleSetRuleBean ruleSetRuleBean = eb;
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
 
-        variables.put(new Integer(1), ub.getId());
-        variables.put(new Integer(2), Status.AVAILABLE.getId());
-        variables.put(new Integer(3), ruleSetRuleBean.getId());
+        variables.put(Integer.valueOf(1), ub.getId());
+        variables.put(Integer.valueOf(2), Status.AVAILABLE.getId());
+        variables.put(Integer.valueOf(3), ruleSetRuleBean.getId());
         execute(digester.getQuery("updateStatus"), variables);
 
         if (isQuerySuccessful()) {
@@ -182,10 +182,10 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         if (eb.getId() == 0) {
             HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
             HashMap<Integer, Object> nullVars = new HashMap<Integer, Object>();
-            variables.put(new Integer(1), ruleSetRuleBean.getRuleSetBean().getId());
-            variables.put(new Integer(2), getRuleDao().findByOid(ruleBean).getId());
-            variables.put(new Integer(3), new Integer(ruleSetRuleBean.getOwnerId()));
-            variables.put(new Integer(4), new Integer(Status.AVAILABLE.getId()));
+            variables.put(Integer.valueOf(1), ruleSetRuleBean.getRuleSetBean().getId());
+            variables.put(Integer.valueOf(2), getRuleDao().findByOid(ruleBean).getId());
+            variables.put(Integer.valueOf(3), Integer.valueOf(ruleSetRuleBean.getOwnerId()));
+            variables.put(Integer.valueOf(4), Integer.valueOf(Status.AVAILABLE.getId()));
 
             executeWithPK(digester.getQuery("create"), variables, nullVars);
             if (isQuerySuccessful()) {
@@ -248,7 +248,7 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);
@@ -267,8 +267,8 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         Integer ruleSetId = Integer.valueOf(ruleSet.getId());
-        variables.put(new Integer(1), ruleSetId);
-        // variables.put(new Integer(2), new Integer(Status.AVAILABLE.getId()));
+        variables.put(Integer.valueOf(1), ruleSetId);
+        // variables.put(Integer.valueOf(2), Integer.valueOf(Status.AVAILABLE.getId()));
 
         String sql = digester.getQuery("findByRuleSetId");
         ArrayList<?> alist = this.select(sql, variables);
@@ -290,9 +290,9 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         Integer ruleSetId = Integer.valueOf(ruleSet.getId());
         Integer ruleId = Integer.valueOf(rule.getId());
-        variables.put(new Integer(1), ruleSetId);
-        variables.put(new Integer(2), new Integer(Status.AVAILABLE.getId()));
-        variables.put(new Integer(3), ruleId);
+        variables.put(Integer.valueOf(1), ruleSetId);
+        variables.put(Integer.valueOf(2), Integer.valueOf(Status.AVAILABLE.getId()));
+        variables.put(Integer.valueOf(3), ruleId);
 
         String sql = digester.getQuery("findByRuleSetIdAndRuleId");
         ArrayList<?> alist = this.select(sql, variables);
@@ -312,7 +312,7 @@ public class RuleSetRuleDAO extends AuditableEntityDAO {
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         Integer studyEventDefinitionId = Integer.valueOf(studyEventDefinition.getId());
-        variables.put(new Integer(1), studyEventDefinitionId);
+        variables.put(Integer.valueOf(1), studyEventDefinitionId);
 
         String sql = digester.getQuery("findByStudyEventDefinition");
         ArrayList alist = this.select(sql, variables);

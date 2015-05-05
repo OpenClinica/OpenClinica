@@ -84,17 +84,17 @@ public class SectionDAO extends AuditableEntityDAO {
     public EntityBean update(EntityBean eb) {
         SectionBean sb = (SectionBean) eb;
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(sb.getCRFVersionId()));
-        variables.put(new Integer(2), new Integer(sb.getStatus().getId()));
-        variables.put(new Integer(3), sb.getLabel());
-        variables.put(new Integer(4), sb.getTitle());
-        variables.put(new Integer(5), sb.getInstructions());
-        variables.put(new Integer(6), sb.getSubtitle());
-        variables.put(new Integer(7), sb.getPageNumberLabel());
-        variables.put(new Integer(8), new Integer(sb.getOrdinal()));
-        variables.put(new Integer(9), new Integer(sb.getUpdaterId()));
-        variables.put(new Integer(10), new Integer(sb.getBorders()));
-        variables.put(new Integer(11), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getCRFVersionId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStatus().getId()));
+        variables.put(Integer.valueOf(3), sb.getLabel());
+        variables.put(Integer.valueOf(4), sb.getTitle());
+        variables.put(Integer.valueOf(5), sb.getInstructions());
+        variables.put(Integer.valueOf(6), sb.getSubtitle());
+        variables.put(Integer.valueOf(7), sb.getPageNumberLabel());
+        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getOrdinal()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getUpdaterId()));
+        variables.put(Integer.valueOf(10), Integer.valueOf(sb.getBorders()));
+        variables.put(Integer.valueOf(11), Integer.valueOf(sb.getId()));
         this.execute(digester.getQuery("update"), variables);
         return eb;
     }
@@ -103,17 +103,17 @@ public class SectionDAO extends AuditableEntityDAO {
         SectionBean sb = (SectionBean) eb;
         HashMap variables = new HashMap();
 
-        variables.put(new Integer(1), new Integer(sb.getCRFVersionId()));
-        variables.put(new Integer(2), new Integer(sb.getStatus().getId()));
-        variables.put(new Integer(3), sb.getLabel());
-        variables.put(new Integer(4), sb.getTitle());
-        variables.put(new Integer(5), sb.getInstructions());
-        variables.put(new Integer(6), sb.getSubtitle());
-        variables.put(new Integer(7), sb.getPageNumberLabel());
-        variables.put(new Integer(8), new Integer(sb.getOrdinal()));
-        variables.put(new Integer(9), new Integer(sb.getParentId()));
-        variables.put(new Integer(10), new Integer(sb.getOwnerId()));
-        variables.put(new Integer(11), new Integer(sb.getBorders()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getCRFVersionId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(sb.getStatus().getId()));
+        variables.put(Integer.valueOf(3), sb.getLabel());
+        variables.put(Integer.valueOf(4), sb.getTitle());
+        variables.put(Integer.valueOf(5), sb.getInstructions());
+        variables.put(Integer.valueOf(6), sb.getSubtitle());
+        variables.put(Integer.valueOf(7), sb.getPageNumberLabel());
+        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getOrdinal()));
+        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getParentId()));
+        variables.put(Integer.valueOf(10), Integer.valueOf(sb.getOwnerId()));
+        variables.put(Integer.valueOf(11), Integer.valueOf(sb.getBorders()));
         this.execute(digester.getQuery("create"), variables);
         return eb;
     }
@@ -155,7 +155,7 @@ public class SectionDAO extends AuditableEntityDAO {
     public Collection findByVersionId(int ID) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByVersionId");
         ArrayList alist = this.selectByCache(sql, variables);
@@ -174,7 +174,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.selectByCache(sql, variables);
@@ -201,7 +201,7 @@ public class SectionDAO extends AuditableEntityDAO {
     public ArrayList findAllByCRFVersionId(int crfVersionId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
 
         return this.executeFindAllQuery("findAllByCRFVersion", variables);
     }
@@ -254,7 +254,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
         String sql = digester.getQuery("getNumItemsPlusRepeatBySectionId");
 
         ArrayList rows = this.select(sql, variables);
@@ -267,7 +267,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
         String sql = digester.getQuery("getNumItemsCompletedBySectionId");
 
         ArrayList rows = this.select(sql, variables);
@@ -280,7 +280,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
         String sql = digester.getQuery("getNumItemsCompletedBySection");
 
         ArrayList rows = this.select(sql, variables);
@@ -293,7 +293,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
         String sql = digester.getQuery("getNumItemsPendingBySectionId");
 
         ArrayList rows = this.select(sql, variables);
@@ -305,8 +305,8 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
-        variables.put(new Integer(1), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
         String sql = digester.getQuery("getNumItemsPendingBySection");
 
         ArrayList rows = this.select(sql, variables);
@@ -318,7 +318,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
         String sql = digester.getQuery("getNumItemsBlankBySectionId");
 
         ArrayList rows = this.select(sql, variables);
@@ -330,8 +330,8 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT); // count
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
-        variables.put(new Integer(1), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
         String sql = digester.getQuery("getNumItemsBlankBySectionId");
 
         ArrayList rows = this.select(sql, variables);
@@ -341,8 +341,8 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getCRFVersionId()));
-        variables.put(new Integer(2), new Integer(current.getOrdinal()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getCRFVersionId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(current.getOrdinal()));
 
         String sql = digester.getQuery("findNext");
         ArrayList rows = this.select(sql, variables);
@@ -360,8 +360,8 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ecb.getCRFVersionId()));
-        variables.put(new Integer(2), new Integer(current.getOrdinal()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ecb.getCRFVersionId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(current.getOrdinal()));
 
         String sql = digester.getQuery("findPrevious");
         ArrayList rows = this.select(sql, variables);
@@ -377,7 +377,7 @@ public class SectionDAO extends AuditableEntityDAO {
 
     public void deleteTestSection(String label) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
+        variables.put(Integer.valueOf(1), label);
         this.execute(digester.getQuery("deleteTestSection"), variables);
     }
 
@@ -390,7 +390,7 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.INT); // count
         
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), sectionId);
+        variables.put(Integer.valueOf(1), sectionId);
         ArrayList rows = this.select(digester.getQuery("countSCDItemBySectionId"), variables);
         if(rows.size()>0) {
             return (Integer) ((HashMap) rows.iterator().next()).get("count");
@@ -404,11 +404,11 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.INT); //item_id
         
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), sectionId);
-        variables.put(new Integer(2), crfVersionId);
-        variables.put(new Integer(3), crfVersionId);
-        variables.put(new Integer(4), sectionId);
-        variables.put(new Integer(5), crfVersionId);
+        variables.put(Integer.valueOf(1), sectionId);
+        variables.put(Integer.valueOf(2), crfVersionId);
+        variables.put(Integer.valueOf(3), crfVersionId);
+        variables.put(Integer.valueOf(4), sectionId);
+        variables.put(Integer.valueOf(5), crfVersionId);
         ArrayList rows = this.select(digester.getQuery("containNormalItem"), variables);
         if(rows.size()>0) {
             return (Integer) ((HashMap) rows.iterator().next()).get("item_id") > 0;
@@ -422,8 +422,8 @@ public class SectionDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.INT); // section_id                
         
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crfVersionId));
-        variables.put(new Integer(2), new Integer(tabId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(tabId));
         
         ArrayList rows = this.select(digester.getQuery("getSectionIdForTabId"), variables);
         return getSectionIdFromRows(rows);

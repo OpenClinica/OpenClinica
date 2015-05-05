@@ -282,7 +282,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDAO itemDAO = new ItemDAO(getDataSource());
         List<ItemBean> items = itemDAO.findAllBySectionId(sectionId);
         if (!items.isEmpty()) {
-            return new Integer(items.get(0).getId()).toString();
+            return Integer.valueOf(items.get(0).getId()).toString();
         }
         return "";
     }
@@ -424,7 +424,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         Status s = ssb.getStatus();
         if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
             addPageMessage(respage.getString("you_may_not_perform_data_entry_on_a_CRF") + respage.getString("study_subject_has_been_deleted"), request);
-            request.setAttribute("id", new Integer(ecb.getStudySubjectId()).toString());
+            request.setAttribute("id", Integer.valueOf(ecb.getStudySubjectId()).toString());
             session.removeAttribute(instantAtt);
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
         }
@@ -1430,7 +1430,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                 }
                 */
-                //request.setAttribute("manualRows", new Integer(manualRows));
+                //request.setAttribute("manualRows", Integer.valueOf(manualRows));
                 Iterator iter3 = errors.keySet().iterator();
                 while (iter3.hasNext()) {
                     String fieldName = iter3.next().toString();
@@ -1953,7 +1953,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 } else {
                                     tabNum = fp.getInt("tab");
                                 }
-                                request.setAttribute("tab", new Integer(tabNum - 1).toString());
+                                request.setAttribute("tab", Integer.valueOf(tabNum - 1).toString());
 
                               //  forwardPage(getServletPage(request), request, response);
                                 getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
@@ -1969,7 +1969,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 } else {
                                     tabNum = fp.getInt("tab");
                                 }
-                                request.setAttribute("tab", new Integer(tabNum + 1).toString());
+                                request.setAttribute("tab", Integer.valueOf(tabNum + 1).toString());
                                 getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
                                 //forwardPage(getServletPage(request), request, response);
                             }
@@ -1987,18 +1987,18 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 session.removeAttribute(DDE_PROGESS);
                                 session.removeAttribute("to_create_crf");
 
-                                request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+                                request.setAttribute("eventId", Integer.valueOf(ecb.getStudyEventId()).toString());
                                 forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
                             } else {
                                 // use clicked 'save'
                                 addPageMessage(respage.getString("data_saved_continue_entering_edit_later"), request);
                                 request.setAttribute(INPUT_EVENT_CRF, ecb);
-                                request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
+                                request.setAttribute(INPUT_EVENT_CRF_ID, Integer.valueOf(ecb.getId()).toString());
                                 // forward to the next section if the previous one
                                 // is not the last section
                                 if (!section.isLastSection()) {
                                     request.setAttribute(INPUT_SECTION, nextSec);
-                                    request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
+                                    request.setAttribute(INPUT_SECTION_ID, Integer.valueOf(nextSec.getId()).toString());
                                     session.removeAttribute("mayProcessUploading");
                                 } else if(section.isLastSection()){ //JN ADDED TO avoid return down
                                     // already the last section, should go back to
@@ -2009,7 +2009,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     session.removeAttribute("to_create_crf");
                                     session.removeAttribute("mayProcessUploading");
 
-                                    request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+                                    request.setAttribute("eventId", Integer.valueOf(ecb.getStudyEventId()).toString());
                                     if(fromViewNotes != null && "1".equals(fromViewNotes)) {
                                         String viewNotesPageFileName = (String)session.getAttribute("viewNotesPageFileName");
                                         session.removeAttribute("viewNotesPageFileName");
@@ -2033,7 +2033,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     tabNum = fp.getInt("tab");
                                 }
                                 if (!section.isLastSection()) {
-                                    request.setAttribute("tab", new Integer(tabNum + 1).toString());
+                                    request.setAttribute("tab", Integer.valueOf(tabNum + 1).toString());
                                 }
 
                               //  forwardPage(getServletPage(request), request, response);
@@ -2222,7 +2222,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if (tabId <= 0) {
             tabId = 1;
         }
-        request.setAttribute(INPUT_TAB, new Integer(tabId));
+        request.setAttribute(INPUT_TAB, Integer.valueOf(tabId));
         request.setAttribute(SECTION_BEAN, sb);
     }
 
@@ -2673,7 +2673,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // }
         LOGGER.debug(" manual rows " + manualRows + " formGroup size " + formGroups.size());
 
-        request.setAttribute("manualRows", new Integer(manualRows));
+        request.setAttribute("manualRows", Integer.valueOf(manualRows));
         // reset ordinal for the auto-created rows except for the first row
         for (int j = 0; j < formGroups.size(); j++) {
             DisplayItemGroupBean formItemGroup = formGroups.get(j);
@@ -3572,24 +3572,24 @@ public abstract class DataEntryServlet extends CoreSecureController {
             dib.setEventDefinitionCRF(edcb);
             ItemBean ib = (ItemBean) items.get(i);
             dib.setItem(ib);
-            displayItems.put(new Integer(dib.getItem().getId()), dib);
+            displayItems.put(Integer.valueOf(dib.getItem().getId()), dib);
         }
 
         ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
         for (int i = 0; i < data.size(); i++) {
             ItemDataBean idb = (ItemDataBean) data.get(i);
-            DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(idb.getItemId()));
+            DisplayItemBean dib = (DisplayItemBean) displayItems.get(Integer.valueOf(idb.getItemId()));
 
             if (dib != null) {
                 dib.setData(idb);
-                displayItems.put(new Integer(idb.getItemId()), dib);
+                displayItems.put(Integer.valueOf(idb.getItemId()), dib);
             }
         }
 
         ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
         for (int i = 0; i < metadata.size(); i++) {
             ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
-            DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
+            DisplayItemBean dib = (DisplayItemBean) displayItems.get(Integer.valueOf(ifmb.getItemId()));
             if (dib != null) {
                 // boolean showItem = false;
                 boolean needsHighlighting = !ifmb.isShowItem();
@@ -3610,7 +3610,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
 
                 dib.setMetadata(ifmb);
-                displayItems.put(new Integer(ifmb.getItemId()), dib);
+                displayItems.put(Integer.valueOf(ifmb.getItemId()), dib);
             }
         }
 
@@ -3998,7 +3998,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         // request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN,
         // ecb);
-        // request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()));
+        // request.setAttribute(INPUT_EVENT_CRF_ID, Integer.valueOf(ecb.getId()));
         LOGGER.trace("inout_event_crf_id:" + ecb.getId());
 
         if (stage.equals(DataEntryStage.UNCOMPLETED) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.LOCKED)) {
@@ -4259,7 +4259,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
         HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
 
-        Integer key = new Integer(sb.getId());
+        Integer key = Integer.valueOf(sb.getId());
 
         int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
@@ -4298,7 +4298,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySection(ecb);
         HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
 
-        Integer key = new Integer(sb.getId());
+        Integer key = Integer.valueOf(sb.getId());
 
         int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
@@ -4351,7 +4351,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         for (int i = 0; i < sections.size(); i++) {
             SectionBean sb = sections.get(i);
-            Integer key = new Integer(sb.getId());
+            Integer key = Integer.valueOf(sb.getId());
 
             int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
             int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
@@ -5415,7 +5415,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 }
             }
         }
-        request.setAttribute("manualRows", new Integer(manualRows));
+        request.setAttribute("manualRows", Integer.valueOf(manualRows));
         return errors;
     }
 

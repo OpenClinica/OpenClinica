@@ -114,7 +114,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
                 addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("added") + "."
                     + respage.getString("study_subject_has_been_deleted"));
-                request.setAttribute("id", new Integer(studySubjectId).toString());
+                request.setAttribute("id", Integer.valueOf(studySubjectId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
             // YW >>
@@ -168,18 +168,18 @@ public class CreateNewStudyEventServlet extends SecureController {
             HashMap presetValues = new HashMap();
 
             // YW 08-16-2007 << set default as blank for time
-            presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(-1));
-            presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(-1));
+            presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", Integer.valueOf(-1));
+            presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", Integer.valueOf(-1));
             presetValues.put(INPUT_STARTDATE_PREFIX + "Half", new String(""));
-            presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(-1));
-            presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", new Integer(-1));
+            presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", Integer.valueOf(-1));
+            presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", Integer.valueOf(-1));
             presetValues.put(INPUT_ENDDATE_PREFIX + "Half", new String(""));
             for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
-                presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour", new Integer(-1));
-                presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute", new Integer(-1));
+                presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour", Integer.valueOf(-1));
+                presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute", Integer.valueOf(-1));
                 presetValues.put(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half", new String(""));
-                presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour", new Integer(-1));
-                presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute", new Integer(-1));
+                presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour", Integer.valueOf(-1));
+                presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute", Integer.valueOf(-1));
                 presetValues.put(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half", new String(""));
             }
 

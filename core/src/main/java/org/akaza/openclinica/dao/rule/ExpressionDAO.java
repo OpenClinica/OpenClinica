@@ -78,10 +78,10 @@ public class ExpressionDAO extends AuditableEntityDAO {
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), expressionBean.getContext().getCode());
-        variables.put(new Integer(2), expressionBean.getValue());
-        variables.put(new Integer(3), expressionBean.getUpdaterId());
-        variables.put(new Integer(4), expressionBean.getId());
+        variables.put(Integer.valueOf(1), expressionBean.getContext().getCode());
+        variables.put(Integer.valueOf(2), expressionBean.getValue());
+        variables.put(Integer.valueOf(3), expressionBean.getUpdaterId());
+        variables.put(Integer.valueOf(4), expressionBean.getId());
 
         this.execute(digester.getQuery("update"), variables, nullVars);
 
@@ -96,11 +96,11 @@ public class ExpressionDAO extends AuditableEntityDAO {
         ExpressionBean expressionBean = (ExpressionBean) eb;
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         HashMap<Integer, Object> nullVars = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), expressionBean.getContext().getCode());
-        variables.put(new Integer(2), expressionBean.getValue());
+        variables.put(Integer.valueOf(1), expressionBean.getContext().getCode());
+        variables.put(Integer.valueOf(2), expressionBean.getValue());
 
-        variables.put(new Integer(3), new Integer(expressionBean.getOwnerId()));
-        variables.put(new Integer(4), new Integer(Status.AVAILABLE.getId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(expressionBean.getOwnerId()));
+        variables.put(Integer.valueOf(4), Integer.valueOf(Status.AVAILABLE.getId()));
 
         executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -134,7 +134,7 @@ public class ExpressionDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);

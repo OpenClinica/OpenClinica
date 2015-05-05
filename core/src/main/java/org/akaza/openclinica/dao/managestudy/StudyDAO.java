@@ -211,54 +211,54 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         HashMap nullVars = new HashMap();
 
         if (sb.getParentStudyId() == 0) {
-            nullVars.put(new Integer(1), new Integer(Types.INTEGER));
-            variables.put(new Integer(1), null);
+            nullVars.put(Integer.valueOf(1), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(1), null);
         } else {
-            variables.put(new Integer(1), new Integer(sb.getParentStudyId()));
+            variables.put(Integer.valueOf(1), Integer.valueOf(sb.getParentStudyId()));
         }
-        variables.put(new Integer(2), sb.getName());
-        variables.put(new Integer(3), sb.getOfficialTitle());
-        variables.put(new Integer(4), sb.getIdentifier());
-        variables.put(new Integer(5), sb.getSecondaryIdentifier());
-        variables.put(new Integer(6), sb.getSummary());
-        variables.put(new Integer(7), sb.getPrincipalInvestigator());
+        variables.put(Integer.valueOf(2), sb.getName());
+        variables.put(Integer.valueOf(3), sb.getOfficialTitle());
+        variables.put(Integer.valueOf(4), sb.getIdentifier());
+        variables.put(Integer.valueOf(5), sb.getSecondaryIdentifier());
+        variables.put(Integer.valueOf(6), sb.getSummary());
+        variables.put(Integer.valueOf(7), sb.getPrincipalInvestigator());
         if (sb.getDatePlannedStart() == null) {
-            nullVars.put(new Integer(8), new Integer(Types.DATE));
-            variables.put(new Integer(8), null);
+            nullVars.put(Integer.valueOf(8), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(8), null);
         } else {
-            variables.put(new Integer(8), sb.getDatePlannedStart());
+            variables.put(Integer.valueOf(8), sb.getDatePlannedStart());
         }
 
         if (sb.getDatePlannedEnd() == null) {
-            nullVars.put(new Integer(9), new Integer(Types.DATE));
-            variables.put(new Integer(9), null);
+            nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(9), null);
         } else {
-            variables.put(new Integer(9), sb.getDatePlannedEnd());
+            variables.put(Integer.valueOf(9), sb.getDatePlannedEnd());
         }
 
-        variables.put(new Integer(10), sb.getFacilityName());
-        variables.put(new Integer(11), sb.getFacilityCity());
-        variables.put(new Integer(12), sb.getFacilityState());
-        variables.put(new Integer(13), sb.getFacilityZip());
-        variables.put(new Integer(14), sb.getFacilityCountry());
-        variables.put(new Integer(15), sb.getFacilityRecruitmentStatus());
-        variables.put(new Integer(16), sb.getFacilityContactName());
-        variables.put(new Integer(17), sb.getFacilityContactDegree());
-        variables.put(new Integer(18), sb.getFacilityContactPhone());
-        variables.put(new Integer(19), sb.getFacilityContactEmail());
-        variables.put(new Integer(20), new Integer(sb.getStatus().getId()));// status
+        variables.put(Integer.valueOf(10), sb.getFacilityName());
+        variables.put(Integer.valueOf(11), sb.getFacilityCity());
+        variables.put(Integer.valueOf(12), sb.getFacilityState());
+        variables.put(Integer.valueOf(13), sb.getFacilityZip());
+        variables.put(Integer.valueOf(14), sb.getFacilityCountry());
+        variables.put(Integer.valueOf(15), sb.getFacilityRecruitmentStatus());
+        variables.put(Integer.valueOf(16), sb.getFacilityContactName());
+        variables.put(Integer.valueOf(17), sb.getFacilityContactDegree());
+        variables.put(Integer.valueOf(18), sb.getFacilityContactPhone());
+        variables.put(Integer.valueOf(19), sb.getFacilityContactEmail());
+        variables.put(Integer.valueOf(20), Integer.valueOf(sb.getStatus().getId()));// status
         // id
-        // variables.put(new Integer(19), sb.getStatus())//need to get a
+        // variables.put(Integer.valueOf(19), sb.getStatus())//need to get a
         // function
         // to get the id
-        // variables.put(new Integer(19), sb.getCreatedDate());
-        variables.put(new Integer(21), new Integer(sb.getUpdaterId()));// owner
+        // variables.put(Integer.valueOf(19), sb.getCreatedDate());
+        variables.put(Integer.valueOf(21), Integer.valueOf(sb.getUpdaterId()));// owner
         // id
-        variables.put(new Integer(22), sb.getUpdatedDate());// date updated
-        variables.put(new Integer(23), new Integer(sb.getOldStatus().getId()));// study id
-        // variables.put(new Integer(22), new Integer(1));
+        variables.put(Integer.valueOf(22), sb.getUpdatedDate());// date updated
+        variables.put(Integer.valueOf(23), Integer.valueOf(sb.getOldStatus().getId()));// study id
+        // variables.put(Integer.valueOf(22), Integer.valueOf(1));
         // stop gap measure for owner and updater id
-        variables.put(new Integer(24), new Integer(sb.getId()));// study id
+        variables.put(Integer.valueOf(24), Integer.valueOf(sb.getId()));// study id
         this.execute(digester.getQuery("updateStepOne"), variables, nullVars);
         return sb;
     }
@@ -294,7 +294,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
      */
     public int findNextKey() {
         this.unsetTypeExpected();
-        Integer keyInt = new Integer(0);
+        Integer keyInt = Integer.valueOf(0);
         this.setTypeExpected(1, TypeNames.INT);
         ArrayList alist = this.select(digester.getQuery("findNextKey"));
         Iterator it = alist.iterator();
@@ -322,52 +322,52 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
         sb.setId(this.findNextKey());
-        variables.put(new Integer(1), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
         if (sb.getParentStudyId() == 0) {
-            nullVars.put(new Integer(2), new Integer(Types.INTEGER));
-            variables.put(new Integer(2), null);
+            nullVars.put(Integer.valueOf(2), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(2), null);
         } else {
-            variables.put(new Integer(2), new Integer(sb.getParentStudyId()));
+            variables.put(Integer.valueOf(2), Integer.valueOf(sb.getParentStudyId()));
         }
 
-        variables.put(new Integer(3), sb.getName());
-        variables.put(new Integer(4), sb.getOfficialTitle());
-        variables.put(new Integer(5), sb.getIdentifier());
-        variables.put(new Integer(6), sb.getSecondaryIdentifier());
-        variables.put(new Integer(7), sb.getSummary());
-        variables.put(new Integer(8), sb.getPrincipalInvestigator());
+        variables.put(Integer.valueOf(3), sb.getName());
+        variables.put(Integer.valueOf(4), sb.getOfficialTitle());
+        variables.put(Integer.valueOf(5), sb.getIdentifier());
+        variables.put(Integer.valueOf(6), sb.getSecondaryIdentifier());
+        variables.put(Integer.valueOf(7), sb.getSummary());
+        variables.put(Integer.valueOf(8), sb.getPrincipalInvestigator());
 
         if (sb.getDatePlannedStart() == null) {
-            nullVars.put(new Integer(9), new Integer(Types.DATE));
-            variables.put(new Integer(9), null);
+            nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(9), null);
         } else {
-            variables.put(new Integer(9), sb.getDatePlannedStart());
+            variables.put(Integer.valueOf(9), sb.getDatePlannedStart());
         }
 
         if (sb.getDatePlannedEnd() == null) {
-            nullVars.put(new Integer(10), new Integer(Types.DATE));
-            variables.put(new Integer(10), null);
+            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(10), null);
         } else {
-            variables.put(new Integer(10), sb.getDatePlannedEnd());
+            variables.put(Integer.valueOf(10), sb.getDatePlannedEnd());
         }
 
-        variables.put(new Integer(11), sb.getFacilityName());
-        variables.put(new Integer(12), sb.getFacilityCity());
-        variables.put(new Integer(13), sb.getFacilityState());
-        variables.put(new Integer(14), sb.getFacilityZip());
-        variables.put(new Integer(15), sb.getFacilityCountry());
-        variables.put(new Integer(16), sb.getFacilityRecruitmentStatusKey());
-        variables.put(new Integer(17), sb.getFacilityContactName());
-        variables.put(new Integer(18), sb.getFacilityContactDegree());
-        variables.put(new Integer(19), sb.getFacilityContactPhone());
-        variables.put(new Integer(20), sb.getFacilityContactEmail());
-        variables.put(new Integer(21), new Integer(sb.getStatus().getId()));
-        // variables.put(new Integer(19), sb.getStatus())//need to get a
+        variables.put(Integer.valueOf(11), sb.getFacilityName());
+        variables.put(Integer.valueOf(12), sb.getFacilityCity());
+        variables.put(Integer.valueOf(13), sb.getFacilityState());
+        variables.put(Integer.valueOf(14), sb.getFacilityZip());
+        variables.put(Integer.valueOf(15), sb.getFacilityCountry());
+        variables.put(Integer.valueOf(16), sb.getFacilityRecruitmentStatusKey());
+        variables.put(Integer.valueOf(17), sb.getFacilityContactName());
+        variables.put(Integer.valueOf(18), sb.getFacilityContactDegree());
+        variables.put(Integer.valueOf(19), sb.getFacilityContactPhone());
+        variables.put(Integer.valueOf(20), sb.getFacilityContactEmail());
+        variables.put(Integer.valueOf(21), Integer.valueOf(sb.getStatus().getId()));
+        // variables.put(Integer.valueOf(19), sb.getStatus())//need to get a
         // function
         // to get the id
-        variables.put(new Integer(22), new java.util.Date());
-        variables.put(new Integer(23), new Integer(sb.getOwnerId()));
-        variables.put(new Integer(24), getValidOid(sb));
+        variables.put(Integer.valueOf(22), new java.util.Date());
+        variables.put(Integer.valueOf(23), Integer.valueOf(sb.getOwnerId()));
+        variables.put(Integer.valueOf(24), getValidOid(sb));
         // replace this with the owner id
         this.execute(digester.getQuery("createStepOne"), variables, nullVars);
         return sb;
@@ -403,7 +403,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
+        variables.put(Integer.valueOf(1), oid);
         ArrayList alist = this.select(digester.getQuery("findByOid"), variables);
         Iterator it = alist.iterator();
 
@@ -422,7 +422,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
+        variables.put(Integer.valueOf(1), oid);
         ArrayList alist = this.select(digester.getQuery("findByUniqueIdentifier"), variables);
         Iterator it = alist.iterator();
 
@@ -440,8 +440,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), parentUniqueIdentifier);
-        variables.put(new Integer(2), siteUniqueIdentifier);
+        variables.put(Integer.valueOf(1), parentUniqueIdentifier);
+        variables.put(Integer.valueOf(2), siteUniqueIdentifier);
         ArrayList alist = this.select(digester.getQuery("findSiteByUniqueIdentifier"), variables);
         Iterator it = alist.iterator();
 
@@ -463,68 +463,68 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         // WHERE STUDY_ID=?
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), new Integer(sb.getType().getId()));
-        variables.put(new Integer(2), sb.getProtocolTypeKey());
-        variables.put(new Integer(3), sb.getProtocolDescription());
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getType().getId()));
+        variables.put(Integer.valueOf(2), sb.getProtocolTypeKey());
+        variables.put(Integer.valueOf(3), sb.getProtocolDescription());
 
         if (sb.getProtocolDateVerification() == null) {
-            nullVars.put(new Integer(4), new Integer(Types.DATE));
-            variables.put(new Integer(4), null);
+            nullVars.put(Integer.valueOf(4), Integer.valueOf(Types.DATE));
+            variables.put(Integer.valueOf(4), null);
         } else {
-            variables.put(new Integer(4), sb.getProtocolDateVerification());
+            variables.put(Integer.valueOf(4), sb.getProtocolDateVerification());
         }
 
-        variables.put(new Integer(5), sb.getPhaseKey());
-        variables.put(new Integer(6), new Integer(sb.getExpectedTotalEnrollment()));
-        variables.put(new Integer(7), sb.getSponsor());
-        variables.put(new Integer(8), sb.getCollaborators());
-        variables.put(new Integer(9), sb.getMedlineIdentifier());
-        variables.put(new Integer(10), new Boolean(sb.isResultsReference()));
-        variables.put(new Integer(11), sb.getUrl());
-        variables.put(new Integer(12), sb.getUrlDescription());
-        variables.put(new Integer(13), sb.getConditions());
-        variables.put(new Integer(14), sb.getKeywords());
-        variables.put(new Integer(15), sb.getEligibility());
-        variables.put(new Integer(16), sb.getGenderKey());
+        variables.put(Integer.valueOf(5), sb.getPhaseKey());
+        variables.put(Integer.valueOf(6), Integer.valueOf(sb.getExpectedTotalEnrollment()));
+        variables.put(Integer.valueOf(7), sb.getSponsor());
+        variables.put(Integer.valueOf(8), sb.getCollaborators());
+        variables.put(Integer.valueOf(9), sb.getMedlineIdentifier());
+        variables.put(Integer.valueOf(10), Boolean.valueOf(sb.isResultsReference()));
+        variables.put(Integer.valueOf(11), sb.getUrl());
+        variables.put(Integer.valueOf(12), sb.getUrlDescription());
+        variables.put(Integer.valueOf(13), sb.getConditions());
+        variables.put(Integer.valueOf(14), sb.getKeywords());
+        variables.put(Integer.valueOf(15), sb.getEligibility());
+        variables.put(Integer.valueOf(16), sb.getGenderKey());
 
-        variables.put(new Integer(17), sb.getAgeMax());
-        variables.put(new Integer(18), sb.getAgeMin());
-        variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
-        // variables.put(new Integer(20), new Boolean(sb.isUsingDOB()));
-        // variables.put(new Integer(21), new
+        variables.put(Integer.valueOf(17), sb.getAgeMax());
+        variables.put(Integer.valueOf(18), sb.getAgeMin());
+        variables.put(Integer.valueOf(19), Boolean.valueOf(sb.getHealthyVolunteerAccepted()));
+        // variables.put(Integer.valueOf(20), Boolean.valueOf(sb.isUsingDOB()));
+        // variables.put(Integer.valueOf(21), new
         // Boolean(sb.isDiscrepancyManagement()));
-        variables.put(new Integer(20), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(20), Integer.valueOf(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
 
     public StudyBean createStepThree(StudyBean sb) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), sb.getPurposeKey());
-        variables.put(new Integer(2), sb.getAllocationKey());
-        variables.put(new Integer(3), sb.getMaskingKey());
-        variables.put(new Integer(4), sb.getControlKey());
-        variables.put(new Integer(5), sb.getAssignmentKey());
-        variables.put(new Integer(6), sb.getEndpointKey());
-        variables.put(new Integer(7), sb.getInterventionsKey());
-        variables.put(new Integer(8), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), sb.getPurposeKey());
+        variables.put(Integer.valueOf(2), sb.getAllocationKey());
+        variables.put(Integer.valueOf(3), sb.getMaskingKey());
+        variables.put(Integer.valueOf(4), sb.getControlKey());
+        variables.put(Integer.valueOf(5), sb.getAssignmentKey());
+        variables.put(Integer.valueOf(6), sb.getEndpointKey());
+        variables.put(Integer.valueOf(7), sb.getInterventionsKey());
+        variables.put(Integer.valueOf(8), Integer.valueOf(sb.getId()));
         this.execute(digester.getQuery("createStepThree"), variables);
         return sb;
     }
 
     public StudyBean createStepFour(StudyBean sb) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), sb.getDurationKey());
-        variables.put(new Integer(2), sb.getSelectionKey());
-        variables.put(new Integer(3), sb.getTimingKey());
-        variables.put(new Integer(4), new Integer(sb.getId()));
+        variables.put(Integer.valueOf(1), sb.getDurationKey());
+        variables.put(Integer.valueOf(2), sb.getSelectionKey());
+        variables.put(Integer.valueOf(3), sb.getTimingKey());
+        variables.put(Integer.valueOf(4), Integer.valueOf(sb.getId()));
         this.execute(digester.getQuery("createStepFour"), variables);
         return sb;
     }
 
     /*
      * public HashMap fillVariables(StudyBean sb) { HashMap variables = new
-     * HashMap(); variables.put(new Integer(1),new
+     * HashMap(); variables.put(Integer.valueOf(1),new
      * Integer(sb.getParentStudyId())); variables.put(new
      * Integer(2),sb.getLabel()); return variables; }
      */
@@ -632,7 +632,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), username);
+        variables.put(Integer.valueOf(1), username);
         ArrayList alist = this.select(digester.getQuery("findAllByUser"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -663,7 +663,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), username);
+        variables.put(Integer.valueOf(1), username);
         ArrayList alist = this.select(digester.getQuery("findAllByUserNotRemoved"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -678,7 +678,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(status.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(status.getId()));
         String sql = digester.getQuery("findAllByStatus");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
@@ -753,7 +753,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
     public Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(parentStudyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentStudyId));
         ArrayList alist = null;
         if (isLimited) {
             alist = this.select(digester.getQuery("findAllByParentLimit5"), variables);
@@ -773,8 +773,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
     public Collection findAll(int studyId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
         ArrayList alist = null;
         alist = this.select(digester.getQuery("findAllByStudyId"), variables);
         ArrayList al = new ArrayList();
@@ -798,7 +798,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);
@@ -819,7 +819,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
+        variables.put(Integer.valueOf(1), name);
 
         String sql = digester.getQuery("findByName");
         ArrayList alist = this.select(sql, variables);
@@ -839,7 +839,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
      */
     public void deleteTestOnly(String name) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
+        variables.put(Integer.valueOf(1), name);
         this.execute(digester.getQuery("deleteTestOnly"), variables);
     }
 
@@ -864,7 +864,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
      * @return
      */
     private HashMap addChildToParent(HashMap answer, int parentId, StudyBean child) {
-        Integer key = new Integer(parentId);
+        Integer key = Integer.valueOf(parentId);
         ArrayList children = (ArrayList) answer.get(key);
 
         if (children == null) {
@@ -911,8 +911,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);// sid
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(study.getId()));
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
         ArrayList alist = this.select(digester.getQuery("findAllSiteIdsByStudy"), variables);
         ArrayList<Integer> al = new ArrayList<Integer>();
         Iterator it = alist.iterator();
@@ -927,7 +927,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);// sid
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
         ArrayList alist = this.select(digester.getQuery("findOlnySiteIdsByStudy"), variables);
         ArrayList<Integer> al = new ArrayList<Integer>();
         Iterator it = alist.iterator();
@@ -942,9 +942,9 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
 
-        variables.put(new Integer(1), sb.getStatus().getId());
-        variables.put(new Integer(2), sb.getOldStatus().getId());
-        variables.put(new Integer(3), sb.getId());
+        variables.put(Integer.valueOf(1), sb.getStatus().getId());
+        variables.put(Integer.valueOf(2), sb.getOldStatus().getId());
+        variables.put(Integer.valueOf(3), sb.getId());
 
         this.execute(digester.getQuery("updateSitesStatus"), variables, nullVars);
         return sb;
@@ -954,9 +954,9 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
 
-        variables.put(new Integer(1), sb.getStatus().getId());
-        variables.put(new Integer(2), sb.getOldStatus().getId());
-        variables.put(new Integer(3), sb.getId());
+        variables.put(Integer.valueOf(1), sb.getStatus().getId());
+        variables.put(Integer.valueOf(2), sb.getOldStatus().getId());
+        variables.put(Integer.valueOf(3), sb.getId());
 
 
         this.execute(digester.getQuery("updateStudyStatus"), variables, nullVars);
@@ -968,7 +968,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         HashMap variables = new HashMap();
         this.setTypesExpected();
 
-        variables.put(new Integer(1), studySubjectId);
+        variables.put(Integer.valueOf(1), studySubjectId);
 
         // >> tbh
         // String sql = digester.getQuery("findByStudySubjectId");
@@ -990,8 +990,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
     public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(parentStudyId));
-        variables.put(new Integer(2), new Integer(parentStudyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentStudyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(parentStudyId));
         ArrayList alist = this.select(digester.getQuery("findAllByParentStudyIdOrderedByIdAsc"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();

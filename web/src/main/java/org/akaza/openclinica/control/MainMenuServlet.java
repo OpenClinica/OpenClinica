@@ -97,7 +97,7 @@ public class MainMenuServlet extends SecureController {
 
         // a flag tells whether users are required to change pwd upon the first
         // time log in or pwd expired
-        int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+        int pwdChangeRequired = Integer.valueOf(SQLInitServlet.getField("change_passwd_required")).intValue();
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
@@ -182,7 +182,7 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                 if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                     //Shaoyu Su
                     //int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
-                    //request.setAttribute("label", new Integer(nextLabel).toString());
+                    //request.setAttribute("label", Integer.valueOf(nextLabel).toString());
                     request.setAttribute("label", resword.getString("id_generated_Save_Add"));
                     //@pgawade 27-June-2012 fix for issue 13477: set label to "ID will be generated on Save or Add" in case of auto generated subject id
                     fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));

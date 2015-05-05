@@ -28,9 +28,9 @@ public class Sum extends AbstractFunction {
             try {
                 values[i] = Double.parseDouble(arg);
             } catch (Exception e) {
-                // errors.put(new Integer(errorCount++), e.getMessage() + " when
+                // errors.put(Integer.valueOf(errorCount++), e.getMessage() + " when
                 // evaluate " + "Sum(); ");
-                errors.put(new Integer(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Sum(); ");
+                errors.put(Integer.valueOf(errorCount++), "Unparseable number:" + " " + arg + " " + "in evaluation of" + " Sum(); ");
             }
         }
         if (errors.size() > 0) {

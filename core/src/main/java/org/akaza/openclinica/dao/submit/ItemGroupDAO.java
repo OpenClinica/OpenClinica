@@ -82,7 +82,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
          * owner_id numeric, update_id numeric,
          */
         variables.put(1, formGroupBean.getName());
-        variables.put(2, new Integer(formGroupBean.getCrfId()));
+        variables.put(2, Integer.valueOf(formGroupBean.getCrfId()));
         variables.put(3, formGroupBean.getStatus().getId());
         variables.put(4, formGroupBean.getUpdater().getId());
         variables.put(5, formGroupBean.getId());
@@ -133,7 +133,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         variables.put(1, id);
         variables.put(2, formGroupBean.getName());
         variables.put(3, formGroupBean.getCrfId());
-        variables.put(4, new Integer(formGroupBean.getStatus().getId()));
+        variables.put(4, Integer.valueOf(formGroupBean.getStatus().getId()));
         variables.put(5, formGroupBean.getOwner().getId());
 
         this.execute(digester.getQuery("create"), variables);
@@ -226,7 +226,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         setTypesExpected();
 
         HashMap<Integer, String> variables = new HashMap<Integer, String>();
-        variables.put(new Integer(1), oid);
+        variables.put(Integer.valueOf(1), oid);
         String sql = digester.getQuery("findGroupByOid");
 
         ArrayList rows = this.select(sql, variables);
@@ -246,7 +246,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
+        variables.put(Integer.valueOf(1), oid);
         String sql = digester.getQuery("findGroupByOid");
 
         ArrayList rows = this.select(sql, variables);
@@ -266,8 +266,8 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), oid);
-        variables.put(new Integer(2), new Integer(crfId));
+        variables.put(Integer.valueOf(1), oid);
+        variables.put(Integer.valueOf(2), Integer.valueOf(crfId));
         String sql = digester.getQuery("findGroupByOidAndCrfId");
 
         ArrayList rows = this.select(sql, variables);
@@ -371,7 +371,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
 
     public void deleteTestGroup(String name) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
+        variables.put(Integer.valueOf(1), name);
         this.execute(digester.getQuery("deleteTestGroup"), variables);
     }
     

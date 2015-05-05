@@ -8,6 +8,9 @@
         <artifactId>OpenClinica</artifactId>
       <version>MAINLINE-SNAPSHOT</version>
     </parent>
+    <properties>
+            <skipTests>false</skipTests>
+    </properties>
     <dependencies>
 		<dependency>
 			<groupId>javax.transaction</groupId>

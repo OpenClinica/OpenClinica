@@ -51,7 +51,7 @@ public class OrderedEntityBeansSet {
      *         had not been added.
      */
     public EntityBean add(EntityBean entity) {
-        Integer key = new Integer(entity.getId());
+        Integer key = Integer.valueOf(entity.getId());
 
         if (entityIsAdded.containsKey(key)) {
             Integer ind = (Integer) entityIsAdded.get(key);
@@ -68,7 +68,7 @@ public class OrderedEntityBeansSet {
             return (EntityBean) entities.get(ind.intValue());
         } else {
             entities.add(entity);
-            Integer ind = new Integer(entities.size() - 1);
+            Integer ind = Integer.valueOf(entities.size() - 1);
             entityIsAdded.put(key, ind);
             return entity;
         }
@@ -82,7 +82,7 @@ public class OrderedEntityBeansSet {
      *            The entity to update.
      */
     public void update(EntityBean entity) {
-        Integer key = new Integer(entity.getId());
+        Integer key = Integer.valueOf(entity.getId());
 
         if (entityIsAdded.containsKey(key)) {
             Integer ind = (Integer) entityIsAdded.get(key);
@@ -108,7 +108,7 @@ public class OrderedEntityBeansSet {
     }
 
     public boolean contains(EntityBean eb) {
-        Integer key = new Integer(eb.getId());
+        Integer key = Integer.valueOf(eb.getId());
         return entityIsAdded.containsKey(key);
     }
 }

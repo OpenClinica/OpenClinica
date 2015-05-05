@@ -277,13 +277,13 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
 
-                            String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
+                            String eventCRFStatus = importedCRFStatuses.get(Integer.valueOf(eventCrfBean.getId()));
                             if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
                                 crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
                             } else {
                                 crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
                             }
-                            eventCrfInts.add(new Integer(eventCrfBean.getId()));
+                            eventCrfInts.add(Integer.valueOf(eventCrfBean.getId()));
                         }
                     }
                     // end of item datas, tbh

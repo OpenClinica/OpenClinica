@@ -164,7 +164,7 @@ public class ListCRFServlet extends SecureController {
         panel.setCreateDataset(false);
 
         if (crfs.size() > 0) {
-            setToPanel("CRFs", new Integer(crfs.size()).toString());
+            setToPanel("CRFs", Integer.valueOf(crfs.size()).toString());
         }
 
         setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));

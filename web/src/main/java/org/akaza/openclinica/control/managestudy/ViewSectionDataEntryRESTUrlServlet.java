@@ -88,7 +88,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         Integer sectionId = (Integer) request.getAttribute("sectionId");
         if(sectionId==null || sectionId == 0)
         {
-        	sectionId = new Integer(1);
+        	sectionId = Integer.valueOf(1);
         }
         int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
         int studySubjectId = fp.getInt("studySubjectId", true);
@@ -486,7 +486,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             } else {
                 tabNum = fp.getInt("tabId");
             }
-            request.setAttribute("tabId", new Integer(tabNum).toString());
+            request.setAttribute("tabId", Integer.valueOf(tabNum).toString());
 
             // 2808: Signal interviewer.jsp that the containing page is
             // viewSectionData,

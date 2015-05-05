@@ -449,7 +449,7 @@ public class UpdateStudyServlet extends SecureController {
 
         spv.setStudyId(study1.getId());
         spv.setParameter("collectDob");
-        spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+        spv.setValue(Integer.valueOf(study1.getStudyParameterConfig().getCollectDob()).toString());
         updateParameter(spvdao, spv);
 
         spv.setParameter("discrepancyManagement");
@@ -517,7 +517,7 @@ public class UpdateStudyServlet extends SecureController {
             StudyParameterValueBean childspv = new StudyParameterValueBean();
             childspv.setStudyId(child.getId());
             childspv.setParameter("collectDob");
-            childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+            childspv.setValue(Integer.valueOf(study1.getStudyParameterConfig().getCollectDob()).toString());
             updateParameter(spvdao, childspv);
             childspv.setParameter("genderRequired");
             childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());

@@ -77,13 +77,13 @@ public class FilterDAO extends AuditableEntityDAO {
         FilterBean fb = (FilterBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), fb.getName());
-        variables.put(new Integer(2), fb.getDescription());
-        variables.put(new Integer(3), new Integer(fb.getStatus().getId()));
-        variables.put(new Integer(4), fb.getSQLStatement());// string, updateid,
+        variables.put(Integer.valueOf(1), fb.getName());
+        variables.put(Integer.valueOf(2), fb.getDescription());
+        variables.put(Integer.valueOf(3), Integer.valueOf(fb.getStatus().getId()));
+        variables.put(Integer.valueOf(4), fb.getSQLStatement());// string, updateid,
         // filterid
-        variables.put(new Integer(5), new Integer(fb.getUpdaterId()));
-        variables.put(new Integer(6), new Integer(fb.getId()));
+        variables.put(Integer.valueOf(5), Integer.valueOf(fb.getUpdaterId()));
+        variables.put(Integer.valueOf(6), Integer.valueOf(fb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
         return fb;
     }
@@ -94,13 +94,13 @@ public class FilterDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         int id = getNextPK();
         // HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), fb.getId());
-        variables.put(new Integer(2), fb.getName());
+        variables.put(Integer.valueOf(1), fb.getId());
+        variables.put(Integer.valueOf(2), fb.getName());
         // name desc sql, status id owner id
-        variables.put(new Integer(3), fb.getDescription());
-        variables.put(new Integer(4), fb.getSQLStatement());
-        variables.put(new Integer(5), new Integer(fb.getStatus().getId()));
-        variables.put(new Integer(6), new Integer(fb.getOwner().getId()));
+        variables.put(Integer.valueOf(3), fb.getDescription());
+        variables.put(Integer.valueOf(4), fb.getSQLStatement());
+        variables.put(Integer.valueOf(5), Integer.valueOf(fb.getStatus().getId()));
+        variables.put(Integer.valueOf(6), Integer.valueOf(fb.getOwner().getId()));
         // changed from get owner id, tbh
 
         this.execute(digester.getQuery("create"), variables);
@@ -154,7 +154,7 @@ public class FilterDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);

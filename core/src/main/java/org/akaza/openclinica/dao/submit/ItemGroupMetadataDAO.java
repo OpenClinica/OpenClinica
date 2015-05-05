@@ -152,7 +152,7 @@ public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends 
         variables.put(11, igMetaBean.getItemId());
         variables.put(12, igMetaBean.getOrdinal());
         variables.put(13, igMetaBean.getBorders());
-        variables.put(14, new Boolean(igMetaBean.isShowGroup()));
+        variables.put(14, Boolean.valueOf(igMetaBean.isShowGroup()));
 
         this.execute(digester.getQuery("create"), variables);
         if (isQuerySuccessful()) {
@@ -240,7 +240,7 @@ public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends 
         this.setTypeExpected(1, TypeNames.INT);
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(crfVersionId));
 
         ArrayList al = this.select(digester.getQuery("findThisCrfVersionId"), variables);
 
