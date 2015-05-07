@@ -49,6 +49,7 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
@@ -98,6 +99,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
+    private ItemDAO itemDao;
 
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
@@ -483,8 +485,9 @@ public class XsltTransformJob extends QuartzJobBean {
                 successMsg =" ";
             }
 
-            ExportLogger.logExport(currentStudy, userBean, datasetBean);
-           postSuccessMessage(successMsg, context);
+            ExportLogger exportLogger = new ExportLogger();
+            exportLogger.logExport(currentStudy, userBean, datasetBean, itemDao, epBean.getFiledescription(), alertEmail);
+            postSuccessMessage(successMsg, context);
         } catch (JobInterruptedException e) {
             logger.info("Job was cancelled by the user");
             exceptions = true;
@@ -576,6 +579,7 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetDao = ctx.getBean(DatasetDAO.class);
             userAccountDao = ctx.getBean(UserAccountDAO.class);
             studyDao = new StudyDAO(dataSource);
+            itemDao = new ItemDAO(dataSource);
             archivedDatasetFileDao = ctx.getBean(ArchivedDatasetFileDAO.class);
             generateFileService = ctx.getBean(GenerateExtractFileService.class);
             odmFileCreation = ctx.getBean(OdmFileCreation.class);
