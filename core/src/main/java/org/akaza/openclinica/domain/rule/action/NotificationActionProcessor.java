@@ -83,6 +83,13 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	RuleActionBean ruleActionBean;
 	ParticipantPortalRegistrar participantPortalRegistrar;
 	String email;
+	String[] listOfEmails;
+	StudySubjectBean ssBean;
+	UserAccountBean uBean;
+	StudyBean studyBean;
+	String message;
+	String url;
+	String emailSubject;
 
 	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO, ParticipantPortalRegistrar participantPortalRegistrar,
 			String email) {
@@ -92,6 +99,18 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.pDTO = pDTO;
 		this.participantPortalRegistrar = participantPortalRegistrar;
 		this.email = email;
+
+	}
+
+	public NotificationActionProcessor(String[] listOfEmails, UserAccountBean uBean, StudyBean studyBean, String message, String emailSubject, ParticipantPortalRegistrar participantPortalRegistrar,
+			JavaMailSenderImpl mailSender) {
+		this.listOfEmails = listOfEmails;
+		this.message = message;
+		this.emailSubject = emailSubject;
+		this.uBean = uBean;
+		this.participantPortalRegistrar = participantPortalRegistrar;
+		this.mailSender = mailSender;
+		this.studyBean = studyBean;
 
 	}
 
@@ -124,7 +143,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		logger.info("Sending email...");
 		try {
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
-
 			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 			helper.setFrom(EmailEngine.getAdminEmail());
 			helper.setTo(pDTO.getEmailAccount());
@@ -169,6 +187,18 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
 		StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(studySubjectBeanId);
+		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
+		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
+		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
+		
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, uBean, studyBean, message, emailSubject, participantPortalRegistrar, mailSender));
+		thread.start();
+
+	}
+
+	@Override
+	public void run() {
+
 		String hostname = "";
 		String url = "";
 		if (message.contains("${participant.url}") || message.contains("${participant.loginurl}")) {
@@ -184,11 +214,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			url = hostname.replaceAll("login", "plogin");
 			message = message.replaceAll("\\$\\{participant.url}", url);
 		}
-
 		for (String email : listOfEmails) {
 
 			if (email.trim().equals("${participant}")) {
-				pDTO = getParticipantInfo(ds, ssBean, studyBean);
+				pDTO = getParticipantInfo(uBean);
 				if (pDTO != null) {
 					String msg = null;
 					msg = message.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
@@ -203,9 +232,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 					pDTO.setEmailSubject(emailSubject);
 
 					// Send Email thru Mandrill Mail Server
-					NotificationActionProcessor notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleActionBean, pDTO, participantPortalRegistrar, email);
-					Thread thread = new Thread(notificationActionProcessor);
-					thread.start();
+					try {
+						participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
+					} catch (Exception e) {
+						e.getStackTrace();
+					}
 
 					System.out.println(pDTO.getMessage() + "   (Email Send to Participant from Mandrill :  " + pDTO.getEmailAccount() + ")");
 
@@ -224,9 +255,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				pDTO.setEmailAccount(email.trim());
 				System.out.println();
 				// Send Email thru Local Mail Server
-				NotificationActionProcessor notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleActionBean, pDTO, participantPortalRegistrar, email);
-				Thread thread = new Thread(notificationActionProcessor);
-				thread.start();
+				execute(ExecutionMode.SAVE, ruleActionBean, pDTO);
 
 				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address from OC Mail Server :  " + pDTO.getEmailAccount() + ")");
 
@@ -248,11 +277,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId), studySubjectId, userId, studyEventOrdinal, event.getContainer().getChangeDetails());
 	}
 
-	public ParticipantDTO getParticipantInfo(DataSource ds, StudySubjectBean ssBean, StudyBean studyBean) {
+	public ParticipantDTO getParticipantInfo(UserAccountBean uBean) {
 		ParticipantDTO pDTO = null;
-		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
-		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
-		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
 		if (uBean != null && uBean.isActive()) {
 			if (uBean.getEmail() == null)
 				return null;
@@ -313,16 +339,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	public RuleSetDao getRuleSetDao() {
 		return ruleSetDao;
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		if (email.trim().equals("${participant}")) {
-			participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
-		} else {
-			execute(ExecutionMode.SAVE, ruleActionBean, pDTO);
-		}
 	}
 
 }
