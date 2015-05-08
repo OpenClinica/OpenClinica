@@ -1,10 +1,11 @@
-package org.akaza.openclinica.web.pmanage;
+package org.akaza.openclinica.service.pmanage;
 
 import java.net.URL;
 
+import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.web.pmanage.Authorization;
-import org.akaza.openclinica.web.pmanage.Study;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.Study;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,22 @@ public class ParticipantPortalRegistrar {
 
     public String registerStudy(String studyOid) {
         return registerStudy(studyOid, null);
+    }
+    
+    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO) {
+        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/email";
+
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
+
+        try {
+        	ParticipantDTO response = rest.postForObject(pManageUrl, participantDTO, ParticipantDTO.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
+        return "";
     }
 
     public String registerStudy(String studyOid, String hostName) {

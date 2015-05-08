@@ -10,10 +10,23 @@ public class ParticipantDTO {
 	private String eventName;
 	private String emailAccount;
 	private String emailSubject;
+	private String url;
+	private String loginUrl;
 	
 	
 	
-	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getLoginUrl() {
+		return loginUrl;
+	}
+	public void setLoginUrl(String loginUrl) {
+		this.loginUrl = loginUrl;
+	}
 	public String getEmailSubject() {
 		return emailSubject;
 	}
