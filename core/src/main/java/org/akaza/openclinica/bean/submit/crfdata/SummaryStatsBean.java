@@ -3,11 +3,20 @@ package org.akaza.openclinica.bean.submit.crfdata;
 public class SummaryStatsBean {
 
     private int eventCrfCount;
+    private int skippedCrfCount;
     private int studySubjectCount;
     private int discNoteCount;
 
     public int getEventCrfCount() {
         return eventCrfCount;
+    }
+
+    public int getSkippedCrfCount() {
+        return skippedCrfCount;
+    }
+
+    public void setSkippedCrfCount(int skippedCrfCount) {
+        this.skippedCrfCount = skippedCrfCount;
     }
 
     public void setEventCrfCount(int eventCrfCount) {

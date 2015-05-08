@@ -29,6 +29,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -42,11 +43,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Create a new CRF verison by uploading excel file. Makes use of several other
- * classes to validate and provide accurate validation. More specifically, uses
- * XmlSchemaValidationHelper, ImportCRFDataService, ODMContainer, and others to
+ * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
+ * validation. More specifically, uses XmlSchemaValidationHelper, ImportCRFDataService, ODMContainer, and others to
  * import all the XML in the ODM 1.3 standard.
- *
+ * 
  * @author Krikor Krumlian, Tom Hickerson updated Apr-May 2008
  */
 public class ImportCRFDataServlet extends SecureController {
@@ -74,7 +74,8 @@ public class ImportCRFDataServlet extends SecureController {
         }
 
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2)) {
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)
+                || r.equals(Role.RESEARCHASSISTANT2)) {
             return;
         }
 
@@ -118,7 +119,7 @@ public class ImportCRFDataServlet extends SecureController {
                 new File(theDir).mkdirs();
                 logger.info("Made the directory " + theDir);
             }
-            //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
+            // MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
             File f = null;
             try {
                 f = uploadFile(theDir, version);
@@ -154,7 +155,8 @@ public class ImportCRFDataServlet extends SecureController {
             myMap.loadMapping(ODM_MAPPING_DIRPath + File.separator + "cd_odm_mapping.xml");
 
             Unmarshaller um1 = new Unmarshaller(myMap);
-            //um1.addNamespaceToPackageMapping("http://www.cdisc.org/ns/odm/v1.3"
+            // um1.addNamespaceToPackageMapping("http://www.openclinica.org/ns/odm_ext_v130/v3.1", "OpenClinica");
+            // um1.addNamespaceToPackageMapping("http://www.cdisc.org/ns/odm/v1.3"
             // ,
             // "ODMContainer");
             boolean fail = false;
@@ -187,7 +189,7 @@ public class ImportCRFDataServlet extends SecureController {
                 // .setProperty("org.exolab.castor.sax.features",
                 // "http://xml.org/sax/features/validation,
                 // http://apache.org/xml/features/validation/schema,
-                //http://apache.org/xml/features/validation/schema-full-checking
+                // http://apache.org/xml/features/validation/schema-full-checking
                 // ");
                 //
                 // m1.setMapping(myMap);
@@ -265,10 +267,16 @@ public class ImportCRFDataServlet extends SecureController {
             // (and the event should be independent, ie not affected by other
             // events)
 
+            Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub);
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
+            // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
+            // doesn't match upsert, it won't be created.
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
+            // The following map is used for setting the EventCRF status post import.
+            HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService().fetchEventCRFStatuses(odmContainer);
             // @pgawade 17-May-2011 Fix for issue#9590 - collection of
             // eventCRFBeans is returned as null
             // when status of one the events in xml file is either stopped,
@@ -278,109 +286,111 @@ public class ImportCRFDataServlet extends SecureController {
             if (eventCRFBeans == null) {
                 fail = true;
                 addPageMessage(respage.getString("no_event_status_matching"));
-            }
- else {
-            ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-            logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
+            } else {
+                ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
+                logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
-//            List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+                // List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 // HashMap<String, String> totalValidationErrors = new
                 // HashMap<String, String>();
                 // HashMap<String, String> hardValidationErrors = new
                 // HashMap<String, String>();
-            logger.debug("found event crfs " + eventCRFBeans.size());
-            // -- does the event already exist? if not, fail
-            if (!eventCRFBeans.isEmpty()) {
-                for (EventCRFBean eventCRFBean : eventCRFBeans) {
-                    DataEntryStage dataEntryStage = eventCRFBean.getStage();
-                    Status eventCRFStatus = eventCRFBean.getStatus();
+                logger.debug("found event crfs " + eventCRFBeans.size());
+                // -- does the event already exist? if not, fail
+                if (!eventCRFBeans.isEmpty()) {
+                    for (EventCRFBean eventCRFBean : eventCRFBeans) {
+                        DataEntryStage dataEntryStage = eventCRFBean.getStage();
+                        Status eventCRFStatus = eventCRFBean.getStatus();
 
-                    logger.info("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
-                        + eventCRFStatus.getName());
-                    if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-                        // actually want the negative
-                        // was status == available and the stage questions, but
-                        // when you are at 'data entry complete' your status is
-                        // set to 'unavailable'.
-                        // >> tbh 09/2008
-                        // HOWEVER, when one event crf is removed and the rest
-                        // are good, what happens???
-                        // need to create a list and inform that one is blocked
-                        // and the rest are not...
-                        //
-                        permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
-                    } else {
-                        // fail = true;
-                        // addPageMessage(respage.getString(
-                        // "the_event_crf_not_correct_status"));
-                        // forwardPage(Page.IMPORT_CRF_DATA);
+                        logger.info("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
+                                + eventCRFStatus.getName());
+                        if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                                || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
+                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                            // actually want the negative
+                            // was status == available and the stage questions, but
+                            // when you are at 'data entry complete' your status is
+                            // set to 'unavailable'.
+                            // >> tbh 09/2008
+                            // HOWEVER, when one event crf is removed and the rest
+                            // are good, what happens???
+                            // need to create a list and inform that one is blocked
+                            // and the rest are not...
+                            //
+                            permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+                        } else {
+                            // fail = true;
+                            // addPageMessage(respage.getString(
+                            // "the_event_crf_not_correct_status"));
+                            // forwardPage(Page.IMPORT_CRF_DATA);
+                        }
                     }
-                }
 
-                // so that we don't repeat this following message
-                // did we exclude all the event CRFs? if not, pass, else fail
-                if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
-                    addPageMessage(respage.getString("passed_event_crf_status_check"));
-                } else {
+                    // so that we don't repeat this following message
+                    // did we exclude all the event CRFs? if not, pass, else fail
+                    if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
+                        addPageMessage(respage.getString("passed_event_crf_status_check"));
+                    } else {
+                        fail = true;
+                        addPageMessage(respage.getString("the_event_crf_not_correct_status"));
+                    }
+                    // do they all have to have the right status to move
+                    // forward? answer from bug tracker = no
+                    // 5. do the items contain the correct data types?
+
+                    // 6. are all the related OIDs present?
+                    // that is to say, do we chain all the way down?
+                    // this is covered by the OID Metadata Check
+
+                    // 7. do the edit checks pass?
+                    // only then can we pass on to VERIFY_IMPORT_SERVLET
+
+                    // do we overwrite?
+
+                    // XmlParser xp = new XmlParser();
+                    // List<HashMap<String, String>> importedData =
+                    // xp.getData(f);
+
+                    // now we generate hard edit checks, and have to set that to the
+                    // screen. get that from the service, generate a summary bean to
+                    // set to either
+                    // page in the workflow, either verifyImport.jsp or import.jsp
+
+                    try {
+                        List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+                        tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
+                                hardValidationErrors, permittedEventCRFIds);
+                        logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
+                        logger.debug("size of total validation errors: " + totalValidationErrors.size());
+                        displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
+                    } catch (NullPointerException npe1) {
+                        // what if you have 2 event crfs but the third is a fake?
+                        fail = true;
+                        logger.debug("threw a NPE after calling lookup validation errors");
+                        System.out.println(ExceptionUtils.getStackTrace(npe1));
+                        addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
+                        // npe1.printStackTrace();
+                    } catch (OpenClinicaException oce1) {
+                        fail = true;
+                        logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
+                        addPageMessage(oce1.getOpenClinicaMessage());
+                    }
+                } else if (!eventCRFStatusesValid) {
                     fail = true;
                     addPageMessage(respage.getString("the_event_crf_not_correct_status"));
+                } else {
+                    fail = true;
+                    addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
                 }
-                // do they all have to have the right status to move
-                // forward? answer from bug tracker = no
-                // 5. do the items contain the correct data types?
-
-                // 6. are all the related OIDs present?
-                // that is to say, do we chain all the way down?
-                // this is covered by the OID Metadata Check
-
-                // 7. do the edit checks pass?
-                // only then can we pass on to VERIFY_IMPORT_SERVLET
-
-                // do we overwrite?
-
-                // XmlParser xp = new XmlParser();
-                // List<HashMap<String, String>> importedData =
-                // xp.getData(f);
-
-                // now we generate hard edit checks, and have to set that to the
-                // screen. get that from the service, generate a summary bean to
-                // set to either
-                // page in the workflow, either verifyImport.jsp or import.jsp
-
-                try {
-                    List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-                    tempDisplayItemBeanWrappers =
-                        getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors, hardValidationErrors,
-                                permittedEventCRFIds);
-                    logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
-                    logger.debug("size of total validation errors: " + totalValidationErrors.size());
-                    displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
-                } catch (NullPointerException npe1) {
-                    // what if you have 2 event crfs but the third is a fake?
-                    fail = true;
-                    logger.debug("threw a NPE after calling lookup validation errors");
-                    addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
-                     // npe1.printStackTrace();
-                } catch (OpenClinicaException oce1) {
-                    fail = true;
-                    logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
-                    addPageMessage(oce1.getOpenClinicaMessage());
-                  }
-            } else {
-                fail = true;
-                addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
+                // for (HashMap<String, String> crfData : importedData) {
+                // DisplayItemBeanWrapper displayItemBeanWrapper =
+                // testing(request,
+                // crfData);
+                // displayItemBeanWrappers.add(displayItemBeanWrapper);
+                // errors = displayItemBeanWrapper.getValidationErrors();
+                //
+                // }
             }
-            // for (HashMap<String, String> crfData : importedData) {
-            // DisplayItemBeanWrapper displayItemBeanWrapper =
-            // testing(request,
-            // crfData);
-            // displayItemBeanWrappers.add(displayItemBeanWrapper);
-            // errors = displayItemBeanWrapper.getValidationErrors();
-            //
-            // }
- }
             if (fail) {
                 logger.debug("failed here - forwarding...");
                 forwardPage(Page.IMPORT_CRF_DATA);
@@ -390,33 +400,34 @@ public class ImportCRFDataServlet extends SecureController {
                 session.setAttribute("importedData", displayItemBeanWrappers);
                 session.setAttribute("validationErrors", totalValidationErrors);
                 session.setAttribute("hardValidationErrors", hardValidationErrors);
+                session.setAttribute("importedCRFStatuses", importedCRFStatuses);
+                session.setAttribute("importCrfInfo", importCrfInfo);
                 // above are updated 'statically' by the method that originally
                 // generated the wrappers; soon the only thing we will use
                 // wrappers for is the 'overwrite' flag
 
                 logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
-                SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
+                SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers, importCrfInfo);
                 session.setAttribute("summaryStats", ssBean);
                 // will have to set hard edit checks here as well
                 session.setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());
                 forwardPage(Page.VERIFY_IMPORT_SERVLET);
             }
-//            }
+            // }
         }
     }
 
     /*
-     * Given the MultipartRequest extract the first File validate that it is an
-     * xml file and then return it.
+     * Given the MultipartRequest extract the first File validate that it is an xml file and then return it.
      */
     private File getFirstFile() {
         File f = null;
         List<File> files = uploadHelper.returnFiles(request, context);
         for (File file : files) {
-            //Enumeration files = multi.getFileNames();
-            //if (files.hasMoreElements()) {
-            //String name = (String) files.nextElement();
-            //f = multi.getFile(name);
+            // Enumeration files = multi.getFileNames();
+            // if (files.hasMoreElements()) {
+            // String name = (String) files.nextElement();
+            // f = multi.getFile(name);
             f = file;
             if (f == null || f.getName() == null) {
                 logger.info("file is empty.");
@@ -433,7 +444,7 @@ public class ImportCRFDataServlet extends SecureController {
 
     /**
      * Uploads the xml file
-     *
+     * 
      * @param version
      * @throws Exception
      */
