@@ -315,7 +315,19 @@
                 
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
+                       
+                         <c:choose>
+                           <c:when test="${eventCRFAudit.ordinal!=0}">
+                               <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
+                           </c:when >
+                           <c:when test="${eventCRFAudit.ordinal==0 && eventCRFAudit.itemDataRepeatKey != 0}">
+                               <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.itemDataRepeatKey}"/>)</td>
+                           </c:when >                      
+                            <c:otherwise>
+                               <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/></td>
+                           </c:otherwise>
+                      </c:choose>                           
+                       
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>
@@ -327,6 +339,7 @@
                                         <c:if test="${eventCRFAudit.oldValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.oldValue eq '11'}">reset</c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                     	<c:choose>
@@ -359,6 +372,7 @@
                                         <c:if test="${eventCRFAudit.newValue eq '5'}">removed</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq '7'}">auto-removed</c:if>
+                                        <c:if test="${eventCRFAudit.newValue eq '11'}">reset</c:if>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                     	<c:choose>

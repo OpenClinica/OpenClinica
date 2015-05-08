@@ -178,6 +178,7 @@ public class AccountController {
 		String mobile = map.get("mobile");
 		String accessCode = map.get("accessCode");
 		String crcUserName = map.get("crcUserName");
+		String email = map.get("email");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		System.out.println("******************     You are in the Rest Service   *****************");
@@ -196,7 +197,7 @@ public class AccountController {
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isFistNameInValid(fName))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		if (isPhoneFieldIsNull(mobile))
+		if (isPhoneFieldIsNull(mobile) && isEmailIsNull(email))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		if (isAccessCodeIsNull(accessCode))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -218,7 +219,7 @@ public class AccountController {
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
 		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
-		uBean = buildUserAccount(oid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName);
+		uBean = buildUserAccount(oid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName, email);
 		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
 		if (!participantUserAccountBean.isActive()) {
 			createUserAccount(uBean);
@@ -249,10 +250,11 @@ public class AccountController {
 		uDTO.setUserName(userAccountBean.getName());
 		uDTO.setAccessCode(userAccountBean.getAccessCode());
 		uDTO.setPassword(userAccountBean.getPasswd());
+		uDTO.setEmail(userAccountBean.getEmail());
 		return uDTO;
 	}
 
-	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String accessCode, UserAccountBean ownerUserAccount, String pUserName)
+	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String accessCode, UserAccountBean ownerUserAccount, String pUserName, String email)
 			throws Exception {
 
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
@@ -272,6 +274,7 @@ public class AccountController {
 		createdUserAccountBean.setPhone(mobile);
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
+		createdUserAccountBean.setEmail(email);
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
@@ -421,6 +424,15 @@ public class AccountController {
 		if (!ownerUserAccount.isActive()) {
 			logger.info("***  CRC user acount does not Exist in the User Table ***");
 			System.out.println("***  CRC user acount does not Exist in the User Table ***");
+			return true;
+		}
+		return false;
+	}
+
+	private Boolean isEmailIsNull(String email) {
+		if (email.length() == 0) {
+			logger.info("***Email Address is a Required field and can't be null ***");
+			System.out.println("***Email Address is a Required field and can't be null ***");
 			return true;
 		}
 		return false;

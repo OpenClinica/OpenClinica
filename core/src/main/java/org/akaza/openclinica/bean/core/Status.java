@@ -29,9 +29,10 @@ public class Status extends Term implements Comparable {
     public static final Status SIGNED = new Status(8, "signed");
     public static final Status FROZEN = new Status(9, "frozen");
     public static final Status SOURCE_DATA_VERIFICATION = new Status(10, "source_data_verification");
+    public static final Status RESET = new Status(11, "reset");
 
     private static final Status[] members =
-        { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
+        { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION,RESET };
     private static List list = Arrays.asList(members);  
 
     private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
@@ -60,6 +61,7 @@ public class Status extends Term implements Comparable {
         membersMap.put(8, "signed");
         membersMap.put(9, "frozen");
         membersMap.put(10, "source_data_verification");
+        membersMap.put(11, "reset");
     }
 
     private Status(int id, String name) {

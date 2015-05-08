@@ -615,17 +615,44 @@ public class OpenRosaXmlGenerator {
 		 * leave only Item_Oid entities. And will neglect the whole path
 		 */
 		String[] exprs = expression.split(" ");
+		boolean byPass = false;
+		String tempExpr = "";
 		for (String expr : exprs) {
 			if (expr.contains("../I_")) {
 				String itemOid = expr.substring(3);
 				logger.info("itemOid:  " + itemOid);
 
 				ItemBean itemBean = getItemBean(itemOid);
+
 				ItemGroupBean itemGroupBean = getItemGroupBeanByItemId(itemBean.getId());
+				itemFormMetadataDAO = new ItemFormMetadataDAO(dataSource);
+				ItemFormMetadataBean ifmBean = (ItemFormMetadataBean) itemFormMetadataDAO.findByItemIdAndCRFVersionId(itemBean.getId(), version.getId());
+
+				if (ifmBean.getResponseSet().getResponseTypeId() == 3 || ifmBean.getResponseSet().getResponseTypeId() == 7) {
+					byPass = true;
+					tempExpr = expr;
+				}
 				expr = "/" + version.getOid() + "/" + itemGroupBean.getOid() + "/" + itemOid;
 			}
 
-			result = result + " " + expr;
+			if (byPass && tempExpr.contains("../I_")) {
+				tempExpr = expr;
+			} else if (byPass && expr.equals("=")) {
+				tempExpr = "selected (" + tempExpr + " , ";
+			} else if (byPass && expr.equals("!=")) {
+				tempExpr = " not selected (" + tempExpr + " , ";
+			} else if (byPass && (expr.equals(">") || expr.equals(">=") || expr.equals("<") || expr.equals("<="))) {
+				tempExpr = tempExpr + " " + expr;
+				result = result + " " + tempExpr;
+				byPass = false;
+			} else if (byPass && !expr.contains("../I_") && !expr.equals("!=") && !expr.equals("=") && !expr.equals(">") && !expr.equals(">=") && !expr.equals("<") && !expr.equals("<=")) {
+				tempExpr = tempExpr + " " + expr + " ) ";
+				result = result + " " + tempExpr;
+				byPass = false;
+			} else {
+				result = result + " " + expr;
+
+			}
 		}
 		logger.info("Full Expression is:  " + result);
 		return result;

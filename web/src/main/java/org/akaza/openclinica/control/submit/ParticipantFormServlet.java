@@ -24,10 +24,18 @@ public class ParticipantFormServlet extends SecureController {
             EnketoCredentials credentials = getCredentials();
             EnketoAPI enketo = new EnketoAPI(credentials);
             formURL = enketo.getFormPreviewURL(crf_oid);
-            if (!formURL.equals(""))
+            if (!formURL.equals("")){
                 response.sendRedirect(formURL);
-            else {
-                addPageMessage(respage.getString("participate_not_available"));
+            } else {
+                if (credentials.getServerUrl() == null) {
+                    addPageMessage(respage.getString("pform_preview_missing_url"));    
+                } else {
+                    if ((credentials.getApiKey() != null) && (credentials.getOcInstanceUrl() != null)) {
+                        addPageMessage(respage.getString("pform_preview_forbidden"));        
+                    } else {
+                        addPageMessage(respage.getString("participate_not_available"));
+                    }
+                }
                 forwardPage(Page.MENU_SERVLET);
             }
         }

@@ -3788,6 +3788,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         DisplayItemBean dib = items.get(j);
                         int itemDataId = dib.getData().getId();
                         int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
+                        int numNotes1 = dndao.findNumOfActiveExistingNotesForItemData(itemDataId);
 
                           int ordinal = this.getManualRows(digbs);
                         String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), dib);
@@ -3795,7 +3796,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             inputName = getGroupItemManualInputName(displayGroup, i, dib);
                         }
 
-                         discNotes.setNumExistingFieldNotes(inputName, numNotes);
+                         discNotes.setNumExistingFieldNotes(inputName, numNotes1);
                         ArrayList notes = discNotes.getNotes(inputName);
                          dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
@@ -3822,9 +3823,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 int itemDataId = dib.getData().getId();
                 int itemId = dib.getItem().getId();
                 int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
+                int numNotes1 = dndao.findNumOfActiveExistingNotesForItemData(itemDataId);
+               
                 String inputFieldName = "input" + itemId;
 
-                discNotes.setNumExistingFieldNotes(inputFieldName, numNotes);
+                discNotes.setNumExistingFieldNotes(inputFieldName, numNotes1);
                 dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
                 dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, discNotes.getNotes(inputFieldName)));
                dib =  setTotals(dib,itemDataId,discNotes.getNotes(inputFieldName), ecb.getId());
