@@ -455,7 +455,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
             }
             // email the message to the user
-            emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
+            emailBuffer.append("<p>" + CoreResources.getField("job.notification.email.footer") + "</p>");
             try {
 
                 // @pgawade 19-April-2011 Log the event into audit_event table
