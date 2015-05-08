@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-       <include file="migration/3.6/2015-05-01-OC-6405.xml"/>
-       <include file="migration/3.6/2015-06-07-OC-6405.xml"/>
-       
+       <include file="migration/3.6/2015-05-01-OC-6405.xml"/>       
 </databaseChangeLog>

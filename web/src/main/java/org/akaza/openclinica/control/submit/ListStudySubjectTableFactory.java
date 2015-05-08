@@ -93,7 +93,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ResourceBundle resformat;
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
     private StudyParameterValueDAO studyParameterValueDAO;
-	private ParticipantPortalRegistrar	participantPortalRegistrar = new ParticipantPortalRegistrar();
+	private ParticipantPortalRegistrar	participantPortalRegistrar; 
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -796,6 +796,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     
     
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception{
+    	 participantPortalRegistrar=new ParticipantPortalRegistrar();
 	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());	    
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(pStudy.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
@@ -829,6 +830,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
+   	    participantPortalRegistrar=new ParticipantPortalRegistrar();
 	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());	    
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());

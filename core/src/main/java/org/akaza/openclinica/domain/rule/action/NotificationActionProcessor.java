@@ -68,7 +68,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
 
-public class NotificationActionProcessor implements ActionProcessor {
+public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	DataSource ds;
@@ -79,7 +79,21 @@ public class NotificationActionProcessor implements ActionProcessor {
 	UserAccountDAO udao;
 	RuleSetService ruleSetService;
 	RuleSetDao ruleSetDao;
-	public static final int PARTICIPATE_READ_TIMEOUT = 5000;
+	ParticipantDTO pDTO;
+	RuleActionBean ruleActionBean;
+	ParticipantPortalRegistrar participantPortalRegistrar;
+	String email;
+
+	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO, ParticipantPortalRegistrar participantPortalRegistrar,
+			String email) {
+		this.ds = ds;
+		this.mailSender = mailSender;
+		this.ruleActionBean = ruleActionBean;
+		this.pDTO = pDTO;
+		this.participantPortalRegistrar = participantPortalRegistrar;
+		this.email = email;
+
+	}
 
 	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule) {
 		this.ds = ds;
@@ -88,6 +102,44 @@ public class NotificationActionProcessor implements ActionProcessor {
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
 
+	}
+
+	public RuleActionBean execute(ExecutionMode executionMode, RuleActionBean ruleActionBean, ParticipantDTO pDTO) {
+		switch (executionMode) {
+		case DRY_RUN: {
+			return ruleActionBean;
+		}
+
+		case SAVE: {
+			sendEmail(ruleActionBean, pDTO);
+			return null;
+		}
+		default:
+			return null;
+		}
+	}
+
+	private void sendEmail(RuleActionBean ruleAction, ParticipantDTO pDTO) throws OpenClinicaSystemException {
+
+		logger.info("Sending email...");
+		try {
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+			helper.setFrom(EmailEngine.getAdminEmail());
+			helper.setTo(pDTO.getEmailAccount());
+			helper.setSubject(pDTO.getEmailSubject());
+			helper.setText(pDTO.getMessage());
+
+			mailSender.send(mimeMessage);
+			logger.debug("Email sent successfully on {}", new Date());
+		} catch (MailException me) {
+			logger.error("Email could not be sent");
+			throw new OpenClinicaSystemException(me.getMessage());
+		} catch (MessagingException me) {
+			logger.error("Email could not be sent");
+			throw new OpenClinicaSystemException(me.getMessage());
+		}
 	}
 
 	@Override
@@ -117,7 +169,6 @@ public class NotificationActionProcessor implements ActionProcessor {
 		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
 		StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(studySubjectBeanId);
-		ParticipantPortalRegistrar participantPortalRegistrar = null;
 		String hostname = "";
 		String url = "";
 		if (message.contains("${participant.url}") || message.contains("${participant.loginurl}")) {
@@ -146,18 +197,17 @@ public class NotificationActionProcessor implements ActionProcessor {
 					String loginUrl = url + "?access_code=" + pDTO.getAccessCode() + "&auto_login=true";
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", loginUrl);
 
+					msg = msg.replaceAll("\\\\n", "\n");
+					;
 					pDTO.setMessage(msg);
 					pDTO.setEmailSubject(emailSubject);
 
-					// Send Email thru Local Mail Server
-/*					NotificationActionSendingEmail notificationActionSendEmail = new NotificationActionSendingEmail(ds, mailSender, ruleActionBean, pDTO);
-					Thread thread = new Thread(notificationActionSendEmail);
+					// Send Email thru Mandrill Mail Server
+					NotificationActionProcessor notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleActionBean, pDTO, participantPortalRegistrar, email);
+					Thread thread = new Thread(notificationActionProcessor);
 					thread.start();
-*/
-					// send email using Mandrill
-					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
 
-					System.out.println(pDTO.getMessage() + "   (Email Send to Participant :  " + pDTO.getEmailAccount() + ")");
+					System.out.println(pDTO.getMessage() + "   (Email Send to Participant from Mandrill :  " + pDTO.getEmailAccount() + ")");
 
 				} else {
 					pDTO = new ParticipantDTO();
@@ -166,6 +216,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 					msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
 					pDTO.setMessage(msg);
+					// pDTO.setMessage("<![CDATA["+msg+"]]>");
 					pDTO.setEmailSubject(emailSubject);
 				}
 
@@ -173,11 +224,11 @@ public class NotificationActionProcessor implements ActionProcessor {
 				pDTO.setEmailAccount(email.trim());
 				System.out.println();
 				// Send Email thru Local Mail Server
-				/*
-				 * NotificationActionSendingEmail notificationActionSendEmail = new NotificationActionSendingEmail(ds, mailSender, ruleActionBean, pDTO); Thread thread = new
-				 * Thread(notificationActionSendEmail); thread.start();
-				 */
-				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address :  " + pDTO.getEmailAccount() + ")");
+				NotificationActionProcessor notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleActionBean, pDTO, participantPortalRegistrar, email);
+				Thread thread = new Thread(notificationActionProcessor);
+				thread.start();
+
+				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address from OC Mail Server :  " + pDTO.getEmailAccount() + ")");
 
 			}
 		}
@@ -209,6 +260,7 @@ public class NotificationActionProcessor implements ActionProcessor {
 			pDTO.setAccessCode(uBean.getAccessCode());
 			pDTO.setfName(uBean.getFirstName());
 			pDTO.setEmailAccount(uBean.getEmail());
+			pDTO.setPhone(uBean.getPhone());
 		} else {
 			return null;
 		}
@@ -261,6 +313,16 @@ public class NotificationActionProcessor implements ActionProcessor {
 
 	public RuleSetDao getRuleSetDao() {
 		return ruleSetDao;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		if (email.trim().equals("${participant}")) {
+			participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
+		} else {
+			execute(ExecutionMode.SAVE, ruleActionBean, pDTO);
+		}
 	}
 
 }
