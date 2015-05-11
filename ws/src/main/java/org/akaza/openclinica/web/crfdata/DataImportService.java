@@ -38,15 +38,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
-
 /**
- *
+ * 
  * @author thickerson, daniel
- *
+ * 
  */
 public class DataImportService {
 
@@ -54,11 +54,10 @@ public class DataImportService {
 
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     ResourceBundle respage;
+
     public ResourceBundle getRespage() {
         return respage;
     }
-
-
 
     public void setRespage(ResourceBundle respage) {
         this.respage = respage;
@@ -67,14 +66,13 @@ public class DataImportService {
     Locale locales;
 
     public Locale getLocale() {
-        if(locales==null) locales = new Locale("en-US");
+        if (locales == null)
+            locales = new Locale("en-US");
         return locales;
     }
 
-
-
     public void setLocale(Locale locale) {
-        if(locale==null)
+        if (locale == null)
             locale = new Locale("en-us");
         this.locales = locale;
     }
@@ -82,17 +80,12 @@ public class DataImportService {
     private ImportCRFDataService dataService;
 
     /**
-     * Import Data, the logic which imports the data for our data service.  Note that
-     * we will return three strings
-     * string 0: status, either 'success', 'fail', or 'warn'.
-     * string 1: the message string which will be returned in our soap response
-     * string 2: the audit message, currently not used but will be saved in the event of a success.
-     *
-     * import consist from 3 steps
-     * 1) parse xml and extract data
-     * 2) validation
-     * 3) data submission
-     *
+     * Import Data, the logic which imports the data for our data service. Note that we will return three strings string
+     * 0: status, either 'success', 'fail', or 'warn'. string 1: the message string which will be returned in our soap
+     * response string 2: the audit message, currently not used but will be saved in the event of a success.
+     * 
+     * import consist from 3 steps 1) parse xml and extract data 2) validation 3) data submission
+     * 
      * @author thickerson
      * @param dataSource
      * @param resources
@@ -101,18 +94,15 @@ public class DataImportService {
      * @param xml
      * @return
      * @throws Exception
-  
-    /*
-     * VALIDATE data on all levels
-     *
-     * msg - contains status messages
-     * @return
-     * list of errors
+     * 
+     *             /* VALIDATE data on all levels
+     * 
+     *             msg - contains status messages
+     * @return list of errors
      */
-    public List<String> validateData(ODMContainer odmContainer,DataSource dataSource, CoreResources resources,
-    		StudyBean studyBean, UserAccountBean userBean,
-    		List<DisplayItemBeanWrapper> displayItemBeanWrappers) {
-        ResourceBundle  respage = ResourceBundleProvider.getPageMessagesBundle();
+    public List<String> validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
+            List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses) {
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
         setRespage(respage);
         TriggerService triggerService = new TriggerService();
 
@@ -123,182 +113,177 @@ public class DataImportService {
         errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
         // this needs to be replaced with the study name from the job, since
         // the user could be in any study ...
-        if (errors != null && errors.size()>0) { return errors;}
+        if (errors != null && errors.size() > 0) {
+            return errors;
+        }
 
-        //htaycher: return back later?
+        // htaycher: return back later?
         auditMsg.append(respage.getString("passed_study_check") + " ");
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
 
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean);
+        getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 
         ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
         logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
-
         // -- does the event already exist? if not, fail
         if (eventCRFBeans.isEmpty()) {
-        	errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));
-        	return errors;
+            errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));
+            return errors;
         }
-        for (EventCRFBean eventCRFBean : eventCRFBeans)
-        {
+        for (EventCRFBean eventCRFBean : eventCRFBeans) {
             DataEntryStage dataEntryStage = eventCRFBean.getStage();
             Status eventCRFStatus = eventCRFBean.getStatus();
 
             logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
                     + eventCRFStatus.getName());
             if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                    || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                    || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                    || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+                    || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                 permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
             } else {
-            	errors.add(respage.getString("your_listed_crf_in_the_file") + " "+eventCRFBean.getEventName());
+                errors.add(respage.getString("your_listed_crf_in_the_file") + " " + eventCRFBean.getEventName());
                 continue;
             }
         }
 
         if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
-        	auditMsg.append(respage.getString("passed_event_crf_status_check") + " ");
+            auditMsg.append(respage.getString("passed_event_crf_status_check") + " ");
         } else {
-        	auditMsg.append(respage.getString("the_event_crf_not_correct_status") + " ");
+            auditMsg.append(respage.getString("the_event_crf_not_correct_status") + " ");
         }
 
-        //  List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+        // List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
         HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
         HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
 
-           try {
-                List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-                //htaycher: this should be rewritten with validator not to use request to store data
-                MockHttpServletRequest request = new MockHttpServletRequest();
-                request.addPreferredLocale(getLocale());
+        try {
+            List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+            // htaycher: this should be rewritten with validator not to use request to store data
+            MockHttpServletRequest request = new MockHttpServletRequest();
+            request.addPreferredLocale(getLocale());
 
-                tempDisplayItemBeanWrappers =
-                    getImportCRFDataService(dataSource).lookupValidationErrors( request, odmContainer, userBean, totalValidationErrors, hardValidationErrors,
-                            permittedEventCRFIds);
-                displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
-                 logger.debug("size of total validation errors: " + ( totalValidationErrors.size() + hardValidationErrors.size()));
-               	 ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-                	if (!hardValidationErrors.isEmpty()) {
-                       //check here where to get group repeat key
-                       errors.add( triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors,"1"));
-                	}
-                 	if (!totalValidationErrors.isEmpty()) {
-                    	errors.add( triggerService.generateHardValidationErrorMessage(subjectData, totalValidationErrors,"1"));
-                    }
+            tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, userBean, totalValidationErrors,
+                    hardValidationErrors, permittedEventCRFIds);
+            displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
+            logger.debug("size of total validation errors: " + (totalValidationErrors.size() + hardValidationErrors.size()));
+            ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+            if (!hardValidationErrors.isEmpty()) {
+                // check here where to get group repeat key
+                errors.add(triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors, "1"));
+            }
+            if (!totalValidationErrors.isEmpty()) {
+                errors.add(triggerService.generateHardValidationErrorMessage(subjectData, totalValidationErrors, "1"));
+            }
 
-            } catch (NullPointerException npe1) {
-                // what if you have 2 event crfs but the third is a fake?
-                npe1.printStackTrace();
-                errors.add(respage.getString("an_error_was_thrown_while_validation_errors"));
-                logger.debug("=== threw the null pointer, import === " + npe1.getMessage());
-            } catch (OpenClinicaException oce1) {
-                errors.add(oce1.getOpenClinicaMessage());
-                logger.debug("=== threw the openclinica message, import === " + oce1.getOpenClinicaMessage());
-           }
+        } catch (NullPointerException npe1) {
+            // what if you have 2 event crfs but the third is a fake?
+            npe1.printStackTrace();
+            errors.add(respage.getString("an_error_was_thrown_while_validation_errors"));
+            logger.debug("=== threw the null pointer, import === " + npe1.getMessage());
+        } catch (OpenClinicaException oce1) {
+            errors.add(oce1.getOpenClinicaMessage());
+            logger.debug("=== threw the openclinica message, import === " + oce1.getOpenClinicaMessage());
+        }
 
-            auditMsg.append(respage.getString("passing_crf_edit_checks") + " ");
+        auditMsg.append(respage.getString("passing_crf_edit_checks") + " ");
 
-      return errors;
+        return errors;
 
     }
 
+    public ArrayList<String> submitData(ODMContainer odmContainer, DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+            List<DisplayItemBeanWrapper> displayItemBeanWrappers, Map<Integer, String> importedCRFStatuses) throws Exception {
 
+        boolean discNotesGenerated = false;
 
-    public ArrayList<String> submitData(ODMContainer odmContainer,
-    		DataSource dataSource,
-    		StudyBean studyBean, UserAccountBean userBean,
-    		List<DisplayItemBeanWrapper> displayItemBeanWrappers
-    )  throws Exception {
+        ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
+        EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
 
-         boolean discNotesGenerated = false;
+        StringBuffer auditMsg = new StringBuffer();
+        int eventCrfBeanId = -1;
+        EventCRFBean eventCrfBean;
+        ArrayList<Integer> eventCrfInts;
+        ItemDataBean itemDataBean;
 
-         ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
-         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
-
-         StringBuffer auditMsg = new StringBuffer();
-         int eventCrfBeanId = -1;EventCRFBean eventCrfBean;
-         ArrayList<Integer> eventCrfInts;
-         ItemDataBean itemDataBean;
-
-         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
-         for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
-                logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
-                if (wrapper.isSavable())
-                {
-                    eventCrfInts = new ArrayList<Integer>();
-                    logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
-                    if ( wrapper.getDisplayItemBeans() != null && wrapper.getDisplayItemBeans().size() == 0)
-                    {
-                    	return getReturnList("fail","", "No items to submit. Please check your XML.");
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
+        for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
+            logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
+            if (wrapper.isSavable()) {
+                eventCrfInts = new ArrayList<Integer>();
+                logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                if (wrapper.getDisplayItemBeans() != null && wrapper.getDisplayItemBeans().size() == 0) {
+                    return getReturnList("fail", "", "No items to submit. Please check your XML.");
+                }
+                for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
+                    eventCrfBeanId = displayItemBean.getData().getEventCRFId();
+                    eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
+                    logger.debug("found value here: " + displayItemBean.getData().getValue());
+                    logger.debug("found status here: " + eventCrfBean.getStatus().getName());
+                    itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
+                            .getData().getOrdinal());
+                    if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
+                        logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
+                        itemDataBean.setUpdatedDate(new Date());
+                        itemDataBean.setUpdater(userBean);
+                        itemDataBean.setValue(displayItemBean.getData().getValue());
+                        // set status?
+                        itemDataDao.update(itemDataBean);
+                        logger.debug("updated: " + itemDataBean.getItemId());
+                        // need to set pk here in order to create dn
+                        displayItemBean.getData().setId(itemDataBean.getId());
+                    } else {
+                        itemDataDao.create(displayItemBean.getData());
+                        logger.debug("created: " + displayItemBean.getData().getItemId());
+                        itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
+                                .getData().getOrdinal());
+                        // logger.debug("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
+                        displayItemBean.getData().setId(itemDataBean.getId());
                     }
-                    for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
-                        eventCrfBeanId = displayItemBean.getData().getEventCRFId();
-                        eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
-                        logger.debug("found value here: " + displayItemBean.getData().getValue());
-                        logger.debug("found status here: " + eventCrfBean.getStatus().getName());
-                        itemDataBean =  itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(),
-                        		displayItemBean.getData().getOrdinal());
-                        if (wrapper.isOverwrite() && itemDataBean.getStatus() != null)
-                        {
-                            logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
-                            itemDataBean.setUpdatedDate(new Date());
-                            itemDataBean.setUpdater(userBean);
-                            itemDataBean.setValue(displayItemBean.getData().getValue());
-                            // set status?
-                            itemDataDao.update(itemDataBean);
-                            logger.debug("updated: " + itemDataBean.getItemId());
-                            // need to set pk here in order to create dn
-                            displayItemBean.getData().setId(itemDataBean.getId());
-                        } else
-                        {
-                            itemDataDao.create(displayItemBean.getData());
-                            logger.debug("created: " + displayItemBean.getData().getItemId());
-                            itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(),
-                        		   displayItemBean.getData().getOrdinal());
-                            //logger.debug("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
-                            displayItemBean.getData().setId(itemDataBean.getId());
-                        }
-                        ItemDAO idao = new ItemDAO(dataSource);
-                        ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
-                        //logger.debug("*** checking for validation errors: " + ibean.getName());
-                        String itemOid =
-                            displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
+                    ItemDAO idao = new ItemDAO(dataSource);
+                    ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
+                    // logger.debug("*** checking for validation errors: " + ibean.getName());
+                    String itemOid = displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
                             + "_" + wrapper.getStudySubjectOid();
-                        //logger.debug("+++ found validation errors hash map: " + wrapper.getValidationErrors().toString());
-                        if (wrapper.getValidationErrors().containsKey(itemOid)) {
-                            ArrayList<String> messageList = (ArrayList<String>) wrapper.getValidationErrors().get(itemOid);
-                            for (String message: messageList) {
-                                 DiscrepancyNoteBean parentDn =
-                                    createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, userBean, dataSource, studyBean);
-                                createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
-                                discNotesGenerated = true;
-                               logger.debug("*** created disc note with message: " + message);
-                                auditMsg.append(wrapper.getStudySubjectOid()+ ": " + ibean.getOid() + ": " + message + "---");
-                                // split by this ? later, tbh
-                                // displayItemBean);
-                            }
+                    // logger.debug("+++ found validation errors hash map: " +
+                    // wrapper.getValidationErrors().toString());
+                    if (wrapper.getValidationErrors().containsKey(itemOid)) {
+                        ArrayList<String> messageList = (ArrayList<String>) wrapper.getValidationErrors().get(itemOid);
+                        for (String message : messageList) {
+                            DiscrepancyNoteBean parentDn = createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, userBean, dataSource,
+                                    studyBean);
+                            createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
+                            discNotesGenerated = true;
+                            logger.debug("*** created disc note with message: " + message);
+                            auditMsg.append(wrapper.getStudySubjectOid() + ": " + ibean.getOid() + ": " + message + "---");
+                            // split by this ? later, tbh
+                            // displayItemBean);
                         }
-                        if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
+                    }
+
+                    if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
+                        String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
+
+                        if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
+                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean);
+                        } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
-                            //logger.debug("*** just updated event crf bean: " + eventCrfBean.getId());
-                            eventCrfInts.add(new Integer(eventCrfBean.getId()));
                         }
+                        eventCrfInts.add(new Integer(eventCrfBean.getId()));
                     }
                 }
             }
-          if (!discNotesGenerated) {
-            return getReturnList("success","", auditMsg.toString());
+        }
+        if (!discNotesGenerated) {
+            return getReturnList("success", "", auditMsg.toString());
         } else {
-            return getReturnList("warn","", auditMsg.toString());
+            return getReturnList("warn", "", auditMsg.toString());
         }
     }
 
-
-
-
-    public  DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
+    public DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
             Integer parentId, UserAccountBean uab, DataSource ds, StudyBean study) {
 
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
@@ -332,34 +317,33 @@ public class DataImportService {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(ds);
         note = (DiscrepancyNoteBean) dndao.create(note);
         // so that the below method works, need to set the entity above
-       logger.debug("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
+        logger.debug("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
         dndao.createMapping(note);
         logger.debug("just created mapping");
         return note;
     }
 
-    public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, StudyBean studyBean,
-            UserAccountBean userBean, List<SubjectDataBean> subjectDataBeans, RuleSetServiceInterface ruleSetService) {
+    public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+            List<SubjectDataBean> subjectDataBeans, RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
-        if(ruleSetService.getCountByStudy(studyBean)>0) {
+        if (ruleSetService.getCountByStudy(studyBean) > 0) {
             ImportDataRuleRunnerContainer container;
             for (SubjectDataBean subjectDataBean : subjectDataBeans) {
                 container = new ImportDataRuleRunnerContainer();
                 container.initRuleSetsAndTargets(dataSource, studyBean, subjectDataBean, ruleSetService);
-                if(container.getShouldRunRules())   containers.add(container);
+                if (container.getShouldRunRules())
+                    containers.add(container);
             }
-            if(containers != null && ! containers.isEmpty())
+            if (containers != null && !containers.isEmpty())
                 ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
         }
         return containers;
     }
 
-
-    public List<String> runRules(StudyBean studyBean, UserAccountBean userBean,
-            List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
-            ExecutionMode executionMode) {
+    public List<String> runRules(StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+            RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
         List<String> messages = new ArrayList<String>();
-        if(containers != null && ! containers.isEmpty()) {
+        if (containers != null && !containers.isEmpty()) {
             HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
             messages = extractRuleActionWarnings(summary);
         }
@@ -368,11 +352,11 @@ public class DataImportService {
 
     private List<String> extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
         List<String> messages = new ArrayList<String>();
-        if(summaryMap != null && !summaryMap.isEmpty()) {
+        if (summaryMap != null && !summaryMap.isEmpty()) {
             for (String key : summaryMap.keySet()) {
-                StringBuilder mesg = new StringBuilder(key+" : ");
-                for(String s : summaryMap.get(key)) {
-                    mesg.append(s+", ");
+                StringBuilder mesg = new StringBuilder(key + " : ");
+                for (String s : summaryMap.get(key)) {
+                    mesg.append(s + ", ");
                 }
                 messages.add(mesg.toString());
             }
@@ -381,17 +365,18 @@ public class DataImportService {
     }
 
     private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
-/*    	if (locale == null) {locale = new Locale("en-US");}
-        dataService = this.dataService != null? dataService : new ImportCRFDataService(dataSource, locale);*/
+        /*
+         * if (locale == null) {locale = new Locale("en-US");} dataService = this.dataService != null? dataService : new
+         * ImportCRFDataService(dataSource, locale);
+         */
         return new ImportCRFDataService(dataSource, getLocale());
     }
 
-    private ArrayList<String> getReturnList(String status,String msg, String auditMsg) {
+    private ArrayList<String> getReturnList(String status, String msg, String auditMsg) {
         ArrayList<String> retList = new ArrayList<String>(3);
         retList.add(status);
         retList.add(msg.toString());
         retList.add(auditMsg.toString());
         return retList;
     }
-   }
-
+}

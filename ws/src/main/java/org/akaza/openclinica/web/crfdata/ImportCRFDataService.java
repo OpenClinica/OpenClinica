@@ -81,8 +81,8 @@ public class ImportCRFDataService {
     }
 
     /*
-     * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the findByEventSubjectVersion method in EventCRFDAO. May
-     * return more than one, hmm.
+     * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
+     * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
     public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
@@ -105,10 +105,10 @@ public class ImportCRFDataService {
 
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
-                StudyEventDefinitionBean studyEventDefinitionBean =
-                    studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), studyBean.getParentStudyId());
+                StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
+                        studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
-                
+
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
@@ -122,16 +122,16 @@ public class ImportCRFDataService {
                         // iterate the studyeventbeans here
                         // for (StudyEventBean studyEventBean : studyEventBeans) {
 
-                        StudyEventBean studyEventBean =
-                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                                    studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
-                        // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
-                        // htaycher: transfer from web  @pgawade 16-March-2011 Do not allow the data import
+                        StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                                studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+                        // ArrayList<StudyEventBean> studyEventBeans =
+                        // studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
+                        // htaycher: transfer from web @pgawade 16-March-2011 Do not allow the data import
                         // if event status is one of the - stopped, signed,
                         // locked
                         if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
-                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
-                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
+                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
+                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
                             return null;
                         }
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
@@ -144,8 +144,8 @@ public class ImportCRFDataService {
                             // spell out criteria and create a bean if
                             // necessary, avoiding false-positives
                             if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
                                 EventCRFBean newEventCrfBean = new EventCRFBean();
                                 newEventCrfBean.setStudyEventId(studyEventBean.getId());
                                 newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
@@ -196,6 +196,58 @@ public class ImportCRFDataService {
         // if it's null, throw an error, since they should be existing beans for
         // iteration one
         return eventCRFBeans;
+    }
+
+    /*
+     * purpose: Build a map of EventCRFs and the statuses they should have post-import. Assumes EventCRFs have been
+     * created for "Not Started" forms.
+     */
+    public void fetchEventCRFStatuses(ODMContainer odmContainer, HashMap<Integer, String> importedCRFStatuses) {
+        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
+        StudyDAO studyDAO = new StudyDAO(ds);
+        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+
+        String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        StudyBean studyBean = studyDAO.findByOid(studyOID);
+
+        ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+
+                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
+
+                StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
+                        studyBean.getId(), studyBean.getParentStudyId());
+                logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
+
+                StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+
+                for (FormDataBean formDataBean : formDataBeans) {
+
+                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+
+                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
+                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        for (EventCRFBean ecb : eventCrfBeans) {
+                            Integer ecbId = new Integer(ecb.getId());
+
+                            if (!importedCRFStatuses.keySet().contains(ecbId) && formDataBean.getEventCRFStatus() != null) {
+                                importedCRFStatuses.put(ecb.getId(), formDataBean.getEventCRFStatus());
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     public SummaryStatsBean generateSummaryStatsBean(ODMContainer odmContainer, List<DisplayItemBeanWrapper> wrappers) {
@@ -280,14 +332,15 @@ public class ImportCRFDataService {
                     // trying to catch NPEs, because tags can be without the
                     // repeat key
                 }
-                StudyEventBean studyEvent =
-                    (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
+                StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        sedBean.getId(), ordinal);
 
                 displayItemBeans = new ArrayList<DisplayItemBean>();
                 // INIT here instead, tbh 08/2008
 
                 for (FormDataBean formDataBean : formDataBeans) {
-                    maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study eventData bean
+                    maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study
+                                   // eventData bean
 
                     // displayItemBeans = new ArrayList<DisplayItemBean>();
                     // list initialized in only one place above, tbh 08/2008
@@ -311,11 +364,12 @@ public class ImportCRFDataService {
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     // >>tbh, 09/2008
-                    // logger.debug("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
+                    // logger.debug("found event crf bean: using study event " + studyEvent.getId() +
+                    // " crf version name: " + crfVersion.getOid());
                     // >>
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
-                    EventDefinitionCRFBean eventDefinitionCRF =
-                        eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), crfVersion.getId());
+                    EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
+                            crfVersion.getId());
                     if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
                         // if and only if it's in the correct status do we need
                         // to generate the beans
@@ -333,7 +387,8 @@ public class ImportCRFDataService {
                             ItemGroupBean testBean = itemGroupDAO.findByOid(itemGroupDataBean.getItemGroupOID());
                             if (testBean == null) {
                                 // TODO i18n of message
-                                // logger.debug("hit the exception for item groups! " + itemGroupDataBean.getItemGroupOID());
+                                // logger.debug("hit the exception for item groups! " +
+                                // itemGroupDataBean.getItemGroupOID());
                                 MessageFormat mf = new MessageFormat("");
                                 mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
                                 Object[] arguments = { itemGroupDataBean.getItemGroupOID(), formDataBean.getFormOID() };
@@ -387,8 +442,7 @@ public class ImportCRFDataService {
                                     }
                                     ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
                                     blankCheckItems.add(itemBean);
-                                    String newKey =
-                                        groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+                                    String newKey = groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
                                             + subjectDataBean.getSubjectOID();
                                     blankCheck.put(newKey, itemDataBean);
                                     logger.info("adding " + newKey + " to blank checks");
@@ -397,7 +451,7 @@ public class ImportCRFDataService {
                                         // also
                                         // possible
                                         // nullpointer
-                                         displayItemBean.setData(itemDataBean);
+                                        displayItemBean.setData(itemDataBean);
                                         displayItemBean.setMetadata(metadataBean);
                                         // set event def crf?
                                         displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
@@ -434,19 +488,21 @@ public class ImportCRFDataService {
                             }// end item data beans
                             logger.debug(".. found blank check: " + blankCheck.toString());
                             // logger.debug(".. and found blank check items: " + blankCheckItems.toString());
-                            // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item Data Bean
+                            // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item
+                            // Data Bean
 
-                            // JN: this max Ordinal can cause problems as it assumes the latest values, and when there is an entry with nongroup towards the
+                            // JN: this max Ordinal can cause problems as it assumes the latest values, and when there
+                            // is an entry with nongroup towards the
                             // end. Refer: MANTIS 6113
 
                             for (int i = 1; i <= maxOrdinal; i++) {
                                 for (ItemBean itemBean : blankCheckItems) {
-                                    String newKey =
-                                        i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_" + subjectDataBean.getSubjectOID();
+                                    String newKey = i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+                                            + subjectDataBean.getSubjectOID();
                                     if (blankCheck.get(newKey) == null) {
                                         // if it already exists, Do Not Add It.
-                                        ItemDataBean itemDataCheck =
-                                            getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCRFBean.getId(), i);
+                                        ItemDataBean itemDataCheck = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
+                                                eventCRFBean.getId(), i);
                                         logger.debug("found item data bean id: " + itemDataCheck.getId() + " for ordinal " + i);
                                         if (itemDataCheck.getId() == 0) {
                                             ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
@@ -457,7 +513,8 @@ public class ImportCRFDataService {
                                             // set event def crf?
                                             displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
                                             String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
-                                            // if you do indeed leave off this in the XML it will pass but return 'null' tbh
+                                            // if you do indeed leave off this in the XML it will pass but return 'null'
+                                            // tbh
 
                                             displayItemBeans.add(displayItemBean);
                                             logger.debug("... adding display item bean");
@@ -501,8 +558,8 @@ public class ImportCRFDataService {
                     String crfVersionId = crfVersion.getId() + "";
 
                     logger.debug("creation of wrapper: original count of display item beans " + displayItemBeans.size() + ", count of item data beans "
-                        + totalItemDataBeanCount + " count of validation errors " + validationErrors.size() + " count of study subjects "
-                        + subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks " + hardValidator.size());
+                            + totalItemDataBeanCount + " count of validation errors " + validationErrors.size() + " count of study subjects "
+                            + subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks " + hardValidator.size());
                     // possibly create the import summary here
                     logger.debug("creation of wrapper: max ordinal found " + maxOrdinal);
                     // check if we need to overwrite
@@ -513,7 +570,7 @@ public class ImportCRFDataService {
                     // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
                     if (// eventCRFStatus.equals(Status.UNAVAILABLE) ||
                     dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                            || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         overwrite = true;
                     }
                     // << tbh, adding extra statuses to prevent appending, 06/2009
@@ -527,13 +584,14 @@ public class ImportCRFDataService {
                     // tbh
 
                     // summary stats added tbh 05/2008
-                    // JN: Changed from validationErrors to totalValidationErrors to create discrepancy notes for all the
-                    displayItemBeanWrapper =
-                        new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
-                                studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
-                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+                    // JN: Changed from validationErrors to totalValidationErrors to create discrepancy notes for all
+                    // the
+                    displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
+                            studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
+                            crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
 
-                    // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as validationErrors would get overwritten and the
+                    // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as
+                    // validationErrors would get overwritten and the
                     // older errors will be overriden. Moving it after the form.
                     // Removing the comments for now, since it seems to be creating duplicate Discrepancy Notes.
                     validationErrors = new HashMap();
@@ -600,14 +658,13 @@ public class ImportCRFDataService {
                     SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
                     sdf_sqldate.setLenient(false);
                     try {
-                    	//htaycher: database exspects format YYYY-MM-DD
+                        // htaycher: database exspects format YYYY-MM-DD
                         Date originalDate = sdf_sqldate.parse(dateValue);
-                       // String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
-                        
+                        // String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
+
                         String replacementValue = new SimpleDateFormat("yyyy-MM-dd").format(originalDate);
                         displayItemBean.getData().setValue(replacementValue);
-                    
-                    
+
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
@@ -686,14 +743,15 @@ public class ImportCRFDataService {
                 }
             }
         }
-        // JN commenting out the following as we dont need hard edits for these cases, they need to be soft stops and DN should be filed REF MANTIS 6271
+        // JN commenting out the following as we dont need hard edits for these cases, they need to be soft stops and DN
+        // should be filed REF MANTIS 6271
 
         else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             // logger.info(itemOid + "is a RADIO or
             // a SELECT ");
             // adding a new hard edit check here; response_option mismatch
-            String theValue =
-                matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
+            String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet()
+                    .getOptions());
             request.setAttribute(itemOid, theValue);
             logger.debug("        found the value for radio/single: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
@@ -710,8 +768,8 @@ public class ImportCRFDataService {
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             // logger.info(itemOid + "is a CHECKBOX
             // or a SELECTMULTI ");
-            String theValue =
-                matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
+            String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet()
+                    .getOptions());
             request.setAttribute(itemOid, theValue);
             // logger.debug("        found the value for checkbx/multi: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
@@ -742,8 +800,8 @@ public class ImportCRFDataService {
     }
 
     /*
-     * difference from the above is only a 'contains' in the place of an 'equals'. and a few other switches...also need to keep in mind that there are non-null
-     * values that need to be taken into account
+     * difference from the above is only a 'contains' in the place of an 'equals'. and a few other switches...also need
+     * to keep in mind that there are non-null values that need to be taken into account
      */
     private String matchValueWithManyOptions(DisplayItemBean displayItemBean, String value, List options) {
         String returnedValue = null;
@@ -803,8 +861,9 @@ public class ImportCRFDataService {
     }
 
     /*
-     * meant to answer the following questions 3.a. is that study subject in that study? 3.b. is that study event def in that study? 3.c. is that site in that
-     * study? 3.d. is that crf version in that study event def? 3.e. are those item groups in that crf version? 3.f. are those items in that item group?
+     * meant to answer the following questions 3.a. is that study subject in that study? 3.b. is that study event def in
+     * that study? 3.c. is that site in that study? 3.d. is that crf version in that study event def? 3.e. are those
+     * item groups in that crf version? 3.f. are those items in that item group?
      */
     public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId) {
         List<String> errors = new ArrayList<String>();
@@ -867,8 +926,8 @@ public class ImportCRFDataService {
                     if (studyEventDataBeans != null) {
                         for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                             String sedOid = studyEventDataBean.getStudyEventOID();
-                            StudyEventDefinitionBean studyEventDefintionBean =
-                                studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(), studyBean.getParentStudyId());
+                            StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(),
+                                    studyBean.getParentStudyId());
                             if (studyEventDefintionBean == null) {
                                 mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
                                 Object[] arguments = { sedOid, oid };
