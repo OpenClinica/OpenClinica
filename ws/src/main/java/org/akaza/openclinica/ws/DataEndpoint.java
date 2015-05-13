@@ -161,7 +161,7 @@ public class DataEndpoint {
 
                 List<String> skippedCRFMsgs = getSkippedCRFMessages(importCrfInfo);
 
-                return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs, skippedCRFMsgs));
+                return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs, skippedCRFMsgs, importCrfInfo));
             } else {
                 return new DOMSource(mapFailConfirmation(errors, null));
             }
@@ -316,13 +316,17 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(List<String> auditMsgs, List<String> ruleActionMsgs, List<String> skippedCRFMsgs) throws Exception {
+    private Element mapConfirmation(List<String> auditMsgs, List<String> ruleActionMsgs, List<String> skippedCRFMsgs, ImportCRFInfoContainer importCRFs)
+            throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
 
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+
+        String totalCRFs = String.valueOf(importCRFs.getImportCRFList().size());
+        String importedCRFs = String.valueOf(importCRFs.getImportCRFList().size() - importCRFs.getCountSkippedEventCrfs());
 
         if (auditMsgs != null) {
             String status = auditMsgs.get(0);
@@ -340,7 +344,7 @@ public class DataEndpoint {
                 responseElement.appendChild(msgElement);
             } else if ("warn".equals(status)) {
                 // set a summary here, and set individual warnings for each DN
-                String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                String confirmation = messages.getMessage("dataEndpoint.success", new Object[] { importedCRFs, totalCRFs }, "Success", locale);
                 resultElement.setTextContent(confirmation);
                 responseElement.appendChild(resultElement);
                 Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "summary");
@@ -353,10 +357,15 @@ public class DataEndpoint {
                     warning.setTextContent(dn);
                     responseElement.appendChild(warning);
                 }
+                for (String s : skippedCRFMsgs) {
+                    Element skipMsg = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                    skipMsg.setTextContent(s);
+                    responseElement.appendChild(skipMsg);
+                }
             } else {
                 if (ruleActionMsgs != null && !ruleActionMsgs.isEmpty()) {
                     // if there is message from rule. Import data success with rule message
-                    String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                    String confirmation = messages.getMessage("dataEndpoint.success", new Object[] { importedCRFs, totalCRFs }, "Success", locale);
                     resultElement.setTextContent(confirmation);
                     responseElement.appendChild(resultElement);
                     for (String s : ruleActionMsgs) {
@@ -366,15 +375,14 @@ public class DataEndpoint {
                     }
                 } else {
                     // plain success no warnings
-                    String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                    String confirmation = messages.getMessage("dataEndpoint.success", new Object[] { importedCRFs, totalCRFs }, "Success", locale);
                     resultElement.setTextContent(confirmation);
                     responseElement.appendChild(resultElement);
-                    for (String s : skippedCRFMsgs) {
-                        Element skipMsg = document.createElementNS(NAMESPACE_URI_V1, "warning");
-                        skipMsg.setTextContent(s);
-                        responseElement.appendChild(skipMsg);
-                    }
-
+                }
+                for (String s : skippedCRFMsgs) {
+                    Element skipMsg = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                    skipMsg.setTextContent(s);
+                    responseElement.appendChild(skipMsg);
                 }
             }
         }
