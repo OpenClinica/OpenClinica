@@ -3,6 +3,7 @@ package org.akaza.openclinica.ws;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,18 +20,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.web.crfdata.DataImportService;
+import org.akaza.openclinica.web.crfdata.ImportCRFInfo;
+import org.akaza.openclinica.web.crfdata.ImportCRFInfoContainer;
 import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
 import org.exolab.castor.mapping.Mapping;
@@ -128,11 +134,15 @@ public class DataEndpoint {
             crfDataImportValidator.validate(crfDataImportBean, errors);
 
             if (!errors.hasErrors()) {
-                List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 StudyBean studyBean = crfDataImportBean.getStudy();
+
+                List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 HashMap<Integer, String> importedCRFStatuses = new HashMap<Integer, String>();
+
+                ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
                 List<String> errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
                         displayItemBeanWrappers, importedCRFStatuses);
+
                 if (errorMessagesFromValidation.size() > 0) {
                     String err_msg = convertToErrorString(errorMessagesFromValidation);
                     return new DOMSource(mapFailConfirmation(null, err_msg));
@@ -149,7 +159,9 @@ public class DataEndpoint {
                 // run rules if applicable
                 List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
-                return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs));
+                List<String> skippedCRFMsgs = getSkippedCRFMessages(importCrfInfo);
+
+                return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs, skippedCRFMsgs));
             } else {
                 return new DOMSource(mapFailConfirmation(errors, null));
             }
@@ -161,6 +173,31 @@ public class DataEndpoint {
             throw new Exception(e);
         }
         // return new DOMSource(mapConfirmation(xml, studyBean, userBean));
+    }
+
+    private List<String> getSkippedCRFMessages(ImportCRFInfoContainer importCrfInfo) {
+        List<String> msgList = new ArrayList<String>();
+
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
+        MessageFormat mf = new MessageFormat("");
+        mf.applyPattern(respage.getString("crf_skipped"));
+
+        for (ImportCRFInfo importCrf : importCrfInfo.getImportCRFList()) {
+            String eventCRFStatus = "";
+            if (importCrf.getEventCRFID() == null)
+                eventCRFStatus = "Not Started";
+            else {
+                EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
+                EventCRFBean eventCRF = (EventCRFBean) eventCrfDAO.findByPK(importCrf.getEventCRFID());
+                eventCRFStatus = eventCRF.getStage().getName();
+
+            }
+            if (!importCrf.isProcessImport()) {
+                Object[] arguments = { importCrf.getStudySubjectOID(), importCrf.getStudyEventOID(), importCrf.getFormOID(), eventCRFStatus };
+                msgList.add(mf.format(arguments));
+            }
+        }
+        return msgList;
     }
 
     private ODMContainer unmarshallToODMContainer(Element odmElement) throws Exception {
@@ -279,7 +316,7 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(List<String> auditMsgs, List<String> ruleActionMsgs) throws Exception {
+    private Element mapConfirmation(List<String> auditMsgs, List<String> ruleActionMsgs, List<String> skippedCRFMsgs) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -332,6 +369,12 @@ public class DataEndpoint {
                     String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
                     resultElement.setTextContent(confirmation);
                     responseElement.appendChild(resultElement);
+                    for (String s : skippedCRFMsgs) {
+                        Element skipMsg = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                        skipMsg.setTextContent(s);
+                        responseElement.appendChild(skipMsg);
+                    }
+
                 }
             }
         }
