@@ -13,7 +13,7 @@ import javax.persistence.Transient;
 public class NotificationActionBean extends RuleActionBean {
 
     private String to;
-    private String Subject;
+    private String subject;
     private String message;
 
     public NotificationActionBean() {
@@ -38,14 +38,6 @@ public class NotificationActionBean extends RuleActionBean {
         this.to = to;
     }
 
-    @Column(name = "email_subject")
-    public String getSubject() {
-		return Subject;
-	}
-
-	public void setSubject(String subject) {
-		Subject = subject;
-	}
 
 	@Override
     @Transient
@@ -53,7 +45,16 @@ public class NotificationActionBean extends RuleActionBean {
         return this.message;
     }
 
-    @Override
+	@Column(name = "email_subject")
+    public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	@Override
     @Transient
     public HashMap<String, Object> getPropertiesForDisplay() {
         LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
@@ -87,6 +88,11 @@ public class NotificationActionBean extends RuleActionBean {
             if (other.message != null)
                 return false;
         } else if (!message.equals(other.message))
+            return false;
+        if (subject == null) {
+            if (other.subject != null)
+                return false;
+        } else if (!subject.equals(other.subject))
             return false;
         if (to == null) {
             if (other.to != null)

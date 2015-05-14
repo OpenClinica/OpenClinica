@@ -182,6 +182,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		String studyName = getStudyBean(studyId).getName();
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 		message = message.replaceAll("\\$\\{study.name}", studyName);
+		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);
+		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", studyName);
 
 		ParticipantDTO pDTO = null;
 		StudyBean studyBean = getStudyBean(studyId);
@@ -201,7 +203,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		String hostname = "";
 		String url = "";
-		if (message.contains("${participant.url}") || message.contains("${participant.loginurl}")) {
+		if (message.contains("${participant.url}") || message.contains("${participant.loginurl}") || emailSubject.contains("${participant.url}") || emailSubject.contains("${participant.loginurl}")) {
 			participantPortalRegistrar = new ParticipantPortalRegistrar();
 
 			try {
@@ -213,6 +215,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			url = hostname.replaceAll("login", "plogin");
 			message = message.replaceAll("\\$\\{participant.url}", url);
+			emailSubject = emailSubject.replaceAll("\\$\\{participant.url}", url);
 		}
 		for (String email : listOfEmails) {
 
@@ -220,16 +223,20 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				pDTO = getParticipantInfo(uBean);
 				if (pDTO != null) {
 					String msg = null;
+					String eSubject = null;
 					msg = message.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
 					msg = msg.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
-
+					eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
+					eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
+					
 					String loginUrl = url + "?access_code=" + pDTO.getAccessCode() + "&auto_login=true";
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", loginUrl);
+					eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", loginUrl);
 
 					msg = msg.replaceAll("\\\\n", "\n");
-					;
+					eSubject = eSubject.replaceAll("\\\\n", "\n");
 					pDTO.setMessage(msg);
-					pDTO.setEmailSubject(emailSubject);
+					pDTO.setEmailSubject(eSubject);
 
 					// Send Email thru Mandrill Mail Server
 					try {
@@ -247,8 +254,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 					msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
 					pDTO.setMessage(msg);
-					// pDTO.setMessage("<![CDATA["+msg+"]]>");
-					pDTO.setEmailSubject(emailSubject);
+					String eSubject = null;
+					eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", "");
+					eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
+					eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
+					pDTO.setEmailSubject(eSubject);
 				}
 
 			} else {
@@ -263,19 +273,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 	}
 
-	public void runInBatch(final OnStudyEventUpdated event, StudyBean studyBean) {
-
-		// seBeans for loop
-
-		Integer studyEventDefId = 1;
-		Integer studyEventOrdinal = 1;
-		Integer studySubjectId = 1;
-		Integer userId = 1;
-
-		if (userId == null && event.getContainer().getEvent().getUserAccount() != null)
-			userId = event.getContainer().getEvent().getUserAccount().getUserId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId), studySubjectId, userId, studyEventOrdinal, event.getContainer().getChangeDetails());
-	}
 
 	public ParticipantDTO getParticipantInfo(UserAccountBean uBean) {
 		ParticipantDTO pDTO = null;
