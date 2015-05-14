@@ -126,16 +126,30 @@
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr>
- <td class="table_header_row"><fmt:message key="study_subject" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="study_oid" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
  <td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
  <td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="event_crf_status" bundle="${resword}"/></td>
 </tr> 
  <c:forEach items="${importCrfInfo.importCRFList}" var="importCRF">
     <c:if test="${!importCRF.processImport}">
     <tr>
-    <td class="table_cell_left"><c:out value="${importCRF.studySubjectOID}" /></td>
+    <td class="table_cell_left"><c:out value="${importCRF.studyOID}" /></td>
+    <td class="table_cell"><c:out value="${importCRF.studySubjectOID}" /></td>
     <td class="table_cell"><c:out value="${importCRF.studyEventOID}" /></td>
     <td class="table_cell"><c:out value="${importCRF.formOID}" /></td>
+    <td class="table_cell">
+        <c:choose>
+	        <c:when test="${importCRF.preImportStage.initialDE}"><fmt:message key="initial_data_entry" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.initialDE_Complete}"><fmt:message key="initial_data_entry_complete" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.doubleDE}"><fmt:message key="double_data_entry" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.doubleDE_Complete}"><fmt:message key="data_entry_complete" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.admin_Editing}"><fmt:message key="administrative_editing" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.locked}"><fmt:message key="locked" bundle="${resword}"/></c:when>
+	        <c:otherwise><fmt:message key="invalid" bundle="${resword}"/></c:otherwise>
+        </c:choose>
+    </td>
     </tr>
     </c:if>
  </c:forEach>

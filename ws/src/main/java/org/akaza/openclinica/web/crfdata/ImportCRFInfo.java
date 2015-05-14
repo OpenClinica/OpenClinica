@@ -1,20 +1,34 @@
 package org.akaza.openclinica.web.crfdata;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
+
 public class ImportCRFInfo {
+    private String studyOID;
     private String studySubjectOID;
     private String studyEventOID;
     private String formOID;
     private Integer eventCRFID;
     private boolean processImport;
-    private String postImportStatus;
+    private DataEntryStage postImportStage;
+    private DataEntryStage preImportStage;
 
-    public ImportCRFInfo(String studySubjectOID, String studyEventOID, String formOID) {
+    public ImportCRFInfo(String studyOID, String studySubjectOID, String studyEventOID, String formOID) {
+        this.studyOID = studyOID;
         this.studySubjectOID = studySubjectOID;
         this.studyEventOID = studyEventOID;
         this.formOID = formOID;
         this.eventCRFID = null;
         this.processImport = true;
-        this.postImportStatus = "Completed";
+        this.postImportStage = DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE;
+        this.preImportStage = null;
+    }
+
+    public String getStudyOID() {
+        return studyOID;
+    }
+
+    public void setStudyOID(String studyOID) {
+        this.studyOID = studyOID;
     }
 
     public String getStudySubjectOID() {
@@ -57,12 +71,20 @@ public class ImportCRFInfo {
         this.processImport = processImport;
     }
 
-    public String getPostImportStatus() {
-        return postImportStatus;
+    public DataEntryStage getPostImportStage() {
+        return postImportStage;
     }
 
-    public void setPostImportStatus(String postImportStatus) {
-        this.postImportStatus = postImportStatus;
+    public void setPostImportStage(DataEntryStage postImportStage) {
+        this.postImportStage = postImportStage;
+    }
+
+    public DataEntryStage getPreImportStage() {
+        return preImportStage;
+    }
+
+    public void setPreImportStage(DataEntryStage preImportStage) {
+        this.preImportStage = preImportStage;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.job;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
@@ -238,12 +239,29 @@ public class TriggerService {
         StringBuffer sb = new StringBuffer();
         sb.append("Skipped CRFs (due to import rules):<br/>");
         sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
-        sb.append("<tr valign=\'top\'> <td>Study Subject:</td> <td>Event CRF OID:</td> <td>CRF Version OID:</td> </tr>");
+        sb.append("<tr valign=\'top\'> <td>Study OID :</td> <td>Study Subject OID :</td> <td>Event CRF OID:</td> <td>CRF Version OID:</td> <td>Event CRF Status:</td> </tr>");
 
         for (ImportCRFInfo importCrfInfo : importCRFList.getImportCRFList()) {
+            String preImportStatus = "";
+
+            if (importCrfInfo.getPreImportStage().isInitialDE())
+                preImportStatus = resword.getString("initial_data_entry");
+            else if (importCrfInfo.getPreImportStage().isInitialDE_Complete())
+                preImportStatus = resword.getString("initial_data_entry_complete");
+            else if (importCrfInfo.getPreImportStage().isDoubleDE())
+                preImportStatus = resword.getString("double_data_entry");
+            else if (importCrfInfo.getPreImportStage().isDoubleDE_Complete())
+                preImportStatus = resword.getString("data_entry_complete");
+            else if (importCrfInfo.getPreImportStage().isAdmin_Editing())
+                preImportStatus = resword.getString("administrative_editing");
+            else if (importCrfInfo.getPreImportStage().isLocked())
+                preImportStatus = resword.getString("locked");
+            else
+                preImportStatus = resword.getString("invalid");
+
             if (!importCrfInfo.isProcessImport())
-                sb.append("<tr valign=\'top\'> <td>" + importCrfInfo.getStudySubjectOID() + "</td>" + "<td>" + importCrfInfo.getStudyEventOID() + "</td>"
-                        + "<td>" + importCrfInfo.getFormOID() + "</td>" + "</tr>");
+                sb.append("<tr valign=\'top\'> <td>" + importCrfInfo.getStudyOID() + "</td> <td>" + importCrfInfo.getStudySubjectOID() + "</td>" + "<td>"
+                        + importCrfInfo.getStudyEventOID() + "</td>" + "<td>" + importCrfInfo.getFormOID() + "</td> <td>" + preImportStatus + "</td></tr>");
         }
         sb.append("</table>");
         return sb.toString();

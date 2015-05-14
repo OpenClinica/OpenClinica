@@ -179,21 +179,31 @@ public class DataEndpoint {
         List<String> msgList = new ArrayList<String>();
 
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
         MessageFormat mf = new MessageFormat("");
         mf.applyPattern(respage.getString("crf_skipped"));
 
         for (ImportCRFInfo importCrf : importCrfInfo.getImportCRFList()) {
-            String eventCRFStatus = "";
-            if (importCrf.getEventCRFID() == null)
-                eventCRFStatus = "Not Started";
-            else {
-                EventCRFDAO eventCrfDAO = new EventCRFDAO(dataSource);
-                EventCRFBean eventCRF = (EventCRFBean) eventCrfDAO.findByPK(importCrf.getEventCRFID());
-                eventCRFStatus = eventCRF.getStage().getName();
-
-            }
             if (!importCrf.isProcessImport()) {
-                Object[] arguments = { importCrf.getStudySubjectOID(), importCrf.getStudyEventOID(), importCrf.getFormOID(), eventCRFStatus };
+                String preImportStatus = "";
+
+                if (importCrf.getPreImportStage().isInitialDE())
+                    preImportStatus = resword.getString("initial_data_entry");
+                else if (importCrf.getPreImportStage().isInitialDE_Complete())
+                    preImportStatus = resword.getString("initial_data_entry_complete");
+                else if (importCrf.getPreImportStage().isDoubleDE())
+                    preImportStatus = resword.getString("double_data_entry");
+                else if (importCrf.getPreImportStage().isDoubleDE_Complete())
+                    preImportStatus = resword.getString("data_entry_complete");
+                else if (importCrf.getPreImportStage().isAdmin_Editing())
+                    preImportStatus = resword.getString("administrative_editing");
+                else if (importCrf.getPreImportStage().isLocked())
+                    preImportStatus = resword.getString("locked");
+                else
+                    preImportStatus = resword.getString("invalid");
+
+                Object[] arguments = { importCrf.getStudyOID(), importCrf.getStudySubjectOID(), importCrf.getStudyEventOID(), importCrf.getFormOID(),
+                        preImportStatus };
                 msgList.add(mf.format(arguments));
             }
         }
