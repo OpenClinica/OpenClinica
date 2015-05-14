@@ -1108,7 +1108,7 @@ public class ImportCRFDataService {
                                     // versions within
                                     // seds;
                                     // right now just check nulls
-                                    if (crfVersionBeans != null) {
+                                    if (crfVersionBeans != null && crfVersionBeans.size() > 0) {
                                         for (CRFVersionBean crfVersionBean : crfVersionBeans) {
                                             if (crfVersionBean == null) {
                                                 mf.applyPattern(respage.getString("your_crf_version_oid_for_study_event_oid"));

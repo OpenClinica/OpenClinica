@@ -136,6 +136,7 @@ public class ImportSpringJob extends QuartzJobBean {
         locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle();
+        resword = ResourceBundleProvider.getWordsBundle();
         triggerService = new TriggerService();
 
         JobDataMap dataMap = context.getMergedJobDataMap();
@@ -168,6 +169,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 locale = new Locale(localeStr);
                 ResourceBundleProvider.updateLocale(locale);
                 respage = ResourceBundleProvider.getPageMessagesBundle();
+                resword = ResourceBundleProvider.getWordsBundle();
             }
             StudyDAO studyDAO = new StudyDAO(dataSource);
             StudyBean studyBean;
@@ -534,7 +536,9 @@ public class ImportSpringJob extends QuartzJobBean {
                 String messageHardVals = triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors, false);
                 // byte[] messageHardValsBytes = messageHardVals.getBytes();
                 out.write(messageHardVals);
+                msg.append(respage.getString("file_generated_hard_validation_error"));
                 // here we create a file and append the data, tbh 06/2010
+                fail = true;
             } else {
                 if (!totalValidationErrors.isEmpty()) {
                     String totalValErrors = triggerService.generateHardValidationErrorMessage(subjectData, totalValidationErrors, false);
@@ -556,8 +560,12 @@ public class ImportSpringJob extends QuartzJobBean {
                 MessageFormat mf = new MessageFormat("");
                 mf.applyPattern(respage.getString("problems_encountered_with_file"));
                 Object[] arguments = { f.getName(), msg.toString() };
-                msg.append(mf.format(arguments) + "<br/>");
+                msg = new StringBuffer(mf.format(arguments) + "<br/>");
                 out.close();
+                auditMsg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + "ViewLogMessage?n=" + generalFileDir
+                        + f.getName() + "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
+                msg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + "ViewLogMessage?n=" + generalFileDir + f.getName()
+                        + "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
                 // msg.append("Problems encountered with file " + f.getName() +
                 // ": " + msg.toString() + "<br/>");
                 continue;
