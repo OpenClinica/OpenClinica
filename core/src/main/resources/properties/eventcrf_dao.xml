@@ -372,6 +372,17 @@
         </sql>
     </query>
     <query>
+        <name>findAllByStudyEventInParticipantForm</name>
+        <sql>select ec.* from event_crf  ec, crf c ,crf_version cv
+            where ec.crf_version_id=cv.crf_version_id
+            and c.crf_id=cv.crf_id
+            and study_event_id =? and c.crf_id in 
+            (select crf_id from event_definition_crf 
+            where study_event_definition_id =? and study_id =? and participant_form=true)
+            order by study_event_id
+            </sql>
+    </query>
+    <query>
         <name>findAllByCRFVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
             where ec.crf_version_id=cv.crf_version_id

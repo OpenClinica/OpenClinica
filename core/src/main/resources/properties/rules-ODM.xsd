@@ -33,6 +33,7 @@
             <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="NotificationAction" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
     </xs:complexType>
@@ -65,6 +66,15 @@
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
+    <xs:element name="NotificationAction" type="NotificaitonActionType"/>
+    <xs:complexType name="NotificationActionType">
+        <xs:sequence>
+            <xs:element name="To" type="xs:string"/>
+            <xs:element name="Subject" type="xs:string"/>
+            <xs:element name="Message" type="xs:string"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
+    </xs:complexType>
     <xs:element name="ShowAction" type="ShowActionType"/>
     <xs:complexType name="ShowActionType">
         <xs:sequence>

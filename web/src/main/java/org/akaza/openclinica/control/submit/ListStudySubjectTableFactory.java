@@ -33,7 +33,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -60,7 +60,6 @@ import java.util.ResourceBundle;
 import java.util.Properties;
 import java.lang.Exception;
 import java.io.InputStream;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;

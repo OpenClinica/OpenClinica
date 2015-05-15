@@ -28,7 +28,13 @@ Translated variables: [[Key to variables and/or reference document]] -->
 				<Message></Message>
 				<!-- To allows you to specify an email account that the email will be sent to. You can specify more than one email by using comma separated values: e.g. usera@example.com,userb@example.com -->
 				<To></To>
-			</EmailAction>
+			    </EmailAction>
+				<NotificationAction IfExpressionEvaluates="">
+				<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the email that gets sent -->
+				<Message></Message>
+				<!-- To allows you to specify an email account that the email will be sent to. You can specify more than one email by using comma separated values: e.g. usera@example.com,userb@example.com -->
+				<To></To>
+			    </NotificaitonAction>
 			<!-- Show action means that an item or group of items will be displayed automatically when the referenced expression evaluates to a result. The items or group of items to be shown must be part of the same CRF as the Target.  You can define if you want the action to occur if it evaluates to "true" or "false" -->
 			<ShowAction IfExpressionEvaluates="">
                 <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />

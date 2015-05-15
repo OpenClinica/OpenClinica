@@ -13,6 +13,7 @@ import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
@@ -58,6 +59,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     private List<EventActionBean> lazyEventActions =  LazyList.decorate(new ArrayList<EventActionBean>(),
             FactoryUtils.instantiateFactory(EventActionBean.class));
+    private List<NotificationActionBean> lazyNotificationActions = LazyList
+            .decorate(new ArrayList<NotificationActionBean>(), FactoryUtils.instantiateFactory(NotificationActionBean.class));
 
     
     // Transient
@@ -73,6 +76,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         actions = new ArrayList<RuleActionBean>();
         actions.addAll(lazyDiscrepancyNoteActions);
         actions.addAll(lazyEmailActions);
+        actions.addAll(lazyNotificationActions);
         actions.addAll(lazyShowActions);
         actions.addAll(lazyHideActions);
         actions.addAll(lazyEventActions);
@@ -244,6 +248,14 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     public void setLazyEmailActions(List<EmailActionBean> lazyEmailActions) {
         this.lazyEmailActions = lazyEmailActions;
+    }
+    @Transient
+    public List<NotificationActionBean> getLazyNotificationActions() {
+        return lazyNotificationActions;
+    }
+
+    public void setLazyNotificationActions(List<NotificationActionBean> lazyNotificationActions) {
+        this.lazyNotificationActions = lazyNotificationActions;
     }
 
     @Transient
