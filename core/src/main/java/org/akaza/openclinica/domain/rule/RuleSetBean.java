@@ -23,6 +23,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -49,7 +50,11 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     private CRFBean crf;
     private CRFVersionBean crfVersion;
     private ItemBean item;
+	private boolean runSchedule=false;
+    private String runTime;
 
+    
+	private RunOnSchedule runOnSchedule;
     private List<RuleSetRuleBean> ruleSetRules;
     private ExpressionBean target;
     private ExpressionBean originalTarget;
@@ -400,7 +405,49 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
                 return false;
         } else if (!target.equals(other.target))
             return false;
+        if (runTime == null) {
+            if (other.runTime != null)
+                return false;
+        } else if (!runTime.equals(other.runTime))
+            return false;
         return true;
     }
+
+    @JoinColumn(name = "run_time")
+	public String getRunTime() {
+		return runTime;
+	}
+
+	public void setRunTime(String runTime) {
+		this.runTime = runTime;
+	}
+
+
+    
+    @Transient
+	public RunOnSchedule getRunOnSchedule() {
+		return runOnSchedule;
+	}
+
+
+
+	public void setRunOnSchedule(RunOnSchedule runOnSchedule) {
+		this.runOnSchedule = runOnSchedule;
+	}
+
+	
+    @JoinColumn(name = "run_on_schedule")
+	public boolean isRunSchedule() {
+		return runSchedule;
+	}
+
+	public void setRunSchedule(boolean runSchedule) {
+		this.runSchedule = runSchedule;
+	}
+
+
+
+
+
 
 }

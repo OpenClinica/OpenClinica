@@ -23,6 +23,7 @@ import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.RunOnSchedule;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
@@ -47,6 +48,7 @@ import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,7 +71,7 @@ public class RulesPostImportContainerService {
     private final OidGenerator oidGenerator;
     private StudyBean currentStudy;
     private UserAccountBean userAccount;
-
+    private RunOnSchedule runOnSchedule;
     private ExpressionService expressionService;
     private InsertActionValidator insertActionValidator;
     private EventActionValidator eventActionValidator;
@@ -146,6 +148,20 @@ public class RulesPostImportContainerService {
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+                    if(ruleSetBean.getRunOnSchedule()!=null){ 
+                    	persistentRuleSetBean.setRunSchedule(true);
+                      if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
+                     	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
+                          persistentRuleSetBean.setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
+                     	 }
+                      }else{ 
+                          persistentRuleSetBean.setRunTime(null);     // supposed to act like 23:00
+                      }	  
+                    }else{
+                    	persistentRuleSetBean.setRunSchedule(false);
+                        persistentRuleSetBean.setRunTime(null);                    	
+                    }
+                    	                    
                     persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
                     ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
                     Iterator<RuleSetRuleBean> itr = importedRuleSetRules.iterator();
@@ -181,6 +197,22 @@ public class RulesPostImportContainerService {
                     ruleSetBeanWrapper.getAuditableBean().setCrfVersion(getExpressionService().getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
+
+                    if(ruleSetBean.getRunOnSchedule()!=null){ 
+                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
+                      if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
+                    	  //validate Time           isRunTimeValid
+                    	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
+                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
+                      }
+                      }else{ 
+                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);     // supposed to act like 23:00
+                      }	  
+                    }else{
+                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
+                  	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
+                    }
+
                 }
               isRuleSetRuleValid(importContainer, ruleSetBeanWrapper, eventActionsRuleSetBean);
             }
@@ -636,6 +668,21 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
+    
+    private boolean isRunTimeValid(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper , String runTime) {
+        boolean isValid = true;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm"); //HH = 24h format
+        dateFormat.setLenient(false);
+        try {
+        	dateFormat.parse(runTime);
+        } catch (Exception e) {
+            ruleSetBeanWrapper.error(createError("OCRERR_0047"));
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    
     private boolean doesPersistentRuleBeanBelongToCurrentStudy(AuditableBeanWrapper<RuleBean> ruleBeanWrapper) {
         boolean isValid = true;
         if (ruleBeanWrapper.getAuditableBean().getRuleSetRules().size() > 0) {
@@ -744,4 +791,6 @@ public class RulesPostImportContainerService {
 
         return expressionService;
     }
+
+
 }

@@ -27,6 +27,11 @@
             <bind-xml name="Target"/>
         </field>
        
+          <field name="RunOnSchedule"
+            type="org.akaza.openclinica.domain.rule.RunOnSchedule">
+            <bind-xml name="RunOnSchedule"/>
+        </field>
+       
        <field name="RuleSetRules"
             type="org.akaza.openclinica.domain.rule.RuleSetRuleBean"
             collection="arraylist">
@@ -261,6 +266,11 @@
      </class>
 
 
+       <class name="org.akaza.openclinica.domain.rule.RunOnSchedule" auto-complete="true">
+        <field name="runTime" type="string" >
+            <bind-xml name="Time" node="attribute"/>
+       </field>
+     </class>
 
 
      <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunEventBean" >
