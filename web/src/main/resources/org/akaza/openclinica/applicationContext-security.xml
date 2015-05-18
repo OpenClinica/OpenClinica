@@ -28,6 +28,7 @@
     <security:intercept-url pattern="/help/**" filters="none"/>
     <security:intercept-url pattern="/ws/**" filters="none"/>
     <security:intercept-url pattern="/Contact" filters="none"/>
+      <security:intercept-url pattern="/rest/**" filters="none"/>
     <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
     <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
