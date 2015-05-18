@@ -57,9 +57,8 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		
 		if(studyOID.equals(GlOBAL_STUDY_OID))
 		{
-			if(checkAuth(userBean)) return containerRequest;
-			
-				
+			//if(checkAuth(userBean)) return containerRequest;
+			return containerRequest;
 		}
 	
 		else{
