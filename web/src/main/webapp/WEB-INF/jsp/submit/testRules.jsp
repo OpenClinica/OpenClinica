@@ -212,7 +212,7 @@
                 </tr>
             </c:forEach>
             
-            <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+            <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && testRuleAction.actionType.code !=7 && fn:length(testRuleAction.properties)>0}">
                 <c:set var="props" value=""/>
                 <c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
                     <c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
@@ -456,7 +456,7 @@
                     </tr>
                 </c:forEach>
                 
-                <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+                <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && testRuleAction.actionType.code !=7 && fn:length(testRuleAction.properties)>0}">
                 <c:set var="props" value=""/>
                 <c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
                     <c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>

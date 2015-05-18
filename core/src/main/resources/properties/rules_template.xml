@@ -11,6 +11,11 @@
                 <Message></Message>
                 <To></To>
 			</EmailAction>
+			<NotificationAction IfExpressionEvaluates="">
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+                <Message></Message>
+                <To></To>
+			</NotificaitonAction>
 			<ShowAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>

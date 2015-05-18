@@ -281,7 +281,7 @@
 		        	</tr>
 		        </c:if>
 		        
-		        <c:if test="${val.actionType.code!=1 && val.actionType.code !=2 && fn:length(val.properties)>0}">
+		        <c:if test="${val.actionType.code!=1 && val.actionType.code !=2 && val.actionType.code !=7 && fn:length(val.properties)>0}">
 		        	<c:set var="props" value=""/>
 		    		<c:forEach items="${val.properties}" var="prop" varStatus="status">
 		    		
