@@ -49,8 +49,8 @@ public class CrfBusinessLogicHelper {
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
         // TODO we have to get that id before we can continue
         eventDefinitionCrfDao = new EventDefinitionCRFDAO(ds);
-        EventDefinitionCRFBean eventDefinitionCrf =
-            eventDefinitionCrfDao.findByStudyEventIdAndCRFVersionId(study, eventCrf.getStudyEventId(), eventCrf.getCRFVersionId());
+        EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDao.findByStudyEventIdAndCRFVersionId(study, eventCrf.getStudyEventId(),
+                eventCrf.getCRFVersionId());
         return eventDefinitionCrf;
     }
 
@@ -160,24 +160,12 @@ public class CrfBusinessLogicHelper {
     }
 
     /**
-     * The following methods are for 'mark CRF complete' Note that we will also
-     * wrap Study Event status changes in this code, possibly split out in a
-     * later release, tbh 06/2008
+     * The following methods are for 'mark CRF complete' Note that we will also wrap Study Event status changes in this
+     * code, possibly split out in a later release, tbh 06/2008
      * 
      * @return
      */
     public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub) throws Exception {
-        // locale = request.getLocale();
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
-        // locale);
-        // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
-        // <
-        // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
-        // getEventCRFBean();
-        // getEventDefinitionCRFBean();
         DataEntryStage stage = ecb.getStage();
         EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
         ItemDataDAO itemDataDao = new ItemDataDAO(ds);
@@ -203,83 +191,9 @@ public class CrfBusinessLogicHelper {
         logger.debug("inout_event_crf_id:" + ecb.getId());
         logger.debug("inout_study_event_def_id:" + sedBean.getId());
 
-        // below bit is from DataEntryServlet, is more appropriate for filling
-        // in by hand than by automatic
-        // removing this in favor of the more streamlined effect below, tbh
-        // 06/2008
-        // Page errorPage = getJSPPage();
-
-        // if (stage.equals(DataEntryStage.UNCOMPLETED) ||
-        // stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) ||
-        // stage.equals(DataEntryStage.LOCKED)) {
-        // logger.info(
-        // "addPageMessage(respage.getString(\"not_mark_CRF_complete1\"))");
-        // return false;
-        // }
-        //
-        // if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) ||
-        // stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-        //
-        // /*
-        // * if (!edcb.isDoubleEntry()) {
-        // *
-        // logger.info(
-        // "addPageMessage(respage.getString(\"not_mark_CRF_complete2\"))");
-        // * return false; }
-        // *
-        // */
-        // }
-        //
-        // /*
-        // * if (!isEachSectionReviewedOnce()) { addPageMessage("You may not
-        // mark
-        // * this Event CRF complete, because there are some sections which have
-        // * not been reviewed once."); return false; }
-        // */
-        //
-        // if (!isEachRequiredFieldFillout(ecb)) {
-        // logger.info(
-        // "addPageMessage(respage.getString(\"not_mark_CRF_complete4\"))");
-        // return false;
-        // }
-        //
-        // /*
-        // * if (ecb.getInterviewerName().trim().equals("")) { throw new
-        // * InconsistentStateException(errorPage, "You may not mark this Event
-        // * CRF complete, because the interviewer name is blank."); }
-        // */
-
         Status newStatus = ecb.getStatus();
         DataEntryStage newStage = ecb.getStage();
         boolean ide = true;
-
-        // currently we are setting the event crf status to complete, so this
-        // block is all to
-        // complete, tbh
-
-        // if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) &&
-
-        // edcb.isDoubleEntry()) {
-        // newStatus = Status.PENDING;
-        // ecb.setUpdaterId(ub.getId());
-        // ecb.setUpdater(ub);
-        // ecb.setUpdatedDate(new Date());
-        // ecb.setDateCompleted(new Date());
-        // } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) &&
-        // !edcb.isDoubleEntry()) {
-        // newStatus = Status.UNAVAILABLE;
-        // ecb.setUpdaterId(ub.getId());
-        // ecb.setUpdater(ub);
-        // ecb.setUpdatedDate(new Date());
-        // ecb.setDateCompleted(new Date());
-        // ecb.setDateValidateCompleted(new Date());
-        // } else if
-        // (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-        // || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-        // newStatus = Status.UNAVAILABLE;
-        // ecb.setDateValidateCompleted(new Date());
-        // ide = false;
-        // }
 
         newStatus = Status.UNAVAILABLE;
         // ecb.setUpdaterId(ub.getId());
@@ -289,12 +203,10 @@ public class CrfBusinessLogicHelper {
         ecb.setDateValidateCompleted(new Date());
 
         /*
-         * //for the non-reviewed sections, no item data in DB yet, need to
-         * //create them if (!isEachSectionReviewedOnce()) { boolean canSave =
-         * saveItemsToMarkComplete(newStatus); if (canSave == false){
-         * addPageMessage("You may not mark this Event CRF complete, because
-         * there are some required entries which have not been filled out.");
-         * return false; } }
+         * //for the non-reviewed sections, no item data in DB yet, need to //create them if
+         * (!isEachSectionReviewedOnce()) { boolean canSave = saveItemsToMarkComplete(newStatus); if (canSave == false){
+         * addPageMessage("You may not mark this Event CRF complete, because there are some required entries which have
+         * not been filled out."); return false; } }
          */
         ecb.setStatus(newStatus);
         ecb.setStage(newStage);
@@ -311,48 +223,6 @@ public class CrfBusinessLogicHelper {
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
         seb.setUpdatedDate(new Date());
         seb.setUpdater(ub);
-
-        /*
-         * EventDefinitionCRFDAO edcdao = new
-         * EventDefinitionCRFDAO(sm.getDataSource()); ArrayList allCRFs =
-         * eventCrfDao.findAllByStudyEvent(seb); ArrayList allEDCs =
-         * edcdao.findAllActiveByEventDefinitionId
-         * (seb.getStudyEventDefinitionId()); boolean eventCompleted = true;
-         * boolean allRequired = true; int allEDCsize = allEDCs.size();
-         * ArrayList nonRequiredCrfIds = new ArrayList(); // go through the list
-         * and find out if all are required, tbh for (int ii = 0; ii <
-         * allEDCs.size(); ii++) { EventDefinitionCRFBean edcBean =
-         * (EventDefinitionCRFBean) allEDCs.get(ii); if
-         * (!edcBean.isRequiredCRF()) { logger.info("found one non required CRF:
-         * " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " +
-         * edcBean.getDefaultVersionName()); allRequired = false;
-         * nonRequiredCrfIds.add(new Integer(edcBean.getCrfId())); allEDCsize--;
-         * } } logger.info("non required crf ids: " +
-         * nonRequiredCrfIds.toString()); // go through all the crfs and check
-         * their status // add an additional check to see if it is required or
-         * not, tbh for (int i = 0; i < allCRFs.size(); i++) { EventCRFBean ec =
-         * (EventCRFBean) allCRFs.get(i); logger.info("-- looking at a CRF: " +
-         * ec.getName() + " " + ec.getCrf().getName() + " " +
-         * ec.getCrf().getId()); // if clause kind of not right since none of
-         * the above fields are // set in the dao, tbh if
-         * (!ec.getStatus().equals(Status.UNAVAILABLE) &&
-         * ec.getDateInterviewed() != null) { // && //
-         * (!nonRequiredCrfIds.contains(new // Integer(ec.getCrf().getId())))) {
-         * eventCompleted = false; logger.info("just rejected eventCompleted
-         * looking at a CRF: " + ec.getName()); break; } }
-         * 
-         * if (!allRequired) {
-         * logger.info("SEB contains some nonrequired CRFs: " + allEDCsize +
-         * " vs " + allEDCs.size()); }
-         * 
-         * if (eventCompleted && allCRFs.size() >= allEDCsize) {// was //
-         * allEDCs.size(), // tbh if (!allRequired) { addPageMessage("All
-         * Required CRFs have been completed. "+ "You can update the Study
-         * Event's status to 'complete'"+ " by following the 'Edit Study Event'
-         * link."); } else { logger.info("just set subj event status to --
-         * COMPLETED --");
-         * seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED); } }
-         */
 
         // updates with Pauls observation from bug:2488:
         // 1. If there is only one CRF in the event (whether the CRF was
@@ -422,4 +292,50 @@ public class CrfBusinessLogicHelper {
 
         return true;
     }
+
+    /**
+     * The following methods are for 'mark CRF Started' Note that we will also wrap Study Event status changes in this
+     * code, possibly split out in a later release, tbh 06/2008
+     * 
+     * @return
+     */
+    public boolean markCRFStarted(EventCRFBean ecb, UserAccountBean ub) throws Exception {
+        EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
+        StudyDAO sdao = new StudyDAO(ds);
+        StudyBean study = sdao.findByStudySubjectId(ecb.getStudySubjectId());
+        EventDefinitionCRFBean edcb = getEventDefinitionCrfByStudyEventAndCrfVersion(ecb, study);
+
+        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+        StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(edcb.getStudyEventDefinitionId());
+        CRFDAO crfDao = new CRFDAO(ds);
+        ArrayList crfs = (ArrayList) crfDao.findAllActiveByDefinition(sedBean);
+        sedBean.setCrfs(crfs);
+
+        logger.debug("inout_event_crf_id:" + ecb.getId());
+        logger.debug("inout_study_event_def_id:" + sedBean.getId());
+
+        Status newStatus = Status.AVAILABLE;
+        DataEntryStage newStage = ecb.getStage();
+
+        ecb.setUpdater(ub);
+        ecb.setUpdatedDate(new Date());
+
+        ecb.setStatus(newStatus);
+        ecb.setStage(newStage);
+        ecb = (EventCRFBean) eventCrfDao.update(ecb);
+        logger.debug("just updated event crf id: " + ecb.getId());
+
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        if (seb.getSubjectEventStatus().isScheduled() || seb.getSubjectEventStatus().isNotScheduled() || seb.getSubjectEventStatus().isDE_Started()) {
+            // change status for study event
+            seb.setUpdatedDate(new Date());
+            seb.setUpdater(ub);
+            seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+            seb = (StudyEventBean) sedao.update(seb);
+        }
+
+        return true;
+    }
+
 }
