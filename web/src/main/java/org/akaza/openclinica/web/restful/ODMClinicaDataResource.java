@@ -88,14 +88,16 @@ public class ODMClinicaDataResource {
 			@PathParam("studySubjectIdentifier") String studySubjectIdentifier,
 			@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
 			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits,@Context HttpServletRequest request) {
-		LOGGER.debug("Requesting clinical data resource");
+		LOGGER.debug("Request ing clinical data resource");
 		boolean includeDN=false;
 		boolean includeAudit= false;
 		if(includeDns.equalsIgnoreCase("no")||includeDns.equalsIgnoreCase("n")) includeDN=false;
 		if(includeAudits.equalsIgnoreCase("no")||includeAudits.equalsIgnoreCase("n")) includeAudit=false;
 		if(includeDns.equalsIgnoreCase("yes")||includeDns.equalsIgnoreCase("y")) includeDN=true;
 		if(includeAudits.equalsIgnoreCase("yes")||includeAudits.equalsIgnoreCase("y")) includeAudit=true;
-		int userId = ((UserAccountBean)request.getSession().getAttribute("userBean")).getId();
+		// TODO: KK - hack to allow access to this web service without authentication/authorization
+		//int userId = ((UserAccountBean)request.getSession().getAttribute("userBean")).getId();
+		int userId = 1;
 		XMLSerializer xmlSerializer = new XMLSerializer();
 		FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID,
 						formVersionOID,
