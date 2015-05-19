@@ -42,9 +42,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.web.pmanage.Study;
-import org.akaza.openclinica.web.pmanage.Submission;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -59,6 +56,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
 import org.akaza.openclinica.service.PformSubmissionService;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.pmanage.Study;
+import org.akaza.openclinica.service.pmanage.Submission;
 
 @Path("/openrosa")
 @Component

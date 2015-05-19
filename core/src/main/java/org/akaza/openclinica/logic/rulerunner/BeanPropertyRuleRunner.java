@@ -4,6 +4,7 @@ package org.akaza.openclinica.logic.rulerunner;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -16,7 +17,7 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
-
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -26,10 +27,11 @@ import java.util.List;
  *
  */
 public class BeanPropertyRuleRunner {
+	NotificationActionProcessor notificationActionProcessor;
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         int eventOrdinal, StudyEventChangeDetails changeDetails,Integer userId) 
+                         int eventOrdinal, StudyEventChangeDetails changeDetails,Integer userId , JavaMailSenderImpl mailSender) 
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
@@ -42,7 +44,9 @@ public class BeanPropertyRuleRunner {
                     if(ruleSetRule.getStatus()==Status.AVAILABLE)
                     {
 	                    RuleBean rule = ruleSetRule.getRuleBean();
-	                    StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
+	             //       StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
+	                    StudyDAO sdao = new StudyDAO(ds);
+	                    StudyBean currentStudy = (StudyBean) sdao.findByPK(rule.getStudyId());
 	                    ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBeanId, studyEventDaoHib, studyEventDefDaoHib);
 	                    try {
 	                       // StopWatch sw = new StopWatch();
@@ -61,7 +65,12 @@ public class BeanPropertyRuleRunner {
 	
 	                        for (RuleActionBean ruleActionBean: actionListBasedOnRuleExecutionResult){
 	                            // ActionProcessor ap =ActionProcessorFacade.getActionProcessor(ruleActionBean.getActionType(), ds, null, null,ruleSet, null, ruleActionBean.getRuleSetRule());
-	                            beanPropertyService.runAction(ruleActionBean,eow,userId);
+	                        	if (ruleActionBean instanceof EventActionBean){
+	                        		beanPropertyService.runAction(ruleActionBean,eow,userId);
+	                        	}else if (ruleActionBean instanceof NotificationActionBean){
+                                    notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule); 
+                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studySubjectBeanId,eventOrdinal);
+	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
 	                    	osa.printStackTrace();

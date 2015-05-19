@@ -33,7 +33,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -60,7 +60,6 @@ import java.util.ResourceBundle;
 import java.util.Properties;
 import java.lang.Exception;
 import java.io.InputStream;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -94,7 +93,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ResourceBundle resformat;
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
     private StudyParameterValueDAO studyParameterValueDAO;
-	private ParticipantPortalRegistrar	participantPortalRegistrar = new ParticipantPortalRegistrar();
+	private ParticipantPortalRegistrar	participantPortalRegistrar; 
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -797,6 +796,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     
     
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception{
+    	 participantPortalRegistrar=new ParticipantPortalRegistrar();
 	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());	    
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(pStudy.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
@@ -830,6 +830,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
+   	    participantPortalRegistrar=new ParticipantPortalRegistrar();
 	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());	    
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());

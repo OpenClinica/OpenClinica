@@ -34,6 +34,7 @@
                 <value>org.akaza.openclinica.domain.rule.action.RuleActionRunBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.NotificationActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.ShowActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.HideActionBean</value>
