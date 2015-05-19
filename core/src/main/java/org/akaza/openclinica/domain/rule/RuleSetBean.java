@@ -436,7 +436,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 	}
 
 	
-    @JoinColumn(name = "run_on_schedule")
+    @JoinColumn(name = "run_schedule")
 	public boolean isRunSchedule() {
 		return runSchedule;
 	}
