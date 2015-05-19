@@ -610,6 +610,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
+                    boolean resetSDV = false;
                     int eventCrfBeanId = -1;
                     EventCRFBean eventCrfBean = new EventCRFBean();
 
@@ -617,6 +618,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     if (wrapper.isSavable()) {
                         ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
                         logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                        itemDataDao.setFormatDates(false);
                         for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                             eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                             eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
@@ -627,6 +629,8 @@ public class ImportSpringJob extends QuartzJobBean {
                                     displayItemBean.getData().getOrdinal());
                             if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
                                 logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
+                                if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
+                                    resetSDV = true;
                                 itemDataBean.setUpdatedDate(new Date());
                                 itemDataBean.setUpdater(ub);
                                 itemDataBean.setValue(displayItemBean.getData().getValue());
@@ -636,6 +640,7 @@ public class ImportSpringJob extends QuartzJobBean {
                                 // need to set pk here in order to create dn
                                 displayItemBean.getData().setId(itemDataBean.getId());
                             } else {
+                                resetSDV = true;
                                 itemDataDao.create(displayItemBean.getData());
                                 logger.debug("created: " + displayItemBean.getData().getItemId());
                                 ItemDataBean itemDataBean2 = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(),
@@ -672,6 +677,10 @@ public class ImportSpringJob extends QuartzJobBean {
                                 eventCrfInts.add(new Integer(eventCrfBean.getId()));
                             }
                         }
+                        itemDataDao.setFormatDates(true);
+                        // Reset the SDV status if item data has been changed or added
+                        if (eventCrfBean != null && resetSDV)
+                            eventCrfDao.setSDVStatus(false, ub.getId(), eventCrfBean.getId());
                     }
                 }
                 // msg.append("===+");

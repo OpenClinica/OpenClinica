@@ -44,15 +44,14 @@ import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * <P>
- * EventCRFDAO.java, data access object for an instance of an event being filled
- * out on a subject. Was originally individual_instrument table in OpenClinica
- * v.1.
- *
+ * EventCRFDAO.java, data access object for an instance of an event being filled out on a subject. Was originally
+ * individual_instrument table in OpenClinica v.1.
+ * 
  * @author thickerson
- *
+ * 
  *         TODO test create and update first thing
  */
-public class EventCRFDAO  <K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class EventCRFDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
     private void setQueryNames() {
@@ -110,9 +109,9 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
         this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
         this.setTypeExpected(22, TypeNames.INT);// old_status
         this.setTypeExpected(23, TypeNames.INT); // sdv_update_id
-//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-//            this.setTypeExpected(24, TypeNames.INT); // r
-//        }
+        // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+        // this.setTypeExpected(24, TypeNames.INT); // r
+        // }
 
     }
 
@@ -249,6 +248,7 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
         eb.setValidateString((String) hm.get("validate_string"));
         eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
         eb.setSdvStatus((Boolean) hm.get("sdv_status"));
+        eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
 
@@ -311,11 +311,10 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
         return executeFindAllQuery("findAllByStudyEvent", variables);
     }
 
-
-    public ArrayList findAllByStudyEventAndStatus(StudyEventBean studyEvent,Status status) {
+    public ArrayList findAllByStudyEventAndStatus(StudyEventBean studyEvent, Status status) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEvent.getId()));
-        variables.put(new Integer(2),new Integer(status.getId()));
+        variables.put(new Integer(2), new Integer(status.getId()));
         return executeFindAllQuery("findAllByStudyEventAndStatus", variables);
     }
 
@@ -382,7 +381,7 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
     public ArrayList findUndeletedWithStudySubjectsByCRFVersion(int versionId) {
         this.setTypesExpected();
         // ss.label, sed.name as sed_name, s.name as study_name, ss.sample_ordinal as repeat_number
-//        this.setTypeExpected(23, TypeNames.STRING);
+        // this.setTypeExpected(23, TypeNames.STRING);
         this.setTypeExpected(24, TypeNames.STRING);
         this.setTypeExpected(25, TypeNames.STRING);
         this.setTypeExpected(26, TypeNames.STRING);
@@ -630,8 +629,8 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
         variables.put(2, parentStudyId);
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
-        //sql = sql + sort.execute("");
-        sql = sql + " order By  ec.date_created ASC "; //major hack
+        // sql = sql + sort.execute("");
+        sql = sql + " order By  ec.date_created ASC "; // major hack
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             // sql += " )  where rownum <= " + rowEnd + " and rownum >" + rowStart + " ";
             sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
@@ -907,14 +906,13 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
 
             Integer studyEventId = bean.getStudyEventId();
             if (!result.containsKey(studyEventId)) {
-                result.put(studyEventId, new TreeSet<EventCRFBean>(new Comparator<EventCRFBean>(
-                        ) {
-                            public int compare(EventCRFBean o1, EventCRFBean o2) {
-                                Integer id1 = o1.getId();
-                                Integer id2 = o2.getId();
-                                return id1.compareTo(id2);
-                            }
-                        }));
+                result.put(studyEventId, new TreeSet<EventCRFBean>(new Comparator<EventCRFBean>() {
+                    public int compare(EventCRFBean o1, EventCRFBean o2) {
+                        Integer id1 = o1.getId();
+                        Integer id2 = o2.getId();
+                        return id1.compareTo(id2);
+                    }
+                }));
             }
             result.get(studyEventId).add(bean);
         }
@@ -940,35 +938,35 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
 
         return result;
     }
-    
-    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id ){
-    	 Connection con = null;
-    	updateCRFVersionID( event_crf_id,  crf_version_id,  user_id, con);
+
+    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id) {
+        Connection con = null;
+        updateCRFVersionID(event_crf_id, crf_version_id, user_id, con);
     }
-    /* this function allows to run transactional updates for an action*/
-    
-	 public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id,  Connection con){
-    	 this.unsetTypeExpected();
-         this.setTypeExpected(1, TypeNames.INT);
-         this.setTypeExpected(2, TypeNames.INT);
-         this.setTypeExpected(3, TypeNames.INT);
-         this.setTypeExpected(4, TypeNames.BOOL);
-         this.setTypeExpected(3, TypeNames.INT);
-                        
-         HashMap variables = new HashMap();
-         variables.put(1, crf_version_id);
-         variables.put(2, user_id);
-         variables.put(3, user_id);
-         variables.put(4, false);
-         variables.put(5, event_crf_id);
-         String sql = digester.getQuery("updateCRFVersionID");
-         // this is the way to make the change transactional
-         if (con == null){
-        	 this.execute(sql, variables);}
-         else{
-        	 this.execute(sql, variables, con);
-         }
+
+    /* this function allows to run transactional updates for an action */
+
+    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id, Connection con) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(3, TypeNames.INT);
+        this.setTypeExpected(4, TypeNames.BOOL);
+        this.setTypeExpected(3, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(1, crf_version_id);
+        variables.put(2, user_id);
+        variables.put(3, user_id);
+        variables.put(4, false);
+        variables.put(5, event_crf_id);
+        String sql = digester.getQuery("updateCRFVersionID");
+        // this is the way to make the change transactional
+        if (con == null) {
+            this.execute(sql, variables);
+        } else {
+            this.execute(sql, variables, con);
+        }
     }
-	
 
 }

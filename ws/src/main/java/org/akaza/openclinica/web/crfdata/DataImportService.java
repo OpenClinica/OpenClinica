@@ -206,16 +206,19 @@ public class DataImportService {
         boolean discNotesGenerated = false;
 
         ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
+        itemDataDao.setFormatDates(false);
         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
 
         StringBuffer auditMsg = new StringBuffer();
         int eventCrfBeanId = -1;
-        EventCRFBean eventCrfBean;
+        EventCRFBean eventCrfBean = null;
         ArrayList<Integer> eventCrfInts;
         ItemDataBean itemDataBean;
 
         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
         for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
+            boolean resetSDV = false;
+
             logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
             if (wrapper.isSavable()) {
                 eventCrfInts = new ArrayList<Integer>();
@@ -231,16 +234,22 @@ public class DataImportService {
                     itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                             .getData().getOrdinal());
                     if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
+
+                        if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
+                            resetSDV = true;
+
                         logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                         itemDataBean.setUpdatedDate(new Date());
                         itemDataBean.setUpdater(userBean);
                         itemDataBean.setValue(displayItemBean.getData().getValue());
+
                         // set status?
                         itemDataDao.update(itemDataBean);
                         logger.debug("updated: " + itemDataBean.getItemId());
                         // need to set pk here in order to create dn
                         displayItemBean.getData().setId(itemDataBean.getId());
                     } else {
+                        resetSDV = true;
                         itemDataDao.create(displayItemBean.getData());
                         logger.debug("created: " + displayItemBean.getData().getItemId());
                         itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
@@ -280,6 +289,9 @@ public class DataImportService {
                         eventCrfInts.add(new Integer(eventCrfBean.getId()));
                     }
                 }
+                // Reset the SDV status if item data has been changed or added
+                if (eventCrfBean != null && resetSDV)
+                    eventCrfDao.setSDVStatus(false, userBean.getId(), eventCrfBean.getId());
             }
         }
         if (!discNotesGenerated) {
