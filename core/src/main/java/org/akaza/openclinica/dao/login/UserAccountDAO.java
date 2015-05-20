@@ -412,7 +412,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
         String accessCode = (String) hm.get("access_code");
-        String timeZone = (String) hm.get("timezone");
+        String timeZone = (String) hm.get("time_zone");
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());

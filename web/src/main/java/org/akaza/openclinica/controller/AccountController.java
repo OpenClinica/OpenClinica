@@ -242,6 +242,37 @@ public class AccountController {
 		}
 	}
 
+	@RequestMapping(value = "/recordParticipantTimezone", method = RequestMethod.POST)
+	public ResponseEntity<UserDTO> updateTimezone(@RequestBody HashMap<String, String> map) throws Exception {
+		uDTO = null;
+		System.out.println("I'm in update Timezone method");
+
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOid();
+
+		String studySubjectId = map.get("studySubjectId");
+		String timeZone = map.get("timezone");
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		System.out.println("******************     You are in the Rest Service   *****************");
+
+		UserAccountBean uBean = null;
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+
+		// build UserName
+		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+		String pUserName = mapValues.get("pUserName"); // Participant User Name
+
+		// Participant user account (Update if exist in user table)
+		UserAccountBean pUBean = getUserAccount(pUserName);
+          if(pUBean.isActive()){
+        	  pUBean.setTimeZone(timeZone);
+			updateUserAccount(pUBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+	}
+		return null;
+  }
+
 	private UserDTO buildUserDTO(UserAccountBean userAccountBean) {
 		uDTO = new UserDTO();
 		uDTO.setfName(userAccountBean.getFirstName());
