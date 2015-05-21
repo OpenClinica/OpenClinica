@@ -110,9 +110,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; //
+        ind++; // time_zone
+//        this.setTypeExpected(ind, TypeNames.INT);
+ //       ind++; //
     }
 
     public void setTypesExpectedFilter() {
@@ -217,6 +217,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         eb.setStudyName((String) hm.get("unique_identifier"));
 //        eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
+        eb.setTime_zone((String) hm.get("time_zone"));
         return eb;
     }
 
@@ -1065,6 +1066,8 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
+        ind++;
+        variables.put(new Integer(ind), sb.getTime_zone());
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));
         ind++;

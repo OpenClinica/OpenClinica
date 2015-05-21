@@ -63,6 +63,7 @@ public class StudySubjectBean extends AuditableEntityBean {
     private String oid;
 
     private OidGenerator oidGenerator = new StudySubjectOidGenerator();
+    private String time_zone;
     	
 	public StudySubjectBean() {
         studyGroupMaps = new ArrayList();
@@ -272,7 +273,14 @@ public class StudySubjectBean extends AuditableEntityBean {
 	public void setDobCollected(boolean isDobCollected) {
 		this.isDobCollected = isDobCollected;
 	}
-    
+
+	public String getTime_zone() {
+		return time_zone;
+	}
+
+	public void setTime_zone(String time_zone) {
+		this.time_zone = time_zone;
+	}
     
 
 }
