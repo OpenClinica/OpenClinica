@@ -264,12 +264,17 @@ public class AccountController {
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 
 		// Participant user account (Update if exist in user table)
-		UserAccountBean pUBean = getUserAccount(pUserName);
+/*		UserAccountBean pUBean = getUserAccount(pUserName);
           if(pUBean.isActive()){
         	  pUBean.setTimeZone(timeZone);
 			updateUserAccount(pUBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 	}
+*/        if (studySubjectBean.isActive()){
+        	studySubjectBean.setTime_zone(timeZone);
+        	ssdao.update(studySubjectBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+        }
 		return null;
   }
 

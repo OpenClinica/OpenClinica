@@ -63,13 +63,11 @@ public class jobTriggerService {
 		this.ruleSetService = ruleSetService;
 	}
 
-//	 @Scheduled(cron = "0 0/2 * * * ?") // trigger every minute
-//	 @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?")
-	// trigger every hour
+	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
+	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
+	@Scheduled(cron = "0 0 0/1 * * ?")	// trigger every hour
 	public void reportCurrentTime() throws ParseException {
 		System.out.println("The time is now " + currentDateFormat.format(new Date()));
-		// Time serverTime = now();
 		uadao = new UserAccountDAO(ds);
 		ssdao = new StudySubjectDAO(ds);
 		sdao = new StudyDAO(ds);
@@ -77,6 +75,7 @@ public class jobTriggerService {
 		Date now = new Date();
 		int serverTime = Integer.parseInt(dateFormat.format(now));
 		TimeZone serverZone = TimeZone.getDefault();
+		TimeZone ssZone;
 		int runTime = 23;
 		ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
 		for (RuleSetBean ruleSet : ruleSets) {
@@ -87,27 +86,25 @@ public class jobTriggerService {
 				runTime = Integer.parseInt(dateFormat.format(dateFormat.parse(ruleSet.getRunTime())));
 			for (StudySubjectBean ssBean : ssBeans) {
 
-				String ssTimeZone = ssBean.getTime_zone();
-				
-				if (ssTimeZone != null && ssTimeZone !="") {
-				    ssTimeZone = ssTimeZone.trim();
-					int timeDifference = 0;
-					TimeZone ssZone = TimeZone.getTimeZone(ssTimeZone);
-					timeDifference = (serverZone.getRawOffset() + serverZone.getDSTSavings() - (ssZone.getRawOffset() + ssZone.getDSTSavings())) / (1000 * 60 * 60);
-					int newSetTime = runTime + timeDifference;
-					if (newSetTime > 23)
-						newSetTime = newSetTime - 24;
-					if (newSetTime < 0)
-						newSetTime = newSetTime + 24;
+				String ssTimeZone = ssBean.getTime_zone().trim();
+				int timeDifference = 0;
 
-					if (serverTime == newSetTime) {
-						trigger(ruleSet, ssBean);
-					}
-				}else{
-					// Non Participant Subjects // Run on Server TimeZone
-					if (serverTime == runTime) {
-						trigger(ruleSet, ssBean);
-					}
+				if (ssTimeZone != "") {
+					ssZone = TimeZone.getTimeZone(ssTimeZone);
+				} else {
+					ssZone = TimeZone.getDefault();
+				}
+
+				timeDifference = (serverZone.getRawOffset() + serverZone.getDSTSavings() - (ssZone.getRawOffset() + ssZone.getDSTSavings())) / (1000 * 60 * 60);
+				int newSetTime = runTime + timeDifference;
+				if (newSetTime > 23)
+					newSetTime = newSetTime - 24;
+				if (newSetTime < 0)
+					newSetTime = newSetTime + 24;
+
+				if (serverTime == newSetTime) {
+					trigger(ruleSet, ssBean);
+
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +89,7 @@ public class ExpressionService {
     private CRFVersionDAO crfVersionDao;
     private ItemDataDAO itemDataDao;
     private StudyEventDAO studyEventDao;
+    private StudySubjectDAO studySubjectDao;
     public final static String STARTDATE =".STARTDATE";
     public final  static String STATUS =".STATUS";
     public static final String STUDY_EVENT_OID_START_KEY="SE_";
@@ -222,6 +226,17 @@ public class ExpressionService {
 
     }
 
+    
+    public String getSSTimeZone(){
+     Integer subjectId = expressionWrapper.getStudySubjectId();
+     System.out.print("  subjectId  " + subjectId + "  : ");
+     if(subjectId ==null) return null;     
+     StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
+       return ssBean.getTime_zone().trim();
+     }
+    
+    
+        
  public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
         if (isExpressionPartial(expression)) {
             throw new OpenClinicaSystemException("getValueFromDb:We cannot get the Value of a PARTIAL expression : " + expression);
@@ -1298,6 +1313,10 @@ public class ExpressionService {
     //    studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(ds);
      //   return studyEventDao;
         return  new StudyEventDAO(ds);
+    }
+
+    private StudySubjectDAO getStudySubjectDao() {
+        return  new StudySubjectDAO(ds);
     }
 
     private EventCRFDAO getEventCRFDao() {
