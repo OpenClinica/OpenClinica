@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
@@ -54,6 +55,7 @@ public class ExpressionBeanService {
     Pattern[] rulePattern;
     Pattern[] ruleActionPattern;
     ExpressionBeanObjectWrapper expressionBeanWrapper;
+    private StudySubjectDAO studySubjectDao;
 
     public static String STUDYEVENTKEY="SE";
 
@@ -141,6 +143,17 @@ public class ExpressionBeanService {
   
     public void setExpressionBeanWrapper(ExpressionBeanObjectWrapper expressionBeanWrapper) {
         this.expressionBeanWrapper = expressionBeanWrapper;
+    }
+    public String getSSTimeZone(){
+        Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
+        System.out.print("  subjectId  " + subjectId + "  : ");
+        if(subjectId ==null) return null;     
+        StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
+          return ssBean.getTime_zone().trim();
+        }
+
+    private StudySubjectDAO getStudySubjectDao() {
+        return  new StudySubjectDAO(ds);
     }
 
 }
