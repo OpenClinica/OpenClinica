@@ -1,4 +1,4 @@
-package org.akaza.openclinica.control.submit;
+package org.akaza.openclinica.web.crfdata;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 
