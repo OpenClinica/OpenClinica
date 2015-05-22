@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -544,6 +545,16 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllBySectionIdAndEventCRFId", variables);
     }
 
+    public ArrayList<ItemDataBean> findByCRFVersion(CRFVersionBean crfVersionBean) {
+        setTypesExpected();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(crfVersionBean.getId()));
+
+        return this.executeFindAllQuery("findByCRFVersion", variables);
+    }
+    
+    
+        
     public ArrayList<ItemDataBean> findAllActiveBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
