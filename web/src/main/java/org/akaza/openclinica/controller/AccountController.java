@@ -242,7 +242,7 @@ public class AccountController {
 		}
 	}
 
-	@RequestMapping(value = "/recordParticipantTimezone", method = RequestMethod.POST)
+	@RequestMapping(value = "/timezone", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> updateTimezone(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
 		System.out.println("I'm in update Timezone method");
@@ -251,28 +251,22 @@ public class AccountController {
 		String oid = parentStudy.getOid();
 
 		String studySubjectId = map.get("studySubjectId");
-		String timeZone = map.get("timezone");
+		String timeZone = map.get("timeZone");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		System.out.println("******************     You are in the Rest Service   *****************");
-
-		UserAccountBean uBean = null;
+        
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
-
-		// build UserName
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 
-		// Participant user account (Update if exist in user table)
-/*		UserAccountBean pUBean = getUserAccount(pUserName);
-          if(pUBean.isActive()){
-        	  pUBean.setTimeZone(timeZone);
-			updateUserAccount(pUBean);
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
-	}
-*/        if (studySubjectBean.isActive()){
+		udao = new UserAccountDAO(dataSource);
+		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
+		
+        if (studySubjectBean.isActive()){
         	studySubjectBean.setTime_zone(timeZone);
-        	ssdao.update(studySubjectBean);
+        	studySubjectBean.setUpdater(userAccountBean);
+        	updateStudySubjectBean(studySubjectBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
         }
 		return null;
@@ -389,6 +383,12 @@ public class AccountController {
 		return studySubjectBean;
 	}
 
+	private void updateStudySubjectBean(StudySubjectBean sBean) {
+		ssdao = new StudySubjectDAO(dataSource);
+        ssdao.update(sBean) ;
+	}
+
+	
 	private Boolean isStudyDoesNotExist(String studyOid) {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean == null) {
