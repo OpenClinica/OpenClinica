@@ -1,5 +1,6 @@
 package org.akaza.openclinica.job;
 
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -11,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specialist class to log all privacy related information which is exported with an OpenClinica export.
+ * Specialist class to log all export related information; for audit and accountability purposes.
  * Created by Jacob Rousseau on 16-Mar-2015.
  * Copyright CTMM-TraIT / VUmc (c) 2015
  */
@@ -19,11 +20,9 @@ public class ExportLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(ExportLogger.class);
 
-    /**
-     * Default constructor
-     */
-    public ExportLogger() {
-
+    public static void logAccessExportFile(UserAccountBean user, ArchivedDatasetFileBean archivedDatasetFileBean) {
+        logger.info("User " + user.getName() + " accessed archived dataset file " + archivedDatasetFileBean.getName() +
+                " ID: " + archivedDatasetFileBean.getId());
     }
 
     /**
@@ -36,7 +35,7 @@ public class ExportLogger {
      * @param notificationEmail the addresses of recipients to whom the notification email is sent
      *
      */
-    public void logExport(StudyBean currentStudy, UserAccountBean user, DatasetBean datasetBean, ItemDAO itemDAO, String fileDescription, String notificationEmail) {
+    public static void logExport(StudyBean currentStudy, UserAccountBean user, DatasetBean datasetBean, ItemDAO itemDAO, String fileDescription, String notificationEmail) {
         String studyInformation = "'" + currentStudy.getName() + "'";
 
         logger.info(user.getName() + " performed export '" + datasetBean.getName() +  "' for study " + studyInformation + "; format: " + fileDescription);
@@ -61,7 +60,7 @@ public class ExportLogger {
         logger.info(nameStr);
     }
 
-    private String extractSubjectInfo(DatasetBean datasetBean) {
+    private static String extractSubjectInfo(DatasetBean datasetBean) {
         String ret = "Exported subject information: ";
 
         ret = appendBooleanField(ret, datasetBean.isShowSubjectUniqueIdentifier(), "person ID");
@@ -82,7 +81,7 @@ public class ExportLogger {
         return ret;
     }
 
-    private String appendBooleanField(String outputString, boolean fieldSelected, String fieldName) {
+    private static String appendBooleanField(String outputString, boolean fieldSelected, String fieldName) {
         if (fieldSelected) {
             outputString += fieldName + ", ";
         }

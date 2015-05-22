@@ -485,8 +485,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 successMsg =" ";
             }
 
-            ExportLogger exportLogger = new ExportLogger();
-            exportLogger.logExport(currentStudy, userBean, datasetBean, itemDao, epBean.getFiledescription(), alertEmail);
+            ExportLogger.logExport(currentStudy, userBean, datasetBean, itemDao, epBean.getFiledescription(), alertEmail);
             postSuccessMessage(successMsg, context);
         } catch (JobInterruptedException e) {
             logger.info("Job was cancelled by the user");
