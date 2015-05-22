@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -95,9 +96,17 @@
 	<tr valign="top">
     	<td class="table_cell_left"><fmt:message key="subjects_affected" bundle="${resword}"/>: <c:out value="${summaryStats.studySubjectCount}" /></td>
 	</tr>
-	<tr valign="top">
-    	<td class="table_cell_left"><fmt:message key="event_CRFs_affected" bundle="${resword}"/>: <c:out value="${summaryStats.eventCrfCount}" /></td>
-	</tr>
+    <tr valign="top">
+        <td class="table_cell_left"><fmt:message key="event_CRFs_affected" bundle="${resword}"/>: <c:out value="${summaryStats.eventCrfCount}" /></td>
+    </tr>
+	<c:if test="${empty hardValidationErrors}">
+	    <tr valign="top">
+	        <td class="table_cell_left"><fmt:message key="event_CRFs_available" bundle="${resword}"/>: <c:out value="${summaryStats.eventCrfCount - summaryStats.skippedCrfCount}" /></td>
+	    </tr>
+	    <tr valign="top">
+	        <td class="table_cell_left"><fmt:message key="event_CRFs_skipped" bundle="${resword}"/>: <c:out value="${summaryStats.skippedCrfCount}" /></td>
+	    </tr>
+	</c:if>
 	<tr valign="top">
     	<td class="table_cell_left"><fmt:message key="validation_rules_generated" bundle="${resword}"/>: <c:out value="${summaryStats.discNoteCount}" /></td>
 	</tr>
@@ -109,6 +118,48 @@
 </div></div></div></div></div></div></div></div>
 </div>
 <br/>
+
+<%-- skipped CRFs here --%>
+<c:if test="${empty hardValidationErrors}">
+<fmt:message key="crf_data_skipped" bundle="${resword}"/>
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="textbox_center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td class="table_header_row"><fmt:message key="study_oid" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
+ <td class="table_header_row"><fmt:message key="event_crf_status" bundle="${resword}"/></td>
+</tr> 
+ <c:forEach items="${importCrfInfo.importCRFList}" var="importCRF">
+    <c:if test="${!importCRF.processImport}">
+    <tr>
+    <td class="table_cell_left"><c:out value="${importCRF.studyOID}" /></td>
+    <td class="table_cell"><c:out value="${importCRF.studySubjectOID}" /></td>
+    <td class="table_cell"><c:out value="${importCRF.studyEventOID}" /></td>
+    <td class="table_cell"><c:out value="${importCRF.formOID}" /></td>
+    <td class="table_cell">
+        <c:choose>
+	        <c:when test="${importCRF.preImportStage.initialDE}"><fmt:message key="initial_data_entry" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.initialDE_Complete}"><fmt:message key="initial_data_entry_complete" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.doubleDE}"><fmt:message key="double_data_entry" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.doubleDE_Complete}"><fmt:message key="data_entry_complete" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.admin_Editing}"><fmt:message key="administrative_editing" bundle="${resword}"/></c:when>
+	        <c:when test="${importCRF.preImportStage.locked}"><fmt:message key="locked" bundle="${resword}"/></c:when>
+	        <c:otherwise><fmt:message key="invalid" bundle="${resword}"/></c:otherwise>
+        </c:choose>
+    </td>
+    </tr>
+    </c:if>
+ </c:forEach>
+</table>
+</div>
+</div></div></div></div></div></div></div></div>
+</div>
+<br/>
+</c:if>
+
 
 <%-- hard validation errors here --%>
 <%-- if we have hard validation errors here, we stop and don't generate the other two tables --%>
@@ -254,13 +305,16 @@
 			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 
 				<c:forEach var="subjectDataBean" items="${subjectData}">
+                    <c:set var="currSubjectMap" value="${importCrfInfo.importCRFMap[subjectDataBean.subjectOID]}"/>
+                    <c:if test="${currSubjectMap != null}">
 					<tr valign="top">
 						<td class="table_header_row" colspan="4"><fmt:message
 							key="study_subject" bundle="${resword}" />: <c:out
 							value="${subjectDataBean.subjectOID}" /></td>
 					</tr>
-					<c:forEach var="studyEventData"
-						items="${subjectDataBean.studyEventData}">
+					<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
+                        <c:set var="currEventMap" value="${currSubjectMap[studyEventData.studyEventOID]}"/>
+                        <c:if test="${currEventMap != null}">
 						<tr valign="top">
 							<td class="table_header_row"><fmt:message
 								key="event_CRF_OID" bundle="${resword}" /></td>
@@ -285,6 +339,8 @@
 							<td class="table_cell" colspan="3"></td>
 						</tr>
 						<c:forEach var="formData" items="${studyEventData.formData}">
+                            <c:set var="currFormMap" value="${currEventMap[formData.formOID]}"/>
+                            <c:if test="${currFormMap != null}">
 							<tr valign="top">
 								<td class="table_header_row"></td>
 								<td class="table_header_row"><fmt:message
@@ -333,8 +389,11 @@
 									</c:if>
 								</c:forEach>
 							</c:forEach>
+							</c:if>
 						</c:forEach>
+                        </c:if>
 					</c:forEach>
+                    </c:if>
 				</c:forEach>
 
 
@@ -372,6 +431,8 @@
 			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 
 				<c:forEach var="subjectDataBean" items="${subjectData}">
+                    <c:set var="currSubjectMap" value="${importCrfInfo.importCRFMap[subjectDataBean.subjectOID]}"/>
+                    <c:if test="${currSubjectMap != null}">
 					<tr valign="top">
 						<td class="table_header_row" colspan="4"><fmt:message
 							key="study_subject" bundle="${resword}" />: <c:out
@@ -379,6 +440,8 @@
 					</tr>
 					<c:forEach var="studyEventData"
 						items="${subjectDataBean.studyEventData}">
+                        <c:set var="currEventMap" value="${currSubjectMap[studyEventData.studyEventOID]}"/>
+                        <c:if test="${currEventMap != null}">
 						<tr valign="top">
 							<td class="table_header_row"><fmt:message
 								key="event_CRF_OID" bundle="${resword}" /></td>
@@ -403,6 +466,10 @@
 							<td class="table_cell" colspan="3"></td>
 						</tr>
 						<c:forEach var="formData" items="${studyEventData.formData}">
+                            <c:set var="currFormMap" value="${currEventMap[formData.formOID]}"/>
+                            <c:if test="${currFormMap != null}">
+
+
 							<tr valign="top">
 								<td class="table_header_row"></td>
 								<td class="table_header_row"><fmt:message
@@ -450,8 +517,11 @@
 									</c:if>
 								</c:forEach>
 							</c:forEach>
+							</c:if>
 						</c:forEach>
+						</c:if>
 					</c:forEach>
+					</c:if>
 				</c:forEach>
 
 

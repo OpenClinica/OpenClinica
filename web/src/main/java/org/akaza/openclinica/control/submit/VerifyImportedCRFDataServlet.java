@@ -16,8 +16,11 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -47,8 +50,7 @@ import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.ImportSpringJob;
 
 /**
- * View the uploaded data and verify what is going to be saved into the system
- * and what is not.
+ * View the uploaded data and verify what is going to be saved into the system and what is not.
  * 
  * @author Krikor Krumlian
  */
@@ -68,7 +70,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         }
 
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)|| r.equals(Role.RESEARCHASSISTANT2)) {
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)
+                || r.equals(Role.RESEARCHASSISTANT2)) {
             return;
         }
 
@@ -122,6 +125,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     @SuppressWarnings(value = "unchecked")
     public void processRequest() throws Exception {
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
+        itemDataDao.setFormatDates(false);
         EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource());
         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource());
         String action = request.getParameter("action");
@@ -158,9 +162,10 @@ public class VerifyImportedCRFDataServlet extends SecureController {
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session.getAttribute("importedData");
             // System.out.println("Size of displayItemBeanWrappers : " +
             // displayItemBeanWrappers.size());
+            HashMap<Integer, String> importedCRFStatuses = (HashMap<Integer, String>) session.getAttribute("importedCRFStatuses");
 
             for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
-
+                boolean resetSDV = false;
                 int eventCrfBeanId = -1;
                 EventCRFBean eventCrfBean = new EventCRFBean();
 
@@ -198,9 +203,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // we get around this by checking the bean first, to
                         // make sure it's not null
                         ItemDataBean itemDataBean = new ItemDataBean();
-                        itemDataBean =
-                            itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean.getData()
-                                    .getOrdinal());
+                        itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
+                                .getData().getOrdinal());
                         if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
                             // ItemDataBean itemDataBean = new ItemDataBean();
                             // itemDataBean =
@@ -212,6 +216,10 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             // itemDataDao.findByEventCRFIdAndItemName(
                             // eventCrfBean,
                             // displayItemBean.getItem().getName());
+
+                            if (!itemDataBean.getValue().equals(displayItemBean.getData().getValue()))
+                                resetSDV = true;
+
                             logger.info("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                             itemDataBean.setUpdatedDate(new Date());
                             itemDataBean.setUpdater(ub);
@@ -222,9 +230,11 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             // need to set pk here in order to create dn
                             displayItemBean.getData().setId(itemDataBean.getId());
                         } else {
+                            resetSDV = true;
+
                             itemDataDao.create(displayItemBean.getData());
                             logger.info("created: " + displayItemBean.getData().getItemId() + "event CRF ID = " + eventCrfBean.getId() + "CRF VERSION ID ="
-                                + eventCrfBean.getCRFVersionId());
+                                    + eventCrfBean.getCRFVersionId());
 
                             // does this dao function work for repeating
                             // events/groups?
@@ -232,9 +242,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             // itemDataDao.findByEventCRFIdAndItemName(
                             // eventCrfBean,
                             // displayItemBean.getItem().getName());
-                            ItemDataBean itemDataBean2 =
-                                itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
-                                        .getData().getOrdinal());
+                            ItemDataBean itemDataBean2 = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(),
+                                    eventCrfBean.getId(), displayItemBean.getData().getOrdinal());
                             logger.info("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
                             displayItemBean.getData().setId(itemDataBean2.getId());
                         }
@@ -250,9 +259,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // ibean.getName());
                         // System.out.println("*** checking for validation errors: "
                         // + ibean.getName());
-                        String itemOid =
-                            displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal() + "_"
-                                + wrapper.getStudySubjectOid();
+                        String itemOid = displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_"
+                                + displayItemBean.getData().getOrdinal() + "_" + wrapper.getStudySubjectOid();
                         if (wrapper.getValidationErrors().containsKey(itemOid)) {
                             ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
                             // if
@@ -265,9 +273,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             // could it be more than one? tbh 08/2008
                             for (int iter = 0; iter < messageList.size(); iter++) {
                                 String message = (String) messageList.get(iter);
-                                DiscrepancyNoteBean parentDn =
-                                    ImportSpringJob.createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, ub, sm.getDataSource(),
-                                            currentStudy);
+                                DiscrepancyNoteBean parentDn = ImportSpringJob.createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, ub,
+                                        sm.getDataSource(), currentStudy);
                                 ImportSpringJob.createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), ub, sm.getDataSource(),
                                         currentStudy);
                                 // System.out.println("*** created disc note with message: "
@@ -278,12 +285,20 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // logger.info("created:
                         // "+displayItemBean.getDbData().getName());
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
-                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                            // System.out.println("*** just updated event crf bean: "
-                            // + eventCrfBean.getId());
+
+                            String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
+                            if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
+                                crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
+                            } else {
+                                crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
+                            }
                             eventCrfInts.add(new Integer(eventCrfBean.getId()));
                         }
                     }
+                    // Reset the SDV status if item data has been changed or added
+                    if (eventCrfBean != null && resetSDV)
+                        eventCrfDao.setSDVStatus(false, ub.getId(), eventCrfBean.getId());
+
                     // end of item datas, tbh
                     // crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
                     // System .out.println("*** just updated event crf bean: "+

@@ -38,14 +38,17 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * <P>
- * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base.
- * If item is date, item data value has to be saved into database as specified in ISO 8601.
- *
+ * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. If item is date, item data value has to be
+ * saved into database as specified in ISO 8601.
+ * 
  * @author thickerson
- *
- *
+ * 
+ * 
  */
 public class ItemDataDAO extends AuditableEntityDAO {
+
+    boolean formatDates = true;
+
     // YW 12-06-2007 <<!!! Be careful when there is item with data-type as
     // "Date".
     // You have to make sure that string pattern conversion has been done before
@@ -60,6 +63,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
     // from database,
     // conversion is from oc_date_format pattern to local date_format pattern.
     // YW >>
+
+    public boolean isFormatDates() {
+        return formatDates;
+    }
+
+    public void setFormatDates(boolean formatDates) {
+        this.formatDates = formatDates;
+    }
 
     public Collection findMinMaxDates() {
         ArrayList al = new ArrayList();
@@ -78,8 +89,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
     public ItemDataDAO(DataSource ds) {
         super(ds);
         setQueryNames();
-        if(this.locale == null) {
-            this.locale = ResourceBundleProvider.getLocale(); //locale still might be null.
+        if (this.locale == null) {
+            this.locale = ResourceBundleProvider.getLocale(); // locale still might be null.
         }
     }
 
@@ -91,7 +102,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         } else {
             this.locale = ResourceBundleProvider.getLocale();
         }
-        if(this.locale != null) {
+        if (this.locale != null) {
             local_df_string = ResourceBundleProvider.getFormatBundle(this.locale).getString("date_format_string");
         }
     }
@@ -164,7 +175,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
     /**
      * This will update item data value
-     *
+     * 
      * @param eb
      * @return
      */
@@ -175,7 +186,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // inserting into database
         ItemDataType dataType = getDataType(idb.getItemId());
         if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string,locale));
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
         } else if (dataType.equals(ItemDataType.PDATE)) {
             idb.setValue(formatPDate(idb.getValue()));
         }
@@ -194,7 +205,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
-
 
     public EntityBean updateValueForRemoved(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
@@ -222,6 +232,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
+
     /**
      * this will update item data status
      */
@@ -239,33 +250,30 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
-    
+
     /*
-     * current_df_string= yyyy-MM-dd
-     * oc_df_string     = yyyy-mm-dd
-     * local_df_string  = dd-MMM-yyyy
-     *  
+     * current_df_string= yyyy-MM-dd oc_df_string = yyyy-mm-dd local_df_string = dd-MMM-yyyy
      */
-	public ItemDataBean setItemDataBeanIfDateOrPdate(ItemDataBean idb, String current_df_string, ItemDataType dataType) {
-		if (dataType.equals(ItemDataType.DATE)) {
-			idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string, locale));
-		} else if (dataType.equals(ItemDataType.PDATE)) {
-			idb.setValue(formatPDate(idb.getValue()));
-		}
-		return idb;
-	}
+    public ItemDataBean setItemDataBeanIfDateOrPdate(ItemDataBean idb, String current_df_string, ItemDataType dataType) {
+        if (dataType.equals(ItemDataType.DATE)) {
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string, locale));
+        } else if (dataType.equals(ItemDataType.PDATE)) {
+            idb.setValue(formatPDate(idb.getValue()));
+        }
+        return idb;
+    }
 
     /**
      * This will update item data value
-     *
+     * 
      * @param eb
      * @return
      */
     public EntityBean updateValue(EntityBean eb, String current_df_string) {
         ItemDataBean idb = (ItemDataBean) eb;
-        
+
         ItemDataType dataType = getDataType(idb.getItemId());
-        setItemDataBeanIfDateOrPdate(idb, current_df_string,dataType);
+        setItemDataBeanIfDateOrPdate(idb, current_df_string, dataType);
 
         idb.setActive(false);
 
@@ -369,29 +377,30 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return itemBean.getDataType();
     }
 
-//    public boolean isPDateType(int itemId) {
-//    	ItemDAO itemDAO = new ItemDAO(this.getDs());
-//    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
-//    	if (itemBean.getDataType().equals(ItemDataType.PDATE)) {
-//    		return true;
-//    	}
-//    	return false;
-//
-//    }
+    // public boolean isPDateType(int itemId) {
+    // ItemDAO itemDAO = new ItemDAO(this.getDs());
+    // ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
+    // if (itemBean.getDataType().equals(ItemDataType.PDATE)) {
+    // return true;
+    // }
+    // return false;
+    //
+    // }
 
-    public String formatPDate (String pDate) {
+    public String formatPDate(String pDate) {
         String temp = "";
-        if(pDate != null && pDate.length()>0) {
+        if (pDate != null && pDate.length() > 0) {
             String yearMonthFormat = I18nFormatUtil.yearMonthFormatString(this.locale);
             String yearFormat = I18nFormatUtil.yearFormatString();
             String dateFormat = I18nFormatUtil.dateFormatString(this.locale);
-            try{
+            try {
                 if (StringUtil.isFormatDate(pDate, dateFormat, this.locale)) {
                     temp = new SimpleDateFormat(oc_df_string, this.locale).format(new SimpleDateFormat(dateFormat, this.locale).parse(pDate));
                 } else if (StringUtil.isPartialYear(pDate, yearFormat, this.locale)) {
                     temp = pDate;
                 } else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat, this.locale)) {
-                    temp = new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), this.locale).format(new SimpleDateFormat(yearMonthFormat, this.locale).parse(pDate));
+                    temp = new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), this.locale).format(new SimpleDateFormat(yearMonthFormat,
+                            this.locale).parse(pDate));
                 }
             } catch (Exception ex) {
                 logger.warn("Parsial Date Parsing Exception........");
@@ -400,19 +409,19 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return temp;
     }
 
-    public String reFormatPDate (String pDate) {
+    public String reFormatPDate(String pDate) {
         String temp = "";
-        if(pDate != null && pDate.length()>0) {
+        if (pDate != null && pDate.length() > 0) {
             String yearMonthFormat = I18nFormatUtil.yearMonthFormatString(this.locale);
             String dateFormat = I18nFormatUtil.dateFormatString(this.locale);
-            try{
+            try {
                 if (StringUtil.isFormatDate(pDate, oc_df_string, this.locale)) {
                     temp = new SimpleDateFormat(dateFormat, this.locale).format(new SimpleDateFormat(oc_df_string, this.locale).parse(pDate));
                 } else if (StringUtil.isPartialYear(pDate, "yyyy", this.locale)) {
                     temp = pDate;
                 } else if (StringUtil.isPartialYearMonth(pDate, ApplicationConstants.getPDateFormatInSavedData(), this.locale)) {
-                    temp = new SimpleDateFormat(yearMonthFormat, this.locale).
-                            format(new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), this.locale).parse(pDate));
+                    temp = new SimpleDateFormat(yearMonthFormat, this.locale).format(new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(),
+                            this.locale).parse(pDate));
                 }
             } catch (Exception ex) {
                 logger.warn("Parsial Date Parsing Exception........");
@@ -420,7 +429,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         }
         return temp;
     }
-
 
     public Object getEntityFromHashMap(HashMap hm) {
         ItemDataBean eb = new ItemDataBean();
@@ -433,11 +441,13 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // right now,
         // convert item date value to local_date_format_string pattern once
         // fetching out from database
-        ItemDataType dataType = getDataType(eb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            eb.setValue(reFormatPDate(eb.getValue()));
+        if (formatDates) {
+            ItemDataType dataType = getDataType(eb.getItemId());
+            if (dataType.equals(ItemDataType.DATE)) {
+                eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string, locale));
+            } else if (dataType.equals(ItemDataType.PDATE)) {
+                eb.setValue(reFormatPDate(eb.getValue()));
+            }
         }
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
@@ -554,9 +564,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllActiveBySectionIdAndEventCRFId", variables);
     }
 
-
-
-
     public ArrayList<ItemDataBean> findAllByEventCRFId(int eventCRFId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -582,6 +589,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return this.executeFindAllQuery("findAllByEventCRFIdAndItemIdNoStatus", variables);
     }
+
     public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -649,6 +657,24 @@ public class ItemDataDAO extends AuditableEntityDAO {
         }
     }
 
+    public ItemDataBean findByItemIdAndEventCRFIdAndOrdinalRaw(int itemId, int eventCRFId, int ordinal) {
+        setTypesExpected();
+        ItemDataBean answer = new ItemDataBean();
+
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(new Integer(2), new Integer(eventCRFId));
+        variables.put(new Integer(3), new Integer(ordinal));
+
+        EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFIdAndOrdinal", variables);
+
+        if (!eb.isActive()) {
+            return new ItemDataBean();// hmm, return null instead?
+        } else {
+            return (ItemDataBean) eb;
+        }
+    }
+
     public int findAllRequiredByEventCRFId(EventCRFBean ecb) {
         setTypesExpected();
         int answer = 0;
@@ -666,7 +692,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
     /**
      * Gets the maximum ordinal for item data in a given item group in a given section and event crf
-     *
+     * 
      * @param ecb
      * @param sb
      * @param igb
@@ -695,23 +721,23 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return 0;
     }
-    
+
     /**
      * Gets the maximum ordinal for item data in a given item group in a given section and event crf
-     *
+     * 
      * @param item_group_oid
-    
+     * 
      * @return
      */
-    public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id ) {
+    public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id) {
 
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.STRING);
 
         HashMap variables = new HashMap(1);
-        variables.put(new Integer(1),new Integer(event_crf_id));
-        variables.put(new Integer(2),  item_group_oid);
+        variables.put(new Integer(1), new Integer(event_crf_id));
+        variables.put(new Integer(2), item_group_oid);
 
         ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByGroupOID"), variables);
         Iterator it = alist.iterator();
@@ -726,7 +752,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return 0;
     }
-  
+
     public int getMaxOrdinalForGroupByItemAndEventCrf(ItemBean ib, EventCRFBean ec) {
 
         this.unsetTypeExpected();
@@ -749,9 +775,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return 0;
     }
-    
-    
-    public boolean  isItemExists(int item_id, int ordinal_for_repeating_group_field, int event_crf_id) {
+
+    public boolean isItemExists(int item_id, int ordinal_for_repeating_group_field, int event_crf_id) {
 
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);

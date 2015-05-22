@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.pmanage;
+package org.akaza.openclinica.service.pmanage;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 

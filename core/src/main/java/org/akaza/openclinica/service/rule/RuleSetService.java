@@ -113,7 +113,6 @@ public class RuleSetService implements RuleSetServiceInterface {
     private DynamicsMetadataService dynamicsMetadataService;
     private RuleActionRunLogDao ruleActionRunLogDao;
     private BeanPropertyService beanPropertyService;
-    
     //hibernate based daos
     private StudyEventDao studyEventDomainDao;
     private StudyEventDefinitionDao studyEventDefDomainDao;
@@ -1022,8 +1021,8 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
             Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
             StudyEventChangeDetails changeDetails) {
-BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId);
+    		BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
+    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender);
 }
 
 	public StudyEventDao getStudyEventDomainDao() {

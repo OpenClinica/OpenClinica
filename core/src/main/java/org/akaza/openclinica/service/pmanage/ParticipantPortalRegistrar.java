@@ -1,10 +1,12 @@
-package org.akaza.openclinica.web.pmanage;
+package org.akaza.openclinica.service.pmanage;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.web.pmanage.Authorization;
-import org.akaza.openclinica.web.pmanage.Study;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.Study;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +66,8 @@ public class ParticipantPortalRegistrar {
         RestTemplate rest = new RestTemplate(requestFactory);
         String response = null;
         try {
+            if (!validHostNameCheck(hostName))
+                return INVALID;
             response = rest.getForObject(pManageUrl, String.class);
             if (response.equals("UNAVAILABLE"))
                 return UNAVAILABLE;
@@ -78,8 +82,46 @@ public class ParticipantPortalRegistrar {
         return UNKNOWN;
     }
 
+    public boolean validHostNameCheck(String hostName) {
+        String pManageBaseUrl = CoreResources.getField("portalURL");
+        if (hostName.contains("."))
+            return false;
+        try {
+            URL baseUrl = new URL(pManageBaseUrl);
+            String port = "";
+            if (baseUrl.getPort() > 0)
+                port = ":" + String.valueOf(baseUrl.getPort());
+            // Check that hostname makes a valid URL
+            URL customerUrl = new URL(baseUrl.getProtocol() + "://" + hostName + "." + baseUrl.getHost() + port);
+            // Check that hostname only contains alphanumeric characters and/or hyphens
+            if (hostName.matches("^[A-Za-z0-9-]+$"))
+                return true;
+        } catch (MalformedURLException mue) {
+            logger.error("Error validating customer selected Participate subdomain.");
+            logger.error(mue.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(mue));
+        }
+        return false;
+    }
+
     public String registerStudy(String studyOid) {
         return registerStudy(studyOid, null);
+    }
+    
+    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO) {
+        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/email";
+
+        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+        RestTemplate rest = new RestTemplate(requestFactory);
+
+        try {
+        	ParticipantDTO response = rest.postForObject(pManageUrl, participantDTO, ParticipantDTO.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
+        return "";
     }
 
     public String registerStudy(String studyOid, String hostName) {
