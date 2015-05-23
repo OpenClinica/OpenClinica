@@ -195,31 +195,19 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         }
     }
 
+
     private String calculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
-        	String ssTimeZone= getExpressionService().getSSTimeZone();
-        if (ssTimeZone == "" || ssTimeZone == null) 	
-        	ssTimeZone = TimeZone.getDefault().getID();
-      
-            DateTimeZone ssZone = DateTimeZone.forID(ssTimeZone);
-            DateMidnight dm = new DateMidnight(ssZone);
-            DateTimeFormatter fmt = ISODateTimeFormat.date();
-            System.out.println(fmt.print(dm) + "   " + ssZone);
-            return fmt.print(dm);
+        	String ssZoneId= getExpressionService().getSSZoneId();
+            return getExpressionService().getSSDate(ssZoneId).get("ssDate");
         }
         return null;
     }
 
     private String testCalculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
-        	String ssTimeZone= getExpressionService().getSSTimeZone();
-            if (ssTimeZone == "") 	
-            	ssTimeZone = TimeZone.getDefault().getID();
-      
-            DateTimeZone ssZone = DateTimeZone.forID(ssTimeZone);
-            DateMidnight dm = new DateMidnight(ssZone);
-            DateTimeFormatter fmt = ISODateTimeFormat.date();
-            return fmt.print(dm);
+        	String ssZoneId= getExpressionService().getSSZoneId();
+            return getExpressionService().getSSDate(ssZoneId).get("ssDate");
         }
         return null;
     }

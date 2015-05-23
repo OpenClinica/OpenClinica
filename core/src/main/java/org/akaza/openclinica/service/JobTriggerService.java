@@ -44,7 +44,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class jobTriggerService {
+public class JobTriggerService {
 	RuleSetDao ruleSetDao;
 	DataSource ds;
 	UserAccountDAO uadao;
@@ -57,7 +57,7 @@ public class jobTriggerService {
 
 	private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-	public jobTriggerService(DataSource ds, RuleSetDao ruleSetDao, RuleSetService ruleSetService) {
+	public JobTriggerService(DataSource ds, RuleSetDao ruleSetDao, RuleSetService ruleSetService) {
 		this.ds = ds;
 		this.ruleSetDao = ruleSetDao;
 		this.ruleSetService = ruleSetService;
@@ -65,16 +65,22 @@ public class jobTriggerService {
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
 	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?")	// trigger every hour
-	public void reportCurrentTime() throws ParseException {
-		System.out.println("The time is now " + currentDateFormat.format(new Date()));
-		uadao = new UserAccountDAO(ds);
-		ssdao = new StudySubjectDAO(ds);
-		sdao = new StudyDAO(ds);
+	@Scheduled(cron = "0 0 0/1 * * ?")
+	// trigger every hour
+	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH");
 		Date now = new Date();
 		int serverTime = Integer.parseInt(dateFormat.format(now));
+		System.out.println("The time is now " + currentDateFormat.format(new Date()));
+		triggerJob(serverTime);
+	}
+
+	public void triggerJob(int serverTime) throws NumberFormatException, ParseException {
 		TimeZone serverZone = TimeZone.getDefault();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH");
+		uadao = new UserAccountDAO(ds);
+		ssdao = new StudySubjectDAO(ds);
+		sdao = new StudyDAO(ds);
 		TimeZone ssZone;
 		int runTime = 23;
 		ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
@@ -85,30 +91,36 @@ public class jobTriggerService {
 			if (ruleSet.getRunTime() != null)
 				runTime = Integer.parseInt(dateFormat.format(dateFormat.parse(ruleSet.getRunTime())));
 			for (StudySubjectBean ssBean : ssBeans) {
-
-				String ssTimeZone = ssBean.getTime_zone().trim();
-				int timeDifference = 0;
-
-				if (ssTimeZone != "") {
-					ssZone = TimeZone.getTimeZone(ssTimeZone);
+				Boolean doTrigger = false;
+				String ssZoneId = ssBean.getTime_zone().trim();
+				if (ssZoneId != "") {
+					ssZone = TimeZone.getTimeZone(ssZoneId);
 				} else {
-					ssZone = TimeZone.getDefault();
+					ssZone = serverZone;
 				}
 
-				timeDifference = (serverZone.getRawOffset() + serverZone.getDSTSavings() - (ssZone.getRawOffset() + ssZone.getDSTSavings())) / (1000 * 60 * 60);
-				int newSetTime = runTime + timeDifference;
-				if (newSetTime > 23)
-					newSetTime = newSetTime - 24;
-				if (newSetTime < 0)
-					newSetTime = newSetTime + 24;
-
-				if (serverTime == newSetTime) {
+				doTrigger = calculateTimezoneDiff(serverZone, ssZone, runTime, serverTime);
+				if (doTrigger) {
 					trigger(ruleSet, ssBean);
 
 				}
 			}
 		}
 
+	}
+
+	public Boolean calculateTimezoneDiff(TimeZone serverZone, TimeZone ssZone, int runTime, int serverTime) {
+		int timeDifference = (serverZone.getRawOffset() + serverZone.getDSTSavings() - (ssZone.getRawOffset() + ssZone.getDSTSavings())) / (1000 * 60 * 60);
+		int newSetTime = runTime + timeDifference;
+		if (newSetTime > 23)
+			newSetTime = newSetTime - 24;
+		if (newSetTime < 0)
+			newSetTime = newSetTime + 24;
+		if (serverTime == newSetTime) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public void trigger(RuleSetBean ruleSet, StudySubjectBean studySubjectBean) {

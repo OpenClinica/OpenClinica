@@ -42,6 +42,10 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,7 +231,7 @@ public class ExpressionService {
     }
 
     
-    public String getSSTimeZone(){
+    public String getSSZoneId(){
      Integer subjectId = expressionWrapper.getStudySubjectId();
      System.out.print("  subjectId  " + subjectId + "  : ");
      if(subjectId ==null) return null;     
@@ -235,6 +239,23 @@ public class ExpressionService {
        return ssBean.getTime_zone().trim();
      }
     
+    public HashMap<String,String> getSSDate(String ssZoneId){
+    	HashMap<String,String> map = new HashMap<String, String>();
+        if (ssZoneId == "") 	
+        	ssZoneId = TimeZone.getDefault().getID();
+  
+        DateTimeZone ssZone = DateTimeZone.forID(ssZoneId);
+        DateMidnight dm = new DateMidnight(ssZone);
+        DateTimeFormatter fmt = ISODateTimeFormat.date();
+        map.put("ssDate", fmt.print(dm));
+        
+        String serverZoneId =TimeZone.getDefault().getID();
+        map.put("serverZoneId", serverZoneId);
+        DateTimeZone serverZone = DateTimeZone.forID(serverZoneId);
+        DateMidnight serverDate = new DateMidnight(serverZone);
+        map.put("serverDate", fmt.print(serverDate));
+        return map;
+    }
     
         
  public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
