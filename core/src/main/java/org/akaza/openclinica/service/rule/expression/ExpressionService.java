@@ -239,7 +239,7 @@ public class ExpressionService {
        return ssBean.getTime_zone().trim();
      }
     
-    public HashMap<String,String> getSSDate(String ssZoneId){
+    public HashMap<String,String> getSSDate(String ssZoneId , String serverZoneId){
     	HashMap<String,String> map = new HashMap<String, String>();
         if (ssZoneId == "") 	
         	ssZoneId = TimeZone.getDefault().getID();
@@ -249,7 +249,6 @@ public class ExpressionService {
         DateTimeFormatter fmt = ISODateTimeFormat.date();
         map.put("ssDate", fmt.print(dm));
         
-        String serverZoneId =TimeZone.getDefault().getID();
         map.put("serverZoneId", serverZoneId);
         DateTimeZone serverZone = DateTimeZone.forID(serverZoneId);
         DateMidnight serverDate = new DateMidnight(serverZone);

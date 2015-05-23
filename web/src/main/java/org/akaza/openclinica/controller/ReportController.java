@@ -64,8 +64,9 @@ public class ReportController {
 	public ResponseEntity<HashMap> getSSZone(@RequestBody HashMap<String, String> hashMap) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		String ssZoneId = hashMap.get("ssZoneId");
+		String serverZoneId = hashMap.get("serverZoneId");
 		System.out.println("I'm in rest call");
-		HashMap<String, String> map = expressionService.getSSDate(ssZoneId);
+		HashMap<String, String> map = expressionService.getSSDate(ssZoneId,serverZoneId );
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
 	}

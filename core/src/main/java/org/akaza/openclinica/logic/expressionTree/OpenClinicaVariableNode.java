@@ -199,7 +199,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
     private String calculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
         	String ssZoneId= getExpressionService().getSSZoneId();
-            return getExpressionService().getSSDate(ssZoneId).get("ssDate");
+            String serverZoneId =TimeZone.getDefault().getID();
+            return getExpressionService().getSSDate(ssZoneId,serverZoneId).get("ssDate");
         }
         return null;
     }
@@ -207,7 +208,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
     private String testCalculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
         	String ssZoneId= getExpressionService().getSSZoneId();
-            return getExpressionService().getSSDate(ssZoneId).get("ssDate");
+            String serverZoneId =TimeZone.getDefault().getID();
+            return getExpressionService().getSSDate(ssZoneId,serverZoneId).get("ssDate");
         }
         return null;
     }
