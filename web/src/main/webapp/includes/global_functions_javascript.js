@@ -343,7 +343,12 @@ function setNewIconInParentWin(idOfImageElement, imageLocation){
 }
 function showSummaryBox(divObject,parentLinkObj,showText,hideText){
     //var sumBox = $(divObject);
-    var sumBox = document.getElementById(divObject);
+    var sumBox;
+ 
+    if (typeof divObject === 'string') //Check if divObject is the actual element or its ID
+        sumBox = document.getElementById(divObject);
+    else
+        sumBox = $(divObject);
     if(sumBox && sumBox.style.display == "none") {
 
 //        sumBox.show();
