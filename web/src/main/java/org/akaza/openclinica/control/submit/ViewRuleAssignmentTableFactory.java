@@ -99,6 +99,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_time"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
@@ -133,6 +135,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_time"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
@@ -244,6 +248,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
+            theItem.put("ruleSetRunSchedule", ruleSetBean.isRunSchedule());
+            theItem.put("ruleSetRunTime", ruleSetBean.getRunTime());
             theItem.put("ruleSetId", ruleSetBean.getId());
             theItem.put("ruleSetRuleId", ruleSetRuleBean.getId());
             theItem.put("ruleId", ruleSetRuleBean.getRuleBean().getId());
@@ -277,7 +283,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     private void getColumnNamesMap() {
-        ArrayList<String> columnNamesList = new ArrayList<String>();
+        ArrayList<String> columnNamesList = new ArrayList<String>(); 
+        columnNamesList.add("ruleSetRunSchedule");
+        columnNamesList.add("ruleSetRunTime");
         columnNamesList.add("targetValue");
         columnNamesList.add("studyEventDefinitionName");
         columnNamesList.add("crfName");

@@ -18,6 +18,7 @@
     <xs:complexType name="RuleAssignmentType">
         <xs:sequence>
             <xs:element ref="Target"/>
+            <xs:element ref="RunOnSchedule" minOccurs="0"/>
             <xs:element ref="RuleRef" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -30,7 +31,7 @@
             <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
-             <xs:element ref="EventAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="EventAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="NotificationAction" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
@@ -68,7 +69,7 @@
     <xs:complexType name="NotificationActionType">
         <xs:sequence>
             <xs:element name="To" type="xs:string"/>
-            <xs:element name="Subject" type="xs:string"/>
+            <xs:element name="Subject" type="xs:string" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
@@ -179,6 +180,17 @@
         </xs:simpleContent>
     </xs:complexType>
     
+    <xs:element name="RunOnSchedule" type="RunOnScheduleType"/>
+    <xs:complexType name="RunOnScheduleType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Time" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+
+
     <xs:complexType name="PropertyType">
         <xs:sequence>
             <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>

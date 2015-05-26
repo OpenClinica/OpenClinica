@@ -47,6 +47,7 @@ public class UserAccountBean extends AuditableEntityBean {
     private Integer lockCounter;
     private Boolean runWebservices;
     private String accessCode;
+    private String timeZone;
 
     /**
      * Counts the number of times the user visited Main Menu servlet.
@@ -532,6 +533,14 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public void setAccessCode(String accessCode) {
 		this.accessCode = accessCode;
+	}
+
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 
 

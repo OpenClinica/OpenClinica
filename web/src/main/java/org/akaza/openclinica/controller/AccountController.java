@@ -242,6 +242,36 @@ public class AccountController {
 		}
 	}
 
+	@RequestMapping(value = "/timezone", method = RequestMethod.POST)
+	public ResponseEntity<UserDTO> updateTimezone(@RequestBody HashMap<String, String> map) throws Exception {
+		uDTO = null;
+		System.out.println("I'm in update Timezone method");
+
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOid();
+
+		String studySubjectId = map.get("studySubjectId");
+		String timeZone = map.get("timeZone");
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		System.out.println("******************     You are in the Rest Service   *****************");
+        
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+		String pUserName = mapValues.get("pUserName"); // Participant User Name
+
+		udao = new UserAccountDAO(dataSource);
+		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
+		
+        if (studySubjectBean.isActive()){
+        	studySubjectBean.setTime_zone(timeZone);
+        	studySubjectBean.setUpdater(userAccountBean);
+        	updateStudySubjectBean(studySubjectBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+        }
+		return null;
+  }
+
 	private UserDTO buildUserDTO(UserAccountBean userAccountBean) {
 		uDTO = new UserDTO();
 		uDTO.setfName(userAccountBean.getFirstName());
@@ -353,6 +383,12 @@ public class AccountController {
 		return studySubjectBean;
 	}
 
+	private void updateStudySubjectBean(StudySubjectBean sBean) {
+		ssdao = new StudySubjectDAO(dataSource);
+        ssdao.update(sBean) ;
+	}
+
+	
 	private Boolean isStudyDoesNotExist(String studyOid) {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean == null) {

@@ -100,6 +100,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(22, TypeNames.INT);
         this.setTypeExpected(23, TypeNames.BOOL);
         this.setTypeExpected(24, TypeNames.STRING);    // access_doe
+        this.setTypeExpected(25, TypeNames.STRING);    // timezone
     }
 
     public void setPrivilegeTypesExpected() {
@@ -184,8 +185,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
         variables.put(new Integer(19), uab.getAccessCode());
+        variables.put(new Integer(20), uab.getTimeZone());
 
-        variables.put(new Integer(20), new Integer(uab.getId()));
+        variables.put(new Integer(21), new Integer(uab.getId()));
 
 
         String sql = digester.getQuery("update");
@@ -410,6 +412,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
         String accessCode = (String) hm.get("access_code");
+        String timeZone = (String) hm.get("time_zone");
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -427,6 +430,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
         eb.setAccessCode(accessCode);
+        eb.setTimeZone(timeZone);
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -435,7 +439,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setUpdaterId(updateId.intValue());
 
         // below block is set up to avoid recursion, etc.
-        if (findOwner) {
+        if (findOwner && !userName.contains(".")) {
             UserAccountBean owner = (UserAccountBean) this.findByPK(ownerId.intValue(), false);
             eb.setOwner(owner);
             UserAccountBean updater = (UserAccountBean) this.findByPK(updateId.intValue(), false);
@@ -450,9 +454,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
 
         // pull out the roles and privs here, tbh
+        if (!userName.contains(".")){
         ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
         eb.setRoles(userRoleBeans);
-
+        }
         // the role-privilege mapping is now statically fixed in Role,
         // so we don't need the block below
 
@@ -570,7 +575,24 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public Collection findAllParticipantsByStudyOid(String studyOid) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), studyOid+".%");
+        ArrayList alist = this.select(digester.getQuery("findAllParticipantsByStudyOid"), variables);
 
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            UserAccountBean eb = (UserAccountBean)this.getEntityFromHashMap((HashMap) it.next(),false);
+            al.add(eb);
+        }
+        return al;
+    }
+
+    
+
+    
     /**
      * Finds all the studies with roles for a user
      *

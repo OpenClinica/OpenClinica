@@ -13,7 +13,7 @@ import javax.persistence.Transient;
 public class NotificationActionBean extends RuleActionBean {
 
     private String to;
-    private String subject;
+    private String subject="";
     private String message;
 
     public NotificationActionBean() {
