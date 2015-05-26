@@ -70,6 +70,17 @@
 			order by  d.ordinal
 		</sql>
 	</query>
+	
+	<query>
+		<name>findByCRFVersion</name>
+		<sql>
+			SELECT d.* FROM item_data d, versioning_map vm
+			WHERE d.item_id = vm.item_id AND vm.crf_version_id = ?
+			order by d.event_crf_id , d.item_id
+		</sql>
+	</query>
+	
+	
 	<query>
 		<name>findAllActiveBySectionIdAndEventCRFId</name>
 		<sql>
