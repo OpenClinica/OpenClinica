@@ -53,10 +53,14 @@ public class RulesPostImportContainer {
             if (ruleSets.containsKey(key)) {
                 RuleSetBean rs = ruleSets.get(key);
                 rs.setTarget(rsr.getRuleSetBean().getTarget());
+                if (rsr.getRuleSetBean().isRunSchedule())
+                    rs.setRunOnSchedule(new RunOnSchedule(rsr.getRuleSetBean().getRunTime()));
                 rs.addRuleSetRuleForDisplay(rsr);
             } else {
                 RuleSetBean rs = new RuleSetBean();
                 rs.setTarget(rsr.getRuleSetBean().getTarget());
+                if (rsr.getRuleSetBean().isRunSchedule())
+                    rs.setRunOnSchedule(new RunOnSchedule(rsr.getRuleSetBean().getRunTime()));
                 rs.addRuleSetRuleForDisplay(rsr);
                 ruleSets.put(key, rs);
             }

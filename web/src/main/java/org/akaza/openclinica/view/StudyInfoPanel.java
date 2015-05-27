@@ -458,7 +458,7 @@ public class StudyInfoPanel {
                 this.setUserOrderedData(displayData);
                 this.setStudyInfoShown(true);
                 this.setOrderedData(true);
-                this.setCreateDataset(true);
+                this.setCreateDataset(false);
                 this.setSubmitDataModule(false);
                 this.setExtractData(false);
 

@@ -99,6 +99,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_time"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
@@ -133,6 +135,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_time"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
@@ -244,6 +248,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
+            theItem.put("ruleSetRunSchedule", ruleSetBean.isRunSchedule());
+            theItem.put("ruleSetRunTime", ruleSetBean.getRunTime());
             theItem.put("ruleSetId", ruleSetBean.getId());
             theItem.put("ruleSetRuleId", ruleSetRuleBean.getId());
             theItem.put("ruleId", ruleSetRuleBean.getRuleBean().getId());
@@ -277,7 +283,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     private void getColumnNamesMap() {
-        ArrayList<String> columnNamesList = new ArrayList<String>();
+        ArrayList<String> columnNamesList = new ArrayList<String>(); 
+        columnNamesList.add("ruleSetRunSchedule");
+        columnNamesList.add("ruleSetRunTime");
         columnNamesList.add("targetValue");
         columnNamesList.add("studyEventDefinitionName");
         columnNamesList.add("crfName");
@@ -636,7 +644,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
  
            if(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS)))
            	{
-                appendRunOnForEventAction(builder,ruleAction);
+             if (ruleAction.getActionType().getCode()!=7)
+        	   appendRunOnForEventAction(builder,ruleAction);
           	}else{
                 appendRunOn(builder,ruleAction);
            	}                
@@ -667,10 +676,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if(ruleActionRun.getAdministrativeDataEntry()!=null && ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
             if (ruleActionRun.getImportDataEntry()!=null && ruleActionRun.getImportDataEntry()) s += resword.getString("import_comma") + " ";
             if(ruleActionRun.getBatch()!=null && ruleActionRun.getBatch()) s+=resword.getString("batch_comma")+" ";
-            s = s.trim(); s = s.substring(0,s.length()-1);
-            if(s.length()>0)
-                builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
-        }
+
+            if(s.length()>0){
+            	s = s.trim(); s = s.substring(0,s.length()-1);
+                    builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
+              }
+            }
 
         public void appendRunOnForEventAction(HtmlBuilder builder, RuleActionBean ruleAction) {
             String s = "";
@@ -683,9 +694,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if(ruleActionRun.getSkipped()!=null && ruleActionRun.getSkipped()==true) s+=resword.getString("skipped_comma")+" ";
             if(ruleActionRun.getStopped()!=null && ruleActionRun.getStopped()==true) s+=resword.getString("stopped_comma")+" ";
             
-            s = s.trim(); s = s.substring(0,s.length()-1);
-            if(s.length()>0)
+            if(s.length()>0){
+                s = s.trim(); s = s.substring(0,s.length()-1);
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
+        }
         }
 
         

@@ -32,10 +32,10 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.web.pmanage.Authorization;
-import org.akaza.openclinica.web.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_api.ODM;
@@ -155,7 +155,7 @@ public class StudyModuleController {
             return "redirect:/pages/studymodule";
         }
         String status = "";
-        String nameAvailability = registrar.getHostNameAvailability(hostName);
+        String nameAvailability = registrar.getHostNameAvailability(hostName);        
         if (nameAvailability.equals(ParticipantPortalRegistrar.UNAVAILABLE)) {
             addRegMessage(request, respage.getString("participate_hostname_not_available"));
             return "redirect:/pages/studymodule";

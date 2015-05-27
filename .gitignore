@@ -10,3 +10,7 @@ release.properties
 .idea/
 OpenClinica.iml
 web/src/main/resources/datainfo.properties
+core/*.iml
+web/*.iml
+ws/*.iml
+

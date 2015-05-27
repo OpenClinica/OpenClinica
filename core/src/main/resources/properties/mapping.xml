@@ -27,6 +27,11 @@
             <bind-xml name="Target"/>
         </field>
        
+       <field name="RunOnSchedule"
+            type="org.akaza.openclinica.domain.rule.RunOnSchedule">
+            <bind-xml name="RunOnSchedule"/>
+        </field>
+
        <field name="RuleSetRules"
             type="org.akaza.openclinica.domain.rule.RuleSetRuleBean"
             collection="arraylist">
@@ -107,6 +112,27 @@
             <bind-xml name="To" node="element"/>
         </field>
      </class>
+
+     <class name="org.akaza.openclinica.domain.rule.action.NotificationActionBean">
+        <map-to xml="NotificationAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+        <field name="To"
+               type="java.lang.String" handler="emailHandler">
+            <bind-xml name="To" node="element"/>
+        </field>
+        <field name="Subject"
+               type="java.lang.String">
+            <bind-xml name="Subject" node="element"/>
+        </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+     </class>
+
      <class name="org.akaza.openclinica.domain.rule.action.ShowActionBean">
         <map-to xml="ShowAction" />
         <field name="ExpressionEvaluatesTo"
@@ -206,6 +232,13 @@
                <bind-xml name="ValueExpression"/>
        </field>
      </class>
+     
+       <class name="org.akaza.openclinica.domain.rule.RunOnSchedule" auto-complete="true">
+        <field name="runTime" type="string" >
+            <bind-xml name="Time" node="attribute"/>
+       </field>
+     </class>
+          
      
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" auto-complete="true">
         <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">

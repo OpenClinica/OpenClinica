@@ -1,6 +1,7 @@
 <RuleImport>
 	<RuleAssignment>
 		<Target Context="OC_RULES_V1"></Target>
+		<RunOnSchedule Time="17:00"/>
 		<RuleRef OID="">
 			<DiscrepancyNoteAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
@@ -11,6 +12,11 @@
                 <Message></Message>
                 <To></To>
 			</EmailAction>
+			<NotificationAction IfExpressionEvaluates="">
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+                <Message></Message>
+                <To></To>
+			</NotificaitonAction>
 			<ShowAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
