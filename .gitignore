@@ -9,3 +9,7 @@ release.properties
 .settings/
 .idea/
 OpenClinica.iml
+OpenClinica-core.iml
+OpenClinica-web.iml
+OpenClinica-ws.iml
+core/src/main/resources/logback-test.xml
