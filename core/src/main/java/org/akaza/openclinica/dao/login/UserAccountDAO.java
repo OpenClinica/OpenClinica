@@ -184,8 +184,20 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), uab.getAccountNonLocked());
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
-        variables.put(new Integer(19), uab.getAccessCode());
-        variables.put(new Integer(20), uab.getTimeZone());
+        if (uab.getAccessCode() == null || uab.getAccessCode().equals("") || uab.getAccessCode().equals("null")) {
+            nullVars.put(new Integer(19), new Integer(TypeNames.STRING));
+            variables.put(new Integer(19), null);
+        } else {
+            variables.put(new Integer(19), uab.getAccessCode());
+        }
+        
+        if (uab.getTime_zone() == null || uab.getTime_zone().equals("")) {
+            nullVars.put(new Integer(20), new Integer(TypeNames.STRING));
+            variables.put(new Integer(20), null);
+        } else {
+            variables.put(new Integer(20), uab.getTime_zone());
+        }
+
 
         variables.put(new Integer(21), new Integer(uab.getId()));
 
@@ -412,7 +424,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
         String accessCode = (String) hm.get("access_code");
-        String timeZone = (String) hm.get("time_zone");
+        String time_zone = (String) hm.get("time_zone");
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -430,7 +442,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
         eb.setAccessCode(accessCode);
-        eb.setTimeZone(timeZone);
+        eb.setTime_zone(time_zone);
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
