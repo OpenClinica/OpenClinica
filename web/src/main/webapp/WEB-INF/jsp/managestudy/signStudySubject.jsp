@@ -431,9 +431,10 @@
 <%-- Subject discrepancy note table--%>
 <div id="subjDiscNoteDivTitle" class="subjDiscNoteDivTitle">
     <a id="discNoteDivParent" href="javascript:void(0)"
-       onclick="showSummaryBox(document.getElementById('subjDiscNoteDiv'),document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
+       onclick="showSummaryBox('subjDiscNoteDiv',document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
 </div>
-<div id="subjDiscNoteDiv" class="subjDiscNoteDiv" style="display:none">
+<%--<div id="subjDiscNoteDiv" class="subjDiscNoteDiv" style="display:none">--%>
+    <div id="subjDiscNoteDiv" class="subjDiscNoteDiv">
     <table class="subjDiscNoteTable" cellpadding="0" cellspacing="0">
         <thead>
             <th class="table_header_row_left">Event Name</th>
