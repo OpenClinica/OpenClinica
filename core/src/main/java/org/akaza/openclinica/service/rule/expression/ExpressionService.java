@@ -241,7 +241,7 @@ public class ExpressionService {
     
     public HashMap<String,String> getSSDate(String ssZoneId , String serverZoneId){
     	HashMap<String,String> map = new HashMap<String, String>();
-        if (ssZoneId == "" || ssZoneId.equals("")) 	
+        if (ssZoneId == null || ssZoneId.equals("")) 	
         	ssZoneId = TimeZone.getDefault().getID();
   
         DateTimeZone ssZone = DateTimeZone.forID(ssZoneId);
