@@ -1067,7 +1067,12 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
         ind++;
-        variables.put(new Integer(ind), sb.getTime_zone());
+        if (sb.getTime_zone() == null || sb.getTime_zone().equals("")) {
+            nullVars.put(new Integer(ind), new Integer(TypeNames.STRING));
+            variables.put(new Integer(ind), null);
+        } else {
+            variables.put(new Integer(ind), sb.getTime_zone());
+        }
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));
         ind++;
