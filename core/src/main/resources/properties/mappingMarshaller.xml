@@ -3,6 +3,7 @@
 <mapping>
 
     <field-handler name="emailHandler" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
+    <field-handler name="emailHandler1" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
 
     <class name="org.akaza.openclinica.domain.rule.RulesPostImportContainer">
         <map-to xml="RuleImport"/>
@@ -119,7 +120,7 @@
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
         <field name="To"
-               type="java.lang.String" handler="emailHandler">
+               type="java.lang.String" handler="emailHandler1">
             <bind-xml name="To" node="element"/>
         </field>
         <field name="Subject"
