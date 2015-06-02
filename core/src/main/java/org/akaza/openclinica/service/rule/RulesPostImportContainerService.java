@@ -29,6 +29,7 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
@@ -333,6 +334,16 @@ public class RulesPostImportContainerService {
 
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean ,List<RuleSetBean> eventActionsRuleSetBean ) {
+         String message ="";
+         String emailSubject="";
+		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.NotificationActionBean){
+			 message = ((NotificationActionBean) ruleActionBean).getMessage();
+			 emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
+			if (emailSubject.length() > 255) 
+			ruleSetBeanWrapper.error(createError("OCRERR_0048"));
+			if (message.length() > 255) 
+			ruleSetBeanWrapper.error(createError("OCRERR_0049"));		
+		}
 
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean)
 			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
