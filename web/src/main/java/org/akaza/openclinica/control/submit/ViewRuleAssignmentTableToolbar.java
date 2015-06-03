@@ -142,7 +142,7 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
          * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
          */
         String getIndexes() {
-            String result = "0,1,3,4,8,9,11,13";
+            String result = "0,1,3,4,11,13";
             return result;
         }
 
