@@ -310,7 +310,6 @@ public class ImportSpringJob extends QuartzJobBean {
 
         new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
         File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
-        boolean fail = false;
         // @pgawade 18-April-2011 Fix for issue 8394
         String ODM_MAPPING_DIR_path = CoreResources.ODM_MAPPING_DIR;
         myMap.loadMapping(ODM_MAPPING_DIR_path + File.separator + "cd_odm_mapping.xml");
@@ -321,6 +320,7 @@ public class ImportSpringJob extends QuartzJobBean {
         // File("log.txt")));
         for (File f : dest) {
             // >> tbh
+            boolean fail = false;
             String regex = "\\s+"; // all whitespace, one or more times
             String replacement = "_"; // replace with underscores
             String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
@@ -428,14 +428,11 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
 
             }
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub);
-
             ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-            logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
-
             Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
-            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
@@ -443,7 +440,15 @@ public class ImportSpringJob extends QuartzJobBean {
             HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer);
 
             // -- does the event already exist? if not, fail
-            if (!eventCRFBeans.isEmpty()) {
+            if (eventCRFBeans == null) {
+                fail = true;
+                msg.append(respage.getString("no_event_status_matching"));
+                out.write(respage.getString("no_event_status_matching"));
+                out.close();
+                continue;
+
+            } else if (!eventCRFBeans.isEmpty()) {
+                logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
                 for (EventCRFBean eventCRFBean : eventCRFBeans) {
                     DataEntryStage dataEntryStage = eventCRFBean.getStage();
                     Status eventCRFStatus = eventCRFBean.getStatus();
