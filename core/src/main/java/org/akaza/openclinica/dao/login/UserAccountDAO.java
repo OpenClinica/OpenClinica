@@ -185,7 +185,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
         variables.put(new Integer(19), uab.getAccessCode());
-        variables.put(new Integer(20), uab.getTimeZone());
+        if (uab.getTimeZone() == null) {
+            nullVars.put(new Integer(20), new Integer(TypeNames.STRING));
+            variables.put(new Integer(20), null);
+        } else {
+            variables.put(new Integer(20), uab.getTimeZone());
+        }
 
         variables.put(new Integer(21), new Integer(uab.getId()));
 
