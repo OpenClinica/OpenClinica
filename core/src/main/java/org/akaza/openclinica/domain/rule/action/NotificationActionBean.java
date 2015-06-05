@@ -60,7 +60,7 @@ public class NotificationActionBean extends RuleActionBean {
         LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
         p.put("rule_action_type", getActionType().getDescription());
         p.put("rule_action_to", getTo());
-        p.put("rule_action_subject", getSubject());
+        p.put("rule_action_subject","\""+  getSubject()+ "\"");
         p.put("rule_action_message", "\"" + getMessage() + "\"");
 
         return p;

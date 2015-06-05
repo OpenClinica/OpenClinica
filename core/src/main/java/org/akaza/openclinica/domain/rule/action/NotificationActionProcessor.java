@@ -253,11 +253,13 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 					msg = message.replaceAll("\\$\\{participant.accessCode}", "");
 					msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
+					msg = msg.replaceAll("\\\\n", "\n");
 					pDTO.setMessage(msg);
 					String eSubject = null;
 					eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", "");
 					eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
 					eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
+					eSubject = eSubject.replaceAll("\\\\n", "\n");
 					pDTO.setEmailSubject(eSubject);
 				}
 
