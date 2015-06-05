@@ -192,7 +192,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
 		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
 		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
-		
+
 		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, uBean, studyBean, message, emailSubject, participantPortalRegistrar, mailSender));
 		thread.start();
 
@@ -203,20 +203,18 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		String hostname = "";
 		String url = "";
-		if (message.contains("${participant.url}") || message.contains("${participant.loginurl}") || emailSubject.contains("${participant.url}") || emailSubject.contains("${participant.loginurl}")) {
-			participantPortalRegistrar = new ParticipantPortalRegistrar();
+		participantPortalRegistrar = new ParticipantPortalRegistrar();
 
-			try {
-				hostname = participantPortalRegistrar.getStudyHost(studyBean.getOid());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			url = hostname.replaceAll("login", "plogin");
-			message = message.replaceAll("\\$\\{participant.url}", url);
-			emailSubject = emailSubject.replaceAll("\\$\\{participant.url}", url);
+		try {
+			hostname = participantPortalRegistrar.getStudyHost(studyBean.getOid());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
+		url = hostname.replaceAll("login", "plogin");
+		message = message.replaceAll("\\$\\{participant.url}", url);
+		emailSubject = emailSubject.replaceAll("\\$\\{participant.url}", url);
 		for (String email : listOfEmails) {
 
 			if (email.trim().equals("${participant}")) {
@@ -228,7 +226,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 					msg = msg.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
 					eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
 					eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
-					
+
 					String loginUrl = url + "?access_code=" + pDTO.getAccessCode() + "&auto_login=true";
 					msg = msg.replaceAll("\\$\\{participant.loginurl}", loginUrl);
 					eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", loginUrl);
@@ -247,23 +245,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 					System.out.println(pDTO.getMessage() + "   (Email Send to Participant from Mandrill :  " + pDTO.getEmailAccount() + ")");
 
-				} else {
-					pDTO = new ParticipantDTO();
-					String msg = null;
-					msg = message.replaceAll("\\$\\{participant.accessCode}", "");
-					msg = msg.replaceAll("\\$\\{participant.firstname}", "");
-					msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
-					msg = msg.replaceAll("\\\\n", "\n");
-					pDTO.setMessage(msg);
-					String eSubject = null;
-					eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", "");
-					eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
-					eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
-					eSubject = eSubject.replaceAll("\\\\n", "\n");
-					pDTO.setEmailSubject(eSubject);
 				}
 
 			} else {
+				if (pDTO == null)
+					pDTO = buildNewPDTO();
+
 				pDTO.setEmailAccount(email.trim());
 				System.out.println();
 				// Send Email thru Local Mail Server
@@ -275,6 +262,23 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 	}
 
+	public ParticipantDTO buildNewPDTO() {
+		pDTO = new ParticipantDTO();
+		String msg = null;
+		msg = message.replaceAll("\\$\\{participant.accessCode}", "");
+		msg = msg.replaceAll("\\$\\{participant.firstname}", "");
+		msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
+		msg = msg.replaceAll("\\\\n", "\n");
+		pDTO.setMessage(msg);
+		String eSubject = null;
+		eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", "");
+		eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
+		eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
+		eSubject = eSubject.replaceAll("\\\\n", "\n");
+		pDTO.setEmailSubject(eSubject);
+
+		return pDTO;
+	}
 
 	public ParticipantDTO getParticipantInfo(UserAccountBean uBean) {
 		ParticipantDTO pDTO = null;
