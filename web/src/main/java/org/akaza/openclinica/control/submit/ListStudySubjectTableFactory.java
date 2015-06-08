@@ -68,11 +68,12 @@ import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
-	private StudyEventDefinitionDAO studyEventDefinitionDao;
+    private StudyEventDefinitionDAO studyEventDefinitionDao;
     private StudySubjectDAO studySubjectDAO;
     private SubjectDAO subjectDAO;
     private StudyEventDAO studyEventDAO;
@@ -82,6 +83,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private StudyDAO studyDAO;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
+    private HttpSession session;
     private StudyBean studyBean;
     private String[] columnNames = new String[] {};
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
@@ -93,14 +95,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ResourceBundle resformat;
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
     private StudyParameterValueDAO studyParameterValueDAO;
-	private ParticipantPortalRegistrar	participantPortalRegistrar; 
+    private ParticipantPortalRegistrar participantPortalRegistrar;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
     @Override
-//To avoid showing title in other pages, the request element is used to determine where the request came from.
+    // To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = LocaleResolver.getLocale(request);
+        session = request.getSession();
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         setDataAndLimitVariables(tableFacade);
@@ -109,13 +112,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             configureColumns(tableFacade, locale);
             tableFacade.setMaxRowsIncrements(getMaxRowIncrements());
             configureTableFacadePostColumnConfiguration(tableFacade);
-            configureTableFacadeCustomView(tableFacade,request);
+            configureTableFacadeCustomView(tableFacade, request);
             configureUnexportedTable(tableFacade, locale);
         } else {
             configureExportColumns(tableFacade, locale);
         }
         return tableFacade;
     }
+
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "images/icon_Scheduled.gif");
         imageIconPaths.put(2, "images/icon_NotStarted.gif");
@@ -133,9 +137,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return "findSubjects";
     }
 
-    public void configureTableFacadeCustomView(TableFacade tableFacade,HttpServletRequest request) {
-        tableFacade.setView(new ListStudyView(getLocale(),request));
+    public void configureTableFacadeCustomView(TableFacade tableFacade, HttpServletRequest request) {
+        tableFacade.setView(new ListStudyView(getLocale(), request));
     }
+
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
         resword = ResourceBundleProvider.getWordsBundle(locale);
@@ -170,8 +175,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(), new StudyEventDefinitionMapCellEditor(),
                     new SubjectEventStatusDroplistFilterEditor(), true, false);
         }
-        String actionsHeader =
-            resword.getString("rule_actions")
+        String actionsHeader = resword.getString("rule_actions")
                 + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true,
                 false);
@@ -301,7 +305,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         }
         for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
             if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED
-                || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED) {
+                    || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED) {
                 isSignable = false;
                 break;
             } else {
@@ -377,11 +381,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
-            if("studySubject.status".equalsIgnoreCase(property)) {
-                value = Status.getByName(value).getId()+"";
+            if ("studySubject.status".equalsIgnoreCase(property)) {
+                value = Status.getByName(value).getId() + "";
             } else if (property.startsWith("sgc_")) {
-                int studyGroupClassId = property.endsWith("_")? 0 : Integer.valueOf(property.split("_")[1]);
-                value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId()+"";
+                int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
+                value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
             }
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -390,11 +394,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to sort the items. The PresidentSort acts as a command
-     * for the Hibernate criteria object. There are probably many ways to do
-     * this, but this is the most flexible way I have found. The point is you
-     * need to somehow take the Limit information and sort the rows.
-     *
+     * A very custom way to sort the items. The PresidentSort acts as a command for the Hibernate criteria object. There
+     * are probably many ways to do this, but this is the most flexible way I have found. The point is you need to
+     * somehow take the Limit information and sort the rows.
+     * 
      * @param limit
      *            The Limit to use.
      */
@@ -435,14 +438,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return studyGroupClasses;
     }
 
-    
-	public StudyParameterValueDAO getStudyParameterValueDAO() {
-		return studyParameterValueDAO;
-	}
-	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
-		this.studyParameterValueDAO = studyParameterValueDAO;
-	}
-	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+    public StudyParameterValueDAO getStudyParameterValueDAO() {
+        return studyParameterValueDAO;
+    }
+
+    public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+        this.studyParameterValueDAO = studyParameterValueDAO;
+    }
+
+    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
         return studyEventDefinitionDao;
     }
 
@@ -546,7 +550,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.currentUser = currentUser;
     }
 
-
     private class CharFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             String item = StringUtils.lowerCase(String.valueOf(itemValue));
@@ -575,7 +578,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public class SubjectEventStatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             String item = StringUtils.lowerCase(SubjectEventStatus.getSubjectEventStatusName((Integer) itemValue));
-            String filter = StringUtils.lowerCase(String.valueOf(filterValue));//.trim().replace(" ", "_");
+            String filter = StringUtils.lowerCase(String.valueOf(filterValue));// .trim().replace(" ", "_");
             if (filterValue.equals(resterms.getString(item))) {
                 return true;
             }
@@ -751,33 +754,37 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
                 if (getCurrentRole().getRole() != Role.MONITOR) {
-                    if (getStudyBean().getStatus() == Status.AVAILABLE && !(studySubjectBean.getStatus() == Status.DELETED
-                         || studySubjectBean.getStatus() == Status.AUTO_DELETED) && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
+                    if (getStudyBean().getStatus() == Status.AVAILABLE
+                            && !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
+                            && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
                         url.append(removeStudySubjectLinkBuilder(studySubjectBean));
                     }
-                    if (getStudyBean().getStatus() == Status.AVAILABLE && (studySubjectBean.getStatus() == Status.DELETED
-                         || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
+                    if (getStudyBean().getStatus() == Status.AVAILABLE
+                            && (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
                         url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
-                    if (getStudyBean().getStatus() == Status.AVAILABLE && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2 
-                        && getCurrentRole().getRole() != Role.INVESTIGATOR && studySubjectBean.getStatus() == Status.AVAILABLE) {
+                    if (getStudyBean().getStatus() == Status.AVAILABLE && getCurrentRole().getRole() != Role.RESEARCHASSISTANT
+                            && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2 && getCurrentRole().getRole() != Role.INVESTIGATOR
+                            && studySubjectBean.getStatus() == Status.AVAILABLE) {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if (getCurrentRole().getRole() == Role.INVESTIGATOR
-                        && getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
+                    if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
+                            && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
 
                     try {
-						if (getStudyBean().getStatus() == Status.AVAILABLE && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
-						        && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE") && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
-							url.append(viewParticipateBuilder(studySubjectBean));
-						}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+                        if (getStudyBean().getStatus() == Status.AVAILABLE
+                                && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
+                                && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
+                                && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
+                            url.append(viewParticipateBuilder(studySubjectBean));
+                        }
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
                 value = url.toString();
             }
@@ -787,62 +794,63 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private String participateStatus(StudySubjectBean studySubjectBean){
-	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());	        	
-    	 String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
-       return participateFormStatus;
+    private String participateStatus(StudySubjectBean studySubjectBean) {
+        StudyBean study = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());
+        String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
+        return participateFormStatus;
     }
-    
-    
-    private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception{
-    	 participantPortalRegistrar=new ParticipantPortalRegistrar();
-	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubjectBean.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());	    
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(pStudy.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
-    return pManageStatus;  	
-    }
-    
-	private StudyBean getParentStudy(String studyOid) {
-		StudyBean study = getStudy(studyOid);
-		if (study.getParentStudyId() == 0) {
-			return study;
-		} else {
-			StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
-			return parentStudy;
-		}
-	}
 
-	private StudyBean getStudy(String oid) {
-		StudyBean studyBean = (StudyBean) studyDAO.findByOid(oid);
-		return studyBean;
-	}
-    
+    private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
+        participantPortalRegistrar = new ParticipantPortalRegistrar();
+        StudyBean study = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());
+        String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOid(), session).toString(); // ACTIVE
+        return pManageStatus;
+    }
+
+    private StudyBean getParentStudy(String studyOid) {
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
+    }
+
+    private StudyBean getStudy(String oid) {
+        StudyBean studyBean = (StudyBean) studyDAO.findByOid(oid);
+        return studyBean;
+    }
+
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
     }
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
-   	    participantPortalRegistrar=new ParticipantPortalRegistrar();
-	    StudyBean study = (StudyBean)studyDAO.findByPK(studySubject.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());	    
+        participantPortalRegistrar = new ParticipantPortalRegistrar();
+        StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
+        StudyBean pStudy = getParentStudy(study.getOid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
-        System.out.println("URL:  "+ url);
+        System.out.println("URL:  " + url);
 
-    	HtmlBuilder actionLink = new HtmlBuilder();
-     //   actionLink.a().href("url?id=" + studySubject.getId());
-        actionLink.a().href(url + "?ssid=" +studySubject.getLabel());
+        HtmlBuilder actionLink = new HtmlBuilder();
+        // actionLink.a().href("url?id=" + studySubject.getId());
+        actionLink.a().href(url + "?ssid=" + studySubject.getLabel());
         actionLink.append("target=\"_blank\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Participate1','images/bt_Ocui_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Participate1','images/bt_Ocui.gif');\"").close();
-        actionLink.img().name("bt_Participate1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant")).title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Participate1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant"))
+                .title(resword.getString("connect_participant")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
@@ -851,10 +859,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href(
                 "RemoveStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
-                    + studySubject.getStudyId());
+                        + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
-        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -865,7 +874,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("SignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('icon_signed','images/icon_Signed.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('icon_signed','images/icon_Signed.gif');\"").close();
-        actionLink.img().name("bt_Sign1").src("images/icon_Signed.gif").border("0").alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Sign1").src("images/icon_Signed.gif").border("0").alt(resword.getString("sign")).title(resword.getString("sign"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -876,7 +886,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
-        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -886,10 +897,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href(
                 "RestoreStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
-                    + studySubject.getStudyId());
+                        + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
-        actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore"))
+                .append("hspace=\"2\"").end().aEnd();
         return actionLink.toString();
 
     }
@@ -905,8 +917,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
         // Lock Div
-        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
+        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
         if (studyEvents.size() > 1) {
             repeatingLockLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
         } else {
@@ -916,8 +928,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         eventDiv.tr(0).valign("top").close().td(0).close();
         // Event Div
-        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
+        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
         eventDiv.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close().div().styleClass("box_B").close().div()
                 .styleClass("box_TL").close().div().styleClass("box_TR").close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
 
@@ -944,7 +956,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String add_another_occurrence = resword.getString("add_another_occurrence");
         String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
         String occurrence_x_of = resword.getString("ocurrence");
@@ -986,8 +998,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20").style(
-                "display: none;").close();
+        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
+                .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").style("display: none;").close();
         eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
@@ -1034,8 +1046,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20").style(
-                "display: none;").close();
+        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
+                .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").close();
         eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
@@ -1049,8 +1061,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.tdEnd().trEnd(0);
 
         eventDiv.tr(0).id("Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("").close();
-        eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append(click_for_more_options).append(
-                "</i>").tdEnd();
+        eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append(click_for_more_options)
+                .append("</i>").tdEnd();
         eventDiv.trEnd(0);
 
         eventDiv.tableEnd(0);
@@ -1066,7 +1078,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
 
@@ -1136,7 +1148,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String add_another_occurrence = resword.getString("add_another_occurrence");
         String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
         String occurrence_x_of = resword.getString("ocurrence");
@@ -1325,7 +1337,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private void repeatingLockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
             StudyEventDefinitionBean sed) {
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
-        //String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
+        // String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
+        // + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         onmouseover += "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_collapse.gif');";
@@ -1362,8 +1375,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
-        String href1Repeating =
-            "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
+        String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
+                + "); ";
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "', event); ";
