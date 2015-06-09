@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.bean.rule.RunOnScheduleBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -61,6 +62,7 @@ import org.openclinica.ns.rules.v31.ShowActionType;
 import org.openclinica.ns.rules.v31.TargetType;
 import org.openclinica.ns.rules.v31.EventActionType;
 import org.openclinica.ns.rules.v31.EventDestinationType;
+import org.openclinica.ns.rules.v31.RunOnScheduleType;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -101,9 +103,13 @@ public class RuleController {
         RulesPostImportContainer rpic = new RulesPostImportContainer();
         TargetType targetType = rules.getRuleAssignment().get(0).getTarget();
         ExpressionBean targetBean = new ExpressionBean(Context.OC_RULES_V1, targetType.getValue());
+        RunOnScheduleType runOnScheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
+        System.out.print("==time on oc runOnScheduleType"+runOnScheduleType.getTime()+"==");
+        RunOnScheduleBean runOnScheduleBean = new RunOnScheduleBean(runOnScheduleType.getTime());
+        System.out.print("==time on oc runOnScheduleBean"+runOnScheduleBean.getTime()+"==");
         RuleSetBean ruleSetBean = new RuleSetBean();
         ruleSetBean.setOriginalTarget(targetBean);
-
+        // ruleSetBean.setRunOnSchedule(runOnScheduleBean);
         // Creating rule definition & populating
         RuleBean ruleBean = new RuleBean();
         ExpressionBean ruleExpressionBean = new ExpressionBean(Context.OC_RULES_V1, rules.getRuleDef().get(0).getExpression().getValue());

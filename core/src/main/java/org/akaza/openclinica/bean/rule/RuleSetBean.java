@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.rule.expression.ExpressionBean;
+import org.akaza.openclinica.bean.rule.RunOnScheduleBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
@@ -42,6 +43,8 @@ public class RuleSetBean extends AuditableEntityBean {
     private ItemBean item;
     // originalTarget populated with same value as target.
     private ExpressionBean originalTarget;
+    //runOnSchedule populate with the same value as runOnSchedule.
+    private RunOnScheduleBean runOnSchedule;
 
     public void addRuleSetRule(RuleSetRuleBean ruleSetRuleBean) {
         if (this.ruleSetRules == null)
@@ -182,6 +185,14 @@ public class RuleSetBean extends AuditableEntityBean {
 
     public void setOriginalTarget(ExpressionBean originalTarget) {
         this.originalTarget = originalTarget;
+    }
+
+    public RunOnScheduleBean getRunOnSchedule() {
+        return runOnSchedule;
+    }
+
+    public void setRunOnSchedule(RunOnScheduleBean runOnSchedule) {
+        this.runOnSchedule = runOnSchedule;
     }
 
 }
