@@ -122,14 +122,6 @@ public class DataImportService {
         StringBuffer auditMsg = new StringBuffer();
         List<String> errors = new ArrayList<String>();
 
-        // logger.debug("passing an odm container and study bean id: " + studyBean.getId());
-        // errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
-        // this needs to be replaced with the study name from the job, since
-        // the user could be in any study ...
-        // if (errors != null && errors.size() > 0) {
-        // return errors;
-        // }
-
         // htaycher: return back later?
         auditMsg.append(respage.getString("passed_study_check") + " ");
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
