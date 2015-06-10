@@ -18,7 +18,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.akaza.openclinica.bean.rule.RunOnScheduleBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -28,6 +27,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.RunOnSchedule;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
@@ -103,13 +103,12 @@ public class RuleController {
         RulesPostImportContainer rpic = new RulesPostImportContainer();
         TargetType targetType = rules.getRuleAssignment().get(0).getTarget();
         ExpressionBean targetBean = new ExpressionBean(Context.OC_RULES_V1, targetType.getValue());
-        RunOnScheduleType runOnScheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
-        System.out.print("==time on oc runOnScheduleType"+runOnScheduleType.getTime()+"==");
-        RunOnScheduleBean runOnScheduleBean = new RunOnScheduleBean(runOnScheduleType.getTime());
-        System.out.print("==time on oc runOnScheduleBean"+runOnScheduleBean.getTime()+"==");
+        RunOnScheduleType scheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
         RuleSetBean ruleSetBean = new RuleSetBean();
         ruleSetBean.setOriginalTarget(targetBean);
-        // ruleSetBean.setRunOnSchedule(runOnScheduleBean);
+        if (!scheduleType.getTime().equals("")) {
+            ruleSetBean.setRunTime(scheduleType.getTime());
+        }
         // Creating rule definition & populating
         RuleBean ruleBean = new RuleBean();
         ExpressionBean ruleExpressionBean = new ExpressionBean(Context.OC_RULES_V1, rules.getRuleDef().get(0).getExpression().getValue());

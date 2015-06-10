@@ -246,7 +246,6 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 getRuleSetService().getObjects(ruleSetBean);
                 ruleSets.put(ruleSetBean.getId(), ruleSetBean);
             }
-
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("ruleSetRunSchedule", ruleSetBean.isRunSchedule());
             theItem.put("ruleSetRunTime", ruleSetBean.getRunTime());
@@ -778,9 +777,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
             String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
             String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
+            String runTime = (String) ((HashMap<Object, Object>) item).get("ruleSetRunTime");
         //    if (isDesignerRequest)
           //  {
-                value += testEditByDesignerBuilder(target, ruleOid);
+                value += testEditByDesignerBuilder(target, ruleOid, runTime);
             //} else
                 if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
@@ -901,11 +901,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     }
 
-    private String testEditByDesignerBuilder(String target, String ruleOid) {
+    private String testEditByDesignerBuilder(String target, String ruleOid, String runTime) {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
         setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
-        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment");
+        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment&runTime="+ runTime);
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();

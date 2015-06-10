@@ -14,7 +14,8 @@ public class RuleActionComparator implements Comparator<RuleActionBean> {
         order.put(ActionType.SHOW, "3");
         order.put(ActionType.HIDE, "4");
         order.put(ActionType.INSERT, "5");
-
+        order.put(ActionType.EVENT, "6");
+        order.put(ActionType.NOTIFICATION, "7");
     }
 
     public int compare(RuleActionBean o1, RuleActionBean o2) {
