@@ -35,6 +35,7 @@ import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;;
 import org.akaza.openclinica.domain.rule.action.EventPropertyBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -63,6 +64,7 @@ import org.openclinica.ns.rules.v31.TargetType;
 import org.openclinica.ns.rules.v31.EventActionType;
 import org.openclinica.ns.rules.v31.EventDestinationType;
 import org.openclinica.ns.rules.v31.RunOnScheduleType;
+import org.openclinica.ns.rules.v31.NotificationActionType;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -212,6 +214,15 @@ public class RuleController {
                 property.setValueExpression(expressionBean);
                 action.addProperty(property);
             }
+            ruleSetRuleBean.addAction(action);
+        }
+
+        for (NotificationActionType notificationActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getNotificationAction()) {
+            NotificationActionBean action = new NotificationActionBean();
+            action.setExpressionEvaluatesTo(Boolean.valueOf(notificationActionType.getIfExpressionEvaluates()));
+            action.setTo(notificationActionType.getTo());
+            action.setSubject(notificationActionType.getSubject());
+            action.setMessage(notificationActionType.getMessage());
             ruleSetRuleBean.addAction(action);
         }
 
