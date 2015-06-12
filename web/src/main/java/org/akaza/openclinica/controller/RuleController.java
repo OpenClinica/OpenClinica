@@ -27,16 +27,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.RunOnSchedule;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
-import org.akaza.openclinica.domain.rule.action.EmailActionBean;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.rule.action.EventActionBean;
-import org.akaza.openclinica.domain.rule.action.NotificationActionBean;;
-import org.akaza.openclinica.domain.rule.action.EventPropertyBean;
+import org.akaza.openclinica.domain.rule.action.*;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -54,17 +45,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.openclinica.ns.response.v31.MessagesType;
 import org.openclinica.ns.response.v31.Response;
-import org.openclinica.ns.rules.v31.DiscrepancyNoteActionType;
-import org.openclinica.ns.rules.v31.EmailActionType;
-import org.openclinica.ns.rules.v31.HideActionType;
-import org.openclinica.ns.rules.v31.InsertActionType;
-import org.openclinica.ns.rules.v31.PropertyType;
-import org.openclinica.ns.rules.v31.ShowActionType;
-import org.openclinica.ns.rules.v31.TargetType;
-import org.openclinica.ns.rules.v31.EventActionType;
-import org.openclinica.ns.rules.v31.EventDestinationType;
-import org.openclinica.ns.rules.v31.RunOnScheduleType;
-import org.openclinica.ns.rules.v31.NotificationActionType;
+import org.openclinica.ns.rules.v31.*;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -103,132 +84,139 @@ public class RuleController {
 
     private RulesPostImportContainer mapRulesToRulesPostImportContainer(org.openclinica.ns.rules.v31.Rules rules) {
         RulesPostImportContainer rpic = new RulesPostImportContainer();
-        TargetType targetType = rules.getRuleAssignment().get(0).getTarget();
-        ExpressionBean targetBean = new ExpressionBean(Context.OC_RULES_V1, targetType.getValue());
-        RunOnScheduleType scheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
-        RuleSetBean ruleSetBean = new RuleSetBean();
-        ruleSetBean.setOriginalTarget(targetBean);
-        if (!scheduleType.getTime().equals("")) {
-            ruleSetBean.setRunTime(scheduleType.getTime());
-        }
-        // Creating rule definition & populating
-        RuleBean ruleBean = new RuleBean();
-        ExpressionBean ruleExpressionBean = new ExpressionBean(Context.OC_RULES_V1, rules.getRuleDef().get(0).getExpression().getValue());
-        ruleBean.setExpression(ruleExpressionBean);
-        ruleBean.setDescription(rules.getRuleDef().get(0).getDescription());
-        ruleBean.setName(rules.getRuleDef().get(0).getName());
-        ruleBean.setOid(rules.getRuleDef().get(0).getOID());
 
-        RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
-        ruleSetRuleBean.setOid(rules.getRuleAssignment().get(0).getRuleRef().get(0).getOID());
+        for (RuleAssignmentType rat : rules.getRuleAssignment()) {
+            TargetType targetType = rat.getTarget();
+            ExpressionBean targetBean = new ExpressionBean(Context.OC_RULES_V1, targetType.getValue());
+            RunOnScheduleType scheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
+            RuleSetBean ruleSetBean = new RuleSetBean();
+            ruleSetBean.setOriginalTarget(targetBean);
+            if (!scheduleType.getTime().equals("")) {
+                ruleSetBean.setRunTime(scheduleType.getTime());
+            }
 
-        for (DiscrepancyNoteActionType discrepancyNoteActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getDiscrepancyNoteAction()) {
-            DiscrepancyNoteActionBean action = new DiscrepancyNoteActionBean();
-            action.setMessage(discrepancyNoteActionType.getMessage());
-            action.setExpressionEvaluatesTo(Boolean.valueOf(discrepancyNoteActionType.getIfExpressionEvaluates()));
-            action.getRuleActionRun().setInitialDataEntry(discrepancyNoteActionType.getRun().isInitialDataEntry());
-            action.getRuleActionRun().setDoubleDataEntry(discrepancyNoteActionType.getRun().isDoubleDataEntry());
-            action.getRuleActionRun().setAdministrativeDataEntry(discrepancyNoteActionType.getRun().isAdministrativeDataEntry());
-            action.getRuleActionRun().setImportDataEntry(discrepancyNoteActionType.getRun().isImportDataEntry());
-            action.getRuleActionRun().setBatch(discrepancyNoteActionType.getRun().isBatch());
-            ruleSetRuleBean.addAction(action);
-        }
-        for (EmailActionType emailActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getEmailAction()) {
-            EmailActionBean action = new EmailActionBean();
-            action.setMessage(emailActionType.getMessage());
-            action.setTo(emailActionType.getTo());
-            action.setExpressionEvaluatesTo(Boolean.valueOf(emailActionType.getIfExpressionEvaluates()));
-            action.getRuleActionRun().setInitialDataEntry(emailActionType.getRun().isInitialDataEntry());
-            action.getRuleActionRun().setDoubleDataEntry(emailActionType.getRun().isDoubleDataEntry());
-            action.getRuleActionRun().setAdministrativeDataEntry(emailActionType.getRun().isAdministrativeDataEntry());
-            action.getRuleActionRun().setImportDataEntry(emailActionType.getRun().isImportDataEntry());
-            action.getRuleActionRun().setBatch(emailActionType.getRun().isBatch());
-            ruleSetRuleBean.addAction(action);
-        }
-        for (ShowActionType showActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getShowAction()) {
-            ShowActionBean action = new ShowActionBean();
-            action.setMessage(showActionType.getMessage());
-            action.setExpressionEvaluatesTo(Boolean.valueOf(showActionType.getIfExpressionEvaluates()));
-            action.getRuleActionRun().setInitialDataEntry(showActionType.getRun().isInitialDataEntry());
-            action.getRuleActionRun().setDoubleDataEntry(showActionType.getRun().isDoubleDataEntry());
-            action.getRuleActionRun().setAdministrativeDataEntry(showActionType.getRun().isAdministrativeDataEntry());
-            action.getRuleActionRun().setImportDataEntry(showActionType.getRun().isImportDataEntry());
-            action.getRuleActionRun().setBatch(showActionType.getRun().isBatch());
-            for (PropertyType propertyType : showActionType.getDestinationProperty()) {
-                PropertyBean property = new PropertyBean();
-                property.setOid(propertyType.getOID());
-                action.addProperty(property);
+            for (RuleRefType rrt : rat.getRuleRef()) {
+                RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
+                ruleSetRuleBean.setOid(rrt.getOID());
+
+                for (DiscrepancyNoteActionType discrepancyNoteActionType : rrt.getDiscrepancyNoteAction()) {
+                    DiscrepancyNoteActionBean action = new DiscrepancyNoteActionBean();
+                    action.setMessage(discrepancyNoteActionType.getMessage());
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(discrepancyNoteActionType.getIfExpressionEvaluates()));
+                    action.getRuleActionRun().setInitialDataEntry(discrepancyNoteActionType.getRun().isInitialDataEntry());
+                    action.getRuleActionRun().setDoubleDataEntry(discrepancyNoteActionType.getRun().isDoubleDataEntry());
+                    action.getRuleActionRun().setAdministrativeDataEntry(discrepancyNoteActionType.getRun().isAdministrativeDataEntry());
+                    action.getRuleActionRun().setImportDataEntry(discrepancyNoteActionType.getRun().isImportDataEntry());
+                    action.getRuleActionRun().setBatch(discrepancyNoteActionType.getRun().isBatch());
+                    ruleSetRuleBean.addAction(action);
+                }
+                for (EmailActionType emailActionType : rrt.getEmailAction()) {
+                    EmailActionBean action = new EmailActionBean();
+                    action.setMessage(emailActionType.getMessage());
+                    action.setTo(emailActionType.getTo());
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(emailActionType.getIfExpressionEvaluates()));
+                    action.getRuleActionRun().setInitialDataEntry(emailActionType.getRun().isInitialDataEntry());
+                    action.getRuleActionRun().setDoubleDataEntry(emailActionType.getRun().isDoubleDataEntry());
+                    action.getRuleActionRun().setAdministrativeDataEntry(emailActionType.getRun().isAdministrativeDataEntry());
+                    action.getRuleActionRun().setImportDataEntry(emailActionType.getRun().isImportDataEntry());
+                    action.getRuleActionRun().setBatch(emailActionType.getRun().isBatch());
+                    ruleSetRuleBean.addAction(action);
+                }
+                for (ShowActionType showActionType : rrt.getShowAction()) {
+                    ShowActionBean action = new ShowActionBean();
+                    action.setMessage(showActionType.getMessage());
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(showActionType.getIfExpressionEvaluates()));
+                    action.getRuleActionRun().setInitialDataEntry(showActionType.getRun().isInitialDataEntry());
+                    action.getRuleActionRun().setDoubleDataEntry(showActionType.getRun().isDoubleDataEntry());
+                    action.getRuleActionRun().setAdministrativeDataEntry(showActionType.getRun().isAdministrativeDataEntry());
+                    action.getRuleActionRun().setImportDataEntry(showActionType.getRun().isImportDataEntry());
+                    action.getRuleActionRun().setBatch(showActionType.getRun().isBatch());
+                    for (PropertyType propertyType : showActionType.getDestinationProperty()) {
+                        PropertyBean property = new PropertyBean();
+                        property.setOid(propertyType.getOID());
+                        action.addProperty(property);
+                    }
+                    ruleSetRuleBean.addAction(action);
+                }
+                for (HideActionType hideActionType : rrt.getHideAction()) {
+                    HideActionBean action = new HideActionBean();
+                    action.setMessage(hideActionType.getMessage());
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(hideActionType.getIfExpressionEvaluates()));
+                    action.getRuleActionRun().setInitialDataEntry(hideActionType.getRun().isInitialDataEntry());
+                    action.getRuleActionRun().setDoubleDataEntry(hideActionType.getRun().isDoubleDataEntry());
+                    action.getRuleActionRun().setAdministrativeDataEntry(hideActionType.getRun().isAdministrativeDataEntry());
+                    action.getRuleActionRun().setImportDataEntry(hideActionType.getRun().isImportDataEntry());
+                    action.getRuleActionRun().setBatch(hideActionType.getRun().isBatch());
+                    for (PropertyType propertyType : hideActionType.getDestinationProperty()) {
+                        PropertyBean property = new PropertyBean();
+                        property.setOid(propertyType.getOID());
+                        action.addProperty(property);
+                    }
+                    ruleSetRuleBean.addAction(action);
+                }
+                for (InsertActionType insertActionType : rrt.getInsertAction()) {
+                    InsertActionBean action = new InsertActionBean();
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(insertActionType.getIfExpressionEvaluates()));
+                    action.getRuleActionRun().setInitialDataEntry(insertActionType.getRun().isInitialDataEntry());
+                    action.getRuleActionRun().setDoubleDataEntry(insertActionType.getRun().isDoubleDataEntry());
+                    action.getRuleActionRun().setAdministrativeDataEntry(insertActionType.getRun().isAdministrativeDataEntry());
+                    action.getRuleActionRun().setImportDataEntry(insertActionType.getRun().isImportDataEntry());
+                    action.getRuleActionRun().setBatch(insertActionType.getRun().isBatch());
+                    ruleSetRuleBean.addAction(action);
+                    for (PropertyType propertyType : insertActionType.getDestinationProperty()) {
+                        PropertyBean property = new PropertyBean();
+                        property.setOid(propertyType.getOID());
+                        property.setValue(propertyType.getValue());
+                        ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, propertyType.getValueExpression().getValue());
+                        property.setValueExpression(expressionBean);
+                        action.addProperty(property);
+                    }
+                    ruleSetRuleBean.addAction(action);
+                }
+
+                for (EventActionType eventActionType : rrt.getEventAction()) {
+                    EventActionBean action = new EventActionBean();
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(eventActionType.getIfExpressionEvaluates()));
+                    action.setOc_oid_reference(eventActionType.getOID());
+                    action.getRuleActionRun().setNot_started(eventActionType.getRunOnStatus().isNotScheduled());
+                    action.getRuleActionRun().setScheduled(eventActionType.getRunOnStatus().isScheduled());
+                    action.getRuleActionRun().setData_entry_started(eventActionType.getRunOnStatus().isDataEntryStarted());
+                    action.getRuleActionRun().setComplete(eventActionType.getRunOnStatus().isCompleted());
+                    action.getRuleActionRun().setSkipped(eventActionType.getRunOnStatus().isSkipped());
+                    action.getRuleActionRun().setStopped(eventActionType.getRunOnStatus().isStopped());
+                    for (EventDestinationType eventDestinationType : eventActionType.getEventDestination()) {
+                        EventPropertyBean property = new EventPropertyBean();
+                        property.setProperty(eventDestinationType.getProperty());
+                        ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, eventDestinationType.getValueExpression().getValue());
+                        property.setValueExpression(expressionBean);
+                        action.addProperty(property);
+                    }
+                    ruleSetRuleBean.addAction(action);
+                }
+
+                for (NotificationActionType notificationActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getNotificationAction()) {
+                    NotificationActionBean action = new NotificationActionBean();
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(notificationActionType.getIfExpressionEvaluates()));
+                    action.setTo(notificationActionType.getTo());
+                    action.setSubject(notificationActionType.getSubject());
+                    action.setMessage(notificationActionType.getMessage());
+                    ruleSetRuleBean.addAction(action);
+                }
+
+                ruleSetBean.addRuleSetRule(ruleSetRuleBean);
             }
-            ruleSetRuleBean.addAction(action);
-        }
-        for (HideActionType hideActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getHideAction()) {
-            HideActionBean action = new HideActionBean();
-            action.setMessage(hideActionType.getMessage());
-            action.setExpressionEvaluatesTo(Boolean.valueOf(hideActionType.getIfExpressionEvaluates()));
-            action.getRuleActionRun().setInitialDataEntry(hideActionType.getRun().isInitialDataEntry());
-            action.getRuleActionRun().setDoubleDataEntry(hideActionType.getRun().isDoubleDataEntry());
-            action.getRuleActionRun().setAdministrativeDataEntry(hideActionType.getRun().isAdministrativeDataEntry());
-            action.getRuleActionRun().setImportDataEntry(hideActionType.getRun().isImportDataEntry());
-            action.getRuleActionRun().setBatch(hideActionType.getRun().isBatch());
-            for (PropertyType propertyType : hideActionType.getDestinationProperty()) {
-                PropertyBean property = new PropertyBean();
-                property.setOid(propertyType.getOID());
-                action.addProperty(property);
-            }
-            ruleSetRuleBean.addAction(action);
-        }
-        for (InsertActionType insertActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getInsertAction()) {
-            InsertActionBean action = new InsertActionBean();
-            action.setExpressionEvaluatesTo(Boolean.valueOf(insertActionType.getIfExpressionEvaluates()));
-            action.getRuleActionRun().setInitialDataEntry(insertActionType.getRun().isInitialDataEntry());
-            action.getRuleActionRun().setDoubleDataEntry(insertActionType.getRun().isDoubleDataEntry());
-            action.getRuleActionRun().setAdministrativeDataEntry(insertActionType.getRun().isAdministrativeDataEntry());
-            action.getRuleActionRun().setImportDataEntry(insertActionType.getRun().isImportDataEntry());
-            action.getRuleActionRun().setBatch(insertActionType.getRun().isBatch());
-            ruleSetRuleBean.addAction(action);
-            for (PropertyType propertyType : insertActionType.getDestinationProperty()) {
-                PropertyBean property = new PropertyBean();
-                property.setOid(propertyType.getOID());
-                property.setValue(propertyType.getValue());
-                ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, propertyType.getValueExpression().getValue());
-                property.setValueExpression(expressionBean);
-                action.addProperty(property);
-            }
-            ruleSetRuleBean.addAction(action);
-        }
-        
-       for (EventActionType eventActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getEventAction()) {
-            EventActionBean action = new EventActionBean();
-            action.setExpressionEvaluatesTo(Boolean.valueOf(eventActionType.getIfExpressionEvaluates()));
-            action.setOc_oid_reference(eventActionType.getOID());
-            action.getRuleActionRun().setNot_started(eventActionType.getRunOnStatus().isNotScheduled());
-            action.getRuleActionRun().setScheduled(eventActionType.getRunOnStatus().isScheduled());
-            action.getRuleActionRun().setData_entry_started(eventActionType.getRunOnStatus().isDataEntryStarted());
-            action.getRuleActionRun().setComplete(eventActionType.getRunOnStatus().isCompleted());
-            action.getRuleActionRun().setSkipped(eventActionType.getRunOnStatus().isSkipped());
-            action.getRuleActionRun().setStopped(eventActionType.getRunOnStatus().isStopped());
-            for (EventDestinationType eventDestinationType : eventActionType.getEventDestination()) {
-                EventPropertyBean property = new EventPropertyBean();
-                property.setProperty(eventDestinationType.getProperty());
-                ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, eventDestinationType.getValueExpression().getValue());
-                property.setValueExpression(expressionBean);
-                action.addProperty(property);
-            }
-            ruleSetRuleBean.addAction(action);
+            rpic.addRuleSet(ruleSetBean);
         }
 
-        for (NotificationActionType notificationActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getNotificationAction()) {
-            NotificationActionBean action = new NotificationActionBean();
-            action.setExpressionEvaluatesTo(Boolean.valueOf(notificationActionType.getIfExpressionEvaluates()));
-            action.setTo(notificationActionType.getTo());
-            action.setSubject(notificationActionType.getSubject());
-            action.setMessage(notificationActionType.getMessage());
-            ruleSetRuleBean.addAction(action);
+        for (RuleDefType rdt : rules.getRuleDef()) {
+            RuleBean ruleBean = new RuleBean();
+            ExpressionBean ruleExpressionBean = new ExpressionBean(Context.OC_RULES_V1, rdt.getExpression().getValue());
+            ruleBean.setExpression(ruleExpressionBean);
+            ruleBean.setDescription(rdt.getDescription());
+            ruleBean.setName(rdt.getName());
+            ruleBean.setOid(rdt.getOID());
+            rpic.addRuleDef(ruleBean);
         }
-
-        ruleSetBean.addRuleSetRule(ruleSetRuleBean);
-        rpic.addRuleSet(ruleSetBean);
-        rpic.addRuleDef(ruleBean);
 
         return rpic;
     }
@@ -423,7 +411,7 @@ public class RuleController {
                 response.getMessages().add(messageType);
             }
         } else {
-        	getRuleSetService().saveImportFromDesigner(rpic);
+            getRuleSetService().saveImportFromDesigner(rpic);
         }
         logger.debug("RPIC READY");
         return response;
@@ -469,7 +457,7 @@ public class RuleController {
             p.put(parameterType.getKey(), parameterType.getValue());
         }
         ExpressionObjectWrapper eow =
-            new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
+                new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
 
         // Run expression with populated HashMap
@@ -478,7 +466,7 @@ public class RuleController {
         DateTime end = new DateTime();
         Duration dur = new Duration(start, end);
         PeriodFormatter yearsAndMonths =
-            new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds").toFormatter();
+                new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds").toFormatter();
         yearsAndMonths.print(dur.toPeriod());
 
         // Run expression with empty HashMap to check rule validity, because
