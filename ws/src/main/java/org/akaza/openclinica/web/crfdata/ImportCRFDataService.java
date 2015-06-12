@@ -610,7 +610,7 @@ public class ImportCRFDataService {
                 }// after forms
                  // validationErrors = new HashMap();
                  // discValidator = new DiscrepancyValidator(request, discNotes);
-                if (displayItemBeanWrapper != null)
+                if (displayItemBeanWrapper != null && displayItemBeans.size() > 0)
                     wrappers.add(displayItemBeanWrapper);
             }// after study events
 
@@ -702,8 +702,8 @@ public class ImportCRFDataService {
 
                         for (EventCRFBean ecb : eventCrfBeans) {
                             Integer ecbId = new Integer(ecb.getId());
-                            if ((!upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                    || (!upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
+                            if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
+                                    && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete()))
                                 return false;
                         }
                     }

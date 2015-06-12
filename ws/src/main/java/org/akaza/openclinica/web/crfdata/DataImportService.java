@@ -128,16 +128,19 @@ public class DataImportService {
         getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 
         ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-        logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
         // -- does the event already exist? if not, fail
-        if (eventCRFBeans.isEmpty() && !eventCRFStatusesValid) {
+        if (eventCRFBeans == null) {
+            errors.add(respage.getString("the_event_crf_not_correct_status"));
+            return errors;
+        } else if (eventCRFBeans.isEmpty() && !eventCRFStatusesValid) {
             errors.add(respage.getString("the_event_crf_not_correct_status"));
             return errors;
         } else if (eventCRFBeans.isEmpty()) {
             errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));
             return errors;
         }
+        logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
             DataEntryStage dataEntryStage = eventCRFBean.getStage();
