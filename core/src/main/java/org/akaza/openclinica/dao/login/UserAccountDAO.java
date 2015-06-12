@@ -184,6 +184,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), uab.getAccountNonLocked());
         variables.put(new Integer(17), uab.getLockCounter());
         variables.put(new Integer(18), uab.getRunWebservices());
+
         if (uab.getAccessCode() == null || uab.getAccessCode().equals("") || uab.getAccessCode().equals("null")) {
             nullVars.put(new Integer(19), new Integer(TypeNames.STRING));
             variables.put(new Integer(19), null);
@@ -197,8 +198,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(20), uab.getTime_zone());
         }
-
-
+        
         variables.put(new Integer(21), new Integer(uab.getId()));
 
 
