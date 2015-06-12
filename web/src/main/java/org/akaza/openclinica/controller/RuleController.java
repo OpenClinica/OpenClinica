@@ -27,14 +27,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
-import org.akaza.openclinica.domain.rule.action.EmailActionBean;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.rule.action.EventActionBean;
-import org.akaza.openclinica.domain.rule.action.EventPropertyBean;
+import org.akaza.openclinica.domain.rule.action.*;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -52,18 +45,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.openclinica.ns.response.v31.MessagesType;
 import org.openclinica.ns.response.v31.Response;
-import org.openclinica.ns.rules.v31.DiscrepancyNoteActionType;
-import org.openclinica.ns.rules.v31.EmailActionType;
-import org.openclinica.ns.rules.v31.HideActionType;
-import org.openclinica.ns.rules.v31.InsertActionType;
-import org.openclinica.ns.rules.v31.PropertyType;
-import org.openclinica.ns.rules.v31.RuleAssignmentType;
-import org.openclinica.ns.rules.v31.RuleDefType;
-import org.openclinica.ns.rules.v31.RuleRefType;
-import org.openclinica.ns.rules.v31.ShowActionType;
-import org.openclinica.ns.rules.v31.TargetType;
-import org.openclinica.ns.rules.v31.EventActionType;
-import org.openclinica.ns.rules.v31.EventDestinationType;
+import org.openclinica.ns.rules.v31.*;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -102,12 +84,16 @@ public class RuleController {
 
     private RulesPostImportContainer mapRulesToRulesPostImportContainer(org.openclinica.ns.rules.v31.Rules rules) {
         RulesPostImportContainer rpic = new RulesPostImportContainer();
-        
+
         for (RuleAssignmentType rat : rules.getRuleAssignment()) {
             TargetType targetType = rat.getTarget();
             ExpressionBean targetBean = new ExpressionBean(Context.OC_RULES_V1, targetType.getValue());
+            RunOnScheduleType scheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
             RuleSetBean ruleSetBean = new RuleSetBean();
             ruleSetBean.setOriginalTarget(targetBean);
+            if (!scheduleType.getTime().equals("")) {
+                ruleSetBean.setRunTime(scheduleType.getTime());
+            }
 
             for (RuleRefType rrt : rat.getRuleRef()) {
                 RuleSetRuleBean ruleSetRuleBean = new RuleSetRuleBean();
@@ -187,7 +173,7 @@ public class RuleController {
                     }
                     ruleSetRuleBean.addAction(action);
                 }
-                
+
                 for (EventActionType eventActionType : rrt.getEventAction()) {
                     EventActionBean action = new EventActionBean();
                     action.setExpressionEvaluatesTo(Boolean.valueOf(eventActionType.getIfExpressionEvaluates()));
@@ -207,6 +193,16 @@ public class RuleController {
                     }
                     ruleSetRuleBean.addAction(action);
                 }
+
+                for (NotificationActionType notificationActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getNotificationAction()) {
+                    NotificationActionBean action = new NotificationActionBean();
+                    action.setExpressionEvaluatesTo(Boolean.valueOf(notificationActionType.getIfExpressionEvaluates()));
+                    action.setTo(notificationActionType.getTo());
+                    action.setSubject(notificationActionType.getSubject());
+                    action.setMessage(notificationActionType.getMessage());
+                    ruleSetRuleBean.addAction(action);
+                }
+
                 ruleSetBean.addRuleSetRule(ruleSetRuleBean);
             }
             rpic.addRuleSet(ruleSetBean);
@@ -415,7 +411,7 @@ public class RuleController {
                 response.getMessages().add(messageType);
             }
         } else {
-        	getRuleSetService().saveImportFromDesigner(rpic);
+            getRuleSetService().saveImportFromDesigner(rpic);
         }
         logger.debug("RPIC READY");
         return response;
@@ -461,7 +457,7 @@ public class RuleController {
             p.put(parameterType.getKey(), parameterType.getValue());
         }
         ExpressionObjectWrapper eow =
-            new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
+                new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
 
         // Run expression with populated HashMap
@@ -470,7 +466,7 @@ public class RuleController {
         DateTime end = new DateTime();
         Duration dur = new Duration(start, end);
         PeriodFormatter yearsAndMonths =
-            new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds").toFormatter();
+                new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds").toFormatter();
         yearsAndMonths.print(dur.toPeriod());
 
         // Run expression with empty HashMap to check rule validity, because

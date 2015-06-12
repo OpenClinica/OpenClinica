@@ -203,7 +203,7 @@ public class RuleSetDAO extends AuditableEntityDAO {
             if (ruleSetBean.getCrf() == null) {
                 nullVars.put(new Integer(3), new Integer(Types.INTEGER));
                 variables.put(new Integer(3), null);
-            } else {
+        } else {
                 variables.put(new Integer(3), new Integer(ruleSetBean.getCrf().getId()));
             }
             if (ruleSetBean.getCrfVersion() == null) {

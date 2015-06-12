@@ -149,6 +149,11 @@ public class RulesPostImportContainerService {
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+                    if (ruleSetBean.getRunTime() != null) {
+                        if (ruleSetBean.getRunOnSchedule() == null) {
+                            ruleSetBean.setRunOnSchedule(new RunOnSchedule(ruleSetBean.getRunTime()));
+                        }
+                    }
                     if(ruleSetBean.getRunOnSchedule()!=null){ 
                     	persistentRuleSetBean.setRunSchedule(true);
                       if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
