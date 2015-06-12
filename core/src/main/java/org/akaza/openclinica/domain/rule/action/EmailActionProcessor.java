@@ -53,7 +53,7 @@ public class EmailActionProcessor implements ActionProcessor {
             sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
             RuleActionRunLogBean ruleActionRunLog =
                 new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+  //          ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
             return null;
         }
         default:
@@ -74,6 +74,7 @@ public class EmailActionProcessor implements ActionProcessor {
             helper.setText(body);
 
             mailSender.send(mimeMessage);
+            System.out.println("Sending Email thru Email Action");
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
             logger.error("Email could not be sent");

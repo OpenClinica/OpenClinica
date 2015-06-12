@@ -25,6 +25,9 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 
 @Override
 	public void onApplicationEvent(final OnStudyEventUpdated event) {
+	boolean isTargetItemSpecific=false;
+	boolean isTargetEventSpecific=false;
+	
 		LOGGER.debug("listening");
 		Integer studyEventDefId = event.getContainer().getEvent().getStudyEventDefinition().getStudyEventDefinitionId();
 		Integer studyEventOrdinal = event.getContainer().getEvent().getSampleOrdinal();
@@ -32,8 +35,13 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 		Integer userId = event.getContainer().getEvent().getUpdateId();
 		
 		if(userId==null && event.getContainer().getEvent().getUserAccount()!=null )userId=  event.getContainer().getEvent().getUserAccount().getUserId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal,event.getContainer().getChangeDetails());
-	}
+		
+		
+		if (event.getContainer().getChangeDetails().getStartDateChanged() || event.getContainer().getChangeDetails().getStatusChanged()){
+		  isTargetEventSpecific = true;
+			getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal,event.getContainer().getChangeDetails(),null, isTargetItemSpecific,  isTargetEventSpecific);
+		}
+		}
 
 
 public RuleSetService getRuleSetService() {

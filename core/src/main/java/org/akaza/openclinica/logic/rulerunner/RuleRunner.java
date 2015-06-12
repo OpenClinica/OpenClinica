@@ -32,9 +32,12 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -56,7 +59,7 @@ public class RuleRunner {
     private StudyDAO studyDao;
     private ItemFormMetadataDAO itemFormMetadataDao;
     private SectionDAO sectionDao;
-    private final JavaMailSenderImpl mailSender;
+    private JavaMailSenderImpl mailSender;
     protected RuleRunnerMode ruleRunnerMode;
     protected DynamicsMetadataService dynamicsMetadataService;
     protected RuleActionRunLogDao ruleActionRunLogDao;
@@ -66,8 +69,9 @@ public class RuleRunner {
     String contextPath;
 
     public enum RuleRunnerMode {
-        DATA_ENTRY, CRF_BULK, RULSET_BULK, IMPORT_DATA
+        DATA_ENTRY, CRF_BULK, RULSET_BULK, IMPORT_DATA ,RUN_ON_SCHEDULE
     };
+
 
     public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
         this.ds = ds;
@@ -75,6 +79,7 @@ public class RuleRunner {
         this.contextPath = contextPath;
         this.mailSender = mailSender;
     }
+
 
     String curateMessage(RuleActionBean ruleAction, RuleSetRuleBean ruleSetRule) {
 
@@ -265,4 +270,6 @@ public class RuleRunner {
     public void setRuleActionRunLogDao(RuleActionRunLogDao ruleActionRunLogDao) {
         this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
+
+    
 }

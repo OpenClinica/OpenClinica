@@ -233,7 +233,7 @@ public class ExpressionService {
     
     public String getSSZoneId(){
      Integer subjectId = expressionWrapper.getStudySubjectId();
-     System.out.print("  subjectId  " + subjectId + "  : ");
+     System.out.println("  subjectId  " + subjectId + "  : ");
      if(subjectId ==null) return null;     
      StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
        return ssBean.getTime_zone().trim();

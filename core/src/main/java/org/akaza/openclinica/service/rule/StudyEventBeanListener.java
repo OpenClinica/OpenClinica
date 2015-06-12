@@ -46,7 +46,8 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	@Override
 	public void update(Listener lstnr) {
 //	System.out.println("Triggering the rules based on event updates");
-	
+		boolean isTargetItemSpecific=false;
+		boolean isTargetEventSpecific=false;
 //		System.out.println("RuleSetDao"+ruleSetDao);
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
 
@@ -55,8 +56,11 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 		Integer userId = studyEventBeanContainer.getEvent().getUpdaterId();
 		Integer studyEventOrdinal = studyEventBeanContainer.getEvent().getSampleOrdinal();
 		if(userId==0) userId = studyEventBeanContainer.getEvent().getOwnerId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal, studyEventBeanContainer.getChangeDetails());
-		
+        
+		if (studyEventBeanContainer.getChangeDetails().getStartDateChanged() || studyEventBeanContainer.getChangeDetails().getStatusChanged()){
+		 isTargetEventSpecific = true;
+			getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal, studyEventBeanContainer.getChangeDetails(),null, isTargetItemSpecific,  isTargetEventSpecific);
+		}
 		
 	}
 	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {

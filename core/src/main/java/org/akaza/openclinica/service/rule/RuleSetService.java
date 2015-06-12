@@ -1020,9 +1020,9 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
             Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
-            StudyEventChangeDetails changeDetails) {
-    		BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender);
+            StudyEventChangeDetails changeDetails , String fullTargetExpression,boolean isTargetItemSpecific, boolean isTargetEventSpecific) {	
+    	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender , fullTargetExpression, isTargetItemSpecific,  isTargetEventSpecific,ruleActionRunLogDao);
 }
 
 	public StudyEventDao getStudyEventDomainDao() {
