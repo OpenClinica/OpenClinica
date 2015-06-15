@@ -27,6 +27,7 @@
         <property name="beanPropertyService" ref="beanPropertyService"/>
         <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
         <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
+        <property name="ruleActionRunLogDao" ref="ruleActionRunLogDao"/>
     </bean>
     
     <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">

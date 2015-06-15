@@ -43,6 +43,9 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.DataBinder;
@@ -51,11 +54,14 @@ import org.springframework.validation.Errors;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -682,10 +688,16 @@ public class RulesPostImportContainerService {
     
     private boolean isRunTimeValid(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper , String runTime) {
         boolean isValid = true;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm"); //HH = 24h format
-        dateFormat.setLenient(false);
+        
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm");
+
         try {
-        	dateFormat.parse(runTime);
+            formatter.parseDateTime(runTime);
+             if(!runTime.matches("\\d{2}:\\d{2}")){
+                 ruleSetBeanWrapper.error(createError("OCRERR_0047"));
+                 isValid = false;            	 
+             }
+        	
         } catch (Exception e) {
             ruleSetBeanWrapper.error(createError("OCRERR_0047"));
             isValid = false;

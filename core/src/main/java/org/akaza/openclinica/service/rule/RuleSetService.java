@@ -1022,7 +1022,7 @@ public class RuleSetService implements RuleSetServiceInterface {
             Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
             StudyEventChangeDetails changeDetails , String fullTargetExpression,boolean isTargetItemSpecific, boolean isTargetEventSpecific) {	
     	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
-    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender , fullTargetExpression, isTargetItemSpecific,  isTargetEventSpecific,ruleActionRunLogDao);
+    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender , fullTargetExpression, isTargetItemSpecific,  isTargetEventSpecific , getRuleActionRunLogDao());
 }
 
 	public StudyEventDao getStudyEventDomainDao() {

@@ -58,12 +58,13 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 	protected DynamicsMetadataService dynamicsMetadataService;
 	StudyBean currentStudy = null;
 	UserAccountBean ub = null;
+
 	ExpressionBeanObjectWrapper eow;
 	UserAccountDAO udao;
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds, Integer studySubjectBeanId, BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib,
 			StudyEventDefinitionDao studyEventDefDaoHib, int eventOrdinal, StudyEventChangeDetails changeDetails, Integer userId, JavaMailSenderImpl mailSender, String fullTargetExpression,
-			boolean isTargetItemSpecific, boolean isTargetEventSpecific , RuleActionRunLogDao ruleActionRunLogDao) {
+			boolean isTargetItemSpecific, boolean isTargetEventSpecific, RuleActionRunLogDao ruleActionRLDao) {
 
 		HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
 
@@ -78,14 +79,13 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 					toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
 					allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 				}
-			}else{
+			} else {
 				String key = ruleSet.getTarget().getValue();
 				toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
 				allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
 			}
 
 			ItemDataBean itemData = null;
-
 
 			for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
 				if (ruleSetRule.getStatus().getCode() == 1) {
@@ -122,10 +122,10 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 								while (itr.hasNext()) {
 									RuleActionBean ruleActionBean = itr.next();
 									RuleActionRunLogBean ruleActionRunLog = new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
-																				
-									 if (ruleActionRunLogDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-									 itr.remove();
-									 }
+
+									if (ruleActionRLDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+										itr.remove();
+									}
 								}
 							}
 						}
@@ -137,12 +137,13 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 						}
 
 					} catch (OpenClinicaSystemException osa) {
-						osa.printStackTrace();
-						System.out.println("Something happeneing : " + osa.getMessage());
+					
+					//	osa.printStackTrace();
+						System.out.println("Something happeneing..");
 						// TODO: report something useful
 					}
 				}
-				
+
 			}
 		}
 		for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
@@ -153,7 +154,7 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 				ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
 				ruleActionContainer.getRuleAction().setCuratedMessage(curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
 				ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, mailSender, dynamicsMetadataService, ruleActionContainer
-						.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+						.getRuleSetBean(), ruleActionRLDao, ruleActionContainer.getRuleAction().getRuleSetRule());
 
 				if (ap instanceof EventActionProcessor) {
 					System.out.println("Event Action Trigger");
@@ -164,9 +165,8 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 					notificationActionProcessor.runNotificationAction(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleSetBean(), studySubjectBeanId, eventOrdinal);
 				} else {
 					System.out.println("Other Action Trigger");
-					// Add new RuleRunner Mode RUN_ON_SCHEDULE
 					udao = new UserAccountDAO(ds);
-					ub=(UserAccountBean) udao.findByUserName("root");     //  Locale issue in StudyUserRole
+					ub = (UserAccountBean) udao.findByUserName("root"); // Locale issue in StudyUserRole
 					RuleActionBean rab = ap.execute(RuleRunnerMode.RUN_ON_SCHEDULE, ExecutionMode.SAVE, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
 							DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction().getRuleSetRule(),
 									currentStudy, ruleActionContainer.getRuleAction()));
@@ -200,6 +200,5 @@ public class BeanPropertyRuleRunner extends RuleRunner {
 		}
 		return result;
 	}
-
 
 }

@@ -53,7 +53,7 @@ public class EmailActionProcessor implements ActionProcessor {
             sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
             RuleActionRunLogBean ruleActionRunLog =
                 new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-  //          ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
             return null;
         }
         default:

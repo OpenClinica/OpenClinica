@@ -22,9 +22,11 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -36,6 +38,7 @@ import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.Status;
@@ -75,7 +78,8 @@ public class JobTriggerService {
 	EventCRFDAO edao;
 	NotificationActionProcessor notificationActionProcessor;
 	RuleSetService ruleSetService;
-
+	ItemDataDAO iddao;
+	ItemBean iBean;
 
 	private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -167,9 +171,10 @@ public class JobTriggerService {
 		String crfOid = "";
 		boolean isTargetItemSpecific = false;
 		boolean isTargetEventSpecific = false;
+
 		if (ruleSet.getItemId() != null) {
 			idao = new ItemDAO(ds);
-			ItemBean iBean = (ItemBean) idao.findByPK(ruleSet.getItemId());
+			iBean = (ItemBean) idao.findByPK(ruleSet.getItemId());
 			String itemOid = iBean.getOid();
 
 			igdao = new ItemGroupDAO(ds);
@@ -197,7 +202,7 @@ public class JobTriggerService {
 			ArrayList<StudyEventBean> seBeans = sedao.findAllByDefinitionAndSubject(sed, studySubjectBean);
 			StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
 			for (StudyEventBean seBean : seBeans) {
-		        ResourceBundleProvider.updateLocale(Locale.getDefault());
+				ResourceBundleProvider.updateLocale(Locale.getDefault());
 				edao = new EventCRFDAO<>(ds);
 				ArrayList<EventCRFBean> ecrfs = edao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, crfOid);
 				if (ruleSet.getItemId() != null) {
@@ -205,7 +210,9 @@ public class JobTriggerService {
 					sedFullTargetExpression = sed.getOid() + "[" + seBean.getId() + "]" + fullTargetExpression;
 
 					for (EventCRFBean ecrf : ecrfs) {
-						if (ecrf.getStudySubjectId() == studySubjectBean.getId()) {
+						iddao = new ItemDataDAO(ds);
+						ItemDataBean idBean = iddao.findByItemIdAndEventCRFId(iBean.getId(), ecrf.getId());
+						if (ecrf.getStudySubjectId() == studySubjectBean.getId() && idBean.isActive()) {
 
 							System.out.println("Item Target Expression:  " + sedFullTargetExpression);
 							System.out.println("StudySubject:  " + studySubjectBean.getId());
@@ -216,7 +223,6 @@ public class JobTriggerService {
 				} else {
 					isTargetEventSpecific = true;
 					sedFullTargetExpression = null;
-
 					System.out.println("Event Target Expression");
 					System.out.println("StudySubject:  " + studySubjectBean.getId());
 					ruleSetService.runRulesInBeanProperty(ruleSets, studySubjectBean.getId(), 1, seBean.getSampleOrdinal(), studyEventChangeDetails, sedFullTargetExpression, isTargetItemSpecific,
