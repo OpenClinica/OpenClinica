@@ -121,10 +121,9 @@ public class ImportCRFInfoContainer {
                             if (crfStatus != null && crfStatus.equals("Data_Entry_Started"))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
                             importCrfInfo.setEventCRFID(new Integer(ecb.getId()));
-                            if ((!upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                    || (!upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE))) {
+                            if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
+                                    && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete()))
                                 importCrfInfo.setProcessImport(false);
-                            }
                             importCRFList.add(importCrfInfo);
                             if (importCrfInfo.isProcessImport())
                                 formMap.put(formDataBean.getFormOID(), "true");
