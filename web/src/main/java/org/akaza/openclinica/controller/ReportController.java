@@ -54,7 +54,7 @@ public class ReportController {
 		if (result) {
 			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 		} else {
-			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
 		}
 
