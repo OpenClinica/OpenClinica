@@ -3,32 +3,32 @@
 		<Target Context="OC_RULES_V1"></Target>
 		<RunOnSchedule Time="17:00"/>
 		<RuleRef OID="">
-			<DiscrepancyNoteAction IfExpressionEvaluates="">
+			<DiscrepancyNoteAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
                 <Message></Message>
 			</DiscrepancyNoteAction>
-			<EmailAction IfExpressionEvaluates="">
+			<EmailAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
                 <Message></Message>
                 <To></To>
 			</EmailAction>
-			<NotificationAction IfExpressionEvaluates="">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
-                <Message></Message>
+			<NotificationAction IfExpressionEvaluates="true">
                 <To></To>
+                <Subject></Subject>
+                <Message></Message>
 			</NotificaitonAction>
-			<ShowAction IfExpressionEvaluates="">
+			<ShowAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
 				<DestinationProperty OID=""/>
 			</ShowAction>			
-			<HideAction IfExpressionEvaluates="">
+			<HideAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
 				<DestinationProperty OID=""/>
 			</HideAction>
-			<InsertAction IfExpressionEvaluates="">
-				<Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch=""/>
+			<InsertAction IfExpressionEvaluates="true">
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false"/>
 				<DestinationProperty OID="" Value="">
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</DestinationProperty>

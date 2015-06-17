@@ -425,7 +425,8 @@ public class RulesPostImportContainerService {
             String currentTarget=null;
             currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
             if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
-               	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
+               	if (ruleActionBean.getActionType().getCode()==6)
+            	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
             }else{
             	ruleSetBeanWrapper.error(createError("OCRERR_0044"));
                		
@@ -487,6 +488,7 @@ public class RulesPostImportContainerService {
 			List<RuleActionBean> ruleActions = getAllRuleActions(isDestination);
 
 			for (RuleActionBean ruleActionBean : ruleActions) {
+               	if (ruleActionBean.getActionType().getCode()==6){
 				if (isDestinationAndTargetMatch(parseTarget(target), parseDestination(((EventActionBean) ruleActionBean).getOc_oid_reference() + ".STARTDATE"))) {
 					ruleSetBeanWrapper.error(createError("OCRERR_0042"));
 					break;
@@ -495,9 +497,10 @@ public class RulesPostImportContainerService {
 					ruleSetBeanWrapper.error(createError("OCRERR_0043"));
 					break;
 				}
-
+				
 				runValidationInList(target, ((EventActionBean) ruleActionBean).getOc_oid_reference(), ruleSetBeanWrapper, eventActionsRuleSetBean);
-			}
+				}
+				}
 		} else {
 
 			addNewRuleSetBeanInList(target, destination, eventActionsRuleSetBean);
