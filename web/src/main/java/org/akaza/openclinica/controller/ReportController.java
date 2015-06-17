@@ -55,7 +55,6 @@ public class ReportController {
 			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 		} else {
 			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
-
 		}
 
 	}
