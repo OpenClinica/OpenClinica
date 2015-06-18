@@ -254,9 +254,9 @@ public class AccountController {
 		String timeZone = map.get("timeZone");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("******************     You are in the Rest Service   *****************");
-        
-		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+		System.out.println("******************     You are in the Rest Service   *****************"); 
+		  
+		StudySubjectBean studySubjectBean = getStudySubjectByOidAndStudy(studySubjectId, parentStudy.getId());
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 
@@ -369,6 +369,12 @@ public class AccountController {
 		sdao = new StudyDAO(dataSource);
 		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
 		return studyBean;
+	}
+
+	private StudySubjectBean getStudySubjectByOidAndStudy(String oid, int studyId) {
+		ssdao = new StudySubjectDAO(dataSource);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByOidAndStudy(oid, studyId);
+		return studySubjectBean;
 	}
 
 	private StudySubjectBean getStudySubject(String label, StudyBean study) {
