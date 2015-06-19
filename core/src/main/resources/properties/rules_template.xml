@@ -16,7 +16,7 @@
                 <To></To>
                 <Subject></Subject>
                 <Message></Message>
-			</NotificaitonAction>
+			</NotificationAction>
 			<ShowAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
