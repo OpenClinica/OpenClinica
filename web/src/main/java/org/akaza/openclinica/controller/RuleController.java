@@ -27,6 +27,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.RunOnSchedule;
 import org.akaza.openclinica.domain.rule.action.*;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -194,7 +195,7 @@ public class RuleController {
                     ruleSetRuleBean.addAction(action);
                 }
 
-                for (NotificationActionType notificationActionType : rules.getRuleAssignment().get(0).getRuleRef().get(0).getNotificationAction()) {
+                for (NotificationActionType notificationActionType : rrt.getNotificationAction()) {
                     NotificationActionBean action = new NotificationActionBean();
                     action.setExpressionEvaluatesTo(Boolean.valueOf(notificationActionType.getIfExpressionEvaluates()));
                     action.setTo(notificationActionType.getTo());
