@@ -155,6 +155,11 @@ public class RulesPostImportContainerService {
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+                    if (ruleSetBean.getRunTime() != null) {
+                        if (ruleSetBean.getRunOnSchedule() == null) {
+                            ruleSetBean.setRunOnSchedule(new RunOnSchedule(ruleSetBean.getRunTime()));
+                        }
+                    }
                     if(ruleSetBean.getRunOnSchedule()!=null){ 
                     	persistentRuleSetBean.setRunSchedule(true);
                       if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
@@ -424,7 +429,8 @@ public class RulesPostImportContainerService {
             String currentTarget=null;
             currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
             if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
-               	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
+               	if (ruleActionBean.getActionType().getCode()==6)
+            	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
             }else{
             	ruleSetBeanWrapper.error(createError("OCRERR_0044"));
                		
@@ -486,6 +492,7 @@ public class RulesPostImportContainerService {
 			List<RuleActionBean> ruleActions = getAllRuleActions(isDestination);
 
 			for (RuleActionBean ruleActionBean : ruleActions) {
+               	if (ruleActionBean.getActionType().getCode()==6){
 				if (isDestinationAndTargetMatch(parseTarget(target), parseDestination(((EventActionBean) ruleActionBean).getOc_oid_reference() + ".STARTDATE"))) {
 					ruleSetBeanWrapper.error(createError("OCRERR_0042"));
 					break;
@@ -494,9 +501,10 @@ public class RulesPostImportContainerService {
 					ruleSetBeanWrapper.error(createError("OCRERR_0043"));
 					break;
 				}
-
+				
 				runValidationInList(target, ((EventActionBean) ruleActionBean).getOc_oid_reference(), ruleSetBeanWrapper, eventActionsRuleSetBean);
-			}
+				}
+				}
 		} else {
 
 			addNewRuleSetBeanInList(target, destination, eventActionsRuleSetBean);
@@ -686,11 +694,11 @@ public class RulesPostImportContainerService {
     }
 
     
+
     private boolean isRunTimeValid(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper , String runTime) {
         boolean isValid = true;
         
         DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm");
-
         try {
             formatter.parseDateTime(runTime);
              if(!runTime.matches("\\d{2}:\\d{2}")){
@@ -705,6 +713,7 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
+    
     
     private boolean doesPersistentRuleBeanBelongToCurrentStudy(AuditableBeanWrapper<RuleBean> ruleBeanWrapper) {
         boolean isValid = true;

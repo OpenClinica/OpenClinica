@@ -183,5 +183,5 @@ public class RuleSetBean extends AuditableEntityBean {
     public void setOriginalTarget(ExpressionBean originalTarget) {
         this.originalTarget = originalTarget;
     }
-
+    
 }

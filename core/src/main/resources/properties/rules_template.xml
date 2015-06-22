@@ -13,12 +13,12 @@
                 <To></To>
 			</EmailAction>
 			<NotificationAction IfExpressionEvaluates="">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+                <Message></Message>
                 <To></To>
                 <Subject></Subject>
                 <Message></Message>
-			</NotificaitonAction>
-			<ShowAction IfExpressionEvaluates="">
+			</NotificationAction>
+			<ShowAction IfExpressionEvaluates="true">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
 				<DestinationProperty OID=""/>

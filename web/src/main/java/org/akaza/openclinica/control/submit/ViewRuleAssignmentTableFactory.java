@@ -778,9 +778,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
             String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
             String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
+            String runTime = (String) ((HashMap<Object, Object>) item).get("ruleSetRunTime");
+            List<RuleActionBean> actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
+            String message = actions.get(0).getSummary();
         //    if (isDesignerRequest)
           //  {
-                value += testEditByDesignerBuilder(target, ruleOid);
+                value += testEditByDesignerBuilder(target, ruleOid, runTime, message);
             //} else
                 if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
@@ -901,11 +904,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     }
 
-    private String testEditByDesignerBuilder(String target, String ruleOid) {
+    private String testEditByDesignerBuilder(String target, String ruleOid, String runTime, String message) {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
         setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
-        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment");
+        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment&runTime="+ runTime +"&msg="+ convertMessage(message));
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
@@ -923,4 +926,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         this.designerLink = designerLink;
     }
 
+    private String convertMessage(String message) {
+        message = message.replace("\n","-0-");
+        message = message.replace(" ","-1-");
+        return message;
+    }
 }
