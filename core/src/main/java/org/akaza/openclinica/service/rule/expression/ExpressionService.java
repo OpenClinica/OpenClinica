@@ -799,7 +799,7 @@ public class ExpressionService {
     public String replaceGroupOidOrdinalInExpression(String expression, Integer ordinal) {
         String replacement = getStudyEventDefinitionOidWithOrdinalFromExpression(expression) + SEPERATOR + getCrfOidFromExpression(expression) + SEPERATOR;
         if (ordinal == null) {
-            replacement += getItemGroupOidFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
+            replacement += getItemGroupOidWithOrdinalFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
         } else {
             replacement +=
                 getItemGroupOidFromExpression(expression) + OPENNIG_BRACKET + ordinal + CLOSING_BRACKET + SEPERATOR + getItemOidFromExpression(expression);
