@@ -139,8 +139,17 @@ public class DataEndpoint {
                 List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 HashMap<Integer, String> importedCRFStatuses = new HashMap<Integer, String>();
 
+                List<String> errorMessagesFromValidation = dataImportService.validateMetaData(odmContainer, dataSource, coreResources, studyBean, userBean,
+                        displayItemBeanWrappers, importedCRFStatuses);
+
+                if (errorMessagesFromValidation.size() > 0) {
+                    String err_msg = convertToErrorString(errorMessagesFromValidation);
+                    return new DOMSource(mapFailConfirmation(null, err_msg));
+                }
+
                 ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
-                List<String> errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
+
+                errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
                         displayItemBeanWrappers, importedCRFStatuses);
 
                 if (errorMessagesFromValidation.size() > 0) {
