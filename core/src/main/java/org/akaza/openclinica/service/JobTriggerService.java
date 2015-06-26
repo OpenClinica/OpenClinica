@@ -91,9 +91,9 @@ public class JobTriggerService {
 	}
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
-	@Scheduled(cron = "0 0/1 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	// trigger every minute
-	// @Scheduled(cron = "0 0 0/1 * * ?")
+	 @Scheduled(cron = "0 0 0/1 * * ?")
 	// trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
 		System.out.println("The time is now " + currentDateFormat.format(new Date()));
@@ -106,7 +106,7 @@ public class JobTriggerService {
 			if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
 				if(ruleSet.getItemId()!=null){ 
                  // item Specific Rule
-					System.out.println("Item Specific Rule ");
+					System.out.println("*** Item Specific Rule ***");
 				ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
 				StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
 				ResourceBundleProvider.updateLocale(Locale.getDefault());
@@ -115,7 +115,7 @@ public class JobTriggerService {
 				ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
 				}else{
 			// Event Specific Rule		
-					System.out.println("Event Specific Rule ");
+					System.out.println("*** Event Specific Rule ***");
 				    StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
 					ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
 					ExpressionBean eBean = new ExpressionBean();

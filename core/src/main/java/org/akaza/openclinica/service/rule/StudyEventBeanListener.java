@@ -9,6 +9,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
@@ -56,7 +57,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();
 //		Integer studySubjectId = studyEventBeanContainer.getEvent().getStudySubjectId();
 		Integer userId = studyEventBeanContainer.getEvent().getUpdaterId();
-//		Integer studyEventOrdinal = studyEventBeanContainer.getEvent().getSampleOrdinal();
+		Integer studyEventOrdinal = studyEventBeanContainer.getEvent().getSampleOrdinal();
 		if(userId==0) userId = studyEventBeanContainer.getEvent().getOwnerId();
 		StudyEventBean studyEvent = studyEventBeanContainer.getEvent();
         
@@ -71,7 +72,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 			}
 
 
-			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails());
+			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails(), studyEventOrdinal);
 	}
 		
 	}

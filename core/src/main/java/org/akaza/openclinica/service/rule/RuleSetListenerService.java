@@ -35,7 +35,7 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
        
 		
 		Integer studyEventDefId = event.getContainer().getEvent().getStudyEventDefinition().getStudyEventDefinitionId();
-	//	Integer studyEventOrdinal = event.getContainer().getEvent().getSampleOrdinal();
+		Integer studyEventOrdinal = event.getContainer().getEvent().getSampleOrdinal();
 	//	Integer studySubjectId = event.getContainer().getEvent().getStudySubject().getStudySubjectId();
 		Integer userId = event.getContainer().getEvent().getUpdateId();
 		
@@ -55,7 +55,7 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEventBean));
 			ruleSetBeans.add(ruleSet);
 			}
-			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId,event.getContainer().getChangeDetails());
+			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId,event.getContainer().getChangeDetails() , studyEventOrdinal);
 
 
 			

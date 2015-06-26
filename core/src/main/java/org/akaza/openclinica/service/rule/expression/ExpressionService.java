@@ -274,7 +274,7 @@ public class ExpressionService {
             String studyEventDefinitionOrdinal = getStudyEventDefinitionOidOrdinalFromExpression(expression);
             studyEventDefinitionOrdinal = studyEventDefinitionOrdinal.equals("") ? "1" : studyEventDefinitionOrdinal;
             String studySubjectId = String.valueOf(studyEvent.getStudySubjectId());
-
+            System.out.println("studySubjectId:  "+ studySubjectId);
             logger.debug("ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
                     new Object[] { studyEvent.getId(), studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal, studySubjectId });
 

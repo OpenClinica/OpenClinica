@@ -94,7 +94,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
-	                    	osa.printStackTrace();
+	                   // 	osa.printStackTrace();
 	                        System.out.println("Something happeneing : " + osa.getMessage());
 	                        // TODO: report something useful
 	                    }

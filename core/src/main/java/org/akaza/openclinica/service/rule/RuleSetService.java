@@ -647,6 +647,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     public List<RuleSetBean> filterRuleSetsByStudySubject(List<RuleSetBean> ruleSets) throws NumberFormatException, ParseException {
         for (RuleSetBean ruleSet : ruleSets) {
             List<ExpressionBean> filteredExpressions = new ArrayList<ExpressionBean>();
+            if (ruleSet.getExpressions()!=null){
             for (ExpressionBean expression : ruleSet.getExpressions()) {
                 String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expression.getValue());
                   StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(Integer.valueOf(studyEventId));
@@ -660,6 +661,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                         filteredExpressions.add(expBean);
                   }
                 
+             }
             }
             ruleSet.setExpressions(filteredExpressions);
         }
@@ -1089,17 +1091,17 @@ public class RuleSetService implements RuleSetServiceInterface {
     		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
 }
 
-    public void runIndividualRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails) {	
+    public void runIndividualRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails , Integer studyEventOrdinal) {	
+    	ArrayList <RuleSetBean> ruleSetBeans = new ArrayList<>();
+    	
+    	for (RuleSetBean ruleSet : ruleSets){
+    	String studyEventDefinitionOrdinal = getExpressionService().getStudyEventDefinitionOrdninalCurated(ruleSet.getOriginalTarget().getValue()+".A.B");      
+        if (studyEventDefinitionOrdinal.equals("") || studyEventDefinitionOrdinal.equals(String.valueOf(studyEventOrdinal))) {
+        	ruleSetBeans.add(ruleSet);	
+          }
+    	}    	
 	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
-	    ruleSets = (ArrayList<RuleSetBean>) filterByStatusEqualsAvailable(ruleSets);
-	    /*try {
-			ruleSets = (ArrayList<RuleSetBean>) filterRuleSetsByStudySubject(ruleSets);
-		} catch (NumberFormatException | ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-*/
- 		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
+ 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
 }
 
     
