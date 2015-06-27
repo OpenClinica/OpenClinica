@@ -18,7 +18,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     }
 
     @SuppressWarnings("unchecked")
-    
+    @Transactional
     public T findById(Integer id) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.id = :id";

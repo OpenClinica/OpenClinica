@@ -43,7 +43,7 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 		  
 		StudyEvent studyEvent = event.getContainer().getEvent();
 		StudyEventBean studyEventBean = new StudyEventBean();
-		studyEventBean.setId(studyEvent.getId());
+		studyEventBean.setId(studyEvent.getStudyEventId());
 		
 
 		ArrayList<RuleSetBean> ruleSetBeans = new ArrayList();		
