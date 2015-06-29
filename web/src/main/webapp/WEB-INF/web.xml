@@ -145,7 +145,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     </filter-mapping>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
-   <url-pattern>/CreateCRFVersion</url-pattern>
+        <url-pattern>/CreateCRFVersion</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/CreateXformCRFVersion</url-pattern>
     </filter-mapping>
   <filter-mapping>
     <filter-name>compressFilter</filter-name>
@@ -596,6 +600,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>CreateCRFVersionServlet</servlet-name>
         <display-name>CreateCRFVersion</display-name>
         <servlet-class>org.akaza.openclinica.control.admin.CreateCRFVersionServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateXformCRFVersionServlet</servlet-name>
+        <display-name>CreateXformCRFVersion</display-name>
+        <servlet-class>org.akaza.openclinica.control.admin.CreateXformCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>InitCreateCRFVersionServlet</servlet-name>
@@ -1757,6 +1766,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet-mapping>
         <servlet-name>CreateCRFVersionServlet</servlet-name>
         <url-pattern>/CreateCRFVersion</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateXformCRFVersionServlet</servlet-name>
+        <url-pattern>/CreateXformCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>InitCreateCRFVersionServlet</servlet-name>
