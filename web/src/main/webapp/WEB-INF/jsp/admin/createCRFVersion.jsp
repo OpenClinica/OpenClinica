@@ -171,9 +171,12 @@ function toggleSectionDisplay(showDivId,hideDivId){
   <form id="xformSubmit" action="CreateXformCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
     <div style="width: 800px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-      <div class="textbox_center">
-        <textarea id="xformText" name="xformText" rows="40" cols="60"></textarea>
-        <br><br>
+        <div class="crf-upload-padded-div"><fmt:message key="xform_upload_instruction" bundle="${resword}"/></div> 
+        <div class="crf-upload-padded-div"><textarea class="crf-upload-padded-div" id="xformText" name="xformText" rows="40" cols="60"></textarea></div>
+        <br>
+        <div class="crf-upload-padded-div"><fmt:message key="xform_upload_media_instruction" bundle="${resword}"/></div>
+        <br>
+        <div class="textbox_center">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr>
             <td class="formlabel"><fmt:message key="upload_media_files" bundle="${resword}"/>:</td>
@@ -181,8 +184,9 @@ function toggleSectionDisplay(showDivId,hideDivId){
             <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
           </tr>
         </table>
+        </div>
         <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-      </div>
+  
     </div></div></div></div></div></div></div></div>
     </div>
 
