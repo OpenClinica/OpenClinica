@@ -97,7 +97,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(DataEntryStage.UNCOMPLETED);
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (crfStatus != null && crfStatus.equals("Data_Entry_Started"))
+                            if (crfStatus != null && crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
                             if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED) || studyEventBean
@@ -118,7 +118,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(ecb.getStage());
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (crfStatus != null && crfStatus.equals("Data_Entry_Started"))
+                            if (crfStatus != null && crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
                             importCrfInfo.setEventCRFID(new Integer(ecb.getId()));
                             if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())

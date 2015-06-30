@@ -289,7 +289,8 @@ public class DataImportService {
                     if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                         String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
 
-                        if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
+                        if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                                && eventCrfBean.getStatus().isAvailable()) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean);
                         } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
