@@ -252,6 +252,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			} else {
 				pDTO.setEmailAccount(email.trim());
+			//	System.out.println();
 				// Send Email thru Local Mail Server
 				execute(ExecutionMode.SAVE, ruleActionBean, pDTO);
 				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address from OC Mail Server :  " + pDTO.getEmailAccount() + ")");

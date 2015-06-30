@@ -2,14 +2,17 @@ package org.akaza.openclinica.logic.rulerunner;
 
 //import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.*;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -18,7 +21,9 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
 import javax.sql.DataSource;
+
 import java.util.List;
 
 /**
@@ -26,17 +31,33 @@ import java.util.List;
  * @author jnyayapathi
  *
  */
-public class BeanPropertyRuleRunner {
+public class BeanPropertyRuleRunner extends RuleRunner{
 	NotificationActionProcessor notificationActionProcessor;
+	StudyEventDAO studyEventDAO;
+	
+	public BeanPropertyRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
+		super(ds, contextPath, contextPath, mailSender);
+		// TODO Auto-generated constructor stub
+	}
 
-	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,Integer studySubjectBeanId,
+	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         int eventOrdinal, StudyEventChangeDetails changeDetails,Integer userId , JavaMailSenderImpl mailSender) 
+                         StudyEventChangeDetails changeDetails,Integer userId , JavaMailSenderImpl mailSender) 
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
-        	if (checkTargetMatch(eventOrdinal,ruleSet,changeDetails))
-        	{
+            for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
+               ruleSet.setTarget(expressionBean);
+                
+        	        StudyEventBean studyEvent =
+                    (StudyEventBean) getStudyEventDao(ds).findByPK(
+                            Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
+        
+        	        int eventOrdinal = studyEvent.getSampleOrdinal();
+        		    int studySubjectBeanId = studyEvent.getStudySubjectId();
+         
+     //   	if (checkTargetMatch(eventOrdinal,ruleSet,changeDetails))
+      //  	{
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) 
                 {
                     Object result = null;
@@ -59,7 +80,7 @@ public class BeanPropertyRuleRunner {
 	                        eow.setStudyBean(currentStudy);
 	                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 	                       // sw.stop();
-		                    //System.out.println(sw + "Result : " + result);
+		                    System.out.println( "Result : " + result);
 	                        // Actions
 	                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 	
@@ -73,13 +94,14 @@ public class BeanPropertyRuleRunner {
 	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
-	                    	osa.printStackTrace();
+	                   // 	osa.printStackTrace();
 	                        System.out.println("Something happeneing : " + osa.getMessage());
 	                        // TODO: report something useful
 	                    }
 	                }
 	            }
         	}
+          //  }
         }
     }
 	
@@ -107,4 +129,10 @@ public class BeanPropertyRuleRunner {
     	}
 		return result;
 	}
+
+	public StudyEventDAO getStudyEventDao(DataSource ds) {
+		return new StudyEventDAO(ds);
+	}
+
+	
 }

@@ -7,11 +7,15 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -41,6 +45,7 @@ import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.rule.action.RuleActionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -98,6 +103,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     // Jdbc based DAOs
     private StudyDAO studyDao;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
+    private StudySubjectDAO studySubjecdao;
     private CRFDAO crfDao;
     private CRFVersionDAO crfVersionDao;
 
@@ -308,15 +314,27 @@ public class RuleSetService implements RuleSetServiceInterface {
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.util.List, java.lang.Boolean,
      * org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
-    public List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub) {
+    public List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub , boolean jobTrigger) {
         ruleSets = filterByStatusEqualsAvailable(ruleSets);
         ruleSets = filterRuleSetsByStudyEventOrdinal(ruleSets, null);
+        if(jobTrigger) {
+        try {
+			ruleSets = filterRuleSetsByStudySubject(ruleSets);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        }
         ruleSets = filterRuleSetsByGroupOrdinal(ruleSets);
         RuleSetBulkRuleRunner ruleRunner = new RuleSetBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
+        System.out.println("in runRulesinBulk method");
         return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -493,7 +511,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSetBean;
     }
 
-    private ExpressionBean replaceSEDOrdinal(ExpressionBean targetExpression, StudyEventBean studyEvent) {
+    public ExpressionBean replaceSEDOrdinal(ExpressionBean targetExpression, StudyEventBean studyEvent) {
         ExpressionBean expression = new ExpressionBean(targetExpression.getContext(), targetExpression.getValue());
         expression.setValue(getExpressionService().replaceStudyEventDefinitionOIDWith(expression.getValue(), String.valueOf(studyEvent.getId())));
         return expression;
@@ -624,20 +642,60 @@ public class RuleSetService implements RuleSetServiceInterface {
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List)
      */
+    
+    @SuppressWarnings("unchecked")
+    public List<RuleSetBean> filterRuleSetsByStudySubject(List<RuleSetBean> ruleSets) throws NumberFormatException, ParseException {
+        for (RuleSetBean ruleSet : ruleSets) {
+            List<ExpressionBean> filteredExpressions = new ArrayList<ExpressionBean>();
+            if (ruleSet.getExpressions()!=null){
+            for (ExpressionBean expression : ruleSet.getExpressions()) {
+                String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expression.getValue());
+                  StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(Integer.valueOf(studyEventId));
+                  StudySubjectBean studySubject   = (StudySubjectBean) getStudySubjecdao().findByPK(studyEvent.getStudySubjectId());
+                
+                  
+                  if (doTriggerRule(ruleSet, studySubject)){
+                        ExpressionBean expBean = new ExpressionBean();
+                        expBean.setValue(expression.getValue());
+                        expBean.setContext(expression.getContext());
+                        filteredExpressions.add(expBean);
+                  }
+                
+             }
+            }
+            ruleSet.setExpressions(filteredExpressions);
+        }
+        logExpressions(ruleSets);
+        return ruleSets;
+    }
+    
+        
     @SuppressWarnings("unchecked")
     public List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, String crfVersionId) {
         ArrayList<RuleSetBean> validRuleSets = new ArrayList<RuleSetBean>();
         for (RuleSetBean ruleSetBean : ruleSets) {
+           
             String studyEventDefinitionOrdinal = getExpressionService().getStudyEventDefinitionOrdninalCurated(ruleSetBean.getTarget().getValue());
             String studyEventDefinitionOid = getExpressionService().getStudyEventDefenitionOid(ruleSetBean.getTarget().getValue());
+           
             String crfOrCrfVersionOid = getExpressionService().getCrfOid(ruleSetBean.getTarget().getValue());
             // whole expression is provided in target
             if (studyEventDefinitionOid != null && crfOrCrfVersionOid != null) {
+            	List<StudyEventBean> studyEvents =null;
+                if (crfOrCrfVersionOid.equals("STARTDATE") || crfOrCrfVersionOid.equals("STATUS")) {
+                   StudyEventDefinitionBean sedBean = getStudyEventDefinitionDao().findByOid(studyEventDefinitionOid);
+                
+                   studyEvents = (List<StudyEventBean>) getStudyEventDao().findAllByDefinition(sedBean.getId());
+                    logger.debug("studyEventDefinitionOrdinal {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEvents {}", new Object[] {
+                        studyEventDefinitionOrdinal, studyEventDefinitionOid, crfOrCrfVersionOid, studyEvents.size() });
+                	
+                }else{
 
-                List<StudyEventBean> studyEvents = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOid, crfOrCrfVersionOid);
+            	 studyEvents = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOid, crfOrCrfVersionOid);
                 logger.debug("studyEventDefinitionOrdinal {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEvents {}", new Object[] {
                     studyEventDefinitionOrdinal, studyEventDefinitionOid, crfOrCrfVersionOid, studyEvents.size() });
-
+                }
+                
                 if (studyEventDefinitionOrdinal.equals("") && studyEvents.size() > 0) {
                     for (StudyEventBean studyEvent : studyEvents) {
                         ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
@@ -645,11 +703,11 @@ public class RuleSetService implements RuleSetServiceInterface {
                     validRuleSets.add(ruleSetBean);
                 } else {
                     for (StudyEventBean studyEvent : studyEvents) {
-                        if (studyEventDefinitionOrdinal.equals(studyEvent.getSampleOrdinal())) {
+                        if (studyEventDefinitionOrdinal.equals(String.valueOf(studyEvent.getSampleOrdinal()))) {
                             ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
-                            validRuleSets.add(ruleSetBean);
                         }
                     }
+                    validRuleSets.add(ruleSetBean);
                 }
 
             } else { // partial expression is provided in target
@@ -788,7 +846,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         for (RuleSetBean ruleSetBean : ruleSets) {
             List<ExpressionBean> expressionsWithCorrectGroupOrdinal = new ArrayList<ExpressionBean>();
             for (ExpressionBean expression : ruleSetBean.getExpressions()) {
-                String studyEventId = getExpressionService().getStudyEventDefenitionOrdninalCurated(expression.getValue());
+                String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expression.getValue());
                 String itemOid = getExpressionService().getItemOid(expression.getValue());
                 String itemGroupOid = getExpressionService().getItemGroupOid(expression.getValue());
                 String groupOrdinal = getExpressionService().getGroupOrdninalCurated(expression.getValue());
@@ -1018,14 +1076,36 @@ public class RuleSetService implements RuleSetServiceInterface {
         this.dataSource = dataSource;
     }
 
-    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,
-            Integer studySubjectBeanId, Integer userId, Integer targetEventOrdinal,
-            StudyEventChangeDetails changeDetails) {
-    		BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner();
-    		ruleRunner.runRules(ruleSets,dataSource,  studySubjectBeanId,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),targetEventOrdinal,changeDetails,userId,mailSender);
+
+    public void runRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails) {	
+    	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+    	    ruleSets = (ArrayList<RuleSetBean>) filterByStatusEqualsAvailable(ruleSets);
+    	    ruleSets = (ArrayList<RuleSetBean>) filterRuleSetsByStudyEventOrdinal(ruleSets, null);
+    	    try {
+				ruleSets = (ArrayList<RuleSetBean>) filterRuleSetsByStudySubject(ruleSets);
+			} catch (NumberFormatException | ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+    		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
 }
 
-	public StudyEventDao getStudyEventDomainDao() {
+    public void runIndividualRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails , Integer studyEventOrdinal) {	
+    	ArrayList <RuleSetBean> ruleSetBeans = new ArrayList<>();
+    	
+    	for (RuleSetBean ruleSet : ruleSets){
+    	String studyEventDefinitionOrdinal = getExpressionService().getStudyEventDefinitionOrdninalCurated(ruleSet.getOriginalTarget().getValue()+".A.B");      
+        if (studyEventDefinitionOrdinal.equals("") || studyEventDefinitionOrdinal.equals(String.valueOf(studyEventOrdinal))) {
+        	ruleSetBeans.add(ruleSet);	
+          }
+    	}    	
+	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+ 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
+}
+
+    
+    public StudyEventDao getStudyEventDomainDao() {
 		return studyEventDomainDao;
 	}
 
@@ -1039,6 +1119,53 @@ public class RuleSetService implements RuleSetServiceInterface {
 
 	public void setStudyEventDefDomainDao(StudyEventDefinitionDao studyEventDefDomainDao) {
 		this.studyEventDefDomainDao = studyEventDefDomainDao;
+	}
+
+	public StudySubjectDAO getStudySubjecdao() {
+        return new StudySubjectDAO(dataSource);
+	}
+
+	public void setStudySubjecdao(StudySubjectDAO studySubjecdao) {
+		this.studySubjecdao = studySubjecdao;
+	}
+
+	public Boolean calculateTimezoneDiff(TimeZone serverZone, TimeZone ssZone, int runTime, int serverTime) {
+		int timeDifference = (serverZone.getRawOffset() + serverZone.getDSTSavings() - (ssZone.getRawOffset() + ssZone.getDSTSavings())) / (1000 * 60 * 60);
+		int newSetTime = runTime + timeDifference;
+		if (newSetTime > 23)
+			newSetTime = newSetTime - 24;
+		if (newSetTime < 0)
+			newSetTime = newSetTime + 24;
+		if (serverTime == newSetTime) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public Boolean doTriggerRule(RuleSetBean ruleSet , StudySubjectBean studySubject) throws NumberFormatException, ParseException{
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH");
+		Date now = new Date();
+		int serverTime = Integer.parseInt(dateFormat.format(now));
+
+		TimeZone serverZone = TimeZone.getDefault();
+
+		TimeZone ssZone;
+		int runTime = 20;
+		Boolean doTrigger = false;
+		if (ruleSet.getRunTime() != null)
+			runTime = Integer.parseInt(dateFormat.format(dateFormat.parse(ruleSet.getRunTime())));
+
+		String ssZoneId = studySubject.getTime_zone().trim();
+		if (!ssZoneId.equals("") ) {
+			ssZone = TimeZone.getTimeZone(ssZoneId);
+		} else {
+			ssZone = serverZone;
+		}
+
+		doTrigger = calculateTimezoneDiff(serverZone, ssZone, runTime, serverTime);
+		return doTrigger;
+
 	}
 
 

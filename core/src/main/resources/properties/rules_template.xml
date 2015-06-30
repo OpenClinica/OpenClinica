@@ -3,16 +3,17 @@
 		<Target Context="OC_RULES_V1"></Target>
 		<RunOnSchedule Time="17:00"/>
 		<RuleRef OID="">
-			<DiscrepancyNoteAction IfExpressionEvaluates="true">
+			<DiscrepancyNoteAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
                 <Message></Message>
 			</DiscrepancyNoteAction>
-			<EmailAction IfExpressionEvaluates="true">
+			<EmailAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
                 <Message></Message>
                 <To></To>
 			</EmailAction>
-			<NotificationAction IfExpressionEvaluates="true">
+			<NotificationAction IfExpressionEvaluates="">
+                <Message></Message>
                 <To></To>
                 <Subject></Subject>
                 <Message></Message>
@@ -22,13 +23,13 @@
                 <Message></Message>
 				<DestinationProperty OID=""/>
 			</ShowAction>			
-			<HideAction IfExpressionEvaluates="true">
+			<HideAction IfExpressionEvaluates="">
 				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
                 <Message></Message>
 				<DestinationProperty OID=""/>
 			</HideAction>
-			<InsertAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false"/>
+			<InsertAction IfExpressionEvaluates="">
+				<Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch=""/>
 				<DestinationProperty OID="" Value="">
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</DestinationProperty>

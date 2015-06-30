@@ -134,9 +134,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
 
         this.setTypeExpected(ind, TypeNames.DATE);
         ind++; // enrollment_date
-        this.setTypeExpected(ind, TypeNames.DATE);
+        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
         ind++; // date_created
-        this.setTypeExpected(ind, TypeNames.DATE);
+        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
         ind++; // date_updated
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // owner_id
@@ -144,12 +144,6 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++; // update_id
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // oc oid
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++;
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++;
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++;
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++;
 

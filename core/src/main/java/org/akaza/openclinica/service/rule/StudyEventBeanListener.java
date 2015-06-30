@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service.rule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -8,6 +9,8 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventJDBCBeanChanged;
@@ -45,18 +48,32 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	}
 	@Override
 	public void update(Listener lstnr) {
+		
 //	System.out.println("Triggering the rules based on event updates");
-	
-//		System.out.println("RuleSetDao"+ruleSetDao);
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
-
+		
+	if (studyEventBeanContainer.getChangeDetails().getStartDateChanged() || studyEventBeanContainer.getChangeDetails().getStatusChanged()){
+		
 		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();
-		Integer studySubjectId = studyEventBeanContainer.getEvent().getStudySubjectId();
+//		Integer studySubjectId = studyEventBeanContainer.getEvent().getStudySubjectId();
 		Integer userId = studyEventBeanContainer.getEvent().getUpdaterId();
 		Integer studyEventOrdinal = studyEventBeanContainer.getEvent().getSampleOrdinal();
 		if(userId==0) userId = studyEventBeanContainer.getEvent().getOwnerId();
-		getRuleSetService().runRulesInBeanProperty(createRuleSet(studyEventDefId),studySubjectId, userId, studyEventOrdinal, studyEventBeanContainer.getChangeDetails());
-		
+		StudyEventBean studyEvent = studyEventBeanContainer.getEvent();
+        
+		ArrayList<RuleSetBean> ruleSetBeans = new ArrayList();		
+		ArrayList<RuleSetBean> ruleSets = (ArrayList<RuleSetBean>) createRuleSet(studyEventDefId);
+		for (RuleSetBean ruleSet : ruleSets){
+			ExpressionBean eBean = new ExpressionBean();
+			eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
+			ruleSet.setTarget(eBean);
+			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEvent));
+			ruleSetBeans.add(ruleSet);
+			}
+
+
+			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails(), studyEventOrdinal);
+	}
 		
 	}
 	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {

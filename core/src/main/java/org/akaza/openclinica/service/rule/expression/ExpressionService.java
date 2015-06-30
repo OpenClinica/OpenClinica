@@ -233,7 +233,7 @@ public class ExpressionService {
     
     public String getSSZoneId(){
      Integer subjectId = expressionWrapper.getStudySubjectId();
-     System.out.print("  subjectId  " + subjectId + "  : ");
+     System.out.println("  subjectId  " + subjectId + "  : ");
      if(subjectId ==null) return null;     
      StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
        return ssBean.getTime_zone().trim();
@@ -274,7 +274,7 @@ public class ExpressionService {
             String studyEventDefinitionOrdinal = getStudyEventDefinitionOidOrdinalFromExpression(expression);
             studyEventDefinitionOrdinal = studyEventDefinitionOrdinal.equals("") ? "1" : studyEventDefinitionOrdinal;
             String studySubjectId = String.valueOf(studyEvent.getStudySubjectId());
-
+            System.out.println("studySubjectId:  "+ studySubjectId);
             logger.debug("ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
                     new Object[] { studyEvent.getId(), studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal, studySubjectId });
 
@@ -799,7 +799,7 @@ public class ExpressionService {
     public String replaceGroupOidOrdinalInExpression(String expression, Integer ordinal) {
         String replacement = getStudyEventDefinitionOidWithOrdinalFromExpression(expression) + SEPERATOR + getCrfOidFromExpression(expression) + SEPERATOR;
         if (ordinal == null) {
-            replacement += getItemGroupOidFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
+            replacement += getItemGroupOidWithOrdinalFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
         } else {
             replacement +=
                 getItemGroupOidFromExpression(expression) + OPENNIG_BRACKET + ordinal + CLOSING_BRACKET + SEPERATOR + getItemOidFromExpression(expression);

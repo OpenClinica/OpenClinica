@@ -3,6 +3,7 @@ package org.akaza.openclinica.dao.hibernate;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
+import org.springframework.transaction.annotation.Transactional;
 
 public class RuleActionRunLogDao extends AbstractDomainDao<RuleActionRunLogBean> {
 
@@ -11,6 +12,7 @@ public class RuleActionRunLogDao extends AbstractDomainDao<RuleActionRunLogBean>
         return RuleActionRunLogBean.class;
     }
 
+    @Transactional
     public Integer findCountByRuleActionRunLogBean(RuleActionRunLogBean ruleActionRunLog) {
         Long k =
             (Long) getCurrentSession().createCriteria(domainClass()).add(Example.create(ruleActionRunLog)).setProjection(Projections.rowCount()).list().get(0);

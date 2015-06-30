@@ -74,6 +74,7 @@ public class EmailActionProcessor implements ActionProcessor {
             helper.setText(body);
 
             mailSender.send(mimeMessage);
+            System.out.println("Sending Email thru Email Action");
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
             logger.error("Email could not be sent");
