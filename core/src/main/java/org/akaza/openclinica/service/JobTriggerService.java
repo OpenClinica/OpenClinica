@@ -124,7 +124,7 @@ public class JobTriggerService {
 					ruleSet.setTarget(eBean);
 					ruleSetBeans.add(ruleSet);
 		
-					ruleSetService.runRulesInBeanProperty(ruleSets ,1, studyEventChangeDetails);
+					ruleSetService.runRulesInBeanProperty(ruleSetBeans ,1, studyEventChangeDetails);
 
 				}
 			}
