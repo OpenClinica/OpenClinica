@@ -71,4 +71,15 @@ public class ReportController {
 
 	}
 
+	@RequestMapping(value = "/runtime", method = RequestMethod.POST)
+	public ResponseEntity<HashMap> getRunTime() throws Exception {
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		HashMap<String, Integer> map = new HashMap<>();
+	    System.out.println("I'm in rest call for RunTime");
+		int result = ruleSetService.getRunTimeWhenTimeIsNotSet();
+ 		map.put("result", result);
+	return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+
+	}
+
 }

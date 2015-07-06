@@ -17,7 +17,7 @@
 		<Target Context="OC_RULES_V1"></Target>
 		<!-- OpenClinica can run rules automatically every hour, on the hour. If 
 			you include this parameter these rules will run on the hour you specify (in 
-			24 hour format). If the time is left blank it will run at 23:00. If you do 
+			24 hour format). If the time is left blank it will run at 20:00. If you do 
 			not include the parameter, rules will run according to its parameters only 
 			and not automatically on a schedule. -->
 		<RunOnSchedule Time="17:00" />
