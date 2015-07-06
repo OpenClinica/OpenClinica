@@ -1143,6 +1143,11 @@ public class RuleSetService implements RuleSetServiceInterface {
 		}
 	}
 
+	public int getRunTimeWhenTimeIsNotSet(){		
+		return 20;
+	}
+	
+	
 	public Boolean doTriggerRule(RuleSetBean ruleSet , StudySubjectBean studySubject) throws NumberFormatException, ParseException{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH");
 		Date now = new Date();
@@ -1151,7 +1156,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 		TimeZone serverZone = TimeZone.getDefault();
 
 		TimeZone ssZone;
-		int runTime = 20;
+		int runTime = getRunTimeWhenTimeIsNotSet();
 		Boolean doTrigger = false;
 		if (ruleSet.getRunTime() != null)
 			runTime = Integer.parseInt(dateFormat.format(dateFormat.parse(ruleSet.getRunTime())));
