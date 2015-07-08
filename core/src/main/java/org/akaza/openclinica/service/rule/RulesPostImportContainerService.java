@@ -401,10 +401,7 @@ public class RulesPostImportContainerService {
       }  	
         if (ruleActionBean instanceof InsertActionBean) {
         	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
-        	//if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-            if (ruleActionBean.getRuleActionRun().getBatch() == true) {
-                ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
-            }
+
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
             InsertActionValidator insertActionValidator = getInsertActionValidator();
