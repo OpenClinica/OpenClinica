@@ -34,6 +34,7 @@ import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rule.RuleSetService;
@@ -51,6 +52,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -130,7 +132,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 
 		case SAVE: {
-			sendEmail(ruleActionBean, pDTO);
+			createMimeMessagePreparator(pDTO);
 			return null;
 		}
 		default:
@@ -138,6 +140,20 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 	}
 
+	
+	private void createMimeMessagePreparator(final ParticipantDTO pDTO){
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+            public void prepare(MimeMessage mimeMessage) throws Exception {
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
+                message.setFrom(EmailEngine.getAdminEmail());
+                message.setTo(pDTO.getEmailAccount());
+                message.setSubject(pDTO.getEmailSubject());
+                message.setText(pDTO.getMessage());
+            }
+        };
+        BulkEmailSenderService.addMimeMessage(preparator);
+    }
+	
 	private void sendEmail(RuleActionBean ruleAction, ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
 		logger.info("Sending email...");
