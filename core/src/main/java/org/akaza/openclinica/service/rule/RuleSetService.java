@@ -77,6 +77,7 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -99,6 +100,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     private RuleSetRuleDao ruleSetRuleDao;
     private JavaMailSenderImpl mailSender;
     // private RuleSetRuleDAO ruleSetRuleDao;
+    private BulkEmailSenderService bulkEmailSenderService;
 
     // Jdbc based DAOs
     private StudyDAO studyDao;
