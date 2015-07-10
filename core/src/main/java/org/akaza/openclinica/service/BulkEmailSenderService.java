@@ -24,18 +24,19 @@ public class BulkEmailSenderService {
     @Autowired
     private JavaMailSenderImpl mailSender;
 
-    private ConcurrentLinkedDeque<MimeMessagePreparator> deque = new ConcurrentLinkedDeque<MimeMessagePreparator>();
 
-    public void addMimeMessage(MimeMessagePreparator mimeMessage){
-        deque.add(mimeMessage);
+    private static ConcurrentLinkedDeque<MimeMessagePreparator> DEQUE = new ConcurrentLinkedDeque<MimeMessagePreparator>();
+
+    public static void addMimeMessage(MimeMessagePreparator mimeMessage){
+        DEQUE.add(mimeMessage);
     }
 
     @Scheduled(fixedDelay=120000)
     private void sendEmail(){
 
         ArrayList<MimeMessagePreparator> mimeMessages = new ArrayList<MimeMessagePreparator>();
-        System.out.println("Executing now..." +  mimeMessages.size() + " " + Thread.currentThread().getName() + " " + deque.size());
-        MimeMessagePreparator mimeMessage = deque.pollFirst();
+        System.out.println("Executing now..." +  mimeMessages.size() + " " + Thread.currentThread().getName() + " " + DEQUE.size());
+        MimeMessagePreparator mimeMessage = DEQUE.pollFirst();
 
         if(mimeMessage == null) {
             System.out.println("Nothing left to do getting out...");
@@ -44,18 +45,20 @@ public class BulkEmailSenderService {
 
         while(mimeMessage != null){
             mimeMessages.add(mimeMessage);
+            System.out.println("In while loop");
 
             if(mimeMessages.size() == 25){
                 System.out.println("I've reached my limit...");
                 break;
             }else{
-                mimeMessage = deque.pollFirst();
+                System.out.println("Else");
+                mimeMessage = DEQUE.pollFirst();
             }
-
         }
 
-        System.out.println("Sending email..." + mimeMessages.size());
+        System.out.println("Sending Boom email..." + mimeMessages.size());
         mailSender.send(mimeMessages.toArray(new MimeMessagePreparator[mimeMessages.size()]));
+        System.out.println("I think i sent my mail..." + mimeMessages.size());
         sendEmail();
 
     }
