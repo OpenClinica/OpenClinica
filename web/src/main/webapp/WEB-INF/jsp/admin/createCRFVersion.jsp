@@ -77,64 +77,56 @@
         <fmt:message key="create_CRF_version" bundle="${resworkflow}"/> <c:out value="${crfName}"/>
      </c:otherwise>
  </c:choose>
+
 </span>
 </h1>
 
 <script type="text/JavaScript" language="JavaScript">
-<!--
-function myCancel() {
+  <!--
+ function myCancel() {
+
     cancelButton=document.getElementById('cancel');
     if ( cancelButton != null) {
-        if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
-            window.location.href="ListCRF?module=" + "<c:out value="${module}"/>";
-            return true;
-        } else {
-            return false;
-        }
-    }
-    return true;
-}
+      if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
+       window.location.href="ListCRF?module=" + "<c:out value="${module}"/>";
+       return true;
+      } else {
+        return false;
+       }
+     }
+     return true;
+
+  }
+
 function submitform(){
     var crfUpload = document.getElementById('excel_file_path');
-	//Does the user browse or select a file or not
-    if (crfUpload.value =='' ) {
+    //Does the user browse or select a file or not
+    if (crfUpload.value =='' )
+    {
         alert("Select a file to upload!");
         return false;
     }
 }
-function submitXform(){
-    var xFormMediaUpload = document.getElementById('xform_media_file_path');
-    if (xFormMediaUpload.value =='' ) {
-        document.getElementById('xformSubmit').setAttribute("enctype","application/x-www-form-urlencoded");
-    } else {
-        document.getElementById('xformSubmit').setAttribute("enctype","multipart/form-data");
-    }
-}
-function toggleSectionDisplay(showDivId,hideDivId){
-    document.getElementById(hideDivId).setAttribute("class","crf-upload-div-hidden");
-    document.getElementById(showDivId).setAttribute("class","crf-upload-div");
-}
 
-//-->
+   //-->
 </script>
 
-<table cellpadding="0" cellspacing="0">
-  <tr>
-    <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xlsUpload','xformUpload')"><b><fmt:message key="xls_file_upload" bundle="${resword}"/></b></a></td>
-    <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xformUpload','xlsUpload')"><b><fmt:message key="xform_file_upload" bundle="${resword}"/></b></a></td>
-  </tr>
-</table>
+<p><fmt:message key="can_download_blank_CRF_excel" bundle="${restext}"/><a href="DownloadVersionSpreadSheet?template=1"><b><fmt:message key="here" bundle="${resword}"/></b></a>.</p>
 
-<div id="xlsUpload" class="crf-upload-div">
-<form action="CreateCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
-<div style="width: 800px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-<div class="crf-upload-padded-div"><fmt:message key="can_download_blank_CRF_excel" bundle="${restext}"/><a href="DownloadVersionSpreadSheet?template=1"><b><fmt:message key="here" bundle="${resword}"/></b></a>.</div>
-
-<div class="crf-upload-padded-div">
+<div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:12px;">
     <p><fmt:message key="openclinica_excel_support" bundle="${restext}"/></p>
-</div>
+
+ </div>
+
+<%--
+<p><fmt:message key="also_download_set_example_CRFs" bundle="${restext}"/><a href="http://www.openclinica.org/entities/entity_details.php?eid=151" target="_blank"><fmt:message key="here" bundle="${resword}"/></a>.</p>
+--%>
+
+
+
+<form action="CreateCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
+<div style="width: 400px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -164,46 +156,6 @@ function toggleSectionDisplay(showDivId,hideDivId){
 <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
 </tr></table>
 </form>
-
-</div>
-
-<div id="xformUpload" class="crf-upload-div-hidden">
-  <form id="xformSubmit" action="CreateXformCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
-    <div style="width: 800px">
-    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-        <div class="crf-upload-padded-div"><fmt:message key="xform_upload_instruction" bundle="${resword}"/></div> 
-        <div class="crf-upload-padded-div"><textarea class="crf-upload-padded-div" id="xformText" name="xformText" rows="40" cols="60"></textarea></div>
-        <br>
-        <div class="crf-upload-padded-div"><fmt:message key="xform_upload_media_instruction" bundle="${resword}"/></div>
-        <br>
-        <div class="textbox_center">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr>
-            <td class="formlabel"><fmt:message key="upload_media_files" bundle="${resword}"/>:</td>
-            <td><div class="formfieldFile_BG"><input type="file" name="media_file" id="xform_media_file_path" multiple></div>
-            <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
-          </tr>
-        </table>
-        </div>
-        <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-  
-    </div></div></div></div></div></div></div></div>
-    </div>
-
-    <br clear="all">
-    <table border="0" cellpadding="0" cellspacing="0">
-      <tr>
-        <td>
-          <input type="submit" onclick="return submitXform();" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
-        </td>
-        <td>
-          <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
-        </td>
-      </tr>
-    </table>
-    </form>
-</div>
-
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">
