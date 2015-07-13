@@ -125,14 +125,14 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	}
 
-	public RuleActionBean execute(ExecutionMode executionMode, RuleActionBean ruleActionBean, ParticipantDTO pDTO) {
+	public RuleActionBean execute(ExecutionMode executionMode, RuleActionBean ruleActionBean, ParticipantDTO pDTO , String email  ) {
 		switch (executionMode) {
 		case DRY_RUN: {
 			return ruleActionBean;
 		}
 
 		case SAVE: {
-			createMimeMessagePreparator(pDTO);
+			createMimeMessagePreparator(pDTO, email);
 			return null;
 		}
 		default:
@@ -141,12 +141,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	
-	private void createMimeMessagePreparator(final ParticipantDTO pDTO){
+	private void createMimeMessagePreparator(final ParticipantDTO pDTO, final String email){
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
                 message.setFrom(EmailEngine.getAdminEmail());
-                message.setTo(pDTO.getEmailAccount());
+                message.setTo(email);
                 message.setSubject(pDTO.getEmailSubject());
                 message.setText(pDTO.getMessage());
             }
@@ -270,7 +270,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				pDTO.setEmailAccount(email.trim());
 			//	System.out.println();
 				// Send Email thru Local Mail Server
-				execute(ExecutionMode.SAVE, ruleActionBean, pDTO);
+				execute(ExecutionMode.SAVE, ruleActionBean, pDTO , email.trim());
 				System.out.println(pDTO.getMessage() + "  (Email sent to Hard Coded email address from OC Mail Server :  " + pDTO.getEmailAccount() + ")");
 
 			}
