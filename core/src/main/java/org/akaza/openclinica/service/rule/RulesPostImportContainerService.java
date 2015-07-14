@@ -210,19 +210,24 @@ public class RulesPostImportContainerService {
                     ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
 
-                    if(ruleSetBean.getRunOnSchedule()!=null){ 
-                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
-                      if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
-                    	  //validate Time           isRunTimeValid
-                    	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
-                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
-                      }
-                      }else{ 
-                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);     // supposed to act like 23:00
-                      }	  
-                    }else{
-                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
-                  	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
+                    if (ruleSetBean.getRunTime() != null) {
+                        if (ruleSetBean.getRunOnSchedule() == null) {
+                            ruleSetBeanWrapper.getAuditableBean().setRunOnSchedule(new RunOnSchedule(ruleSetBean.getRunTime()));
+                        }
+                    }
+                    if (ruleSetBean.getRunOnSchedule() != null) {
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
+                        if (ruleSetBean.getRunOnSchedule().getRunTime() != null) {
+                            //validate Time           isRunTimeValid
+                            if (isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())) {
+                                ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
+                            }
+                        } else {
+                            ruleSetBeanWrapper.getAuditableBean().setRunTime(null);     // supposed to act like DEFAULT_TIME
+                        }
+                    } else {
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
+                        ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
                     }
 
                 }
