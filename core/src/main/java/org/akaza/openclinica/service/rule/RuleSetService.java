@@ -665,6 +665,8 @@ public class RuleSetService implements RuleSetServiceInterface {
                 
              }
             ruleSet.setExpressions(filteredExpressions);
+            }else{
+                ruleSet.setExpressions(filteredExpressions);
             }
         }
         logExpressions(ruleSets);
