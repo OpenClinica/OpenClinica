@@ -1,6 +1,7 @@
 package org.akaza.openclinica.web.pform;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -51,9 +53,13 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestTemplate;
 import org.akaza.openclinica.service.PformSubmissionService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -177,10 +183,11 @@ public class OpenRosaServices {
     @POST
     @Path("/{studyOID}/submission")
     @Produces(MediaType.APPLICATION_XML)
-    public String doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+    public Response doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
             @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
 
         String output = null;
+        Response.ResponseBuilder builder = Response.noContent();
         String studySubjectOid = null;
         Integer studyEventDefnId = null;
         Integer studyEventOrdinal = null;
@@ -193,7 +200,8 @@ public class OpenRosaServices {
                 LOGGER.warn("WARNING: This prototype doesn't support multipart content.");
             }
 
-            if (!mayProceedSubmission(studyOID)) return null;
+            if (!mayProceedSubmission(studyOID))
+                return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
@@ -201,7 +209,7 @@ public class OpenRosaServices {
             StudySubjectBean ssBean = ssdao.findByOid(userContext.get("studySubjectOID"));
 
             if (!mayProceedSubmission(studyOID, ssBean))
-                return null;
+                return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
 
             studySubjectOid = userContext.get("studySubjectOID");
             studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID"));
@@ -225,29 +233,29 @@ public class OpenRosaServices {
             cal.setTime(currentDate);
             SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
             format.setCalendar(cal);
-            response.setHeader("Date", format.format(currentDate));
-            response.setHeader("X-OpenRosa-Version", "1.0");
-            response.setContentType("text/xml; charset=utf-8");
-            response.setStatus(201);
+            builder.header("Date", format.format(currentDate));
+            builder.header("X-OpenRosa-Version", "1.0");
+            builder.type("text/xml; charset=utf-8");
 
             if (!errors.hasErrors()) {
 
-                output = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
+                builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
                 LOGGER.debug("Successful OpenRosa submission");
 
             } else {
                 LOGGER.error("Failed OpenRosa submission");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.flushBuffer();
+                return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
             }
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
-            return "<Error>" + e.getMessage() + "</Error>";
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
+        URI newURI = null;
         try {
+            newURI = new URI("");
             // Notify Participate of successful form submission.
             String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/submission";
             Submission submission = new Submission();
@@ -267,7 +275,7 @@ public class OpenRosaServices {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return output;
+        return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
     }
 
     @GET
@@ -374,13 +382,14 @@ public class OpenRosaServices {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
-        participantPortalRegistrar=new ParticipantPortalRegistrar();
-        String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-        String participateStatus = pStatus.getValue().toString();         // enabled , disabled
-        String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-        logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
-        System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        participantPortalRegistrar = new ParticipantPortalRegistrar();
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+                                                                                                      // PENDING ,
+                                                                                                      // INACTIVE
+        String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+        String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
+        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
             accessPermission = true;
         }
