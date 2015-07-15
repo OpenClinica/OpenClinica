@@ -1,17 +1,30 @@
 package org.akaza.openclinica.control.admin;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
@@ -19,33 +32,92 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
-        // TODO Auto-generated method stub
-        System.out.println("hello world");
+        // Retrieve submission data from multipart request
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        List<FileItem> items = upload.parseRequest(request);
 
-        FormProcessor fp = new FormProcessor(request);
-        // checks which module the requests are from
-        String module = fp.getString(MODULE);
+        CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
+        logger.debug("Found original CRF ID for new CRF Version:" + version.getCrfId());
 
-        System.out.println("Received an xform:");
-        System.out.println(fp.getString("xformText"));
+        CRFDAO crfDAO = new CRFDAO(sm.getDataSource());
+        CRFBean crf = null;
 
-        String dir = SQLInitServlet.getField("filePath");
-        if (!new File(dir).exists()) {
-            logger.debug("The filePath in datainfo.properties is invalid " + dir);
-            addPageMessage(resword.getString("the_filepath_you_defined"));
-            forwardPage(Page.CREATE_CRF_VERSION);
-            return;
+        // Retrieve CRFBean. Create one if it doesn't exist yet.
+        if (version.getCrfId() > 0) {
+            crf = (CRFBean) crfDAO.findByPK(version.getCrfId());
+        } else {
+            CRFBean newCRF = new CRFBean();
+            newCRF.setName(retrieveFormFieldValue(items, "crfName"));
+            newCRF.setDescription(retrieveFormFieldValue(items, "versionDescription"));
+            newCRF.setOwner(ub);
+            newCRF.setStatus(Status.AVAILABLE);
+            newCRF.setStudyId(currentStudy.getId());
+            crfDAO.create(newCRF);
+            crf = (CRFBean) crfDAO.findByName(newCRF.getName());
         }
-        // All the uploaded files will be saved in filePath/crf/original/
-        String theDir = dir + "crf" + File.separator + "original" + File.separator;
-        if (!new File(theDir).isDirectory()) {
-            new File(theDir).mkdirs();
-            logger.debug("Made the directory " + theDir);
-        }
 
-        List<File> theFiles = uploadHelper.returnFiles(request, context, theDir);
+        // Create new CRF Version
+        CRFVersionDAO versionDAO = new CRFVersionDAO(sm.getDataSource());
+        CRFVersionBean newCRFVersion = new CRFVersionBean();
+        newCRFVersion.setName(retrieveFormFieldValue(items, "versionName"));
+        newCRFVersion.setDescription(retrieveFormFieldValue(items, "versionDescription"));
+        newCRFVersion.setCrfId(crf.getId());
+        newCRFVersion.setOwner(ub);
+        newCRFVersion.setStatus(Status.AVAILABLE);
+        newCRFVersion.setRevisionNotes(retrieveFormFieldValue(items, "revisionNotes"));
+        newCRFVersion.setOid(versionDAO.getValidOid(new CRFVersionBean(), crf.getOid(), newCRFVersion.getName()));
+        newCRFVersion.setXform(retrieveFormFieldValue(items, "xformText"));
+        versionDAO.create(newCRFVersion);
+        // Save any media files uploaded with xform
+        saveAttachedMedia(items, crf, newCRFVersion);
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
+    }
+
+    private String retrieveFormFieldValue(List<FileItem> items, String fieldName) {
+        for (FileItem item : items) {
+            if (fieldName.equals(item.getFieldName()))
+                return item.getString();
+        }
+        logger.warn("Form field '" + fieldName + "' missing from xform submission.");
+        return "";
+    }
+
+    private void saveAttachedMedia(List<FileItem> items, CRFBean crf, CRFVersionBean newCRFVersion) {
+        boolean hasFiles = false;
+        for (FileItem item : items) {
+            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
+                hasFiles = true;
+        }
+
+        if (hasFiles) {
+            // Create the directory structure for saving the media
+            String dir = Utils.getCrfMediaFilePath(crf, newCRFVersion);
+            if (!new File(dir).exists()) {
+                new File(dir).mkdirs();
+                logger.debug("Made the directory " + dir);
+            }
+            // Save any media files
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+
+                    String fileName = item.getName();
+                    // Some browsers IE 6,7 getName returns the whole path
+                    int startIndex = fileName.lastIndexOf('\\');
+                    if (startIndex != -1) {
+                        fileName = fileName.substring(startIndex + 1, fileName.length());
+                    }
+
+                    File uploadedFile = new File(dir + File.separator + fileName);
+                    try {
+                        item.write(uploadedFile);
+                    } catch (Exception e) {
+                        throw new OpenClinicaSystemException(e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @Override

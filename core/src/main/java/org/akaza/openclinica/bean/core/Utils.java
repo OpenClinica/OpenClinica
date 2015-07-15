@@ -8,7 +8,9 @@
 
 package org.akaza.openclinica.bean.core;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
@@ -46,7 +48,7 @@ public class Utils {
 
     /**
      * This Method will compare the two Dates and return a String with number of years , weeks and days.
-     *
+     * 
      * @author Krikor Krumlian 10/20/2006
      * @param eventStartDate
      *            The event start date
@@ -117,29 +119,26 @@ public class Utils {
     }
 
     /**
-     * Convert string with from_pattern to string with to_pattern.
-     * Use SimpleDateFormat with no Locale parameter.
-     *
+     * Convert string with from_pattern to string with to_pattern. Use SimpleDateFormat with no Locale parameter.
+     * 
      * @param itemValue
      * @param from_pattern
      * @param to_pattern
      * @return
      */
-    //ywang 12-06-2007
+    // ywang 12-06-2007
     public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern) {
         return resolveItemDateValue(itemValue, from_pattern, to_pattern, null);
     }
 
-    public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern,
-            Locale locale) {
+    public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern, Locale locale) {
         return resolveItemDateValue(itemValue, from_pattern, to_pattern, locale);
     }
 
-    private static String resolveItemDateValue(String itemValue,
-            String from_pattern, String to_pattern, Locale locale) {
+    private static String resolveItemDateValue(String itemValue, String from_pattern, String to_pattern, Locale locale) {
         SimpleDateFormat sdf_from;
         SimpleDateFormat sdf_to;
-        if(locale == null) {
+        if (locale == null) {
             sdf_from = new SimpleDateFormat(from_pattern);
             sdf_to = new SimpleDateFormat(to_pattern);
         } else {
@@ -162,13 +161,13 @@ public class Utils {
 
     /**
      * Zip StringBuffer to a file
-     *
+     * 
      * @param fileName
      * @param filePath
      * @param content
-     *
+     * 
      */
-    //ywang (07-2008)
+    // ywang (07-2008)
     public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
         try {
             File dir = new File(filePath);
@@ -190,7 +189,7 @@ public class Utils {
 
     /**
      * age = the_year_of_controlDate - the_year_of_birthDate
-     *
+     * 
      * @param birthDate
      * @param controlDate
      * @return
@@ -229,6 +228,18 @@ public class Utils {
         return attachedFilePath;
     }
 
+    public static String getCrfMediaFilePath(CRFBean crf, CRFVersionBean version) {
+        String attachedFilePath = CoreResources.getField("attached_file_location");
+
+        if (attachedFilePath == null || attachedFilePath.length() <= 0) {
+            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + crf.getOid() + File.separator + version.getOid()
+                    + File.separator;
+        } else {
+            attachedFilePath += crf.getOid() + File.separator + version.getOid() + File.separator;
+        }
+        return attachedFilePath;
+    }
+
     public static String getAttachedFileRootPath() {
         String rootPath = CoreResources.getField("attached_file_location");
         if (rootPath == null || rootPath.length() <= 0) {
@@ -239,6 +250,7 @@ public class Utils {
 
     /*
      * see if a regular expression fits
+     * 
      * @author thickerson August 5th 2010
      */
     public static boolean isMatchingRegexp(String input, String regexp) {
