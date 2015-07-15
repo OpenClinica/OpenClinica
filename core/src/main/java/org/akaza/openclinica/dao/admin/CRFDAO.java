@@ -27,11 +27,11 @@ import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * the data access object for instruments in the database.
- *
+ * 
  * @author thickerson
- *
+ * 
  */
-public class CRFDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class CRFDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
 
@@ -87,6 +87,7 @@ public class CRFDAO<K extends String,V extends ArrayList> extends AuditableEntit
         variables.put(Integer.valueOf(3), cb.getDescription());
         variables.put(Integer.valueOf(4), Integer.valueOf(cb.getOwner().getId()));
         variables.put(Integer.valueOf(5), getValidOid(cb, cb.getName()));
+        variables.put(Integer.valueOf(6), cb.getStudyId());
         // am i the only one who runs their daos' unit tests after I change
         // things, tbh?
         this.execute(digester.getQuery("create"), variables);
@@ -365,7 +366,7 @@ public class CRFDAO<K extends String,V extends ArrayList> extends AuditableEntit
     }
 
     /**
-     *
+     * 
      * @param studySubjectId
      * @return
      */
