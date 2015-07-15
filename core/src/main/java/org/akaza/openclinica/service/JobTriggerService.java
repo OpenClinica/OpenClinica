@@ -100,7 +100,8 @@ public class JobTriggerService {
 		triggerJob();
 	}
 
-	public void triggerJob() throws NumberFormatException, ParseException {
+	public void triggerJob(){
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
 		for (RuleSetBean ruleSet : ruleSets) {
 			if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
