@@ -652,6 +652,42 @@ function updateThis(multiSelEle, count) {
         	</select>
 		    </td>
 		</tr>
+	        <c:choose>
+		    <c:when test="${participateFormStatus == 'enabled'}">
+		
+						<tr valign="top">		
+        <td class="table_cell" colspan="2">
+        <fmt:message key="participant_form" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.participantForm == true}">
+                <input type="checkbox" checked name="participantForm<c:out value="${num}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="participantForm<c:out value="${num}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="2">
+        <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.allowAnonymousSubmission == true}">
+                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="6">
+        <fmt:message key="submission_url" bundle="${resword}"/>:
+                <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
+    </td>
+     </c:when>  
+ </c:choose>
+  
+</tr>
+		
+		
 		<c:set var="count" value="${count+1}"/>
 		</c:if>
 		<tr><td class="table_divider" colspan="8">&nbsp;</td></tr>

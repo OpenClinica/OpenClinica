@@ -63,7 +63,7 @@
 
 <form action="DefineStudyEvent" method="post">
     <input type="hidden" name="actionName" value="confirm">
-    <div style="width: 600px">
+    <div style="width: 8	00px">
         <!-- These DIVs define shaded box borders -->
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -97,6 +97,7 @@
                                         </c:forEach>
                                 </select>
                             </td></tr>
+                            
                         <tr valign="top">
                             <td class="table_cell" colspan="1"><fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes"></td>
 
@@ -104,12 +105,16 @@
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
             <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
+            <td class="table_cell" colspan="1"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:<input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes"></td>
+            <td class="table_cell" colspan="1"><fmt:message key="submission_url" bundle="${resword}"/>:<input type="text" name="submissionUrl<c:out value="${count}"/>" value=""></td>
    </c:when>  
  </c:choose>
 
+                        </tr>
 
+                           <tr valign="top">
                     		
-                            <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
+                            <td class="table_cell" colspan="4"><fmt:message key="sdv_option" bundle="${resword}"/>:
 							    <select name="sdvOption<c:out value="${count}"/>">
 						        	<c:set var="index" value="1"/>
 						            <c:forEach var="sdv" items="${sdvOptions}">

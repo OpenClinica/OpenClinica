@@ -292,6 +292,9 @@ public class DefineStudyEventServlet extends SecureController {
             String decisionCondition = fp.getString("decisionCondition" + i);
             String electronicSignature = fp.getString("electronicSignature" + i);
             String participantForm = fp.getString("participantForm" + i);
+            String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
+            String submissionUrl = fp.getString("submissionUrl" + i);
+            
 
             // issue 312 BWP<<
             String hiddenCrf = fp.getString("hiddenCrf" + i);
@@ -315,6 +318,11 @@ public class DefineStudyEventServlet extends SecureController {
             } else {
                 edcBean.setParticipantForm(false);
             }
+            if (!StringUtils.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim())) {
+                edcBean.setAllowAnonymousSubmission(true);
+            } else {
+                edcBean.setAllowAnonymousSubmission(false);
+            }
             if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);
             } else {
@@ -331,7 +339,8 @@ public class DefineStudyEventServlet extends SecureController {
             } else {
                 edcBean.setElectronicSignature(false);
             }
-
+            edcBean.setSubmissionUrl(submissionUrl);
+            
             String nullString = "";
             // process null values
             ArrayList nulls = NullValue.toArrayList();

@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +98,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-
+        
         errors = v.validate();
 
         if (!errors.isEmpty()) {
@@ -133,7 +134,13 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     String hideCRF = fp.getString("hideCRF" + i);
                     int sdvId = fp.getInt("sdvOption" + i);
                     String participantForm = fp.getString("participantForm"+i);
+                    String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
+                    String submissionUrl = fp.getString("submissionUrl" + i);
 
+                    System.out.println("submission :"+ submissionUrl);
+                    
+                    
+                    
                     if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
                         edcBean.setHideCrf(true);
                     } else {
@@ -167,6 +174,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     } else {
                         edcBean.setParticipantForm(false);
                     }
+                    if (!StringUtils.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim())) {
+                        edcBean.setAllowAnonymousSubmission(true);
+                    } else {
+                        edcBean.setAllowAnonymousSubmission(false);
+                    }
+                    edcBean.setSubmissionUrl(submissionUrl);
 
                     String nullString = "";
                     // process null values

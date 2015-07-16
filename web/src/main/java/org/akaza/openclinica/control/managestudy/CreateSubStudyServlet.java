@@ -593,11 +593,16 @@ public class CreateSubStudyServlet extends SecureController {
 
     private void submitSiteEventDefinitions(StudyBean site) {
         FormProcessor fp = new FormProcessor(request);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
         HashMap<String, Boolean> changes = (HashMap<String, Boolean>) session.getAttribute("changed");
         for (StudyEventDefinitionBean sed : seds) {
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             for (EventDefinitionCRFBean edcBean : edcs) {

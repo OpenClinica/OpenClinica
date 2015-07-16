@@ -375,6 +375,9 @@
     <!-- <td valign="top" class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/></td>-->
     <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
+     <td valign="top" class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>
+     <td valign="top" class="table_header_row"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/></td>
+     <td valign="top" class="table_header_row"><fmt:message key="submission_url" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="selected_verions" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
@@ -441,6 +444,16 @@
    <td class="table_cell">
     <c:out value="${crf.hideCrf}"/>
    </td>
+   <td class="table_cell">
+    <c:out value="${crf.participantForm}"/>
+   </td>
+   <td class="table_cell">
+    <c:out value="${crf.allowAnonymousSubmission}"/>
+   </td>
+   <td class="table_cell">
+    <c:out value="${crf.submissionUrl}"/>
+   </td>
+   
    <td class="table_cell">
     <c:out value="${crf.nullValues}"/> &nbsp;
   </td>
