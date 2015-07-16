@@ -56,8 +56,8 @@ public class BeanPropertyRuleRunner extends RuleRunner{
         	        int eventOrdinal = studyEvent.getSampleOrdinal();
         		    int studySubjectBeanId = studyEvent.getStudySubjectId();
          
-     //   	if (checkTargetMatch(eventOrdinal,ruleSet,changeDetails))
-      //  	{
+        	if (checkTargetMatch(ruleSet,changeDetails))
+      	{
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) 
                 {
                     Object result = null;
@@ -101,11 +101,11 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                }
 	            }
         	}
-          //  }
+            }
         }
     }
 	
-	public boolean checkTargetMatch(Integer eventOrdinal, RuleSetBean ruleSet,StudyEventChangeDetails changeDetails)
+	public boolean checkTargetMatchOld(Integer eventOrdinal, RuleSetBean ruleSet,StudyEventChangeDetails changeDetails)
 	{
 		Boolean result = true;
     	String ruleOrdinal = null;
@@ -130,6 +130,23 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 		return result;
 	}
 
+	public boolean checkTargetMatch(RuleSetBean ruleSet,StudyEventChangeDetails changeDetails)
+	{
+		Boolean result = true;
+    	String targetProperty = ruleSet.getTarget().getValue().substring(ruleSet.getTarget().getValue().indexOf("."));
+
+    	//Compare Target rule property (STATUS or STARTDATE) to what has been changed in event.
+    	//Don't run rule if there isn't a match.
+
+    	if (targetProperty.equals(ExpressionService.STARTDATE+".A.B") && !changeDetails.getStartDateChanged()){
+    		result = false;
+    	}else if (targetProperty.equals(ExpressionService.STATUS+".A.B") && !changeDetails.getStatusChanged()){ 
+    		result = false;
+    	}
+		return result;
+	}
+
+	
 	public StudyEventDAO getStudyEventDao(DataSource ds) {
 		return new StudyEventDAO(ds);
 	}
