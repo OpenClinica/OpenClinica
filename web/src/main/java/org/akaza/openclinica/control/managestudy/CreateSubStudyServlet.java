@@ -627,6 +627,8 @@ public class CreateSubStudyServlet extends SecureController {
     }
 
     private ArrayList<StudyEventDefinitionBean> initDefinitions(StudyBean site) {
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -636,6 +638,9 @@ public class CreateSubStudyServlet extends SecureController {
         seds = sedDao.findAllByStudy(parentStudy);
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs =
                 (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, site.getId(), parentStudy.getId());

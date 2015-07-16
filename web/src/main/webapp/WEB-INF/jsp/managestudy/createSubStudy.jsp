@@ -531,7 +531,7 @@ function updateThis(multiSelEle, count) {
 		<c:forEach var="edc" items="${def.crfs}">
 		<c:set var="num" value="${count}-${edc.id}" />
 		<tr valign="top" bgcolor="#F5F5F5">
-		    <td class="table_header_column" colspan="3"><c:out value="${edc.crfName}"/></td>
+		    <td class="table_header_column" colspan="10"><c:out value="${edc.crfName}"/></td>
 		</tr>
 
 		<c:if test="${edc.status.id==1}">
@@ -652,18 +652,18 @@ function updateThis(multiSelEle, count) {
         	</select>
 		    </td>
 		</tr>
-	        <c:choose>
-		    <c:when test="${participateFormStatus == 'enabled'}">
-		
-						<tr valign="top">		
+   <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
+
+				<tr valign="top">		
         <td class="table_cell" colspan="2">
         <fmt:message key="participant_form" bundle="${resword}"/>:
         <c:choose>
             <c:when test="${edc.participantForm == true}">
-                <input type="checkbox" checked name="participantForm<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled checked name="participantForm<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="participantForm<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled name="participantForm<c:out value="${num}"/>" value="yes">
             </c:otherwise>
         </c:choose>
     </td>
@@ -671,10 +671,10 @@ function updateThis(multiSelEle, count) {
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
         <c:choose>
             <c:when test="${edc.allowAnonymousSubmission == true}">
-                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:otherwise>
         </c:choose>
     </td>
@@ -686,6 +686,7 @@ function updateThis(multiSelEle, count) {
  </c:choose>
   
 </tr>
+  
 		
 		
 		<c:set var="count" value="${count+1}"/>

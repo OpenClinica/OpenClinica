@@ -660,10 +660,10 @@ function updateThis(multiSelEle, count) {
         <fmt:message key="participant_form" bundle="${resword}"/>:
         <c:choose>
             <c:when test="${edc.participantForm == true}">
-                <input type="checkbox" checked name="participantForm<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled checked name="participantForm<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="participantForm<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled name="participantForm<c:out value="${num}"/>" value="yes">
             </c:otherwise>
         </c:choose>
     </td>
@@ -671,10 +671,10 @@ function updateThis(multiSelEle, count) {
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
         <c:choose>
             <c:when test="${edc.allowAnonymousSubmission == true}">
-                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+                <input type="checkbox" disabled name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:otherwise>
         </c:choose>
     </td>
