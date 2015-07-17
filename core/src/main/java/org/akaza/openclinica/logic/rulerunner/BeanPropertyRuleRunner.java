@@ -56,8 +56,8 @@ public class BeanPropertyRuleRunner extends RuleRunner{
         	        int eventOrdinal = studyEvent.getSampleOrdinal();
         		    int studySubjectBeanId = studyEvent.getStudySubjectId();
          
-        	if (checkTargetMatch(ruleSet,changeDetails))
-      	{
+   //     	if (checkTargetMatch(ruleSet,changeDetails))
+   //   	{
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) 
                 {
                     Object result = null;
@@ -100,7 +100,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                    }
 	                }
 	            }
-        	}
+   //     	}
             }
         }
     }
