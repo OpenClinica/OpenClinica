@@ -454,6 +454,8 @@ public class CreateSubStudyServlet extends SecureController {
 
     private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site) {
         FormProcessor fp = new FormProcessor(request);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         StudyBean parentStudy = (StudyBean) new StudyDAO(sm.getDataSource()).findByPK(site.getParentStudyId());
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
@@ -464,10 +466,23 @@ public class CreateSubStudyServlet extends SecureController {
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
         for (StudyEventDefinitionBean sed : seds) {
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             int start = 0;
             for (EventDefinitionCRFBean edcBean : edcs) {
+
+            	if (edcBean.getParentId()<1){
+                    edcBean.setParentParticipantForm(edcBean.isParticipantForm());
+                    edcBean.setParentAllowAnonymousSubmission(edcBean.isAllowAnonymousSubmission());
+                    }else{
+                    	  EventDefinitionCRFBean edc =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getParentId());
+                        edcBean.setParentParticipantForm(edc.isParticipantForm());
+                        edcBean.setParentAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
+                    }
+
                 int edcStatusId = edcBean.getStatus().getId();
                 if (edcStatusId == 5 || edcStatusId == 7) {
                 } else {
@@ -478,6 +493,10 @@ public class CreateSubStudyServlet extends SecureController {
                     String electronicSignature = fp.getString("electronicSignature" + order);
                     String hideCRF = fp.getString("hideCRF" + order);
                     int sdvId = fp.getInt("sdvOption" + order);
+                    String participantForm = fp.getString("participantForm"+order);
+                    String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + order);
+                    String submissionUrl = fp.getString("submissionUrl" + order);
+
                     ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
                     int selectedVersionIdListSize = selectedVersionIdList.size();
                     String selectedVersionIds = "";
@@ -493,6 +512,9 @@ public class CreateSubStudyServlet extends SecureController {
                     boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim()) ? true : false;
                     boolean hasPassword = !StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim()) ? true : false;
                     boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim()) ? true : false;
+                    boolean isParticpantForm = !StringUtil.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim()) ? true : false;
+                    boolean isAllowAnonymousSubmission = !StringUtil.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim()) ? true : false;
+
                     if (edcBean.getParentId() > 0) {
                         int dbDefaultVersionId = edcBean.getDefaultVersionId();
                         if (defaultVersionId != dbDefaultVersionId) {
@@ -517,6 +539,19 @@ public class CreateSubStudyServlet extends SecureController {
                             changed = true;
                             edcBean.setHideCrf(isHide);
                         }
+                        if (isParticpantForm != edcBean.isParticipantForm()) {
+                            changed = true;
+                            edcBean.setParticipantForm(isParticpantForm);
+                        }
+                        if (isAllowAnonymousSubmission != edcBean.isAllowAnonymousSubmission()) {
+                            changed = true;
+                            edcBean.setAllowAnonymousSubmission(isAllowAnonymousSubmission);
+                        }
+                        if (!submissionUrl.equals(edcBean.getSubmissionUrl())) {
+                            changed = true;
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+
                         if (!StringUtil.isBlank(selectedVersionIds) && !selectedVersionIds.equals(edcBean.getSelectedVersionIds())) {
                             changed = true;
                             String[] ids = selectedVersionIds.split(",");
@@ -540,6 +575,10 @@ public class CreateSubStudyServlet extends SecureController {
                                 if (isDouble == edcBean.isDoubleEntry()) {
                                     if (hasPassword == edcBean.isElectronicSignature()) {
                                         if (isHide == edcBean.isHideCrf()) {
+                                            if (isParticpantForm == edcBean.isParticipantForm()) {
+                                                if (isAllowAnonymousSubmission == edcBean.isAllowAnonymousSubmission()) {
+                                                    if (submissionUrl.equals(edcBean.getSubmissionUrl())) {
+
                                             if (selectedVersionIdListSize > 0) {
                                                 if (selectedVersionIdListSize == edcBean.getVersions().size()) {
                                                     if (sdvId > 0) {
@@ -558,6 +597,18 @@ public class CreateSubStudyServlet extends SecureController {
                                                     edcBean.setSelectedVersionIdList(idList);
                                                     edcBean.setSelectedVersionIds(selectedVersionIds);
                                                 }
+                                            }
+                                        } else {
+                                            changed = true;
+                                            edcBean.setSubmissionUrl(submissionUrl);
+                                        }
+                                                } else {
+                                                    changed = true;
+                                                    edcBean.setAllowAnonymousSubmission(isAllowAnonymousSubmission);
+                                                }
+                                            } else {
+                                                changed = true;
+                                                edcBean.setParticipantForm(isParticpantForm);;
                                             }
                                         } else {
                                             changed = true;
@@ -606,6 +657,16 @@ public class CreateSubStudyServlet extends SecureController {
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             for (EventDefinitionCRFBean edcBean : edcs) {
+           
+            	if (edcBean.getParentId()<1){
+                edcBean.setParentParticipantForm(edcBean.isParticipantForm());
+                edcBean.setParentAllowAnonymousSubmission(edcBean.isAllowAnonymousSubmission());
+                }else{
+                	  EventDefinitionCRFBean edc =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getParentId());
+                    edcBean.setParentParticipantForm(edc.isParticipantForm());
+                    edcBean.setParentAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
+                }
+
                 int edcStatusId = edcBean.getStatus().getId();
                 if (edcStatusId == 5 || edcStatusId == 7) {
                 } else {
@@ -647,6 +708,16 @@ public class CreateSubStudyServlet extends SecureController {
             ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
             // sed.setCrfNum(edcs.size());
             for (EventDefinitionCRFBean edcBean : edcs) {
+            	
+                if (edcBean.getParentId()<1){
+                edcBean.setParentParticipantForm(edcBean.isParticipantForm());
+                edcBean.setParentAllowAnonymousSubmission(edcBean.isAllowAnonymousSubmission());
+                }else{
+                	  EventDefinitionCRFBean edc =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getParentId());
+                    edcBean.setParentParticipantForm(edc.isParticipantForm());
+                    edcBean.setParentAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
+                }
+
                 int edcStatusId = edcBean.getStatus().getId();
                 CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
                 int crfStatusId = crf.getStatusId();

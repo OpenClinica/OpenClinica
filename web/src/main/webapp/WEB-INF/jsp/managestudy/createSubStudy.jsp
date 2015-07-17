@@ -652,14 +652,14 @@ function updateThis(multiSelEle, count) {
         	</select>
 		    </td>
 		</tr>
-   <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
+<c:choose>
+    <c:when test="${participateFormStatus == 'enabled' && edc.parentParticipantForm == true}">
 
 				<tr valign="top">		
         <td class="table_cell" colspan="2">
         <fmt:message key="participant_form" bundle="${resword}"/>:
         <c:choose>
-            <c:when test="${edc.participantForm == true}">
+            <c:when test="${edc.parentParticipantForm == true}">
                 <input type="checkbox" disabled checked name="participantForm<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
@@ -667,10 +667,15 @@ function updateThis(multiSelEle, count) {
             </c:otherwise>
         </c:choose>
     </td>
+         </c:when>  
+ </c:choose>
+   <c:choose>
+    <c:when test="${participateFormStatus == 'enabled' && edc.parentAllowAnonymousSubmission == true}">
+    
         <td class="table_cell" colspan="2">
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
         <c:choose>
-            <c:when test="${edc.allowAnonymousSubmission == true}">
+            <c:when test="${edc.parentAllowAnonymousSubmission == true}">
                 <input type="checkbox" disabled checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
@@ -681,13 +686,14 @@ function updateThis(multiSelEle, count) {
         <td class="table_cell" colspan="6">
         <fmt:message key="submission_url" bundle="${resword}"/>:
                 <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
-    </td>
+    </td>                                 
      </c:when>  
+            <c:otherwise>
+        <td class="table_cell" colspan="8"> </td>
+            </c:otherwise>
  </c:choose>
   
-</tr>
-  
-		
+</tr>		
 		
 		<c:set var="count" value="${count+1}"/>
 		</c:if>

@@ -179,7 +179,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     private boolean participantForm =false;
     private boolean allowAnonymousSubmission = false;
     private String submissionUrl;
-
+    private boolean parentParticipantForm = false;
+    private boolean parentAllowAnonymousSubmission = false;
+    
     //Not in db
     private String eventName;
 
@@ -608,6 +610,22 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setSubmissionUrl(String submissionUrl) {
 		this.submissionUrl = submissionUrl;
+	}
+
+	public boolean isParentParticipantForm() {
+		return parentParticipantForm;
+	}
+
+	public void setParentParticipantForm(boolean parentParticipantForm) {
+		this.parentParticipantForm = parentParticipantForm;
+	}
+
+	public boolean isParentAllowAnonymousSubmission() {
+		return parentAllowAnonymousSubmission;
+	}
+
+	public void setParentAllowAnonymousSubmission(boolean parentAllowAnonymousSubmission) {
+		this.parentAllowAnonymousSubmission = parentAllowAnonymousSubmission;
 	}
 
 
