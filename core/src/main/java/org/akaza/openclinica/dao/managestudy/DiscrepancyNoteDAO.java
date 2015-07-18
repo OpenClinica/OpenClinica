@@ -1437,7 +1437,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), Integer.valueOf(eb.getEntityId()));
         variables.put(Integer.valueOf(2), Integer.valueOf(eb.getId()));
         variables.put(Integer.valueOf(3), eb.getColumn());
-        variables.put(Integer.valueOf(4), eb.isActivated());
         String entityType = eb.getEntityType();
 
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -1449,6 +1448,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         } else if ("studyEvent".equalsIgnoreCase(entityType)) {
             this.execute(digester.getQuery("createStudyEventMap"), variables);
         } else if ("itemData".equalsIgnoreCase(entityType)) {
+            variables.put(Integer.valueOf(4), eb.isActivated());
             this.execute(digester.getQuery("createItemDataMap"), variables);
         }
 
