@@ -337,12 +337,8 @@ public class UpdateSubStudyServlet extends SecureController {
                     boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim()) ? true : false;
                     boolean hasPassword = !StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim()) ? true : false;
                     boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim()) ? true : false;
-               //     boolean isParticpantForm = !StringUtil.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim()) ? true : false;
-                //    boolean isAllowAnonymousSubmission = !StringUtil.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim()) ? true : false;
 
                     System.out.println("crf name :"+ edcBean.getCrfName());
-                //    System.out.println("participantForm: "+ isParticpantForm);
-                //    System.out.println("allowAnonymousSubmission: "+ isAllowAnonymousSubmission);
                     System.out.println("submissionUrl: "+ submissionUrl);
 
                     if (edcBean.getParentId() > 0) {
@@ -390,8 +386,6 @@ public class UpdateSubStudyServlet extends SecureController {
                         
                         
                         if (changed) {
-                     //   	edcBean.setParticipantForm(edcBean.isParticipantForm());
-                     //   	edcBean.setAllowAnonymousSubmission(isAllowAnonymousSubmission);
                             edcBean.setUpdater(ub);
                             edcBean.setUpdatedDate(new Date());
                             logger.debug("update for site");
@@ -447,8 +441,6 @@ public class UpdateSubStudyServlet extends SecureController {
                             edcBean.setDoubleEntry(isDouble);
                             edcBean.setElectronicSignature(hasPassword);
                             edcBean.setHideCrf(isHide);
-                 //           edcBean.setParticipantForm(isParticpantForm);
-                 //           edcBean.setAllowAnonymousSubmission(isAllowAnonymousSubmission);
                             edcBean.setSubmissionUrl(submissionUrl);
 
                             if (selectedVersionIdListSize > 0 && selectedVersionIdListSize != edcBean.getVersions().size()) {

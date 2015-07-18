@@ -504,8 +504,6 @@ public class CreateSubStudyServlet extends SecureController {
                     boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim()) ? true : false;
                     boolean hasPassword = !StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim()) ? true : false;
                     boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim()) ? true : false;
-             //       boolean isParticpantForm = !StringUtil.isBlank(participantForm) && "yes".equalsIgnoreCase(participantForm.trim()) ? true : false;
-             //       boolean isAllowAnonymousSubmission = !StringUtil.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim()) ? true : false;
 
                     if (edcBean.getParentId() > 0) {
                         int dbDefaultVersionId = edcBean.getDefaultVersionId();
@@ -693,14 +691,15 @@ public class CreateSubStudyServlet extends SecureController {
                     edcBean.setCrfName(crf.getName());
                     CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
                     edcBean.setDefaultVersionName(defaultVersion.getName());
+                    edcBean.setSubmissionUrl("");
 
-                    EventDefinitionCRFBean eBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
+/*                    EventDefinitionCRFBean eBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
                     if (eBean.isActive()){ 
                     	edcBean.setSubmissionUrl(eBean.getSubmissionUrl());
                     }else{
                         edcBean.setSubmissionUrl("");
                     }
-                    
+*/                    
                     String sversionIds = edcBean.getSelectedVersionIds();
                     ArrayList<Integer> idList = new ArrayList<Integer>();
                     if (sversionIds.length() > 0) {

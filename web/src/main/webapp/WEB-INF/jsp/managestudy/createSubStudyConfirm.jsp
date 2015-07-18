@@ -517,7 +517,7 @@
          </c:when>  
  </c:choose>
    <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.aAllowAnonymousSubmission == true}">
+    <c:when test="${participateFormStatus == 'enabled' && edc.allowAnonymousSubmission == true}">
     
         <td class="table_cell" colspan="2">
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:

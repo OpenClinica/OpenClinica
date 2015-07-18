@@ -138,7 +138,7 @@
     <c:out value="${crf.nullValues}"/>     
   </td>
   </tr>             
-  <tr><td class="table_divider" colspan="5">&nbsp;</td></tr>
+  <tr><td class="table_divider" colspan="8">&nbsp;</td></tr>
  </c:forEach>
  
  </table>

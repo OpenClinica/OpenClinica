@@ -136,6 +136,9 @@ public class ViewSiteServlet extends SecureController {
                     }
                     idNames = idNames.substring(0, idNames.length() - 1);
                 }
+                if(edcBean.getParentId()<1){
+                	edcBean.setSubmissionUrl("");
+                }
                 edcBean.setSelectedVersionIdList(idList);
                 edcBean.setSelectedVersionNames(idNames);
                 defCrfs.add(edcBean);

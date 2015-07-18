@@ -11,7 +11,8 @@
 	</query>
 	<query>
 		<name>findAllByDefinition</name>
-		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? order by ordinal asc</sql>
+		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? and parent_id is null order by ordinal asc
+</sql>
 	</query>
     <query>
         <name>findAllByStudy</name>
