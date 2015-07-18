@@ -217,6 +217,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
         ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
         StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
+        if (sed !=null)
         logger.info("Definition bean to be updated:" + sed.getName() + sed.getCategory());
 
         sed.setUpdater(ub);
@@ -235,6 +236,15 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 logger.info("version:" + edc.getDefaultVersionId());
                 logger.info("Electronic Signature [" + edc.isElectronicSignature() + "]");
                 cdao.update(edc);
+                
+                ArrayList <EventDefinitionCRFBean> eventDefCrfBeans = cdao.findAllByCrfDefinitionInSiteOnly(edc.getStudyEventDefinitionId(), edc.getCrfId());
+                for (EventDefinitionCRFBean eventDefCrfBean :eventDefCrfBeans){
+                	eventDefCrfBean.setParticipantForm(edc.isParticipantForm());
+                	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
+                	cdao.update(eventDefCrfBean);
+                }
+                
+                
 
                 if (edc.getStatus().equals(Status.DELETED)
                         || edc.getStatus().equals(Status.AUTO_DELETED)) {

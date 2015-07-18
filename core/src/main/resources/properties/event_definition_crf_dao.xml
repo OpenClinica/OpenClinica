@@ -22,6 +22,16 @@
 				order by edc.study_event_definition_id, edc.ordinal asc
         </sql>
     </query>
+    
+    <query>
+        <name>findAllByCrfDefinitionInSiteOnly</name>
+        <sql>SELECT edc.* FROM EVENT_DEFINITION_CRF edc 
+        WHERE study_event_definition_id=? AND crf_id=? AND parent_id is not Null
+        </sql>
+    </query>
+    
+    
+    
 	<query>
 		<name>findAllParentsByDefinition</name>
 		<!-- find all which have unavailable parent_id.

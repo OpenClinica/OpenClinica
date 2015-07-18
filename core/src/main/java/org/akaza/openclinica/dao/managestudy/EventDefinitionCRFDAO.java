@@ -224,6 +224,27 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return al;
     }
 
+    
+    public ArrayList<EventDefinitionCRFBean> findAllByCrfDefinitionInSiteOnly(int definitionId, int crfId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(definitionId));
+        variables.put(new Integer(2), new Integer(crfId));
+
+        String sql = digester.getQuery("findAllByCrfDefinitionInSiteOnly");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList <EventDefinitionCRFBean> al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+    
+    
+    
+    
     public Collection findAllByCRF(int crfId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

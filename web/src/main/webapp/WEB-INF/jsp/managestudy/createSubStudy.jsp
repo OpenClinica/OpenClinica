@@ -653,13 +653,13 @@ function updateThis(multiSelEle, count) {
 		    </td>
 		</tr>
 <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.parentParticipantForm == true}">
+    <c:when test="${participateFormStatus == 'enabled' && edc.participantForm == true}">
 
 				<tr valign="top">		
         <td class="table_cell" colspan="2">
         <fmt:message key="participant_form" bundle="${resword}"/>:
         <c:choose>
-            <c:when test="${edc.parentParticipantForm == true}">
+            <c:when test="${edc.participantForm == true}">
                 <input type="checkbox" disabled checked name="participantForm<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>
@@ -670,12 +670,12 @@ function updateThis(multiSelEle, count) {
          </c:when>  
  </c:choose>
    <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.parentAllowAnonymousSubmission == true}">
+    <c:when test="${participateFormStatus == 'enabled' && edc.allowAnonymousSubmission == true}">
     
         <td class="table_cell" colspan="2">
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
         <c:choose>
-            <c:when test="${edc.parentAllowAnonymousSubmission == true}">
+            <c:when test="${edc.allowAnonymousSubmission == true}">
                 <input type="checkbox" disabled checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
             </c:when>
             <c:otherwise>

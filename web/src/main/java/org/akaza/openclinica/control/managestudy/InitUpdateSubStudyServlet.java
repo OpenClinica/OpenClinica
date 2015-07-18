@@ -166,17 +166,17 @@ public class InitUpdateSubStudyServlet extends SecureController {
                     ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean.getCrfId());
                     edcBean.setVersions(versions);
                     edcBean.setCrfName(crf.getName());
+                    
+                    EventDefinitionCRFBean eBean =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
+                    if (eBean.isActive()){ 
+                    	edcBean.setSubmissionUrl(eBean.getSubmissionUrl());
+                    }else{
+                        edcBean.setSubmissionUrl("");
+                    }
+                    
                     CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
                     edcBean.setDefaultVersionName(defaultVersion.getName());
                     String sversionIds = edcBean.getSelectedVersionIds();
-                    if (edcBean.getParentId()<1){
-                    edcBean.setParentParticipantForm(edcBean.isParticipantForm());
-                    edcBean.setParentAllowAnonymousSubmission(edcBean.isAllowAnonymousSubmission());
-                    }else{
-                    	  EventDefinitionCRFBean edc =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getParentId());
-                        edcBean.setParentParticipantForm(edc.isParticipantForm());
-                        edcBean.setParentAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
-                    }
                     
                     ArrayList<Integer> idList = new ArrayList<Integer>();
                     if (sversionIds.length() > 0) {
