@@ -20,17 +20,23 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -494,7 +500,7 @@ public class DefineStudyEventServlet extends SecureController {
             sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
             sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
             request.setAttribute("sdvOptions", sdvOptions);
-
+            baseUrl(); 
             forwardPage(Page.DEFINE_STUDY_EVENT3);
         }
     }
@@ -547,6 +553,20 @@ public class DefineStudyEventServlet extends SecureController {
         session.removeAttribute("crfsWithVersion");
 
         addPageMessage(respage.getString("the_new_event_definition_created_succesfully"));
+
+    }
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
 
     }
 

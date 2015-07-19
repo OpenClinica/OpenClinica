@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,21 +95,8 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-/*        String portalURL = CoreResources.getField("portalURL");
-        URL pManageUrl = new URL(portalURL);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-
-     StudyBean studyBean = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId()); 
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-    Authorization pManageAuthorization = registrar.getAuthorization(studyBean.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
-    	
-    	System.out.println("the url :  "+ url);
-    	request.setAttribute("participantUrl",url);
-
-*/        StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+    	baseUrl();
+        StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("definition id: " + idString);
         if (StringUtil.isBlank(idString)) {
@@ -167,6 +155,21 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
     }
 
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
+
+    }
+    
     private HashMap processNullValues(EventDefinitionCRFBean edc) {
         HashMap flags = new LinkedHashMap();
         String s = "";// edc.getNullValues();

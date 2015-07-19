@@ -318,7 +318,7 @@
         </c:choose>
     </td>
         <td class="table_cell" colspan="2">
-        <fmt:message key="submission_url" bundle="${resword}"/>   ${participantUrl} :
+        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
                 <input type="text"  name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}"/>
     </td>
 

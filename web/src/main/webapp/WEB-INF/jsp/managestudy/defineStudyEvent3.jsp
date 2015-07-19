@@ -125,7 +125,7 @@
     <c:when test="${participateFormStatus == 'enabled'}">
             <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
             <td class="table_cell" colspan="1"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:<input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes"></td>
-            <td class="table_cell" colspan="2"><fmt:message key="submission_url" bundle="${resword}"/>:<input type="text" name="submissionUrl<c:out value="${count}"/>" value=""></td>
+            <td class="table_cell" colspan="2"><fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value=""></td>
    </c:when>  
  </c:choose>
 
