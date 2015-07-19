@@ -167,12 +167,8 @@ public class InitUpdateSubStudyServlet extends SecureController {
                     edcBean.setVersions(versions);
                     edcBean.setCrfName(crf.getName());
                     
-                    EventDefinitionCRFBean eBean =  (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
-                    if (eBean.isActive()){ 
-                    	edcBean.setSubmissionUrl(eBean.getSubmissionUrl());
-                    }else{
+                    if (edcBean.getParentId()==0)
                         edcBean.setSubmissionUrl("");
-                    }
                     
                     CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
                     edcBean.setDefaultVersionName(defaultVersion.getName());

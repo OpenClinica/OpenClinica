@@ -375,9 +375,14 @@
     <!-- <td valign="top" class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/></td>-->
     <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
+     <c:choose>
+   <c:when test="${participateFormStatus == 'enabled'}">     
      <td valign="top" class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="submission_url" bundle="${resword}"/></td>
+    </c:when>
+    </c:choose>
+     
      <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="selected_verions" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
@@ -444,15 +449,25 @@
    <td class="table_cell">
     <c:out value="${crf.hideCrf}"/>
    </td>
+   
+  <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
    <td class="table_cell">
-    <c:out value="${crf.participantForm}"/>
-   </td>
+     <c:choose>
+      <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+    </td>
    <td class="table_cell">
-    <c:out value="${crf.allowAnonymousSubmission}"/>
-   </td>
-   <td class="table_cell">
-    <c:out value="${crf.submissionUrl}"/>
-   </td>
+     <c:choose>
+      <c:when test="${crf.allowAnonymousSubmission == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+    </td>
+    <td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> 
+    
+   </c:when>  
+ </c:choose>
    
    <td class="table_cell">
     <c:out value="${crf.nullValues}"/> &nbsp;
