@@ -1741,25 +1741,14 @@ break;
 
     protected boolean isSpacesInSubmissionUrl(String fieldName) {
         String fieldValue = getFieldValue(fieldName);
-        if (fieldValue.contains(" ")) {
+        if (fieldValue.trim().contains(" ")) {
             return true;
         }
-
         return false;
     }
-
     
     protected boolean isSubmissionUrlUnique(String fieldName) {
-        String fieldValue = getFieldValue(fieldName);
-
-        if (fieldValue == null) {
             return true;
-        }
-        if (fieldValue.trim().equals("")) {
-            return true;
-        }
-
-        return false;
     }
 
     

@@ -39,6 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @author jxu
@@ -103,8 +104,26 @@ public class UpdateEventDefinitionServlet extends SecureController {
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-        v.addValidation("submissionUrl1", Validator.NO_SPACES_ALLOWED);
-        
+
+        ArrayList <EventDefinitionCRFBean>  edcsInSession = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("eventDefinitionCRFs");
+        int parentStudyId=sed.getStudyId();
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        ListIterator <EventDefinitionCRFBean> iter =(ListIterator<EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
+         
+                 
+        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        for (int i = 0; i < edcsInSession.size(); i++) {
+            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
+
+            	  while(iter.hasNext()){
+                if (iter.next().getSubmissionUrl().equals(edcsInSession.get(i).getSubmissionUrl())){
+            	   v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                }else{
+            		   iter.add(edcsInSession.get(i));   
+                }
+            }
+        }
+
         errors = v.validate();
 
         if (!errors.isEmpty()) {
@@ -123,7 +142,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
             session.setAttribute("definition", sed);
             ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
-            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
             for (int i = 0; i < edcs.size(); i++) {
                 EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
                 if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {
@@ -185,7 +203,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     } else {
                         edcBean.setAllowAnonymousSubmission(false);
                     }
-                    edcBean.setSubmissionUrl(submissionUrl);
+                    edcBean.setSubmissionUrl(submissionUrl.trim());
 
                     String nullString = "";
                     // process null values
