@@ -103,6 +103,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+        v.addValidation("submissionUrl1", Validator.NO_SPACES_ALLOWED);
         
         errors = v.validate();
 
