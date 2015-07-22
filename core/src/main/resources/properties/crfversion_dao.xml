@@ -35,8 +35,8 @@
 		<name>create</name>
 		<sql>INSERT INTO CRF_VERSION (CRF_ID, STATUS_ID, NAME,
 		DESCRIPTION, OWNER_ID,
-		DATE_CREATED, REVISION_NOTES) 
-		VALUES (?,?,?,?,?,NOW(),?)</sql>
+		DATE_CREATED, REVISION_NOTES, OC_OID, XFORM) 
+		VALUES (?,?,?,?,?,NOW(),?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
