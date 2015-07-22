@@ -398,15 +398,15 @@ public class UpdateEventDefinitionServlet extends SecureController {
             		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
             		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
             		System.out.println();
-            	if(sessionBean.getSubmissionUrl().equals("") || sessionBean.getSubmissionUrl() ==null){
+            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
-                if (eventDef.getSubmissionUrl().equals(sessionBean.getSubmissionUrl()) && (eventDef.getId() != sessionBean.getId())){
+                if (eventDef.getSubmissionUrl().trim().equals(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
                 	v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
                 	System.out.println("Duplicate ****************************");
                 	isExist = true;
             	   break;
-            	}else if(eventDef.getSubmissionUrl().equals(sessionBean.getSubmissionUrl()) && (eventDef.getId() == sessionBean.getId())){
+            	}else if(eventDef.getSubmissionUrl().trim().equals(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())){
                 	System.out.println("Not Duplicate  ***********");
                 	isExist = true;
             		break;

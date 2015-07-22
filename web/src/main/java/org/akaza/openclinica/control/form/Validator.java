@@ -1741,6 +1741,7 @@ break;
 
     protected boolean isSpacesInSubmissionUrl(String fieldName) {
         String fieldValue = getFieldValue(fieldName);
+        if (fieldValue ==null) return false; 
         if (fieldValue.trim().contains(" ")) {
             return true;
         }
