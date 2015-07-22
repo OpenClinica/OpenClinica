@@ -14,7 +14,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -162,22 +161,6 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public ListIterator findAllActiveSitesAndStudiesPerParentStudy(int parentStudyId) {
-        this.setTypesExpected();
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(parentStudyId));
-
-        String sql = digester.getQuery("findAllActiveSitesAndStudiesPerParentStudy");
-        ArrayList alist = this.select(sql, variables);
-        ListIterator al =  new ListIterator();
-        Iterator it = alist.iterator();
-        while (it.hasNext()) {
-            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
-            al.add(eb);
-        }
-        return al;
-    }
-    
     
     
     /**
@@ -262,7 +245,24 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     }
     
     
+    public ArrayList<EventDefinitionCRFBean> findAllActiveSitesAndStudiesPerParentStudy(int parentStudyId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(parentStudyId));
+        variables.put(new Integer(2), new Integer(parentStudyId));
+
+        String sql = digester.getQuery("findAllActiveSitesAndStudiesPerParentStudy");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList <EventDefinitionCRFBean> al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
     
+
     
     public Collection findAllByCRF(int crfId) {
         this.setTypesExpected();

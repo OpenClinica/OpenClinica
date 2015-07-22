@@ -261,6 +261,7 @@ public enum Page {
     DEFINE_STUDY_EVENT1 ("/WEB-INF/jsp/managestudy/defineStudyEvent1.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT2 ("/WEB-INF/jsp/managestudy/defineStudyEvent2.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT3 ("/WEB-INF/jsp/managestudy/defineStudyEvent3.jsp", "Define Study Event"),
+    DEFINE_STUDY_EVENT4 ("/WEB-INF/jsp/managestudy/defineStudyEvent4.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT_CONFIRM("/WEB-INF/jsp/managestudy/defineStudyEventConfirm.jsp", "Define Study Event Confirm"),
 
     /**

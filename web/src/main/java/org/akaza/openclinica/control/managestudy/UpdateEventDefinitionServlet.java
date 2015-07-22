@@ -21,6 +21,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -108,31 +109,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
         ArrayList <EventDefinitionCRFBean>  edcsInSession = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("eventDefinitionCRFs");
         int parentStudyId=sed.getStudyId();
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        ListIterator <EventDefinitionCRFBean> iter =(ListIterator<EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
+        ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
          
-                 
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-        for (int i = 0; i < edcsInSession.size(); i++) {
-            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
 
-            	  while(iter.hasNext()){
-                if (iter.next().getSubmissionUrl().equals(edcsInSession.get(i).getSubmissionUrl())){
-            	   v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                }else{
-            		   iter.add(edcsInSession.get(i));   
-                }
-            }
-        }
-
-        errors = v.validate();
-
-        if (!errors.isEmpty()) {
-            logger.info("has errors");
-            request.setAttribute("formMessages", errors);
-            forwardPage(Page.UPDATE_EVENT_DEFINITION1);
-
-        } else {
-            logger.info("no errors");
+         //   logger.info("no errors");
 
             sed.setName(fp.getString("name"));
             sed.setRepeating(fp.getBoolean("repeating"));
@@ -141,6 +121,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
             sed.setType(fp.getString("type"));
 
             session.setAttribute("definition", sed);
+            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
             ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
             for (int i = 0; i < edcs.size(); i++) {
                 EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
@@ -226,10 +207,22 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 }
 
             }
+            
+            validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
+            errors = v.validate();
+
+            if (!errors.isEmpty()) {
+                logger.info("has errors");
+                session.setAttribute("eventDefinitionCRFs", edcs);
+                request.setAttribute("formMessages", errors);
+                forwardPage(Page.UPDATE_EVENT_DEFINITION1);
+
+            } 
 
             session.setAttribute("eventDefinitionCRFs", edcs);
             forwardPage(Page.UPDATE_EVENT_DEFINITION_CONFIRM);
-        }
+        
+        
 
     }
 
@@ -394,4 +387,38 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     }
 
+    public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
+    	for (int i = 0; i < edcsInSession.size(); i++) {
+            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
+            EventDefinitionCRFBean sessionBean=null;
+            boolean isExist = false;
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
+            		  sessionBean = edcsInSession.get(i);
+            		 
+            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
+            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
+            		System.out.println();
+            	if(sessionBean.getSubmissionUrl().equals("") || sessionBean.getSubmissionUrl() ==null){
+            		break;
+            	}else{
+                if (eventDef.getSubmissionUrl().equals(sessionBean.getSubmissionUrl()) && (eventDef.getId() != sessionBean.getId())){
+                	v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                	System.out.println("Duplicate ****************************");
+                	isExist = true;
+            	   break;
+            	}else if(eventDef.getSubmissionUrl().equals(sessionBean.getSubmissionUrl()) && (eventDef.getId() == sessionBean.getId())){
+                	System.out.println("Not Duplicate  ***********");
+                	isExist = true;
+            		break;
+            	}
+            	  }
+            }
+            	if(!isExist){ 
+            		eventDefCrfList.add(sessionBean);
+            	}
+        }
+
+    }
+    
+    
 }

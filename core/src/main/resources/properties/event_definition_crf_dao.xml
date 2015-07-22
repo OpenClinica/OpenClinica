@@ -23,15 +23,6 @@
 				order by edc.study_event_definition_id, edc.ordinal asc
         </sql>
     </query>
-
-    <query>
-        <name>findAllActiveSitesAndStudiesPerParentStudy</name>
-        <sql> select edc.* from event_definition_crf edc where study_id in 
-        (select study_id from study where parent_study_id=? or study_id=?) 
-        and status_id=1 
-        </sql>
-    </query>
-
     <query>
         <name>findAllByCrfDefinitionInSiteOnly</name>
         <sql>SELECT edc.* FROM EVENT_DEFINITION_CRF edc 
@@ -39,6 +30,13 @@
         </sql>
     </query>
     
+    <query>
+        <name>findAllActiveSitesAndStudiesPerParentStudy</name>
+        <sql>select edc.* from event_definition_crf edc where edc.study_id in 
+        (select study_id from study s where s.parent_study_id=? or s.study_id=?) 
+        and edc.status_id=1 
+        </sql>
+    </query>
     
     
 	<query>
