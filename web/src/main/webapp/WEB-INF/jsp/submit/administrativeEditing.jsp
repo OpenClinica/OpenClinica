@@ -53,6 +53,7 @@
   TabsForwardByNum(<c:out value="${tabId}"/>); alert(self.screen.availWidth);
 margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
+<c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:10px;background-color: white; color:black;">
 
