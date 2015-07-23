@@ -670,7 +670,7 @@ function updateThis(multiSelEle, count) {
          </c:when>  
  </c:choose>
    <c:choose>
-    <c:when test="${participateFormStatus == 'enabled' && edc.allowAnonymousSubmission == true}">
+    <c:when test="${participateFormStatus == 'enabled' && edc.participantForm == true && edc.allowAnonymousSubmission == true}">
     
         <td class="table_cell" colspan="2">
         <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
@@ -687,7 +687,8 @@ function updateThis(multiSelEle, count) {
                 <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
           <c:set var="summary" value="submissionUrl${num}"/>
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-    
+          
+        </td>
      </c:when>  
             <c:otherwise>
         <td class="table_cell" colspan="8"> </td>

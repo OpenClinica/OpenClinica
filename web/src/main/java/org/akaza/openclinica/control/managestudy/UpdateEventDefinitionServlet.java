@@ -122,7 +122,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
             session.setAttribute("definition", sed);
             CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-            ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
+            ArrayList<EventDefinitionCRFBean> edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
             for (int i = 0; i < edcs.size(); i++) {
                 EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.get(i);
                 if (!edcBean.getStatus().equals(Status.DELETED) && !edcBean.getStatus().equals(Status.AUTO_DELETED)) {

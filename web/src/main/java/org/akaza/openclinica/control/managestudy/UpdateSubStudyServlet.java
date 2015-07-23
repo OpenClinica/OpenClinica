@@ -28,6 +28,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.fop.fo.properties.ToBeImplementedProperty;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -314,6 +315,9 @@ public class UpdateSubStudyServlet extends SecureController {
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyBean.getId());
 
+        ArrayList <EventDefinitionCRFBean> toBeCreatedEventDefBean = new ArrayList<>();
+        ArrayList <EventDefinitionCRFBean> toBeUpdatedEventDefBean = new ArrayList<>();
+    
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
         
         for (StudyEventDefinitionBean sed : seds) {
@@ -326,6 +330,7 @@ public class UpdateSubStudyServlet extends SecureController {
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             int start = 0;
             for (EventDefinitionCRFBean edcBean : edcs) {
+            	EventDefinitionCRFBean persistEventDefBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
                 int edcStatusId = edcBean.getStatus().getId();
                 if (edcStatusId == 5 || edcStatusId == 7) {
                 } else {
@@ -340,9 +345,6 @@ public class UpdateSubStudyServlet extends SecureController {
                     String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + order);
                     String submissionUrl = fp.getString("submissionUrl" + order);
 
-                    
-                    
-                    
                     
                     int sdvId = fp.getInt("sdvOption" + order);
                     ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
@@ -364,7 +366,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
                     System.out.println("crf name :"+ edcBean.getCrfName());
                     System.out.println("submissionUrl: "+ submissionUrl);
-
+                    
                     if (edcBean.getParentId() > 0) {
                         int dbDefaultVersionId = edcBean.getDefaultVersionId();
                         if (defaultVersionId != dbDefaultVersionId) {
@@ -389,7 +391,7 @@ public class UpdateSubStudyServlet extends SecureController {
                             changed = true;
                             edcBean.setHideCrf(isHide);
                         }
-                        if (!submissionUrl.equals(edcBean.getSubmissionUrl())) {
+                        if (!submissionUrl.equals(edcBean.getSubmissionUrl()) || !submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
                             changed = true;
                             edcBean.setSubmissionUrl(submissionUrl);
                         }
@@ -413,7 +415,8 @@ public class UpdateSubStudyServlet extends SecureController {
                             edcBean.setUpdater(ub);
                             edcBean.setUpdatedDate(new Date());
                             logger.debug("update for site");
-                            edcdao.update(edcBean);
+                            toBeUpdatedEventDefBean.add(edcBean);
+                         //   edcdao.update(edcBean);
                         }
                     } else {
                         // only if definition-crf has been modified, will it be
@@ -425,7 +428,7 @@ public class UpdateSubStudyServlet extends SecureController {
                                 if (isDouble == edcBean.isDoubleEntry()) {
                                     if (hasPassword == edcBean.isElectronicSignature()) {
                                         if (isHide == edcBean.isHideCrf()) {
-                                                    if (submissionUrl.equals(edcBean.getSubmissionUrl())) {
+                                                    if (submissionUrl.equals(edcBean.getSubmissionUrl()) && submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
 
                                             if (selectedVersionIdListSize > 0) {
                                                 if (selectedVersionIdListSize == edcBean.getVersions().size()) {
@@ -484,6 +487,7 @@ public class UpdateSubStudyServlet extends SecureController {
                             edcBean.setUpdater(ub);
                             edcBean.setUpdatedDate(new Date());
                             logger.debug("create for the site");
+                            toBeCreatedEventDefBean.add(edcBean);
                    //         edcdao.create(edcBean);
                         }
                     }
@@ -504,18 +508,16 @@ public class UpdateSubStudyServlet extends SecureController {
             session.setAttribute("definitions", seds);
             request.setAttribute("formMessages", errors);
             
-            logger.info("has validation errors");
-            fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-            fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-            fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-
-            setPresetValues(fp.getPresetValues());
-            request.setAttribute("formMessages", errors);
-            request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
-            request.setAttribute("statuses", Status.toStudyUpdateMembersList());
             forwardPage(Page.UPDATE_SUB_STUDY);
-
+        }else{  
+            for (EventDefinitionCRFBean toBeCreated: toBeCreatedEventDefBean){
+            	edcdao.create(toBeCreated);
+            }
+            for (EventDefinitionCRFBean toBeUpdated: toBeUpdatedEventDefBean){
+            	edcdao.update(toBeUpdated);
+            }
             
+        	
         } 
     }
 

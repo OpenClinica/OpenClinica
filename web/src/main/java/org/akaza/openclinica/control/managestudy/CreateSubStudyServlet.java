@@ -248,18 +248,19 @@ public class CreateSubStudyServlet extends SecureController {
         v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-        errors = v.validate();
+    //    errors = v.validate();
+
         // >> tbh
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+ /*       StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
         for (StudyBean thisBean : allStudies) {
             if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
-                Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
+                v.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
             }
         }
         // << tbh #3999 08/2009
         if (fp.getString("name").trim().length() > 100) {
-            Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+         //   Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
         }
         if (fp.getString("uniqueProId").trim().length() > 30) {
             Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
@@ -272,18 +273,19 @@ public class CreateSubStudyServlet extends SecureController {
         }
         if (fp.getInt("expectedTotalEnrollment") <= 0) {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
-        }
+        }*/
 
+    
         StudyBean newSite = this.createStudyBean();
         StudyBean parentStudy = (StudyBean) new StudyDAO(sm.getDataSource()).findByPK(newSite.getParentStudyId());
         session.setAttribute("newStudy", newSite);
-        session.setAttribute("definitions", this.createSiteEventDefinitions(parentStudy));
+        session.setAttribute("definitions", this.createSiteEventDefinitions(parentStudy,v));
 
         if (errors.isEmpty()) {
             logger.info("no errors");
             forwardPage(Page.CONFIRM_CREATE_SUB_STUDY);
 
-        } else {
+        }/* else {
             try {
                 local_df.parse(fp.getString(INPUT_START_DATE));
                 fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
@@ -310,7 +312,7 @@ public class CreateSubStudyServlet extends SecureController {
             request.setAttribute("statuses", Status.toActiveArrayList());
             forwardPage(Page.CREATE_SUB_STUDY);
         }
-
+*/
     }
 
     /**
@@ -457,9 +459,19 @@ public class CreateSubStudyServlet extends SecureController {
 
     }
 
-    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site) {
+    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site, Validator v) {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+
+        StudyBean parentStudyBean;
+        if (site.getParentStudyId()==0){
+        	parentStudyBean = site;
+        }else{
+            StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+             parentStudyBean = (StudyBean) studyDAO.findByPK(site.getParentStudyId());          	
+        }
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyBean.getId());
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         StudyBean parentStudy = (StudyBean) new StudyDAO(sm.getDataSource()).findByPK(site.getParentStudyId());
@@ -474,10 +486,11 @@ public class CreateSubStudyServlet extends SecureController {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
-            EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+         //   EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             int start = 0;
             for (EventDefinitionCRFBean edcBean : edcs) {
+            	EventDefinitionCRFBean persistEventDefBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
 
 
                 int edcStatusId = edcBean.getStatus().getId();
@@ -534,7 +547,7 @@ public class CreateSubStudyServlet extends SecureController {
                             changed = true;
                             edcBean.setHideCrf(isHide);
                         }
-                        if (!submissionUrl.equals(edcBean.getSubmissionUrl())) {
+                        if (!submissionUrl.equals(edcBean.getSubmissionUrl()) || !submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
                             changed = true;
                             edcBean.setSubmissionUrl(submissionUrl);
                         }
@@ -562,7 +575,7 @@ public class CreateSubStudyServlet extends SecureController {
                                 if (isDouble == edcBean.isDoubleEntry()) {
                                     if (hasPassword == edcBean.isElectronicSignature()) {
                                         if (isHide == edcBean.isHideCrf()) {
-                                            if (submissionUrl.equals(edcBean.getSubmissionUrl())) {
+                                            if (submissionUrl.equals(edcBean.getSubmissionUrl()) && submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
 
                                             if (selectedVersionIdListSize > 0) {
                                                 if (selectedVersionIdListSize == edcBean.getVersions().size()) {
@@ -621,7 +634,71 @@ public class CreateSubStudyServlet extends SecureController {
                     ++start;
                 }
             }
-        }
+            eventDefCrfList = validateSubmissionUrl(edcs,eventDefCrfList,v);
+
+
+       }
+       errors = v.validate();
+       StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+       ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
+       for (StudyBean thisBean : allStudies) {
+           if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
+               v.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
+           }
+       }
+       // << tbh #3999 08/2009
+       if (fp.getString("name").trim().length() > 100) {
+        //   Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
+       }
+       if (fp.getString("uniqueProId").trim().length() > 30) {
+           Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
+       }
+       if (fp.getString("description").trim().length() > 255) {
+           Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_255"));
+       }
+       if (fp.getString("prinInvestigator").trim().length() > 255) {
+           Validator.addError(errors, "prinInvestigator", resexception.getString("maximum_lenght_principal_investigator_255"));
+       }
+       if (fp.getInt("expectedTotalEnrollment") <= 0) {
+           Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
+       }
+
+       if (!errors.isEmpty()) {
+    //       logger.info("has errors");
+           StudyBean study = createStudyBean();
+           session.setAttribute("newStudy", study);
+           session.setAttribute("definitions", seds);
+           request.setAttribute("formMessages", errors);
+        /*   try {
+               local_df.parse(fp.getString(INPUT_START_DATE));
+               fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
+           } catch (ParseException pe) {
+               fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+           }
+           try {
+               local_df.parse(fp.getString(INPUT_END_DATE));
+               fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
+           } catch (ParseException pe) {
+               fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+           }
+           try {
+               local_df.parse(fp.getString(INPUT_VER_DATE));
+               fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
+           } catch (ParseException pe) {
+               fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+           }*/
+   //        setPresetValues(fp.getPresetValues());
+           logger.info("has validation errors");
+    //       request.setAttribute("formMessages", errors);
+           // request.setAttribute("facRecruitStatusMap",
+           // CreateStudyServlet.facRecruitStatusMap);
+     //      request.setAttribute("statuses", Status.toActiveArrayList());
+     //      forwardPage(Page.CREATE_SUB_STUDY);
+           
+           
+           forwardPage(Page.CREATE_SUB_STUDY);
+       }
+        
         session.setAttribute("changed", changes);
         return seds;
     }
@@ -756,5 +833,41 @@ public class CreateSubStudyServlet extends SecureController {
     	request.setAttribute("participantUrl",url+"/");
 
     }
+    
+
+    public ArrayList <EventDefinitionCRFBean> validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
+    	for (int i = 0; i < edcsInSession.size(); i++) {
+            String order = i + "-" + edcsInSession.get(i).getId();
+            v.addValidation("submissionUrl"+ order, Validator.NO_SPACES_ALLOWED);	
+            EventDefinitionCRFBean sessionBean=null;
+            boolean isExist = false;
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
+            		  sessionBean = edcsInSession.get(i);
+            		 
+            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
+            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
+            		System.out.println();
+            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
+            		break;
+            	}else{
+                if (eventDef.getSubmissionUrl().trim().equals(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
+                	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                	System.out.println("Duplicate ****************************");
+                	isExist = true;
+            	   break;
+            	}else if(eventDef.getSubmissionUrl().trim().equals(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())){
+                	System.out.println("Not Duplicate  ***********");
+                	isExist = true;
+            		break;
+            	}
+            	  }
+            }
+            	if(!isExist){ 
+            		eventDefCrfList.add(sessionBean);
+            	}
+        }
+    	return eventDefCrfList;
+    }
+    
 
 }
