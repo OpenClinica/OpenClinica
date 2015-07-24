@@ -80,4 +80,17 @@ public class PFormCache {
         subjectContextCache.put(hashOutput, contextMap);
         return hashOutput;
 	}
+	public String putAnnonymousFormContext(String studyOID,  String crfVersionOID)
+	{
+		HashMap<String,String> contextMap = new HashMap<String,String>();
+		contextMap.put("studyOID",studyOID);
+		contextMap.put("crfVersionOID", crfVersionOID);
+		
+		String hashString = studyOID + "." + crfVersionOID;
+	    ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
+        String hashOutput = encoder.encodePassword(hashString,null);
+        subjectContextCache.put(hashOutput, contextMap);
+        return hashOutput;
+	}
+
 }
