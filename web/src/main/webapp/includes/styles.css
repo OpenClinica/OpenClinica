@@ -1503,6 +1503,20 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	color: #789EC5 
 	}
 
+.normal_tab { background-image: url(../images/normal_tab.gif);
+    background-repeat: no-repeat;
+    background-position: top right;
+    border-style: solid;
+    border-width: 0px 0px 0px 0px;
+    border-color: #B2B2B2;
+    width: 160px;
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    background-color: #FFFFFF
+    }
+
 .background { background-image: url(../images/bgdots.gif);
 	background-repeat: repeat-y;
 	background-position: left;
@@ -2059,4 +2073,16 @@ margin: 2px;;
 	padding-bottom:10px;
 	padding-right:10px;
 	display:none;
+}
+.crf-upload-div {
+	display:inline;
+}
+
+.crf-upload-div-hidden {
+    display:none;
+}
+.crf-upload-padded-div {
+    padding-top:10px;
+    padding-left:17px;
+    padding-right:17px;
 }

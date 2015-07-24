@@ -10,8 +10,9 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
-@Transactional    
+@Transactional(propagation = Propagation.NEVER)
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
 
 	private ApplicationEventPublisher eventPublisher;

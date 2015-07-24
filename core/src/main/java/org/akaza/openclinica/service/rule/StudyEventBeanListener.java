@@ -15,6 +15,7 @@ import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventJDBCBeanChanged;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -52,7 +53,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 //	System.out.println("Triggering the rules based on event updates");
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
 		
-	if (studyEventBeanContainer.getChangeDetails().getStartDateChanged() || studyEventBeanContainer.getChangeDetails().getStatusChanged()){
+//	if (studyEventBeanContainer.getChangeDetails().getStartDateChanged() || studyEventBeanContainer.getChangeDetails().getStatusChanged()){
 		
 		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();
 //		Integer studySubjectId = studyEventBeanContainer.getEvent().getStudySubjectId();
@@ -61,19 +62,28 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 		if(userId==0) userId = studyEventBeanContainer.getEvent().getOwnerId();
 		StudyEventBean studyEvent = studyEventBeanContainer.getEvent();
         
-		ArrayList<RuleSetBean> ruleSetBeans = new ArrayList();		
+		
 		ArrayList<RuleSetBean> ruleSets = (ArrayList<RuleSetBean>) createRuleSet(studyEventDefId);
-		for (RuleSetBean ruleSet : ruleSets){
+		for (RuleSetBean ruleSet : ruleSets) {
+			ArrayList<RuleSetBean> ruleSetBeans = new ArrayList();		
 			ExpressionBean eBean = new ExpressionBean();
-			eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
+			eBean.setValue(ruleSet.getTarget().getValue() + ".A.B");
 			ruleSet.setTarget(eBean);
 			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEvent));
 			ruleSetBeans.add(ruleSet);
+
+			// for (RuleSetBean ruleSet : ruleSetBeans){
+			String targetProperty = ruleSet.getTarget().getValue().substring(ruleSet.getTarget().getValue().indexOf("."));
+
+			if ((targetProperty.contains(ExpressionService.STARTDATE + ".A.B") && studyEventBeanContainer.getChangeDetails().getStartDateChanged())
+					|| (targetProperty.contains(ExpressionService.STATUS + ".A.B") && studyEventBeanContainer.getChangeDetails().getStatusChanged())) {
+
+				getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails(), studyEventOrdinal);
 			}
-
-
-			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails(), studyEventOrdinal);
-	}
+		}
+//	}
+		
+	
 		
 	}
 	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {
