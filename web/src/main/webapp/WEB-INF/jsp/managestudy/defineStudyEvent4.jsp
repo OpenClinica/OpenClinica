@@ -41,6 +41,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
+<jsp:useBean scope='session' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
 <h1><span class="title_manage"><fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="selected_CRFs"  bundle="${resword}"/> - <fmt:message key="selected_default_version"  bundle="${resword}"/></span></h1>
 <script type="text/JavaScript" language="JavaScript">
     <!--
@@ -71,61 +72,138 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <c:set var="count" value="0"/>
 
-                    <c:forEach var ="crf" items="${definition.crfs}">
-                        <input type="hidden" name="crfId<c:out value="${count}"/>" value="<c:out value="${crf.id}"/>">
-                        <input type="hidden" name="crfName<c:out value="${count}"/>" value="<c:out value="${crf.name}"/>">
+                    <c:forEach var ="edc" items="${eventDefinitionCRFs}">
+                        <input type="hidden" name="crfId<c:out value="${count}"/>" value="<c:out value="${edc.crfId}"/>">
+                        <input type="hidden" name="crfName<c:out value="${count}"/>" value="<c:out value="${edc.name}"/>">
 
                         <tr valign="top" bgcolor="#F5F5F5">
-                            <td class="table_header_column" colspan="4"><c:out value="${crf.name}"/></td>
+                            <td class="table_header_column" colspan="4"><c:out value="${edc.name}"/></td>
                         </tr>
 
                         <tr valign="top">
 
-                            <td class="table_cell" colspan="1"><fmt:message key="required" bundle="${resword}"/>:<input type="checkbox" checked name="requiredCRF<c:out value="${count}"/>" value="yes"></td>
+    <td class="table_cell" colspan="1"><fmt:message key="required" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.requiredCRF == true}">
+                <input type="checkbox" checked name="requiredCRF<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="requiredCRF<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
 
-                            <td class="table_cell" colspan="1"><fmt:message key="double_data_entry" bundle="${resword}"/>:<input type="checkbox" name="doubleEntry<c:out value="${count}"/>" value="yes"></td>
+    <td class="table_cell" colspan="1"><fmt:message key="double_data_entry" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.doubleEntry == true}">
+                <c:set var="msg" value="You are choosing to have this CRF go through one pass of data entry instead of having it go through Double Data Entry. Before choosing this option, ensure that all Subject`s who have data entry for this CRF are not in one of the following 2 phases:\n\n1. The event CRF is in a status of Double Data Entry Started\n2. The event CRF is in a status of Initial Data Entry Completed.\n\nIf the CRFs are in one of those two phases, data entry will not be allowed to continue. You will have to change the configuration back to Double Data Entry.\n\nSelect OK to remove the DDE configuration. Select Cancel to keep the DDE configuration."/>
+                <input type="checkbox" onclick="javascript:return confirm('<c:out value="${msg}"/>');" checked name="doubleEntry<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="doubleEntry<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
 
-                            <td class="table_cell" colspan="1"><fmt:message key="password_required" bundle="${resword}"/>:<input type="checkbox" name="electronicSignature<c:out value="${count}"/>" value="yes"></td>
+    <td class="table_cell" colspan="1"><fmt:message key="password_required" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.electronicSignature == true}">
+                <input type="checkbox" checked name="electronicSignature<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="electronicSignature<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
 
                                 <%-- <td class="table_cell"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/>:<input type="checkbox" name="decisionCondition<c:out value="${count}"/>"  checked value="yes"></td>--%>
 
-                            <td class="table_cell" colspan="1"><fmt:message key="default_version" bundle="${resword}"/>:
+    <td class="table_cell" colspan="1"><fmt:message key="default_version" bundle="${resword}"/>:
+        <select name="defaultVersionId<c:out value="${count}"/>">
+            <c:forEach var="version" items="${edc.versions}">
+            <c:choose>
+            <c:when test="${edc.defaultVersionId == version.id}">
+            <option value="<c:out value="${version.id}"/>" selected><c:out value="${version.name}"/>
+                </c:when>
+                <c:otherwise>
+            <option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
+                </c:otherwise>
+                </c:choose>
+                </c:forEach>
+        </select>
+    </td>
+    </tr>
+    
+    
+<tr valign="top">
+    <td class="table_cell" colspan="1">
+        <fmt:message key="hidden_crf" bundle="${resword}"/>:
 
-                                <select name="defaultVersionId<c:out value="${count}"/>">
-                                    <c:forEach var="version" items="${crf.versions}">
-                                    <option value="<c:out value="${version.id}"/>"><c:out value="${version.name}"/>
-                                        </c:forEach>
-                                </select>
-                            </td></tr>
-                            
-                        <tr valign="top">
-                            <td class="table_cell" colspan="1"><fmt:message key="hidden_crf" bundle="${resword}"/>:<input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes"></td>
-
-
-                            <td class="table_cell" colspan="3"><fmt:message key="sdv_option" bundle="${resword}"/>:
-							    <select name="sdvOption<c:out value="${count}"/>">
-						        	<c:set var="index" value="1"/>
-						            <c:forEach var="sdv" items="${sdvOptions}">
-						            	<c:choose>
-						            	<c:when test="${index == 3}">
-						            		<option value="${index}" selected><c:out value="${sdv}"/>
-						                </c:when>
-						                <c:otherwise>
-						            		<option value="${index}"><c:out value="${sdv}"/>
-						                </c:otherwise>
-						                </c:choose>
-						            	<c:set var="index" value="${index+1}"/>
-						            </c:forEach>
-					        	</select>
-							    </td>                      
-                        </tr>
-
+        <c:choose>
+            <c:when test="${edc.hideCrf == true}">
+                <input type="checkbox" checked name="hiddenCrf<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="hiddenCrf<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        
+    </td>
+ 
+     <td class="table_cell" colspan="3"><fmt:message key="sdv_option" bundle="${resword}"/>:
+		    <select name="sdvOption<c:out value="${count}"/>">
+	        	<c:set var="index" value="1"/>
+	            <c:forEach var="sdv" items="${sdvOptions}">
+	            	<c:choose>
+	            	<c:when test="${edc.sourceDataVerification.code == index}">
+	            		<option value="${index}" selected><c:out value="${sdv}"/>
+	                </c:when>
+	                <c:otherwise>
+	            		<option value="${index}"><c:out value="${sdv}"/>
+	                </c:otherwise>
+	                </c:choose>
+	            	<c:set var="index" value="${index+1}"/>
+	            </c:forEach>
+        	</select>
+		    </td>
+ 
+ 
+  
+</tr>
                            <tr valign="top">
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
-            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes"></td>
-            <td class="table_cell" colspan="1"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:<input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes"></td>
-            <td class="table_cell" colspan="2"><fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value=""></td>
+ 
+        <td class="table_cell" colspan="1">
+        <fmt:message key="participant_form" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.participantForm == true}">
+                <input type="checkbox" checked name="participantForm<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="1">
+        <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.allowAnonymousSubmission == true}">
+                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="2">
+        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
+                <input type="text"  name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}"/>
+          <c:set var="summary" value="submissionUrl${count}"/>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+                
+    </td>
    </c:when>  
  </c:choose>
 
