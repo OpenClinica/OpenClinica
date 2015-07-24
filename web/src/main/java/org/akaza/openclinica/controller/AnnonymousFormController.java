@@ -54,14 +54,8 @@ public class AnnonymousFormController {
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	public static final String INPUT_EMAIL = "";
-	public static final String INPUT_INSTITUTION = "PFORM";
 	UserAccountDAO udao;
 	StudyDAO sdao;
-	StudySubjectDAO ssdao;
-	UserDTO uDTO;
-	AuthoritiesDao authoritiesDao;
-	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	@RequestMapping(value = "/enketoform", method = RequestMethod.POST)
 	public ResponseEntity<String> getEnketoForm(@RequestBody HashMap<String, String> map) throws Exception {
