@@ -159,8 +159,17 @@ public class OpenRosaServices {
         }
 
         try {
-            OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
-            xform = generator.buildForm(formId);
+
+            CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
+            CRFVersionBean crfVersion = versionDAO.findByOid(formId);
+
+            if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
+                xform = crfVersion.getXform();
+            else {
+
+                OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
+                xform = generator.buildForm(formId);
+            }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -193,7 +202,8 @@ public class OpenRosaServices {
                 LOGGER.warn("WARNING: This prototype doesn't support multipart content.");
             }
 
-            if (!mayProceedSubmission(studyOID)) return null;
+            if (!mayProceedSubmission(studyOID))
+                return null;
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
@@ -374,13 +384,15 @@ public class OpenRosaServices {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(),"participantPortal");
-        participantPortalRegistrar=new ParticipantPortalRegistrar();
-        String pManageStatus =participantPortalRegistrar.getRegistrationStatus(studyOid).toString();   // ACTIVE , PENDING , INACTIVE
-        String participateStatus = pStatus.getValue().toString();         // enabled , disabled
-        String studyStatus = study.getStatus().getName().toString();      // available , pending , frozen , locked
-        logger.info("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
-        System.out.println("pManageStatus: "+ pManageStatus + "  participantStatus: " + participateStatus+ "   studyStatus: " + studyStatus );
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        participantPortalRegistrar = new ParticipantPortalRegistrar();
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+                                                                                                      // PENDING ,
+                                                                                                      // INACTIVE
+        String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+        String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
+        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
             accessPermission = true;
         }

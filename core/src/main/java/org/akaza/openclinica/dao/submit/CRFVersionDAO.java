@@ -156,6 +156,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         eb.setCrfId(((Integer) hm.get("crf_id")).intValue());
         eb.setRevisionNotes((String) hm.get("revision_notes"));
         eb.setOid((String) hm.get("oc_oid"));
+        eb.setXform((String) hm.get("xform"));
         return eb;
     }
 
