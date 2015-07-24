@@ -14,7 +14,5 @@ OpenClinica-web.iml
 OpenClinica-ws.iml
 core/src/main/resources/logback-test.xml
 web/src/main/resources/datainfo.properties
-core/*.iml
-web/*.iml
-ws/*.iml
+*.iml?
 core/src/main/resources/logback-test.xml
