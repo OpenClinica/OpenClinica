@@ -221,13 +221,23 @@ public class OpenRosaServices {
             StringWriter writer = new StringWriter();
             String body = IOUtils.toString(request.getInputStream(), "UTF-8");
 
-            body = body.substring(body.indexOf("<F_"));
-            int length = body.indexOf(" ");
-            body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
-            body = body.substring(0, body.indexOf("</F_") + length + 2);
-            body = "<instance>" + body + "</instance>";
+            CRFVersionBean crfVersion = crfvdao.findByOid(crfVersionOID);
+            if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")) {
+                body = body.substring(body.indexOf("<" + crfVersion.getXformName()));
+                int length = body.indexOf(" ");
+                body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
+                body = body.substring(0, body.indexOf("</" + crfVersion.getXformName()) + length + 2);
+                body = "<instance>" + body + "</instance>";
+            } else {
+                body = body.substring(body.indexOf("<F_"));
+                int length = body.indexOf(" ");
+                body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
+                body = body.substring(0, body.indexOf("</F_") + length + 2);
+                body = "<instance>" + body + "</instance>";
+            }
 
-            Errors errors = getPformSubmissionService().saveProcess(body, studySubjectOid, studyEventDefnId, studyEventOrdinal);
+            Errors errors = getPformSubmissionService().saveProcess(body, studySubjectOid, studyEventDefnId, studyEventOrdinal,
+                    crfvdao.findByOid(crfVersionOID));
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));

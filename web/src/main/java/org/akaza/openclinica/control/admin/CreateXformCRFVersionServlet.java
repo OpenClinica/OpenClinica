@@ -161,6 +161,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
             XformContainer container = new XformContainer();
             container.setGroups(groups);
+            container.setInstanceName(form.getTagName());
             return container;
         } catch (Exception e) {
             logger.error(e.getMessage());

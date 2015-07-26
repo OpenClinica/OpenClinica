@@ -137,6 +137,7 @@ public class XformMetaDataService {
         crfVersion.setRevisionNotes(submittedRevisionNotes);
         crfVersion.setOcOid(oldCRFVersionDAO.getValidOid(new CRFVersionBean(), crf.getOcOid(), crfVersion.getName()));
         crfVersion.setXform(submittedXformText);
+        crfVersion.setXformName(container.getInstanceName());
         crfVersionDao.saveOrUpdate(crfVersion);
         crfVersion = crfVersionDao.findByOcOID(crfVersion.getOcOid());
 
