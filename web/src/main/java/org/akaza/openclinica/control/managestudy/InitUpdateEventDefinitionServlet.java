@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -95,7 +96,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-    	baseUrl();
+
         StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("definition id: " + idString);
@@ -108,6 +109,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+              if (participateFormStatus.equals("enabled"))        	baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             if (currentStudy.getId() != sed.getStudyId()) {
@@ -158,9 +160,8 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
     private void baseUrl() throws MalformedURLException{
     	String portalURL = CoreResources.getField("portalURL");
         URL pManageUrl = new URL(portalURL);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();    
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
          String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");

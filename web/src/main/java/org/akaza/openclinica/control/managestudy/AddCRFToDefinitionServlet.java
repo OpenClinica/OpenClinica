@@ -60,7 +60,6 @@ public class AddCRFToDefinitionServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-    	baseUrl();
         String actionName = request.getParameter("actionName");
         String submit = request.getParameter("Submit");
 
@@ -232,6 +231,8 @@ public class AddCRFToDefinitionServlet extends SecureController {
 
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            if (participateFormStatus.equals("enabled")) baseUrl();
+            
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             ArrayList edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
