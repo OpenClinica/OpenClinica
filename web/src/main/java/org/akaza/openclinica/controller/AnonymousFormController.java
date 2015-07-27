@@ -40,9 +40,9 @@ import java.util.HashMap;
 import java.util.Locale;
 
 @Controller
-@RequestMapping(value = "/annonymousform")
+@RequestMapping(value = "/api/v1/anonymousform")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-public class AnnonymousFormController {
+public class AnonymousFormController {
 
 	@Autowired
 	@Qualifier("dataSource")
@@ -57,7 +57,7 @@ public class AnnonymousFormController {
 	UserAccountDAO udao;
 	StudyDAO sdao;
 
-	@RequestMapping(value = "/enketoform", method = RequestMethod.POST)
+	@RequestMapping(value = "/form", method = RequestMethod.POST)
 	public ResponseEntity<String> getEnketoForm(@RequestBody HashMap<String, String> map) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		String formUrl = null;
@@ -77,7 +77,7 @@ public class AnnonymousFormController {
 				CRFVersionDAO cvdao = new CRFVersionDAO<>(dataSource);
 				CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
 
-				formUrl = createAnnonymousEnketoUrl(parentStudy.getOid(), crfVersionBean);
+				formUrl = createAnonymousEnketoUrl(parentStudy.getOid(), crfVersionBean);
 				System.out.println("FormUrl:  " + formUrl);
 				return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.OK);
 			} else {
@@ -122,10 +122,10 @@ public class AnnonymousFormController {
 		return studyBean;
 	}
 
-	private String createAnnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion) throws Exception {
+	private String createAnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion) throws Exception {
 		PFormCache cache = PFormCache.getInstance(context);
 		String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
-		String contextHash = cache.putAnnonymousFormContext(studyOID, crfVersion.getOid());
+		String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid());
 
 		String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
 		logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
