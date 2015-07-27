@@ -58,6 +58,8 @@ public class EventDefinitionCrf extends DataMapDomainObject {
 	private Integer parentId;
 	private Set datasetCrfVersionMaps = new HashSet(0);
 	private Boolean paricipantForm;
+	private Boolean allowAnonymousSubmission;
+	private String submissionUrl;
 
 	public EventDefinitionCrf() {
 	}
@@ -306,6 +308,25 @@ public class EventDefinitionCrf extends DataMapDomainObject {
 		this.paricipantForm = paricipantForm;
 	}
 
+	@Column(name = "allow_anonymous_submission")
+	public Boolean getAllowAnonymousSubmission() {
+		return allowAnonymousSubmission;
+	}
+
+	public void setAllowAnonymousSubmission(Boolean allowAnonymousSubmission) {
+		this.allowAnonymousSubmission = allowAnonymousSubmission;
+	}
+
+	@Column(name = "submission_urll")
+	public String getSubmissionUrl() {
+		return submissionUrl;
+	}
+
+	public void setSubmissionUrl(String submissionUrl) {
+		this.submissionUrl = submissionUrl;
+	}
+
+	
 	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")
 	// public Set getDatasetCrfVersionMaps() {
 	// return this.datasetCrfVersionMaps;

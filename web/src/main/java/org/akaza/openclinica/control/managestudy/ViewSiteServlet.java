@@ -107,6 +107,10 @@ public class ViewSiteServlet extends SecureController {
         seds = sedDao.findAllByStudy(siteToView);
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();       
+            request.setAttribute("participateFormStatus",participateFormStatus );            
+            
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs =
                 (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId, siteToView.getParentStudyId());
@@ -136,6 +140,9 @@ public class ViewSiteServlet extends SecureController {
                     }
                     idNames = idNames.substring(0, idNames.length() - 1);
                 }
+                if(edcBean.getParentId()<1){
+                	edcBean.setSubmissionUrl("");
+                }
                 edcBean.setSelectedVersionIdList(idList);
                 edcBean.setSelectedVersionNames(idNames);
                 defCrfs.add(edcBean);
@@ -144,6 +151,7 @@ public class ViewSiteServlet extends SecureController {
             sed.setCrfs(defCrfs);
             sed.setCrfNum(defCrfs.size());
         }
+
         request.setAttribute("definitions", seds);
         ArrayList<String> sdvOptions = new ArrayList<String>();
         sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
