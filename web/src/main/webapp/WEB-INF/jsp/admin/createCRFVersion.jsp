@@ -194,7 +194,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
         <table border="0" cellpadding="0" cellspacing="0">
           <tr>
             <td class="formlabel"><fmt:message key="upload_media_files" bundle="${resword}"/>:</td>
-            <td><div class="formfieldFile_BG"><input type="file" name="media_file" id="xform_media_file_path" multiple></div>
+            <td><div><input type="file" name="media_file" id="xform_media_file_path" multiple></div>
             <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
           </tr>
         </table>
