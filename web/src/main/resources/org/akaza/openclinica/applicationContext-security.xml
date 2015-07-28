@@ -33,6 +33,7 @@
     <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmss/**" filters="none"/>
     <security:intercept-url pattern="/pages/healthcheck/**" filters="none"/>
+    <security:intercept-url pattern="/pages/api/v1/anonymousform/**" filters="none"/>
     <!--
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
       default-target-url='/MainMenu' always-use-default-target='true' />

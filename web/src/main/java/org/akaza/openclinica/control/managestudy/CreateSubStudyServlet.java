@@ -172,7 +172,6 @@ public class CreateSubStudyServlet extends SecureController {
                 session.setAttribute("definitions", this.initDefinitions(newStudy));
                 request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
                 request.setAttribute("statuses", Status.toActiveArrayList());
-                baseUrl();
                 forwardPage(Page.CREATE_SUB_STUDY);
             }
 
@@ -459,7 +458,7 @@ public class CreateSubStudyServlet extends SecureController {
 
     }
 
-    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site, Validator v) {
+    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site, Validator v) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
@@ -484,6 +483,7 @@ public class CreateSubStudyServlet extends SecureController {
         HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            if (participateFormStatus.equals("enabled")) baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
          //   EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
