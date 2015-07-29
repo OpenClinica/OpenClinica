@@ -121,6 +121,7 @@ public class UserAccountBean extends AuditableEntityBean {
         accountNonLocked = true;
         lockCounter = 0;
         runWebservices = false;
+        accessCode="";
     }
 
     /**

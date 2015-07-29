@@ -45,7 +45,7 @@ public class StudySubjectBean extends AuditableEntityBean {
 
     private String studyName = "";// not in the table, for display purpose
 
-    private char gender = 'm';// not in the table, for display purpose
+    private char gender;// not in the table, for display purpose
 
     private Date dateOfBirth;// not in the db
 
