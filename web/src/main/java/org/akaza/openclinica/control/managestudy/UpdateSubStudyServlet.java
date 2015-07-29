@@ -20,16 +20,21 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.fop.fo.properties.ToBeImplementedProperty;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -295,7 +300,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
     }
 
-    private void submitSiteEventDefinitions(StudyBean site) {
+    private void submitSiteEventDefinitions(StudyBean site) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         Validator v = new Validator(request);
         
@@ -323,7 +328,8 @@ public class UpdateSubStudyServlet extends SecureController {
         for (StudyEventDefinitionBean sed : seds) {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            request.setAttribute("participateFormStatus",participateFormStatus );
+            if (participateFormStatus.equals("enabled")) 	baseUrl();
+          request.setAttribute("participateFormStatus",participateFormStatus );
 
         	
 
@@ -522,9 +528,10 @@ public class UpdateSubStudyServlet extends SecureController {
     }
 
     /**
-     * Inserts the new study into databa * *
+     * Inserts the new study into databa * 
+     * @throws MalformedURLException *
      */
-    private void submitStudy() {
+    private void submitStudy() throws MalformedURLException {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) session.getAttribute("newStudy");
         ArrayList parameters = study.getStudyParameters();
@@ -623,6 +630,20 @@ public class UpdateSubStudyServlet extends SecureController {
         }
     	return eventDefCrfList;
     }
-    
+
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
+
+    }
+
 
 }

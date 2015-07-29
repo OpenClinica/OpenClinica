@@ -135,7 +135,12 @@
      </c:choose>
     </td>
    <td class="table_cell"><fmt:message key="submission_url" bundle="${resword}"/>: 
-       <c:out value="${crf.submissionUrl}"/></td> 
+
+     <c:choose>    
+       <c:when test="${crf.submissionUrl != ''}">    
+      <c:out value="${participantUrl}${crf.submissionUrl}"/></c:when>   
+      <c:otherwise><c:out value="${crf.submissionUrl}"/> </c:otherwise>   
+     </c:choose>
    </c:when>  
  </c:choose>
 
