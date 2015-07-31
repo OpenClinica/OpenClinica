@@ -52,6 +52,7 @@ public class AnonymousFormController {
 	ServletContext context;
 
 	public static final String FORM_CONTEXT = "ecid";
+	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	UserAccountDAO udao;
@@ -62,10 +63,14 @@ public class AnonymousFormController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		String formUrl = null;
 		System.out.println("I'm in EnketoForm Rest Method");
+		String studyOid = map.get("studyOid");
 
+		if (!mayProceed(studyOid))
+			return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		
 		String submissionUri = map.get("submissionUri");
 		if (submissionUri != "" && submissionUri != null) {
-			String studyOid = map.get("studyOid");
+
 
 			StudyBean parentStudy = getParentStudy(studyOid);
 			StudyBean study = getStudy(studyOid);
@@ -131,6 +136,25 @@ public class AnonymousFormController {
 		logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
 		return url;
 
+	}
+	private boolean mayProceed(String studyOid) throws Exception {
+		boolean accessPermission = false;
+		StudyBean siteStudy = getStudy(studyOid);
+		StudyBean study = getParentStudy(studyOid);
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+		participantPortalRegistrar = new ParticipantPortalRegistrar();
+		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
+		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
+		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
+		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
+		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus  + "   siteStatus: " + siteStatus);
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+			accessPermission = true;
+		}
+
+		return accessPermission;
 	}
 
 }
