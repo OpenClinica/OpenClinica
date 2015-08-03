@@ -725,6 +725,14 @@
             where discrepancy_note_id=?
         </sql>
     </query>
+     <query>
+        <name>updateDnMapActivation</name>
+        <sql>
+            update dn_item_data_map set
+            activated = ?
+            where item_data_id=?
+        </sql>
+    </query>
     <query>
         <name>deleteNotes</name>
         <sql>
@@ -777,8 +785,8 @@
             INSERT INTO dn_item_data_map
             (item_data_id,
             discrepancy_note_id,
-            column_name)
-            VALUES (?,?,?)
+            column_name,activated)
+            VALUES (?,?,?,?)
         </sql>
     </query>
     <query>
@@ -824,6 +832,18 @@
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
         </sql>
     </query>
+
+    <query>
+        <name>findNumOfActiveExistingNotesForItemData</name>
+        <sql>
+            SELECT count(*) as num
+            FROM discrepancy_note dn, dn_item_data_map didm
+            where didm.item_data_id=? AND didm.activated = true
+            AND dn.discrepancy_note_id=didm.discrepancy_note_id
+                   </sql>
+    </query>
+
+
     <query>
         <name>findExistingNotesForItemData</name>
         <sql>
@@ -833,6 +853,17 @@
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
                    </sql>
     </query>
+
+    <query>
+        <name>findParentNotesOnlyByItemData</name>
+        <sql>
+            SELECT dn.*
+            FROM discrepancy_note dn, dn_item_data_map didm
+            where didm.item_data_id=? AND dn.parent_dn_id isnull
+            AND dn.discrepancy_note_id=didm.discrepancy_note_id
+                   </sql>
+    </query>
+
         <query>
         <name>findExistingNotesForToolTip</name>
         <sql>

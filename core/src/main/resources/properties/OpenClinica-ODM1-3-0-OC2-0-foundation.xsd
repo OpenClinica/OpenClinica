@@ -611,7 +611,8 @@
 		<xs:attribute name="DoubleDataEntry" type="odm:text"/>
 		<xs:attribute name="HideCRF" type="odm:text"/>
 		<xs:attribute name="SourceDataVerification" type="odm:text"/>
-	</xs:attributeGroup>
+		<xs:attribute name="ParticipantForm" type="odm:text"/>
+			</xs:attributeGroup>
 	
 	<xs:attributeGroup name="MultiSelectListRefAttributeExtension"/>
 	<xs:attributeGroup name="MultiSelectListAttributeExtension"/>

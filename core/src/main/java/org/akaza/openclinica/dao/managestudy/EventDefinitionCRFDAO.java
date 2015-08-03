@@ -88,6 +88,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(19, TypeNames.INT); // source_data_verification_id
         this.setTypeExpected(20, TypeNames.STRING); // selected_version_ids
         this.setTypeExpected(21, TypeNames.INT); // parent_id
+        this.setTypeExpected(22, TypeNames.BOOL);  // participant_crf
+        this.setTypeExpected(23, TypeNames.BOOL);  // allow_anonymous_submission
+        this.setTypeExpected(24, TypeNames.STRING); // submission_url
     }
 
     /**
@@ -123,6 +126,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         eb.setSelectedVersionIds(selectedVersionIds != null ? selectedVersionIds : "");
         int parentId = (Integer) hm.get("parent_id");
         eb.setParentId(parentId > 0 ? parentId : 0);
+        eb.setParticipantForm(((Boolean) hm.get("participant_form")).booleanValue());
+        eb.setAllowAnonymousSubmission(((Boolean) hm.get("allow_anonymous_submission")).booleanValue());
+        eb.setSubmissionUrl(((String) hm.get("submission_url")));
         return eb;
     }
 
@@ -155,6 +161,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return al;
     }
 
+    
+    
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
      * 
@@ -218,6 +226,64 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return al;
     }
 
+    
+    public ArrayList<EventDefinitionCRFBean> findAllByCrfDefinitionInSiteOnly(int definitionId, int crfId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(definitionId));
+        variables.put(new Integer(2), new Integer(crfId));
+
+        String sql = digester.getQuery("findAllByCrfDefinitionInSiteOnly");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList <EventDefinitionCRFBean> al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+    
+    
+    public ArrayList<EventDefinitionCRFBean> findAllActiveSitesAndStudiesPerParentStudy(int parentStudyId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(parentStudyId));
+        variables.put(new Integer(2), new Integer(parentStudyId));
+
+        String sql = digester.getQuery("findAllActiveSitesAndStudiesPerParentStudy");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList <EventDefinitionCRFBean> al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+    
+    public ArrayList<EventDefinitionCRFBean> findAllSubmissionUriAndStudyId(String submissionUri, int studyId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new String(submissionUri));
+        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(new Integer(3), new Integer(studyId));
+
+        String sql = digester.getQuery("findAllSubmissionUriAndStudyId");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList <EventDefinitionCRFBean> al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+
+    
+    
+    
+    
     public Collection findAllByCRF(int crfId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
@@ -300,6 +366,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
+        variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
+        variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));
+        variables.put(new Integer(21), new String (sb.getSubmissionUrl()));
+        
         this.execute(digester.getQuery("create"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -347,7 +417,10 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
-        variables.put(new Integer(19), new Integer(sb.getId()));
+        variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
+        variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));
+        variables.put(new Integer(21), sb.getSubmissionUrl());
+        variables.put(new Integer(22), new Integer(sb.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
@@ -471,6 +544,25 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         }
     }
 
+    
+    public Collection findAllActiveByEventDefinitionIdandStudyId(int definitionId , int studyId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(definitionId));
+        variables.put(new Integer(2), new Integer(studyId));
+
+        String sql = digester.getQuery("findAllActiveByEventDefinitionIdandStudyId");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean eb = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+    
+    
     public Collection findAllActiveParentsByEventDefinitionId(int definitionId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

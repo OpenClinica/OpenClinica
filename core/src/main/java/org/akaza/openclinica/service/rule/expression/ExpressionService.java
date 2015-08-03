@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -40,6 +42,10 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +53,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +93,7 @@ public class ExpressionService {
     private CRFVersionDAO crfVersionDao;
     private ItemDataDAO itemDataDao;
     private StudyEventDAO studyEventDao;
+    private StudySubjectDAO studySubjectDao;
     public final static String STARTDATE =".STARTDATE";
     public final  static String STATUS =".STATUS";
     public static final String STUDY_EVENT_OID_START_KEY="SE_";
@@ -222,6 +230,33 @@ public class ExpressionService {
 
     }
 
+    
+    public String getSSZoneId(){
+     Integer subjectId = expressionWrapper.getStudySubjectId();
+     System.out.println("  subjectId  " + subjectId + "  : ");
+     if(subjectId ==null) return null;     
+     StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
+       return ssBean.getTime_zone().trim();
+     }
+    
+    public HashMap<String,String> getSSDate(String ssZoneId , String serverZoneId){
+    	HashMap<String,String> map = new HashMap<String, String>();
+        if (ssZoneId == null || ssZoneId.equals("")) 	
+        	ssZoneId = TimeZone.getDefault().getID();
+  
+        DateTimeZone ssZone = DateTimeZone.forID(ssZoneId);
+        DateMidnight dm = new DateMidnight(ssZone);
+        DateTimeFormatter fmt = ISODateTimeFormat.date();
+        map.put("ssDate", fmt.print(dm));
+        
+        map.put("serverZoneId", serverZoneId);
+        DateTimeZone serverZone = DateTimeZone.forID(serverZoneId);
+        DateMidnight serverDate = new DateMidnight(serverZone);
+        map.put("serverDate", fmt.print(serverDate));
+        return map;
+    }
+    
+        
  public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
         if (isExpressionPartial(expression)) {
             throw new OpenClinicaSystemException("getValueFromDb:We cannot get the Value of a PARTIAL expression : " + expression);
@@ -239,7 +274,7 @@ public class ExpressionService {
             String studyEventDefinitionOrdinal = getStudyEventDefinitionOidOrdinalFromExpression(expression);
             studyEventDefinitionOrdinal = studyEventDefinitionOrdinal.equals("") ? "1" : studyEventDefinitionOrdinal;
             String studySubjectId = String.valueOf(studyEvent.getStudySubjectId());
-
+            System.out.println("studySubjectId:  "+ studySubjectId);
             logger.debug("ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
                     new Object[] { studyEvent.getId(), studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal, studySubjectId });
 
@@ -764,7 +799,7 @@ public class ExpressionService {
     public String replaceGroupOidOrdinalInExpression(String expression, Integer ordinal) {
         String replacement = getStudyEventDefinitionOidWithOrdinalFromExpression(expression) + SEPERATOR + getCrfOidFromExpression(expression) + SEPERATOR;
         if (ordinal == null) {
-            replacement += getItemGroupOidFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
+            replacement += getItemGroupOidWithOrdinalFromExpression(expression) + SEPERATOR + getItemOidFromExpression(expression);
         } else {
             replacement +=
                 getItemGroupOidFromExpression(expression) + OPENNIG_BRACKET + ordinal + CLOSING_BRACKET + SEPERATOR + getItemOidFromExpression(expression);
@@ -1298,6 +1333,10 @@ public class ExpressionService {
     //    studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(ds);
      //   return studyEventDao;
         return  new StudyEventDAO(ds);
+    }
+
+    private StudySubjectDAO getStudySubjectDao() {
+        return  new StudySubjectDAO(ds);
     }
 
     private EventCRFDAO getEventCRFDao() {

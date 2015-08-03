@@ -114,14 +114,14 @@
             (STUDY_EVENT_DEFINITION_ID,STUDY_SUBJECT_ID,LOCATION,SAMPLE_ORDINAL,
             DATE_START,DATE_END,OWNER_ID,STATUS_ID,DATE_CREATED,subject_event_status_id,
             start_time_flag, end_time_flag)
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,now(),?,?,?)
         </sql>
     </query>
     <query>
         <name>update</name>
         <sql>
             UPDATE study_event SET STUDY_EVENT_DEFINITION_ID=?,STUDY_SUBJECT_ID=?,LOCATION=?,
-            SAMPLE_ORDINAL=?, DATE_START=?,DATE_END=?,STATUS_ID=?,DATE_UPDATED=?,
+            SAMPLE_ORDINAL=?, DATE_START=?,DATE_END=?,STATUS_ID=?,DATE_UPDATED=now(),
             UPDATE_ID=? , subject_event_status_id=?, start_time_flag=?, end_time_flag=? WHERE STUDY_EVENT_ID=?
         </sql>
     </query>
@@ -198,6 +198,7 @@
             ORDER BY sed.ordinal asc , se.sample_ordinal asc
         </sql>
     </query>
+
     <query>
         <name>findAllByStudySubjectAndDefinition</name>
         <sql>
@@ -282,5 +283,41 @@
 			and se.study_subject_id = ?
 			and sed.study_event_definition_id = ?
     	</sql>
+    </query>
+    <query>
+        <name>getNextScheduledEvent</name>
+        <sql>
+			SELECT se2.* 
+			FROM study_event se2 JOIN (
+			  SELECT se.*,sed.ordinal
+			  FROM study_event se JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id
+			    JOIN study_event_definition sed on se.study_event_definition_id = sed.study_event_definition_id  
+			  WHERE ss.oc_oid = ?             
+			    AND se.status_id = 1                                                       
+			    AND se.subject_event_status_id = 1                                                               
+			
+			UNION
+			
+			SELECT se.*, sed.ordinal
+			FROM study_event se 
+			  JOIN study_subject ss ON se.study_subject_id = ss.study_subject_id 
+			  JOIN study_event_definition sed ON se.study_event_definition_id = sed.study_event_definition_id
+			  JOIN event_definition_crf edc ON sed.study_event_definition_id = edc.study_event_definition_id
+			  JOIN crf_version cv ON cv.crf_version_id = edc.default_version_id
+			  LEFT JOIN event_crf ec on edc.default_version_id = ec.crf_version_id AND ec.study_event_id = se.study_event_id
+			WHERE se.status_id = 1 AND se.subject_event_status_id = 3 AND ss.oc_oid = ? AND (ec.event_crf_id IS NULL OR event_crf_id NOT IN 
+			  (SELECT DISTINCT ec.event_crf_id 
+			    FROM study_event se, study_subject ss, event_crf ec,item_data id
+			    WHERE se.study_subject_id = ss.study_subject_id
+			      AND se.study_event_id = ec.study_event_id
+			      AND id.event_crf_id = ec.event_crf_id
+			      AND se.status_id = 1
+			      AND se.subject_event_status_id = 3
+			      AND ss.oc_oid = ?
+			      AND id.item_data_id IS NOT NULL))
+			  ) filter ON se2.study_event_id = filter.study_event_id
+			ORDER BY se2.date_start ASC, filter.ordinal ASC, se2.sample_ordinal ASC
+			LIMIT 1
+        </sql>
     </query>
 </queries>

@@ -11,7 +11,8 @@
 	</query>
 	<query>
 		<name>findAllByDefinition</name>
-		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? order by ordinal asc</sql>
+		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? and parent_id is null order by ordinal asc
+</sql>
 	</query>
     <query>
         <name>findAllByStudy</name>
@@ -22,6 +23,31 @@
 				order by edc.study_event_definition_id, edc.ordinal asc
         </sql>
     </query>
+    <query>
+        <name>findAllByCrfDefinitionInSiteOnly</name>
+        <sql>SELECT edc.* FROM EVENT_DEFINITION_CRF edc 
+        WHERE study_event_definition_id=? AND crf_id=? AND parent_id is not Null
+        </sql>
+    </query>
+    
+    <query>
+        <name>findAllActiveSitesAndStudiesPerParentStudy</name>
+        <sql>select edc.* from event_definition_crf edc where edc.study_id in 
+        (select study_id from study s where s.parent_study_id=? or s.study_id=?) 
+        and edc.status_id=1 
+        </sql>
+    </query>
+    
+
+    <query>
+        <name>findAllSubmissionUriAndStudyId</name>
+        <sql>select edc.* from event_definition_crf edc where edc.submission_url = ? and edc.study_id in 
+        (select study_id from study s where s.parent_study_id=? or s.study_id=?) 
+        </sql>
+    </query>
+    
+
+    
 	<query>
 		<name>findAllParentsByDefinition</name>
 		<!-- find all which have unavailable parent_id.
@@ -58,8 +84,8 @@
 		   (EVENT_DEFINITION_CRF_ID,STUDY_EVENT_DEFINITION_ID,STUDY_ID,CRF_ID,REQUIRED_CRF,
            DOUBLE_ENTRY,REQUIRE_ALL_TEXT_FILLED,DECISION_CONDITIONS,
            NULL_VALUES,DEFAULT_VERSION_ID,STATUS_ID,OWNER_ID,DATE_CREATED,ordinal,ELECTRONIC_SIGNATURE,
-           HIDE_CRF,SOURCE_DATA_VERIFICATION_CODE,SELECTED_VERSION_IDS,PARENT_ID)
-		   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?)
+           HIDE_CRF,SOURCE_DATA_VERIFICATION_CODE,SELECTED_VERSION_IDS,PARENT_ID,PARTICIPANT_FORM,ALLOW_ANONYMOUS_SUBMISSION,SUBMISSION_URL)
+		   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -70,7 +96,7 @@
            DOUBLE_ENTRY=?,REQUIRE_ALL_TEXT_FILLED=?,DECISION_CONDITIONS=?,
            NULL_VALUES=?,DEFAULT_VERSION_ID=?,STATUS_ID=?,DATE_UPDATED=?,UPDATE_ID=?,
            ordinal=?,ELECTRONIC_SIGNATURE=?, HIDE_CRF=?,
-           SOURCE_DATA_VERIFICATION_CODE=?, SELECTED_VERSION_IDS=?, PARENT_ID=?
+           SOURCE_DATA_VERIFICATION_CODE=?, SELECTED_VERSION_IDS=?, PARENT_ID=?,PARTICIPANT_FORM=?, ALLOW_ANONYMOUS_SUBMISSION=? , SUBMISSION_URL=?
            WHERE EVENT_DEFINITION_CRF_ID=?
 	    </sql>
 	</query>
@@ -102,6 +128,14 @@
 		<sql>
           SELECT * FROM event_definition_crf
           WHERE study_event_definition_id=? and status_id=1
+          order by ordinal asc
+        </sql>
+	</query>
+	<query>
+		<name>findAllActiveByEventDefinitionIdandStudyId</name>
+		<sql>
+          SELECT * FROM event_definition_crf
+          WHERE study_event_definition_id=? and study_id=? and status_id=1 and participant_form=true
           order by ordinal asc
         </sql>
 	</query>

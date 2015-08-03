@@ -68,6 +68,7 @@ public class ChangeStudyServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
+    private StudyParameterValueDAO studyParameterValueDAO;
 
     // < ResourceBundlerestext;
 
@@ -229,6 +230,9 @@ public class ChangeStudyServlet extends SecureController {
                     case 6:
                         role.setDescription("site_monitor");
                         break;
+                    case 7:
+                        role.setDescription("site_Data_Entry_Person2");
+                        break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }
@@ -282,7 +286,7 @@ public class ChangeStudyServlet extends SecureController {
                 + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
-        if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+        if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
             setupListStudySubjectTable();
         }
         if (currentRole.isMonitor()) {
@@ -371,6 +375,7 @@ public class ChangeStudyServlet extends SecureController {
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
+        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         String findSubjectsHtml = factory.createTable(request, response).render();
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
     }
@@ -434,4 +439,14 @@ public class ChangeStudyServlet extends SecureController {
         return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
     }
 
+	public StudyParameterValueDAO getStudyParameterValueDAO() {
+	     studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
+		return studyParameterValueDAO;
+	}
+
+	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+		this.studyParameterValueDAO = studyParameterValueDAO;
+	}
+
+    
 }

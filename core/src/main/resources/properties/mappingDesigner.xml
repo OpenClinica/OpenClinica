@@ -3,6 +3,7 @@
 <mapping>
 
     <field-handler name="emailHandler" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
+    <field-handler name="emailHandler1" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
 
     <class name="org.akaza.openclinica.domain.rule.RulesPostImportContainer">
         <map-to xml="Rules" ns-prefix="ns3" ns-uri="http://www.openclinica.org/ns/rules/v3.1"/>
@@ -37,6 +38,10 @@
 			       </field>
 			    </class>            
 			    </bind-xml>
+        </field>
+         <field name="RunOnSchedule"
+            type="org.akaza.openclinica.domain.rule.RunOnSchedule">
+            <bind-xml name="RunOnSchedule"/>
         </field>
        
        <field name="RuleSetRules"
@@ -134,6 +139,26 @@
             <bind-xml name="To" node="element"/>
         </field>
      </class>
+     <class name="org.akaza.openclinica.domain.rule.action.NotificationActionBean">
+        <map-to xml="NotificationAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+        <field name="To"
+               type="java.lang.String" handler="emailHandler1">
+            <bind-xml name="To" node="element"/>
+        </field>
+        <field name="Subject"
+               type="java.lang.String">
+            <bind-xml name="Subject" node="element"/>
+        </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+     </class>
+
      <class name="org.akaza.openclinica.domain.rule.action.ShowActionBean">
         <map-to xml="ShowAction" />
         <field name="ExpressionEvaluatesTo"
@@ -204,6 +229,13 @@
                <bind-xml name="ValueExpression"/>
        </field>
      </class>
+     
+      <class name="org.akaza.openclinica.domain.rule.RunOnSchedule" auto-complete="true">
+        <field name="runTime" type="string" >
+            <bind-xml name="Time" node="attribute"/>
+       </field>
+     </class>
+     
      <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunBean" auto-complete="true">
         <map-to ns-prefix="ns3" xml="Run"/>
         <field name="administrativeDataEntry" type="boolean">

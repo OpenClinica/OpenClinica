@@ -242,6 +242,14 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return this.executeFindAllQuery("findAllBySectionId", variables);
     }
 
+    public ArrayList findAllBySectionIdOrderedByItemFormMetadataOrdinal(int sectionId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+
+        return this.executeFindAllQuery("findAllBySectionIdOrderedByItemFormMetadataOrdinal", variables);
+    }
+
+    
     public ArrayList findAllUngroupedParentsBySectionId(int sectionId, int crfVersionId) {
         HashMap variables = new HashMap();
         variables.put(1, sectionId);
@@ -303,6 +311,25 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         }
         return beanList;
     }
+
+    
+    public List<ItemBean> findAllItemsByGroupIdAndSectionIdOrdered(int id, int crfVersionId , int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, id);
+        variables.put(2, sectionId);
+        variables.put(3, crfVersionId);
+        String sql = digester.getQuery("findAllItemsByGroupIdAndSectionIdOrdered");
+        List listofMaps = this.select(sql, variables);
+        List<ItemBean> beanList = new ArrayList<ItemBean>();
+        ItemBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
+
     
     public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId,int sectionId) {
         this.setTypesExpected();

@@ -200,6 +200,10 @@ public class StudyEventDefinitionEndpoint {
                 element.setTextContent(String.valueOf(eventCrf.isHideCrf()));
                 eventDefinitionCrfElement.appendChild(element);
 
+                element = document.createElementNS(NAMESPACE_URI_V1, "participantForm");
+                element.setTextContent(String.valueOf(eventCrf.isParticipantForm()));
+                eventDefinitionCrfElement.appendChild(element);
+
                 element = document.createElementNS(NAMESPACE_URI_V1, "sourceDataVerificaiton");
                 element.setTextContent(String.valueOf(eventCrf.getSourceDataVerification()));
                 eventDefinitionCrfElement.appendChild(element);

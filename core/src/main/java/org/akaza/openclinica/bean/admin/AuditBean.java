@@ -26,11 +26,68 @@ public class AuditBean extends EntityBean {
     private String userName;
     private String auditEventTypeName;
     private int studyEventId;
-
+    
     private int itemDataTypeId;
     private int ordinal;
+    private int eventCrfVersionId;
+    private String crfName;
+    private String crfVersionName;
+    private Date dateInterviewed;
+    private String interviewerName;
+    private int itemDataRepeatKey;
 
-    public int getItemDataTypeId() {
+    
+	
+    public int getItemDataRepeatKey() {
+		return itemDataRepeatKey;
+	}
+
+	public void setItemDataRepeatKey(int itemDataRepeatKey) {
+		this.itemDataRepeatKey = itemDataRepeatKey;
+	}
+
+	public Date getDateInterviewed() {
+		return dateInterviewed;
+	}
+    
+    public void setInterviewerName(String interviewerName) {
+		this.interviewerName = interviewerName;
+	}
+    
+	
+	public String getInterviewerName() {
+		return interviewerName;
+	}
+
+	public void setDateInterviewed(Date dateInterviewed) {
+		this.dateInterviewed = dateInterviewed;
+	}
+
+	public String getCrfName() {
+		return crfName;
+	}
+
+	public void setCrfName(String crfName) {
+		this.crfName = crfName;
+	}
+
+	public String getCrfVersionName() {
+		return crfVersionName;
+	}
+
+	public void setCrfVersionName(String crfVersionName) {
+		this.crfVersionName = crfVersionName;
+	}
+
+	public int getEventCrfVersionId() {
+		return eventCrfVersionId;
+	}
+
+	public void setEventCrfVersionId(int eventCrfVersionId) {
+		this.eventCrfVersionId = eventCrfVersionId;
+	}
+
+	public int getItemDataTypeId() {
         return this.itemDataTypeId;
     }
 

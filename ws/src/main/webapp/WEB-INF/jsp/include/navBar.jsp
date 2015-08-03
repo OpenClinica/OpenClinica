@@ -76,7 +76,7 @@
                                             <li><a href="${urlPrefix}ListDiscNotesSubjectServlet?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                         </c:if>
-                                        <c:if test="${userRole.researchAssistant}">
+                                        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2}">
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <c:if test="${study.status.available}">
@@ -164,7 +164,7 @@
         </div>
         <br clear="all">    
         </c:if>
-        <c:if test="${userRole.researchAssistant }">
+        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2  }">
         <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>

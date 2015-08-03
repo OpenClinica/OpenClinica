@@ -26,7 +26,8 @@ import javax.servlet.ServletOutputStream;
 /**
  * @author jxu
  *         <p/>
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
+ *         Code Templates
  */
 public class DownloadVersionSpreadSheetServlet extends SecureController {
     public static String CRF_ID = "crfId";
@@ -35,7 +36,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     public static String CRF_VERSION_ID = "crfVersionId";
 
-    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.3.xls";
+    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.5.xls";
 
     /**
      *
@@ -83,7 +84,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
             // excelFile = new File(dir + CRF_VERSION_TEMPLATE);
-            excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE, "crf"+File.separator+"original"+File.separator);
+            excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE, "crf" + File.separator + "original" + File.separator);
             excelFileName = CRF_VERSION_TEMPLATE;
             // FileOutputStream fos = new FileOutputStream(excelFile);
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);

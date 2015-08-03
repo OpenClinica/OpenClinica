@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
-<mapping>
+<mapping xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1">
 
 	<class name="org.akaza.openclinica.bean.submit.crfdata.ODMContainer">
         <map-to xml="ODM"/>
@@ -20,27 +20,49 @@
             <bind-xml name="SubjectData"/>
         </field>
         
+        <field name="UpsertOn"
+            type="org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean">
+            <bind-xml name="UpsertOn"/>
+        </field>
+        
         <field name="StudyOID"
         		type="java.lang.String">
         		<bind-xml name="StudyOID" node="attribute"/>
-        </field>
-        
-        
+        </field>                
     </class>
 
-	<class name="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"> 
-		<map-to xml="SubjectData"/>
-		
-		<field name="SubjectOID"
+    <class name="org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean"> 
+        <map-to xml="UpsertOn"/>
+        
+        <field name="NotStarted"
+               type="java.lang.Boolean">
+            <bind-xml name="NotStarted" node="attribute"/>
+       </field>
+       
+        <field name="DataEntryStarted"
+               type="java.lang.Boolean">
+            <bind-xml name="DataEntryStarted" node="attribute"/>
+       </field>
+       
+        <field name="DataEntryComplete"
+               type="java.lang.Boolean">
+            <bind-xml name="DataEntryComplete" node="attribute"/>
+       </field>
+       
+    </class>
+    <class name="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"> 
+        <map-to xml="SubjectData"/>
+        
+        <field name="SubjectOID"
                type="java.lang.String">
             <bind-xml name="SubjectKey" node="attribute"/>
        </field>
        
        <field name="StudyEventData"
-       		type="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean"
-       		collection="arraylist">
-       		<bind-xml name="StudyEventData"/>
-       	</field>
+            type="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean"
+            collection="arraylist">
+            <bind-xml name="StudyEventData"/>
+        </field>
     </class>
     
     <class name="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean">
@@ -64,17 +86,21 @@
     </class>
     
     <class name="org.akaza.openclinica.bean.submit.crfdata.FormDataBean">
-    	<map-to xml="FormData"/>
-		<field name="FormOID"
-               type="java.lang.String">
+        <map-to xml="FormData"/>
+
+        <field name="FormOID" type="java.lang.String">
             <bind-xml name="FormOID" node="attribute"/>
-       </field>
+        </field>
        
-       <field name="ItemGroupData"
+        <field name="EventCRFStatus" type="java.lang.String">
+            <bind-xml name="OpenClinica:Status" node="attribute"/>
+        </field>
+       
+        <field name="ItemGroupData"
        		type="org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean"
        		collection="arraylist">
        		<bind-xml name="ItemGroupData"/>
-       	</field>
+        </field>
     </class>
     
     <class name="org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean">

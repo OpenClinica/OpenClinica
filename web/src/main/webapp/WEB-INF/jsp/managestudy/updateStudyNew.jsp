@@ -15,10 +15,12 @@
 		<jsp:include page="../include/home-header.jsp"/>
 	</c:when>
 	<c:otherwise>
+	
 		<jsp:include page="../include/admin-header.jsp"/>
 	</c:otherwise>
 </c:choose>
 
+  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
 
 
 <!-- move the alert message to the sidebar-->
@@ -97,7 +99,21 @@
 		       }
 	         }
            }
-
+       
+           function registerPManage(event){
+               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
+               jQuery.ajax({
+        	       type:'GET',
+        	       url: regURL,
+        	       success: function(data){
+                       jQuery('#pManageDiv').html('Registration: ' + data);
+        	    }});
+           }
+           
+           function togglePManage(show){
+        	   if (show) jQuery('#pManageDiv').show();
+        	   else jQuery('#pManageDiv').hide();
+           }
        //-->
  </script>
 
@@ -553,7 +569,7 @@
 <br>
 
 <div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:17px;">
-    
+
     <fmt:message key="expand_each_section" bundle="${restext}"/>
 </div>
     <br>
@@ -1002,6 +1018,7 @@
   </td>
   </tr>
 
+
   <tr valign="top">
       <td class="formlabel"><fmt:message key="event_location_required" bundle="${resword}"/></td><td>
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'required'}"> checked </c:if> name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
@@ -1009,7 +1026,6 @@
             <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'not_used'}"> checked </c:if> name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
   </tr>
-
 
 </table>
 </div>

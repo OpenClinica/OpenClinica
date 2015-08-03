@@ -44,10 +44,15 @@ public class SQLInitServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        context = getServletContext();
 
-        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
-        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
+
+        context = getServletContext();
+        CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+        params = cr.getDATAINFO();
+        entParams =cr.getDATAINFO();
+
+//        params = (Properties) SpringServletAccess.getApplicationContext(context).getBean("dataInfo");
+//        entParams = (Properties) SpringServletAccess.getApplicationContext(context).getBean("enterpriseInfo");
 
         ConfigurationDao configurationDao = SpringServletAccess
                 .getApplicationContext(context)
@@ -58,8 +63,9 @@ public class SQLInitServlet extends HttpServlet {
         Role.STUDYDIRECTOR.setDescription(getField("director"));
         Role.INVESTIGATOR.setDescription(getField("investigator"));
         Role.RESEARCHASSISTANT.setDescription(getField("ra"));
+        Role.RESEARCHASSISTANT2.setDescription(getField("ra2"));
         Role.MONITOR.setDescription(getField("monitor"));
-        
+
         Page.INITIAL_DATA_ENTRY_NW.getFileName();
 
         //The crf/original/CRF Template  will be created if not exist.
@@ -123,8 +129,10 @@ public class SQLInitServlet extends HttpServlet {
      * @return String The value of field
      */
     public static String getEnterpriseField(String key) {
-        String name = null;
-        name = entParams.getProperty(key).trim();
+        String name = entParams.getProperty(key);
+        if (name != null) {
+            name = name.trim();
+        }
         return name == null ? "" : name;
     }
 
@@ -177,7 +185,7 @@ public class SQLInitServlet extends HttpServlet {
      * @param propertyNameInProperties
      */
     private void overridePropertyFromDatabase(ConfigurationDao configurationDao, String propertyNameInDatabase,
-            Properties properties, String propertyNameInProperties) {
+                                              Properties properties, String propertyNameInProperties) {
         ConfigurationBean config = configurationDao.findByKey(propertyNameInDatabase);
         if (config != null) {
             properties.setProperty(propertyNameInProperties, config.getValue());

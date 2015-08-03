@@ -9,6 +9,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.jmesa.facade.TableFacade;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTableFactory {
 
     protected Locale locale;
+
+    protected HttpSession session;
 
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -52,6 +55,7 @@ public abstract class AbstractTableFactory {
 
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = LocaleResolver.getLocale(request);
+        session = request.getSession();
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         setStateAttr(tableFacade);
         setDataAndLimitVariables(tableFacade);
@@ -69,11 +73,9 @@ public abstract class AbstractTableFactory {
     }
 
     /**
-     * Use this method to export all data from table.
-     * 1. filters/sorts will be ignored
-     * 2. Whole table will be exported page by page
-     * 3. Configure getSize(Limit limit)
-     *
+     * Use this method to export all data from table. 1. filters/sorts will be ignored 2. Whole table will be exported
+     * page by page 3. Configure getSize(Limit limit)
+     * 
      * @param request
      * @param response
      * @see getSize(Limit limit), createLimits()
@@ -137,9 +139,9 @@ public abstract class AbstractTableFactory {
     }
 
     /**
-     * By Default we configure a default toolbar. Overwrite this method if you
-     * need to provide a custom toolbar and configure other options.
-     *
+     * By Default we configure a default toolbar. Overwrite this method if you need to provide a custom toolbar and
+     * configure other options.
+     * 
      * @param tableFacade
      */
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
@@ -147,9 +149,8 @@ public abstract class AbstractTableFactory {
     }
 
     /**
-     * By Default we configure a default view. Overwrite this method if you need
-     * to provide a custom view.
-     *
+     * By Default we configure a default view. Overwrite this method if you need to provide a custom view.
+     * 
      * @param tableFacade
      * @see http://code.google.com/p/jmesa/wiki/CustomViewTotalsTutorial
      */
@@ -218,14 +219,15 @@ public abstract class AbstractTableFactory {
 
         return name;
     }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List paginateData(List list, int rowStart, int rowEnd) {
         ArrayList mainList = new ArrayList();
         if (rowStart > 0) {
-            rowStart = rowStart+1;
+            rowStart = rowStart + 1;
         }
         for (int i = rowStart; i <= rowEnd; i++) {
-            if(i < list.size() ) {
+            if (i < list.size()) {
                 mainList.add(list.get(i));
             } else {
                 break;
@@ -236,8 +238,8 @@ public abstract class AbstractTableFactory {
     }
 
     public void setStateAttr(TableFacade tableFacade) {
-        if(getTableName() != null) {
-            tableFacade.setStateAttr(getTableName()+"_restore");
+        if (getTableName() != null) {
+            tableFacade.setStateAttr(getTableName() + "_restore");
         } else {
             tableFacade.setStateAttr("restore");
             logger.debug("getTableName() returned null, so tableFacade.setStateAttr = restore");

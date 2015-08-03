@@ -32,6 +32,15 @@ public class ExpressionTreeHelper {
     final static String MMddyyyyFORMATDashes = "MM-dd-yyyy";
     final static String ddMMMyyyyFORMATDashes = "dd-MMM-yyyy";
 
+    // partial date
+    final static String yyyyMMFORMATDashes= "yyyy-MM";
+    final static String yyyyMMDashes = "[0-9]{4}-[0-9]{1,2}";
+
+    // partial date
+    final static String yyyyFORMATDashes= "yyyy";
+    final static String yyyyDashes = "[0-9]{4}";
+
+
     static Date getDate(String dateString) {
         logger.info("DateString : " + dateString);
         String[] componentsOfDate = dateString.split("[/|.|-]");
@@ -93,6 +102,39 @@ public class ExpressionTreeHelper {
         else
             return false;
     }
+    
+    static public boolean isDateyyyyMMddDashes(String dateString) {
+        String dateFormatDashes = yyyyMMddFORMATDashes;
+        String dateRegexpDashes = yyyyMMddDashes;
+
+        if (isDate(dateString, dateFormatDashes, dateRegexpDashes))
+            return true;
+        else
+            return false;
+    }
+
+    // partial year and month
+    static public boolean isDateyyyyMMDashes(String dateString) {
+        String dateFormatDashes = yyyyMMFORMATDashes;
+        String dateRegexpDashes = yyyyMMDashes;
+
+        if (isDate(dateString, dateFormatDashes, dateRegexpDashes))
+            return true;
+        else
+            return false;
+    }
+
+    // partial date year only 
+    static public boolean isDateyyyyDashes(String dateString) {
+        String dateFormatDashes = yyyyFORMATDashes;
+        String dateRegexpDashes = yyyyDashes;
+
+        if (isDate(dateString, dateFormatDashes, dateRegexpDashes))
+            return true;
+        else
+            return false;
+    }
+
     
     static public boolean isDateddMMMyyyyDashes(String dateString) {
         String dateFormat = ddMMMyyyyFORMATDashes;

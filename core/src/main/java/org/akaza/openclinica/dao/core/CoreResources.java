@@ -1,7 +1,10 @@
+
 package org.akaza.openclinica.dao.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +39,10 @@ public class CoreResources implements ResourceLoaderAware {
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
 
-    private Properties dataInfo;
+	private Properties dataInfo;
+	private Properties dataInfoProp;
     private Properties extractInfo;
+	private Properties extractProp;
 
     public static final Integer PDF_ID = 10;
     public static final Integer TAB_ID = 8;
@@ -86,19 +91,78 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+    
+    	 
+	public Properties getPropValues(Properties prop, String propFileName) throws IOException {
+//		System.out.println(propFileName);
+        
+		prop = new Properties();
+		File file = new File(propFileName);
+           if (!file.exists()) return null;
+		
+		InputStream inputStream = new FileInputStream(propFileName);
+		prop.load(inputStream);
+		
+		return prop;
+	}    
+    
+
+    public void getPropertiesSource(){
+    	try {
+            String filePath = "$catalina.home/$WEBAPP.lower.config";
+
+            filePath = replaceWebapp(filePath);
+            filePath = replaceCatHome(filePath);
+            
+            String dataInfoPropFileName = filePath +"/datainfo.properties";
+            String extractPropFileName =  filePath+"/extract.properties";
+             
+            
+                
+            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp,dataInfoPropFileName);
+            Properties OC_dataExtractProperties = getPropValues(extractProp,extractPropFileName);
+            
+            if  (OC_dataDataInfoProperties!=null)  dataInfo=OC_dataDataInfoProperties;
+            if  (OC_dataExtractProperties!=null)  extractInfo=OC_dataExtractProperties;
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+	
+	
+    
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
         try {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
-
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
+            getPropertiesSource();   
+            
+            String filePath = "$catalina.home/$WEBAPP.lower.config";
 
+            filePath = replaceWebapp(filePath);
+            filePath = replaceCatHome(filePath);
+            
+            String dataInfoPropFileName = filePath +"/datainfo.properties";
+            String extractPropFileName =  filePath+"/extract.properties";
+             
+            
+                
+            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp,dataInfoPropFileName);
+            Properties OC_dataExtractProperties = getPropValues(extractProp,extractPropFileName);
+            
+            if  (OC_dataDataInfoProperties!=null)  dataInfo=OC_dataDataInfoProperties;
+            if  (OC_dataExtractProperties!=null)  extractInfo=OC_dataExtractProperties;
+            
             String dbName = dataInfo.getProperty("dbType");
-
-            DATAINFO = dataInfo;
-            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for instance
+            
+            
+            DATAINFO = dataInfo;            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for instance
            
             EXTRACTINFO = extractInfo;
 
@@ -113,6 +177,7 @@ public class CoreResources implements ResourceLoaderAware {
             extractProperties = findExtractProperties();
             //JN: this is in for junits to run without extract props
             copyImportRulesFiles();
+            copyConfig();
             }
 
 
@@ -219,6 +284,8 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
+        getPropertiesSource();   
+
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
             filePath = "$catalina.home/$WEBAPP.lower.data";
@@ -283,6 +350,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("max_inactive_interval", DATAINFO.getProperty("maxInactiveInterval"));
 
         DATAINFO.setProperty("ra", "Data_Entry_Person");
+        DATAINFO.setProperty("ra2", "site_Data_Entry_Person2");
         DATAINFO.setProperty("investigator", "Investigator");
         DATAINFO.setProperty("director", "Study_Director");
 
@@ -292,11 +360,11 @@ public class CoreResources implements ResourceLoaderAware {
 
         String rss_url = DATAINFO.getProperty("rssUrl");
         if (rss_url == null || rss_url.isEmpty())
-            rss_url = "http://clinicalresearch.wordpress.com/feed/";
+            rss_url = "http://blog.openclinica.com/feed/";
         DATAINFO.setProperty("rss.url", rss_url);
         String rss_more = DATAINFO.getProperty("rssMore");
         if (rss_more == null || rss_more.isEmpty())
-            rss_more = "http://clinicalresearch.wordpress.com/";
+            rss_more = "http://blog.openclinica.com/";
         DATAINFO.setProperty("rss.more", rss_more);
 
         String supportURL = DATAINFO.getProperty("supportURL");
@@ -310,15 +378,19 @@ public class CoreResources implements ResourceLoaderAware {
         if (DATAINFO.getProperty("userAccountNotification") != null)
             DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
         logger.debug("DataInfo..." + DATAINFO);
+
         String designerURL = DATAINFO.getProperty("designerURL");
-        if (designerURL == null || designerURL.isEmpty())
-            // @pgawade 13-April-2011 - Fix for issue #8877: Commented out the
-            // hardcoded rule designer
-            // URL as it is added as a property
-            // in datainfo.properties file
-            // designerURL =
-            // "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
-        DATAINFO.setProperty("designer.url", designerURL);
+        if (designerURL == null || designerURL.isEmpty()) {
+            DATAINFO.setProperty("designer.url", designerURL);
+        }
+
+        String portalURL = DATAINFO.getProperty("portalURL");
+        if (portalURL == null || portalURL.isEmpty()){
+            DATAINFO.setProperty("portal.url", "");
+            logger.debug(" Portal URL NOT Defined in datainfo ");
+        }else{
+            logger.debug("Portal URL IS Defined in datainfo:  "+ portalURL);
+        }
         return DATAINFO;
     }
 
@@ -447,6 +519,57 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
 
+    private void copyConfig() throws IOException
+    {
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+        Resource[] resources = null;
+        FileOutputStream out =null;
+        Resource resource1 = null;
+        Resource resource2 = null;
+        
+       resource1 = resolver.getResource("classpath:datainfo.properties");
+       resource2 = resolver.getResource("classpath:extract.properties");
+       
+       String filePath = "$catalina.home/$WEBAPP.lower.config";
+
+       filePath = replaceWebapp(filePath);
+       filePath = replaceCatHome(filePath);
+       
+       
+        File dest = new File(filePath) ;
+        if (!dest.exists()) {
+            if (!dest.mkdirs()) {
+                throw new OpenClinicaSystemException("Copying files, Could not create directory: " + dest.getAbsolutePath() + ".");
+            }
+        }
+
+    	File f1 = new File(dest, resource1.getFilename());
+    	File f2 = new File(dest, resource2.getFilename());
+        if(!f1.exists()){
+    		 out = new FileOutputStream(f1);
+			IOUtils.copy(resource1.getInputStream(), out);
+			out.close();
+        }
+        if(!f2.exists()){
+			 out = new FileOutputStream(f2);
+			IOUtils.copy(resource2.getInputStream(), out);
+			out.close();
+        }
+        
+        /*
+        
+        for (Resource r: resources) {
+    		File f = new File(dest, r.getFilename());
+               if(!f.exists()){
+    			 out = new FileOutputStream(f);
+    			IOUtils.copy(r.getInputStream(), out);
+    			out.close();
+               }
+    	}
+*/            
+    }
+
+    
     /**
      * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly.
      * Use Commons IO's {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
@@ -768,8 +891,10 @@ public class CoreResources implements ResourceLoaderAware {
 
 
     public static String getDBName() {
-        return DB_NAME;
-    }
+            if (null == DB_NAME)
+                return "postgres";
+            return DB_NAME;
+        }
 
     public static String getField(String key) {
         String value = DATAINFO.getProperty(key);
@@ -864,6 +989,11 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
+	public Properties getDATAINFO() {
+		return DATAINFO;
+	}
+
+    
     // // TODO comment out system out after dev
     // private static void logMe(String message) {
 //         System.out.println(message);

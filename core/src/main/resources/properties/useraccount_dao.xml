@@ -6,11 +6,11 @@
 	</query>
 	<query>
 		<name>findAll</name>
-		<sql>SELECT * FROM USER_ACCOUNT</sql>
+		<sql>SELECT * FROM USER_ACCOUNT WHERE USER_NAME NOT LIKE '%.SS_%'</sql>
 	</query>
 	<query>
 		<name>findAllByLimit</name>
-		<sql>SELECT * FROM USER_ACCOUNT limit 5</sql>
+		<sql>SELECT * FROM USER_ACCOUNT WHERE USER_NAME NOT LIKE '%.SS_%' limit 5</sql>
 	</query>
 	<query>
 		<name>insert</name>
@@ -18,8 +18,8 @@
 			email, active_study, institutional_affiliation,
 			status_id, owner_id, date_created,
 			passwd_challenge_question, passwd_challenge_answer,
-			phone, user_type_id,run_webservices)
-			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?)</sql>
+			phone, user_type_id,run_webservices,access_code)
+			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>insertStudyUserRole</name>
@@ -38,8 +38,8 @@
 			email=?, active_study=?, institutional_affiliation=?,
 			status_id=?, update_id=?, date_updated=now(), date_lastvisit=?,
 			passwd_timestamp=?, passwd_challenge_question=?,
-			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?
-			where user_id=?</sql>
+			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,access_code=?,
+			time_zone=? where user_id=?</sql>
 	</query>
 	<query>
 		<name>createRole</name>
@@ -81,6 +81,14 @@
 	<query>
 		<name>findByUserName</name>
 		<sql>select * from user_account where user_name=?</sql>
+	</query>
+	<query>
+		<name>findByAccessCode</name>
+		<sql>select * from user_account where access_code=?</sql>
+	</query>
+	<query>
+		<name>findAllParticipantsByStudyOid</name>
+		<sql>select * from user_account where access_code != 'null' and access_code !='' and user_name like ? </sql>
 	</query>
 	<query>
 		<name>findAllRolesByUserName</name>
@@ -188,6 +196,7 @@
 				AND ua.status_id=1
 				AND sur.status_id=1
 				AND (s.study_id=? OR s.parent_study_id=?)
+				AND  ua.user_name NOT LIKE '%.SS_%'
 			ORDER BY ua.date_created ASC
 		</sql>
 	</query>
@@ -215,6 +224,7 @@
                 AND ua.status_id=1
                 AND sur.status_id=1
                 AND (s.study_id=? OR s.study_id=?
+               	AND  ua.user_name NOT LIKE '%.SS_%'
 			        OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                 )
                 ORDER BY ua.last_name ASC

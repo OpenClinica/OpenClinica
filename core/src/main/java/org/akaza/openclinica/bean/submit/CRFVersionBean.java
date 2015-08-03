@@ -15,9 +15,9 @@ import java.util.Date;
 
 /**
  * The object to carry CRF versions in the application.
- *
+ * 
  * @author thickerson
- *
+ * 
  */
 public class CRFVersionBean extends AuditableEntityBean {
 
@@ -29,9 +29,13 @@ public class CRFVersionBean extends AuditableEntityBean {
 
     // not in DB, tells whether the spreadsheet is downloadable
     private boolean downloadable = false;
+    // not in DB, stores a URL for displaying the CRF in Enketo
+    private String enketoURL = "";
 
     private String oid;
     private OidGenerator oidGenerator;
+
+    private String xform;
 
     public CRFVersionBean() {
         this.oidGenerator = new CrfVersionOidGenerator();
@@ -138,7 +142,17 @@ public class CRFVersionBean extends AuditableEntityBean {
         this.oidGenerator = oidGenerator;
     }
 
-    /* (non-Javadoc)
+    public String getXform() {
+        return xform;
+    }
+
+    public void setXform(String xform) {
+        this.xform = xform;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -149,7 +163,9 @@ public class CRFVersionBean extends AuditableEntityBean {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

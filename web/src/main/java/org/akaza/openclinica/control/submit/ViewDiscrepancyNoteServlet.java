@@ -127,7 +127,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
         
         request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
             resStatuses.add(ResolutionStatus.UPDATED);
             resStatuses.add(ResolutionStatus.RESOLVED);
@@ -389,7 +389,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
             // initialize dn for a new thread
             DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
                 dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
                 dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
                 autoviews.put(0, 0);
@@ -592,7 +592,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 Role r = currentRole.getRole();
                 // if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) &&
                 // currentStudy.getId() != currentStudy.getParentStudyId()) {
-                if (r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.INVESTIGATOR)) {
+                if (r.equals(Role.RESEARCHASSISTANT) ||r.equals(Role.RESEARCHASSISTANT2) || r.equals(Role.INVESTIGATOR)) {
                     if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId() && note.getResStatus().getId() == ResolutionStatus.UPDATED.getId()) {
                         dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
                     } else {

@@ -1234,9 +1234,9 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 6px;
 }
 
-.formfieldFile_BG { background-image: url(../images/formfieldM_BG.gif);
+.formfieldFile_BG { background-image: url(../images/formfieldXXL_BG.gif);
     background-repeat: no-repeat;
-    width: 162px;
+    width: 307px;
     height: 26px;
     margin-bottom: 6px;
 }
@@ -1502,6 +1502,20 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 	line-height: 13px;
 	color: #789EC5 
 	}
+
+.normal_tab { background-image: url(../images/normal_tab.gif);
+    background-repeat: no-repeat;
+    background-position: top right;
+    border-style: solid;
+    border-width: 0px 0px 0px 0px;
+    border-color: #B2B2B2;
+    width: 160px;
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    background-color: #FFFFFF
+    }
 
 .background { background-image: url(../images/bgdots.gif);
 	background-repeat: repeat-y;
@@ -2023,4 +2037,52 @@ margin: 2px;;
 .connect-widget img {
     vertical-align: middle;
     margin-right: 5px;
+}
+
+.participate-text {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #4D4D4D;	
+}
+
+.participate-sample-url {
+	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #B6B6B4;
+}
+
+.participate-warnings {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #D00000;
+}
+
+.participate-inactive-status {
+	color: #FF0000;
+}
+
+.participate-active-status {
+	color: #006633;
+}
+
+.participate-registration-div {
+	padding-left:10px;
+	padding-bottom:10px;
+	padding-right:10px;
+	display:none;
+}
+.crf-upload-div {
+	display:inline;
+}
+
+.crf-upload-div-hidden {
+    display:none;
+}
+.crf-upload-padded-div {
+    padding-top:10px;
+    padding-left:17px;
+    padding-right:17px;
 }

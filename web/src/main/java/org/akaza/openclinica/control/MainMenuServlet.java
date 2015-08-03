@@ -53,7 +53,7 @@ public class MainMenuServlet extends SecureController {
     //Shaoyu Su
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private SubjectDAO subjectDAO;
+	private SubjectDAO subjectDAO;
     private StudySubjectDAO studySubjectDAO;
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
@@ -63,6 +63,7 @@ public class MainMenuServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
+    private StudyParameterValueDAO studyParameterValueDAO;
 
     // < ResourceBundle respage;
 
@@ -188,7 +189,7 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                 }
                 setPresetValues(fp.getPresetValues());
 
-                if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
+                if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
                     setupListStudySubjectTable();
                 }
                 if (currentRole.isMonitor()) {
@@ -292,11 +293,22 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
+        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         String findSubjectsHtml = factory.createTable(request, response).render();
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
     }
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+    
+    public StudyParameterValueDAO getStudyParameterValueDAO() {
+     studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
+		return studyParameterValueDAO;
+	}
+
+	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
+		studyParameterValueDAO = studyParameterValueDAO;
+	}
+
+	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
         studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
         return studyEventDefinitionDAO;
     }

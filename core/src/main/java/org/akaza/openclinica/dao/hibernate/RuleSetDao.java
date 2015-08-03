@@ -158,6 +158,13 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         return (ArrayList<RuleSetBean>) q.list();
     }
 
+    @Transactional
+    public ArrayList<RuleSetBean> findAllRunOnSchedules(Boolean shedule){
+    	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.runSchedule = :shedule";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setBoolean("shedule", shedule);
+        return (ArrayList<RuleSetBean>) q.list();
+    }
 
     
     @Transactional

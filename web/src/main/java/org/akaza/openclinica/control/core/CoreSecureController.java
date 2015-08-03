@@ -224,7 +224,7 @@ public abstract class CoreSecureController extends HttpServlet {
         Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
         try {
             if (jobName != null && groupName != null) {
-            	LOGGER.debug("trying to retrieve status on " + jobName + " " + groupName);
+                LOGGER.debug("trying to retrieve status on " + jobName + " " + groupName);
                 int state = getScheduler(request).getTriggerState(jobName, groupName);
                 LOGGER.debug("found state: " + state);
                 org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
@@ -233,7 +233,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 String failMessage = dataMap.getString("failMessage");
                 if (state == Trigger.STATE_NONE) {
                     // add the message here that your export is done
-                     // TODO make absolute paths in the message, for example a
+                    // TODO make absolute paths in the message, for example a
                     // link from /pages/* would break
                     // TODO i18n
                     if (failMessage != null) {
@@ -241,7 +241,7 @@ public abstract class CoreSecureController extends HttpServlet {
                         // ERROR: relation "demographics" already exists
                         // More information may be available in the log files.
                         addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-                            + "<br/><br/>More information may be available in the log files.", request);
+                                + "<br/><br/>More information may be available in the log files.", request);
                     } else {
                         String successMsg = dataMap.getString("SUCCESS_MESSAGE");
                         if (successMsg != null) {
@@ -251,11 +251,11 @@ public abstract class CoreSecureController extends HttpServlet {
 
                             addPageMessage(
                                     "Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
-                                        + datasetId + "'>View Specific Dataset</a>." + successMsg, request);
+                                            + datasetId + "'>View Specific Dataset</a>." + successMsg, request);
                         } else {
                             addPageMessage(
                                     "Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
-                                        + datasetId + "'>View Specific Dataset</a>.", request);
+                                            + datasetId + "'>View Specific Dataset</a>.", request);
                         }
                     }
                     request.getSession().removeAttribute("jobName");
@@ -278,16 +278,16 @@ public abstract class CoreSecureController extends HttpServlet {
         ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
         successMsg =
-            successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId()
-                + "\">here </a>");
+                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId()
+                        + "\">here </a>");
 
         return successMsg;
     }
 
     private StdScheduler getScheduler(HttpServletRequest request) {
         scheduler =
-            this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(
-                    SCHEDULER);
+                this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(
+                        SCHEDULER);
         return scheduler;
     }
 
@@ -417,23 +417,26 @@ public abstract class CoreSecureController extends HttpServlet {
                 for (Iterator it = roles.iterator(); it.hasNext();) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                    case 2:
-                        role.setDescription("site_Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("site_Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("site_investigator");
-                        break;
-                    case 5:
-                        role.setDescription("site_Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("site_monitor");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
+                        case 2:
+                            role.setDescription("site_Study_Coordinator");
+                            break;
+                        case 3:
+                            role.setDescription("site_Study_Director");
+                            break;
+                        case 4:
+                            role.setDescription("site_investigator");
+                            break;
+                        case 5:
+                            role.setDescription("site_Data_Entry_Person");
+                            break;
+                        case 6:
+                            role.setDescription("site_monitor");
+                            break;
+                        case 7:
+                            role.setDescription("site_Data_Entry_Person2");
+                            break;
+                        default:
+                            // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -445,23 +448,23 @@ public abstract class CoreSecureController extends HttpServlet {
                 for (Iterator it = roles.iterator(); it.hasNext();) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                    case 2:
-                        role.setDescription("Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("Investigator");
-                        break;
-                    case 5:
-                        role.setDescription("Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("Monitor");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
+                        case 2:
+                            role.setDescription("Study_Coordinator");
+                            break;
+                        case 3:
+                            role.setDescription("Study_Director");
+                            break;
+                        case 4:
+                            role.setDescription("Investigator");
+                            break;
+                        case 5:
+                            role.setDescription("Data_Entry_Person");
+                            break;
+                        case 6:
+                            role.setDescription("Monitor");
+                            break;
+                        default:
+                            // logger.info("No role matched when setting role description");
                     }
                 }
             }
@@ -521,7 +524,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 passwdTimeOut(request, response, ub);
             }
             mayProceed(request, response);
-         //   pingJobServer(request);
+            //   pingJobServer(request);
             processRequest(request, response);
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
@@ -598,10 +601,10 @@ public abstract class CoreSecureController extends HttpServlet {
      *            TODO
      */
     protected void forwardPage(Page jspPage, boolean checkTrail, HttpServletRequest request, HttpServletResponse response) {
-    	Page page1 = Page.valueOf(jspPage.name());
-    	String temp;
-    	
-    	// YW 10-03-2007 <<
+        Page page1 = Page.valueOf(jspPage.name());
+        String temp;
+
+        // YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", -1);
@@ -639,12 +642,12 @@ public abstract class CoreSecureController extends HttpServlet {
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }*/
-           // above added 01/19/2005, tbh
+            // above added 01/19/2005, tbh
             temp = page1.getFileName();
             getServletContext().getRequestDispatcher(temp).forward(request, response);
 
             // response.sendRedirect(request.getContextPath()+jspPage.getFileName());
-       } catch (Exception se) {
+        } catch (Exception se) {
             /*if ("View Notes".equals(jspPage.getTitle())) {
                 String viewNotesURL = jspPage.getFileName();
                 if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
@@ -674,13 +677,13 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
             }
          */
-    	LOGGER.error(se.getMessage(),se);
+            LOGGER.error(se.getMessage(),se);
         }
         finally {
-        	page1 = null;
-        	jspPage = null;
-        	temp = null;
-        }	
+            page1 = null;
+            jspPage = null;
+            temp = null;
+        }
 
     }
 
@@ -713,7 +716,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * @throws InconsistentStateException
      */
     protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty, HttpServletRequest request,
-            HttpServletResponse response) throws InconsistentStateException {
+                                 HttpServletResponse response) throws InconsistentStateException {
         if (list.isEmpty()) {
             throw new InconsistentStateException(destinationIfEmpty, messageIfEmpty);
         }
@@ -912,18 +915,18 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail, String successMessage, String failMessage,
-            Boolean sendMessage, HttpServletRequest request) throws Exception {
+                             Boolean sendMessage, HttpServletRequest request) throws Exception {
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(getServletContext()).getBean("mailSender");
 
-          //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
-           //retrieve the host name
+            //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
+            //retrieve the host name
             Properties javaMailProperties = mailSender.getJavaMailProperties();
             if(null != javaMailProperties){
-            	if (javaMailProperties.get("mail.smtp.localhost") == null || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
-            		javaMailProperties.put("mail.smtp.localhost", "localhost");
-            	}
+                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
+                    javaMailProperties.put("mail.smtp.localhost", "localhost");
+                }
             }
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();

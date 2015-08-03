@@ -99,7 +99,10 @@ public class CreateUserAccountServlet extends SecureController {
         Map roleMap = new LinkedHashMap();
         for (Iterator it = getRoles().iterator(); it.hasNext();) {
             Role role = (Role) it.next();
-            roleMap.put(role.getId(), role.getDescription());
+            // I added the below if statement , to exclude displaying on study level the newly added 'ReseachAssisstant2' role by default.
+            if (role.getId() != 7) 
+                roleMap.put(role.getId(), role.getDescription());
+//            roleMap.put(role.getId(), role.getDescription());
         }
 
         // addEntityList("roles", getRoles(), respage.getString("a_user_cannot_be_created_no_roles_as_role"), Page.ADMIN_SYSTEM);
@@ -135,6 +138,9 @@ public class CreateUserAccountServlet extends SecureController {
                         break;
                     case 6:
                         roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
+                        break;
+                    case 7:
+                        roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person2").trim());
                         break;
                     default:
                         // logger.info("No role matched when setting role description");
@@ -241,7 +247,8 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setPhone("");
                 createdUserAccountBean.setOwner(ub);
                 createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-
+                createdUserAccountBean.setAccessCode("null");
+                
                 int studyId = fp.getInt(INPUT_STUDY);
                 Role r = Role.get(fp.getInt(INPUT_ROLE));
                 createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyId, r);

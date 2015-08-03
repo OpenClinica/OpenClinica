@@ -21,7 +21,7 @@
 
 		<div class="sidebar_tab_content">		
         
-        <fmt:message key="confirm_removal_of_this_CRF_from_event"  bundle="${resword}"/> <c:out value="${event.studyEventDefinition.name}"/> (<fmt:message key="date"  bundle="${resword}"/> <fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>). <fmt:message key="all_data_associated_with_the_CRF_in_this_event"  bundle="${resword}"/>
+        <fmt:message key="confirm_removal_of_this_CRF_from_event"  bundle="${resword}"/> <c:out value="${event.studyEventDefinition.name}"/> (<fmt:message key="date"  bundle="${resword}"/> <fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>). <fmt:message key="all_data_associated_with_the_CRF_in_this_event_will_be_removed"  bundle="${resword}"/>
         
 		</div>
 
@@ -134,7 +134,7 @@
    <c:choose>
     <c:when test="${!empty items && count>0}">
      <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
-      <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_crf_has_data" bundle="${resword}"/>");'>
+      <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_crf_has_data_remove" bundle="${resword}"/>");'>
       <input type="button" onclick="confirmCancel('ViewStudyEvents');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
      </form>
     </c:when>

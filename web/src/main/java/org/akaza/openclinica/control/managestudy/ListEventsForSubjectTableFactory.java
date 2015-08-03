@@ -792,7 +792,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() == Status.AVAILABLE) {
-                        if (currentRole.getRole() != Role.INVESTIGATOR && currentRole.getRole() != Role.RESEARCHASSISTANT) {
+                        if (currentRole.getRole() != Role.INVESTIGATOR && currentRole.getRole() != Role.RESEARCHASSISTANT && currentRole.getRole() != Role.RESEARCHASSISTANT2 ) {
                             url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                         }
                     }

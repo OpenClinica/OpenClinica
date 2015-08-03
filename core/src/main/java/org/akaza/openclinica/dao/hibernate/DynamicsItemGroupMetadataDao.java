@@ -57,4 +57,11 @@ public class DynamicsItemGroupMetadataDao extends AbstractDomainDao<DynamicsItem
         q.setInteger("crfVersionId", crfVersionId);
         return q.list() != null && q.list().size() > 0;
     }
+    public  void delete(int eventCrfId){
+        String query = " delete from " + getDomainClassName() +  "  where eventCrfId =:eventCrfId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("eventCrfId", eventCrfId);
+        q.executeUpdate();
+    }
+
 }

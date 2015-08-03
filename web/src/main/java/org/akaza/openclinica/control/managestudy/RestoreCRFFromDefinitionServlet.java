@@ -10,8 +10,10 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -49,6 +51,14 @@ public class RestoreCRFFromDefinitionServlet extends SecureController {
 
         String idString = request.getParameter("id");
         logger.info("crf id:" + idString);
+
+        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+    
+        request.setAttribute("participateFormStatus",participateFormStatus );
+
+        
         if (StringUtil.isBlank(idString)) {
             addPageMessage(respage.getString("please_choose_a_CRF_to_restore"));
             forwardPage(Page.UPDATE_EVENT_DEFINITION1);

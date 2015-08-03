@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 
 import java.util.ArrayList;
@@ -36,5 +37,12 @@ public class SCDItemMetadataDao extends AbstractDomainDao<SCDItemMetadataBean>{
         org.hibernate.Query q = this.getCurrentSession().createSQLQuery(query);
         q.setInteger("sectionId", sectionId);
         return q.list();
+    }
+    @SuppressWarnings("unchecked")
+    public ArrayList<SCDItemMetadataBean> findAllSCDByItemFormMetadataId(Integer itemFormMetadataId) {
+        String query = "select scd.* from scd_item_metadata scd where scd.scd_item_form_metadata_id = :itemFormMetadataId)";
+        org.hibernate.Query q = this.getCurrentSession().createSQLQuery(query);
+        q.setInteger("itemFormMetadataId", itemFormMetadataId);
+        return (ArrayList<SCDItemMetadataBean>) q.list();
     }
 }

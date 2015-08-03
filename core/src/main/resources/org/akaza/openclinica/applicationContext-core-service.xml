@@ -27,6 +27,7 @@
         <property name="beanPropertyService" ref="beanPropertyService"/>
         <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
         <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
+        <property name="ruleActionRunLogDao" ref="ruleActionRunLogDao"/>
     </bean>
     
     <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
@@ -120,7 +121,19 @@
 		<property name="studySubjectDao" ref = "studySubjectDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
+   
+<bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
+      <constructor-arg ref="dataSource"/>
+      <constructor-arg ref="authoritiesDao"/>
+        <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
+        <property name="dynamicsItemGroupMetadataDao" ref="dynamicsItemGroupMetadataDao"/>
+        <property name="dynamicsItemFormMetadataDao" ref="dynamicsItemFormMetadataDao"/>
+    </bean>
     
+        <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
+       <constructor-arg ref="dataSource"/>
+    </bean>
+        
     <!-- 
 <bean id="expressionBeanService" class="org.akaza.openclinica.service.rule.expression.ExpressionBeanService" autowire="byName">
      

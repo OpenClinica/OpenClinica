@@ -165,7 +165,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
 
                 // Find deleted Event CRFs
-                List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
+                List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEventByEventCRFStatus(studyEvent.getId());
                 allDeletedEventCRFs.addAll(deletedEventCRFs);
                 logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
             }

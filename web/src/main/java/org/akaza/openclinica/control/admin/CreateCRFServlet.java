@@ -25,7 +25,7 @@ import java.util.Locale;
 
 /**
  * Creates a new CRF
- *
+ * 
  * @author jxu
  */
 public class CreateCRFServlet extends SecureController {
@@ -127,6 +127,7 @@ public class CreateCRFServlet extends SecureController {
                         crf.setOwner(ub);
                         crf.setCreatedDate(new Date());
                         crf.setStatus(Status.AVAILABLE);
+                        crf.setStudyId(currentStudy.getId());
                         cdao.create(crf);
 
                         crf = (CRFBean) cdao.findByName(crf.getName());

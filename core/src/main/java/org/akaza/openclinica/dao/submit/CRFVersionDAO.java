@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -28,15 +29,14 @@ import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * <p>
- * CRFVersionDAO.java, the data access object for versions of instruments in the
- * database. Each of these are related to Sections, a versioning map that links
- * them with Items, and an Event, which then links to a Study.
- *
+ * CRFVersionDAO.java, the data access object for versions of instruments in the database. Each of these are related to
+ * Sections, a versioning map that links them with Items, and an Event, which then links to a Study.
+ * 
  * @author thickerson
- *
- *
+ * 
+ * 
  */
-public class CRFVersionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class CRFVersionDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
 
     @Override
     protected void setDigesterName() {
@@ -78,8 +78,36 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
     }
 
     public EntityBean create(EntityBean eb) {
+        // "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," +
+        // "OWNER_ID,REVISION_NOTES,OC_OID) "
+        // + "VALUES ('" + stripQuotes(version) + "','" + stripQuotes(versionDesc) + "'," +
+        // "(SELECT CRF_ID FROM CRF WHERE NAME='"
+        // + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
 
-        return eb;
+        // <sql>INSERT INTO CRF_VERSION (CRF_ID, STATUS_ID, NAME,
+        // DESCRIPTION, OWNER_ID,
+        // DATE_CREATED, REVISION_NOTES)
+        // VALUES (?,?,?,?,?,NOW(),?)</sql>
+
+        CRFVersionBean cvb = (CRFVersionBean) eb;
+        HashMap variables = new HashMap();
+        // variables.put(Integer.valueOf(2), cb.getLabel());
+        variables.put(Integer.valueOf(1), Integer.valueOf(cvb.getCrfId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(cvb.getStatus().getId()));
+        variables.put(Integer.valueOf(3), cvb.getName());
+        variables.put(Integer.valueOf(4), cvb.getDescription());
+        variables.put(Integer.valueOf(5), Integer.valueOf(cvb.getOwner().getId()));
+        variables.put(Integer.valueOf(6), cvb.getRevisionNotes());
+        variables.put(Integer.valueOf(7), getValidOid(cvb, cvb.getName(), cvb.getOid()));
+        variables.put(Integer.valueOf(8), cvb.getXform());
+
+        // am i the only one who runs their daos' unit tests after I change
+        // things, tbh?
+        this.execute(digester.getQuery("create"), variables);
+        if (isQuerySuccessful()) {
+            cvb.setActive(true);
+        }
+        return cvb;
 
     }
 
@@ -111,6 +139,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         this.setTypeExpected(9, TypeNames.INT);
         this.setTypeExpected(10, TypeNames.INT);
         this.setTypeExpected(11, TypeNames.STRING);
+        this.setTypeExpected(12, TypeNames.STRING);
 
     }
 
@@ -127,12 +156,21 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         eb.setCrfId(((Integer) hm.get("crf_id")).intValue());
         eb.setRevisionNotes((String) hm.get("revision_notes"));
         eb.setOid((String) hm.get("oc_oid"));
+        eb.setXform((String) hm.get("xform"));
         return eb;
     }
 
     public Collection findAll() {
-        ArrayList al = new ArrayList();
+        this.setTypesExpected();
 
+        ArrayList al = new ArrayList();
+        ArrayList alist = this.select(digester.getQuery("findAll"));
+
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
         return al;
     }
 
@@ -241,6 +279,21 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         return al;
     }
 
+    public ArrayList findDefCRFVersionsByStudyEvent(int studyEventDefinitionId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventDefinitionId));
+        String sql = digester.getQuery("findDefCRFVersionsByStudyEvent");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+    }
+
     public boolean isItemUsedByOtherVersion(int versionId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
@@ -319,7 +372,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
 
     /**
      * Generates all the delete queries for deleting a version
-     *
+     * 
      * @param versionId
      * @param items
      */
@@ -457,7 +510,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
     }
 
     /**
-     *
+     * 
      * @param studySubjectId
      * @return
      */

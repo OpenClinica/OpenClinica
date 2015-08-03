@@ -999,7 +999,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(temp != null && temp.length() > 0 ? " NullValues=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
                 xml.append(" PasswordRequired=\"" + p.getPasswordRequired() + "\"");
                 temp = p.getDoubleDataEntry();
-                xml.append((temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "") + " HideCRF=\"" + p.getHideCrf() + "\"");
+                xml.append((temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "") + " HideCRF=\"" + p.getHideCrf() + "\""+" ParticipantForm=\"" + p.getParticipantForm() + "\"");
                 temp = p.getSourceDataVerification();
                 xml.append(temp != null && temp.length() > 0 ? " SourceDataVerification=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
                 xml.append("/>");

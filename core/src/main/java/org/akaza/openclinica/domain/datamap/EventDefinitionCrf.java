@@ -1,4 +1,5 @@
 package org.akaza.openclinica.domain.datamap;
+
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
@@ -32,7 +33,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "event_definition_crf")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class EventDefinitionCrf  extends DataMapDomainObject {
+public class EventDefinitionCrf extends DataMapDomainObject {
 
 	private int eventDefinitionCrfId;
 	private UserAccount userAccount;
@@ -56,6 +57,9 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 	private String selectedVersionIds;
 	private Integer parentId;
 	private Set datasetCrfVersionMaps = new HashSet(0);
+	private Boolean paricipantForm;
+	private Boolean allowAnonymousSubmission;
+	private String submissionUrl;
 
 	public EventDefinitionCrf() {
 	}
@@ -64,15 +68,9 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 		this.eventDefinitionCrfId = eventDefinitionCrfId;
 	}
 
-	public EventDefinitionCrf(int eventDefinitionCrfId,
-			UserAccount userAccount, StudyEventDefinition studyEventDefinition,
-			CrfVersion crfVersion, Study study, Status status, CrfBean crf,
-			Boolean requiredCrf, Boolean doubleEntry,
-			Boolean requireAllTextFilled, Boolean decisionConditions,
-			String nullValues, Date dateCreated, Date dateUpdated,
-			Integer updateId, Integer ordinal, Boolean electronicSignature,
-			Boolean hideCrf, Integer sourceDataVerificationCode,
-			String selectedVersionIds, Integer parentId,
+	public EventDefinitionCrf(int eventDefinitionCrfId, UserAccount userAccount, StudyEventDefinition studyEventDefinition, CrfVersion crfVersion, Study study, Status status, CrfBean crf,
+			Boolean requiredCrf, Boolean doubleEntry, Boolean requireAllTextFilled, Boolean decisionConditions, String nullValues, Date dateCreated, Date dateUpdated, Integer updateId,
+			Integer ordinal, Boolean electronicSignature, Boolean hideCrf, Boolean participantForm, Integer sourceDataVerificationCode, String selectedVersionIds, Integer parentId,
 			Set datasetCrfVersionMaps) {
 		this.eventDefinitionCrfId = eventDefinitionCrfId;
 		this.userAccount = userAccount;
@@ -92,6 +90,7 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 		this.ordinal = ordinal;
 		this.electronicSignature = electronicSignature;
 		this.hideCrf = hideCrf;
+		this.paricipantForm = participantForm;
 		this.sourceDataVerificationCode = sourceDataVerificationCode;
 		this.selectedVersionIds = selectedVersionIds;
 		this.parentId = parentId;
@@ -125,8 +124,7 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 		return this.studyEventDefinition;
 	}
 
-	public void setStudyEventDefinition(
-			StudyEventDefinition studyEventDefinition) {
+	public void setStudyEventDefinition(StudyEventDefinition studyEventDefinition) {
 		this.studyEventDefinition = studyEventDefinition;
 	}
 
@@ -150,14 +148,15 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 		this.study = study;
 	}
 
-    @Type(type = "status")
-    @Column(name = "status_id")
-    public Status getStatus() {
-        if (status != null) {
-            return status;
-        } else
-            return Status.AVAILABLE;
-    }
+	@Type(type = "status")
+	@Column(name = "status_id")
+	public Status getStatus() {
+		if (status != null) {
+			return status;
+		} else
+			return Status.AVAILABLE;
+	}
+
 	public void setStatus(Status status) {
 		this.status = status;
 	}
@@ -300,15 +299,41 @@ public class EventDefinitionCrf  extends DataMapDomainObject {
 		this.parentId = parentId;
 	}
 
-//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")
-//	public Set getDatasetCrfVersionMaps() {
-//		return this.datasetCrfVersionMaps;
-//	}
-//
-//	public void setDatasetCrfVersionMaps(Set datasetCrfVersionMaps) {
-//		this.datasetCrfVersionMaps = datasetCrfVersionMaps;
-//	}
+	@Column(name = "participant_form")
+	public Boolean getParicipantForm() {
+		return paricipantForm;
+	}
+
+	public void setParicipantForm(Boolean paricipantForm) {
+		this.paricipantForm = paricipantForm;
+	}
+
+	@Column(name = "allow_anonymous_submission")
+	public Boolean getAllowAnonymousSubmission() {
+		return allowAnonymousSubmission;
+	}
+
+	public void setAllowAnonymousSubmission(Boolean allowAnonymousSubmission) {
+		this.allowAnonymousSubmission = allowAnonymousSubmission;
+	}
+
+	@Column(name = "submission_urll")
+	public String getSubmissionUrl() {
+		return submissionUrl;
+	}
+
+	public void setSubmissionUrl(String submissionUrl) {
+		this.submissionUrl = submissionUrl;
+	}
 
 	
+	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")
+	// public Set getDatasetCrfVersionMaps() {
+	// return this.datasetCrfVersionMaps;
+	// }
+	//
+	// public void setDatasetCrfVersionMaps(Set datasetCrfVersionMaps) {
+	// this.datasetCrfVersionMaps = datasetCrfVersionMaps;
+	// }
 
 }

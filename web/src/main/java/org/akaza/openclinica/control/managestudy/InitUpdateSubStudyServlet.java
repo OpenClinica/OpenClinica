@@ -20,15 +20,20 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -59,7 +64,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-
+    	//baseUrl();
         String userName = request.getRemoteUser();
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
@@ -97,6 +102,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
                             // logger.info("value:" +
                             // scg.getValue().getValue());
                             StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(), scg.getParameter().getHandle());
+                            if (spvb.getValue().equals("enabled")) baseUrl(); 
                             if (spvb.getId() > 0) {
                                 // the sub study itself has the parameter
                                 scg.setValue(spvb);
@@ -135,9 +141,24 @@ public class InitUpdateSubStudyServlet extends SecureController {
         }
 
     }
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
+
+    }
 
     private void createEventDefinitions(StudyBean parentStudy) {
         FormProcessor fp = new FormProcessor(request);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+
         int siteId = Integer.valueOf(request.getParameter("id").trim());
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -147,6 +168,9 @@ public class InitUpdateSubStudyServlet extends SecureController {
         seds = sedDao.findAllByStudy(parentStudy);
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
+            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs =
                 (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId, parentStudy.getId());
@@ -161,9 +185,14 @@ public class InitUpdateSubStudyServlet extends SecureController {
                     ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) cvdao.findAllActiveByCRF(edcBean.getCrfId());
                     edcBean.setVersions(versions);
                     edcBean.setCrfName(crf.getName());
+                    
+                    if (edcBean.getParentId()==0)
+                        edcBean.setSubmissionUrl("");
+                    
                     CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
                     edcBean.setDefaultVersionName(defaultVersion.getName());
                     String sversionIds = edcBean.getSelectedVersionIds();
+                    
                     ArrayList<Integer> idList = new ArrayList<Integer>();
                     if (sversionIds.length() > 0) {
                         String[] ids = sversionIds.split("\\,");

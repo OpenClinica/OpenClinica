@@ -67,7 +67,7 @@
                     }
                 } else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
                      var ieversion=new Number(RegExp.$1)
-                     if (ieversion!=8 && ieversion!=7){
+                     if (!(ieversion>=8)){
                      document.write("<tr> <td align='center' > <h4>"+
                          "<fmt:message key="choose_browser" bundle="${restext}"/> "+
                          "</h4></td> </tr>");

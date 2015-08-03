@@ -88,6 +88,14 @@ public class AuditDAO extends EntityDAO {
     public void setTypesExpectedWithItemDataType() {
         this.setTypesExpected();
         this.setTypeExpected(14, TypeNames.INT); // item_data_type_id
+        this.setTypeExpected(15, TypeNames.INT); // event_crf_version_id
+        this.setTypeExpected(16, TypeNames.STRING); // event_crf_version_Name
+        this.setTypeExpected(17, TypeNames.STRING); // event_crf_Name
+        this.setTypeExpected(18, TypeNames.INT); // study_event_id
+        this.setTypeExpected(19, TypeNames.INT); // ordinal
+        this.setTypeExpected(20, TypeNames.DATE); // interviewed_date
+        this.setTypeExpected(21, TypeNames.STRING); // interviewer
+        this.setTypeExpected(22, TypeNames.INT); // ordinal from audit_log_event table
     }
 
     /**
@@ -117,7 +125,8 @@ public class AuditDAO extends EntityDAO {
         eb.setAuditEventTypeId(((Integer) hm.get("audit_log_event_type_id")).intValue());
         eb.setUserName((String) hm.get("user_name"));
         eb.setAuditEventTypeName((String) hm.get("name"));
-
+        
+        
         return eb;
     }
 
@@ -127,6 +136,22 @@ public class AuditDAO extends EntityDAO {
         return eb;
     }
 
+    public Object getEntityFromHashMapWithItemDataTypeUpdated(HashMap hm) {
+        AuditBean eb = (AuditBean) this.getEntityFromHashMap(hm);
+        eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));       
+        eb.setEventCrfVersionId((Integer) hm.get("event_crf_version_id"));
+        eb.setCrfVersionName((String) hm.get("crf_version_name"));
+        eb.setCrfName((String) hm.get("crf_name"));       
+        eb.setStudyEventId((Integer) hm.get("study_event_id"));
+        eb.setOrdinal((Integer) hm.get("ordinal"));
+        eb.setDateInterviewed((java.util.Date) hm.get("date_interviewed"));
+        eb.setInterviewerName((String) hm.get("interviewer_name"));          
+        if (  ((Integer) hm.get("item_data_repeat_key")) != null)
+          eb.setItemDataRepeatKey(((Integer) hm.get("item_data_repeat_key")));
+        return eb;
+    }
+
+    
     /*
      * Find By Primary Key
      *
@@ -251,6 +276,67 @@ public class AuditDAO extends EntityDAO {
     }
 
     /*
+    * Find audit log events type for an EventCrf
+    *
+    */
+    public Collection findEventCRFAudit(int eventCRFId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCRFId));
+
+        String sql = digester.getQuery("findEventCrfAuditLog");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+    
+
+    public Collection findAllEventCRFAuditEvents(int studyEventId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventId));
+
+        String sql = digester.getQuery("findAllEventCRFAuditEvents");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeUpdated((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+
+    public Collection findAllEventCRFAuditEventsWithItemDataType(int studyEventId) {
+        this.setTypesExpectedWithItemDataType();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventId));
+
+        String sql = digester.getQuery("findAllEventCRFAuditEventsWithItemDataType");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMapWithItemDataTypeUpdated((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+    
+    
+    
+    /*
      * Find audit log events type for an Study Event
      *
      */
@@ -283,7 +369,8 @@ public class AuditDAO extends EntityDAO {
         this.setTypeExpected(2, TypeNames.STRING); // crf name
         this.setTypeExpected(3, TypeNames.STRING); // crf version
         this.setTypeExpected(4, TypeNames.STRING); // user name
-        this.setTypeExpected(5, TypeNames.DATE); // delete date
+        this.setTypeExpected(5, TypeNames.TIMESTAMP); // delete date
+        this.setTypeExpected(6, TypeNames.INT); // delete date
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(13)); // audit_log_event_type_id
@@ -304,11 +391,51 @@ public class AuditDAO extends EntityDAO {
             bean.setCrfVersion((String) map.get("crf_version_name"));
             bean.setDeletedBy((String) map.get("user_name"));
             bean.setDeletedDate((Date) map.get("audit_date"));
+            bean.setDeletedEventCrfId((Integer) map.get("event_crf_id"));
+            
             al.add(bean);
         }
         return al;
 
     }
+
+    public List findDeletedEventCRFsFromAuditEventByEventCRFStatus(int studyEventId) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); // study_event_id
+        //this.setTypeExpected(2, TypeNames.INT); // study_event_id
+        this.setTypeExpected(2, TypeNames.STRING); // crf name
+        this.setTypeExpected(3, TypeNames.STRING); // crf version
+        this.setTypeExpected(4, TypeNames.STRING); // user name
+        this.setTypeExpected(5, TypeNames.TIMESTAMP); // delete date
+        this.setTypeExpected(6, TypeNames.INT); // delete date
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(40)); // audit_log_event_type_id Event_crf status = deleted
+        // 40 means deleted
+        // items
+        variables.put(new Integer(2), new Integer(studyEventId));
+
+        String sql = digester.getQuery("findDeletedEventCRFsFromAuditEventByEventCRFStatus");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        logger.info("alist size [" + alist.size() + "]");
+        while (it.hasNext()) {
+            DeletedEventCRFBean bean = new DeletedEventCRFBean();
+            HashMap map = (HashMap) it.next();
+            bean.setStudyEventId(studyEventId);
+            bean.setCrfName((String) map.get("crf_name"));
+            bean.setCrfVersion((String) map.get("crf_version_name"));
+            bean.setDeletedBy((String) map.get("user_name"));
+            bean.setDeletedDate((Date) map.get("audit_date"));
+            bean.setDeletedEventCrfId((Integer) map.get("event_crf_id"));
+            
+            al.add(bean);
+        }
+        return al;
+
+    }
+
 
     // ///////////////////////////////////////////////////////////////////////////////////////////////////
     // TODO: This method not fully implemented

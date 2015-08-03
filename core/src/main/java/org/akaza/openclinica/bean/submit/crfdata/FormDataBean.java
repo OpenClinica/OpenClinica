@@ -10,7 +10,8 @@ public class FormDataBean {
     private AuditLogsBean auditLogs;
     private DiscrepancyNotesBean discrepancyNotes;
     private String formOID;
-    
+    private String EventCRFStatus;
+
     public FormDataBean() {
         itemGroupData = new ArrayList<ImportItemGroupDataBean>();
         auditLogs = new AuditLogsBean();
@@ -23,6 +24,14 @@ public class FormDataBean {
 
     public void setFormOID(String formOID) {
         this.formOID = formOID;
+    }
+
+    public String getEventCRFStatus() {
+        return EventCRFStatus;
+    }
+
+    public void setEventCRFStatus(String eventCRFStatus) {
+        EventCRFStatus = eventCRFStatus;
     }
 
     public ArrayList<ImportItemGroupDataBean> getItemGroupData() {

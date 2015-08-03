@@ -110,9 +110,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; //
+        ind++; // time_zone
+//        this.setTypeExpected(ind, TypeNames.INT);
+ //       ind++; //
     }
 
     public void setTypesExpectedFilter() {
@@ -134,9 +134,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
 
         this.setTypeExpected(ind, TypeNames.DATE);
         ind++; // enrollment_date
-        this.setTypeExpected(ind, TypeNames.DATE);
+        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
         ind++; // date_created
-        this.setTypeExpected(ind, TypeNames.DATE);
+        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
         ind++; // date_updated
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // owner_id
@@ -144,12 +144,6 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++; // update_id
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // oc oid
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++;
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++;
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++;
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++;
 
@@ -217,6 +211,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         eb.setStudyName((String) hm.get("unique_identifier"));
 //        eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
+        eb.setTime_zone((String) hm.get("time_zone"));
         return eb;
     }
 
@@ -1059,12 +1054,19 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             variables.put(new Integer(ind), enrollmentDate);
             ind++;
         }
-
-        variables.put(new Integer(ind), new java.util.Date());
-        ind++;
+      // date_updated is set to now()
+      //  variables.put(new Integer(ind), new java.util.Date());
+      //  ind++;
         variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
+        ind++;
+        if (sb.getTime_zone() == null || sb.getTime_zone().equals("")) {
+            nullVars.put(new Integer(ind), new Integer(TypeNames.STRING));
+            variables.put(new Integer(ind), "");
+        } else {
+            variables.put(new Integer(ind), sb.getTime_zone());
+        }
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));
         ind++;
