@@ -239,6 +239,7 @@ public class OpenRosaServices {
 
   public SubjectBean createSubjectBean(UserAccountBean uBean){
 	  SubjectBean subjectBean = new SubjectBean();   
+	  subjectBean.setGender('\0');    // setting null character
 	  subjectBean.setOwner(uBean);
 	  subjectBean.setStatus(Status.AVAILABLE);	 
 	  SubjectDAO subjectdao = new SubjectDAO(dataSource);	  	  
@@ -248,6 +249,7 @@ public class OpenRosaServices {
   
   public StudySubjectBean createStudySubjectBean(StudyBean sBean, SubjectBean subjectBean,UserAccountBean uBean){
 	  StudySubjectBean ssBean = new StudySubjectBean();   
+	  subjectBean.setGender('\0');    // setting null character
 	  ssBean.setStudyId(sBean.getId());
 	  ssBean.setSubjectId(subjectBean.getId());
 	  ssBean.setStatus(Status.AVAILABLE);
