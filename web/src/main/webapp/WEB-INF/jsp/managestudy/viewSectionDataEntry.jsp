@@ -4,8 +4,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-
 <jsp:useBean scope='session' id='studySubjectId' class='java.lang.String'/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
@@ -40,9 +38,9 @@
 <title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/print.css" type="text/css" media="print">
-    <script type="text/JavaScript" language="JavaScript" src="<c:out value="${contextPath}" />/includes/global_functions_javascript.js"></script>
+    <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <!-- <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script> -->
     <script type="text/javascript" language="JavaScript" src=
@@ -221,7 +219,7 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
-    <img src="<c:out value="${contextPath}" />/images/arrow_back_dis.gif" border="0"/></td>
+    <img src="images/arrow_back_dis.gif" border="0"/></td>
 </c:if>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -327,7 +325,7 @@ function checkDataStatus() {
 <c:if test="${fn:length(toc.sections) gt 1}">
 
 <td align="right" id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
-<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="<c:out value="${contextPath}" />/images/arrow_next.gif" border="0" style=
+<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
   "margin-top:10px;margin-right:6px"/></a></td>
 <td>&nbsp;
     <div class="formfieldM_BG_noMargin">

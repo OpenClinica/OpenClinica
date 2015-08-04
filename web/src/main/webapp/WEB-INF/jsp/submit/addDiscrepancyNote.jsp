@@ -17,7 +17,7 @@
 <head>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
-<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
+<link rel="stylesheet" href="includes/styles.css" type="text/css">
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>

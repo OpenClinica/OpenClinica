@@ -25,7 +25,7 @@
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-<link rel="stylesheet" href="<c:out value="${contextPath}" />/includes/styles.css" type="text/css">
+<link rel="stylesheet" href="includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -34,7 +34,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
     <!-- Added for the new Calender -->
 
-    <link rel="stylesheet" type="text/css" media="all" href="<c:out value="${contextPath}" />/includes/new_cal/skins/aqua/theme.css" title="Aqua" />
+    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
