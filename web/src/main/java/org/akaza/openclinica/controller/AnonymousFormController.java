@@ -81,8 +81,9 @@ public class AnonymousFormController {
 				EventDefinitionCRFBean edcBean = edcBeans.get(0);
 				CRFVersionDAO cvdao = new CRFVersionDAO<>(dataSource);
 				CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
-
-				formUrl = createAnonymousEnketoUrl(parentStudy.getOid(), crfVersionBean);
+                StudyBean sBean = (StudyBean) sdao.findByPK(edcBean.getStudyId());
+				
+				formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean ,edcBean.getStudyEventDefinitionId());
 				System.out.println("FormUrl:  " + formUrl);
 				return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.OK);
 			} else {
@@ -127,10 +128,10 @@ public class AnonymousFormController {
 		return studyBean;
 	}
 
-	private String createAnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion) throws Exception {
+	private String createAnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion, int studyEventDefinitionId) throws Exception {
 		PFormCache cache = PFormCache.getInstance(context);
 		String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
-		String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid());
+		String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid(),studyEventDefinitionId);
 
 		String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
 		logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);

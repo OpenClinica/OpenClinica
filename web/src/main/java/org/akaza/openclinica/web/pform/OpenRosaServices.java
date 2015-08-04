@@ -25,21 +25,29 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -64,7 +72,19 @@ import org.akaza.openclinica.service.pmanage.Submission;
 @Component
 public class OpenRosaServices {
 
-    public static final String FORM_CONTEXT = "ecid";
+	public static final String INPUT_USER_SOURCE = "userSource";
+	public static final String INPUT_FIRST_NAME = "Participant";
+	public static final String INPUT_LAST_NAME = "User";
+	public static final String INPUT_EMAIL = "email";
+	public static final String INPUT_INSTITUTION = "PFORM";
+	public static final String INPUT_STUDY = "activeStudy";
+	public static final String INPUT_ROLE = "role";
+	public static final String INPUT_TYPE = "type";
+	public static final String INPUT_DISPLAY_PWD = "displayPwd";
+	public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+	public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+
+	public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
     private DataSource dataSource;
     private CoreResources coreResources;
@@ -74,6 +94,7 @@ public class OpenRosaServices {
     ParticipantPortalRegistrar participantPortalRegistrar;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
+    StudySubjectDAO studySubjectDao;
 
     @GET
     @Path("/{studyOID}/formList")
@@ -183,6 +204,78 @@ public class OpenRosaServices {
 
     }
 
+    
+  public StudySubjectBean getSSBean(HashMap<String, String> userContext) throws Exception{    
+	     String studySubjectOid = userContext.get("studySubjectOID");
+    StudySubjectBean ssBean = null;
+    StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
+    SubjectDAO subjectdao = new SubjectDAO(dataSource);
+    UserAccountDAO udao = new UserAccountDAO(dataSource);
+   if(studySubjectOid !=null){
+        ssBean = ssdao.findByOid(studySubjectOid);	     
+   }else{
+	 String studyOid = userContext.get("studyOID"); 
+	 
+	 StudyBean studyBean =sdao.findByOid(studyOid);
+     int studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID"));
+     int studyEventOrdinal = Integer.valueOf(userContext.get("studyEventOrdinal"));
+	  UserAccountBean uBean =(UserAccountBean) udao.findByPK(1);    
+     // build Subject Account
+	  SubjectBean subjectBean = createSubjectBean(uBean);
+	  subjectBean = (SubjectBean) subjectdao.findByPK(subjectBean.getId());
+     // build StudySubject Account
+	  ssBean = createStudySubjectBean(studyBean,subjectBean,uBean);
+     ssBean = (StudySubjectBean) ssdao.findByPK(ssBean.getId());
+     System.out.println("study subject oid:  "+ssBean.getOid());
+      // build User Account
+      UserAccountBean userAccountBean = createUserAccount(uBean, studyBean, ssBean);
+      userAccountBean = (UserAccountBean) udao.findByPK(userAccountBean.getId());
+      // build and schedule study Event      
+      StudyEventBean studyEventBean = createStudyEventBean(ssBean,studyEventDefnId, studyEventOrdinal, userAccountBean);
+   }	    
+  return ssBean;
+  }
+    
+
+  public SubjectBean createSubjectBean(UserAccountBean uBean){
+	  SubjectBean subjectBean = new SubjectBean();   
+	  subjectBean.setOwner(uBean);
+	  subjectBean.setStatus(Status.AVAILABLE);	 
+	  SubjectDAO subjectdao = new SubjectDAO(dataSource);	  	  
+	 return subjectdao.create(subjectBean); 
+  }
+
+  
+  public StudySubjectBean createStudySubjectBean(StudyBean sBean, SubjectBean subjectBean,UserAccountBean uBean){
+	  StudySubjectBean ssBean = new StudySubjectBean();   
+	  ssBean.setStudyId(sBean.getId());
+	  ssBean.setSubjectId(subjectBean.getId());
+	  ssBean.setStatus(Status.AVAILABLE);
+	  ssBean.setOwner(uBean);
+	  ssBean.setEnrollmentDate(new Date());
+      int nextLabel = getStudySubjectDao().findTheGreatestLabel() + 1;
+      ssBean.setLabel(Integer.toString(nextLabel));      
+      StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);	
+      ssBean = (StudySubjectBean)ssdao.create(ssBean, false);
+	return  ssBean;
+  }
+  
+  
+  public StudyEventBean createStudyEventBean(StudySubjectBean ssBean , int studyEventDefinitionId ,int studyEventDefnOrdinal , UserAccountBean uBean){
+	  StudyEventBean studyEventBean = new StudyEventBean();   
+      studyEventBean.setStudySubjectId(ssBean.getId());
+      studyEventBean.setStudyEventDefinitionId(studyEventDefinitionId);
+      studyEventBean.setSampleOrdinal(studyEventDefnOrdinal);
+      studyEventBean.setStatus(Status.AVAILABLE);
+      studyEventBean.setOwner(uBean);
+      studyEventBean.setDateStarted(new Date());
+	  studyEventBean.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+	  StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);	  	  
+	  studyEventBean =(StudyEventBean)studyEventDao.create(studyEventBean);
+	  return studyEventBean;
+  }
+  
+    
     @POST
     @Path("/{studyOID}/submission")
     @Produces(MediaType.APPLICATION_XML)
@@ -207,13 +300,16 @@ public class OpenRosaServices {
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
+            
+            
+            
+            
             StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
-            StudySubjectBean ssBean = ssdao.findByOid(userContext.get("studySubjectOID"));
-
+            StudySubjectBean ssBean = getSSBean(userContext);
+            
             if (!mayProceedSubmission(studyOID, ssBean))
                 return null;
 
-            studySubjectOid = userContext.get("studySubjectOID");
             studyEventDefnId = Integer.valueOf(userContext.get("studyEventDefinitionID"));
             studyEventOrdinal = Integer.valueOf(userContext.get("studyEventOrdinal"));
             crfVersionOID = userContext.get("crfVersionOID");
@@ -227,7 +323,7 @@ public class OpenRosaServices {
             body = body.substring(0, body.indexOf("</F_") + length + 2);
             body = "<instance>" + body + "</instance>";
 
-            Errors errors = getPformSubmissionService().saveProcess(body, studySubjectOid, studyEventDefnId, studyEventOrdinal);
+            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal);
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -440,5 +536,69 @@ public class OpenRosaServices {
         }
         return accessPermission;
     }
+    public StudySubjectDAO getStudySubjectDao() {
+        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+        return studySubjectDao;
+    }
+
+    	private UserAccountBean createUserAccount(UserAccountBean rootUserAccount, StudyBean studyBean, StudySubjectBean studySubjectBean)
+	throws Exception {
+
+    		UserAccountBean createdUserAccountBean = new UserAccountBean();
+      createdUserAccountBean.setName(getInputUsername(studyBean, studySubjectBean));
+      createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
+      createdUserAccountBean.setLastName(INPUT_LAST_NAME);
+      createdUserAccountBean.setEmail(INPUT_EMAIL);
+      createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
+      createdUserAccountBean.setActiveStudyId(studyBean.getId());
+      String passwordHash = UserAccountBean.LDAP_PASSWORD;
+      createdUserAccountBean.setPasswd(passwordHash);
+      createdUserAccountBean.setPasswdTimestamp(null);
+      createdUserAccountBean.setLastVisitDate(null);
+      createdUserAccountBean.setActiveStudyId(studyBean.getId());
+      createdUserAccountBean.setStatus(Status.DELETED);
+      createdUserAccountBean.setPasswdChallengeQuestion("");
+      createdUserAccountBean.setPasswdChallengeAnswer("");
+      createdUserAccountBean.setPhone("");
+      createdUserAccountBean.setOwner(rootUserAccount);
+      createdUserAccountBean.setRunWebservices(false);
+      Role r = Role.RESEARCHASSISTANT2;
+      createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyBean.getId(), r, rootUserAccount);
+      UserType type = UserType.get(2);
+      createdUserAccountBean.addUserType(type);
+      
+      UserAccountDAO udao = new UserAccountDAO(dataSource);
+      createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean);
+//authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
+return createdUserAccountBean;
+}
+
+    	
+    	private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r, UserAccountBean rootUserAccount) {
+        StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
+        studyUserRole.setStudyId(studyId);
+        studyUserRole.setRoleName(r.getName());
+        studyUserRole.setStatus(Status.AUTO_DELETED);
+        studyUserRole.setOwner(rootUserAccount);
+        createdUserAccountBean.addRole(studyUserRole);
+       return createdUserAccountBean;
+}
+
+    	public String getInputUsername(StudyBean studyBean, StudySubjectBean studySubjectBean) {
+    		String inputUserName = null;
+    		if (studySubjectBean != null) {
+    			if (studyBean.getParentStudyId() > 0)
+    				studyBean = getStudy(studyBean.getParentStudyId());
+
+    			inputUserName = studyBean.getOid() + "." + studySubjectBean.getOid();
+    		}
+    		return inputUserName;
+    	}
+
+    	private StudyBean getStudy(Integer id) {
+    		sdao = new StudyDAO(dataSource);
+    		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+    		return studyBean;
+    	}
 
 }
