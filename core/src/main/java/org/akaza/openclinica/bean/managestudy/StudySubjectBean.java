@@ -21,7 +21,8 @@ import java.util.Date;
 public class StudySubjectBean extends AuditableEntityBean {
     // STUDY_SUBJECT_ID, LABEL, SUBJECT_ID, STUDY_ID
     // STATUS_ID, DATE_CREATED, OWNER_ID,
-    // DATE_UPDATED, UPDATE_ID,secondary_label
+    // DATE_UPDATED, UPDATE_ID, secondary_label
+    // unique_identifier
     private String label = "";
 
     private int subjectId;
@@ -40,8 +41,7 @@ public class StudySubjectBean extends AuditableEntityBean {
 
     private String secondaryLabel = "";
 
-    private String uniqueIdentifier = "";// not in the table, for display
-    // purpose
+    private String uniqueIdentifier = "";
 
     private String studyName = "";// not in the table, for display purpose
 

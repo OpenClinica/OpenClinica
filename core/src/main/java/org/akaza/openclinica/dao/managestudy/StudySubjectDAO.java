@@ -111,6 +111,10 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // time_zone
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // study unique identifier
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // subject unique identifier
 //        this.setTypeExpected(ind, TypeNames.INT);
  //       ind++; //
     }
@@ -208,7 +212,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         eb.setEnrollmentDate((Date) hm.get("enrollment_date"));
         eb.setSecondaryLabel((String) hm.get("secondary_label"));
         eb.setOid((String) hm.get("oc_oid"));
-        eb.setStudyName((String) hm.get("unique_identifier"));
+        eb.setUniqueIdentifier((String) hm.get("unique_identifier"));
 //        eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         eb.setTime_zone((String) hm.get("time_zone"));

@@ -77,7 +77,7 @@
     </query>
     <query>
         <name>getWithFilterAndSort</name>
-        <sql>SELECT DISTINCT(ss.*), ST.unique_identifier 
+        <sql>SELECT DISTINCT(ss.*), ST.unique_identifier, s.unique_identifier
                 FROM study_subject ss LEFT JOIN study_event se ON ss.study_subject_id = se.study_subject_id,STUDY ST,SUBJECT S
                 where
                     SS.SUBJECT_ID=S.SUBJECT_ID

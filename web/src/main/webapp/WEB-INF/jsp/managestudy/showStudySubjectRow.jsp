@@ -33,6 +33,7 @@
         <td class="table_cell" style="display: all" id="Groups_0_2_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.oid}"/>&nbsp;</td>
         <td class="table_cell" style="display: all" id="Groups_0_3_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.gender}"/>&nbsp;</td>
         <td class="table_cell" style="display: all" id="Groups_0_4_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.secondaryLabel}"/>&nbsp;</td>
+        <td class="table_cell" style="display: all" id="Groups_0_5_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.subject.uniqueIdentifier}"/>&nbsp;</td>
         <%-- This value should not be hard-coded --%>
         <c:set var="groupCount" value="5"/>
         <c:forEach var="group" items="${currRow.bean.studyGroups}">
@@ -56,6 +57,7 @@
         <td class="table_cell" style="display: none" id="Groups_0_2_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.oid}"/>&nbsp;</td>
         <td class="table_cell" style="display: none" id="Groups_0_3_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.gender}"/>&nbsp;</td>
         <td class="table_cell" style="display: none" id="Groups_0_4_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.secondaryLabel}"/>&nbsp;</td>
+        <td class="table_cell" style="display: none" id="Groups_0_5_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.subject.uniqueIdentifier}"/>&nbsp;</td>
 
         <c:set var="groupCount" value="5"/>
         <c:forEach var="group" items="${currRow.bean.studyGroups}">
