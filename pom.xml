@@ -29,8 +29,15 @@
 
 		<!-- Library Versions -->
 		<spring.version>3.0.5.RELEASE</spring.version>
+		<db.test>localhost</db.test>
 	</properties>
 	<profiles>
+		<profile>
+			<id>codeship</id>
+			<properties>
+					<db.test>107.170.116.150</db.test>
+			</properties>
+		</profile>
 		<profile>
 			<!-- This profile is not compatible with Maven v2. Use it with Maven v3 
 				only. -->
@@ -507,10 +514,24 @@
 			</resource>
 		</resources>
 
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+				</includes>
+			</testResource>
+		</testResources>
+
+		<!--
 		<filters>
 			<filter>src/main/filters/default.properties</filter>
 			<filter>src/main/filters/${config.id}.properties</filter>
 		</filters>
+		-->
 
 	</build>
 	<scm>
