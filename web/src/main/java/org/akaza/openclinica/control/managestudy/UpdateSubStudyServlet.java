@@ -20,18 +20,24 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.fop.fo.properties.ToBeImplementedProperty;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author jxu
@@ -295,10 +301,12 @@ public class UpdateSubStudyServlet extends SecureController {
 
     }
 
-    private void submitSiteEventDefinitions(StudyBean site) {
+    private void submitSiteEventDefinitions(StudyBean site) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         Validator v = new Validator(request);
-        
+        HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
+        HashMap<String, Boolean> changeStatus = (HashMap<String, Boolean>) session.getAttribute("changed");
+
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         
         ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
@@ -317,20 +325,22 @@ public class UpdateSubStudyServlet extends SecureController {
 
         ArrayList <EventDefinitionCRFBean> toBeCreatedEventDefBean = new ArrayList<>();
         ArrayList <EventDefinitionCRFBean> toBeUpdatedEventDefBean = new ArrayList<>();
-    
+        ArrayList <EventDefinitionCRFBean> edcsInSession = new ArrayList<EventDefinitionCRFBean>();
+        boolean changestate = false;
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
         
         for (StudyEventDefinitionBean sed : seds) {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            request.setAttribute("participateFormStatus",participateFormStatus );
+            if (participateFormStatus.equals("enabled")) 	baseUrl();
+          request.setAttribute("participateFormStatus",participateFormStatus );
 
         	
 
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
             int start = 0;
             for (EventDefinitionCRFBean edcBean : edcs) {
-            	EventDefinitionCRFBean persistEventDefBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
+
                 int edcStatusId = edcBean.getStatus().getId();
                 if (edcStatusId == 5 || edcStatusId == 7) {
                 } else {
@@ -359,6 +369,13 @@ public class UpdateSubStudyServlet extends SecureController {
                     String sdvOption = fp.getString("sdvOption" + order);
 
                     boolean changed = false;
+                   
+                    if(changeStatus!=null){ 
+                    	changed = changeStatus.get(sed.getId() + "-" + edcBean.getId());
+                        edcBean.setSubmissionUrl(submissionUrl);
+                    }
+
+
                     boolean isRequired = !StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim()) ? true : false;
                     boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim()) ? true : false;
                     boolean hasPassword = !StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim()) ? true : false;
@@ -391,7 +408,7 @@ public class UpdateSubStudyServlet extends SecureController {
                             changed = true;
                             edcBean.setHideCrf(isHide);
                         }
-                        if (!submissionUrl.equals(edcBean.getSubmissionUrl()) || !submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
+                        if (!submissionUrl.equals(edcBean.getSubmissionUrl())) {
                             changed = true;
                             edcBean.setSubmissionUrl(submissionUrl);
                         }
@@ -428,7 +445,7 @@ public class UpdateSubStudyServlet extends SecureController {
                                 if (isDouble == edcBean.isDoubleEntry()) {
                                     if (hasPassword == edcBean.isElectronicSignature()) {
                                         if (isHide == edcBean.isHideCrf()) {
-                                                    if (submissionUrl.equals(edcBean.getSubmissionUrl()) && submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
+                                             if (submissionUrl.equals("")) {
 
                                             if (selectedVersionIdListSize > 0) {
                                                 if (selectedVersionIdListSize == edcBean.getVersions().size()) {
@@ -443,7 +460,7 @@ public class UpdateSubStudyServlet extends SecureController {
                                             }
                                     } else {
                                         changed = true;
-                                    }
+                                  }
                                         } else {
                                             changed = true;
                                         }
@@ -485,6 +502,7 @@ public class UpdateSubStudyServlet extends SecureController {
                             edcBean.setParentId(edcBean.getId());
                             edcBean.setStudyId(site.getId());
                             edcBean.setUpdater(ub);
+                            edcBean.setId(0);
                             edcBean.setUpdatedDate(new Date());
                             logger.debug("create for the site");
                             toBeCreatedEventDefBean.add(edcBean);
@@ -492,10 +510,13 @@ public class UpdateSubStudyServlet extends SecureController {
                         }
                     }
                     ++start;
+                    changes.put(sed.getId() + "-" + edcBean.getId(), changed);
                 }
+                edcsInSession.add(edcBean);
+
             }
             
-             eventDefCrfList = validateSubmissionUrl(edcs,eventDefCrfList,v);
+             eventDefCrfList = validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
 
 
         }
@@ -505,12 +526,13 @@ public class UpdateSubStudyServlet extends SecureController {
             logger.info("has errors");
             StudyBean study = createStudyBean();
             session.setAttribute("newStudy", study);
-            session.setAttribute("definitions", seds);
             request.setAttribute("formMessages", errors);
-            
+            session.setAttribute("changed", changes);
+
             forwardPage(Page.UPDATE_SUB_STUDY);
         }else{  
             for (EventDefinitionCRFBean toBeCreated: toBeCreatedEventDefBean){
+         
             	edcdao.create(toBeCreated);
             }
             for (EventDefinitionCRFBean toBeUpdated: toBeUpdatedEventDefBean){
@@ -522,9 +544,10 @@ public class UpdateSubStudyServlet extends SecureController {
     }
 
     /**
-     * Inserts the new study into databa * *
+     * Inserts the new study into databa * 
+     * @throws MalformedURLException *
      */
-    private void submitStudy() {
+    private void submitStudy() throws MalformedURLException {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) session.getAttribute("newStudy");
         ArrayList parameters = study.getStudyParameters();
@@ -598,20 +621,20 @@ public class UpdateSubStudyServlet extends SecureController {
             boolean isExist = false;
             for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
             		  sessionBean = edcsInSession.get(i);
-            		 
-            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
-            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
-            		System.out.println();
+            		System.out.println("iter:           "+eventDef.getId()+       "--db:    "+eventDef.getSubmissionUrl()); 
+            		System.out.println("edcsInSession:  "+sessionBean.getId()   + "--session:"+sessionBean.getSubmissionUrl()); 
             	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
                 if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                 	System.out.println("Duplicate ****************************");
+            		System.out.println();
                 	isExist = true;
             	   break;
             	}else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())){
                 	System.out.println("Not Duplicate  ***********");
+            		System.out.println();
                 	isExist = true;
             		break;
             	}
@@ -623,6 +646,20 @@ public class UpdateSubStudyServlet extends SecureController {
         }
     	return eventDefCrfList;
     }
-    
+
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
+
+    }
+
 
 }

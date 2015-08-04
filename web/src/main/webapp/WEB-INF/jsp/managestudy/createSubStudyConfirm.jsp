@@ -530,10 +530,15 @@
             </c:otherwise>
         </c:choose>
     </td>
-        <td class="table_cell" colspan="6">
-        <fmt:message key="submission_url" bundle="${resword}"/>
+    
+    
+                <td class="table_cell" colspan="6">
+        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
                 <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
-    </td>
+          <c:set var="summary" value="submissionUrl${num}"/>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+        </td>
+    
      </c:when>  
             <c:otherwise>
         <td class="table_cell" colspan="8"> </td>

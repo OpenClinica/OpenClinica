@@ -155,7 +155,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
     }
 
-    private void createEventDefinitions(StudyBean parentStudy) {
+    private void createEventDefinitions(StudyBean parentStudy) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
@@ -169,6 +169,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+              if (participateFormStatus.equals("enabled")) 	baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             int defId = sed.getId();
@@ -232,5 +233,4 @@ public class InitUpdateSubStudyServlet extends SecureController {
             return "";
         }
     }
-
 }
