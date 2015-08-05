@@ -376,6 +376,9 @@ public class DefineStudyEventServlet extends SecureController {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
              request.setAttribute("participateFormStatus",participateFormStatus );
+             if (participateFormStatus.equals("enabled")) baseUrl();
+
+             request.setAttribute("participateFormStatus",participateFormStatus );
 
         
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
@@ -527,6 +530,8 @@ public class DefineStudyEventServlet extends SecureController {
             session.setAttribute("eventDefinitionCRFs", new ArrayList());
             session.setAttribute("definition", sed);
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            if (participateFormStatus.equals("enabled")) baseUrl();
+
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             ArrayList<String> sdvOptions = new ArrayList<String>();
@@ -535,7 +540,6 @@ public class DefineStudyEventServlet extends SecureController {
             sdvOptions.add(SourceDataVerification.NOTREQUIRED.toString());
             sdvOptions.add(SourceDataVerification.NOTAPPLICABLE.toString());
             request.setAttribute("sdvOptions", sdvOptions);
-            baseUrl(); 
             forwardPage(Page.DEFINE_STUDY_EVENT3);
         }
 

@@ -172,7 +172,6 @@ public class CreateSubStudyServlet extends SecureController {
                 session.setAttribute("definitions", this.initDefinitions(newStudy));
                 request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
                 request.setAttribute("statuses", Status.toActiveArrayList());
-                baseUrl();
                 forwardPage(Page.CREATE_SUB_STUDY);
             }
 
@@ -459,9 +458,10 @@ public class CreateSubStudyServlet extends SecureController {
 
     }
 
-    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site, Validator v) {
+    private ArrayList<StudyEventDefinitionBean> createSiteEventDefinitions(StudyBean site, Validator v) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        ArrayList <EventDefinitionCRFBean> edcsInSession = new ArrayList<EventDefinitionCRFBean>();
 
         StudyBean parentStudyBean;
         if (site.getParentStudyId()==0){
@@ -484,6 +484,7 @@ public class CreateSubStudyServlet extends SecureController {
         HashMap<String, Boolean> changes = new HashMap<String, Boolean>();
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            if (participateFormStatus.equals("enabled")) baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
          //   EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -575,7 +576,7 @@ public class CreateSubStudyServlet extends SecureController {
                                 if (isDouble == edcBean.isDoubleEntry()) {
                                     if (hasPassword == edcBean.isElectronicSignature()) {
                                         if (isHide == edcBean.isHideCrf()) {
-                                            if (submissionUrl.equals(edcBean.getSubmissionUrl()) && submissionUrl.equals(persistEventDefBean.getSubmissionUrl())) {
+                                            if (submissionUrl.equals("")) {
 
                                             if (selectedVersionIdListSize > 0) {
                                                 if (selectedVersionIdListSize == edcBean.getVersions().size()) {
@@ -633,7 +634,9 @@ public class CreateSubStudyServlet extends SecureController {
                     changes.put(sed.getId() + "-" + edcBean.getId(), changed);
                     ++start;
                 }
+                edcsInSession.add(edcBean);
             }
+            
             eventDefCrfList = validateSubmissionUrl(edcs,eventDefCrfList,v);
 
 
@@ -703,7 +706,7 @@ public class CreateSubStudyServlet extends SecureController {
         return seds;
     }
 
-    private void submitSiteEventDefinitions(StudyBean site) {
+    private void submitSiteEventDefinitions(StudyBean site) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
@@ -714,6 +717,7 @@ public class CreateSubStudyServlet extends SecureController {
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
             request.setAttribute("participateFormStatus",participateFormStatus );
+            if (participateFormStatus.equals("enabled")) 	baseUrl();
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
@@ -740,7 +744,7 @@ public class CreateSubStudyServlet extends SecureController {
         session.removeAttribute("sdvOptions");
     }
 
-    private ArrayList<StudyEventDefinitionBean> initDefinitions(StudyBean site) {
+    private ArrayList<StudyEventDefinitionBean> initDefinitions(StudyBean site) throws MalformedURLException {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
@@ -753,6 +757,7 @@ public class CreateSubStudyServlet extends SecureController {
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+            if (participateFormStatus.equals("enabled")) 	baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             int defId = sed.getId();
@@ -850,6 +855,36 @@ public class CreateSubStudyServlet extends SecureController {
             	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
+                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())){
+                	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                	System.out.println("Duplicate ****************************");
+                	isExist = true;
+            	   break;
+            	}
+            	  }
+            }
+            	if(!isExist){ 
+            		eventDefCrfList.add(sessionBean);
+            	}
+        }
+    	return eventDefCrfList;
+    }
+    
+    public ArrayList <EventDefinitionCRFBean> validateSubmissionUrlOrig(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
+    	for (int i = 0; i < edcsInSession.size(); i++) {
+            String order = i + "-" + edcsInSession.get(i).getId();
+            v.addValidation("submissionUrl"+ order, Validator.NO_SPACES_ALLOWED);	
+            EventDefinitionCRFBean sessionBean=null;
+            boolean isExist = false;
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
+            		  sessionBean = edcsInSession.get(i);
+            		 
+            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
+            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
+            		System.out.println();
+            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
+            		break;
+            	}else{
                 if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                 	System.out.println("Duplicate ****************************");
@@ -868,6 +903,5 @@ public class CreateSubStudyServlet extends SecureController {
         }
     	return eventDefCrfList;
     }
-    
 
 }

@@ -64,7 +64,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-    	baseUrl();
+    	//baseUrl();
         String userName = request.getRemoteUser();
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
@@ -102,6 +102,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
                             // logger.info("value:" +
                             // scg.getValue().getValue());
                             StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(), scg.getParameter().getHandle());
+                            if (spvb.getValue().equals("enabled")) baseUrl(); 
                             if (spvb.getId() > 0) {
                                 // the sub study itself has the parameter
                                 scg.setValue(spvb);
@@ -143,7 +144,6 @@ public class InitUpdateSubStudyServlet extends SecureController {
     private void baseUrl() throws MalformedURLException{
     	String portalURL = CoreResources.getField("portalURL");
         URL pManageUrl = new URL(portalURL);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 
     ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
@@ -155,7 +155,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
     }
 
-    private void createEventDefinitions(StudyBean parentStudy) {
+    private void createEventDefinitions(StudyBean parentStudy) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
 
@@ -169,6 +169,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+              if (participateFormStatus.equals("enabled")) 	baseUrl();
             request.setAttribute("participateFormStatus",participateFormStatus );
 
             int defId = sed.getId();
@@ -232,5 +233,4 @@ public class InitUpdateSubStudyServlet extends SecureController {
             return "";
         }
     }
-
 }

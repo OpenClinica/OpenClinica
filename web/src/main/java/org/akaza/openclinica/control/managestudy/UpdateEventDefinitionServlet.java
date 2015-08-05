@@ -36,6 +36,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,7 +99,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
         String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-    
+        if (participateFormStatus.equals("enabled")) baseUrl();
+
         request.setAttribute("participateFormStatus",participateFormStatus );
 
         v.addValidation("name", Validator.NO_BLANKS);
@@ -454,4 +456,19 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     }
     
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
+
+    }
+
 }
