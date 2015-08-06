@@ -1,5 +1,10 @@
 package org.akaza.openclinica.web.pform;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,7 +13,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
@@ -21,8 +25,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,8 +38,10 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -40,8 +49,11 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
+import org.akaza.openclinica.web.pform.manifest.Manifest;
+import org.akaza.openclinica.web.pform.manifest.MediaFile;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -79,7 +91,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization) throws Exception {
+            @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
 
@@ -91,6 +103,8 @@ public class OpenRosaServices {
 
         CRFVersionDAO cVersionDao = new CRFVersionDAO(getDataSource());
         Collection<CRFVersionBean> crfVersions = cVersionDao.findAll();
+
+        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
 
         try {
             XFormList formList = new XFormList();
@@ -109,6 +123,11 @@ public class OpenRosaServices {
 
                         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                         form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
+
+                        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getId());
+                        if (mediaList != null && mediaList.size() > 0) {
+                            form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid());
+                        }
                         formList.add(form);
                     }
                 }
@@ -124,6 +143,64 @@ public class OpenRosaServices {
             StringWriter writer = new StringWriter();
             marshaller.setWriter(writer);
             marshaller.marshal(formList);
+
+            // Set response headers
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+            Date currentDate = new Date();
+            cal.setTime(currentDate);
+            SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
+            format.setCalendar(cal);
+            response.setHeader("Content-Type", "text/xml; charset=UTF-8");
+            response.setHeader("Date", format.format(currentDate));
+            response.setHeader("X-OpenRosa-Version", "1.0");
+            return writer.toString();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            return "<Error>" + e.getMessage() + "</Error>";
+        }
+    }
+
+    @GET
+    @Path("/{studyOID}/manifest")
+    @Produces(MediaType.TEXT_XML)
+    public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+            @QueryParam("formId") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+        if (!mayProceedPreview(studyOID))
+            return null;
+
+        CRFVersionDAO cVersionDao = new CRFVersionDAO(getDataSource());
+        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
+
+        CRFVersionBean crfVersion = cVersionDao.findByOid(crfOID);
+        List<MediaFile> mediaFiles = new ArrayList<MediaFile>();
+        Manifest manifest = new Manifest();
+
+        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getId());
+        if (mediaList != null && mediaList.size() > 0) {
+            for (CrfVersionMedia media : mediaList) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+
+                MediaFile mediaFile = new MediaFile();
+                mediaFile.setFilename(media.getName());
+                mediaFile.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                mediaFile.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?crfVersionMediaId=" + media.getCrfVersionMediaId());
+                manifest.add(mediaFile);
+            }
+        }
+        try {
+            // Create the XML manifest using a Castor mapping file.
+            XMLContext xmlContext = new XMLContext();
+            Mapping mapping = xmlContext.createMapping();
+            mapping.loadMapping(getCoreResources().getURL("openRosaManifestMapping.xml"));
+            xmlContext.addMapping(mapping);
+
+            Marshaller marshaller = xmlContext.createMarshaller();
+            StringWriter writer = new StringWriter();
+            marshaller.setWriter(writer);
+            marshaller.marshal(manifest);
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -181,6 +258,23 @@ public class OpenRosaServices {
         response.setContentType("text/xml; charset=utf-8");
         return xform;
 
+    }
+
+    @GET
+    @Path("/{studyOID}/downloadMedia")
+    public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+            @QueryParam("crfVersionMediaId") String crfVersionMediaId, @RequestHeader("Authorization") String authorization, @Context ServletContext context)
+            throws Exception {
+        if (!mayProceedPreview(studyOID))
+            return null;
+
+        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
+        CrfVersionMedia media = mediaDao.findById(Integer.valueOf(crfVersionMediaId));
+
+        File image = new File(media.getPath() + media.getName());
+        FileInputStream fis = new FileInputStream(image);
+        StreamingOutput stream = new MediaStreamingOutput(fis);
+        return Response.ok(stream).build();
     }
 
     @POST
@@ -451,4 +545,20 @@ public class OpenRosaServices {
         return accessPermission;
     }
 
+    private class MediaStreamingOutput implements StreamingOutput {
+
+        private InputStream in = null;
+
+        public MediaStreamingOutput(InputStream in) {
+            this.in = in;
+        }
+
+        @Override
+        public void write(OutputStream out) throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            IOUtils.copy(in, out);
+            in.close();
+            out.close();
+        }
+    }
 }

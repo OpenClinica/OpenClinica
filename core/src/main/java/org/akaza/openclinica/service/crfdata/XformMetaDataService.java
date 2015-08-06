@@ -1,11 +1,13 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -14,6 +16,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataTypeDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -31,6 +34,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemDataType;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -48,6 +52,8 @@ import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Group;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +79,9 @@ public class XformMetaDataService {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private CrfVersionMediaDao crfVersionMediaDao;
 
     @Autowired
     private ItemGroupDao itemGroupDao;
@@ -107,7 +116,7 @@ public class XformMetaDataService {
     @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
-            String submittedXformText) {
+            String submittedXformText, List<FileItem> formItems) {
 
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
@@ -157,7 +166,40 @@ public class XformMetaDataService {
 
         createGroups(container, html, crf, crfVersion, section, ub);
 
+        saveMedia(formItems, crf, crfVersion);
+
         return crfVersion;
+    }
+
+    private void saveMedia(List<FileItem> items, CrfBean crf, CrfVersion version) {
+        boolean hasFiles = false;
+        for (FileItem item : items) {
+            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
+                hasFiles = true;
+        }
+
+        if (hasFiles) {
+            String dir = Utils.getCrfMediaFilePath(crf, version);
+            // Save any media files
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+
+                    String fileName = item.getName();
+                    // Some browsers IE 6,7 getName returns the whole path
+                    int startIndex = fileName.lastIndexOf('\\');
+                    if (startIndex != -1) {
+                        fileName = fileName.substring(startIndex + 1, fileName.length());
+                    }
+
+                    CrfVersionMedia media = new CrfVersionMedia();
+                    media.setCrfVersion(version);
+                    media.setName(fileName);
+                    media.setPath(dir);
+                    crfVersionMediaDao.saveOrUpdate(media);
+
+                }
+            }
+        }
     }
 
     private void createGroups(XformContainer container, Html html, CrfBean crf, CrfVersion version, Section section, UserAccountBean ub) {
