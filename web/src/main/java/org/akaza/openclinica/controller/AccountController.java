@@ -613,16 +613,18 @@ public class AccountController {
 
 	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
+		StudyBean siteStudy = getStudy(studyOid);
 		StudyBean study = getParentStudy(studyOid);
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
-		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
+		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
+		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
+		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus  + "   siteStatus: " + siteStatus);
+		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
 		}
 

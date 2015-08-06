@@ -76,14 +76,14 @@
 </div> 
  <br>
  <span class="table_title_manage"><fmt:message key="CRFs" bundle="${resword}"/>:</span> 
- <div style="width: 600px">
+ <div style="width: 800px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">  
   <c:forEach var ="crf" items="${eventDefinitionCRFs}">   
    <tr valign="top" bgcolor="#F5F5F5">             
-    <td class="table_header_column" colspan="5"><c:out value="${crf.crfName}"/></td> 
+    <td class="table_header_column" colspan="7"><c:out value="${crf.crfName}"/></td> 
     <td class="table_header_column" colspan="1"><c:out value="${crf.status.name}"/></td>      
   </tr>  
    <tr valign="top">   
@@ -113,7 +113,6 @@
     <c:out value="${crf.defaultVersionName}"/>     
   
   
-  
     <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
     <td class="table_cell"><fmt:message key="participant_form" bundle="${resword}"/>:
@@ -122,16 +121,28 @@
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
    </td>
+    <td class="table_cell"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+     <c:choose>
+      <c:when test="${crf.allowAnonymousSubmission == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+   </td>
+   <td class="table_cell"><fmt:message key="submission_url" bundle="${resword}"/>:    
+     <c:choose>    
+       <c:when test="${crf.submissionUrl != ''}">    
+      <c:out value="${participantUrl}${crf.submissionUrl}"/></c:when>   
+      <c:otherwise><c:out value="${crf.submissionUrl}"/> </c:otherwise>   
+     </c:choose>
+   </td>    
    </c:when>  
  </c:choose>
-  
   
   
    <td class="table_cell"><fmt:message key="null_values" bundle="${resword}"/>:    
     <c:out value="${crf.nullValues}"/>     
   </td>
   </tr>             
-  <tr><td class="table_divider" colspan="5">&nbsp;</td></tr>
+  <tr><td class="table_divider" colspan="8">&nbsp;</td></tr>
  </c:forEach>
  
  </table>

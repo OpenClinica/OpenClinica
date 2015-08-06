@@ -498,6 +498,56 @@
         	</select>
 		    </td>
 		</tr>
+		
+		<c:choose>
+    <c:when test="${participateFormStatus == 'enabled' && edc.participantForm == true}">
+
+				<tr valign="top">		
+        <td class="table_cell" colspan="2">
+        <fmt:message key="participant_form" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.participantForm == true}">
+                <input type="checkbox" disabled checked name="participantForm<c:out value="${num}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" disabled name="participantForm<c:out value="${num}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+         </c:when>  
+ </c:choose>
+   <c:choose>
+    <c:when test="${participateFormStatus == 'enabled' && edc.allowAnonymousSubmission == true}">
+    
+        <td class="table_cell" colspan="2">
+        <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.allowAnonymousSubmission == true}">
+                <input type="checkbox" disabled checked name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" disabled name="allowAnonymousSubmission<c:out value="${num}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+    
+    
+                <td class="table_cell" colspan="6">
+        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
+                <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
+          <c:set var="summary" value="submissionUrl${num}"/>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+        </td>
+    
+     </c:when>  
+            <c:otherwise>
+        <td class="table_cell" colspan="8"> </td>
+            </c:otherwise>
+ </c:choose>
+  
+</tr>		
+		
+		
 		<c:set var="count" value="${count+1}"/>
 		</c:if>
 		<tr><td class="table_divider" colspan="8">&nbsp;</td></tr>
