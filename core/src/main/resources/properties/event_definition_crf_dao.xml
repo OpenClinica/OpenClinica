@@ -145,7 +145,7 @@
 		<name>findAllDefIdandStudyId</name>
 		<sql>
           SELECT * FROM event_definition_crf
-          WHERE study_event_definition_id=? and study_id=? 
+          WHERE study_event_definition_id=? and study_id=? and status_id=1
           order by ordinal asc
         </sql>
 	</query>
@@ -154,7 +154,7 @@
 		<name>findAllDefnIdandStudyIdForSite</name>
 		<sql>
           SELECT * FROM event_definition_crf
-          WHERE study_event_definition_id=? and study_id=? and hide_crf=false
+          WHERE study_event_definition_id=? and study_id=? and status_id=1 and hide_crf=false
           order by ordinal asc
         </sql>
 	</query>
