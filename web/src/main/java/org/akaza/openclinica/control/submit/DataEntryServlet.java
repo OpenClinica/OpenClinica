@@ -1636,14 +1636,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         DisplayItemBean dib = diwb.getSingleItem();
                         // TODO work on this line
 
-                        this.addAttachedFilePath(dib, attachedFilePath);
+                      //  this.addAttachedFilePath(dib, attachedFilePath);
+                        String fileName= addAttachedFilePath(dib, attachedFilePath);
                         boolean writeDN = writeDN(dib);
                         temp = writeToDB(dib, iddao, 1, request);
                         LOGGER.debug("just executed writeToDB - 3");
-                        if (temp && newUploadedFiles.containsKey(dib.getItem().getId() + "")) {
+                        if (temp && (newUploadedFiles.containsKey(dib.getItem().getId() + "") || newUploadedFiles.containsKey(fileName))) {
                             // so newUploadedFiles will contain only failed file
                             // items;
                             newUploadedFiles.remove(dib.getItem().getId() + "");
+                            newUploadedFiles.remove(fileName);
                         }
 
                         String inputName = getInputName(dib);
