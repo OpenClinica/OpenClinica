@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -19,12 +21,15 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.service.pmanage.Authorization;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -100,7 +105,13 @@ public class ViewEventDefinitionServlet extends SecureController {
             
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();       
-            request.setAttribute("participateFormStatus",participateFormStatus );            
+            request.setAttribute("participateFormStatus",participateFormStatus );       
+            if (participateFormStatus.equals("enabled")) baseUrl();
+
+            request.setAttribute("participateFormStatus",participateFormStatus );
+
+            
+            
             request.setAttribute("definition", sed);
             request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
             request.setAttribute("defSize", new Integer(eventDefinitionCRFs.size()));
@@ -108,6 +119,20 @@ public class ViewEventDefinitionServlet extends SecureController {
             // ArrayList(tm.values()));
             forwardPage(Page.VIEW_EVENT_DEFINITION);
         }
+
+    }
+    private void baseUrl() throws MalformedURLException{
+    	String portalURL = CoreResources.getField("portalURL");
+        URL pManageUrl = new URL(portalURL);
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+
+    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+    	System.out.println("the url :  "+ url);
+    	request.setAttribute("participantUrl",url+"/");
 
     }
 

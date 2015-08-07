@@ -182,7 +182,11 @@
     </td>
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
-    <td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> 
+     <c:choose>    
+       <c:when test="${crf.submissionUrl != ''}">    
+      <td class="table_cell"><c:out value="${participantUrl}${crf.submissionUrl}"/></td></c:when>   
+      <c:otherwise><td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> </c:otherwise>   
+     </c:choose>
    </c:when>  
  </c:choose>
     

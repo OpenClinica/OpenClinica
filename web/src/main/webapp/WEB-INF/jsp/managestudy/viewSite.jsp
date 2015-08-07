@@ -464,7 +464,11 @@
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
     </td>
-    <td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> 
+     <c:choose>    
+       <c:when test="${crf.submissionUrl != ''}">    
+      <td class="table_cell"><c:out value="${participantUrl}${crf.submissionUrl}"/></td></c:when>   
+      <c:otherwise><td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> </c:otherwise>   
+     </c:choose>
     
    </c:when>  
  </c:choose>
