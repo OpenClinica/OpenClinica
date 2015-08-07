@@ -213,10 +213,18 @@ public class PformSubmissionService {
 	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId , Integer studyId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllActiveByEventDefinitionIdandStudyId(studyEventDefinitionId , studyId).size();
+		count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId , studyId).size();
 		return count;
 	}
 
+	private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId , Integer studyId) {
+		int count = 0;
+		edcdao = new EventDefinitionCRFDAO(ds);
+		count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId , studyId).size();
+		return count;
+	}
+
+	
 	private EventDefinitionCRFBean getCrfVersionStatusInAEventDefCrf(String crfVersionOid, StudyBean studyBean,
 			StudyEventBean studyEventBean) {
 		edcdao = new EventDefinitionCRFDAO(ds);
@@ -686,8 +694,18 @@ public class PformSubmissionService {
 							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
 							// Study Event status
 							// update
-							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-									.getId(),studyBean.getId())) {
+							int count ;
+							if(studyBean.getParentStudyId()!=0){   	// this is a site 
+								StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
+							    count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(),parentStudyBean.getId());
+							}else{   // a parent study  	
+								count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(),studyBean.getId());
+								
+							}
+							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==count){
+							
+//							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+//									.getId(),studyBean.getId())) {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
 							} else {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
@@ -853,5 +871,21 @@ public class PformSubmissionService {
 	public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
 		this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
 	}
+    private StudyBean getParentStudy(String studyOid) {
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
+    }
 
+    private StudyBean getStudy(String oid) {
+        sdao = new StudyDAO(ds);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+        return studyBean;
+    }
+
+	
 }
