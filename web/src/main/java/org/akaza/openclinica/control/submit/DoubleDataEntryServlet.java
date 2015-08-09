@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -267,14 +269,35 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         LOGGER.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
         LOGGER.debug("VALIDATION COUNT " + validationCount);
         if (showOriginalItem && showDuplicateItem || showItem) {
-            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
-                    || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
+            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
                 dib = validateDisplayItemBeanText(v, dib, inputName, request);
                 if (validationCount == null || validationCount.intValue() == 0) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                     v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                         + respage.getString("from_initial_data_entry"));
                 }
+
+            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
+            	dib = validateDisplayItemBeanText(v, dib, inputName, request);
+            	if (validationCount == null || validationCount.intValue() == 0) {
+            		// we want to check if the current uploaded file matched the initial data file, quick way to do it is by using the hash
+            		// value of the file content that was added to the filename
+
+            		// cloned for prosperity
+            		ItemDataBean pathStrippedValueToCompare;
+            		try {
+            			pathStrippedValueToCompare = (ItemDataBean) BeanUtils.cloneBean(valueToCompare);
+            		} catch (Throwable e) {
+            			e.printStackTrace();
+            			return dib;
+            		}
+            		// the value we want to check only has filename with no path, so we strip path from the one stored in database, and compare
+            		pathStrippedValueToCompare.setValue(FilenameUtils.getName(valueToCompare.getValue()));
+
+            		v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, pathStrippedValueToCompare, false);
+            		v.setErrorMessage(respage.getString("value_you_specified") + " " + pathStrippedValueToCompare.getValue() + " "
+            			+ respage.getString("from_initial_data_entry"));
+            	}
 
             } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
                 dib = validateDisplayItemBeanSingleCV(v, dib, inputName);

@@ -3577,8 +3577,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
             displayItems.put(new Integer(dib.getItem().getId()), dib);
         }
 
-        BeanUtils bu = new BeanUtils();
-
         ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
         for (int i = 0; i < data.size(); i++) {
             ItemDataBean idb = (ItemDataBean) data.get(i);
@@ -3586,7 +3584,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             if (dib != null) {
                 dib.setData(idb);
-                dib.setDbData((ItemDataBean) bu.cloneBean(idb));
+                dib.setDbData((ItemDataBean) BeanUtils.cloneBean(idb));
                 displayItems.put(new Integer(idb.getItemId()), dib);
             }
         }
