@@ -116,6 +116,11 @@
 		<!-- Jackson JSON Mapper -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.5.3</version>
 		</dependency>
@@ -295,11 +300,6 @@
 			<version>3.5.1-Final</version>
 		</dependency>
 		<dependency>
-			<artifactId>hibernate-ehcache</artifactId>
-			<groupId>org.hibernate</groupId>
-			<version>4.0.0.CR6</version>
-		</dependency>
-		<dependency>
 			<groupId>javassist</groupId>
 			<artifactId>javassist </artifactId>
 			<version>3.8.0.GA</version>
@@ -345,6 +345,11 @@
 			<groupId>org.apache.ws.commons.schema</groupId>
 			<artifactId>XmlSchema</artifactId>
 			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.castor</groupId>
+			<artifactId>castor-core</artifactId>
+			<version>1.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
