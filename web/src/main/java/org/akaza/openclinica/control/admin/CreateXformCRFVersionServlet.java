@@ -67,7 +67,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
         // Create Database entries
         XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
         CrfVersion newVersion = xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText);
+                submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items);
         CrfBean newCrf = crfDao.findByName(submittedCrfName);
 
         // Save any media files uploaded with xform
@@ -117,25 +117,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
             System.out.println("Found the form element: " + form.getTagName());
 
-            // XformGroup defaultGroup = null;
-            // Get the ungrouped items
-            // for (int i = 0; i < form.getChildNodes().getLength(); i++) {
-            // if (form.getChildNodes().item(i) instanceof Element && !((Element)
-            // form.getChildNodes().item(i)).hasChildNodes()) {
-            // Element item = (Element) form.getChildNodes().item(i);
-            // System.out.println("Found a groupless item:" + (item.getTagName()));
-            // XformItem newItem = new XformItem();
-            // newItem.setItemPath("/" + form.getTagName() + "/" + item.getTagName());
-            // newItem.setItemName(item.getTagName());
-            // items.add(newItem);
-            // if (defaultGroup == null)
-            // defaultGroup = new XformGroup();
-            // defaultGroup.getItems().add(newItem);
-            // }
-            // }
-            // if (defaultGroup != null)
-            // groups.add(defaultGroup);
-
             // Get the groups and grouped items
             for (int i = 0; i < form.getChildNodes().getLength(); i++) {
                 if (form.getChildNodes().item(i) instanceof Element && ((Element) form.getChildNodes().item(i)).hasChildNodes()
@@ -161,6 +142,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
             XformContainer container = new XformContainer();
             container.setGroups(groups);
+            container.setInstanceName(form.getTagName());
             return container;
         } catch (Exception e) {
             logger.error(e.getMessage());

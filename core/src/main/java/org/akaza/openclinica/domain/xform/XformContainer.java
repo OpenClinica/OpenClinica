@@ -5,6 +5,7 @@ import java.util.List;
 public class XformContainer {
     private List<XformGroup> groups;
     private List<XformItem> items;
+    private String instanceName;
 
     public List<XformGroup> getGroups() {
         return groups;
@@ -39,6 +40,14 @@ public class XformContainer {
 
     public void setItems(List<XformItem> items) {
         this.items = items;
+    }
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
     }
 
 }
