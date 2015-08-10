@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -3584,6 +3586,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             if (dib != null) {
                 dib.setData(idb);
+                dib.setDbData((ItemDataBean) BeanUtils.cloneBean(idb));
                 displayItems.put(new Integer(idb.getItemId()), dib);
             }
         }
