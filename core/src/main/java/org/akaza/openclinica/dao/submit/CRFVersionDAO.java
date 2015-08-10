@@ -100,6 +100,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         variables.put(Integer.valueOf(6), cvb.getRevisionNotes());
         variables.put(Integer.valueOf(7), getValidOid(cvb, cvb.getName(), cvb.getOid()));
         variables.put(Integer.valueOf(8), cvb.getXform());
+        variables.put(Integer.valueOf(9), cvb.getXformName());
 
         // am i the only one who runs their daos' unit tests after I change
         // things, tbh?
@@ -140,6 +141,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         this.setTypeExpected(10, TypeNames.INT);
         this.setTypeExpected(11, TypeNames.STRING);
         this.setTypeExpected(12, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.STRING);
 
     }
 
@@ -157,6 +159,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         eb.setRevisionNotes((String) hm.get("revision_notes"));
         eb.setOid((String) hm.get("oc_oid"));
         eb.setXform((String) hm.get("xform"));
+        eb.setXformName((String) hm.get("xform_name"));
         return eb;
     }
 
