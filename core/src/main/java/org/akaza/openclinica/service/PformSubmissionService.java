@@ -712,7 +712,7 @@ public class PformSubmissionService {
 		iddao = new ItemDataDAO(ds);
 		ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
 		ArrayList<PropertyBean> propertyBeans = null;
-		propertyBeans = getGroupPropertyBean(itemBean.getOid());
+		propertyBeans = getItemPropertyBean(itemBean.getOid());
 		RuleBean ruleBean;
 		if (propertyBeans.size() != 0) {
 			for (PropertyBean propertyBean : propertyBeans) {
