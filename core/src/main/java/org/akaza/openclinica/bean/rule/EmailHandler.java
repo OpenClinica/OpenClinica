@@ -1,8 +1,5 @@
 package org.akaza.openclinica.bean.rule;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.validator.EmailValidator;
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
@@ -49,13 +46,12 @@ public class EmailHandler extends GeneralizedFieldHandler {
 		for (String str : emails) {
 
 			if (str.trim().startsWith("$") && !str.trim().equals("${participant}")) {
-				throw new OpenClinicaSystemException("The  \"" + value + " \" you provided is not Valid, Please provide valid comma seperated addresses.");
+				throw new OpenClinicaSystemException("The  \"" + value + " \" you provided is not Valid, Please provide valid comma separated addresses.");
 
 			} else if (!str.trim().startsWith("$")) {
-				areEmailsValid= isValidEmailAddress(str.trim());
-		//		areEmailsValid = EmailValidator.getInstance().isValid(str.trim());
+				areEmailsValid = EmailValidator.getInstance().isValid(str.trim());
 				if (!areEmailsValid) {
-					throw new OpenClinicaSystemException("Email Address : \"" + str.trim() + " \" you provided is not Valid, Please provide valid comma seperated addresses.");
+					throw new OpenClinicaSystemException("Email Address : \"" + str.trim() + " \" you provided is not Valid, Please provide valid comma separated addresses.");
 				}
 
 			}
@@ -90,16 +86,4 @@ public class EmailHandler extends GeneralizedFieldHandler {
 		return null;
 	}
 
-	public static boolean isValidEmailAddress(String email) {
-		   boolean result = true;
-		   try {
-		      InternetAddress emailAddr = new InternetAddress(email);
-		      emailAddr.validate();
-		   } catch (AddressException ex) {
-		      result = false;
-		   }
-		   return result;
-		}
-
-	
 }

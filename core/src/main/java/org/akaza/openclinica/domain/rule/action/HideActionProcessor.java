@@ -27,7 +27,7 @@ public class HideActionProcessor implements ActionProcessor {
 
         switch (executionMode) {
         case DRY_RUN: {
-            if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
+            if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY || ruleRunnerMode == RuleRunnerMode.RUN_ON_SCHEDULE) {
                 return null;
             } else {
                 dryRun(ruleAction, itemDataBean, itemData, currentStudy, ub);
@@ -36,6 +36,8 @@ public class HideActionProcessor implements ActionProcessor {
         case SAVE: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
                 return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub);
+            }else if (ruleRunnerMode == RuleRunnerMode.RUN_ON_SCHEDULE) {
+                    return null;
             } else {
                 return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
             }

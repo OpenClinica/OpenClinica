@@ -270,26 +270,7 @@
         
     </td>
  
- 
- 
-   <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
- 
-        <td class="table_cell" colspan="1">
-        <fmt:message key="participant_form" bundle="${resword}"/>:
-        <c:choose>
-            <c:when test="${edc.participantForm == true}">
-                <input type="checkbox" checked name="participantForm<c:out value="${count}"/>" value="yes">
-            </c:when>
-            <c:otherwise>
-                <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes">
-            </c:otherwise>
-        </c:choose>
-    </td>
-   </c:when>  
- </c:choose>
-    
-    <td class="table_cell" colspan="2"><fmt:message key="sdv_option" bundle="${resword}"/>:
+     <td class="table_cell" colspan="3"><fmt:message key="sdv_option" bundle="${resword}"/>:
 		    <select name="sdvOption<c:out value="${count}"/>">
 	        	<c:set var="index" value="1"/>
 	            <c:forEach var="sdv" items="${sdvOptions}">
@@ -305,6 +286,47 @@
 	            </c:forEach>
         	</select>
 		    </td>
+ 
+ 
+  
+</tr>
+  <tr valign="top">
+    
+   <c:choose>
+    <c:when test="${participateFormStatus == 'enabled'}">
+ 
+        <td class="table_cell" colspan="1">
+        <fmt:message key="participant_form" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.participantForm == true}">
+                <input type="checkbox" checked name="participantForm<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="1">
+        <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+        <c:choose>
+            <c:when test="${edc.allowAnonymousSubmission == true}">
+                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+            </c:otherwise>
+        </c:choose>
+    </td>
+        <td class="table_cell" colspan="2">
+        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
+                <input type="text"  name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}"/>
+          <c:set var="summary" value="submissionUrl${count}"/>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+                
+    </td>
+
+   </c:when>  
+ </c:choose>
 </tr>
 
 <tr valign="top">

@@ -181,7 +181,7 @@ public class RemoveEventCRFServlet extends SecureController {
 
                 String emailBody =
                     respage.getString("the_event_CRF") + " " + cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
-                        + event.getStudyEventDefinition().getName() + ".";
+                        + event.getStudyEventDefinition().getName() + ". "+ respage.getString("has_been_removed_from_the_event_cont");
 
                 addPageMessage(emailBody);
                 sendEmail(emailBody);

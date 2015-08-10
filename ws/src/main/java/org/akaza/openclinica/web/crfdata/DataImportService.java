@@ -79,6 +79,19 @@ public class DataImportService {
 
     private ImportCRFDataService dataService;
 
+    public List<String> validateMetaData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean,
+            UserAccountBean userBean, List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses) {
+
+        logger.debug("passing an odm container and study bean id: " + studyBean.getId());
+        List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
+
+        if (errors == null)
+            return new ArrayList<String>();
+        else
+            return errors;
+
+    }
+
     /**
      * Import Data, the logic which imports the data for our data service. Note that we will return three strings string
      * 0: status, either 'success', 'fail', or 'warn'. string 1: the message string which will be returned in our soap
@@ -108,14 +121,6 @@ public class DataImportService {
 
         StringBuffer auditMsg = new StringBuffer();
         List<String> errors = new ArrayList<String>();
-
-        logger.debug("passing an odm container and study bean id: " + studyBean.getId());
-        errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
-        // this needs to be replaced with the study name from the job, since
-        // the user could be in any study ...
-        if (errors != null && errors.size() > 0) {
-            return errors;
-        }
 
         // htaycher: return back later?
         auditMsg.append(respage.getString("passed_study_check") + " ");
@@ -284,7 +289,8 @@ public class DataImportService {
                     if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                         String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
 
-                        if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
+                        if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                                && eventCrfBean.getStatus().isAvailable()) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean);
                         } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);

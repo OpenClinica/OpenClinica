@@ -43,6 +43,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -53,11 +54,14 @@ import org.springframework.validation.Errors;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -206,19 +210,24 @@ public class RulesPostImportContainerService {
                     ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
 
-                    if(ruleSetBean.getRunOnSchedule()!=null){ 
-                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
-                      if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
-                    	  //validate Time           isRunTimeValid
-                    	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
-                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
-                      }
-                      }else{ 
-                    	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);     // supposed to act like 23:00
-                      }	  
-                    }else{
-                    	ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
-                  	  ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
+                    if (ruleSetBean.getRunTime() != null) {
+                        if (ruleSetBean.getRunOnSchedule() == null) {
+                            ruleSetBeanWrapper.getAuditableBean().setRunOnSchedule(new RunOnSchedule(ruleSetBean.getRunTime()));
+                        }
+                    }
+                    if (ruleSetBean.getRunOnSchedule() != null) {
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
+                        if (ruleSetBean.getRunOnSchedule().getRunTime() != null) {
+                            //validate Time           isRunTimeValid
+                            if (isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())) {
+                                ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
+                            }
+                        } else {
+                            ruleSetBeanWrapper.getAuditableBean().setRunTime(null);     // supposed to act like DEFAULT_TIME
+                        }
+                    } else {
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
+                        ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
                     }
 
                 }
@@ -397,10 +406,7 @@ public class RulesPostImportContainerService {
       }  	
         if (ruleActionBean instanceof InsertActionBean) {
         	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
-        	//if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-            if (ruleActionBean.getRuleActionRun().getBatch() == true) {
-                ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
-            }
+
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
             InsertActionValidator insertActionValidator = getInsertActionValidator();

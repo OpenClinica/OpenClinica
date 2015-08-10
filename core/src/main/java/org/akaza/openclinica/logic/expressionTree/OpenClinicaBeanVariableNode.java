@@ -122,7 +122,7 @@ public class OpenClinicaBeanVariableNode extends ExpressionNode {
     private Object calculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
         	String ssTimeZone= getExpressionBeanService().getSSTimeZone();
-        if (ssTimeZone == "" || ssTimeZone == null) 	
+        if (ssTimeZone.equals("") || ssTimeZone == null) 	
         	ssTimeZone = TimeZone.getDefault().getID();
       
             DateTimeZone ssZone = DateTimeZone.forID(ssTimeZone);
@@ -136,7 +136,7 @@ public class OpenClinicaBeanVariableNode extends ExpressionNode {
     private String testCalculateVariable() {
         if (number.equals("_CURRENT_DATE")) {
         	String ssTimeZone= getExpressionBeanService().getSSTimeZone();
-        if (ssTimeZone == "" || ssTimeZone == null) 	
+            if (ssTimeZone.equals("") || ssTimeZone == null) 	
         	ssTimeZone = TimeZone.getDefault().getID();
       
             DateTimeZone ssZone = DateTimeZone.forID(ssTimeZone);

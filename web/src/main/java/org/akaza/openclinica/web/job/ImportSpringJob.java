@@ -673,7 +673,8 @@ public class ImportSpringJob extends QuartzJobBean {
                             // Update CRF status
                             if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                                 String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
-                                if (eventCRFStatus != null && eventCRFStatus.equals("Data_Entry_Started") && eventCrfBean.getStatus().isAvailable()) {
+                                if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                                        && eventCrfBean.getStatus().isAvailable()) {
                                     crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
                                 } else {
                                     crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

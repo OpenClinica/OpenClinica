@@ -92,8 +92,10 @@ public class RuleController {
             RunOnScheduleType scheduleType = rules.getRuleAssignment().get(0).getRunOnSchedule();
             RuleSetBean ruleSetBean = new RuleSetBean();
             ruleSetBean.setOriginalTarget(targetBean);
-            if (!scheduleType.getTime().equals("")) {
-                ruleSetBean.setRunTime(scheduleType.getTime());
+            if (scheduleType != null) {
+                if (!scheduleType.getTime().equals("")) {
+                    ruleSetBean.setRunTime(scheduleType.getTime());
+                }
             }
 
             for (RuleRefType rrt : rat.getRuleRef()) {

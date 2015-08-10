@@ -3,24 +3,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<changeSet author="jkeremian" id="2014-08-28-5896_1" dbms="postgresql" runOnChange="false">
+	<changeSet author="jkeremian" id="2014-08-28-5896_1" dbms="postgresql" runOnChange="true">
 		<comment>Before Changing data type of created_date to timestamp, we need to drop all Views</comment>
-		<sql> DROP VIEW dn_age_days;
-			DROP VIEW
-			view_site_hidden_event_definition_crf;
-			DROP VIEW
-			view_study_hidden_event_definition_crf;
-			DROP VIEW
-			view_discrepancy_note;
-			DROP VIEW view_dn_item_data;
-			DROP VIEW
-			view_dn_event_crf;
-			DROP VIEW view_dn_study_event;
-			DROP VIEW
-			view_dn_study_subject;
-			DROP VIEW view_dn_subject;
-			DROP VIEW
-			view_dn_stats;
+		<sql> DROP VIEW IF EXISTS dn_age_days;
+			DROP VIEW IF EXISTS	view_site_hidden_event_definition_crf;
+			DROP VIEW IF EXISTS	view_study_hidden_event_definition_crf;
+			DROP VIEW IF EXISTS	view_discrepancy_note;
+			DROP VIEW IF EXISTS view_dn_item_data;
+			DROP VIEW IF EXISTS	view_dn_event_crf;
+			DROP VIEW IF EXISTS view_dn_study_event;
+			DROP VIEW IF EXISTS	view_dn_study_subject;
+			DROP VIEW IF EXISTS view_dn_subject;
+			DROP VIEW IF EXISTS	view_dn_stats;
 		</sql>
 		<rollback>
 			<sql></sql>

@@ -261,6 +261,7 @@ public enum Page {
     DEFINE_STUDY_EVENT1 ("/WEB-INF/jsp/managestudy/defineStudyEvent1.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT2 ("/WEB-INF/jsp/managestudy/defineStudyEvent2.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT3 ("/WEB-INF/jsp/managestudy/defineStudyEvent3.jsp", "Define Study Event"),
+    DEFINE_STUDY_EVENT4 ("/WEB-INF/jsp/managestudy/defineStudyEvent4.jsp", "Define Study Event"),
     DEFINE_STUDY_EVENT_CONFIRM("/WEB-INF/jsp/managestudy/defineStudyEventConfirm.jsp", "Define Study Event Confirm"),
 
     /**
@@ -351,6 +352,8 @@ public enum Page {
 
     REMOVE_CRF_VERSION ("/WEB-INF/jsp/admin/removeCRFVersion.jsp", "Remove CRF Version"),
     RESTORE_CRF_VERSION ("/WEB-INF/jsp/admin/restoreCRFVersion.jsp", "Restore CRF Version"),
+
+    CREATE_XFORM_CRF_VERSION_SERVLET ("/WEB-INF/jsp/admin/createXformCRFVersion.jsp", "Create a new Xform CRF Version"),
 
     /**
      * Page for creating crf data imports

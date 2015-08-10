@@ -218,7 +218,7 @@ public class DeleteEventCRFServlet extends SecureController {
                    sedao.update(event);
 				}
 				
-				String emailBody = respage.getString("the_event_CRF") + cb.getName() + respage.getString("has_been_deleted_from_the_event") + event.getStudyEventDefinition().getName() + ".";
+				String emailBody = respage.getString("the_event_CRF") + cb.getName() + respage.getString("has_been_deleted_from_the_event") + event.getStudyEventDefinition().getName() + ". " + respage.getString("has_been_deleted_from_the_event_cont");
 
 				addPageMessage(emailBody);
 				// sendEmail(emailBody);
