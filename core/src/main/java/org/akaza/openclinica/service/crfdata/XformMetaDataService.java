@@ -1,11 +1,13 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -14,6 +16,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataTypeDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -31,6 +34,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemDataType;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -48,6 +52,8 @@ import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Group;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +79,9 @@ public class XformMetaDataService {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private CrfVersionMediaDao crfVersionMediaDao;
 
     @Autowired
     private ItemGroupDao itemGroupDao;
@@ -107,7 +116,7 @@ public class XformMetaDataService {
     @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
-            String submittedXformText) {
+            String submittedXformText, List<FileItem> formItems) {
 
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
@@ -137,6 +146,7 @@ public class XformMetaDataService {
         crfVersion.setRevisionNotes(submittedRevisionNotes);
         crfVersion.setOcOid(oldCRFVersionDAO.getValidOid(new CRFVersionBean(), crf.getOcOid(), crfVersion.getName()));
         crfVersion.setXform(submittedXformText);
+        crfVersion.setXformName(container.getInstanceName());
         crfVersionDao.saveOrUpdate(crfVersion);
         crfVersion = crfVersionDao.findByOcOID(crfVersion.getOcOid());
 
@@ -156,7 +166,40 @@ public class XformMetaDataService {
 
         createGroups(container, html, crf, crfVersion, section, ub);
 
+        saveMedia(formItems, crf, crfVersion);
+
         return crfVersion;
+    }
+
+    private void saveMedia(List<FileItem> items, CrfBean crf, CrfVersion version) {
+        boolean hasFiles = false;
+        for (FileItem item : items) {
+            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
+                hasFiles = true;
+        }
+
+        if (hasFiles) {
+            String dir = Utils.getCrfMediaFilePath(crf, version);
+            // Save any media files
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+
+                    String fileName = item.getName();
+                    // Some browsers IE 6,7 getName returns the whole path
+                    int startIndex = fileName.lastIndexOf('\\');
+                    if (startIndex != -1) {
+                        fileName = fileName.substring(startIndex + 1, fileName.length());
+                    }
+
+                    CrfVersionMedia media = new CrfVersionMedia();
+                    media.setCrfVersion(version);
+                    media.setName(fileName);
+                    media.setPath(dir);
+                    crfVersionMediaDao.saveOrUpdate(media);
+
+                }
+            }
+        }
     }
 
     private void createGroups(XformContainer container, Html html, CrfBean crf, CrfVersion version, Section section, UserAccountBean ub) {
@@ -176,30 +219,45 @@ public class XformMetaDataService {
             itemGroupDao.saveOrUpdate(itemGroup);
             itemGroup = itemGroupDao.findByOcOID(itemGroup.getOcOid());
 
+            List<UserControl> widgets = null;
+            boolean isRepeating = false;
+            if (htmlGroup.getRepeat() != null && htmlGroup.getRepeat().getUsercontrol() != null) {
+                widgets = htmlGroup.getRepeat().getUsercontrol();
+                isRepeating = true;
+            } else {
+                widgets = htmlGroup.getUsercontrol();
+            }
             // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
-            for (UserControl widget : htmlGroup.getUsercontrol()) {
+            for (UserControl widget : widgets) {
                 XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 Item item = createItem(html, widget, xformGroup, xformItem, crf, ub);
                 if (item != null) {
                     ResponseSet responseSet = createResponseSet(html, xformItem, widget, version);
                     createItemFormMetadata(html, xformItem, item, responseSet, section, version);
                     createVersioningMap(version, item);
-                    createItemGroupMetadata(html, item, version, itemGroup);
+                    createItemGroupMetadata(html, item, version, itemGroup, isRepeating);
                 }
             }
         }
 
     }
 
-    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup) {
+    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);// item_group_id,
         itemGroupMetadata.setHeader("");// header,
         itemGroupMetadata.setSubheader("");// subheader,
         itemGroupMetadata.setLayout("");// layout,
         // TODO: Add repeating group info here.
-        itemGroupMetadata.setRepeatNumber(1);// repeat_number,
-        itemGroupMetadata.setRepeatMax(1);// repeat_max,
+        if (isRepeating) {
+            itemGroupMetadata.setRepeatingGroup(true);// repeating_group
+            itemGroupMetadata.setRepeatNumber(1);// repeat_number,
+            itemGroupMetadata.setRepeatMax(40);// repeat_max,
+        } else {
+            itemGroupMetadata.setRepeatingGroup(false);// repeating_group
+            itemGroupMetadata.setRepeatNumber(1);// repeat_number,
+            itemGroupMetadata.setRepeatMax(1);// repeat_max,
+        }
         itemGroupMetadata.setRepeatArray("");// repeat_array,
         itemGroupMetadata.setRowStartNumber(0);// row_start_number,
         itemGroupMetadata.setCrfVersion(version);// crf_version_id,
@@ -208,7 +266,6 @@ public class XformMetaDataService {
         itemGroupMetadata.setOrdinal(1);// ordinal,
         itemGroupMetadata.setShowGroup(true);// show_group,
         // TODO: More repeating group info here.
-        itemGroupMetadata.setRepeatingGroup(false);// repeating_group
         itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
     }
 
@@ -273,7 +330,6 @@ public class XformMetaDataService {
 
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub) {
         ItemDAO itemDAO = new ItemDAO(datasource);
-
         ItemDataType dataType = getItemDataType(html, xformItem);
         if (dataType != null) {
             Item item = new Item();
@@ -298,12 +354,24 @@ public class XformMetaDataService {
     private String getLeftItemText(Html html, XformItem xformItem) {
         // TODO: Need to handle repeating groups here.
         for (Group group : html.getBody().getGroup()) {
-            for (UserControl control : group.getUsercontrol()) {
-                if (control.getRef().equals(xformItem.getItemPath())) {
-                    if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                        return control.getLabel().getLabel();
-                    else
-                        return "";
+            if (group.getRepeat() != null && group.getRepeat().getUsercontrol() != null) {
+                for (UserControl control : group.getRepeat().getUsercontrol()) {
+                    if (control.getRef().equals(xformItem.getItemPath())) {
+                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
+                            return control.getLabel().getLabel();
+                        else
+                            return "";
+                    }
+                }
+
+            } else {
+                for (UserControl control : group.getUsercontrol()) {
+                    if (control.getRef().equals(xformItem.getItemPath())) {
+                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
+                            return control.getLabel().getLabel();
+                        else
+                            return "";
+                    }
                 }
             }
         }

@@ -19,12 +19,17 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import javax.xml.bind.DatatypeConverter;
 
 public class UploadFileServlet extends SecureController {
     Locale locale;
@@ -130,9 +135,24 @@ public class UploadFileServlet extends SecureController {
     */
 
     class OCFileRename implements org.akaza.openclinica.bean.rule.FileRenamePolicy {
-        public File rename(File f) {
+    	private String checksum(File f, InputStream content) throws Exception {
+    		byte[] buffer = new byte[8192];
+    		MessageDigest md = MessageDigest.getInstance("SHA-1");
+
+    		DigestInputStream dis = new DigestInputStream(content, md);
+    		try {
+    			while (dis.read(buffer) != -1);
+    		} finally {
+    			dis.close();
+    		}
+
+    		return DatatypeConverter.printHexBinary(md.digest());
+    	}
+
+        public File rename(File f, InputStream content) {
             // here, File f has been validated as a valid File.
             String pathAndName = f.getPath();
+            String newName;
             int p = pathAndName.lastIndexOf('.');
             int n = pathAndName.lastIndexOf(File.separatorChar);
             logger.debug("found n: " + n);
@@ -143,9 +163,13 @@ public class UploadFileServlet extends SecureController {
                 logger.debug("found non word characters");
                 fileName = fileName.replaceAll("\\W+", "_");
             }
-            String newName = pathAndName.substring(0, n) +
-            	File.separator +
-            	fileName + new SimpleDateFormat("yyyyMMddHHmmssZ").format(new Date()) + pathAndName.substring(p);
+            try {
+            	newName = pathAndName.substring(0, n) + File.separator + fileName +
+            			checksum(f, content) + pathAndName.substring(p);
+            } catch (Throwable e) {
+            	e.printStackTrace();
+            	return null;
+            }
             // >> tbh 5545 remove all html-symbol characters here
             //            if (!Utils.isMatchingRegexp(newName, "[a-zA-Z_0-9/\\\\:.+-\\s]")) {
             //                logger.debug("found non word characters");

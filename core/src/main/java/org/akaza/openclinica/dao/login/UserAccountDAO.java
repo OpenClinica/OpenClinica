@@ -101,6 +101,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(23, TypeNames.BOOL);
         this.setTypeExpected(24, TypeNames.STRING);    // access_doe
         this.setTypeExpected(25, TypeNames.STRING);    // timezone
+        this.setTypeExpected(23, TypeNames.BOOL);      // enable_api_key 
+        this.setTypeExpected(24, TypeNames.STRING);    // api_key
     }
 
     public void setPrivilegeTypesExpected() {
@@ -198,8 +200,16 @@ public class UserAccountDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(20), uab.getTime_zone());
         }
+        variables.put(new Integer(21), uab.isEnableApiKey());
         
-        variables.put(new Integer(21), new Integer(uab.getId()));
+        if (uab.getApiKey() == null || uab.getApiKey().equals("")) {
+            nullVars.put(new Integer(22), new Integer(TypeNames.STRING));
+            variables.put(new Integer(22), null);        
+        }else{
+        variables.put(new Integer(22), uab.getApiKey());
+        }
+        
+        variables.put(new Integer(23), new Integer(uab.getId()));
 
 
         String sql = digester.getQuery("update");
@@ -303,7 +313,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         variables.put(new Integer(15), uab.getRunWebservices());
         variables.put(new Integer(16), uab.getAccessCode());
+        variables.put(new Integer(17), uab.isEnableApiKey());
+        variables.put(new Integer(18), uab.getApiKey());
 
+        
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
         success = success && isQuerySuccessful();
@@ -587,6 +600,22 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public EntityBean findByApiKey(String name) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+
+        variables.put(new Integer(1), name);
+
+        ArrayList alist = this.select(digester.getQuery("findByApiKey"), variables);
+        UserAccountBean eb = new UserAccountBean();
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            eb = (UserAccountBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+        }
+        return eb;
+    }
+
+    
     public Collection findAllParticipantsByStudyOid(String studyOid) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

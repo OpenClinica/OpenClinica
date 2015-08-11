@@ -563,6 +563,24 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     }
     
     
+    
+    
+    public ArrayList findAllDefIdandStudyId(Integer studyEventDefnId, Integer studyId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventDefnId));
+        variables.put(new Integer(2), new Integer(studyId));
+        return executeFindAllQuery("findAllDefIdandStudyId", variables);
+    }
+
+    public ArrayList findAllDefnIdandStudyIdForSite(Integer studyEventDefnId, Integer studyId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEventDefnId));
+        variables.put(new Integer(2), new Integer(studyId));
+        return executeFindAllQuery("findAllDefnIdandStudyIdForSite", variables);
+    }
+
+
+    
     public Collection findAllActiveParentsByEventDefinitionId(int definitionId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

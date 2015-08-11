@@ -370,7 +370,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
                     boolean changed = false;
                    
-                    if(changeStatus!=null){ 
+                    if(changeStatus!=null && changeStatus.get(sed.getId() + "-" + edcBean.getId())!=null){ 
                     	changed = changeStatus.get(sed.getId() + "-" + edcBean.getId());
                         edcBean.setSubmissionUrl(submissionUrl);
                     }
@@ -626,7 +626,9 @@ public class UpdateSubStudyServlet extends SecureController {
             	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
+                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())
+                		||(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())&& eventDef.getId()==0)
+                		){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                 	System.out.println("Duplicate ****************************");
             		System.out.println();

@@ -36,6 +36,7 @@ public class CRFVersionBean extends AuditableEntityBean {
     private OidGenerator oidGenerator;
 
     private String xform;
+    private String xformName;
 
     public CRFVersionBean() {
         this.oidGenerator = new CrfVersionOidGenerator();
@@ -148,6 +149,14 @@ public class CRFVersionBean extends AuditableEntityBean {
 
     public void setXform(String xform) {
         this.xform = xform;
+    }
+
+    public String getXformName() {
+        return xformName;
+    }
+
+    public void setXformName(String xformName) {
+        this.xformName = xformName;
     }
 
     /*
