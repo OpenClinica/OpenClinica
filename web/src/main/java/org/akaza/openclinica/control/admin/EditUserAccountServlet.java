@@ -9,6 +9,8 @@ package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
@@ -169,7 +171,14 @@ public class EditUserAccountServlet extends SecureController {
                 user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
                 user.setUpdater(ub);
                 user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
-
+                user.setEnableApiKey(true);
+ 
+               String apiKey=null; 		
+               do{
+                	apiKey=getRandom32ChApiKey() ;
+               } while(isApiKeyExist(apiKey));                
+               user.setApiKey(apiKey);
+                
                 UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
                 if (ut.equals(UserType.SYSADMIN)) {
                     user.addUserType(ut);
@@ -308,4 +317,22 @@ public class EditUserAccountServlet extends SecureController {
     protected String getAdminServlet() {
         return SecureController.ADMIN_SERVLET_CODE;
     }
+
+	public Boolean isApiKeyExist(String uuid) {
+		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean uBean = (UserAccountBean) udao.findByApiKey(uuid);
+		if (uBean == null || !uBean.isActive()) {
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
+	public String getRandom32ChApiKey() {
+		String uuid = UUID.randomUUID().toString();
+		System.out.print(uuid.replaceAll("-", ""));
+		return uuid.replaceAll("-", "");
+	}
+    
 }
