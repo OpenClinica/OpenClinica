@@ -101,8 +101,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(23, TypeNames.BOOL);
         this.setTypeExpected(24, TypeNames.STRING);    // access_doe
         this.setTypeExpected(25, TypeNames.STRING);    // timezone
-        this.setTypeExpected(23, TypeNames.BOOL);      // enable_api_key 
-        this.setTypeExpected(24, TypeNames.STRING);    // api_key
+        this.setTypeExpected(26, TypeNames.BOOL);      // enable_api_key 
+        this.setTypeExpected(27, TypeNames.STRING);    // api_key
     }
 
     public void setPrivilegeTypesExpected() {
