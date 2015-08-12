@@ -420,7 +420,7 @@ public class OpenRosaServices {
                 body = "<instance>" + body + "</instance>";
             }
 
-            Errors errors = getPformSubmissionService().saveProcess(body, studySubjectOid, studyEventDefnId, studyEventOrdinal,
+            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
                     crfvdao.findByOid(crfVersionOID));
 
             // Set response headers
