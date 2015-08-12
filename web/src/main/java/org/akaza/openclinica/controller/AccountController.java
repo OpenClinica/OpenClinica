@@ -359,6 +359,9 @@ public class AccountController {
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
 		createdUserAccountBean.setEmail(email);
+		createdUserAccountBean.setEnableApiKey(false);
+		createdUserAccountBean.setApiKey("");
+
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);

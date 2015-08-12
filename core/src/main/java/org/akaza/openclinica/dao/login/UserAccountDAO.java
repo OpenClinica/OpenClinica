@@ -438,6 +438,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer updateId = (Integer) hm.get("update_id");
         String accessCode = (String) hm.get("access_code");
         String time_zone = (String) hm.get("time_zone");
+        Boolean enableApiKey = (Boolean) hm.get("enable_api_key");
+        String apiKey = (String) hm.get("api_key");
+        
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -456,6 +459,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
         eb.setAccessCode(accessCode);
         eb.setTime_zone(time_zone);
+        eb.setEnableApiKey(enableApiKey);
+        eb.setApiKey(apiKey);
+        
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
