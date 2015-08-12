@@ -51,7 +51,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 @Controller
-@RequestMapping(value = "/api/v1/discrepancynote")
+@RequestMapping(value = "/auth/api/v1/discrepancynote")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class DiscrepancyNoteController {
 

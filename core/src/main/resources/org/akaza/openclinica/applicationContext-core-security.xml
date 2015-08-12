@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:security="http://www.springframework.org/schema/security"
-    xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                           http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-3.0.xsd
-                           http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.0.xsd
-                           http://www.springframework.org/schema/security/oauth2 
-                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
-    
-  
-  <security:authentication-manager alias="authenticationManager">
-    <security:authentication-provider user-service-ref="ocUserDetailsService">
-        <security:password-encoder ref="openClinicaPasswordEncoder" />
-        <!-- <security:password-encoder hash="md5" /> -->
-        <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
-    </security:authentication-provider>
-    <security:authentication-provider ref="ldapAuthenticationProvider"/>
-  </security:authentication-manager>       
 
-    <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
-    <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="ocUserDetailsService">
+            <security:password-encoder ref="openClinicaPasswordEncoder"/>
+            <!-- <security:password-encoder hash="md5" /> -->
+            <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
+        </security:authentication-provider>
+        <security:authentication-provider ref="ldapAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+    <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
 
     <bean id="openClinicaPasswordEncoder" class="org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
         <property name="currentPasswordEncoder" ref="shaPasswordEncoder"/>
@@ -33,7 +29,7 @@
     </bean>
 
     <bean id="securityManager" class="org.akaza.openclinica.core.SecurityManager">
-        <property name="encoder" ref="openClinicaPasswordEncoder" />
+        <property name="encoder" ref="openClinicaPasswordEncoder"/>
         <property name="providers">
             <list>
                 <ref bean="ldapAuthenticationProvider"/>
@@ -61,25 +57,31 @@
         <security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER"/>
     </bean>
     -->
-	
+
     <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
-        p:dataSource-ref="dataSource"
-        p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?" />
-	
+          p:dataSource-ref="dataSource"
+          p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?"/>
+
     <!--<security:global-method-security secured-annotations="enabled">
         <security:protect-pointcut
             expression="execution(* com.springsource..*Service.*(..))"
             access="ROLE_USER" />
     </security:global-method-security>
     -->
-    
+
     <!-- ActiveDirectory -->
     <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-        <constructor-arg><value>s[ldap.host]</value></constructor-arg>
-        <property name="userDn"><value>s[ldap.userDn]</value></property>
-        <property name="password"><value>s[ldap.password]</value></property>
+        <constructor-arg>
+            <value>s[ldap.host]</value>
+        </constructor-arg>
+        <property name="userDn">
+            <value>s[ldap.userDn]</value>
+        </property>
+        <property name="password">
+            <value>s[ldap.password]</value>
+        </property>
     </bean>
-    
+
     <bean id="ldapAuthenticationProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
         <constructor-arg>
             <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
@@ -90,10 +92,13 @@
         <constructor-arg>
             <bean class="org.akaza.openclinica.web.filter.OpenClinicaLdapAuthoritiesPopulator"/>
         </constructor-arg>
-     </bean>
-<bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
-    <property name="dataSource" ref="dataSource"></property>
-    <property name="coreResources" ref="coreResources"/>
-</bean>
-    
+    </bean>
+
+    <bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="coreResources" ref="coreResources"/>
+    </bean>
+
+    <bean name="apiSecurityFilter" class="org.akaza.openclinica.web.filter.ApiSecurityFilter"/>
+
 </beans>
