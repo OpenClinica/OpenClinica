@@ -2,12 +2,17 @@ package org.akaza.openclinica.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -127,8 +132,10 @@ public class UserAccountService {
 			uDTO = buildUserDTO(uBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		}
-	}
+		}
+		return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 
+	}
 
 	private UserAccountBean buildUserAccount(String username, String fName, String lName, String password,String institution,String name, UserAccountBean ownerUserAccount,
 			String email, String apiKey) throws Exception {
@@ -253,4 +260,78 @@ public class UserAccountService {
 		return uDTO;
 	}
 	
+	
+/*    Map roleMap = new LinkedHashMap();
+    for (Iterator it = getRoles().iterator(); it.hasNext();) {
+        Role role = (Role) it.next();
+        // I added the below if statement , to exclude displaying on study level the newly added 'ReseachAssisstant2' role by default.
+        if (role.getId() != 7) 
+            roleMap.put(role.getId(), role.getDescription());
+//        roleMap.put(role.getId(), role.getDescription());
+    }
+
+    roleMap = new LinkedHashMap();
+    ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+
+    if (study.getParentStudyId() > 0) {
+        for (Iterator it = getRoles().iterator(); it.hasNext();) {
+            Role role = (Role) it.next();
+            switch (role.getId()) {
+            // case 2: roleMap.put(role.getId(), resterm.getString("site_Study_Coordinator").trim());
+            // break;
+            // case 3: roleMap.put(role.getId(), resterm.getString("site_Study_Director").trim());
+            // break;
+            case 4:
+                roleMap.put(role.getId(), resterm.getString("site_investigator").trim());
+                break;
+            case 5:
+                roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person").trim());
+                break;
+            case 6:
+                roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
+                break;
+            case 7:
+                roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person2").trim());
+                break;
+            default:
+                // logger.info("No role matched when setting role description");
+            }
+        }
+    } else {
+        for (Iterator it = getRoles().iterator(); it.hasNext();) {
+            Role role = (Role) it.next();
+            switch (role.getId()) {
+            case 2:
+                roleMap.put(role.getId(), resterm.getString("Study_Coordinator").trim());
+                break;
+            case 3:
+                roleMap.put(role.getId(), resterm.getString("Study_Director").trim());
+                break;
+            case 4:
+                roleMap.put(role.getId(), resterm.getString("Investigator").trim());
+                break;
+            case 5:
+                roleMap.put(role.getId(), resterm.getString("Data_Entry_Person").trim());
+                break;
+            case 6:
+                roleMap.put(role.getId(), resterm.getString("Monitor").trim());
+                break;
+            default:
+                // logger.info("No role matched when setting role description");
+            }
+        }
+    }
+    request.setAttribute("roles", roleMap);
+}
+}
+private ArrayList getRoles() {
+
+    ArrayList roles = Role.toArrayList();
+    roles.remove(Role.ADMIN);
+
+    return roles;
+}
+*/	
+		
+
 }
