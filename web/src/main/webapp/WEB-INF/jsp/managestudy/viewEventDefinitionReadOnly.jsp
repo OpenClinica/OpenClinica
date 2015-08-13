@@ -172,16 +172,12 @@
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
     </td>
-  <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
    <td class="table_cell">
      <c:choose>
       <c:when test="${crf.allowAnonymousSubmission == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
     </td>
-  <c:choose>
-    <c:when test="${participateFormStatus == 'enabled'}">
      <c:choose>    
        <c:when test="${crf.submissionUrl != ''}">    
       <td class="table_cell"><c:out value="${participantUrl}${crf.submissionUrl}"/></td></c:when>   
