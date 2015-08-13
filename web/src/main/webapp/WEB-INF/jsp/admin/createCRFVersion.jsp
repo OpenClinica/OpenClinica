@@ -159,65 +159,6 @@ function submitform(){
 
 </div>
 
-<div id="xformUpload" class="crf-upload-div-hidden">
-  <form id="xformSubmit" action="CreateXformCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
-    <div style="width: 800px">
-    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-<div class="textbox_center">
-        <table border="0" cellpadding="0" cellspacing="0">
-        <c:if test="${empty CrfId}">
-          <tr>
-            <td class="formlabel"><fmt:message key="CRF_name" bundle="${resword}"/>:</td>
-            <td><input type="text" id="crfName" name="crfName"/></td>
-          </tr>
-          </c:if>
-         <tr>
-            <td class="formlabel"><fmt:message key="version_name" bundle="${resword}"/>:</td>
-            <td><input type="text" id="versionName" name="versionName"/></td>
-          </tr>
-         <tr>
-            <td class="formlabel"><fmt:message key="crf_version_description" bundle="${resword}"/>:</td>
-            <td><input type="text" id="versionDescription" name="versionDescription"/></td>
-          </tr>
-         <tr>
-            <td class="formlabel"><fmt:message key="revision_notes" bundle="${resword}"/>:</td>
-            <td><input type="text" id="revisionNotes" name="revisionNotes"/></td>
-          </tr>
-        </table>
-</div>
-        <div class="crf-upload-padded-div"><textarea class="crf-upload-padded-div" id="xformText" name="xformText" rows="40" cols="60"></textarea></div>
-        <br>
-        <div class="crf-upload-padded-div"><fmt:message key="xform_upload_media_instruction" bundle="${resword}"/></div>
-        <br>
-        <div class="textbox_center">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr>
-            <td class="formlabel"><fmt:message key="upload_media_files" bundle="${resword}"/>:</td>
-            <td><div><input type="file" name="media_file" id="xform_media_file_path" multiple></div>
-            <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
-          </tr>
-        </table>
-        </div>
-        <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-  
-    </div></div></div></div></div></div></div></div>
-    </div>
-
-    <br clear="all">
-    <table border="0" cellpadding="0" cellspacing="0">
-      <tr>
-        <td>
-          <input type="submit" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
-        </td>
-        <td>
-          <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
-        </td>
-      </tr>
-    </table>
-    </form>
-</div>
-
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">
