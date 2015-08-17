@@ -24,6 +24,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +35,7 @@ import javax.servlet.ServletContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -45,6 +50,9 @@ public class AccountController {
 	@Autowired
 	ServletContext context;
 
+	@Autowired
+	AuthenticationManager authenticationManager;
+
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -56,6 +64,52 @@ public class AccountController {
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
+
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ResponseEntity<HashMap> getAccountByUserName(@RequestBody HashMap<String, String> requestMap) throws Exception {
+
+		System.out.println("I'm in getAccountByUserName");
+		String userName = requestMap.get("username");
+		String password = requestMap.get("password");
+
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userName,
+				password);
+
+		try{
+			authentication = authenticationManager.authenticate(authentication);
+		}catch (BadCredentialsException bce){
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
+		}
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		StudyDAO studyDAO = new StudyDAO(dataSource);
+		HashMap<String,Object> userDTO = new HashMap<String,Object>();
+
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
+		if(null != userAccountBean) {
+			userDTO.put("username", userName);
+			userDTO.put("password", userAccountBean.getPasswd());
+			userDTO.put("firstName",userAccountBean.getFirstName());
+			userDTO.put("lastName",userAccountBean.getLastName());
+			userDTO.put("apiKey",userAccountBean.getApiKey());
+
+
+
+			ArrayList<HashMap<String,String>> rolesDTO = new ArrayList<>();
+			for (StudyUserRoleBean role : (List<StudyUserRoleBean>)userAccountBean.getRoles()) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("roleName", role.getRoleName());
+				map.put("studyOID", ((StudyBean) studyDAO.findByPK(role.getStudyId())).getOid());
+				rolesDTO.add(map);
+			}
+			userDTO.put("roles",rolesDTO);
+		}else{
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
+
+		}
+		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
@@ -305,6 +359,9 @@ public class AccountController {
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
 		createdUserAccountBean.setEmail(email);
+		createdUserAccountBean.setEnableApiKey(false);
+		createdUserAccountBean.setApiKey("");
+
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
