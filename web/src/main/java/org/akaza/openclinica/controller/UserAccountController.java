@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -43,6 +44,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -66,14 +70,16 @@ public class UserAccountController {
 	@Autowired
 	AuthoritiesDao authoritiesDao;
 
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	UserAccountDAO udao;
 	StudyDAO sdao;
 	StudySubjectDAO ssdao;
 	UserAccountBean uBean;
-
+	
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
-	public ResponseEntity<UserAccountBean> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
+	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
+		logger.info("I'm in createUserAccount");
 		System.out.println("I'm in createUserAccount");
 		uBean = null;
 
@@ -95,27 +101,38 @@ public class UserAccountController {
 		request.setAttribute("study_name", studyName);
 		request.setAttribute("role_name", roleName);
 
+		
+		
+		// UserAccountBean ownerUserAccount = getUserAccountByApiKey(apiKey);
+		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+		if (!ownerUserAccount.isActive() && (!ownerUserAccount.isTechAdmin() || !ownerUserAccount.isSysAdmin())) {
+			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
+			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
+		}
+
 		// generate password
 		String password = ""; // generate
 		String passwordHash = UserAccountBean.LDAP_PASSWORD;
 		SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
 		password = secm.genPassword();
 		passwordHash = secm.encrytPassword(password, null);
-		System.out.println("Password:" + password);
 
 		// Validate Entry Fields
 		Validator v = new Validator(request);
 		addValidationToFields(v, username);
 		HashMap errors = v.validate();
 		if (!errors.isEmpty()) {
-			System.out.println("VAlidation Error: " + errors.toString());
-				return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.BAD_REQUEST);
+			logger.info("Validation Error: " + errors.toString());
+			System.out.println("Validation Error: " + errors.toString());
+				return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		StudyBean study = getStudyByName(studyName);
 		if (!study.isActive()) {
+			logger.info("The Study Name is not Valid");
 			System.out.println("The Study Name is not Valid");
-			return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		// Role
@@ -133,8 +150,9 @@ public class UserAccountController {
 		}
 
 		if (!found) {
+			logger.info("The Role is not a Valid Role for the Study or Site");
 			System.out.println("The Role is not a Valid Role for the Study or Site");
-			return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		// User Types
@@ -151,19 +169,15 @@ public class UserAccountController {
 		}
 
 		if (!found) {
+			logger.info("The Type is not a Valid User Type");
 			System.out.println("The Type is not a Valid User Type");
-			return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.BAD_REQUEST);
-		}
-		// UserAccountBean ownerUserAccount = getUserAccountByApiKey(apiKey);
-		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
-		if (!ownerUserAccount.isActive() && (!ownerUserAccount.isTechAdmin() || !ownerUserAccount.isSysAdmin())) {
-			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
-			return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.BAD_REQUEST);
+			
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 		// build UserName
 
 		uBean = buildUserAccount(username, fName, lName, password, institution, study, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap) ,role, uType);
-
+		HashMap<String,Object> userDTO = null;
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {
 			createUserAccount(uBean);
@@ -172,8 +186,16 @@ public class UserAccountController {
 			logger.info("***New User Account is created***");
 			System.out.println("***New User Account is created***");
 			uBean.setPasswd(password);
-		}
-		return new ResponseEntity<UserAccountBean>(uBean, org.springframework.http.HttpStatus.OK);
+	
+		    userDTO = new HashMap<String,Object>();
+
+			userDTO.put("username", uBean.getName());
+			userDTO.put("password", uBean.getPasswd());
+			userDTO.put("firstName",uBean.getFirstName());
+			userDTO.put("lastName",uBean.getLastName());
+			userDTO.put("apiKey",uBean.getApiKey());
+	}
+		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
 	private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution, StudyBean study, UserAccountBean ownerUserAccount, String email,
@@ -313,7 +335,6 @@ public class UserAccountController {
 
 	public String getRandom32ChApiKey() {
 		String uuid = UUID.randomUUID().toString();
-		System.out.print(uuid.replaceAll("-", ""));
 		return uuid.replaceAll("-", "");
 	}
 
@@ -333,8 +354,6 @@ public class UserAccountController {
 			v.addValidation("username", Validator.IS_A_USERNAME);
 
 		v.addValidation("username", Validator.USERNAME_UNIQUE, udao);
-
-		v.addValidation("fName", Validator.NO_BLANKS);
 		v.addValidation("fName", Validator.NO_BLANKS);
 		v.addValidation("fName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
 		v.addValidation("lName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 50);
