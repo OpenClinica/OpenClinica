@@ -70,13 +70,12 @@ public class UserAccountController {
 	@Autowired
 	AuthoritiesDao authoritiesDao;
 
-
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	UserAccountDAO udao;
 	StudyDAO sdao;
 	StudySubjectDAO ssdao;
 	UserAccountBean uBean;
-	
+
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
 		logger.info("I'm in createUserAccount");
@@ -101,8 +100,6 @@ public class UserAccountController {
 		request.setAttribute("study_name", studyName);
 		request.setAttribute("role_name", roleName);
 
-		
-		
 		// UserAccountBean ownerUserAccount = getUserAccountByApiKey(apiKey);
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (!ownerUserAccount.isActive() && (!ownerUserAccount.isTechAdmin() || !ownerUserAccount.isSysAdmin())) {
@@ -125,7 +122,7 @@ public class UserAccountController {
 		if (!errors.isEmpty()) {
 			logger.info("Validation Error: " + errors.toString());
 			System.out.println("Validation Error: " + errors.toString());
-				return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		StudyBean study = getStudyByName(studyName);
@@ -171,13 +168,13 @@ public class UserAccountController {
 		if (!found) {
 			logger.info("The Type is not a Valid User Type");
 			System.out.println("The Type is not a Valid User Type");
-			
+
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 		// build UserName
 
-		uBean = buildUserAccount(username, fName, lName, password, institution, study, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap) ,role, uType);
-		HashMap<String,Object> userDTO = null;
+		uBean = buildUserAccount(username, fName, lName, password, institution, study, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
+		HashMap<String, Object> userDTO = null;
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {
 			createUserAccount(uBean);
@@ -186,20 +183,20 @@ public class UserAccountController {
 			logger.info("***New User Account is created***");
 			System.out.println("***New User Account is created***");
 			uBean.setPasswd(password);
-	
-		    userDTO = new HashMap<String,Object>();
+
+			userDTO = new HashMap<String, Object>();
 
 			userDTO.put("username", uBean.getName());
 			userDTO.put("password", uBean.getPasswd());
-			userDTO.put("firstName",uBean.getFirstName());
-			userDTO.put("lastName",uBean.getLastName());
-			userDTO.put("apiKey",uBean.getApiKey());
-	}
+			userDTO.put("firstName", uBean.getFirstName());
+			userDTO.put("lastName", uBean.getLastName());
+			userDTO.put("apiKey", uBean.getApiKey());
+		}
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
 	private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution, StudyBean study, UserAccountBean ownerUserAccount, String email,
-			String passwordHash,Boolean authorizeSoap, Role roleName, UserType userType) throws Exception {
+			String passwordHash, Boolean authorizeSoap, Role roleName, UserType userType) throws Exception {
 
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
 
