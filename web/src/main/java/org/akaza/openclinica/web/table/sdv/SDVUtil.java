@@ -904,12 +904,17 @@ public class SDVUtil {
 
             }
             //TODO: I18N Date must be formatted properly
-            if (crfBean.getCreatedDate() != null) {
-                tempSDVBean.setEventDate(sdformat.format(crfBean.getCreatedDate()));
-            } else {
-                //tempSDVBean.setEventDate("unknown");
-
-            }
+           //Fix OC 1888
+            StudyEventDAO sedao= new StudyEventDAO(dataSource);
+            StudyEventBean seBean = (StudyEventBean) sedao.findByPK(crfBean.getStudyEventId());
+            tempSDVBean.setEventDate(sdformat.format(seBean.getDateStarted()));
+            
+//            if (crfBean.getCreatedDate() != null) {
+//                tempSDVBean.setEventDate(sdformat.format(crfBean.getCreatedDate()));
+//            } else {
+//                //tempSDVBean.setEventDate("unknown");
+//
+//            }
             //crfBean.getEventName()
             tempSDVBean.setEventName(crfBean.getEventName());
             //The checkbox is next to the study subject id
