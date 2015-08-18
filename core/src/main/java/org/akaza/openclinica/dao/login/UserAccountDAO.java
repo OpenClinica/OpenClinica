@@ -344,7 +344,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     public StudyUserRoleBean createStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
         Locale currentLocale = ResourceBundleProvider.getLocale();
-        ResourceBundleProvider.updateLocale(Locale.US);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), studyRole.getRoleName());
         variables.put(new Integer(2), new Integer(studyRole.getStudyId()));
