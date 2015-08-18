@@ -517,6 +517,7 @@ public class UpdateSubStudyServlet extends SecureController {
             }
             
              eventDefCrfList = validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
+             edcsInSession.clear();
 
 
         }
@@ -626,7 +627,7 @@ public class UpdateSubStudyServlet extends SecureController {
             	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())
+                if ((eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()))
                 		||(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())&& eventDef.getId()==0)
                 		){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
