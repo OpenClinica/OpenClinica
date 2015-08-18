@@ -8,6 +8,7 @@ public class Select implements UserControl {
     private Label label = null;
     private Hint hint = null;
     private List<Item> item;
+    private ItemSet itemSet;
 
     public String getRef() {
         return ref;
@@ -47,5 +48,13 @@ public class Select implements UserControl {
 
     public void setItem(List<Item> item) {
         this.item = item;
+    }
+
+    public ItemSet getItemSet() {
+        return itemSet;
+    }
+
+    public void setItemSet(ItemSet itemSet) {
+        this.itemSet = itemSet;
     }
 }

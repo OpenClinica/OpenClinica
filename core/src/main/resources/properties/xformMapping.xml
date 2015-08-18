@@ -21,11 +21,53 @@
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Model">
         <map-to xml="model" />
+        <field name="itext" type="org.akaza.openclinica.domain.xform.dto.Itext">
+            <bind-xml name="itext" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
         <field name="instance" type="string" collection="arraylist">
             <bind-xml name="instance" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
         <field name="bind" type="org.akaza.openclinica.domain.xform.dto.Bind" collection="arraylist">
             <bind-xml name="bind" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    <class name="org.akaza.openclinica.domain.xform.dto.Itext">
+        <map-to xml="itext" />
+        <field name="translation" type="org.akaza.openclinica.domain.xform.dto.Translation" collection="arraylist">
+            <bind-xml name="translation" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    <class name="org.akaza.openclinica.domain.xform.dto.Translation">
+        <map-to xml="translation" />
+        <field name="defaultLang" type="string">
+            <bind-xml name="default" node="attribute" />
+        </field>
+        <field name="lang" type="string">
+            <bind-xml name="lang" node="attribute" />
+        </field>
+        <field name="text" type="org.akaza.openclinica.domain.xform.dto.Text" collection="arraylist">
+            <bind-xml name="text" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    <class name="org.akaza.openclinica.domain.xform.dto.Text">
+        <map-to xml="text" />
+        <field name="id" type="string">
+            <bind-xml name="id" node="attribute" />
+        </field>
+        <field name="value" type="org.akaza.openclinica.domain.xform.dto.Value" collection="arraylist">
+            <bind-xml name="text" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    <class name="org.akaza.openclinica.domain.xform.dto.Value">
+        <map-to xml="value" />
+        <field name="form" type="string">
+            <bind-xml name="form" node="attribute" />
+        </field>
+        <field name="ref" type="string">
+            <bind-xml name="ref" node="attribute" />
+        </field>
+        <field name="value" type="string">
+            <bind-xml name="value" node="text" />
         </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Body">
@@ -87,6 +129,9 @@
         <field name="item" type="org.akaza.openclinica.domain.xform.dto.Item" collection="arraylist">
             <bind-xml name="item" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
+        <field name="itemSet" type="org.akaza.openclinica.domain.xform.dto.ItemSet">
+            <bind-xml name="itemset" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Select1">
         <map-to xml="select1" ns-uri="http://www.w3.org/2002/xforms" />
@@ -105,6 +150,9 @@
         <field name="item" type="org.akaza.openclinica.domain.xform.dto.Item" collection="arraylist">
             <bind-xml name="item" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
+        <field name="itemSet" type="org.akaza.openclinica.domain.xform.dto.ItemSet">
+            <bind-xml name="itemset" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
     </class>
    <class name="org.akaza.openclinica.domain.xform.dto.Input">
         <map-to xml="input" ns-uri="http://www.w3.org/2002/xforms" />
@@ -121,6 +169,20 @@
             <bind-xml name="hint" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
+    
+    <class name="org.akaza.openclinica.domain.xform.dto.ItemSet">
+        <map-to xml="itemSet" />
+        <field name="nodeSet" type="string">
+            <bind-xml name="nodeset" node="attribute" />
+        </field>
+        <field name="label" type="org.akaza.openclinica.domain.xform.dto.Label">
+            <bind-xml name="label" node="element" />
+        </field>
+        <field name="value" type="org.akaza.openclinica.domain.xform.dto.Value">
+            <bind-xml name="value" node="element" />
+        </field>
+    </class>
+    
     <class name="org.akaza.openclinica.domain.xform.dto.Label">
         <map-to xml="label" />
         <field name="ref" type="string">

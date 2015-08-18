@@ -48,10 +48,14 @@ import org.akaza.openclinica.domain.datamap.VersioningMapId;
 import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
+import org.akaza.openclinica.domain.xform.XformUtils;
 import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Group;
 import org.akaza.openclinica.domain.xform.dto.Html;
+import org.akaza.openclinica.domain.xform.dto.Text;
+import org.akaza.openclinica.domain.xform.dto.Translation;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.domain.xform.dto.Value;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
@@ -113,10 +117,13 @@ public class XformMetaDataService {
     @Autowired
     private DataSource datasource;
 
+    @Autowired
+    private ResponseSetService responseSetService;
+
     @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
-            String submittedXformText, List<FileItem> formItems) {
+            String submittedXformText, List<FileItem> formItems) throws Exception {
 
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
@@ -164,7 +171,7 @@ public class XformMetaDataService {
         sectionDao.saveOrUpdate(section);
         section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
 
-        createGroups(container, html, crf, crfVersion, section, ub);
+        createGroups(container, html, submittedXformText, crf, crfVersion, section, ub);
 
         saveMedia(formItems, crf, crfVersion);
 
@@ -202,7 +209,8 @@ public class XformMetaDataService {
         }
     }
 
-    private void createGroups(XformContainer container, Html html, CrfBean crf, CrfVersion version, Section section, UserAccountBean ub) {
+    private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion version, Section section,
+            UserAccountBean ub) throws Exception {
         ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
 
         List<Group> htmlGroups = html.getBody().getGroup();
@@ -232,7 +240,7 @@ public class XformMetaDataService {
                 XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 Item item = createItem(html, widget, xformGroup, xformItem, crf, ub);
                 if (item != null) {
-                    ResponseSet responseSet = createResponseSet(html, xformItem, widget, version);
+                    ResponseSet responseSet = createResponseSet(html, submittedXformText, xformItem, widget, version);
                     createItemFormMetadata(html, xformItem, item, responseSet, section, version);
                     createVersioningMap(version, item);
                     createItemGroupMetadata(html, item, version, itemGroup, isRepeating);
@@ -310,22 +318,20 @@ public class XformMetaDataService {
         itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
     }
 
-    private ResponseSet createResponseSet(Html html, XformItem xformItem, UserControl widget, CrfVersion version) {
+    private ResponseSet createResponseSet(Html html, String submittedXformText, XformItem xformItem, UserControl widget, CrfVersion version) throws Exception {
         ResponseType responseType = getResponseType(html, xformItem);
 
         // TODO: Eventually will need to build support for ItemSets defined in XML.
         // TODO: And for non text types
-        ResponseSet existingSet = responseSetDao.findByLabelVersion(responseType.getName(), version.getCrfVersionId());
-        if (existingSet == null) {
-            ResponseSet responseSet = new ResponseSet();
-            responseSet.setLabel(responseType.getName());
-            responseSet.setOptionsText(responseType.getName());
-            responseSet.setOptionsValues(responseType.getName());
-            responseSet.setResponseType(responseType);
-            responseSet.setVersionId(version.getCrfVersionId());
-            return responseSetDao.saveOrUpdate(responseSet);
-        } else
-            return existingSet;
+        /*
+         * ResponseSet existingSet = responseSetDao.findByLabelVersion(responseType.getName(),
+         * version.getCrfVersionId()); if (existingSet == null) { ResponseSet responseSet = new ResponseSet();
+         * responseSet.setLabel(responseType.getName()); responseSet.setOptionsText(responseType.getName());
+         * responseSet.setOptionsValues(responseType.getName()); responseSet.setResponseType(responseType);
+         * responseSet.setVersionId(version.getCrfVersionId()); return responseSetDao.saveOrUpdate(responseSet); } else
+         * return existingSet;
+         */
+        return responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType);
     }
 
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub) {
@@ -359,7 +365,11 @@ public class XformMetaDataService {
                     if (control.getRef().equals(xformItem.getItemPath())) {
                         if (control.getLabel() != null && control.getLabel().getLabel() != null)
                             return control.getLabel().getLabel();
-                        else
+                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
+                            String ref = control.getLabel().getRef();
+                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
+                            return XformUtils.getDefaultTranslation(html, itextKey);
+                        } else
                             return "";
                     }
                 }
@@ -369,7 +379,11 @@ public class XformMetaDataService {
                     if (control.getRef().equals(xformItem.getItemPath())) {
                         if (control.getLabel() != null && control.getLabel().getLabel() != null)
                             return control.getLabel().getLabel();
-                        else
+                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
+                            String ref = control.getLabel().getRef();
+                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
+                            return XformUtils.getDefaultTranslation(html, itextKey);
+                        } else
                             return "";
                     }
                 }
@@ -389,6 +403,12 @@ public class XformMetaDataService {
 
                 if (dataType.equals("string"))
                     return itemDataTypeDao.findByItemDataTypeCode("ST");
+                else if (dataType.equals("int"))
+                    return itemDataTypeDao.findByItemDataTypeCode("INT");
+                else if (dataType.equals("decimal"))
+                    return itemDataTypeDao.findByItemDataTypeCode("REAL");
+                else if (dataType.equals("select") || dataType.equals("select1"))
+                    return itemDataTypeDao.findByItemDataTypeCode("ST");
             }
         }
         return null;
@@ -405,6 +425,16 @@ public class XformMetaDataService {
 
                 if (responseType.equals("string"))
                     return responseTypeDao.findByResponseTypeName("text");
+                else if (responseType.equals("int"))
+                    return responseTypeDao.findByResponseTypeName("text");
+                else if (responseType.equals("decimal"))
+                    return responseTypeDao.findByResponseTypeName("text");
+                else if (responseType.equals("select"))
+                    return responseTypeDao.findByResponseTypeName("checkbox");
+                else if (responseType.equals("select1"))
+                    return responseTypeDao.findByResponseTypeName("radio");
+                else
+                    return null;
             }
         }
         return null;
