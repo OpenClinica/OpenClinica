@@ -21,7 +21,7 @@
 
     <!-- for testing, purge the log on each run -->
     <appender name="file" class="org.apache.log4j.FileAppender">
-        <param name="file" value="/usr/local/tomcat/logs/openclinica-test.log"/>
+        <param name="file" value="${project.basedir}/target/openclinica-test.log"/>
         <param name="append" value="false"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="conversionPattern" value="%d [%t] %-5p %c %x: %m%n"/>

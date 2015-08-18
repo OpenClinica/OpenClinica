@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -121,7 +122,11 @@ public class FileUploadHelper {
 
         File uploadedFile = new File(dirToSaveUploadedFileIn + File.separator + fileName);
         if (fileRenamePolicy != null) {
-            uploadedFile = fileRenamePolicy.rename(uploadedFile);
+        	try {
+        		uploadedFile = fileRenamePolicy.rename(uploadedFile, item.getInputStream());
+        	} catch (IOException e) {
+        		throw new OpenClinicaSystemException(e.getMessage());
+        	}
         }
         try {
 			item.write(uploadedFile);

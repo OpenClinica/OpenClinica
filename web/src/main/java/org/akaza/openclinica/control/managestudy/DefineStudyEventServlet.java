@@ -388,7 +388,8 @@ public class DefineStudyEventServlet extends SecureController {
         int parentStudyId=sed.getStudyId();
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
-
+       
+        if(eventDefCrfList.size()!=0)
         validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
         errors = v.validate();
 
