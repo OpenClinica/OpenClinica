@@ -51,7 +51,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(_username);
                             if(ub.getId() != 0){
                                 request.getSession().setAttribute("userBean",ub);
-                                filterChain.doFilter(request, response);
                             }else{
                                 unauthorized(response, "Bad credentials");
                             }
