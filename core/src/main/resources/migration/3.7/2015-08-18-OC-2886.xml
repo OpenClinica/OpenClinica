@@ -62,7 +62,7 @@
 		END;
 		'
 		    LANGUAGE plpgsql;
-		        	</sql>
+	</sql>
     </changeSet>
 
 </databaseChangeLog>
