@@ -237,13 +237,18 @@ public class XformMetaDataService {
             }
             // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
             for (UserControl widget : widgets) {
-                XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
-                Item item = createItem(html, widget, xformGroup, xformItem, crf, ub);
-                if (item != null) {
-                    ResponseSet responseSet = createResponseSet(html, submittedXformText, xformItem, widget, version);
-                    createItemFormMetadata(html, xformItem, item, responseSet, section, version);
-                    createVersioningMap(version, item);
-                    createItemGroupMetadata(html, item, version, itemGroup, isRepeating);
+
+                // Skip read-only items here
+                String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
+                if (readonly == null || !readonly.trim().equals("true()")) {
+                    XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
+                    Item item = createItem(html, widget, xformGroup, xformItem, crf, ub);
+                    if (item != null) {
+                        ResponseSet responseSet = createResponseSet(html, submittedXformText, xformItem, widget, version);
+                        createItemFormMetadata(html, xformItem, item, responseSet, section, version);
+                        createVersioningMap(version, item);
+                        createItemGroupMetadata(html, item, version, itemGroup, isRepeating);
+                    }
                 }
             }
         }
@@ -312,7 +317,7 @@ public class XformMetaDataService {
         // TODO: Will need to pull required info from bindings
         itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
-        itemFormMetadata.setResponseLayout("Horizontal");
+        itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
         itemFormMetadata.setShowItem(true);
         itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
