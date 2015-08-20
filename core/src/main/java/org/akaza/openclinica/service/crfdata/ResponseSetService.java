@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
@@ -50,8 +49,6 @@ public class ResponseSetService {
         if (existingSet == null) {
             ResponseSet responseSet = new ResponseSet();
             responseSet.setLabel(xformItem.getItemName());
-            // responseSet.setOptionsText(xformItem.getItemName());
-            // responseSet.setOptionsValues(responseType.getName());
             responseSet.setOptionsText(getOptionsText(html, submittedXformText, xformItem, responseType));
             responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
             responseSet.setResponseType(responseType);
@@ -96,6 +93,7 @@ public class ResponseSetService {
                     else {
                         for (Item option : items) {
                             String label = lookupLabel(html, option.getLabel());
+                            label = label.replaceAll(",", "\\\\,");
                             if (optionsText.isEmpty())
                                 optionsText = label;
                             else
@@ -142,6 +140,7 @@ public class ResponseSetService {
                 label = XformUtils.getDefaultTranslation(html, itemLabelName.getTextContent());
             else
                 label = itemLabelName.getTextContent();
+            label = label.replaceAll(",", "\\\\,");
             if (optionsText.equals(""))
                 optionsText = label;
             else

@@ -212,7 +212,7 @@ public class XformMetaDataService {
     private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion version, Section section,
             UserAccountBean ub) throws Exception {
         ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
-
+        Integer itemOrdinal = 1;
         List<Group> htmlGroups = html.getBody().getGroup();
 
         for (Group htmlGroup : htmlGroups) {
@@ -245,9 +245,10 @@ public class XformMetaDataService {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub);
                     if (item != null) {
                         ResponseSet responseSet = createResponseSet(html, submittedXformText, xformItem, widget, version);
-                        createItemFormMetadata(html, xformItem, item, responseSet, section, version);
+                        createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
                         createVersioningMap(version, item);
-                        createItemGroupMetadata(html, item, version, itemGroup, isRepeating);
+                        createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                        itemOrdinal++;
                     }
                 }
             }
@@ -255,7 +256,7 @@ public class XformMetaDataService {
 
     }
 
-    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating) {
+    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);// item_group_id,
         itemGroupMetadata.setHeader("");// header,
@@ -276,7 +277,7 @@ public class XformMetaDataService {
         itemGroupMetadata.setCrfVersion(version);// crf_version_id,
         itemGroupMetadata.setItem(item);// item_id ,
         // TODO: Figure out ordinals here.
-        itemGroupMetadata.setOrdinal(1);// ordinal,
+        itemGroupMetadata.setOrdinal(itemOrdinal);// ordinal,
         itemGroupMetadata.setShowGroup(true);// show_group,
         // TODO: More repeating group info here.
         itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
@@ -295,7 +296,8 @@ public class XformMetaDataService {
         versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private void createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version) {
+    private void createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
+            Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
         itemFormMetadata.setCrfVersionId(version.getCrfVersionId());
         itemFormMetadata.setResponseSet(responseSet);
@@ -307,7 +309,7 @@ public class XformMetaDataService {
         itemFormMetadata.setParentId(0);
         itemFormMetadata.setSection(section);
         // TODO: Will need to pull the ordinal from the XML.
-        itemFormMetadata.setOrdinal(1);
+        itemFormMetadata.setOrdinal(itemOrdinal);
         itemFormMetadata.setParentLabel("");
         itemFormMetadata.setColumnNumber(0);
         itemFormMetadata.setPageNumberLabel("");
