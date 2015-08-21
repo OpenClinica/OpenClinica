@@ -688,4 +688,104 @@ public class AccountController {
 		return accessPermission;
 	}
 
+	@RequestMapping(value = "/study/{studyOid}", method = RequestMethod.GET)
+	public ResponseEntity <ArrayList <UserDTO>> getAllParticipantPerStudy(@PathVariable("studyOid") String studyOid) throws Exception {
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		ArrayList <UserDTO> uDTOs = null;
+		System.out.println("I'm in getAllParticipantPerStudy");
+
+		StudyBean parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOid();
+
+
+		if (isStudyDoesNotExist(oid))
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		// build UserName
+	//	HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+
+		udao = new UserAccountDAO(dataSource);
+		ArrayList <UserAccountBean> uBeans = (ArrayList<UserAccountBean>) udao.findAllParticipantsByStudyOid(oid);
+		if (uBeans !=null) {
+			uDTOs= new ArrayList<>();
+			for(UserAccountBean uBean : uBeans){
+                UserDTO uDTO = new UserDTO();
+                
+                String username =uBean.getName();
+        		String studySubjectOid= username.substring(username.indexOf(".")+1);
+                ssdao = new StudySubjectDAO<>(dataSource);
+        		String studySubjectId = ssdao.findByOid(studySubjectOid).getLabel();
+        		
+                uDTO.setfName(uBean.getFirstName());
+                uDTO.setEmail(uBean.getEmail());
+                uDTO.setMobile(uBean.getPhone());
+                uDTO.setAccessCode(uBean.getAccessCode());
+                uDTO.setUserName(uBean.getName());
+                uDTO.setPassword(uBean.getPasswd());
+                uDTO.setlName(uBean.getLastName());
+                uDTO.setStudySubjectId(studySubjectId);
+                
+				uDTOs.add(uDTO);
+			}
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.OK);
+		} else {
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+	
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public ResponseEntity<UserDTO> updateAccount(@RequestBody HashMap<String, String> map) throws Exception {
+		uDTO = null;
+		System.out.println("I'm in UpdateAccount");
+
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOid();
+
+		String studySubjectId = map.get("studySubjectId");
+		String fName = map.get("fName");
+		String lName = map.get("lName");
+		String mobile = map.get("mobile");
+		String accessCode = map.get("accessCode");
+		String crcUserName = map.get("crcUserName");
+		String email = map.get("email");
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		System.out.println("******************     You are in the Update Rest Service   *****************");
+
+		UserAccountBean uBean = null;
+
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
+
+
+		// build UserName
+		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+		String pUserName = mapValues.get("pUserName"); // Participant User Name
+		String studySubjectOid = mapValues.get("studySubjectOid");
+		Integer pStudyId = Integer.valueOf(mapValues.get("pStudyId"));
+
+		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
+		uBean = buildUserAccount(oid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName, email);
+		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
+		if (!participantUserAccountBean.isActive()) {
+			createUserAccount(uBean);
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			disableUserAccount(uBean);
+			logger.info("***New User Account is created***");
+			System.out.println("***New User Account is created***");
+			uDTO = buildUserDTO(uBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+
+		} else {
+			uBean.setId(getUserAccount(uBean.getName()).getId());
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			logger.info("***User Account already exist in the system and data is been Updated ***");
+			System.out.println("***User Account already exist in the system and data is been Updated ***");
+			uDTO = buildUserDTO(uBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+		}
+	}
+
 }
