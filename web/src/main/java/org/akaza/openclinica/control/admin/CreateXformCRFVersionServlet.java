@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.xform.XformContainer;
@@ -33,6 +34,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,6 +47,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         CrfDao crfDao = (CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
+        CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
 
         // Retrieve submission data from multipart request
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -66,11 +69,20 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
         // Create Database entries
         XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
-        CrfVersion newVersion = xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
+        Errors errors = xformService.runService(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
                 submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items);
-        CrfBean newCrf = crfDao.findByName(submittedCrfName);
+
+        // Save errors to request so they can be displayed to the user
+        if (errors.hasErrors()) {
+            request.setAttribute("errors", errors);
+            System.out.println("Found at least one error.  Data not saved.");
+        } else {
+            System.out.println("Didn't find any errors.  Saved data.");
+        }
 
         // Save any media files uploaded with xform
+        CrfBean newCrf = crfDao.findByName(submittedCrfName);
+        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, newCrf.getId());
         saveAttachedMedia(items, newCrf, newVersion);
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
