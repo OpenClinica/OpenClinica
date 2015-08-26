@@ -68,7 +68,7 @@ public class AnonymousFormController {
 		if (!mayProceed(studyOid))
 			return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		
-		String submissionUri = map.get("submissionUri");
+		String submissionUri = map.get("submissionUri");	
 		if (submissionUri != "" && submissionUri != null) {
 
 
@@ -129,8 +129,9 @@ public class AnonymousFormController {
 	}
 
 	private String createAnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion, int studyEventDefinitionId) throws Exception {
+		StudyBean parentStudyBean = getParentStudy(studyOID);
 		PFormCache cache = PFormCache.getInstance(context);
-		String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
+		String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), crfVersion.getOid());
 		String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid(),studyEventDefinitionId);
 
 		String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;

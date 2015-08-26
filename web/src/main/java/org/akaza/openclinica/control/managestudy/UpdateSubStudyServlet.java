@@ -328,13 +328,14 @@ public class UpdateSubStudyServlet extends SecureController {
         ArrayList <EventDefinitionCRFBean> edcsInSession = new ArrayList<EventDefinitionCRFBean>();
         boolean changestate = false;
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
+
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+        String participateFormStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal").getValue();
+        if (participateFormStatus.equals("enabled")) 	baseUrl();
+      request.setAttribute("participateFormStatus",participateFormStatus );
+
         
         for (StudyEventDefinitionBean sed : seds) {
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
-            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            if (participateFormStatus.equals("enabled")) 	baseUrl();
-          request.setAttribute("participateFormStatus",participateFormStatus );
-
         	
 
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
@@ -370,7 +371,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
                     boolean changed = false;
                    
-                    if(changeStatus!=null){ 
+                    if(changeStatus!=null && changeStatus.get(sed.getId() + "-" + edcBean.getId())!=null){ 
                     	changed = changeStatus.get(sed.getId() + "-" + edcBean.getId());
                         edcBean.setSubmissionUrl(submissionUrl);
                     }
@@ -499,10 +500,9 @@ public class UpdateSubStudyServlet extends SecureController {
                             if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
                                 edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
                             }
-                            edcBean.setParentId(edcBean.getId());
+                       //     edcBean.setParentId(edcBean.getId());
                             edcBean.setStudyId(site.getId());
                             edcBean.setUpdater(ub);
-                            edcBean.setId(0);
                             edcBean.setUpdatedDate(new Date());
                             logger.debug("create for the site");
                             toBeCreatedEventDefBean.add(edcBean);
@@ -517,6 +517,7 @@ public class UpdateSubStudyServlet extends SecureController {
             }
             
              eventDefCrfList = validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
+             edcsInSession.clear();
 
 
         }
@@ -532,7 +533,7 @@ public class UpdateSubStudyServlet extends SecureController {
             forwardPage(Page.UPDATE_SUB_STUDY);
         }else{  
             for (EventDefinitionCRFBean toBeCreated: toBeCreatedEventDefBean){
-         
+                  toBeCreated.setParentId(toBeCreated.getId());
             	edcdao.create(toBeCreated);
             }
             for (EventDefinitionCRFBean toBeUpdated: toBeUpdatedEventDefBean){
@@ -626,7 +627,9 @@ public class UpdateSubStudyServlet extends SecureController {
             	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
             		break;
             	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
+                if ((eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()))
+                		||(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())&& eventDef.getId()==0)
+                		){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                 	System.out.println("Duplicate ****************************");
             		System.out.println();

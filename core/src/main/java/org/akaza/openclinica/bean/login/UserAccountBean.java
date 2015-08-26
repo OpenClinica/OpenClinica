@@ -48,6 +48,8 @@ public class UserAccountBean extends AuditableEntityBean {
     private Boolean runWebservices;
     private String accessCode;
     private String time_zone;
+    private boolean enableApiKey;
+    private String apiKey;
 
     /**
      * Counts the number of times the user visited Main Menu servlet.
@@ -122,6 +124,8 @@ public class UserAccountBean extends AuditableEntityBean {
         lockCounter = 0;
         runWebservices = false;
         accessCode="";
+        enableApiKey=false;
+        apiKey="";
     }
 
     /**
@@ -542,6 +546,22 @@ public class UserAccountBean extends AuditableEntityBean {
 
 	public void setTime_zone(String time_zone) {
 		this.time_zone = time_zone;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public boolean isEnableApiKey() {
+		return enableApiKey;
+	}
+
+	public void setEnableApiKey(boolean enableApiKey) {
+		this.enableApiKey = enableApiKey;
 	}
 
 

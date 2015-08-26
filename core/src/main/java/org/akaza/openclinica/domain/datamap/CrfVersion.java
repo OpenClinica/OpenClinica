@@ -49,6 +49,7 @@ public class CrfVersion extends DataMapDomainObject {
     private Integer updateId;
     private String ocOid;
     private String xform;
+    private String xformName;
     private Set filterCrfVersionMaps = new HashSet(0);
     private List<VersioningMap> versioningMaps;
     private List<EventCrf> eventCrfs;
@@ -67,9 +68,9 @@ public class CrfVersion extends DataMapDomainObject {
     }
 
     public CrfVersion(int crfVersionId, UserAccount userAccount, Status status, CrfBean crf, String name, String description, String revisionNotes,
-            Date dateCreated, Date dateUpdated, Integer updateId, String ocOid, String xform, Set filterCrfVersionMaps, List<VersioningMap> versioningMaps,
-            List<EventCrf> eventCrfs, List<Section> sections, List<EventDefinitionCrf> eventDefinitionCrfs, Set decisionConditions,
-            Set<ItemGroupMetadata> itemGroupMetadatas) {
+            Date dateCreated, Date dateUpdated, Integer updateId, String ocOid, String xform, String xformName, Set filterCrfVersionMaps,
+            List<VersioningMap> versioningMaps, List<EventCrf> eventCrfs, List<Section> sections, List<EventDefinitionCrf> eventDefinitionCrfs,
+            Set decisionConditions, Set<ItemGroupMetadata> itemGroupMetadatas) {
         this.crfVersionId = crfVersionId;
         this.userAccount = userAccount;
         this.status = status;
@@ -82,6 +83,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.updateId = updateId;
         this.ocOid = ocOid;
         this.xform = xform;
+        this.xformName = xformName;
         this.filterCrfVersionMaps = filterCrfVersionMaps;
         this.versioningMaps = versioningMaps;
         this.eventCrfs = eventCrfs;
@@ -204,6 +206,15 @@ public class CrfVersion extends DataMapDomainObject {
 
     public void setXform(String xform) {
         this.xform = xform;
+    }
+
+    @Column(name = "xformName")
+    public String getXformName() {
+        return xformName;
+    }
+
+    public void setXformName(String xformName) {
+        this.xformName = xformName;
     }
 
     /*

@@ -317,7 +317,7 @@ public class EventDefinitionCrf extends DataMapDomainObject {
 		this.allowAnonymousSubmission = allowAnonymousSubmission;
 	}
 
-	@Column(name = "submission_urll")
+	@Column(name = "submission_url")
 	public String getSubmissionUrl() {
 		return submissionUrl;
 	}

@@ -3,8 +3,8 @@
 <web-app version="2.4"
          xmlns="http://java.sun.com/xml/ns/j2ee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" >
-    <display-name>OpenClinica </display-name>
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>OpenClinica</display-name>
     <description>
         OpenClinica web interface
     </description>
@@ -12,28 +12,28 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-classpath:org/akaza/openclinica/applicationContext-security.xml
-classpath:org/akaza/openclinica/applicationContext-web-beans.xml
-classpath:org/akaza/openclinica/application-context-web-beans.xml
-classpath:org/akaza/openclinica/applicationContext-core-timer.xml
-classpath:org/akaza/openclinica/applicationContext-core-spring.xml
-classpath:org/akaza/openclinica/applicationContext-core-security.xml
-classpath:org/akaza/openclinica/applicationContext-core-service.xml
-classpath:org/akaza/openclinica/applicationContext-core-scheduler.xml
-classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
-classpath:org/akaza/openclinica/applicationContext-core-email.xml
-classpath:org/akaza/openclinica/applicationContext-core-db.xml
+            classpath:org/akaza/openclinica/applicationContext-security.xml
+            classpath:org/akaza/openclinica/applicationContext-web-beans.xml
+            classpath:org/akaza/openclinica/application-context-web-beans.xml
+            classpath:org/akaza/openclinica/applicationContext-core-timer.xml
+            classpath:org/akaza/openclinica/applicationContext-core-spring.xml
+            classpath:org/akaza/openclinica/applicationContext-core-security.xml
+            classpath:org/akaza/openclinica/applicationContext-core-service.xml
+            classpath:org/akaza/openclinica/applicationContext-core-scheduler.xml
+            classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
+            classpath:org/akaza/openclinica/applicationContext-core-email.xml
+            classpath:org/akaza/openclinica/applicationContext-core-db.xml
 
 
         </param-value>
-  </context-param>
+    </context-param>
 
     <context-param>
         <param-name>jmesaMessagesLocation</param-name>
         <param-value>org/akaza/openclinica/jmesaResourceBundle</param-value>
     </context-param>
 
-   <context-param>
+    <context-param>
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>
@@ -43,52 +43,51 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
         <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
-    
-<!--     <listener>
-      <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
-</listener>  -->
-    
+
+    <!--     <listener>
+          <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+    </listener>  -->
+
     <listener>
-    
-    
-    <listener-class>
-      org.springframework.security.web.session.HttpSessionEventPublisher
-    </listener-class>
+
+
+        <listener-class>
+            org.springframework.security.web.session.HttpSessionEventPublisher
+        </listener-class>
     </listener>
-      <listener>
+    <listener>
         <listener-class>org.akaza.openclinica.control.OCServletContextListener</listener-class>
     </listener>
-<listener>
+    <listener>
 
-    <listener-class>
+        <listener-class>
 
-        org.springframework.web.context.request.RequestContextListener
+            org.springframework.web.context.request.RequestContextListener
 
-    </listener-class>
+        </listener-class>
 
-  </listener>
-
-
-<!-- <filter> -->
-<!-- <filter-name>restODMFilter</filter-name> -->
-<!-- <filter-class>org.akaza.openclinica.web.filter.rest.RestODMFilter</filter-class> -->
-<!-- <init-param> -->
-<!--   <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> -->
-<!--   <param-value>org.akaza.openclinica.web.filter.rest</param-value> -->
-<!-- </init-param> -->
-<!-- </filter> -->
+    </listener>
 
 
-<!-- <filter-mapping> -->
-<!-- <filter-name>restODMFilter</filter-name> -->
-<!-- <url-pattern>/rest/*</url-pattern> -->
-<!-- </filter-mapping> -->
+    <!-- <filter> -->
+    <!-- <filter-name>restODMFilter</filter-name> -->
+    <!-- <filter-class>org.akaza.openclinica.web.filter.rest.RestODMFilter</filter-class> -->
+    <!-- <init-param> -->
+    <!--   <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> -->
+    <!--   <param-value>org.akaza.openclinica.web.filter.rest</param-value> -->
+    <!-- </init-param> -->
+    <!-- </filter> -->
 
+
+    <!-- <filter-mapping> -->
+    <!-- <filter-name>restODMFilter</filter-name> -->
+    <!-- <url-pattern>/rest/*</url-pattern> -->
+    <!-- </filter-mapping> -->
 
 
     <filter>
         <filter-name>encodingFilter</filter-name>
-            <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
         <init-param>
             <param-name>encoding</param-name>
             <param-value>UTF-8</param-value>
@@ -107,41 +106,41 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-  <filter>
-      <filter-name>localeFilter</filter-name>
-      <filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
-   </filter>
-   <filter-mapping>
-      <filter-name>localeFilter</filter-name>
-      <url-pattern>/*</url-pattern>
-   </filter-mapping>
-     <filter>
-        <filter-name>compressFilter</filter-name>
-        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter </filter-class>
+    <filter>
+        <filter-name>localeFilter</filter-name>
+        <filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
     </filter>
-     <filter-mapping>
+    <filter-mapping>
+        <filter-name>localeFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>compressFilter</filter-name>
+        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter</filter-class>
+    </filter>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/InitialDataEntry</url-pattern>
-     </filter-mapping>
-      <filter-mapping>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/ViewSectionDataEntry</url-pattern>
-     </filter-mapping>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/AdministrativeEditing</url-pattern>
-     </filter-mapping>
-  <filter-mapping>
-        <filter-name>compressFilter</filter-name>
-      <url-pattern>/DoubleDataEntry</url-pattern>
-    </filter-mapping>
-  <filter-mapping>
-        <filter-name>compressFilter</filter-name>
-    <url-pattern>/ListStudySubjects</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
-   <url-pattern>/SectionPreview</url-pattern>
+        <url-pattern>/DoubleDataEntry</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/ListStudySubjects</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/SectionPreview</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
@@ -151,38 +150,49 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <filter-name>compressFilter</filter-name>
         <url-pattern>/CreateXformCRFVersion</url-pattern>
     </filter-mapping>
-  <filter-mapping>
-    <filter-name>compressFilter</filter-name>
-   <url-pattern>/*</url-pattern>
+    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
-   <filter>
+    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
-            <url-pattern>/*</url-pattern>
-   </filter-mapping>
-   <filter>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
         <filter-name>hibernateFilter</filter-name>
         <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>hibernateFilter</filter-name>
         <url-pattern>/*</url-pattern>
-   </filter-mapping>
-  <filter>
+    </filter-mapping>
+    <filter>
         <filter-name>logFilter</filter-name>
         <filter-class>org.akaza.openclinica.control.core.OCServletFilter</filter-class>
     </filter>
-     <filter-mapping>
+    <filter-mapping>
         <filter-name>logFilter</filter-name>
         <url-pattern>/*</url-pattern>
-   </filter-mapping>
+    </filter-mapping>
+    <filter>
+        <filter-name>apiSecurityFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>apiSecurityFilter</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>apiSecurityFilter</filter-name>
+        <url-pattern>/pages/auth/api/*</url-pattern>
+    </filter-mapping>
 
 
-
-   <servlet>
+    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
@@ -194,9 +204,9 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     </servlet-mapping>
 
     <servlet-mapping>
-    <servlet-name>pages</servlet-name>
-    <url-pattern>/oauth/*</url-pattern>
-  </servlet-mapping>
+        <servlet-name>pages</servlet-name>
+        <url-pattern>/oauth/*</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>ws</servlet-name>
@@ -301,12 +311,12 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet</servlet-class>
     </servlet>
 
-<!--    <servlet>
-        <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
-        <display-name>ListDiscNotesSubjectServlet</display-name>
-        <description>ListDiscNotesSubjectServlet</description>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesSubjectServlet</servlet-class>
-    </servlet>-->
+    <!--    <servlet>
+            <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
+            <display-name>ListDiscNotesSubjectServlet</display-name>
+            <description>ListDiscNotesSubjectServlet</description>
+            <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesSubjectServlet</servlet-class>
+        </servlet>-->
     <servlet>
         <servlet-name>ViewJobServlet</servlet-name>
         <display-name>ViewJobServlet</display-name>
@@ -375,12 +385,12 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <description>The log out Servlet</description>
         <servlet-class>org.akaza.openclinica.control.login.LogoutServlet</servlet-class>
     </servlet>
-<!--    <servlet>
-        <servlet-name>EnterpriseServlet</servlet-name>
-        <display-name>EnterpriseServlet</display-name>
-        <description>The Enterprise Servlet</description>
-        <servlet-class>org.akaza.openclinica.control.login.EnterpriseServlet</servlet-class>
-    </servlet>-->
+    <!--    <servlet>
+            <servlet-name>EnterpriseServlet</servlet-name>
+            <display-name>EnterpriseServlet</display-name>
+            <description>The Enterprise Servlet</description>
+            <servlet-class>org.akaza.openclinica.control.login.EnterpriseServlet</servlet-class>
+        </servlet>-->
     <servlet>
         <servlet-name>RequestPasswordServlet</servlet-name>
         <display-name>RequestPasswordServlet</display-name>
@@ -391,11 +401,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ContactServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.login.ContactServlet</servlet-class>
     </servlet>
-<!--    <servlet>
-        <servlet-name>RequestAccountServlet</servlet-name>
-        <display-name>RequestAccountServlet</display-name>
-        <servlet-class>org.akaza.openclinica.control.login.RequestAccountServlet</servlet-class>
-    </servlet>-->
+    <!--    <servlet>
+            <servlet-name>RequestAccountServlet</servlet-name>
+            <display-name>RequestAccountServlet</display-name>
+            <servlet-class>org.akaza.openclinica.control.login.RequestAccountServlet</servlet-class>
+        </servlet>-->
     <servlet>
         <servlet-name>RequestStudyServlet</servlet-name>
         <display-name>RequestStudyServlet</display-name>
@@ -426,7 +436,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ShowFile</display-name>
         <servlet-class>org.akaza.openclinica.control.extract.ShowFileServlet</servlet-class>
     </servlet>
-     <servlet>
+    <servlet>
         <servlet-name>StudyAuditLogServlet</servlet-name>
         <display-name>StudyAuditLog</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.StudyAuditLogServlet</servlet-class>
@@ -586,7 +596,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ViewEventDefinition</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionServlet</servlet-class>
     </servlet>
-     <servlet>
+    <servlet>
         <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
         <display-name>ViewEventDefinitionReadOnly</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionReadOnlyServlet</servlet-class>
@@ -747,16 +757,15 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ViewStudyUser</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
     </servlet>
-	
-	<!-- Export Excel -->
-	<servlet>
+
+    <!-- Export Excel -->
+    <servlet>
         <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
         <display-name>ExportExcelStudySubjectAuditLog</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ExportExcelStudySubjectAuditLogServlet</servlet-class>
     </servlet>
-	
-	
-	
+
+
     <servlet>
         <servlet-name>SetStudyUserRoleServlet</servlet-name>
         <display-name>SetStudyUserRole</display-name>
@@ -1152,7 +1161,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet>
         <servlet-name>ViewSectionDataEntryPreview</servlet-name>
         <display-name>ViewSectionDataEntryPreview</display-name>
-        <servlet-class> org.akaza.openclinica.control.managestudy.ViewSectionDataEntryPreview</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryPreview</servlet-class>
     </servlet>
 
     <servlet>
@@ -1316,14 +1325,14 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <display-name>ViewItemAuditLogServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
-       
+
     <servlet>
         <servlet-name>ParticipantFormServlet</servlet-name>
         <display-name>ParticipantFormServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.ParticipantFormServlet</servlet-class>
     </servlet>
 
- 
+
     <servlet>
         <servlet-name>OpenRosaFormDownloadServlet</servlet-name>
         <display-name>OpenRosaFormDownloadServlet</display-name>
@@ -1360,11 +1369,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
 
-<!--    <servlet-mapping>
-        <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
-        <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
-    </servlet-mapping>
--->
+    <!--    <servlet-mapping>
+            <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
+            <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
+        </servlet-mapping>
+    -->
     <servlet-mapping>
         <servlet-name>ViewJobServlet</servlet-name>
         <url-pattern>/ViewJob</url-pattern>
@@ -1405,7 +1414,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/UpdateJobExport</url-pattern>
     </servlet-mapping>
 
-  <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
@@ -1586,10 +1595,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewSchedulerServlet</servlet-name>
         <url-pattern>/ViewScheduler</url-pattern>
     </servlet-mapping>
-<!--    <servlet-mapping>
-        <servlet-name>RequestAccountServlet</servlet-name>
-        <url-pattern>/RequestAccount</url-pattern>
-    </servlet-mapping>-->
+    <!--    <servlet-mapping>
+            <servlet-name>RequestAccountServlet</servlet-name>
+            <url-pattern>/RequestAccount</url-pattern>
+        </servlet-mapping>-->
     <servlet-mapping>
         <servlet-name>RequestStudyServlet</servlet-name>
         <url-pattern>/RequestStudy</url-pattern>
@@ -1979,8 +1988,8 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
-	
-	<!--  Export Excel -->
+
+    <!--  Export Excel -->
     <servlet-mapping>
         <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ExportExcelStudySubjectAuditLog</url-pattern>
@@ -2110,8 +2119,8 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/DownloadVersionSpreadSheet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-      <servlet-name>DownloadAttachedFileServlet</servlet-name>
-      <url-pattern>/DownloadAttachedFile</url-pattern>
+        <servlet-name>DownloadAttachedFileServlet</servlet-name>
+        <url-pattern>/DownloadAttachedFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewNotesServlet</servlet-name>
@@ -2177,7 +2186,7 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>UploadFileServlet</servlet-name>
         <url-pattern>/UploadFile</url-pattern>
     </servlet-mapping>
-   
+
     <!-- just for testing purposes -->
     <servlet-mapping>
         <servlet-name>ManageStudyServlet</servlet-name>
@@ -2215,55 +2224,54 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <url-pattern>/ClinicalData/html/view/*</url-pattern>
     </servlet-mapping>
     <error-page>
-    <error-code>404</error-code>
-    <location>/WEB-INF/jsp/404.jsp</location>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/404.jsp</location>
     </error-page>
 
     <error-page>
-    <error-code>403</error-code>
-    <location>/WEB-INF/jsp/403.jsp</location>
-    
+        <error-code>403</error-code>
+        <location>/WEB-INF/jsp/403.jsp</location>
+
     </error-page>
     <error-page>
-    <error-code>500</error-code>
-    <location>/WEB-INF/jsp/error.jsp</location>
-    
-    </error-page>
- 
-  <servlet>
-    <servlet-name>OpenClinicaJersey2</servlet-name>
-    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.akaza.openclinica.web.pform</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+        <error-code>500</error-code>
+        <location>/WEB-INF/jsp/error.jsp</location>
 
-  <servlet-mapping>
-    <servlet-name>OpenClinicaJersey2</servlet-name>
-    <url-pattern>/rest2/*</url-pattern>
-  </servlet-mapping>
-  
+    </error-page>
+
     <servlet>
-    <servlet-name>OpenClinicaJersey</servlet-name>
-    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-    <init-param>
-	  <param-name>com.sun.jersey.config.property.packages</param-name>
-	  <param-value> org.akaza.openclinica.web.restful</param-value>
-	</init-param>
-	<init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-      <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
-    </init-param>
-	<load-on-startup>1</load-on-startup>
- </servlet>
+        <servlet-name>OpenClinicaJersey2</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.akaza.openclinica.web.pform</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-  <servlet-mapping>
-    <servlet-name>OpenClinicaJersey</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
-  </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenClinicaJersey2</servlet-name>
+        <url-pattern>/rest2/*</url-pattern>
+    </servlet-mapping>
 
+    <servlet>
+        <servlet-name>OpenClinicaJersey</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.akaza.openclinica.web.restful</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+            <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OpenClinicaJersey</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
 
 
 </web-app>
