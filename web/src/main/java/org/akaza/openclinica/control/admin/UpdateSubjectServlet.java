@@ -99,7 +99,7 @@ public class UpdateSubjectServlet extends SecureController {
 	        }
             if ("show".equalsIgnoreCase(action)) {
             	
-            	 request.setAttribute("localBirthDate", " ");//no DOB collected
+            	 request.setAttribute("localBirthDate", "");//no DOB collected
             	if (!currentStudy.getStudyParameterConfig().getCollectDob().equals("3") &&
             			subject.getDateOfBirth() != null ){
             		setLocalDOB( subject);
@@ -214,11 +214,14 @@ public class UpdateSubjectServlet extends SecureController {
                 boolean isTheSameDate = false;
                 try{
                 	Date fakeDOB = yformat.parse(submitted_date);
+                	if(subject.getDateOfBirth() != null)
+                	{
                 	if (subject.getDateOfBirth().getYear() == (fakeDOB.getYear())){
                 		isTheSameDate=true;
                 		String  converted_date = yformat.format(subject.getDateOfBirth());
                 		request.setAttribute(DATE_DOB_TO_SAVE, converted_date);
                  	}
+                	}
                 }catch(ParseException pe){
                 	logger.debug("update subject: cannot convert date " + submitted_date);
                 	//I am putting on Pradnya's request the link to code review with a long discussion
@@ -319,9 +322,13 @@ public class UpdateSubjectServlet extends SecureController {
         	//about what type of logging should be here: enjoy
         	//https://dev.openclinica.com/crucible/cru/OC-117
             logger.error("update subject validation errors");
+            
             setInputMessages(errors);
             setDNFlag( subjectId);
             setLocalDOB( subject);
+            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+            request.setAttribute("localBirthDate", "");
+            
             forwardPage(Page.UPDATE_SUBJECT);
         }
     }
@@ -353,8 +360,10 @@ public class UpdateSubjectServlet extends SecureController {
 //    }    
 
     private void setLocalDOB(SubjectBean subject){
+    	       
     	Date birthDate = subject.getDateOfBirth();
-        try {
+        
+    	try {
             if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
             {
             String localBirthDate = local_df.format(birthDate);
