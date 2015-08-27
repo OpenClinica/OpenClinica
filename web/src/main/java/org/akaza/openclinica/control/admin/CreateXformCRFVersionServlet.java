@@ -176,10 +176,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
     }
 
-    private String retrieveFormFieldValue(List<FileItem> items, String fieldName) {
+    private String retrieveFormFieldValue(List<FileItem> items, String fieldName) throws Exception {
         for (FileItem item : items) {
             if (fieldName.equals(item.getFieldName()))
-                return item.getString();
+                return item.getString("UTF-8");
         }
         logger.warn("Form field '" + fieldName + "' missing from xform submission.");
         return "";
