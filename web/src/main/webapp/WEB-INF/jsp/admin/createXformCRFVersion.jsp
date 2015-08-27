@@ -105,10 +105,52 @@
 <div style="width: 400px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
+
+
+
+
+
+
 <div class="textbox_center">
 
-<div>PLACEHOLDER: This is where the uploaded form will be validated.</div>
+
+
+<c:choose>
+ <c:when test="${not empty errorList}">
+  <p>WARNING!  Found validation errors while importing CRF.  Import cancelled.  Please resolve the errors listed below and re-import the CRF.
+  </p>
+  <br>
+  <div>
+   <table style="border: 1px solid black;border-collapse: collapse;width:100%">
+    <c:forEach items="${errorList}" var="error">
+     <tr>
+      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Object Type:</b></td>
+      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Name:</b></td>  
+      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Error Code:</b></td>  
+     </tr>
+     <tr>
+      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.objectName}"/></td>
+      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.defaultMessage}"/></td>  
+      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.code}"/></td>  
+     </tr>
+    </c:forEach>
+   </table>
+  </div>
+ </c:when>
+<c:otherwise>
+ <div> SUCCESS.  CRF was successfully imported.</div>
+</c:otherwise>
+</c:choose>
+
+
+
 </div>
+
+
+
+
+
+
 
 </div></div></div></div></div></div></div></div>
 </div>

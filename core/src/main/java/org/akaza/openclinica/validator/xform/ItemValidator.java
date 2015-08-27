@@ -12,11 +12,13 @@ public class ItemValidator implements Validator {
 
     private ItemDao itemDao = null;
     private ItemDataType oldDataType = null;
+    private ItemDataType newDataType = null;
     private CrfBean crf = null;
 
-    public ItemValidator(ItemDao itemDao, ItemDataType oldDataType, CrfBean crf) {
+    public ItemValidator(ItemDao itemDao, ItemDataType oldDataType, ItemDataType newDataType, CrfBean crf) {
         this.itemDao = itemDao;
         this.oldDataType = oldDataType;
+        this.newDataType = newDataType;
         this.crf = crf;
     }
 
@@ -34,8 +36,8 @@ public class ItemValidator implements Validator {
         // if (existingItem == null)
         // return;
 
-        if (oldDataType != null && oldDataType.getId() != item.getItemDataType().getId()) {
-            errors.rejectValue(item.getName(), "item.invaliddatatypechange", "Item data type cannot change between versions.");
+        if (oldDataType != null && oldDataType.getItemDataTypeId() != newDataType.getItemDataTypeId()) {
+            errors.rejectValue("itemDataType", "item.invaliddatatypechange", item.getName());
         }
 
     }

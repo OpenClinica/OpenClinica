@@ -62,6 +62,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
 @Service
 public class XformMetaDataService {
@@ -138,12 +139,11 @@ public class XformMetaDataService {
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
-
         return errors;
     }
 
     @Transactional
-    private CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
+    public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
             String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
 
@@ -197,9 +197,10 @@ public class XformMetaDataService {
 
         saveMedia(formItems, crf, crfVersion);
 
-        if (errors.hasErrors())
-            throw new Exception("Encountered validation errors while saving CRF.");
-
+        if (errors.hasErrors()) {
+            System.out.println("Found errors.  Attempting runtimeexception to rollback DB changes.");
+            throw new RuntimeException("Encountered validation errors while saving CRF.");
+        }
         return crfVersion;
     }
 
@@ -353,9 +354,9 @@ public class XformMetaDataService {
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, Errors errors)
             throws Exception {
         ItemDAO itemDAO = new ItemDAO(datasource);
-        ItemDataType dataType = getItemDataType(html, xformItem);
+        ItemDataType newDataType = getItemDataType(html, xformItem);
 
-        if (dataType == null) {
+        if (newDataType == null) {
             System.out.println("Found unsupported item type for item: " + xformItem.getItemName());
             return null;
         }
@@ -372,7 +373,7 @@ public class XformMetaDataService {
             item.setDescription("");
             item.setUnits("");
             item.setPhiStatus(false);
-            item.setItemDataType(dataType);
+            item.setItemDataType(newDataType);
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
@@ -380,7 +381,7 @@ public class XformMetaDataService {
             item.setOcOid(itemDAO.getValidOid(new ItemBean(), crf.getName(), xformItem.getItemName(), new ArrayList()));// OC_OID
             itemDao.saveOrUpdate(item);
         }
-        ItemValidator validator = new ItemValidator(itemDao, oldDataType, crf);
+        ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType, crf);
         DataBinder dataBinder = new DataBinder(item);
         Errors itemErrors = dataBinder.getBindingResult();
         validator.validate(item, itemErrors);

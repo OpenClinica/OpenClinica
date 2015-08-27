@@ -17,4 +17,11 @@ public class CrfDao extends AbstractDomainDao<CrfBean> {
         return (CrfBean) q.uniqueResult();
     }
 
+    public CrfBean findByCrfId(Integer crfId) {
+        String query = "from " + getDomainClassName() + " crf  where crf.crfId = :crfId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("crfId", crfId);
+        return (CrfBean) q.uniqueResult();
+    }
+
 }

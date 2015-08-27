@@ -34,6 +34,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,22 +69,34 @@ public class CreateXformCRFVersionServlet extends SecureController {
         Html html = parser.unMarshall(submittedXformText);
 
         // Create Database entries
+        // Create container for holding validation errors
+        DataBinder dataBinder = new DataBinder(new CrfVersion());
+        Errors errors = dataBinder.getBindingResult();
+
         XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
-        Errors errors = xformService.runService(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items);
+        try {
+            xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
+                    submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
+        } catch (RuntimeException e) {
+            // TODO: can you get a runtime and empty errors object? need to verify.
+            System.out.println("Error encountered while saving CRF: " + e.getMessage());
+            System.out.println(ExceptionUtils.getStackTrace(e));
+            logger.error("Error encountered while saving CRF: " + e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+        }
 
         // Save errors to request so they can be displayed to the user
         if (errors.hasErrors()) {
-            request.setAttribute("errors", errors);
+            request.setAttribute("errorList", errors.getAllErrors());
             System.out.println("Found at least one error.  Data not saved.");
         } else {
             System.out.println("Didn't find any errors.  Saved data.");
         }
 
         // Save any media files uploaded with xform
-        CrfBean newCrf = crfDao.findByName(submittedCrfName);
-        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, newCrf.getId());
-        saveAttachedMedia(items, newCrf, newVersion);
+        CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
+        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getId());
+        saveAttachedMedia(items, crf, newVersion);
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
