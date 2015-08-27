@@ -42,6 +42,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,7 +70,7 @@ public class DiscrepancyNoteController {
 	DiscrepancyNoteDAO dnDao;
 
 	@RequestMapping(value = "/dnote", method = RequestMethod.POST)
-	public ResponseEntity buidDiscrepancyNote(@RequestBody HashMap<String, String> map) throws Exception {
+	public ResponseEntity buidDiscrepancyNote(@RequestBody HashMap<String, String> map, HttpServletRequest request) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		System.out.println("I'm in EnketoForm DN Rest Method");
 		org.springframework.http.HttpStatus httpStatus = null;
@@ -85,6 +86,7 @@ public class DiscrepancyNoteController {
 		String description = map.get("Description");
 		String detailedNotes = map.get("DetailedNote");
 		String dn_id = map.get("DN_Id");
+		dn_id = dn_id != null ? dn_id.replaceFirst("DN_",""): dn_id;
 
 		UserAccountDAO udao = new UserAccountDAO(dataSource);
 		StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
@@ -93,7 +95,7 @@ public class DiscrepancyNoteController {
 		DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
 
 		UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(assignedUser);
-		UserAccountBean ownerBean = (UserAccountBean) udao.findByUserName(owner);
+		UserAccountBean ownerBean = (UserAccountBean)request.getSession().getAttribute("userBean");
 		StudySubjectBean ssBean = ssdao.findByOid(studySubjectOid);
 		StudyEventDefinitionBean sedBean = seddao.findByOid(se_oid);
 		StudyBean studyBean = getStudy(sedBean.getStudyId());
@@ -107,7 +109,7 @@ public class DiscrepancyNoteController {
 			return new ResponseEntity(httpStatus);
 		}
 
-		if (resolutionStatus.equalsIgnoreCase("New")) {
+		if (!parent.isActive()){
 			saveFieldNotes(description, detailedNotes, seBean.getId(), entityType, studyBean, ownerBean, assignedUserBean, resolutionStatus, noteType, entityName);
 			httpStatus = org.springframework.http.HttpStatus.OK;
 		} else {
@@ -229,9 +231,6 @@ public class DiscrepancyNoteController {
 			result = false;
 		}
 		if (!entityName.equals("start_date") && !entityName.equals("end_date") && !entityName.equals("location")) {
-			result = false;
-		}
-		if ((!resolutionStatus.equals("New") && !parent.isActive()) || (!resolutionStatus.equals("New") && parent.isActive() && parent.getParentDnId() != 0)) {
 			result = false;
 		}
 		if (!ownerBean.isActive()) {
