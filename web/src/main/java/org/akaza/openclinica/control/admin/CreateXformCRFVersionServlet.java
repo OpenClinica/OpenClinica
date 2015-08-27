@@ -95,7 +95,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
         // Save any media files uploaded with xform
         CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
-        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getId());
+        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
         saveAttachedMedia(items, crf, newVersion);
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
