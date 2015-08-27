@@ -28,7 +28,7 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
     public CrfVersion findByNameCrfId(String name, Integer crfId) {
         String query = "select distinct cv.* from crf_version cv,crf c " + "where c.crf_id = " + crfId + " and cv.name = '" + name
                 + "' and cv.crf_id = c.crf_id";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(CrfVersion.class);
         return ((CrfVersion) q.uniqueResult());
     }
 
