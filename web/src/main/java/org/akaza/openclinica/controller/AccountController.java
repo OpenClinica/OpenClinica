@@ -211,7 +211,8 @@ public class AccountController {
 		udao = new UserAccountDAO(dataSource);
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
 		if (!userAccountBean.isActive()) {
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+			uDTO = new UserDTO();
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		} else {
 			buildUserDTO(userAccountBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
