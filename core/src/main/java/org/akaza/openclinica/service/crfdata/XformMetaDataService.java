@@ -274,7 +274,7 @@ public class XformMetaDataService {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
-                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType);
+                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
                         createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
                         createVersioningMap(version, item);
                         createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);

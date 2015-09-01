@@ -25,9 +25,14 @@ import org.akaza.openclinica.domain.xform.dto.Label;
 import org.akaza.openclinica.domain.xform.dto.Select;
 import org.akaza.openclinica.domain.xform.dto.Select1;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.validator.xform.ResponseSetValidator;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -35,25 +40,36 @@ import org.w3c.dom.NodeList;
 @Service
 public class ResponseSetService {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     @Autowired
     private ResponseSetDao responseSetDao;
 
     public ResponseSetService() {
-
     }
 
-    public ResponseSet getResponseSet(Html html, String submittedXformText, XformItem xformItem, CrfVersion version, ResponseType responseType)
-            throws Exception {
+    public ResponseSet getResponseSet(Html html, String submittedXformText, XformItem xformItem, CrfVersion version, ResponseType responseType,
+            org.akaza.openclinica.domain.datamap.Item item, Errors errors) throws Exception {
 
         ResponseSet existingSet = responseSetDao.findByLabelVersion(responseType.getName(), version.getCrfVersionId());
         if (existingSet == null) {
+            // Create the response set
             ResponseSet responseSet = new ResponseSet();
             responseSet.setLabel(xformItem.getItemName());
             responseSet.setOptionsText(getOptionsText(html, submittedXformText, xformItem, responseType));
             responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
             responseSet.setResponseType(responseType);
             responseSet.setVersionId(version.getCrfVersionId());
-            return responseSetDao.saveOrUpdate(responseSet);
+            responseSetDao.saveOrUpdate(responseSet);
+            responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+            // Run validation against it
+            ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);
+            DataBinder dataBinder = new DataBinder(responseSet);
+            Errors responseSetErrors = dataBinder.getBindingResult();
+            validator.validate(responseSet, responseSetErrors);
+            errors.addAllErrors(responseSetErrors);
+
+            return responseSet;
         } else
             return existingSet;
     }
@@ -84,7 +100,7 @@ public class ResponseSetService {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
                     } else {
-                        System.out.println("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
+                        logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;
                     }
 
@@ -129,7 +145,6 @@ public class ResponseSetService {
         Document xml = builder.parse(new ByteArrayInputStream(submittedXformText.getBytes(StandardCharsets.UTF_8)));
         String expression = formatItemSetXPath(itemSet.getNodeSet());
         NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xml, XPathConstants.NODESET);
-        System.out.println("Successfully executed xpath expression.  Got " + nodeList.getLength() + " results");
 
         // Iterate thru the list of items, build the list of Options Text, Performing Itext lookups if required.
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -162,7 +177,6 @@ public class ResponseSetService {
 
             for (UserControl control : controls) {
                 if (control.getRef().equals(xformItem.getItemPath())) {
-                    System.out.println("Found " + xformItem.getItemName() + " in html body.  Building reponse set text.");
 
                     List<Item> items = null;
                     ItemSet itemSet = null;
@@ -176,7 +190,7 @@ public class ResponseSetService {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
                     } else {
-                        System.out.println("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
+                        logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;
                     }
 
@@ -212,7 +226,6 @@ public class ResponseSetService {
         Document xml = builder.parse(new ByteArrayInputStream(submittedXformText.getBytes(StandardCharsets.UTF_8)));
         String expression = formatItemSetXPath(itemSet.getNodeSet());
         NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xml, XPathConstants.NODESET);
-        System.out.println("Successfully executed xpath expression.  Got " + nodeList.getLength() + " results");
 
         // Iterate thru the list of items, build the list of Options Values.
         for (int i = 0; i < nodeList.getLength(); i++) {

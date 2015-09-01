@@ -29,15 +29,10 @@ public class ItemValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Item item = (Item) target;
 
-        ValidationUtils.rejectIfEmpty(errors, "name", "name.empty");
-
-        // Item existingItem = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
-
-        // if (existingItem == null)
-        // return;
+        ValidationUtils.rejectIfEmpty(errors, "name", "crf_val_item_nameempty");
 
         if (oldDataType != null && oldDataType.getItemDataTypeId() != newDataType.getItemDataTypeId()) {
-            errors.rejectValue("itemDataType", "item.invaliddatatypechange", item.getName());
+            errors.rejectValue("itemDataType", "crf_val_item_invaliddatatypechange", item.getName());
         }
 
     }
