@@ -62,7 +62,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 
 @Service
 public class XformMetaDataService {
@@ -134,8 +133,6 @@ public class XformMetaDataService {
         } catch (Exception e) {
             // Transaction has been rolled back due to an exception.
             // TODO: Should we add an error message here?
-            System.out.println("Error encountered while saving CRF: " + e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
@@ -198,7 +195,7 @@ public class XformMetaDataService {
         saveMedia(formItems, crf, crfVersion);
 
         if (errors.hasErrors()) {
-            System.out.println("Found errors.  Attempting runtimeexception to rollback DB changes.");
+            logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
             throw new RuntimeException("Encountered validation errors while saving CRF.");
         }
         return crfVersion;
@@ -288,25 +285,25 @@ public class XformMetaDataService {
 
     private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
-        itemGroupMetadata.setItemGroup(itemGroup);// item_group_id,
-        itemGroupMetadata.setHeader("");// header,
-        itemGroupMetadata.setSubheader("");// subheader,
-        itemGroupMetadata.setLayout("");// layout,
+        itemGroupMetadata.setItemGroup(itemGroup);
+        itemGroupMetadata.setHeader("");
+        itemGroupMetadata.setSubheader("");
+        itemGroupMetadata.setLayout("");
         if (isRepeating) {
-            itemGroupMetadata.setRepeatingGroup(true);// repeating_group
-            itemGroupMetadata.setRepeatNumber(1);// repeat_number,
-            itemGroupMetadata.setRepeatMax(40);// repeat_max,
+            itemGroupMetadata.setRepeatingGroup(true);
+            itemGroupMetadata.setRepeatNumber(1);
+            itemGroupMetadata.setRepeatMax(40);
         } else {
-            itemGroupMetadata.setRepeatingGroup(false);// repeating_group
-            itemGroupMetadata.setRepeatNumber(1);// repeat_number,
-            itemGroupMetadata.setRepeatMax(1);// repeat_max,
+            itemGroupMetadata.setRepeatingGroup(false);
+            itemGroupMetadata.setRepeatNumber(1);
+            itemGroupMetadata.setRepeatMax(1);
         }
-        itemGroupMetadata.setRepeatArray("");// repeat_array,
-        itemGroupMetadata.setRowStartNumber(0);// row_start_number,
-        itemGroupMetadata.setCrfVersion(version);// crf_version_id,
-        itemGroupMetadata.setItem(item);// item_id ,
-        itemGroupMetadata.setOrdinal(itemOrdinal);// ordinal,
-        itemGroupMetadata.setShowGroup(true);// show_group,
+        itemGroupMetadata.setRepeatArray("");
+        itemGroupMetadata.setRowStartNumber(0);
+        itemGroupMetadata.setCrfVersion(version);
+        itemGroupMetadata.setItem(item);
+        itemGroupMetadata.setOrdinal(itemOrdinal);
+        itemGroupMetadata.setShowGroup(true);
         itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
     }
 
@@ -342,7 +339,6 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        // TODO: Will need to pull required info from bindings
         itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
@@ -357,17 +353,15 @@ public class XformMetaDataService {
         ItemDataType newDataType = getItemDataType(html, xformItem);
 
         if (newDataType == null) {
-            System.out.println("Found unsupported item type for item: " + xformItem.getItemName());
+            logger.error("Found unsupported item type for item: " + xformItem.getItemName());
             return null;
         }
 
+        Item existingItem = null;
         Item item = itemDao.findByNameCrfId(xformItem.getItemName(), crf.getCrfId());
-        ItemDataType oldDataType = null;
         if (item != null) {
-            System.out.println("Item '" + xformItem.getItemName() + "' exists.");
-            oldDataType = itemDataTypeDao.findByItemDataTypeId(itemDao.getItemDataTypeId(item));
+            existingItem = item;
         } else {
-            System.out.println("item '" + xformItem.getItemName() + "' does not exist. Creating.");
             item = new Item();
             item.setName(xformItem.getItemName());
             item.setDescription("");
@@ -380,8 +374,9 @@ public class XformMetaDataService {
             // TODO: DATE_CREATED,
             item.setOcOid(itemDAO.getValidOid(new ItemBean(), crf.getName(), xformItem.getItemName(), new ArrayList()));// OC_OID
             itemDao.saveOrUpdate(item);
+            item = itemDao.findByOcOID(item.getOcOid());
         }
-        ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType, crf);
+        ItemValidator validator = new ItemValidator(itemDao, itemDataTypeDao, existingItem);
         DataBinder dataBinder = new DataBinder(item);
         Errors itemErrors = dataBinder.getBindingResult();
         validator.validate(item, itemErrors);

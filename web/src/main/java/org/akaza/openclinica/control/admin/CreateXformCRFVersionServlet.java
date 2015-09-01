@@ -79,8 +79,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
         } catch (RuntimeException e) {
             // TODO: can you get a runtime and empty errors object? need to verify.
-            System.out.println("Error encountered while saving CRF: " + e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
@@ -88,9 +86,9 @@ public class CreateXformCRFVersionServlet extends SecureController {
         // Save errors to request so they can be displayed to the user
         if (errors.hasErrors()) {
             request.setAttribute("errorList", errors.getAllErrors());
-            System.out.println("Found at least one error.  Data not saved.");
+            logger.debug("Found at least one error.  CRF data not saved.");
         } else {
-            System.out.println("Didn't find any errors.  Saved data.");
+            logger.debug("Didn't find any errors.  CRF data saved.");
         }
 
         // Save any media files uploaded with xform
@@ -129,7 +127,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     break;
                 }
             }
-            System.out.println("Found the primary instance element: " + instance.getTagName());
 
             // Get the form element
             Element form = null;
@@ -140,14 +137,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     break;
                 }
             }
-            System.out.println("Found the form element: " + form.getTagName());
 
             // Get the groups and grouped items
             for (int i = 0; i < form.getChildNodes().getLength(); i++) {
                 if (form.getChildNodes().item(i) instanceof Element && ((Element) form.getChildNodes().item(i)).hasChildNodes()
                         && !((Element) form.getChildNodes().item(i)).getTagName().equals("meta")) {
                     Element group = (Element) form.getChildNodes().item(i);
-                    System.out.println("Found a group:" + (group.getTagName()));
                     XformGroup newGroup = new XformGroup();
                     newGroup.setGroupName(group.getTagName());
                     newGroup.setGroupPath("/" + form.getTagName() + "/" + group.getTagName());
@@ -155,7 +150,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     for (int j = 0; j < group.getChildNodes().getLength(); j++) {
                         if (group.getChildNodes().item(j) instanceof Element) {
                             Element item = (Element) group.getChildNodes().item(j);
-                            System.out.println("Found a grouped item:" + (item.getTagName()));
                             XformItem newItem = new XformItem();
                             newItem.setItemPath("/" + form.getTagName() + "/" + group.getTagName() + "/" + item.getTagName());
                             newItem.setItemName(item.getTagName());

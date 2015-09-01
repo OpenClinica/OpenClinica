@@ -86,7 +86,6 @@ public class ResponseSetService {
 
             for (UserControl control : controls) {
                 if (control.getRef().equals(xformItem.getItemPath())) {
-                    System.out.println("Found " + xformItem.getItemName() + " in html body.  Building reponse set text.");
 
                     List<Item> items = null;
                     ItemSet itemSet = null;
