@@ -1565,9 +1565,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 boolean writeDN = true;
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
                                 LOGGER.debug("group item value: " + displayItem.getData().getValue());
-                                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
-                                    displayItem.getData().setValue("");
-                                }
+                //                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
+                //                    displayItem.getData().setValue("");
+                 //               }
                                
                                 //15350, this particular logic, takes into consideration that a DN is created properly as long as the item data record exists and it fails to get created when it doesnt.
                                 //so, we are expanding the logic from writeToDb method to avoid creating duplicate records.
@@ -1617,9 +1617,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                     displayItem.setEditFlag(displayGroup.getEditFlag());
                                     LOGGER.debug("group item value: " + displayItem.getData().getValue());
-                                    if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
-                                        displayItem.getData().setValue("");
-                                    }
+                     //               if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
+                     //                   displayItem.getData().setValue("");
+                     //               }
                                     temp = writeToDB(displayItem, iddao, 0, request);
                                     LOGGER.debug("just executed writeToDB - 2");
                                     if (temp && newUploadedFiles.containsKey(fileName)) {
