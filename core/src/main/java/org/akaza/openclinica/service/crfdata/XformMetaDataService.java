@@ -357,10 +357,10 @@ public class XformMetaDataService {
             return null;
         }
 
-        Item existingItem = null;
         Item item = itemDao.findByNameCrfId(xformItem.getItemName(), crf.getCrfId());
+        ItemDataType oldDataType = null;
         if (item != null) {
-            existingItem = item;
+            oldDataType = itemDataTypeDao.findByItemDataTypeId(itemDao.getItemDataTypeId(item));
         } else {
             item = new Item();
             item.setName(xformItem.getItemName());
@@ -376,7 +376,7 @@ public class XformMetaDataService {
             itemDao.saveOrUpdate(item);
             item = itemDao.findByOcOID(item.getOcOid());
         }
-        ItemValidator validator = new ItemValidator(itemDao, itemDataTypeDao, existingItem);
+        ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType);
         DataBinder dataBinder = new DataBinder(item);
         Errors itemErrors = dataBinder.getBindingResult();
         validator.validate(item, itemErrors);
