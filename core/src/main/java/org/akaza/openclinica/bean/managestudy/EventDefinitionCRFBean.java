@@ -587,7 +587,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	}
 
 	public boolean isParticipantForm() {
-		return participantForm;
+		return participantForm == true;
 	}
 
 	public void setParticipantForm(boolean participantForm) {
@@ -595,7 +595,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 	}
 
 	public boolean isAllowAnonymousSubmission() {
-		return allowAnonymousSubmission;
+		return allowAnonymousSubmission == true;
 	}
 
 	public void setAllowAnonymousSubmission(boolean allowAnonymousSubmission) {
