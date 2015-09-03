@@ -204,7 +204,9 @@ public class DiscrepancyNoteController {
 		eventParentNote.setAssignedUserId(assignedUserBean.getId());
 		eventParentNote.setUpdater(ownerBean);
 		getDnDao().update(eventParentNote); // update parent DN
-		getDnDao().updateAssignedUser(eventParentNote); // update parent DN assigned user
+		if(eventParentNote.getAssignedUserId() != 0) {
+			getDnDao().updateAssignedUser(eventParentNote); // update parent DN assigned user
+		}
 
 		return dnb;
 
