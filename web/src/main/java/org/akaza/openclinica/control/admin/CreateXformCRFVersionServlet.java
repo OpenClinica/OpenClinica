@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
@@ -78,9 +79,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
             xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
                     submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
         } catch (RuntimeException e) {
-            // TODO: can you get a runtime and empty errors object? need to verify.
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
+            // If there are no logged validation errors, this was an unanticipated exception
+            // and should be allow to crash the page for now
+            if (!errors.hasErrors())
+                throw e;
         }
 
         // Save errors to request so they can be displayed to the user
@@ -218,6 +222,14 @@ public class CreateXformCRFVersionServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
+
+        // Make sure xforms are enabled
+        String xformEnabled = CoreResources.getField("xform.enabled");
+        if (xformEnabled == null || !xformEnabled.equals("true")) {
+            addPageMessage(respage.getString("may_not_create_xforms"));
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_create_xforms"), "1");
+        }
+
         if (ub.isSysAdmin()) {
             return;
         }
