@@ -572,6 +572,7 @@ public class OpenRosaXmlGenerator {
 		marshaller.setNamespaceMapping("xsd", "http://www.w3.org/2001/XMLSchema");
 		marshaller.setNamespaceMapping("ev", "http://www.w3.org/2001/xml-events");
 		marshaller.setNamespaceMapping("", "http://www.w3.org/2002/xforms");
+		marshaller.setProperty("org.exolab.castor.indent", "false");
 		marshaller.setWriter(writer);
 		marshaller.marshal(html);
 		String xform = writer.toString();
