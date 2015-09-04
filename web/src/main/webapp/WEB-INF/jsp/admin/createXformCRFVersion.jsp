@@ -117,28 +117,33 @@
 
 <c:choose>
  <c:when test="${not empty errorList}">
-  <p>WARNING!  Found validation errors while importing CRF.  Import cancelled.  Please resolve the errors listed below and re-import the CRF.
+  <p>
+   <fmt:message key="crf_version_validation_fail" bundle="${resword}"/>
   </p>
   <br>
   <div>
-   <table style="border: 1px solid black;border-collapse: collapse;width:100%">
-    <c:forEach items="${errorList}" var="error">
+   <table class="contenttable" style="width:100%">
+    <thead>
      <tr>
-      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Object Type:</b></td>
-      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Name:</b></td>  
-      <th style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><b>Error Code:</b></td>  
+      <td><b><fmt:message key="crf_validation_error_identifier" bundle="${resword}"/>:</b></td>
+      <td><b><fmt:message key="crf_validation_error_reason" bundle="${resword}"/>:</b></td>
      </tr>
-     <tr>
-      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.objectName}"/></td>
-      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.defaultMessage}"/></td>  
-      <td style="border: 1px solid black;border-collapse: collapse;padding: 5px;text-align:left"><c:out value="${error.code}"/></td>  
-     </tr>
-    </c:forEach>
+    </thead>
+    <tbody>
+     <c:forEach items="${errorList}" var="error">
+      <tr>
+       <td><c:out value="${error.defaultMessage}"/></td>  
+       <td><fmt:message key="${error.code}" bundle="${resword}"/></td>  
+      </tr>
+     </c:forEach>
+    </tbody>
    </table>
   </div>
  </c:when>
 <c:otherwise>
- <div> SUCCESS.  CRF was successfully imported.</div>
+ <p>
+  <fmt:message key="crf_version_validation_success" bundle="${resword}"/>
+ </p>
 </c:otherwise>
 </c:choose>
 
