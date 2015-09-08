@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
@@ -15,6 +16,15 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setString("OCOID", OCOID);
+        return (ItemGroup) q.uniqueResult();
+    }
+
+    public ItemGroup findByNameCrfId(String groupName, CrfBean crf) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do  where do.name = :groupName and do.crf = :crf";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("groupName", groupName);
+        q.setEntity("crf", crf);
         return (ItemGroup) q.uniqueResult();
     }
 }

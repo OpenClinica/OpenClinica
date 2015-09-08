@@ -1,4 +1,3 @@
-
 package org.akaza.openclinica.dao.core;
 
 import java.io.ByteArrayInputStream;
@@ -39,10 +38,10 @@ public class CoreResources implements ResourceLoaderAware {
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
 
-	private Properties dataInfo;
-	private Properties dataInfoProp;
+    private Properties dataInfo;
+    private Properties dataInfoProp;
     private Properties extractInfo;
-	private Properties extractProp;
+    private Properties extractProp;
 
     public static final Integer PDF_ID = 10;
     public static final Integer TAB_ID = 8;
@@ -67,6 +66,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     /**
      * TODO: Delete me!
+     * 
      * @param dataInfoProps
      * @throws IOException
      */
@@ -82,58 +82,53 @@ public class CoreResources implements ResourceLoaderAware {
         String contHome = System.getProperty("catalina.home");
         Properties pros = System.getProperties();
         Enumeration proEnum = pros.propertyNames();
-        for (; proEnum.hasMoreElements(); ) {
+        for (; proEnum.hasMoreElements();) {
             // Get property name
-            String propName = (String)proEnum.nextElement();
+            String propName = (String) proEnum.nextElement();
 
             // Get property value
             String propValue = (String) pros.get(propName);
         }
     }
 
-    
-    	 
-	public Properties getPropValues(Properties prop, String propFileName) throws IOException {
-//		System.out.println(propFileName);
-        
-		prop = new Properties();
-		File file = new File(propFileName);
-           if (!file.exists()) return null;
-		
-		InputStream inputStream = new FileInputStream(propFileName);
-		prop.load(inputStream);
-		
-		return prop;
-	}    
-    
+    public Properties getPropValues(Properties prop, String propFileName) throws IOException {
+        // System.out.println(propFileName);
 
-    public void getPropertiesSource(){
-    	try {
+        prop = new Properties();
+        File file = new File(propFileName);
+        if (!file.exists())
+            return null;
+
+        InputStream inputStream = new FileInputStream(propFileName);
+        prop.load(inputStream);
+
+        return prop;
+    }
+
+    public void getPropertiesSource() {
+        try {
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
             filePath = replaceWebapp(filePath);
             filePath = replaceCatHome(filePath);
-            
-            String dataInfoPropFileName = filePath +"/datainfo.properties";
-            String extractPropFileName =  filePath+"/extract.properties";
-             
-            
-                
-            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp,dataInfoPropFileName);
-            Properties OC_dataExtractProperties = getPropValues(extractProp,extractPropFileName);
-            
-            if  (OC_dataDataInfoProperties!=null)  dataInfo=OC_dataDataInfoProperties;
-            if  (OC_dataExtractProperties!=null)  extractInfo=OC_dataExtractProperties;
-            
+
+            String dataInfoPropFileName = filePath + "/datainfo.properties";
+            String extractPropFileName = filePath + "/extract.properties";
+
+            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
+            Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
+
+            if (OC_dataDataInfoProperties != null)
+                dataInfo = OC_dataDataInfoProperties;
+            if (OC_dataExtractProperties != null)
+                extractInfo = OC_dataExtractProperties;
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-	
-	
-    
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -141,45 +136,45 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            getPropertiesSource();   
-            
+            getPropertiesSource();
+
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
             filePath = replaceWebapp(filePath);
             filePath = replaceCatHome(filePath);
-            
-            String dataInfoPropFileName = filePath +"/datainfo.properties";
-            String extractPropFileName =  filePath+"/extract.properties";
-             
-            
-                
-            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp,dataInfoPropFileName);
-            Properties OC_dataExtractProperties = getPropValues(extractProp,extractPropFileName);
-            
-            if  (OC_dataDataInfoProperties!=null)  dataInfo=OC_dataDataInfoProperties;
-            if  (OC_dataExtractProperties!=null)  extractInfo=OC_dataExtractProperties;
-            
+
+            String dataInfoPropFileName = filePath + "/datainfo.properties";
+            String extractPropFileName = filePath + "/extract.properties";
+
+            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
+            Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
+
+            if (OC_dataDataInfoProperties != null)
+                dataInfo = OC_dataDataInfoProperties;
+            if (OC_dataExtractProperties != null)
+                extractInfo = OC_dataExtractProperties;
+
             String dbName = dataInfo.getProperty("dbType");
-            
-            
-            DATAINFO = dataInfo;            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for instance
-           
+
+            DATAINFO = dataInfo;
+            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
+                                               // instance
+
             EXTRACTINFO = extractInfo;
 
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
             setODM_MAPPING_DIR();
-            if(extractInfo!=null)
-            {copyBaseToDest(resourceLoader);
-            // @pgawade 18-April-2011 Fix for issue 8394
-            copyODMMappingXMLtoResources(resourceLoader);
-            extractProperties = findExtractProperties();
-            //JN: this is in for junits to run without extract props
-            copyImportRulesFiles();
-            copyConfig();
+            if (extractInfo != null) {
+                copyBaseToDest(resourceLoader);
+                // @pgawade 18-April-2011 Fix for issue 8394
+                copyODMMappingXMLtoResources(resourceLoader);
+                extractProperties = findExtractProperties();
+                // JN: this is in for junits to run without extract props
+                copyImportRulesFiles();
+                copyConfig();
             }
-
 
             // tbh, following line to be removed
             // reportUrl();
@@ -247,23 +242,22 @@ public class CoreResources implements ResourceLoaderAware {
         if (catalina == null) {
             catalina = System.getenv("catalina.home");
         }
-        //        logMe("catalina home - " + value);
-        //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
-        //        logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
-        //        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
-        //        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
-        //        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
-        //        Map<String, String> env = System.getenv();
-        //        for (String envName : env.keySet()) {
-        //            logMe("%s=%s%n"+ envName+ env.get(envName));
-        //        }
+        // logMe("catalina home - " + value);
+        // logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
+        // logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
+        // logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
+        // logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
+        // logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
+        // Map<String, String> env = System.getenv();
+        // for (String envName : env.keySet()) {
+        // logMe("%s=%s%n"+ envName+ env.get(envName));
+        // }
 
-
-        if (value.contains("${catalina.home}") &&  catalina != null) {
+        if (value.contains("${catalina.home}") && catalina != null) {
             value = value.replace("${catalina.home}", catalina);
         }
 
-        if (value.contains("$catalina.home") &&  catalina != null) {
+        if (value.contains("$catalina.home") && catalina != null) {
             value = value.replace("$catalina.home", catalina);
         }
 
@@ -284,7 +278,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
-        getPropertiesSource();   
+        getPropertiesSource();
 
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
@@ -294,7 +288,7 @@ public class CoreResources implements ResourceLoaderAware {
         setDatabaseProperties(database);
 
         setDataInfoVals();
-        if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0)
+        if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
@@ -384,14 +378,19 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("designer.url", designerURL);
         }
 
+        String xformEnabled = DATAINFO.getProperty("xformEnabled");
+        if (xformEnabled == null || xformEnabled.isEmpty())
+            DATAINFO.setProperty("xformEnabled", "");
+
         String portalURL = DATAINFO.getProperty("portalURL");
-        if (portalURL == null || portalURL.isEmpty()){
+        if (portalURL == null || portalURL.isEmpty()) {
             DATAINFO.setProperty("portal.url", "");
             logger.debug(" Portal URL NOT Defined in datainfo ");
-        }else{
-            logger.debug("Portal URL IS Defined in datainfo:  "+ portalURL);
+        } else {
+            logger.debug("Portal URL IS Defined in datainfo:  " + portalURL);
         }
         return DATAINFO;
+
     }
 
     private void setMailProps() {
@@ -414,19 +413,18 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
     }
+
     private void setDatabaseProperties(String database) {
 
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") +
-                    "/" + DATAINFO.getProperty("db");
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
         } else if (database.equalsIgnoreCase("oracle")) {
-            url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") +
-                    ":" + DATAINFO.getProperty("db");
+            url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
             hibernateDialect = "org.hibernate.dialect.OracleDialect";
         }
@@ -444,135 +442,121 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private void copyBaseToDest(ResourceLoader resourceLoader) {
-    	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
-    	Resource[] resources;
-    	try {
-    		/*
-    		 * Use classpath* to search for resources that match this pattern in ALL of the
-    		 * jars in the application class path.
-    		 * See: http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html#resources-classpath-wildcards
-    		 */
-    		resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+        Resource[] resources;
+        try {
+            /*
+             * Use classpath* to search for resources that match this pattern in ALL of the jars in the application
+             * class path. See:
+             * http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources
+             * .html#resources-classpath-wildcards
+             */
+            resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
 
-    	} catch (IOException ioe) {
-    		logger.debug(ioe.getMessage(), ioe);
-    		throw new OpenClinicaSystemException("Unable to read source files", ioe);
-    	}
+        } catch (IOException ioe) {
+            logger.debug(ioe.getMessage(), ioe);
+            throw new OpenClinicaSystemException("Unable to read source files", ioe);
+        }
 
-    	File dest = new File(getField("filePath") + "xslt");
-    	if (!dest.exists()) {
-    		if (!dest.mkdirs()) {
-    			throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
-    		}
-    	}
+        File dest = new File(getField("filePath") + "xslt");
+        if (!dest.exists()) {
+            if (!dest.mkdirs()) {
+                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+            }
+        }
 
-    	for (Resource r: resources) {
-    		File f = new File(dest, r.getFilename());
-    		try {
+        for (Resource r : resources) {
+            File f = new File(dest, r.getFilename());
+            try {
 
-    			FileOutputStream out = new FileOutputStream(f);
-    			IOUtils.copy(r.getInputStream(), out);
-    			out.close();
+                FileOutputStream out = new FileOutputStream(f);
+                IOUtils.copy(r.getInputStream(), out);
+                out.close();
 
-    		} catch (IOException ioe) {
-    			logger.debug(ioe.getMessage(), ioe);
+            } catch (IOException ioe) {
+                logger.debug(ioe.getMessage(), ioe);
                 throw new OpenClinicaSystemException("Unable to copy file: " + r.getFilename() + " to " + f.getAbsolutePath(), ioe);
 
-    		}
-    	}
+            }
+        }
     }
 
-    private void copyImportRulesFiles() throws IOException
-    {
+    private void copyImportRulesFiles() throws IOException {
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
-        String[] fileNames =       { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
+        String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
         Resource[] resources = null;
-        FileOutputStream out =null;
-        
-       
-        
+        FileOutputStream out = null;
+
         resources = resolver.getResources("classpath*:properties/rules_template*.xml");
-        
-       
+
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
                 throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
             }
         }
-        for (Resource r: resources) {
-    		File f = new File(dest, r.getFilename());
-    		
-    			 out = new FileOutputStream(f);
-    			IOUtils.copy(r.getInputStream(), out);
-    			out.close();
+        for (Resource r : resources) {
+            File f = new File(dest, r.getFilename());
 
-    		
-    	}
-        Resource[] r1 =  resolver.getResources("classpath*:properties/"+ fileNames[0]);
-        File f1 = new File(dest,r1[0].getFilename());
+            out = new FileOutputStream(f);
+            IOUtils.copy(r.getInputStream(), out);
+            out.close();
+
+        }
+        Resource[] r1 = resolver.getResources("classpath*:properties/" + fileNames[0]);
+        File f1 = new File(dest, r1[0].getFilename());
         out = new FileOutputStream(f1);
         IOUtils.copy(r1[0].getInputStream(), out);
-		out.close();
-        
+        out.close();
+
     }
 
-
-    private void copyConfig() throws IOException
-    {
+    private void copyConfig() throws IOException {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
         Resource[] resources = null;
-        FileOutputStream out =null;
+        FileOutputStream out = null;
         Resource resource1 = null;
         Resource resource2 = null;
-        
-       resource1 = resolver.getResource("classpath:datainfo.properties");
-       resource2 = resolver.getResource("classpath:extract.properties");
-       
-       String filePath = "$catalina.home/$WEBAPP.lower.config";
 
-       filePath = replaceWebapp(filePath);
-       filePath = replaceCatHome(filePath);
-       
-       
-        File dest = new File(filePath) ;
+        resource1 = resolver.getResource("classpath:datainfo.properties");
+        resource2 = resolver.getResource("classpath:extract.properties");
+
+        String filePath = "$catalina.home/$WEBAPP.lower.config";
+
+        filePath = replaceWebapp(filePath);
+        filePath = replaceCatHome(filePath);
+
+        File dest = new File(filePath);
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
                 throw new OpenClinicaSystemException("Copying files, Could not create directory: " + dest.getAbsolutePath() + ".");
             }
         }
 
-    	File f1 = new File(dest, resource1.getFilename());
-    	File f2 = new File(dest, resource2.getFilename());
-        if(!f1.exists()){
-    		 out = new FileOutputStream(f1);
-			IOUtils.copy(resource1.getInputStream(), out);
-			out.close();
+        File f1 = new File(dest, resource1.getFilename());
+        File f2 = new File(dest, resource2.getFilename());
+        if (!f1.exists()) {
+            out = new FileOutputStream(f1);
+            IOUtils.copy(resource1.getInputStream(), out);
+            out.close();
         }
-        if(!f2.exists()){
-			 out = new FileOutputStream(f2);
-			IOUtils.copy(resource2.getInputStream(), out);
-			out.close();
+        if (!f2.exists()) {
+            out = new FileOutputStream(f2);
+            IOUtils.copy(resource2.getInputStream(), out);
+            out.close();
         }
-        
+
         /*
-        
-        for (Resource r: resources) {
-    		File f = new File(dest, r.getFilename());
-               if(!f.exists()){
-    			 out = new FileOutputStream(f);
-    			IOUtils.copy(r.getInputStream(), out);
-    			out.close();
-               }
-    	}
-*/            
+         * 
+         * for (Resource r: resources) { File f = new File(dest, r.getFilename()); if(!f.exists()){ out = new
+         * FileOutputStream(f); IOUtils.copy(r.getInputStream(), out); out.close(); } }
+         */
     }
 
-    
     /**
-     * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly.
-     * Use Commons IO's {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
+     * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly. Use Commons IO's
+     *              {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
      */
     @Deprecated
     private void copyFiles(ByteArrayInputStream fis, File dest) {
@@ -586,8 +570,8 @@ public class CoreResources implements ResourceLoaderAware {
                 fos.write(buffer, 0, bytesRead);
             }
         } catch (IOException ioe) {// error while copying files
-            OpenClinicaSystemException oe =
-                new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
+            OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
+                    + dest.getAbsolutePath() + ".");
             oe.initCause(ioe);
             oe.setStackTrace(ioe.getStackTrace());
             throw oe;
@@ -596,8 +580,8 @@ public class CoreResources implements ResourceLoaderAware {
                 try {
                     fis.close();
                 } catch (IOException ioe) {
-                    OpenClinicaSystemException oe =
-                        new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
+                    OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
+                            + dest.getAbsolutePath() + ".");
                     oe.initCause(ioe);
                     oe.setStackTrace(ioe.getStackTrace());
                     logger.debug(ioe.getMessage());
@@ -609,8 +593,8 @@ public class CoreResources implements ResourceLoaderAware {
                 try {
                     fos.close();
                 } catch (IOException ioe) {
-                    OpenClinicaSystemException oe =
-                        new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
+                    OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
+                            + dest.getAbsolutePath() + ".");
                     oe.initCause(ioe);
                     oe.setStackTrace(ioe.getStackTrace());
                     logger.debug(ioe.getMessage());
@@ -621,13 +605,12 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
-
     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
-    	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
         String[] fileNames = { "cd_odm_mapping.xml" };
         Resource[] resources;
         try {
-        	 resources = resolver.getResources("classpath*:properties/cd_odm_mapping.xml");
+            resources = resolver.getResources("classpath*:properties/cd_odm_mapping.xml");
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
             oe.initCause(ioe);
@@ -638,7 +621,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-              	 dest = new File(getField("filePath") );
+            dest = new File(getField("filePath"));
             if (!dest.exists()) {
                 if (!dest.mkdirs()) {
                     throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
@@ -646,8 +629,8 @@ public class CoreResources implements ResourceLoaderAware {
             }
             File f = new File(dest, resources[0].getFilename());
             FileOutputStream out = new FileOutputStream(f);
-    		IOUtils.copy(resources[0].getInputStream(), out);
-    		out.close();
+            IOUtils.copy(resources[0].getInputStream(), out);
+            out.close();
 
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
@@ -656,12 +639,7 @@ public class CoreResources implements ResourceLoaderAware {
             throw oe;
         }
 
-      
-
-     
     }
-
-
 
     public ResourceLoader getResourceLoader() {
         return resourceLoader;
@@ -833,13 +811,12 @@ public class CoreResources implements ResourceLoaderAware {
 
             InputStream inputStream = getInputStream(fileName);
 
-            File f = new File(getField("filePath")+relDirectory+fileName);
+            File f = new File(getField("filePath") + relDirectory + fileName);
 
             /*
-             * OutputStream outputStream = new FileOutputStream(f); byte buf[] =
-             * new byte[1024]; int len; try { while ((len =
-             * inputStream.read(buf)) > 0) outputStream.write(buf, 0, len); }
-             * finally { outputStream.close(); inputStream.close(); }
+             * OutputStream outputStream = new FileOutputStream(f); byte buf[] = new byte[1024]; int len; try { while
+             * ((len = inputStream.read(buf)) > 0) outputStream.write(buf, 0, len); } finally { outputStream.close();
+             * inputStream.close(); }
              */
             return f;
 
@@ -867,11 +844,9 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     /**
-     * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute
-     *          file path value to point to "odm_mapping" in resources.
-     *          cd_odm_mapping.xml file used by Castor API during CRF data
-     *          import will be copied to this location during application
-     *          initialization
+     * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
+     *          in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this
+     *          location during application initialization
      */
     public void setODM_MAPPING_DIR() {
         String resource = "classpath:datainfo.properties";
@@ -881,20 +856,19 @@ public class CoreResources implements ResourceLoaderAware {
         try {
 
             absolutePath = scr.getFile().getAbsolutePath();
-        
-                 ODM_MAPPING_DIR = getField("filePath");
-            //System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
+
+            ODM_MAPPING_DIR = getField("filePath");
+            // System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
         } catch (IOException e) {
             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
     }
 
-
     public static String getDBName() {
-            if (null == DB_NAME)
-                return "postgres";
-            return DB_NAME;
-        }
+        if (null == DB_NAME)
+            return "postgres";
+        return DB_NAME;
+    }
 
     public static String getField(String key) {
         String value = DATAINFO.getProperty(key);
@@ -940,7 +914,8 @@ public class CoreResources implements ResourceLoaderAware {
         return value.split(",");
     }
 
-    // JN: by using static when u click same export link from 2 different datasets the first one stays in tact and is saved in
+    // JN: by using static when u click same export link from 2 different datasets the first one stays in tact and is
+    // saved in
     // there.
 
     /**
@@ -989,14 +964,13 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
-	public Properties getDATAINFO() {
-		return DATAINFO;
-	}
+    public Properties getDATAINFO() {
+        return DATAINFO;
+    }
 
-    
     // // TODO comment out system out after dev
     // private static void logMe(String message) {
-//         System.out.println(message);
+    // System.out.println(message);
     // logger.info(message);
     // }
 

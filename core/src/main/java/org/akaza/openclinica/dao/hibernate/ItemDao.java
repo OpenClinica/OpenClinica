@@ -17,4 +17,16 @@ public class ItemDao extends AbstractDomainDao<Item> {
         return (Item) q.uniqueResult();
     }
 
+    public Item findByNameCrfId(String name, Integer crfId) {
+        String query = "select distinct i.* from item i, item_form_metadata ifm,crf_version cv " + "where i.name= '" + name + "' and i.item_id= ifm.item_id "
+                + "and ifm.crf_version_id=cv.crf_version_id " + "and cv.crf_id=" + crfId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
+        return ((Item) q.uniqueResult());
+    }
+
+    public int getItemDataTypeId(Item item) {
+        String query = "select item_data_type_id from item where item_id = " + item.getItemId();
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        return ((Number) q.uniqueResult()).intValue();
+    }
 }
