@@ -196,28 +196,38 @@
       <c:otherwise> No </c:otherwise>
      </c:choose>
    </td>
+
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
-   <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
-   <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.allowAnonymousSubmission == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
-     <c:choose>    
-       <c:when test="${crf.submissionUrl != ''}">    
-      <td class="table_cell"><c:out value="${participantUrl}${crf.submissionUrl}"/></td></c:when>   
-      <c:otherwise><td class="table_cell"><c:out value="${crf.submissionUrl}"/></td> </c:otherwise>   
-     </c:choose>
-    
-   </c:when>  
- </c:choose>
+      <td class="table_cell">
+        <c:choose>
+          <c:when test="${crf.participantForm == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+          <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+        </c:choose>
+      </td>
+      <td class="table_cell">
+        <c:choose>
+          <c:when test="${crf.participantForm == true}">
+            <c:choose>
+              <c:when test="${crf.allowAnonymousSubmission == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+              <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+            </c:choose>
+          </c:when>
+        </c:choose>
+      </td>
+      <td class="table_cell">
+        <c:choose>
+          <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true}">
+            <c:choose>
+              <c:when test="${crf.submissionUrl != ''}">
+                <c:out value="${participantUrl}${crf.submissionUrl}"/>
+              </c:when>
+            </c:choose>
+          </c:when>
+        </c:choose>
+      </td>
+    </c:when>
+  </c:choose>
 
 
    <td class="table_cell"> 

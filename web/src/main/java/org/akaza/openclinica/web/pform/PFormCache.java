@@ -47,7 +47,10 @@ public class PFormCache {
 		{
 			studyURLs = new HashMap<String,String>();
 			String url = enketo.getFormURL(crfVersionOID);
-			studyURLs.put(crfVersionOID,url);
+            if (url.equals("")) {
+                throw new Exception("Unable to get enketo form url.");
+            }
+            studyURLs.put(crfVersionOID,url);
 			urlCache.put(studyOID, studyURLs);
 			return url;
 		}

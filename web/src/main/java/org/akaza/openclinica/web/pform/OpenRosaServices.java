@@ -75,6 +75,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.akaza.openclinica.service.PformSubmissionService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.pmanage.Study;
@@ -563,9 +564,11 @@ public class OpenRosaServices {
         return studyBean;
     }
 
-    private StudyBean getParentStudy(String studyOid) {
+    private StudyBean getParentStudy(String studyOid) throws NoSuchRequestHandlingMethodException {
         StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+        if (study == null) {
+            throw new NoSuchRequestHandlingMethodException("getParentStudy", OpenRosaServices.class);
+        } else if (study.getParentStudyId() == 0) {
             return study;
         } else {
             StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
