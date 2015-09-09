@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -130,6 +131,21 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
             request.setAttribute("studySub", studySubject);
             SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
+
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+            study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getId(), "collectDob").getValue());
+            String collectdob="used";
+                if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
+                	collectdob="yearOnly";
+                }else if (study.getStudyParameterConfig().getCollectDob().equals("3")) {
+                	collectdob="notUsed";                
+                }else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
+                	collectdob="used";                
+                }
+                
+                
+                
+            request.setAttribute("collectdob", collectdob);
             request.setAttribute("subject", subject);
 
             request.setAttribute("study", study);

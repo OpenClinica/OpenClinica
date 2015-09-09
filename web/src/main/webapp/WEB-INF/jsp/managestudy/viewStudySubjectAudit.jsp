@@ -14,10 +14,12 @@
 <jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
+<jsp:useBean scope="request" id="collectdob" class="java.lang.String"/>
 <jsp:useBean scope="request" id="eventCRFAudits" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="allDeletedEventCRFs" class="java.util.ArrayList"/>
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<c:set var="yearFormat"><fmt:message key="date_format_year" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <body>
@@ -47,7 +49,20 @@
     <tr>
         <td class="table_header_column"><c:out value="${studySub.label}"/></td>
         <td class="table_header_column"><c:out value="${studySub.secondaryLabel}"/></td>
+         <c:choose>
+                <c:when test="${collectdob=='used'}">
         <td class="table_header_column"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></td>
+                </c:when>
+                <c:when test="${collectdob=='notUsed'}">
+        <td class="table_header_column"><c:out value="" /></td>
+                </c:when>
+                <c:when test="${collectdob=='yearOnly'}">
+        <td class="table_header_column"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${yearFormat}" /></td>
+                </c:when>
+                <c:otherwise>
+        <td class="table_header_column"><c:out value="" /></td>
+                </c:otherwise>
+            </c:choose>
         <td class="table_header_column"><c:out value="${subject.uniqueIdentifier}"/></td>
         <!--   <td class="table_header_column"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/></td> -->
         <td class="table_header_column"><c:out value="${studySub.owner.name}"/></td>
