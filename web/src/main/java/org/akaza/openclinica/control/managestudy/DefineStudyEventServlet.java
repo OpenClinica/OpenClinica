@@ -383,9 +383,8 @@ public class DefineStudyEventServlet extends SecureController {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
              request.setAttribute("participateFormStatus",participateFormStatus );
              if (participateFormStatus.equals("enabled")) baseUrl();
-
+   
              request.setAttribute("participateFormStatus",participateFormStatus );
-
         
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
         session.setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
@@ -627,7 +626,7 @@ public class DefineStudyEventServlet extends SecureController {
             		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
             		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
             		System.out.println();
-            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
+            	if(sessionBean.getSubmissionUrl() == null){
             		break;
             	}else{
                 if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()) ||
