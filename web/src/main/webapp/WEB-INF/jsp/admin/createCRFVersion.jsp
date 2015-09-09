@@ -211,7 +211,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
     <table border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <input type="submit" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
+          <input type="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
         </td>
         <td>
           <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
