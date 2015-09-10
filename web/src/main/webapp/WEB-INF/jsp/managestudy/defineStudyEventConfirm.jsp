@@ -153,7 +153,7 @@
      </c:choose>
     </td>
       <c:choose>    
-       <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true && crf.submissionUrl != null }">    
+       <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true && crf.submissionUrl != '' }">    
            <td class="table_cell"><c:out value="${participantUrl}${crf.submissionUrl}"/></td>
         </c:when>   
        <c:otherwise>    
