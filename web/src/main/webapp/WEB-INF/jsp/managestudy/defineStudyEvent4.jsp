@@ -59,6 +59,31 @@
         return true;
 
     }
+    function showMe(count,idField) {
+        switch(idField) {
+            case "participantForm" :
+                var elEvaluator = document.getElementsByName('participantForm'+count)[0];
+                var elChangeVisibility = document.getElementById('enabledIfParticipantForm'+count);
+                var elAllowAnonymousSubmission = document.getElementsByName('allowAnonymousSubmission'+count)[0];
+                if (elEvaluator.checked) {
+                    elChangeVisibility.removeAttribute("style");
+                } else {
+                    elAllowAnonymousSubmission.checked = false;
+                    elChangeVisibility.setAttribute("style", "display: none;");
+                }
+                // break;
+            case "allowAnonymousSubmission" :
+                var elEvaluator = document.getElementsByName('allowAnonymousSubmission'+count)[0];
+                var elChangeVisibility = document.getElementById('enabledIfAllowAnonymousSubmission'+count);
+                if (elEvaluator.checked) {
+                    elChangeVisibility.removeAttribute("style");
+                } else {
+                    elChangeVisibility.setAttribute("style", "display: none;");
+                }
+                break;
+        }
+    }
+
     //-->
 </script>
 
@@ -174,38 +199,73 @@
                            <tr valign="top">
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
- 
+
         <td class="table_cell" colspan="1">
-        <fmt:message key="participant_form" bundle="${resword}"/>:
-        <c:choose>
+          <fmt:message key="participant_form" bundle="${resword}"/>:
+          <c:choose>
             <c:when test="${edc.participantForm == true}">
-                <input type="checkbox" checked name="participantForm<c:out value="${count}"/>" value="yes">
+              <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')" checked>
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes">
+                <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')">
             </c:otherwise>
-        </c:choose>
-    </td>
+          </c:choose>
+        </td>
+
         <td class="table_cell" colspan="1">
-        <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
-        <c:choose>
-            <c:when test="${edc.allowAnonymousSubmission == true}">
-                <input type="checkbox" checked name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+          <c:choose>
+            <c:when test="${edc.participantForm == true}">
+              <span id="enabledIfParticipantForm<c:out value="${count}"/>">
+                <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+                <c:choose>
+                  <c:when test="${edc.allowAnonymousSubmission == true}">
+                    <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')" checked>
+                  </c:when>
+                  <c:otherwise>
+                    <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')">
+                  </c:otherwise>
+                </c:choose>
+              </span>
             </c:when>
             <c:otherwise>
-                <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes">
+              <span id="enabledIfParticipantForm<c:out value="${count}"/>" style="display : none">
+                <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+                <c:choose>
+                  <c:when test="${edc.allowAnonymousSubmission == true}">
+                    <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')" checked>
+                  </c:when>
+                  <c:otherwise>
+                    <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')">
+                  </c:otherwise>
+                </c:choose>
+              </span>
             </c:otherwise>
-        </c:choose>
-    </td>
+          </c:choose>
+        </td>
+
         <td class="table_cell" colspan="2">
-        <fmt:message key="submission_url" bundle="${resword}"/>:  ${participantUrl}
-                <input type="text"  name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}"/>
-          <c:set var="summary" value="submissionUrl${count}"/>
-          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-                
-    </td>
-   </c:when>  
- </c:choose>
+          <c:choose>
+            <c:when test="${edc.participantForm == true && edc.allowAnonymousSubmission == true}">
+              <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>">
+                <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}
+                <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
+                <c:set var="summary" value="submissionUrl${count}"/>
+                <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+              </span>
+            </c:when>
+            <c:otherwise>
+              <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>" style="display : none">
+                <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}
+                <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
+                <c:set var="summary" value="submissionUrl${count}"/>
+                <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+              </span>
+            </c:otherwise>
+          </c:choose>
+        </td>
+      </c:when>
+    </c:choose>
+
 
                         </tr>
 
