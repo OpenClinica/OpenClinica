@@ -367,8 +367,19 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
         variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
+        if (sb.isParticipantForm()){
         variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));
-        variables.put(new Integer(21), new String (sb.getSubmissionUrl()));
+        }else{
+            sb.setAllowAnonymousSubmission(false);
+        	variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));        	
+        }
+        if(sb.isAllowAnonymousSubmission()){
+            if (sb.getSubmissionUrl()==null) sb.setSubmissionUrl("");
+            variables.put(new Integer(21), sb.getSubmissionUrl());
+        }else{
+           sb.setSubmissionUrl("");
+        	variables.put(new Integer(21), sb.getSubmissionUrl());
+        }
         
         this.execute(digester.getQuery("create"), variables, nullVars);
 
@@ -418,8 +429,18 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
             variables.put(new Integer(18), new Integer(sb.getParentId()));
         }
         variables.put(new Integer(19), new Boolean(sb.isParticipantForm()));
+        if (sb.isParticipantForm()){
         variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));
+        }else{
+            sb.setAllowAnonymousSubmission(false);
+        	variables.put(new Integer(20), new Boolean(sb.isAllowAnonymousSubmission()));        	
+        }
+        if(sb.isAllowAnonymousSubmission()){
         variables.put(new Integer(21), sb.getSubmissionUrl());
+        }else{
+           sb.setSubmissionUrl("");
+        	variables.put(new Integer(21), sb.getSubmissionUrl());
+        }
         variables.put(new Integer(22), new Integer(sb.getId()));
 
         String sql = digester.getQuery("update");
