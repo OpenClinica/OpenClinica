@@ -636,8 +636,9 @@ public class CreateSubStudyServlet extends SecureController {
                 }
                 edcsInSession.add(edcBean);
             }
-            
-            eventDefCrfList = validateSubmissionUrl(edcs,eventDefCrfList,v);
+        	sed.setPopulated(false);
+            eventDefCrfList = validateSubmissionUrl(edcsInSession,eventDefCrfList,v,sed);
+            edcsInSession.clear();
 
 
        }
@@ -833,45 +834,15 @@ public class CreateSubStudyServlet extends SecureController {
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
          String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
     	System.out.println("the url :  "+ url);
     	request.setAttribute("participantUrl",url+"/");
 
     }
     
 
-    public ArrayList <EventDefinitionCRFBean> validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
-    	for (int i = 0; i < edcsInSession.size(); i++) {
-            String order = i + "-" + edcsInSession.get(i).getId();
-            v.addValidation("submissionUrl"+ order, Validator.NO_SPACES_ALLOWED);	
-            EventDefinitionCRFBean sessionBean=null;
-            boolean isExist = false;
-            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
-            		  sessionBean = edcsInSession.get(i);
-            		 
-            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
-            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
-            		System.out.println();
-            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
-            		break;
-            	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())){
-                	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                	System.out.println("Duplicate ****************************");
-                	isExist = true;
-            	   break;
-            	}
-            	  }
-            }
-            	if(!isExist){ 
-            		eventDefCrfList.add(sessionBean);
-            	}
-        }
-    	return eventDefCrfList;
-    }
-    
-    public ArrayList <EventDefinitionCRFBean> validateSubmissionUrlOrig(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
-    	for (int i = 0; i < edcsInSession.size(); i++) {
+
+    public ArrayList <EventDefinitionCRFBean> validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v, StudyEventDefinitionBean sed){
+       	for (int i = 0; i < edcsInSession.size(); i++) {
             String order = i + "-" + edcsInSession.get(i).getId();
             v.addValidation("submissionUrl"+ order, Validator.NO_SPACES_ALLOWED);	
             EventDefinitionCRFBean sessionBean=null;
@@ -887,7 +858,8 @@ public class CreateSubStudyServlet extends SecureController {
             	}else{
                 if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
                 	v.addValidation("submissionUrl"+ order, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                	System.out.println("Duplicate ****************************");
+                	sed.setPopulated(true);
+                   System.out.println("Duplicate ****************************");
                 	isExist = true;
             	   break;
             	}else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())){

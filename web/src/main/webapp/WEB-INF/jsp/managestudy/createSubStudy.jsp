@@ -508,7 +508,14 @@ function updateThis(multiSelEle, count) {
     <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${def.name}"/></b></a>
 	</c:otherwise>
 	</c:choose>
-	<div id="sed<c:out value="${defCount}"/>" style="display: none">
+		<c:choose>
+	<c:when test="${def.populated ==true}">
+    	<div id="sed<c:out value="${defCount}"/>" style="display: all">
+	</c:when>
+	<c:otherwise>
+    	<div id="sed<c:out value="${defCount}"/>" style="display: none">	
+	</c:otherwise>
+	</c:choose>
 
 	<!-- These DIVs define shaded box borders -->
  	<div style="width: 100%">

@@ -389,47 +389,17 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     }
 
-    public void validateSubmissionUrlOld(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
-    	for (int i = 0; i < edcsInSession.size(); i++) {
-            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
-            EventDefinitionCRFBean sessionBean=null;
-            boolean isExist = false;
-            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
-            		  sessionBean = edcsInSession.get(i);
-            		 
-            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
-            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
-            		System.out.println();
-            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
-            		break;
-            	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())){
-                	v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                	System.out.println("Duplicate ****************************");
-                	isExist = true;
-            	   break;
-            	}else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId())){
-                	System.out.println("Not Duplicate  ***********");
-                	isExist = true;
-            		break;
-            	}
-            	  }
-            }
-            	if(!isExist){ 
-            		eventDefCrfList.add(sessionBean);
-            	}
-        }
-
-    }
-    
     public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
     	for (int i = 0; i < edcsInSession.size(); i++) {
             v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
             EventDefinitionCRFBean sessionBean=null;
             boolean isExist = false;
-            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
-            		  sessionBean = edcsInSession.get(i);
-            		 
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList){
+      		  sessionBean = edcsInSession.get(i);
+            	if(!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()){ 
+                	isExist = true;
+            		break;
+            	}
             		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
             		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
             		System.out.println();
@@ -447,7 +417,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 	isExist = true;
             		break;
             	}
-            	  }
+            }
             }
             	if(!isExist){ 
             		eventDefCrfList.add(sessionBean);
@@ -463,9 +433,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
+        String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                   + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
     	System.out.println("the url :  "+ url);
     	request.setAttribute("participantUrl",url+"/");
 
