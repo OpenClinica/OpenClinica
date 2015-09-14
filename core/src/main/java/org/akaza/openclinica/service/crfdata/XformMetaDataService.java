@@ -236,6 +236,8 @@ public class XformMetaDataService {
             UserAccountBean ub, Errors errors) throws Exception {
         ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
         Integer itemOrdinal = 1;
+        ArrayList<String> usedGroupOids = new ArrayList<String>();
+        ArrayList<String> usedItemOids = new ArrayList<String>();
         List<Group> htmlGroups = html.getBody().getGroup();
 
         for (Group htmlGroup : htmlGroups) {
@@ -248,7 +250,8 @@ public class XformMetaDataService {
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
-                itemGroup.setOcOid(itemGroupDAO.getValidOid(new ItemGroupBean(), crf.getName(), xformGroup.getGroupName(), new ArrayList()));
+                itemGroup.setOcOid(itemGroupDAO.getValidOid(new ItemGroupBean(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
+                usedGroupOids.add(itemGroup.getOcOid());
                 // dbgroup.setDateCreated(dateCreated)
                 itemGroupDao.saveOrUpdate(itemGroup);
                 itemGroup = itemGroupDao.findByOcOID(itemGroup.getOcOid());
@@ -268,7 +271,7 @@ public class XformMetaDataService {
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
                 if (readonly == null || !readonly.trim().equals("true()")) {
                     XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
-                    Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, errors);
+                    Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
@@ -347,8 +350,8 @@ public class XformMetaDataService {
         itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
     }
 
-    private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, Errors errors)
-            throws Exception {
+    private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
+            ArrayList<String> usedItemOids, Errors errors) throws Exception {
         ItemDAO itemDAO = new ItemDAO(datasource);
         ItemDataType newDataType = getItemDataType(html, xformItem);
 
@@ -372,7 +375,8 @@ public class XformMetaDataService {
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
             // TODO: DATE_CREATED,
-            item.setOcOid(itemDAO.getValidOid(new ItemBean(), crf.getName(), xformItem.getItemName(), new ArrayList()));// OC_OID
+            item.setOcOid(itemDAO.getValidOid(new ItemBean(), crf.getName(), xformItem.getItemName(), usedItemOids));
+            usedItemOids.add(item.getOcOid());
             itemDao.saveOrUpdate(item);
             item = itemDao.findByOcOID(item.getOcOid());
         }
