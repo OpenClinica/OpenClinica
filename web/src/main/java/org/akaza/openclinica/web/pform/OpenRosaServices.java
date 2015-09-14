@@ -409,8 +409,8 @@ public class OpenRosaServices {
             if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")) {
                 body = body.substring(body.indexOf("<" + crfVersion.getXformName()));
                 int length = body.indexOf(" ");
-                body = body.replace(body.substring(body.indexOf("<meta>"), body.indexOf("</meta>") + 7), "");
-                body = body.substring(0, body.indexOf("</" + crfVersion.getXformName()) + length + 2);
+                body = body.replace(body.substring(body.lastIndexOf("<meta>"), body.lastIndexOf("</meta>") + 7), "");
+                body = body.substring(0, body.lastIndexOf("</" + crfVersion.getXformName()) + length + 2);
                 body = "<instance>" + body + "</instance>";
             } else {
                 body = body.substring(body.indexOf("<F_"));
