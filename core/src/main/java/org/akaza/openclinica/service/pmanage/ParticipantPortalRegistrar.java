@@ -1,19 +1,26 @@
 package org.akaza.openclinica.service.pmanage;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.login.ParticipantDTO;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.Study;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriUtils;
 
 public class ParticipantPortalRegistrar {
 
@@ -23,6 +30,12 @@ public class ParticipantPortalRegistrar {
     public static final String INVALID = "invalid";
     public static final String UNKNOWN = "unknown";
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
+
+	@Autowired
+	@Qualifier("dataSource")
+	private BasicDataSource dataSource;
+
+    private StudyDAO sdao;
 
     public Authorization getAuthorization(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
@@ -139,10 +152,22 @@ public class ParticipantPortalRegistrar {
 
     public String registerStudy(String studyOid, String hostName) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
+        sdao = new StudyDAO(dataSource);
+        StudyBean sb = sdao.findByOid(studyOid);
+        String encoding = "UTF-8";
+        String pManageUrl;
+        try {
+            pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" +
+                UriUtils.encodeQueryParam(studyOid, encoding) + "&instanceurl=" + UriUtils.encodeQueryParam(ocUrl, encoding);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            return "";
+        }
         Authorization authRequest = new Authorization();
         Study authStudy = new Study();
         authStudy.setStudyOid(studyOid);
+        authStudy.setName(sb.getName());
         authStudy.setInstanceUrl(ocUrl);
         authStudy.setHost(hostName);
         authRequest.setStudy(authStudy);
