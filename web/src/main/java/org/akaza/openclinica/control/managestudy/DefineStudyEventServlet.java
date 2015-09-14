@@ -610,7 +610,6 @@ public class DefineStudyEventServlet extends SecureController {
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
          String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
     	System.out.println("the url :  "+ url);
     	request.setAttribute("participantUrl",url+"/");
 
@@ -622,7 +621,10 @@ public class DefineStudyEventServlet extends SecureController {
             boolean isExist = false;
             for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
             		  sessionBean = edcsInSession.get(i);
-            		 
+                  	if(!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()){ 
+                    	isExist = true;
+                		break;
+                	}
             		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
             		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
             		System.out.println();
