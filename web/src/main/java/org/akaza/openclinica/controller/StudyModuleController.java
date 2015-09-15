@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -78,6 +79,10 @@ public class StudyModuleController {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
+
+    // used to inject dependencies into object created with new, see http://stackoverflow.com/a/3813725
+    @Autowired
+    private AutowireCapableBeanFactory beanFactory;
 
     private EventDefinitionCRFDAO eventDefinitionCRFDao;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
@@ -143,6 +148,7 @@ public class StudyModuleController {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+        beanFactory.autowireBean(registrar);
 
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);

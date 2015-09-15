@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class Study {
     private String instanceUrl = null;
     private String studyOid = null;
+    private String name = null;
     private String host = null;
     private Organization organization = null;
 
@@ -23,6 +24,14 @@ public class Study {
 
     public void setStudyOid(String studyOid) {
         this.studyOid = studyOid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getHost() {
