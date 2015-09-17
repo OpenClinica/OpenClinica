@@ -72,7 +72,7 @@ public class StudyController {
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
 		StudyBean studyDTO = null;
 		System.out.println("I'm in Create Study");
-
+		String message = " field is missing from Study Json object";
 		Object study = map.get("study");
 
 		String uniqueProtocolID = ((Map<String, String>) study).get("UniqueProtocolID");
@@ -82,7 +82,33 @@ public class StudyController {
 		String sponsor = ((Map<String, String>) study).get("Sponsor");
 		String protocolType = ((Map<String, String>) study).get("ProtocolType");
 		String startDate = ((Map<String, String>) study).get("StartDate");
-		String expectedTotalEnrollment = ((Map<String, String>) study).get("expectedTotalEnrollment");
+		String expectedTotalEnrollment = ((Map<String, String>) study).get("ExpectedTotalEnrollment");
+
+		if (uniqueProtocolID == null)
+			return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (name == null)
+			return new ResponseEntity("BriefTitle (Study Name)" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (principalInvestigator == null)
+			return new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (briefSummary == null)
+			return new ResponseEntity("BriefSummary (Description)" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (sponsor == null)
+			return new ResponseEntity("Sponsor" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (protocolType == null)
+			return new ResponseEntity("ProtocolType" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (startDate == null)
+			return new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (expectedTotalEnrollment == null)
+			return new ResponseEntity("ExpectedTotalEnrollment" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+
+		uniqueProtocolID = uniqueProtocolID.trim();
+		name = name.trim();
+		principalInvestigator = principalInvestigator.trim();
+		briefSummary = briefSummary.trim();
+		sponsor = sponsor.trim();
+		protocolType = protocolType.trim();
+		startDate = startDate.trim();
+		expectedTotalEnrollment = expectedTotalEnrollment.trim();
 
 		request.setAttribute("uniqueProId", uniqueProtocolID);
 		request.setAttribute("name", name); // Brief Title
@@ -111,7 +137,7 @@ public class StudyController {
 		}
 
 		if (!verfiyProtocolTypeExist(protocolType))
-			return new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST); // /////// check owner's ROLE
+			return new ResponseEntity("Protocol Type is not Valid", org.springframework.http.HttpStatus.BAD_REQUEST); // /////// check owner's ROLE
 
 		studyDTO = buildStudy(uniqueProtocolID, name, principalInvestigator, protocolType, briefSummary, sponsor, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), formattedDate);
 
@@ -120,7 +146,7 @@ public class StudyController {
 		if (map.get("sites") != null)
 			createNewSites(request, map, uniqueProtocolID);
 
-		return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
 
 	}
 
@@ -128,6 +154,7 @@ public class StudyController {
 	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
 		StudyBean studyDTO = null;
 		System.out.println("I'm in Create Sites ");
+		String message = " field is missing from Site Json object";
 
 		ArrayList sites = (ArrayList) map.get("sites");
 
@@ -135,10 +162,32 @@ public class StudyController {
 			String name = ((Map<String, String>) site).get("BriefTitle");
 			String principalInvestigator = (String) ((Map<String, String>) site).get("PrincipalInvestigator");
 			String uniqueSiteProtocolID = (String) ((Map<String, String>) site).get("UniqueProtocolID");
-			String expectedTotalEnrollment = (String) ((Map<String, String>) site).get("expectedTotalEnrollment");
+			String expectedTotalEnrollment = (String) ((Map<String, String>) site).get("ExpectedTotalEnrollment");
 			String startDate = (String) ((Map<String, String>) site).get("StartDate");
 			String protocolDateVerification = (String) ((Map<String, String>) site).get("ProtocolDateVerification");
 			String secondaryProId = (String) ((Map<String, String>) site).get("SecondaryProtocolID");
+
+			if (uniqueProtocolID == null)
+				return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+			if (name == null)
+				return new ResponseEntity("BriefTitle" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+			if (principalInvestigator == null)
+				return new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+			if (startDate == null)
+				return new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+			if (protocolDateVerification == null)
+				return new ResponseEntity("ProtocolDateVerification" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+			if (secondaryProId == null)
+				return new ResponseEntity("SecondaryProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+
+			uniqueProtocolID = uniqueProtocolID.trim();
+			name = name.trim();
+			principalInvestigator = principalInvestigator.trim();
+			startDate = startDate.trim();
+			expectedTotalEnrollment = expectedTotalEnrollment.trim();
+			protocolDateVerification = protocolDateVerification.trim();
+			secondaryProId = secondaryProId.trim();
+			uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
 
 			request.setAttribute("uniqueProId", uniqueSiteProtocolID);
 			request.setAttribute("name", name);
@@ -185,7 +234,7 @@ public class StudyController {
 				updateStudy(studyDTO, ownerUserAccount);
 			}
 		}
-		return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
 	}
 
 	public Boolean verfiyProtocolTypeExist(String protocolType) {
@@ -258,7 +307,6 @@ public class StudyController {
 		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
 		v.addValidation("sponsor", Validator.NO_BLANKS);
 		v.addValidation("startDate", Validator.NO_BLANKS);
-
 		v.addValidation("startDate", Validator.IS_A_DATE);
 	}
 
