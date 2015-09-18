@@ -121,9 +121,10 @@ public class ParticipantPortalRegistrar {
         return registerStudy(studyOid, null);
     }
 
-    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO) {
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/email";
-
+    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
+    	String host = hostname.substring(0,hostname.indexOf("/#/login"));
+       	String pManageUrl =host + "/app/rest/oc/email";
+        
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);

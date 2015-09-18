@@ -247,8 +247,14 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			msg = msg.replaceAll("\\\\n", "\n");
 			eSubject = eSubject.replaceAll("\\\\n", "\n");
+			message = message.replaceAll("\\\\n", "\n");
+			emailSubject = emailSubject.replaceAll("\\\\n", "\n");
 			pDTO.setMessage(msg);
 			pDTO.setEmailSubject(eSubject);
+			pDTO.setUrl(url);
+			pDTO.setOrigMessage(message);
+			pDTO.setOrigEmailSubject(emailSubject);
+
 
 		} else {
 			pDTO = buildNewPDTO();
@@ -260,7 +266,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			if (email.trim().equals("${participant}")) {
 				// Send Email thru Mandrill Mail Server
 				try {
-					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
+					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO,hostname);
 				} catch (Exception e) {
 					e.getStackTrace();
 				}
