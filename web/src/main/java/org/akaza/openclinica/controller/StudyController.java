@@ -121,7 +121,7 @@ public class StudyController {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 		Date formattedDate = formatter.parse(startDate);
 
-		UserAccountBean ownerUserAccount = getOwnerAccount(request);
+		UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
 		if (ownerUserAccount == null)
 			return new ResponseEntity("The Owner User Account is not Valid Account or Does not have Admin user type", org.springframework.http.HttpStatus.BAD_REQUEST);
 
@@ -201,7 +201,11 @@ public class StudyController {
 			Date formattedStartDate = formatter.parse(startDate);
 			Date formattedProtDateVer = formatter.parse(protocolDateVerification);
 
-			UserAccountBean ownerUserAccount = getOwnerAccount(request);
+			StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+			if (parentStudy.getParentStudyId() != 0)
+				return new ResponseEntity("The Unique Protocol Id provided is not a valid Study Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
+
+			UserAccountBean ownerUserAccount = getSiteOwnerAccount(request,parentStudy);
 			if (ownerUserAccount == null)
 				return new ResponseEntity("The Owner User Account is not Valid Account or Does not have Admin user type", org.springframework.http.HttpStatus.BAD_REQUEST);
 
@@ -216,9 +220,6 @@ public class StudyController {
 				System.out.println("Validation Error: " + errors.toString());
 				return new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
 			}
-			StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
-			if (parentStudy.getParentStudyId() != 0)
-				return new ResponseEntity("The Unique Protocol Id provided is not a valid Study Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
 
 			studyDTO = buildSubStudy(uniqueSiteProtocolID, name, principalInvestigator, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), parentStudy.getId(), secondaryProId,
 					formattedProtDateVer, formattedStartDate);
@@ -361,7 +362,7 @@ public class StudyController {
 
 	}
 
-	public UserAccountBean getOwnerAccount(HttpServletRequest request) {
+	public UserAccountBean getStudyOwnerAccount(HttpServletRequest request) {
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
 			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
@@ -369,6 +370,17 @@ public class StudyController {
 			return null;
 		}
 		return ownerUserAccount;
+	}
+
+	public UserAccountBean getSiteOwnerAccount(HttpServletRequest request , StudyBean study) {
+		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+		ArrayList <StudyUserRoleBean> roles =ownerUserAccount.getRoles();
+		for (StudyUserRoleBean role : roles){
+			if (role.getStudyId()==study.getId() && (role.getRole().getId()==1 || role.getRole().getId()==2)){
+				return ownerUserAccount;
+			}			
+		}		
+		return null;
 	}
 
 }
