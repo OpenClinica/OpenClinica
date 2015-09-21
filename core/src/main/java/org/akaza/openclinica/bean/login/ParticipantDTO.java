@@ -10,6 +10,7 @@ public class ParticipantDTO {
 		private String origMessage;
 		private String message;
 		private String eventName;
+		private String participantEmailAccount;
 		private String emailAccount;
 		private String origEmailSubject;
 		private String emailSubject;
@@ -97,6 +98,12 @@ public class ParticipantDTO {
 		}
 		public void setOrigEmailSubject(String origEmailSubject) {
 			this.origEmailSubject = origEmailSubject;
+		}
+		public String getParticipantEmailAccount() {
+			return participantEmailAccount;
+		}
+		public void setParticipantEmailAccount(String participantEmailAccount) {
+			this.participantEmailAccount = participantEmailAccount;
 		}
 		
 	}

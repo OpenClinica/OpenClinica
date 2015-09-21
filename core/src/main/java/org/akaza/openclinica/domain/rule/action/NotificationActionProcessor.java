@@ -254,6 +254,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			pDTO.setUrl(url);
 			pDTO.setOrigMessage(message);
 			pDTO.setOrigEmailSubject(emailSubject);
+			pDTO.setParticipantEmailAccount(pDTO.getEmailAccount());
 
 
 		} else {
@@ -264,6 +265,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		for (String email : listOfEmails) {
 
 			if (email.trim().equals("${participant}")) {
+			     pDTO.setEmailAccount(pDTO.getParticipantEmailAccount());
+
 				// Send Email thru Mandrill Mail Server
 				try {
 					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO,hostname);
