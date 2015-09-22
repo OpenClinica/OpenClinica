@@ -4,8 +4,6 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.SiteDTO;
-import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
@@ -65,11 +63,6 @@ public class StudyController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 
-	@Autowired
-	StudyDTO studyDTO;
-
-	@Autowired
-	SiteDTO siteDTO;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -82,7 +75,6 @@ public class StudyController {
 		StudyBean studyDTO = null;
 		System.out.println("I'm in Create Study");
 		String message = " field is missing from Study Json object";
-
 		String uniqueProtocolID = (String) map.get("UniqueProtocolID");
 		String name = (String) map.get("BriefTitle");
 		String principalInvestigator = (String) map.get("PrincipalInvestigator");
@@ -91,6 +83,7 @@ public class StudyController {
 		String protocolType = (String) map.get("ProtocolType");
 		String startDate = (String) map.get("StartDate");
 		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
+		ArrayList sites = (ArrayList) map.get("sites");
 
 		if (uniqueProtocolID == null)
 			return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
@@ -157,26 +150,17 @@ public class StudyController {
 		sub.setOwner(ownerUserAccount);
 		StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
 
-		ResponseEntity<Object> response = createNewSites(request, (HashMap) map, uniqueProtocolID);
+		ResponseEntity<Object> response = createNewSites(request,sites, uniqueProtocolID);
 		if (response.getStatusCode()==org.springframework.http.HttpStatus.BAD_REQUEST){
 			return response;
 		}
 		
-/*		ArrayList sites = (ArrayList) map.get("sites");
-		if (sites != null)
-			for (Object site : sites) {
-				ResponseEntity<Object> response = createNewSites(request, (HashMap) site, uniqueProtocolID);
-				if (response.getStatusCode()==org.springframework.http.HttpStatus.BAD_REQUEST){
-					return response;
-				}
-			}
-*/		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
 
 	}
 
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		ArrayList sites = (ArrayList) map.get("sites");
+	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody ArrayList sites, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
 		System.out.println("I'm in Create Sites ");
 		String message = " field is missing from Site Json object";
 		if (sites != null)
@@ -243,7 +227,7 @@ public class StudyController {
 		if (!errors.isEmpty()) {
 			logger.info("Validation Error: " + errors.toString());
 			System.out.println("Validation Error: " + errors.toString());
-			return new ResponseEntity("Site "+errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
+			return new ResponseEntity("In Site "+errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		studyDTO = buildSubStudy(uniqueSiteProtocolID, name, principalInvestigator, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), parentStudy.getId(), secondaryProId,
