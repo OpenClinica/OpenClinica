@@ -4,6 +4,8 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.SiteDTO;
+import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
@@ -21,6 +23,7 @@ import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +65,12 @@ public class StudyController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 
+	@Autowired
+	StudyDTO studyDTO;
+
+	@Autowired
+	SiteDTO siteDTO;
+
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -73,16 +82,15 @@ public class StudyController {
 		StudyBean studyDTO = null;
 		System.out.println("I'm in Create Study");
 		String message = " field is missing from Study Json object";
-		Object study = map.get("study");
 
-		String uniqueProtocolID = ((Map<String, String>) study).get("UniqueProtocolID");
-		String name = ((Map<String, String>) study).get("BriefTitle");
-		String principalInvestigator = ((Map<String, String>) study).get("PrincipalInvestigator");
-		String briefSummary = ((Map<String, String>) study).get("BriefSummary");
-		String sponsor = ((Map<String, String>) study).get("Sponsor");
-		String protocolType = ((Map<String, String>) study).get("ProtocolType");
-		String startDate = ((Map<String, String>) study).get("StartDate");
-		String expectedTotalEnrollment = ((Map<String, String>) study).get("ExpectedTotalEnrollment");
+		String uniqueProtocolID = (String) map.get("UniqueProtocolID");
+		String name = (String) map.get("BriefTitle");
+		String principalInvestigator = (String) map.get("PrincipalInvestigator");
+		String briefSummary = (String) map.get("BriefSummary");
+		String sponsor = (String) map.get("Sponsor");
+		String protocolType = (String) map.get("ProtocolType");
+		String startDate = (String) map.get("StartDate");
+		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
 
 		if (uniqueProtocolID == null)
 			return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
@@ -141,100 +149,119 @@ public class StudyController {
 
 		studyDTO = buildStudy(uniqueProtocolID, name, principalInvestigator, protocolType, briefSummary, sponsor, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), formattedDate);
 
-		createStudy(studyDTO, ownerUserAccount);
+		StudyBean studyBean = createStudy(studyDTO, ownerUserAccount);
+		StudyUserRoleBean sub = new StudyUserRoleBean();
+		sub.setRole(Role.COORDINATOR);
+		sub.setStudyId(studyBean.getId());
+		sub.setStatus(Status.AVAILABLE);
+		sub.setOwner(ownerUserAccount);
+		StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
 
-		if (map.get("sites") != null)
-			createNewSites(request, map, uniqueProtocolID);
-
-		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
+		ResponseEntity<Object> response = createNewSites(request, (HashMap) map, uniqueProtocolID);
+		if (response.getStatusCode()==org.springframework.http.HttpStatus.BAD_REQUEST){
+			return response;
+		}
+		
+/*		ArrayList sites = (ArrayList) map.get("sites");
+		if (sites != null)
+			for (Object site : sites) {
+				ResponseEntity<Object> response = createNewSites(request, (HashMap) site, uniqueProtocolID);
+				if (response.getStatusCode()==org.springframework.http.HttpStatus.BAD_REQUEST){
+					return response;
+				}
+			}
+*/		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
 
 	}
 
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		StudyBean studyDTO = null;
+		ArrayList sites = (ArrayList) map.get("sites");
 		System.out.println("I'm in Create Sites ");
 		String message = " field is missing from Site Json object";
+		if (sites != null)
+			for (Object site : sites) {
 
-		ArrayList sites = (ArrayList) map.get("sites");
+		StudyBean studyDTO = null;
 
-		for (Object site : sites) {
-			String name = ((Map<String, String>) site).get("BriefTitle");
-			String principalInvestigator = (String) ((Map<String, String>) site).get("PrincipalInvestigator");
-			String uniqueSiteProtocolID = (String) ((Map<String, String>) site).get("UniqueProtocolID");
-			String expectedTotalEnrollment = (String) ((Map<String, String>) site).get("ExpectedTotalEnrollment");
-			String startDate = (String) ((Map<String, String>) site).get("StartDate");
-			String protocolDateVerification = (String) ((Map<String, String>) site).get("ProtocolDateVerification");
-			String secondaryProId = (String) ((Map<String, String>) site).get("SecondaryProtocolID");
+		String name = (String) ((HashMap<String,Object>) site).get("BriefTitle");
+		String principalInvestigator = (String) ((HashMap<String,Object>) site).get("PrincipalInvestigator");
+		String uniqueSiteProtocolID = (String) ((HashMap<String,Object>) site).get("UniqueProtocolID");
+		String expectedTotalEnrollment = (String) ((HashMap<String,Object>) site).get("ExpectedTotalEnrollment");
+		String startDate = (String) ((HashMap<String,Object>) site).get("StartDate");
+		String protocolDateVerification = (String) ((HashMap<String,Object>) site).get("ProtocolDateVerification");
+		String secondaryProId = (String) ((HashMap<String,Object>) site).get("SecondaryProtocolID");
 
-			if (uniqueProtocolID == null)
-				return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-			if (name == null)
-				return new ResponseEntity("BriefTitle" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-			if (principalInvestigator == null)
-				return new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-			if (startDate == null)
-				return new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-			if (protocolDateVerification == null)
-				return new ResponseEntity("ProtocolDateVerification" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-			if (secondaryProId == null)
-				return new ResponseEntity("SecondaryProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (uniqueProtocolID == null)
+			return new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (name == null)
+			return new ResponseEntity("BriefTitle" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (principalInvestigator == null)
+			return new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (startDate == null)
+			return new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (protocolDateVerification == null)
+			return new ResponseEntity("ProtocolDateVerification" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
+		if (secondaryProId == null)
+			return new ResponseEntity("SecondaryProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
 
-			uniqueProtocolID = uniqueProtocolID.trim();
-			name = name.trim();
-			principalInvestigator = principalInvestigator.trim();
-			startDate = startDate.trim();
-			expectedTotalEnrollment = expectedTotalEnrollment.trim();
-			protocolDateVerification = protocolDateVerification.trim();
-			secondaryProId = secondaryProId.trim();
-			uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
+		uniqueProtocolID = uniqueProtocolID.trim();
+		name = name.trim();
+		principalInvestigator = principalInvestigator.trim();
+		startDate = startDate.trim();
+		expectedTotalEnrollment = expectedTotalEnrollment.trim();
+		protocolDateVerification = protocolDateVerification.trim();
+		secondaryProId = secondaryProId.trim();
+		uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
 
-			request.setAttribute("uniqueProId", uniqueSiteProtocolID);
-			request.setAttribute("name", name);
-			request.setAttribute("prinInvestigator", principalInvestigator);
-			request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
-			request.setAttribute("startDate", startDate);
-			request.setAttribute("protocolDateVerification", protocolDateVerification);
-			request.setAttribute("secondProId", secondaryProId);
+		request.setAttribute("uniqueProId", uniqueSiteProtocolID);
+		request.setAttribute("name", name);
+		request.setAttribute("prinInvestigator", principalInvestigator);
+		request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
+		request.setAttribute("startDate", startDate);
+		request.setAttribute("protocolDateVerification", protocolDateVerification);
+		request.setAttribute("secondProId", secondaryProId);
 
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-			Date formattedStartDate = formatter.parse(startDate);
-			Date formattedProtDateVer = formatter.parse(protocolDateVerification);
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+		Date formattedStartDate = formatter.parse(startDate);
+		Date formattedProtDateVer = formatter.parse(protocolDateVerification);
 
-			StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
-			if (parentStudy.getParentStudyId() != 0)
-				return new ResponseEntity("The Unique Protocol Id provided is not a valid Study Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
+		StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+		if (parentStudy.getParentStudyId() != 0)
+			return new ResponseEntity("The Unique Protocol Id provided is not a valid Study Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
 
-			UserAccountBean ownerUserAccount = getSiteOwnerAccount(request,parentStudy);
-			if (ownerUserAccount == null)
-				return new ResponseEntity("The Owner User Account is not Valid Account or Does not have Admin user type", org.springframework.http.HttpStatus.BAD_REQUEST);
+		UserAccountBean ownerUserAccount = getSiteOwnerAccount(request, parentStudy);
+		if (ownerUserAccount == null)
+			return new ResponseEntity("The Owner User Account is not Valid Account or Does not have rights to Create Sites", org.springframework.http.HttpStatus.BAD_REQUEST);
 
-			Validator v = new Validator(request);
-			addValidationToSiteFields(v);
-			HashMap errors = v.validate();
-			validateUniqueProId(request, errors);
-			siteValidation(request, errors);
+		Validator v = new Validator(request);
+		addValidationToSiteFields(v);
+		HashMap errors = v.validate();
+		validateUniqueProId(request, errors);
+		siteValidation(request, errors);
 
-			if (!errors.isEmpty()) {
-				logger.info("Validation Error: " + errors.toString());
-				System.out.println("Validation Error: " + errors.toString());
-				return new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
-			}
-
-			studyDTO = buildSubStudy(uniqueSiteProtocolID, name, principalInvestigator, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), parentStudy.getId(), secondaryProId,
-					formattedProtDateVer, formattedStartDate);
-			if (studyDTO == null)
-				return new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST); // study exists , update info
-
-			StudyBean siteStudy = getStudyByUniqId(uniqueSiteProtocolID);
-			if (siteStudy == null) {
-				createStudy(studyDTO, ownerUserAccount);
-			} else {
-				studyDTO.setId(siteStudy.getId());
-				studyDTO.setOldStatus(studyDTO.getStatus());
-				updateStudy(studyDTO, ownerUserAccount);
-			}
+		if (!errors.isEmpty()) {
+			logger.info("Validation Error: " + errors.toString());
+			System.out.println("Validation Error: " + errors.toString());
+			return new ResponseEntity("Site "+errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
+
+		studyDTO = buildSubStudy(uniqueSiteProtocolID, name, principalInvestigator, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), parentStudy.getId(), secondaryProId,
+				formattedProtDateVer, formattedStartDate);
+		if (studyDTO == null)
+			return new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST); // study exists , update info
+
+		StudyBean siteStudy = getStudyByUniqId(uniqueSiteProtocolID);
+		if (siteStudy == null) {
+			StudyBean studyBean = createStudy(studyDTO, ownerUserAccount);
+			StudyUserRoleBean sub = new StudyUserRoleBean();
+			sub.setRole(Role.COORDINATOR);
+			sub.setStudyId(studyBean.getId());
+			sub.setStatus(Status.AVAILABLE);
+			sub.setOwner(ownerUserAccount);
+			StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+		}
+			}
 		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
 	}
 
@@ -292,6 +319,18 @@ public class StudyController {
 		sdao = new StudyDAO(dataSource);
 		StudyBean sBean = (StudyBean) sdao.create(studyBean);
 		return sBean;
+	}
+
+	public StudyUserRoleBean createRole(UserAccountBean ownerUserAccount, StudyUserRoleBean sub) {
+		udao = new UserAccountDAO(dataSource);
+		StudyUserRoleBean studyUserRoleBean = (StudyUserRoleBean) udao.createStudyUserRole(ownerUserAccount, sub);
+		return studyUserRoleBean;
+	}
+
+	public StudyUserRoleBean createUserRole(UserAccountBean ownerUserAccount, StudyBean study) {
+		udao = new UserAccountDAO(dataSource);
+		StudyUserRoleBean surBean = udao.findRoleByUserNameAndStudyId(ownerUserAccount.getName(), study.getId());
+		return surBean;
 	}
 
 	public StudyBean updateStudy(StudyBean studyBean, UserAccountBean owner) {
@@ -372,14 +411,14 @@ public class StudyController {
 		return ownerUserAccount;
 	}
 
-	public UserAccountBean getSiteOwnerAccount(HttpServletRequest request , StudyBean study) {
+	public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, StudyBean study) {
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
-		ArrayList <StudyUserRoleBean> roles =ownerUserAccount.getRoles();
-		for (StudyUserRoleBean role : roles){
-			if (role.getStudyId()==study.getId() && (role.getRole().getId()==1 || role.getRole().getId()==2)){
-				return ownerUserAccount;
-			}			
-		}		
+		StudyUserRoleBean currentRole = createUserRole(ownerUserAccount, study);
+
+		if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+			return ownerUserAccount;
+		}
+
 		return null;
 	}
 
