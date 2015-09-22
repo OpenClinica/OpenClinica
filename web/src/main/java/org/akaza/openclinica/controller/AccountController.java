@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +160,9 @@ public class AccountController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
 		System.out.println("I'm in getAccount2");
-
+ 
+		accessCode = URLDecoder.decode(accessCode, "UTF-8");
+		
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
 
