@@ -7,11 +7,13 @@ import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.ErrorObject;
 import org.akaza.openclinica.bean.login.SiteDTO;
 import org.akaza.openclinica.bean.login.StudyDTO;
+import org.akaza.openclinica.bean.login.EventDefinitionDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -20,6 +22,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
@@ -67,6 +70,7 @@ public class StudyController {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	UserAccountDAO udao;
 	StudyDAO sdao;
+	StudyEventDefinitionDAO seddao;
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
@@ -467,7 +471,6 @@ public class StudyController {
 		}
 
 		UserAccountBean ownerUserAccount = null;
-		;
 
 		if (parentStudy != null) {
 			ownerUserAccount = getSiteOwnerAccount(request, parentStudy);
@@ -571,6 +574,159 @@ public class StudyController {
 
 	}
 
+	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
+	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID)
+			throws Exception {
+		System.out.println("I'm in Create Event Definition ");
+		ArrayList<ErrorObject> errorObjects = new ArrayList();
+		StudyEventDefinitionBean eventBean = null;
+		ResponseEntity<Object> response = null;
+
+		String validation_failed_message = "VALIDATION FAILED";
+		String validation_passed_message = "SUCCESS";
+
+		String name = (String) map.get("Name");
+		String description = (String) map.get("Description");
+		String category = (String) map.get("Category");
+		String type = (String) map.get("Type");
+		String repeating = (String) map.get("Repeating");
+
+		EventDefinitionDTO eventDefinitionDTO = buildEventDefnDTO(name, description, category, repeating, type);
+
+		if (name == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Name");
+			errorObjects.add(errorOBject);
+		} else {
+			name = name.trim();
+		}
+		if (description == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Description");
+			errorObjects.add(errorOBject);
+		} else {
+			description = description.trim();
+		}
+		if (category == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Category");
+			errorObjects.add(errorOBject);
+		} else {
+			category = category.trim();
+		}
+		if (type == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Type");
+			errorObjects.add(errorOBject);
+		} else {
+			type = type.trim();
+		}
+		if (repeating == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Repeating");
+			errorObjects.add(errorOBject);
+		} else {
+			repeating = repeating.trim();
+		}
+		if (repeating != null) {
+			if (!repeating.equalsIgnoreCase("true") && !repeating.equalsIgnoreCase("false")) {
+				ErrorObject errorOBject = createErrorObject("Event Definition Object", "Repeating Field should be Either 'True' or 'False'", "Repeating");
+				errorObjects.add(errorOBject);
+			}
+		}
+
+		if (type != null) {
+			if (!type.equalsIgnoreCase("scheduled") && !type.equalsIgnoreCase("unscheduled") && !type.equalsIgnoreCase("common")) {
+				ErrorObject errorOBject = createErrorObject("Event Definition Object", "Type Field should be Either 'Scheduled' , 'UnScheduled' or 'Common'", "Type");
+				errorObjects.add(errorOBject);
+			}
+		}
+
+		request.setAttribute("name", name);
+		request.setAttribute("description", description);
+		request.setAttribute("category", category);
+		request.setAttribute("type", type);
+		request.setAttribute("repeating", repeating);
+
+		StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+		if (parentStudy == null) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Protocol Id provided in the URL is not a valid Protocol Id", "Unique Study Protocol Id");
+			errorObjects.add(errorOBject);
+		} else if (parentStudy.getParentStudyId() != 0) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Protocol Id provided in the URL is not a valid Study Protocol Id", "Unique Study Protocol Id");
+			errorObjects.add(errorOBject);
+		}
+
+		UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+		if (ownerUserAccount == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v1 = new Validator(request);
+		v1.addValidation("name", Validator.NO_BLANKS);
+		HashMap vError1 = v1.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Name");
+			errorObjects.add(errorOBject);
+		}
+
+		if (name != null) {
+			Validator v2 = new Validator(request);
+			v2.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+			HashMap vError2 = v2.validate();
+			if (!vError2.isEmpty()) {
+				ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Name");
+				errorObjects.add(errorOBject);
+			}
+		}
+		if (description != null) {
+			Validator v3 = new Validator(request);
+			v3.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+			HashMap vError3 = v3.validate();
+			if (!vError3.isEmpty()) {
+				ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Description");
+				errorObjects.add(errorOBject);
+			}
+		}
+		if (category != null) {
+			Validator v4 = new Validator(request);
+			v4.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+			HashMap vError4 = v4.validate();
+			if (!vError4.isEmpty()) {
+				ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Category");
+				errorObjects.add(errorOBject);
+			}
+		}
+		Validator v5 = new Validator(request);
+		v5.addValidation("repeating", Validator.NO_BLANKS);
+		HashMap vError5 = v5.validate();
+		if (!vError5.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Repeating");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v6 = new Validator(request);
+		v6.addValidation("type", Validator.NO_BLANKS);
+		HashMap vError6 = v6.validate();
+		if (!vError6.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Type");
+			errorObjects.add(errorOBject);
+		}
+
+		eventDefinitionDTO.setErrors(errorObjects);
+
+		if (errorObjects != null && errorObjects.size() != 0) {
+			eventDefinitionDTO.setMessage(validation_failed_message);
+			response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+		} else {
+			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy.getId());
+
+			StudyEventDefinitionBean sedBean = createEventDefn(eventBean, ownerUserAccount);
+			eventDefinitionDTO.setEventDefnOid(sedBean.getOid());
+			eventDefinitionDTO.setMessage(validation_passed_message);
+		}
+		response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.OK);
+
+		return response;
+
+	}
+
 	public Boolean verifyProtocolTypeExist(String protocolType) {
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 		if (!protocolType.equals(resadmin.getString("interventional")) && !protocolType.equals(resadmin.getString("observational"))) {
@@ -578,6 +734,21 @@ public class StudyController {
 			return false;
 		}
 		return true;
+	}
+
+	public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner, int parentStudyId) {
+
+		StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
+
+		sed.setName(name);
+		sed.setCategory(category);
+		sed.setType(type.toLowerCase());
+		sed.setDescription(description);
+		sed.setRepeating(Boolean.valueOf("repeating"));
+		sed.setStudyId(parentStudyId);
+		sed.setOwner(owner);
+		sed.setStatus(Status.AVAILABLE);
+		return sed;
 	}
 
 	public StudyBean buildSiteBean(String uniqueSiteProtocolId, String name, String principalInvestigator, int expectedTotalEnrollment, Date startDate, Date protocolDateVerification,
@@ -604,6 +775,13 @@ public class StudyController {
 		StudyBean sBean = (StudyBean) sdao.create(studyBean);
 		sBean = (StudyBean) sdao.findByPK(sBean.getId());
 		return sBean;
+	}
+
+	public StudyEventDefinitionBean createEventDefn(StudyEventDefinitionBean sedBean, UserAccountBean owner) {
+		seddao = new StudyEventDefinitionDAO(dataSource);
+		StudyEventDefinitionBean sdBean = (StudyEventDefinitionBean) seddao.create(sedBean);
+		sdBean = (StudyEventDefinitionBean) seddao.findByPK(sdBean.getId());
+		return sdBean;
 	}
 
 	public StudyUserRoleBean createRole(UserAccountBean ownerUserAccount, StudyUserRoleBean sub) {
@@ -713,6 +891,17 @@ public class StudyController {
 		siteDTO.setProtocolDateVerification(protocolDateVerification);
 		siteDTO.setAssignUserRoles(userList);
 		return siteDTO;
+	}
+
+	public EventDefinitionDTO buildEventDefnDTO(String name, String description, String category, String repeating, String type) {
+		EventDefinitionDTO eventDefinitionDTO = new EventDefinitionDTO();
+		eventDefinitionDTO.setName(name);
+		eventDefinitionDTO.setDescription(description);
+		eventDefinitionDTO.setCategory(category);
+		eventDefinitionDTO.setType(type);
+		eventDefinitionDTO.setRepeating(repeating);
+
+		return eventDefinitionDTO;
 	}
 
 	public StudyBean buildStudyBean(String uniqueProtocolId, String name, String briefSummary, String principalInvestigator, String sponsor, int expectedTotalEnrollment, String protocolType,
