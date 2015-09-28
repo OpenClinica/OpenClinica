@@ -4,9 +4,13 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.ErrorObject;
+import org.akaza.openclinica.bean.login.SiteDTO;
+import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
+import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
@@ -37,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -51,18 +56,11 @@ import java.util.ResourceBundle;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
-@ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class StudyController {
 
 	@Autowired
 	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
-
-	@Autowired
-	ServletContext context;
-
-	@Autowired
-	AuthenticationManager authenticationManager;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -71,291 +69,509 @@ public class StudyController {
 	StudyDAO sdao;
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody ArrayList studies) throws Exception {
-
-		StudyBean studyDTO = null;
+	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
+		ArrayList<ErrorObject> errorObjects = new ArrayList();
+		StudyBean studyBean = null;
 		System.out.println("I'm in Create Study");
-		String returnStudyMessage = "";
 		ResponseEntity<Object> response = null;
-		if (studies != null)
-			for (Object study : studies) {
 
-				String message = " field is missing from Study Json object";
-				String uniqueProtocolID = (String) ((HashMap<String, Object>) study).get("UniqueProtocolID");
-				String name = (String) ((HashMap<String, Object>) study).get("BriefTitle");
-				String principalInvestigator = (String) ((HashMap<String, Object>) study).get("PrincipalInvestigator");
-				String briefSummary = (String) ((HashMap<String, Object>) study).get("BriefSummary");
-				String sponsor = (String) ((HashMap<String, Object>) study).get("Sponsor");
-				String protocolType = (String) ((HashMap<String, Object>) study).get("ProtocolType");
-				String startDate = (String) ((HashMap<String, Object>) study).get("StartDate");
-				String expectedTotalEnrollment = (String) ((HashMap<String, Object>) study).get("ExpectedTotalEnrollment");
-				String status = (String) ((HashMap<String, Object>) study).get("Status");
+		String validation_failed_message = "VALIDATION FAILED";
+		String validation_passed_message = "SUCCESS";
 
-				ArrayList sites = (ArrayList) ((HashMap<String, Object>) study).get("sites");
-				ArrayList definitions = (ArrayList) ((HashMap<String, Object>) study).get("definitions");
+		String uniqueProtocolID = (String) map.get("UniqueProtocolID");
+		String name = (String) map.get("BriefTitle");
+		String principalInvestigator = (String) map.get("PrincipalInvestigator");
+		String briefSummary = (String) map.get("BriefSummary");
+		String sponsor = (String) map.get("Sponsor");
+		String protocolType = (String) map.get("ProtocolType");
+		String startDate = (String) map.get("StartDate");
+		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
+		String status = (String) map.get("Status");
+		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("AssignUserRoles");
 
-				if (uniqueProtocolID == null) {
-					response = new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (name == null) {
-					response = new ResponseEntity("BriefTitle (Study Name)" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (principalInvestigator == null) {
-					response = new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (briefSummary == null) {
-					response = new ResponseEntity("BriefSummary (Description)" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (sponsor == null) {
-					response = new ResponseEntity("Sponsor" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (protocolType == null) {
-					response = new ResponseEntity("ProtocolType" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (startDate == null) {
-					response = new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (expectedTotalEnrollment == null) {
-					response = new ResponseEntity("ExpectedTotalEnrollment" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (!status.equalsIgnoreCase("available") && !status.equalsIgnoreCase("design")) {
-					response = new ResponseEntity("ExpectedTotalEnrollment" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (status == null)
-					status = "design";
+		ArrayList<UserRole> userList = new ArrayList<>();
 
-				uniqueProtocolID = uniqueProtocolID.trim();
-				name = name.trim();
-				principalInvestigator = principalInvestigator.trim();
-				briefSummary = briefSummary.trim();
-				sponsor = sponsor.trim();
-				protocolType = protocolType.trim();
-				startDate = startDate.trim();
-				expectedTotalEnrollment = expectedTotalEnrollment.trim();
-				status = status.trim();
+		if (assignUserRoles != null) {
+			for (Object userRole : assignUserRoles) {
+				UserRole uRole = new UserRole();
+				uRole.setUsername((String) ((HashMap<String, Object>) userRole).get("username"));
+				uRole.setRole((String) ((HashMap<String, Object>) userRole).get("role"));
+				udao = new UserAccountDAO(dataSource);
+				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(uRole.getUsername());
+				if (assignedUserBean == null || !assignedUserBean.isActive()) {
+					ErrorObject errorOBject = createErrorObject("Study Object", "The Assigned Username " + uRole.getUsername() + " is not a Valid User", "Assigned User");
+					errorObjects.add(errorOBject);
+				}
 
-				request.setAttribute("uniqueProId", uniqueProtocolID);
-				request.setAttribute("name", name); // Brief Title
-				request.setAttribute("prinInvestigator", principalInvestigator);
-				request.setAttribute("description", briefSummary);
-				request.setAttribute("sponsor", sponsor);
-				request.setAttribute("startDate", startDate);
-				request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
-				request.setAttribute("status", status);
+				ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
-				
-				
-				String format = "yyyy-MM-dd";
-				SimpleDateFormat formatter=null;
-				Date formattedDate=null;
-				try {
-					 formatter = new SimpleDateFormat(format);
-					 formattedDate = formatter.parse(startDate);
-				  }
-				 catch (  ParseException e) {
-						response = new ResponseEntity(" The StartDate format is not a valid 'yyyy-MM-dd' format ", org.springframework.http.HttpStatus.BAD_REQUEST);
-						break;
-				  }
-				
+				if (getStudyRole(uRole.getRole(), resterm) == null) {
+					ErrorObject errorOBject = createErrorObject("Study Object", "Assigned Role for " + uRole.getUsername() + " is not a Valid Study Role", "Assigned Role");
+					errorObjects.add(errorOBject);
+				}
+				userList.add(uRole);
+			}
+		}
+
+		StudyDTO studyDTO = buildStudyDTO(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, expectedTotalEnrollment, protocolType, status, startDate, userList);
+
+		if (uniqueProtocolID == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+			errorObjects.add(errorOBject);
+		} else {
+			uniqueProtocolID = uniqueProtocolID.trim();
+		}
+		if (name == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
+			errorObjects.add(errorOBject);
+		} else {
+			name = name.trim();
+		}
+		if (principalInvestigator == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "PrincipalInvestigator");
+			errorObjects.add(errorOBject);
+		} else {
+			principalInvestigator = principalInvestigator.trim();
+		}
+		if (briefSummary == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefSummary");
+			errorObjects.add(errorOBject);
+		} else {
+			briefSummary = briefSummary.trim();
+		}
+		if (sponsor == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "Sponsor");
+			errorObjects.add(errorOBject);
+		} else {
+			sponsor = sponsor.trim();
+		}
+		if (protocolType == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ProtocolType");
+			errorObjects.add(errorOBject);
+		} else {
+			protocolType = protocolType.trim();
+		}
+		if (startDate == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "StartDate");
+			errorObjects.add(errorOBject);
+		} else {
+			startDate = startDate.trim();
+		}
+		if (expectedTotalEnrollment == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ExpectedTotalEnrollment");
+			errorObjects.add(errorOBject);
+		} else {
+			expectedTotalEnrollment = expectedTotalEnrollment.trim();
+		}
+		if (status == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "Status");
+			errorObjects.add(errorOBject);
+		} else {
+			status = status.trim();
+		}
+
+		if (assignUserRoles == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "AssignUserRoles");
+			errorObjects.add(errorOBject);
+		}
+
+		if (status != null && !status.equalsIgnoreCase("available") && !status.equalsIgnoreCase("design") && !status.equals("")) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Status Field Should have 'Available' or 'Design' Status only, If left empty , will default to 'Design' Mode", "Status");
+			errorObjects.add(errorOBject);
+		}
+
+		request.setAttribute("uniqueProId", uniqueProtocolID);
+		request.setAttribute("name", name); // Brief Title
+		request.setAttribute("prinInvestigator", principalInvestigator);
+		request.setAttribute("description", briefSummary);
+		request.setAttribute("sponsor", sponsor);
+		request.setAttribute("startDate", startDate);
+		request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
+		request.setAttribute("status", status);
+
+		String format = "yyyy-MM-dd";
+		SimpleDateFormat formatter = null;
+		Date formattedDate = null;
+		if (startDate != "" && startDate != null) {
+			try {
+				formatter = new SimpleDateFormat(format);
+				formattedDate = formatter.parse(startDate);
+			} catch (ParseException e) {
+				ErrorObject errorOBject = createErrorObject("Study Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+				errorObjects.add(errorOBject);
+			}
+			if (formattedDate != null) {
 				if (!startDate.equals(formatter.format(formattedDate))) {
-					response = new ResponseEntity(" The StartDate format is not a valid 'yyyy-MM-dd' format ", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
-				if (ownerUserAccount == null) {
-					response = new ResponseEntity(" The Owner User Account is not Valid Account or Does not have Admin user type", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				Validator v = new Validator(request);
-				addValidationToStudyFields(v);
-				HashMap errors = v.validate();
-				if (uniqueProtocolID != null)
-					validateUniqueProId(request, errors);
-
-				if (!errors.isEmpty()) {
-					logger.info("Validation Error(s): " + errors.toString());
-					System.out.println("Validation Errors: " + errors.toString());
-					response = new ResponseEntity(" In Study " + errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-
-				if (!verfiyProtocolTypeExist(protocolType)) {
-					response = new ResponseEntity(" Protocol Type is not Valid", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				studyDTO = buildStudy(uniqueProtocolID, name, principalInvestigator, protocolType, briefSummary, sponsor, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), formattedDate,
-						status);
-
-				StudyBean studyBean = createStudy(studyDTO, ownerUserAccount);
-				StudyUserRoleBean sub = new StudyUserRoleBean();
-				sub.setRole(Role.COORDINATOR);
-				sub.setStudyId(studyBean.getId());
-				sub.setStatus(Status.AVAILABLE);
-				sub.setOwner(ownerUserAccount);
-				StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
-				returnStudyMessage = returnStudyMessage + " StudyOid for '" + uniqueProtocolID + "':" + studyBean.getOid() + " is created. ";
-
-				if (sites != null) {
-					response = createNewSites(request, sites, uniqueProtocolID);
-				}
-
-				if (definitions != null) {
-					// ResponseEntity<Object> response = createNewEventDefinitions(request, definitions, uniqueProtocolID);
+					ErrorObject errorOBject = createErrorObject("Study Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+					errorObjects.add(errorOBject);
 				}
 			}
-		return new ResponseEntity(returnStudyMessage + response.getBody(), response.getStatusCode());
+		}
+
+		UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+		if (ownerUserAccount == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
+			errorObjects.add(errorOBject);
+
+		}
+
+		Validator v0 = new Validator(request);
+		v0.addValidation("name", Validator.NO_BLANKS);
+		HashMap vError0 = v0.validate();
+		if (!vError0.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v1 = new Validator(request);
+		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
+		HashMap vError1 = v1.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+		Validator v2 = new Validator(request);
+		v2.addValidation("description", Validator.NO_BLANKS);
+		HashMap vError2 = v2.validate();
+		if (!vError2.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefSummary");
+			errorObjects.add(errorOBject);
+		}
+		Validator v3 = new Validator(request);
+		v3.addValidation("prinInvestigator", Validator.NO_BLANKS);
+		HashMap vError3 = v3.validate();
+		if (!vError3.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "PrincipleInvestigator");
+			errorObjects.add(errorOBject);
+		}
+		Validator v4 = new Validator(request);
+		v4.addValidation("sponsor", Validator.NO_BLANKS);
+		HashMap vError4 = v4.validate();
+		if (!vError4.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "Sponsor");
+			errorObjects.add(errorOBject);
+		}
+		Validator v5 = new Validator(request);
+		v5.addValidation("startDate", Validator.NO_BLANKS);
+		HashMap vError5 = v5.validate();
+		if (!vError5.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "StartDate");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v6 = new Validator(request);
+		HashMap vError6 = v6.validate();
+		if (uniqueProtocolID != null)
+			validateUniqueProId(request, vError6);
+		if (!vError6.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v7 = new Validator(request);
+		v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
+		HashMap vError7 = v7.validate();
+		if (!vError7.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
+			errorObjects.add(errorOBject);
+		}
+
+		if (protocolType != null && !verifyProtocolTypeExist(protocolType)) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Protocol Type is not Valid", "ProtocolType");
+			errorObjects.add(errorOBject);
+		}
+
+		studyDTO.setErrors(errorObjects);
+
+		if (errorObjects != null && errorObjects.size() != 0) {
+			studyDTO.setMessage(validation_failed_message);
+			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+		} else {
+			studyBean = buildStudyBean(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, Integer.valueOf(expectedTotalEnrollment), protocolType, status, formattedDate,
+					ownerUserAccount);
+
+			StudyBean sBean = createStudy(studyBean, ownerUserAccount);
+			studyDTO.setStudyOid(sBean.getOid());
+			studyDTO.setMessage(validation_passed_message);
+
+			StudyUserRoleBean sub = new StudyUserRoleBean();
+			sub.setRole(Role.COORDINATOR);
+			sub.setStudyId(sBean.getId());
+			sub.setStatus(Status.AVAILABLE);
+			sub.setOwner(ownerUserAccount);
+			StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+
+			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+
+			for (UserRole userRole : userList) {
+				sub = new StudyUserRoleBean();
+				sub.setRole(getStudyRole(userRole.getRole(), resterm));
+				sub.setStudyId(sBean.getId());
+				sub.setStatus(Status.AVAILABLE);
+				sub.setOwner(ownerUserAccount);
+				udao = new UserAccountDAO(dataSource);
+				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
+				surb = createRole(assignedUserBean, sub);
+			}
+
+			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.OK);
+		}
+		return response;
 
 	}
 
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody ArrayList sites, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
+	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
 		System.out.println("I'm in Create Sites ");
-		String message = " field is missing from Site Json object";
+		ArrayList<ErrorObject> errorObjects = new ArrayList();
+		StudyBean siteBean = null;
 		ResponseEntity<Object> response = null;
-		String returnSiteMessage = "";
-		if (sites != null)
-			for (Object site : sites) {
 
-				StudyBean studyDTO = null;
+		String validation_failed_message = "VALIDATION FAILED";
+		String validation_passed_message = "SUCCESS";
 
-				String name = (String) ((HashMap<String, Object>) site).get("BriefTitle");
-				String principalInvestigator = (String) ((HashMap<String, Object>) site).get("PrincipalInvestigator");
-				String uniqueSiteProtocolID = (String) ((HashMap<String, Object>) site).get("UniqueProtocolID");
-				String expectedTotalEnrollment = (String) ((HashMap<String, Object>) site).get("ExpectedTotalEnrollment");
-				String startDate = (String) ((HashMap<String, Object>) site).get("StartDate");
-				String protocolDateVerification = (String) ((HashMap<String, Object>) site).get("ProtocolDateVerification");
-				String secondaryProId = (String) ((HashMap<String, Object>) site).get("SecondaryProtocolID");
+		String name = (String) map.get("BriefTitle");
+		String principalInvestigator = (String) map.get("PrincipalInvestigator");
+		String uniqueSiteProtocolID = (String) map.get("UniqueProtocolID");
+		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
+		String startDate = (String) map.get("StartDate");
+		String protocolDateVerification = (String) map.get("ProtocolDateVerification");
+		String secondaryProId = (String) map.get("SecondaryProtocolID");
+		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("AssignUserRoles");
 
-				if (uniqueProtocolID == null) {
-					response = new ResponseEntity("UniqueProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (name == null) {
-					response = new ResponseEntity("BriefTitle" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (principalInvestigator == null) {
-					response = new ResponseEntity("PrincipalInvestigator" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (startDate == null) {
-					response = new ResponseEntity("StartDate" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (protocolDateVerification == null) {
-					response = new ResponseEntity("ProtocolDateVerification" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (secondaryProId == null) {
-					response = new ResponseEntity("SecondaryProtocolID" + message, org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
+		ArrayList<UserRole> userList = new ArrayList<>();
+		if (assignUserRoles != null) {
+			for (Object userRole : assignUserRoles) {
+				UserRole uRole = new UserRole();
+				uRole.setUsername((String) ((HashMap<String, Object>) userRole).get("username"));
+				uRole.setRole((String) ((HashMap<String, Object>) userRole).get("role"));
+				udao = new UserAccountDAO(dataSource);
+				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(uRole.getUsername());
+				if (assignedUserBean == null || !assignedUserBean.isActive()) {
+					ErrorObject errorOBject = createErrorObject("Study Object", "The Assigned Username " + uRole.getUsername() + " is not a Valid User", "Assigned User");
+					errorObjects.add(errorOBject);
 				}
 
-				uniqueProtocolID = uniqueProtocolID.trim();
-				name = name.trim();
-				principalInvestigator = principalInvestigator.trim();
-				startDate = startDate.trim();
-				expectedTotalEnrollment = expectedTotalEnrollment.trim();
-				protocolDateVerification = protocolDateVerification.trim();
-				secondaryProId = secondaryProId.trim();
-				uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
+				ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
-				request.setAttribute("uniqueProId", uniqueSiteProtocolID);
-				request.setAttribute("name", name);
-				request.setAttribute("prinInvestigator", principalInvestigator);
-				request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
-				request.setAttribute("startDate", startDate);
-				request.setAttribute("protocolDateVerification", protocolDateVerification);
-				request.setAttribute("secondProId", secondaryProId);
-
-				String format = "yyyy-MM-dd";
-				SimpleDateFormat formatter = new SimpleDateFormat(format);
-				Date formattedStartDate = formatter.parse(startDate);
-				Date formattedProtDateVer = formatter.parse(protocolDateVerification);
-				if (!startDate.equals(formatter.format(formattedStartDate)) && !protocolDateVerification.equals(formatter.format(formattedProtDateVer))) {
-					response = new ResponseEntity("The StartDate / ProtocolDateVerfication format is not a valid 'yyyy-MM-dd' format ", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
+				if (getSiteRole(uRole.getRole(), resterm) == null) {
+					ErrorObject errorOBject = createErrorObject("Study Object", "Assigned Role for " + uRole.getUsername() + " is not a Valid Site Role", "Assigned Role");
+					errorObjects.add(errorOBject);
 				}
-				StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
-				if (parentStudy == null) {
-					response = new ResponseEntity("The Unique Protocol Id provided is not a valid Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				if (parentStudy.getParentStudyId() != 0) {
-					response = new ResponseEntity("The Unique Protocol Id provided is not a valid Study Protocol Id", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				UserAccountBean ownerUserAccount = getSiteOwnerAccount(request, parentStudy);
-				if (ownerUserAccount == null) {
-					response = new ResponseEntity("The Owner User Account is not Valid Account or Does not have rights to Create Sites", org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-				Validator v = new Validator(request);
-				addValidationToSiteFields(v);
-				HashMap errors = v.validate();
-				validateUniqueProId(request, errors);
-				siteValidation(request, errors);
-
-				if (!errors.isEmpty()) {
-					logger.info("Validation Error: " + errors.toString());
-					System.out.println("Validation Error: " + errors.toString());
-					response = new ResponseEntity("In Site " + errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-
-				studyDTO = buildSubStudy(uniqueSiteProtocolID, name, principalInvestigator, ownerUserAccount, Integer.valueOf(expectedTotalEnrollment), parentStudy.getId(), secondaryProId,
-						formattedProtDateVer, formattedStartDate);
-				if (studyDTO == null) {
-					response = new ResponseEntity(errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
-					break;
-				}
-
-				StudyBean siteStudy = getStudyByUniqId(uniqueSiteProtocolID);
-				StudyBean studyBean = null;
-				if (siteStudy == null) {
-					studyBean = createStudy(studyDTO, ownerUserAccount);
-					returnSiteMessage = returnSiteMessage + " SiteOid for '" + uniqueSiteProtocolID + "':" + studyBean.getOid() + " is created. ";
-
-				}
-
+				userList.add(uRole);
 			}
-		return new ResponseEntity(returnSiteMessage + response.getBody(), response.getStatusCode());
+		}
+
+		SiteDTO siteDTO = buildSiteDTO(uniqueSiteProtocolID, name, principalInvestigator, expectedTotalEnrollment, startDate, protocolDateVerification, secondaryProId, userList);
+
+		if (uniqueSiteProtocolID == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "UniqueProtocolID");
+			errorObjects.add(errorOBject);
+		} else {
+			uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
+		}
+		if (name == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "BriefTitle");
+			errorObjects.add(errorOBject);
+		} else {
+			name = name.trim();
+		}
+		if (principalInvestigator == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "PrincipalInvestigator");
+			errorObjects.add(errorOBject);
+		} else {
+			principalInvestigator = principalInvestigator.trim();
+		}
+		if (startDate == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "StartDate");
+			errorObjects.add(errorOBject);
+		} else {
+			startDate = startDate.trim();
+		}
+		if (protocolDateVerification == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ProtocolDateVerification");
+			errorObjects.add(errorOBject);
+		} else {
+			protocolDateVerification = protocolDateVerification.trim();
+		}
+		if (expectedTotalEnrollment == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
+			errorObjects.add(errorOBject);
+		} else {
+			expectedTotalEnrollment = expectedTotalEnrollment.trim();
+		}
+		if (secondaryProId == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "SecondaryProtocolID");
+			errorObjects.add(errorOBject);
+		} else {
+			secondaryProId = secondaryProId.trim();
+		}
+
+		if (assignUserRoles == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "AssignUserRoles");
+			errorObjects.add(errorOBject);
+		}
+
+		request.setAttribute("uniqueProId", uniqueSiteProtocolID);
+		request.setAttribute("name", name);
+		request.setAttribute("prinInvestigator", principalInvestigator);
+		request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
+		request.setAttribute("startDate", startDate);
+		request.setAttribute("protocolDateVerification", protocolDateVerification);
+		request.setAttribute("secondProId", secondaryProId);
+
+		String format = "yyyy-MM-dd";
+		SimpleDateFormat formatter = null;
+		Date formattedStartDate = null;
+		Date formattedProtocolDate = null;
+
+		if (startDate != "" && startDate != null) {
+			try {
+				formatter = new SimpleDateFormat(format);
+				formattedStartDate = formatter.parse(startDate);
+			} catch (ParseException e) {
+				ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+				errorObjects.add(errorOBject);
+			}
+			if (formattedStartDate != null) {
+				if (!startDate.equals(formatter.format(formattedStartDate))) {
+					ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+					errorObjects.add(errorOBject);
+				}
+			}
+		}
+
+		if (protocolDateVerification != "" && protocolDateVerification != null) {
+			try {
+				formatter = new SimpleDateFormat(format);
+				formattedProtocolDate = formatter.parse(protocolDateVerification);
+			} catch (ParseException e) {
+				ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
+				errorObjects.add(errorOBject);
+			}
+			if (formattedProtocolDate != null) {
+				if (!protocolDateVerification.equals(formatter.format(formattedProtocolDate))) {
+					ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
+					errorObjects.add(errorOBject);
+				}
+			}
+		}
+
+		StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+		if (parentStudy == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Protocol Id provided in the URL is not a valid Protocol Id", "Unique Study Protocol Id");
+			errorObjects.add(errorOBject);
+		} else if (parentStudy.getParentStudyId() != 0) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Protocol Id provided in the URL is not a valid Study Protocol Id", "Unique Study Protocol Id");
+			errorObjects.add(errorOBject);
+		}
+
+		UserAccountBean ownerUserAccount = null;
+		;
+
+		if (parentStudy != null) {
+			ownerUserAccount = getSiteOwnerAccount(request, parentStudy);
+			if (ownerUserAccount == null) {
+				ErrorObject errorOBject = createErrorObject("Site Object", "The Owner User Account is not Valid Account or Does not have rights to Create Sites", "Owner Account");
+				errorObjects.add(errorOBject);
+			}
+		}
+
+		Validator v1 = new Validator(request);
+		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
+		HashMap vError1 = v1.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+		Validator v2 = new Validator(request);
+		v2.addValidation("name", Validator.NO_BLANKS);
+		HashMap vError2 = v2.validate();
+		if (!vError2.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "BriefTitle");
+			errorObjects.add(errorOBject);
+		}
+		Validator v3 = new Validator(request);
+		v3.addValidation("prinInvestigator", Validator.NO_BLANKS);
+		HashMap vError3 = v3.validate();
+		if (!vError3.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "PrincipleInvestigator");
+			errorObjects.add(errorOBject);
+		}
+		Validator v4 = new Validator(request);
+		v4.addValidation("secondProId", Validator.NO_BLANKS);
+		HashMap vError4 = v4.validate();
+		if (!vError4.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "SecondaryProtocolID");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v6 = new Validator(request);
+		HashMap vError6 = v6.validate();
+		if (uniqueProtocolID != null)
+			validateUniqueProId(request, vError6);
+		if (!vError6.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v7 = new Validator(request);
+		v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
+		HashMap vError7 = v7.validate();
+		if (!vError7.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
+			errorObjects.add(errorOBject);
+		}
+
+		if (request.getAttribute("name") != null && ((String) request.getAttribute("name")).length() > 100) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "BriefTitle Length exceeds the max length 100", "BriefTitle");
+			errorObjects.add(errorOBject);
+		}
+		if (request.getAttribute("uniqueProId") != null && ((String) request.getAttribute("uniqueProId")).length() > 30) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "UniqueProtocolId Length exceeds the max length 30", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+		if (request.getAttribute("prinInvestigator") != null && ((String) request.getAttribute("prinInvestigator")).length() > 255) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "PrincipleInvestigator Length exceeds the max length 255", "PrincipleInvestigator");
+			errorObjects.add(errorOBject);
+		}
+		if (request.getAttribute("expectedTotalEnrollment") != null && Integer.valueOf((String) request.getAttribute("expectedTotalEnrollment")) <= 0) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "ExpectedTotalEnrollment Length can't be negative", "ExpectedTotalEnrollment");
+			errorObjects.add(errorOBject);
+		}
+
+		siteDTO.setErrors(errorObjects);
+
+		if (errorObjects != null && errorObjects.size() != 0) {
+			siteDTO.setMessage(validation_failed_message);
+			response = new ResponseEntity(siteDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+		} else {
+			siteBean = buildSiteBean(uniqueSiteProtocolID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate, formattedProtocolDate, secondaryProId,
+					ownerUserAccount, parentStudy.getId());
+
+			StudyBean sBean = createStudy(siteBean, ownerUserAccount);
+			siteDTO.setSiteOid(sBean.getOid());
+			siteDTO.setMessage(validation_passed_message);
+			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+			StudyUserRoleBean sub = null;
+			for (UserRole userRole : userList) {
+				sub = new StudyUserRoleBean();
+				sub.setRole(getSiteRole(userRole.getRole(), resterm));
+				sub.setStudyId(sBean.getId());
+				sub.setStatus(Status.AVAILABLE);
+				sub.setOwner(ownerUserAccount);
+				udao = new UserAccountDAO(dataSource);
+				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
+				StudyUserRoleBean surb = createRole(assignedUserBean, sub);
+			}
+
+			response = new ResponseEntity(siteDTO, org.springframework.http.HttpStatus.OK);
+		}
+		return response;
+
 	}
 
-	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewEventDefinitions(HttpServletRequest request, @RequestBody ArrayList definitions, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		System.out.println("I'm in Create Definition ");
-		String message = " field is missing from Definition Json object";
-		if (definitions != null)
-			for (Object definition : definitions) {
-
-				StudyBean studyDTO = null;
-
-				Validator v = new Validator(request);
-				addValidationToDefinitionFields(v);
-				HashMap errors = v.validate();
-				validateUniqueProId(request, errors);
-
-				if (!errors.isEmpty()) {
-					logger.info("Validation Error: " + errors.toString());
-					System.out.println("Validation Error: " + errors.toString());
-					return new ResponseEntity("In Definition " + errors.toString(), org.springframework.http.HttpStatus.BAD_REQUEST);
-				}
-
-			}
-		return new ResponseEntity("SUCCESS", org.springframework.http.HttpStatus.OK);
-	}
-
-	public Boolean verfiyProtocolTypeExist(String protocolType) {
+	public Boolean verifyProtocolTypeExist(String protocolType) {
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 		if (!protocolType.equals(resadmin.getString("interventional")) && !protocolType.equals(resadmin.getString("observational"))) {
 			System.out.println("Protocol Type not supported");
@@ -364,45 +580,17 @@ public class StudyController {
 		return true;
 	}
 
-	public StudyBean buildStudy(String uniqueProtocolID, String briefTitle, String principalInvestigator, String protocolType, String briefSummary, String sponsor, UserAccountBean owner,
-			int expectedTotalEnrollment, Date datePlannedStart, String status) {
-		StudyBean study = new StudyBean();
-		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-		if (protocolType.equals(resadmin.getString("interventional"))) {
-			study.setProtocolType("interventional");
-		} else if (protocolType.equals(resadmin.getString("observational"))) {
-			study.setProtocolType("observational");
-		}
+	public StudyBean buildSiteBean(String uniqueSiteProtocolId, String name, String principalInvestigator, int expectedTotalEnrollment, Date startDate, Date protocolDateVerification,
+			String secondaryProId, UserAccountBean owner, int parentStudyId) {
 
-		study.setIdentifier(uniqueProtocolID);
-		study.setName(briefTitle);
-		study.setPrincipalInvestigator(principalInvestigator);
-		study.setSummary(briefSummary);
-		study.setSponsor(sponsor);
-		study.setExpectedTotalEnrollment(expectedTotalEnrollment);
-		study.setDatePlannedStart(datePlannedStart);
-
-		study.setOwner(owner);
-		ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
-
-		if (resword.getString("available").equalsIgnoreCase(status))
-			study.setStatus(Status.AVAILABLE);
-		else if (resword.getString("design").equalsIgnoreCase(status))
-			study.setStatus(Status.PENDING);
-
-		return study;
-	}
-
-	public StudyBean buildSubStudy(String uniqueProtocolID, String briefTitle, String principalInvestigator, UserAccountBean owner, int expectedTotalEnrollment, int parentStudyId,
-			String secondaryIdentifier, Date protocolDateVerification, Date datePlannedStart) {
 		StudyBean study = new StudyBean();
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 
-		study.setDatePlannedStart(datePlannedStart);
+		study.setDatePlannedStart(startDate);
 		study.setProtocolDateVerification(protocolDateVerification);
-		study.setSecondaryIdentifier(secondaryIdentifier);
-		study.setIdentifier(uniqueProtocolID);
-		study.setName(briefTitle);
+		study.setSecondaryIdentifier(secondaryProId);
+		study.setIdentifier(uniqueSiteProtocolId);
+		study.setName(name);
 		study.setPrincipalInvestigator(principalInvestigator);
 		study.setExpectedTotalEnrollment(expectedTotalEnrollment);
 		study.setParentStudyId(parentStudyId);
@@ -436,47 +624,12 @@ public class StudyController {
 		return sBean;
 	}
 
-	public void addValidationToStudyFields(Validator v) {
-
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("uniqueProId", Validator.NO_BLANKS);
-		v.addValidation("description", Validator.NO_BLANKS);
-		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
-		v.addValidation("sponsor", Validator.NO_BLANKS);
-		v.addValidation("startDate", Validator.NO_BLANKS);
-	}
-
-	public void addValidationToSiteFields(Validator v) {
-
-		v.addValidation("name", Validator.NO_BLANKS);
-		v.addValidation("uniqueProId", Validator.NO_BLANKS);
-		v.addValidation("prinInvestigator", Validator.NO_BLANKS);
-		v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-
-	}
-
 	public void addValidationToDefinitionFields(Validator v) {
 
 		v.addValidation("name", Validator.NO_BLANKS);
 		v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 		v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 		v.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-
-	}
-
-	public void siteValidation(HttpServletRequest request, HashMap errors) {
-		if (((String) request.getAttribute("name")).length() > 100) {
-			Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
-		}
-		if (((String) request.getAttribute("uniqueProId")).length() > 30) {
-			Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
-		}
-		if (((String) request.getAttribute("prinInvestigator")).length() > 255) {
-			Validator.addError(errors, "prinInvestigator", resexception.getString("maximum_lenght_principal_investigator_255"));
-		}
-		if (Integer.valueOf((String) request.getAttribute("expectedTotalEnrollment")) <= 0) {
-			Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
-		}
 
 	}
 
@@ -496,7 +649,7 @@ public class StudyController {
 		StudyDAO studyDAO = new StudyDAO(dataSource);
 		ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
 		for (StudyBean thisBean : allStudies) {
-			if (request.getAttribute("uniqueProId").equals(thisBean.getIdentifier())) {
+			if (request.getAttribute("uniqueProId") != null && request.getAttribute("uniqueProId").equals(thisBean.getIdentifier())) {
 				ResourceBundle resexception = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getExceptionsBundle();
 				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
 				break;
@@ -524,6 +677,107 @@ public class StudyController {
 		}
 
 		return null;
+	}
+
+	public StudyDTO buildStudyDTO(String uniqueProtocolID, String name, String briefSummary, String principalInvestigator, String sponsor, String expectedTotalEnrollment, String protocolType,
+			String status, String startDate, ArrayList<UserRole> userList) {
+		if (status != null) {
+			if (status.equals(""))
+				status = "design";
+		}
+
+		StudyDTO studyDTO = new StudyDTO();
+		studyDTO.setUniqueProtocolID(uniqueProtocolID);
+		studyDTO.setName(name);
+		studyDTO.setPrincipalInvestigator(principalInvestigator);
+		studyDTO.setBriefSummary(briefSummary);
+		studyDTO.setSponsor(sponsor);
+		studyDTO.setProtocolType(protocolType);
+		studyDTO.setStatus(status);
+		studyDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
+		studyDTO.setStartDate(startDate);
+		studyDTO.setAssignUserRoles(userList);
+		return studyDTO;
+	}
+
+	public SiteDTO buildSiteDTO(String uniqueSiteProtocolID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate, String protocolDateVerification,
+			String secondaryProId, ArrayList<UserRole> userList) {
+
+		SiteDTO siteDTO = new SiteDTO();
+		siteDTO.setUniqueSiteProtocolID(uniqueSiteProtocolID);
+		siteDTO.setName(name);
+		siteDTO.setPrincipalInvestigator(principalInvestigator);
+		siteDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
+		siteDTO.setStartDate(startDate);
+		siteDTO.setSecondaryProId(secondaryProId);
+		siteDTO.setProtocolDateVerification(protocolDateVerification);
+		siteDTO.setAssignUserRoles(userList);
+		return siteDTO;
+	}
+
+	public StudyBean buildStudyBean(String uniqueProtocolId, String name, String briefSummary, String principalInvestigator, String sponsor, int expectedTotalEnrollment, String protocolType,
+			String status, Date startDate, UserAccountBean owner) {
+
+		StudyBean study = new StudyBean();
+		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+		if (protocolType.equals(resadmin.getString("interventional"))) {
+			study.setProtocolType("interventional");
+		} else if (protocolType.equals(resadmin.getString("observational"))) {
+			study.setProtocolType("observational");
+		}
+		ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
+		if (resword.getString("available").equalsIgnoreCase(status))
+			study.setStatus(Status.AVAILABLE);
+		else if (resword.getString("design").equalsIgnoreCase(status))
+			study.setStatus(Status.PENDING);
+
+		study.setIdentifier(uniqueProtocolId);
+		study.setName(name);
+		study.setPrincipalInvestigator(principalInvestigator);
+		study.setSummary(briefSummary);
+		study.setSponsor(sponsor);
+		study.setExpectedTotalEnrollment(expectedTotalEnrollment);
+		study.setDatePlannedStart(startDate);
+
+		study.setOwner(owner);
+
+		return study;
+	}
+
+	public ErrorObject createErrorObject(String resource, String code, String field) {
+		ErrorObject errorOBject = new ErrorObject();
+		errorOBject.setResource(resource);
+		errorOBject.setCode(code);
+		errorOBject.setField(field);
+		return errorOBject;
+	}
+
+	public Role getStudyRole(String roleName, ResourceBundle resterm) {
+		if (roleName.equalsIgnoreCase(resterm.getString("Study_Director").trim())) {
+			return Role.STUDYDIRECTOR;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("Study_Coordinator").trim())) {
+			return Role.COORDINATOR;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("Investigator").trim())) {
+			return Role.INVESTIGATOR;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("Data_Entry_Person").trim())) {
+			return Role.RESEARCHASSISTANT;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("Monitor").trim())) {
+			return Role.MONITOR;
+		} else
+			return null;
+	}
+
+	public Role getSiteRole(String roleName, ResourceBundle resterm) {
+		if (roleName.equalsIgnoreCase(resterm.getString("site_investigator").trim())) {
+			return Role.INVESTIGATOR;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person").trim())) {
+			return Role.RESEARCHASSISTANT;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("site_monitor").trim())) {
+			return Role.MONITOR;
+		} else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person2").trim())) {
+			return Role.RESEARCHASSISTANT2;
+		} else
+			return null;
 	}
 
 }
