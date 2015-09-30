@@ -5,6 +5,9 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.ErrorObject;
+import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
 import org.akaza.openclinica.bean.login.SiteDTO;
 import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.EventDefinitionDTO;
@@ -138,22 +141,8 @@ public class StudyController {
 	 *                    HTTP/1.1 200 OK
 	 *                    {
 	 *                    "message": "SUCCESS",
-	 *                    "status": "available",
-	 *                    "errors": [],
-	 *                    "principalInvestigator": "Principal Investigator Name",
-	 *                    "expectedTotalEnrollment": "10",
-	 *                    "sponsor": "Sponsor Name",
-	 *                    "protocolType": "Interventional",
 	 *                    "uniqueProtocolID": "Study Protocol ID",
-	 *                    "briefTitle": "Study Protocol Title",
-	 *                    "briefSummary": "Study Summary",
-	 *                    "assignUserRoles": [
-	 *                    { "username": "usera", "role": "Data Manager"},
-	 *                    { "username": "userb", "role": "Study Director"},
-	 *                    { "username": "userc", "role": "Data Specialist" }
-	 *                    ],
 	 *                    "studyOid": "S_STUDYPRO",
-	 *                    "startDate": "2011-11-11"
 	 *                    }
 	 */
 
@@ -403,8 +392,12 @@ public class StudyController {
 				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
 				surb = createRole(assignedUserBean, sub);
 			}
-
-			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.OK);
+            ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+            responseSuccess.setMessage(studyDTO.getMessage());
+            responseSuccess.setStudyOid(studyDTO.getStudyOid());
+            responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
+                        
+			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		}
 		return response;
 
@@ -471,21 +464,8 @@ public class StudyController {
 	 *                    HTTP/1.1 200 OK
 	 *                    {
 	 *                    "message": "SUCCESS",
-	 *                    "protocolDateVerification": "2011-10-14",
-	 *                    "principalInvestigator": "Principal Investigator Name",
-	 *                    "expectedTotalEnrollment": "10",
-	 *                    "errors": [],
-	 *                    "secondaryProId": "Secondary Protocol ID 1",
-	 *                    "siteOid": "S_SITEPROT_5381",
-	 *                    "briefTitle": "Site Protocol ID Name",
-	 *                    "assignUserRoles": [
-	 *                    { "role": "Investigator", "username": "userc"},
-	 *                    { "role": "Clinical Research Coordinator", "username": "userb"},
-	 *                    { "role": "Monitor", "username": "dm_normal"},
-	 *                    { "role": "Data Entry Person", "username": "sd_root"}
-	 *                    ],
-	 *                    "uniqueSiteProtocolID": "Site Protocol IDqq",
-	 *                    "startDate": "2011-11-11"
+	 *                    "siteOid": "S_SITEPROT",
+	 *                    "uniqueSiteProtocolID": "Site Protocol IDqq"
 	 *                    }
 	 */
 
@@ -732,8 +712,13 @@ public class StudyController {
 				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
 				StudyUserRoleBean surb = createRole(assignedUserBean, sub);
 			}
+            ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
+            responseSuccess.setMessage(siteDTO.getMessage());
+            responseSuccess.setSiteOid(siteDTO.getSiteOid());
+            responseSuccess.setUniqueSiteProtocolID(siteDTO.getUniqueSiteProtocolID());
+                        
+			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
-			response = new ResponseEntity(siteDTO, org.springframework.http.HttpStatus.OK);
 		}
 		return response;
 
@@ -744,7 +729,7 @@ public class StudyController {
 	 * @apiName createEventDefinition
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
-	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
 	 * @apiParam {String} name Event Name.
 	 * @apiParam {String} description Event Description.
 	 * @apiParam {String} category Category Name.
@@ -781,14 +766,9 @@ public class StudyController {
 	 * @apiSuccessExample {json} Success-Response:
 	 *                    HTTP/1.1 200 OK
 	 *                    {
-	 *                    "name": "Event Name",
 	 *                    "message": "SUCCESS",
-	 *                    "type": "Scheduled",
-	 *                    "errors": [],
-	 *                    "category": "Category Name",
-	 *                    "description": "Event Description",
-	 *                    "eventDefOid": "SE_EVENTNAME",
-	 *                    "repeating": "true"
+	 *                    "name": "Event Name",
+	 *                    "eventDefOid": "SE_EVENTNAME"
 	 *                    }
 	 */
 	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
@@ -938,8 +918,13 @@ public class StudyController {
 			eventDefinitionDTO.setEventDefOid(sedBean.getOid());
 			eventDefinitionDTO.setMessage(validation_passed_message);
 		}
-		response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.OK);
-
+        ResponseSuccessEventDefDTO responseSuccess = new ResponseSuccessEventDefDTO();
+        responseSuccess.setMessage(eventDefinitionDTO.getMessage());
+        responseSuccess.setEventDefOid(eventDefinitionDTO.getEventDefOid());
+        responseSuccess.setName(eventDefinitionDTO.getName());
+        
+                    
+		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		return response;
 
 	}
