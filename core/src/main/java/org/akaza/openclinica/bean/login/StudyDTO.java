@@ -8,7 +8,7 @@ import org.akaza.openclinica.bean.core.Status;
 
 public class StudyDTO {
 	private String uniqueProtocolID;
-	private String name;
+	private String briefTitle;
 	private String principalInvestigator;
 	private String briefSummary;
 	private String sponsor;
@@ -34,13 +34,16 @@ public class StudyDTO {
 		this.uniqueProtocolID = uniqueProtocolID;
 	}
 
-	public String getName() {
-		return name;
+
+	public String getBriefTitle() {
+		return briefTitle;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+
+	public void setBriefTitle(String briefTitle) {
+		this.briefTitle = briefTitle;
 	}
+
 
 	public String getPrincipalInvestigator() {
 		return principalInvestigator;

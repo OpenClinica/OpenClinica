@@ -11,14 +11,14 @@ public class EventDefinitionDTO {
 	private String repeating;
 	private ArrayList<ErrorObject> errors;
 	private String message;
-	private String eventDefnOid;
+	private String eventDefOid;
 
-	public String getEventDefnOid() {
-		return eventDefnOid;
+	public String getEventDefOid() {
+		return eventDefOid;
 	}
 
-	public void setEventDefnOid(String eventDefnOid) {
-		this.eventDefnOid = eventDefnOid;
+	public void setEventDefOid(String eventDefOid) {
+		this.eventDefOid = eventDefOid;
 	}
 
 	public String getMessage() {

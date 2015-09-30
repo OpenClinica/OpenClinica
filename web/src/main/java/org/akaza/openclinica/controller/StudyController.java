@@ -72,6 +72,92 @@ public class StudyController {
 	StudyDAO sdao;
 	StudyEventDefinitionDAO seddao;
 
+	/**
+	 * @api {post} /auth/api/v1/studies Create New Study in OC
+	 * @apiName createNewStudy
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} briefTitle Brief Title .
+	 * @apiParam {String} principalInvestigator Principal Investigator Name.
+	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
+	 * @apiParam {String} sponsor Sponsor name.
+	 * @apiParam {String} protocolType 'Interventional' or ' Observational'
+	 * @apiParam {String} status 'Available' or 'Design'
+	 * @apiParam {String} briefSummary Study Summary
+	 * @apiParam {Date} startDate Start date
+	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
+	 * @apiGroup Study
+	 * @apiHeader {String} api_key Users unique access-key.
+	 * @apiDescription This API is to create a New Study in OC.
+	 *                 All the fields are required fields and can't be left blank.
+	 *                 You need to provide your Api-key to be connected.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "briefTitle": "Study Protocol ID Name",
+	 *                  "principalInvestigator": "Principal Investigator Name",
+	 *                  "expectedTotalEnrollment": "10",
+	 *                  "sponsor": "Sponsor Name",
+	 *                  "protocolType": "Interventional",
+	 *                  "status": "available",
+	 *                  "assignUserRoles": [
+	 *                  { "username": "usera", "role": "Data Manager" },
+	 *                  { "username": "userb", "role": "Study Director" },
+	 *                  { "username": "userc", "role": "Data Specialist" },
+	 *                  { "username": "userd", "role": "Monitor" },
+	 *                  { "username": "usere", "role": "Data Entry Person" }
+	 *                  ],
+	 *                  "uniqueProtocolID": "Study Protocol ID",
+	 *                  "briefSummary": "Study Summary",
+	 *                  "startDate": "2011-11-11"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "message": "VALIDATION FAILED",
+	 *                  "status": "available",
+	 *                  "principalInvestigator": "Principal Investigator Name",
+	 *                  "expectedTotalEnrollment": "10",
+	 *                  "sponsor": "Sponsor Name",
+	 *                  "protocolType": "Interventional",
+	 *                  "errors": [
+	 *                  {"field": "UniqueProtocolId","resource": "Study Object","code": "Unique Protocol Id exist in the System"}
+	 *                  ],
+	 *                  "startDate": "2011-11-11",
+	 *                  "assignUserRoles": [
+	 *                  {"username": "usera","role": "Data Manager"},
+	 *                  {"username": "userb","role": "Study Director"},
+	 *                  {"username": "userc","role": "Data Specialist"}
+	 *                  ],
+	 *                  "uniqueProtocolID": "Study Protocol ID",
+	 *                  "briefTitle": "Study Protocol ID",
+	 *                  "briefSummary": "Study Summary",
+	 *                  "studyOid": null
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "message": "SUCCESS",
+	 *                    "status": "available",
+	 *                    "errors": [],
+	 *                    "principalInvestigator": "Principal Investigator Name",
+	 *                    "expectedTotalEnrollment": "10",
+	 *                    "sponsor": "Sponsor Name",
+	 *                    "protocolType": "Interventional",
+	 *                    "uniqueProtocolID": "Study Protocol ID",
+	 *                    "briefTitle": "Study Protocol Title",
+	 *                    "briefSummary": "Study Summary",
+	 *                    "assignUserRoles": [
+	 *                    { "username": "usera", "role": "Data Manager"},
+	 *                    { "username": "userb", "role": "Study Director"},
+	 *                    { "username": "userc", "role": "Data Specialist" }
+	 *                    ],
+	 *                    "studyOid": "S_STUDYPRO",
+	 *                    "startDate": "2011-11-11"
+	 *                    }
+	 */
+
+	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
@@ -82,16 +168,16 @@ public class StudyController {
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
 
-		String uniqueProtocolID = (String) map.get("UniqueProtocolID");
-		String name = (String) map.get("BriefTitle");
-		String principalInvestigator = (String) map.get("PrincipalInvestigator");
-		String briefSummary = (String) map.get("BriefSummary");
-		String sponsor = (String) map.get("Sponsor");
-		String protocolType = (String) map.get("ProtocolType");
-		String startDate = (String) map.get("StartDate");
-		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
-		String status = (String) map.get("Status");
-		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("AssignUserRoles");
+		String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+		String name = (String) map.get("briefTitle");
+		String principalInvestigator = (String) map.get("principalInvestigator");
+		String briefSummary = (String) map.get("briefSummary");
+		String sponsor = (String) map.get("sponsor");
+		String protocolType = (String) map.get("protocolType");
+		String startDate = (String) map.get("startDate");
+		String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
+		String status = (String) map.get("status");
+		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
 		ArrayList<UserRole> userList = new ArrayList<>();
 
@@ -324,6 +410,85 @@ public class StudyController {
 
 	}
 
+	/**
+	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/sites Create New Site in OC
+	 * @apiName createNewSite
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} briefTitle Brief Title .
+	 * @apiParam {String} principalInvestigator Principal Investigator Name.
+	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
+	 * @apiParam {String} briefSummary Study Summary
+	 * @apiParam {Date} startDate Start date
+	 * @apiParam {Date} protocolDateVerification protocol Verification date
+	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
+	 * @apiGroup Site
+	 * @apiHeader {String} api_key Users unique access-key.
+	 * @apiDescription This API is to create a New Site in OC.
+	 *                 All the fields are required fields and can't be left blank.
+	 *                 You need to provide your Api-key to be connected.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "briefTitle": "Site Protocol ID Name",
+	 *                  "principalInvestigator": "Principal Investigator Name",
+	 *                  "expectedTotalEnrollment": "10",
+	 *                  "assignUserRoles": [
+	 *                  { "username" : "userc", "role" : "Investigator"},
+	 *                  { "username" : "userb", "role" : "Clinical Research Coordinator"},
+	 *                  { "username" : "dm_normal", "role" : "Monitor"},
+	 *                  { "username" : "sd_root", "role" : "Data Entry Person"}
+	 *                  ],
+	 *                  "uniqueProtocolID": "Site Protocol ID",
+	 *                  "startDate": "2011-11-11",
+	 *                  "secondaryProtocolID" : "Secondary Protocol ID 1" ,
+	 *                  "protocolDateVerification" : "2011-10-14"
+	 *                  }
+	 * 
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "message": "VALIDATION FAILED",
+	 *                  "protocolDateVerification": "2011-10-14",
+	 *                  "principalInvestigator": "Principal Investigator Name",
+	 *                  "expectedTotalEnrollment": "10",
+	 *                  "errors": [
+	 *                  { "field": "UniqueProtocolId", "resource": "Site Object","code": "Unique Protocol Id exist in the System" }
+	 *                  ],
+	 *                  "secondaryProId": "Secondary Protocol ID 1",
+	 *                  "siteOid": null,
+	 *                  "briefTitle": "Site Protocol ID Name",
+	 *                  "assignUserRoles": [
+	 *                  { "role": "Investigator", "username": "userc"},
+	 *                  { "role": "Clinical Research Coordinator", "username": "userb"},
+	 *                  { "role": "Monitor","username": "dm_normal"},
+	 *                  { "role": "Data Entry Person","username": "sd_root"}
+	 *                  ],
+	 *                  "uniqueSiteProtocolID": "Site Protocol ID",
+	 *                  "startDate": "2011-11-11"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "message": "SUCCESS",
+	 *                    "protocolDateVerification": "2011-10-14",
+	 *                    "principalInvestigator": "Principal Investigator Name",
+	 *                    "expectedTotalEnrollment": "10",
+	 *                    "errors": [],
+	 *                    "secondaryProId": "Secondary Protocol ID 1",
+	 *                    "siteOid": "S_SITEPROT_5381",
+	 *                    "briefTitle": "Site Protocol ID Name",
+	 *                    "assignUserRoles": [
+	 *                    { "role": "Investigator", "username": "userc"},
+	 *                    { "role": "Clinical Research Coordinator", "username": "userb"},
+	 *                    { "role": "Monitor", "username": "dm_normal"},
+	 *                    { "role": "Data Entry Person", "username": "sd_root"}
+	 *                    ],
+	 *                    "uniqueSiteProtocolID": "Site Protocol IDqq",
+	 *                    "startDate": "2011-11-11"
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
 		System.out.println("I'm in Create Sites ");
@@ -334,14 +499,14 @@ public class StudyController {
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
 
-		String name = (String) map.get("BriefTitle");
-		String principalInvestigator = (String) map.get("PrincipalInvestigator");
-		String uniqueSiteProtocolID = (String) map.get("UniqueProtocolID");
-		String expectedTotalEnrollment = (String) map.get("ExpectedTotalEnrollment");
-		String startDate = (String) map.get("StartDate");
-		String protocolDateVerification = (String) map.get("ProtocolDateVerification");
-		String secondaryProId = (String) map.get("SecondaryProtocolID");
-		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("AssignUserRoles");
+		String name = (String) map.get("briefTitle");
+		String principalInvestigator = (String) map.get("principalInvestigator");
+		String uniqueSiteProtocolID = (String) map.get("uniqueProtocolID");
+		String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
+		String startDate = (String) map.get("startDate");
+		String protocolDateVerification = (String) map.get("protocolDateVerification");
+		String secondaryProId = (String) map.get("secondaryProtocolID");
+		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
 		ArrayList<UserRole> userList = new ArrayList<>();
 		if (assignUserRoles != null) {
@@ -574,6 +739,58 @@ public class StudyController {
 
 	}
 
+	/**
+	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create New Study Event Definition in OC
+	 * @apiName createEventDefinition
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} name Event Name.
+	 * @apiParam {String} description Event Description.
+	 * @apiParam {String} category Category Name.
+	 * @apiParam {Boolean} repeating 'True' or 'False'.
+	 * @apiParam {String} type 'Scheduled' , 'UnScheduled' or 'Common'.
+	 * @apiGroup Study Event Definition
+	 * @apiHeader {String} api_key Users unique access-key.
+	 * @apiDescription This API is to create a New Study Event Definition in OC.
+	 *                 All the fields are required fields and can't be left blank.
+	 *                 You need to provide your Api-key to be connected.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "name": "Event Name",
+	 *                  "description": "Event Description",
+	 *                  "category": "Category Name",
+	 *                  "repeating": "true",
+	 *                  "type":"Scheduled"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "name": "Event Name",
+	 *                  "message": "VALIDATION FAILED",
+	 *                  "type": "",
+	 *                  "errors": [
+	 *                  {"field": "Type","resource": "Event Definition Object","code": "Type Field should be Either 'Scheduled' , 'UnScheduled' or 'Common'"},
+	 *                  {"field": "Type","resource": "Event Definition Object","code": "This field cannot be blank."}
+	 *                  ],
+	 *                  "category": "Category Name",
+	 *                  "description": "Event Description",
+	 *                  "eventDefOid": null,
+	 *                  "repeating": "true"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "name": "Event Name",
+	 *                    "message": "SUCCESS",
+	 *                    "type": "Scheduled",
+	 *                    "errors": [],
+	 *                    "category": "Category Name",
+	 *                    "description": "Event Description",
+	 *                    "eventDefOid": "SE_EVENTNAME",
+	 *                    "repeating": "true"
+	 *                    }
+	 */
 	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
 	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID)
 			throws Exception {
@@ -585,11 +802,11 @@ public class StudyController {
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
 
-		String name = (String) map.get("Name");
-		String description = (String) map.get("Description");
-		String category = (String) map.get("Category");
-		String type = (String) map.get("Type");
-		String repeating = (String) map.get("Repeating");
+		String name = (String) map.get("name");
+		String description = (String) map.get("description");
+		String category = (String) map.get("category");
+		String type = (String) map.get("type");
+		String repeating = (String) map.get("repeating");
 
 		EventDefinitionDTO eventDefinitionDTO = buildEventDefnDTO(name, description, category, repeating, type);
 
@@ -718,7 +935,7 @@ public class StudyController {
 			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy.getId());
 
 			StudyEventDefinitionBean sedBean = createEventDefn(eventBean, ownerUserAccount);
-			eventDefinitionDTO.setEventDefnOid(sedBean.getOid());
+			eventDefinitionDTO.setEventDefOid(sedBean.getOid());
 			eventDefinitionDTO.setMessage(validation_passed_message);
 		}
 		response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.OK);
@@ -866,7 +1083,7 @@ public class StudyController {
 
 		StudyDTO studyDTO = new StudyDTO();
 		studyDTO.setUniqueProtocolID(uniqueProtocolID);
-		studyDTO.setName(name);
+		studyDTO.setBriefTitle(name);
 		studyDTO.setPrincipalInvestigator(principalInvestigator);
 		studyDTO.setBriefSummary(briefSummary);
 		studyDTO.setSponsor(sponsor);
@@ -883,7 +1100,7 @@ public class StudyController {
 
 		SiteDTO siteDTO = new SiteDTO();
 		siteDTO.setUniqueSiteProtocolID(uniqueSiteProtocolID);
-		siteDTO.setName(name);
+		siteDTO.setBriefTitle(name);
 		siteDTO.setPrincipalInvestigator(principalInvestigator);
 		siteDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
 		siteDTO.setStartDate(startDate);
@@ -970,3 +1187,5 @@ public class StudyController {
 	}
 
 }
+
+
