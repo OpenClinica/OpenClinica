@@ -7,9 +7,12 @@ public class ParticipantDTO {
 		private String studyName;
 		private String phone;
 		private String studyURL;
+		private String origMessage;
 		private String message;
 		private String eventName;
+		private String participantEmailAccount;
 		private String emailAccount;
+		private String origEmailSubject;
 		private String emailSubject;
 		private String url;
 		private String loginUrl;
@@ -84,4 +87,23 @@ public class ParticipantDTO {
 			this.eventName = eventName;
 		}
 
+		public String getOrigMessage() {
+			return origMessage;
+		}
+		public void setOrigMessage(String origMessage) {
+			this.origMessage = origMessage;
+		}
+		public String getOrigEmailSubject() {
+			return origEmailSubject;
+		}
+		public void setOrigEmailSubject(String origEmailSubject) {
+			this.origEmailSubject = origEmailSubject;
+		}
+		public String getParticipantEmailAccount() {
+			return participantEmailAccount;
+		}
+		public void setParticipantEmailAccount(String participantEmailAccount) {
+			this.participantEmailAccount = participantEmailAccount;
+		}
+		
 	}
