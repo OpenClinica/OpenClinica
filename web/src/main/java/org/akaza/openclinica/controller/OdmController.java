@@ -142,7 +142,7 @@ public class OdmController {
                         int eventStatus = eventCrf.getStatus().getId();
                         if (eventStatus != 1 && eventStatus != 2)
                             validStatus = false;
-                        if (eventStatus == 1 && itemDataDAO.findAllByEventCRFId(eventCrf.getId()).size() > 0)
+                        if (itemDataDAO.findAllByEventCRFId(eventCrf.getId()).size() > 0)
                             itemDataExists = true;
                     }
                 }
@@ -252,9 +252,9 @@ public class OdmController {
         PFormCache cache = PFormCache.getInstance(context);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
                 String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
-        String editURL = CoreResources.getField("sysURL.base") + "pages/odmk/editform";
+        String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
 
-        String url = editURL + "&" + FORM_CONTEXT + "=" + contextHash;
+        String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Edit URL for " + crfVersion.getName() + "= " + url);
         return url;
 
