@@ -16,7 +16,11 @@ package org.akaza.openclinica.bean.oid;
  */
 public class StudyOidGenerator extends OidGenerator {
 
-    private final int argumentLength = 1;
+    public int getArgumentLength() {
+		return argumentLength;
+	}
+
+	private final int argumentLength = 1;
 
     @Override
     void verifyArgumentLength(String... keys) throws Exception {
