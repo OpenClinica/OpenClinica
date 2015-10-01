@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class SiteDTO {
 	private String uniqueSiteProtocolID;
-	private String name;
+	private String briefTitle;
 	private String principalInvestigator;
 	private String expectedTotalEnrollment;
 	private String startDate;
@@ -31,13 +31,16 @@ public class SiteDTO {
 		this.uniqueSiteProtocolID = uniqueSiteProtocolID;
 	}
 
-	public String getName() {
-		return name;
+
+	public String getBriefTitle() {
+		return briefTitle;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+
+	public void setBriefTitle(String briefTitle) {
+		this.briefTitle = briefTitle;
 	}
+
 
 	public String getPrincipalInvestigator() {
 		return principalInvestigator;
