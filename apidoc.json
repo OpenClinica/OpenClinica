@@ -1,0 +1,16 @@
+{
+  "name": "OpenClinica API",
+  "version": "3.7",
+  "description": "The OpenClinica REST API",
+  "title": "The OpenClinica REST API",
+  "url" : "https://demo2.eclinicalhosting.com/OpenClinica9",
+  "sampleUrl": "http://104.131.126.24:8080/OpenClinica",
+  "order": [
+    "GetUser",
+    "PostUser"
+  ],
+  "template": {
+  	"withCompare": true,
+  	"withGenerator": true
+  }
+}
