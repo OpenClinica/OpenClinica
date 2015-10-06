@@ -144,3 +144,58 @@
  *     }
  */
 
+/**
+	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/subjects Create New Study Subject in an OpenClinica Study (proposed; not implemented)
+	 * @apiName createNewSite
+	 * @apiPermission user
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} uniqueProtocolId Study or site unique protocol ID or OID.
+	 * @apiParam {String} ssid Study Subject ID (optional or required, depending on study configuration).
+	 * @apiParam {Date} dob Date of Birth (optional or required, send full date or just year depending on study configuration).
+	 * @apiParam {String} sex Sex (optional or required, depending on study configuration).
+	 * @apiParam {Date} enrollmentDate Enrollment or registration date. Defaults to current date if omitted.
+	 * @apiParam {Array} groups Assign the study subject to one or more Groups in this Study.
+	 * @apiParam {Array} events Create one or more events for the study subject
+	 * @apiParam {Array} data Add data to a CRF in the study subject's record. For path, use EVENT_OID[EVENT_ORDINAL]/CRF_OID/ITEMGROUP_OID[GROUP_ORDINAL]/ITEM_OID
+	 * @apiGroup Subject
+	 * @apiHeader {String} api_key User's unique access-key.
+	 * @apiDescription This API is to create a study subject in an OpenClinica study or site in OC.
+	 *                 All the fields are required fields and can't be left blank.
+	 *                 You need to provide your Api-key to be connected.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "uniqueProtocolId": "S_ABC1234",
+	 *                  "dob": "1944-08-22",
+	 *                  "sex": "m",
+	 *                  "enrollmentDate": "2015-10-06",
+	 *                  "groups": [
+	 *                  { "groupClass" : "Arm", "group" : "Arm B"},
+	 *                  { "groupClass" : "Age Group", "group" : ">60"}
+	 *                  ],
+	 *                  "event": [
+	 *                  { "event" : "E_FIRSTVISIT", "startDate" : "2015-10-07"},
+	 *                  { "event" : "E_FIRSTDIARY", "startDate" : "2015-10-08"} 
+	 *                  ],
+	 *                  "data": [
+	 *                  { "path" : "E_CONSENT/F_INFORMED_CONSENT/IG_MAIN/I_CONSENTDATE", "value" : "2015-10-05"},
+	 *                  { "path" : "E_CONSENT/F_INFORMED_CONSENT/IG_MAIN/I_CONSENTSIGNED", "value" : "Y"}
+	 *                  ]
+	 *                  }
+	 * 
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "message": "FAILED",
+	 *                  "errors": [
+	 *                  { "field": "UniqueProtocolId", "resource": "Stite Object","code": "Unique Protocol Id/OID must match a study or site OID for which you have been granted a user role" }
+	 *                  ]
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "message": "SUCCESS",
+	 *                    "ssid": "101",
+	 *                    "subjectKey": "SS_101"
+	 *                    }
+	 */
+
