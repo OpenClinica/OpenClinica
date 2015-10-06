@@ -1119,7 +1119,7 @@ public class StudyController {
 		ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
 		if (resword.getString("available").equalsIgnoreCase(status))
 			study.setStatus(Status.AVAILABLE);
-		else if (resword.getString("design").equalsIgnoreCase(status))
+		else if (resword.getString("design").equalsIgnoreCase(status) || status.equals(""))
 			study.setStatus(Status.PENDING);
 
 		study.setIdentifier(uniqueProtocolId);
