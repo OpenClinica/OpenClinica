@@ -75,7 +75,7 @@ public class EnketoAPI {
         return null;
     }
 
-    public EnketoURLResponse getEditURL(String crfOID, String instance) {
+    public EnketoURLResponse getEditURL(String crfOid, String instance, String instanceId, String redirect) {
         if (enketoURL == null)
             return null;
 
@@ -88,7 +88,7 @@ public class EnketoAPI {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOID, "bob", "http://study1.sdibona.local/#/plogin", instance);
+            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance);
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

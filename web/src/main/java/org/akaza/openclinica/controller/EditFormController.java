@@ -3,10 +3,16 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
+import org.akaza.openclinica.dao.hibernate.SectionDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
@@ -17,14 +23,20 @@ import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.EnketoAPI;
 import org.akaza.openclinica.web.pform.EnketoCredentials;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +46,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -47,8 +56,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Controller
@@ -66,6 +77,9 @@ public class EditFormController {
     private CrfVersionDao crfVersionDao;
 
     @Autowired
+    private SectionDao sectionDao;
+
+    @Autowired
     private StudyEventDao studyEventDao;
 
     @Autowired
@@ -79,6 +93,18 @@ public class EditFormController {
 
     @Autowired
     private ItemDao itemDao;
+
+    @Autowired
+    private ItemGroupDao itemGroupDao;
+
+    @Autowired
+    private ItemGroupMetadataDao itemGroupMetadataDao;
+
+    @Autowired
+    private ItemFormMetadataDao itemFormMetadataDao;
+
+    @Autowired
+    private ResponseTypeDao responseTypeDao;
 
     @Autowired
     private ItemDataDao itemDataDao;
@@ -111,100 +137,123 @@ public class EditFormController {
                 crfVersion.getCrfVersionId());
 
         // Load populated instance
-        String populatedInstance = null;
-        if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-            populatedInstance = getPopulatedXformInstance(crfVersion, eventCrf);
-        else
-            populatedInstance = getPopulatedLegacyInstance();
-        // String instance =
-        // "<question_types_1><intro/><text_questions><my_string>AswcdewfcW</my_string></text_questions><number_questions><my_int>1</my_int><my_decimal>1.1</my_decimal></number_questions><select_questions><my_select>a</my_select><my_select1>1</my_select1></select_questions></question_types_1>";
+        String populatedInstance = getPopulatedInstance(crfVersion, eventCrf);
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
 
+        // Build redirect url
+        String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOID);
+
         // Return Enketo URL
-        editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance).getEdit_url();
-        System.out.println(editURL);
+        editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance, formContext, redirectUrl).getEdit_url();
+        logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
 
     }
 
-    private String getPopulatedXformInstance(CrfVersion crfVersion, EventCrf eventCrf) throws Exception {
+    private String getRedirectUrl(String studySubjectOid, String studyOid) {
+        String portalURL = CoreResources.getField("portalURL");
+        String url = "";
+        if (portalURL != null && !portalURL.equals("")) {
+            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+            Authorization pManageAuthorization = registrar.getAuthorization(studyOid);
+            try {
+                URL pManageUrl = new URL(portalURL);
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        // dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        InputSource is = new InputSource();
-        is.setCharacterStream(new StringReader(crfVersion.getXform()));
-        Document doc = db.parse(is);
-        String itemName;
-
-        NodeList instanceNodeList = doc.getElementsByTagName("instance");
-        Node populatedCrfNode = null;
-        // Instance loop
-        for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
-            Node instanceNode = instanceNodeList.item(i);
-            if (instanceNode instanceof Element) {
-                NodeList crfNodeList = instanceNode.getChildNodes();
-                // Form loop
-                for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
-                    Node crfNode = crfNodeList.item(j);
-                    if (crfNode instanceof Element) {
-                        populatedCrfNode = crfNode;
-                        NodeList groupNodeList = crfNode.getChildNodes();
-                        // Group loop
-                        for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
-                            Node groupNode = groupNodeList.item(k);
-
-                            if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
-                                NodeList itemNodeList = groupNode.getChildNodes();
-                                // Item loop
-                                for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
-                                    Node itemNode = itemNodeList.item(m);
-                                    if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
-                                            && !itemNode.getNodeName().endsWith(".SUBHEADER")) {
-
-                                        itemName = itemNode.getNodeName().trim();
-                                        Item item = itemDao.findByNameCrfId(itemName, crfVersion.getCrf().getCrfId());
-                                        ItemData itemData = null;
-                                        if (item != null)
-                                            itemData = itemDataDao.findByItemEventCrf(item.getItemId(), eventCrf.getEventCrfId());
-
-                                        // Set Value here
-                                        if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals(""))
-                                            itemNode.setTextContent(itemData.getValue());
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
+                        && !pManageAuthorization.getStudy().getHost().equals("")) {
+                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
                 }
+            } catch (MalformedURLException e) {
+                logger.error("Error building redirect URL: " + e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+                return "";
             }
-        }// End of instance loop
-        return convertNodeToXMLString(populatedCrfNode);
-
+        }
+        if (!url.equals(""))
+            url = url + "/#/event/" + studySubjectOid + "/dashboard";
+        return url;
     }
 
-    private String convertNodeToXMLString(Node item) throws Exception {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    private String getPopulatedInstance(CrfVersion crfVersion, EventCrf eventCrf) throws Exception {
+        boolean isXform = false;
+        if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
+            isXform = true;
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder build = docFactory.newDocumentBuilder();
+        Document doc = build.newDocument();
+
+        Element crfElement = null;
+        if (isXform)
+            crfElement = doc.createElement(crfVersion.getXformName());
+        else
+            crfElement = doc.createElement(crfVersion.getOcOid());
+        doc.appendChild(crfElement);
+
+        ArrayList<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
+        for (ItemGroup itemGroup : itemGroups) {
+            ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId()).get(
+                    0);
+            ArrayList<Item> items = (ArrayList<Item>) itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
+
+            // Get max repeat in item data
+            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), items.get(0).getItemId());
+            // loop thru each repeat creating items in instance
+            String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
+            Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();
+
+            // TODO: Test empty group here (no items). make sure doesn't get nullpointer exception
+            for (int i = 0; i < maxGroupRepeat; i++) {
+                Element groupElement = null;
+
+                if (isXform)
+                    groupElement = doc.createElement(itemGroup.getName());
+                else
+                    groupElement = doc.createElement(itemGroup.getOcOid());
+                if (isrepeating) {
+                    groupElement.setTextContent(repeatGroupMin);
+                }
+                crfElement.appendChild(groupElement);
+
+                for (Item item : items) {
+                    ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
+
+                    Element question = null;
+                    if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
+                        question = doc.createElement(item.getName());
+                    else
+                        question = doc.createElement(item.getOcOid());
+
+                    if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
+                        ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
+                        String itemValue = itemData.getValue();
+                        if (responseType.getResponseTypeId() == 3 || responseType.getResponseTypeId() == 7) {
+                            itemValue = itemValue.replaceAll(",", " ");
+                        }
+
+                        question.setTextContent(itemValue);
+                    }
+                    groupElement.appendChild(question);
+                } // end of item
+            }
+
+        } // end of group
+
+        TransformerFactory transformFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(item);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);
-
-        String xmlInstance = result.getWriter().toString();
-        System.out.println(xmlInstance);
-        return xmlInstance;
-    }
-
-    private String getPopulatedLegacyInstance() {
-        // TODO Auto-generated method stub
-        return "<question_types_1><intro/><text_questions><my_string>AswcdewfcW</my_string></text_questions><number_questions><my_int>1</my_int><my_decimal>1.1</my_decimal></number_questions><select_questions><my_select>a</my_select><my_select1>1</my_select1></select_questions></question_types_1>";
+        String instance = writer.toString();
+        return instance;
     }
 
     private StudyBean getParentStudy(Integer studyId) {
