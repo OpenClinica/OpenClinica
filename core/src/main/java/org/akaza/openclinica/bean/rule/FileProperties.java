@@ -5,7 +5,7 @@
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2010 Akaza Research
 
- * File fileSizeMax set to Interger.MAX_VALUE : derivitive work (under orig license) by Nor Consult, LLC in 2015
+ * fileSizeMax set to Long.MAX_VALUE : derivitive work (under orig license) by Nor Consult, LLC in 2015
 
  */
 package org.akaza.openclinica.bean.rule;
@@ -27,7 +27,7 @@ public class FileProperties {
 	private String extensions;
     private ExtensionSettings extensionSettings;
     private final Integer MB = 1024 * 1024;
-    private final Long fileSizeMax = Integer.MAX_VALUE;
+    private final Long fileSizeMax = Long.MAX_VALUE;
 
     enum ExtensionSettings {
         VALID, INVALID
