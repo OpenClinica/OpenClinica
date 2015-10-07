@@ -76,7 +76,7 @@ public class StudyController {
 	StudyEventDefinitionDAO seddao;
 
 	/**
-	 * @api {post} /auth/api/v1/studies Create New Study in OC
+	 * @api {post} /pages/auth/api/v1/studies Create New Study
 	 * @apiName createNewStudy
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -404,7 +404,7 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/sites Create New Site in OC
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create New Site
 	 * @apiName createNewSite
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -416,7 +416,7 @@ public class StudyController {
 	 * @apiParam {Date} startDate Start date
 	 * @apiParam {Date} protocolDateVerification protocol Verification date
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
-	 * @apiGroup Site
+	 * @apiGroup Study
 	 * @apiHeader {String} api_key Users unique access-key.
 	 * @apiDescription This API is to create a New Site in OC.
 	 *                 All the fields are required fields and can't be left blank.
@@ -725,7 +725,7 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create New Study Event Definition in OC
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create Study Event Definition
 	 * @apiName createEventDefinition
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -735,7 +735,7 @@ public class StudyController {
 	 * @apiParam {String} category Category Name.
 	 * @apiParam {Boolean} repeating 'True' or 'False'.
 	 * @apiParam {String} type 'Scheduled' , 'UnScheduled' or 'Common'.
-	 * @apiGroup Study Event Definition
+	 * @apiGroup Study Event
 	 * @apiHeader {String} api_key Users unique access-key.
 	 * @apiDescription This API is to create a New Study Event Definition in OC.
 	 *                 All the fields are required fields and can't be left blank.

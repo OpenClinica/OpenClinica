@@ -76,6 +76,50 @@ public class UserAccountController {
 	StudySubjectDAO ssdao;
 	UserAccountBean uBean;
 
+	/**
+	 * @api {post} /pages/auth/api/v1/createuseraccount Create New User Account
+	 * @apiName createOrUpdateAccount2
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} username UserName
+	 * @apiParam {String} fName First Name
+	 * @apiParam {String} lName Last Name
+	 * @apiParam {String} institution Institution
+	 * @apiParam {String} email Email Address
+	 * @apiParam {String} study_name Study Name
+	 * @apiParam {String} role_name Role Name
+	 * @apiParam {String} user_type User Type
+	 * @apiParam {String} authorize_soap Authorize Soap
+	 * 
+	 * @apiGroup User Account
+	 * @apiDescription This API is to create a new user account
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "username": "testingUser",
+	 *                  "fName": "Jimmy",
+	 *                  "lName": "Sander",
+	 *                  "institution": "OC",
+	 *                  "email": "abcde@yahoo.com",
+	 *                  "study_name": "Baseline Study 101",
+	 *                  "role_name": "Data Manager",
+	 *                  "user_type": "user",
+	 *                  "authorize_soap":"false"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lastName": "Sander",
+	 *                    "username": "testingUser",
+	 *                    "firstName": "Jimmy",
+	 *                    "password": "rgluVsO0",
+	 *                    "apiKey": "5f462a16b3b04b1b9747262968bd5d2f"
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
 		logger.info("I'm in createUserAccount");

@@ -66,6 +66,39 @@ public class AccountController {
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
 
+	/**
+	 * @api {post} /pages/accounts/login Get API-Key With Credentials
+	 * @apiName getAccountByUserName
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} username OC login Username.
+	 * @apiParam {String} password OC login Password .
+	 * @apiGroup Login
+	 * @apiDescription This API is to get the API Key using Login Credentials in OC
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "username": "usera",
+	 *                  "password": "password"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 401 Bad Credentials
+	 *                  {
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lastName": "User",
+	 *                    "username": "root",
+	 *                    "roles": [
+	 *                    {"roleName": "director", "studyOID": "S_DEFAULTS1"},
+	 *                    {"roleName": "Data Specialist", "studyOID": "S_JAPSTUDY_5293"}
+	 *                    ],
+	 *                    "firstName": "Root",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "apiKey": "6e8b69f6fb774e899f9a6c349c5adace"
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> getAccountByUserName(@RequestBody HashMap<String, String> requestMap) throws Exception {
 
@@ -73,44 +106,69 @@ public class AccountController {
 		String userName = requestMap.get("username");
 		String password = requestMap.get("password");
 
-		Authentication authentication = new UsernamePasswordAuthenticationToken(userName,
-				password);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userName, password);
 
-		try{
+		try {
 			authentication = authenticationManager.authenticate(authentication);
-		}catch (BadCredentialsException bce){
+		} catch (Exception bce) {
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
 		}
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 		StudyDAO studyDAO = new StudyDAO(dataSource);
-		HashMap<String,Object> userDTO = new HashMap<String,Object>();
+		HashMap<String, Object> userDTO = new HashMap<String, Object>();
 
 		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
-		if(null != userAccountBean) {
+		if (null != userAccountBean) {
 			userDTO.put("username", userName);
 			userDTO.put("password", userAccountBean.getPasswd());
-			userDTO.put("firstName",userAccountBean.getFirstName());
-			userDTO.put("lastName",userAccountBean.getLastName());
-			userDTO.put("apiKey",userAccountBean.getApiKey());
+			userDTO.put("firstName", userAccountBean.getFirstName());
+			userDTO.put("lastName", userAccountBean.getLastName());
+			userDTO.put("apiKey", userAccountBean.getApiKey());
 
-
-
-			ArrayList<HashMap<String,String>> rolesDTO = new ArrayList<>();
-			for (StudyUserRoleBean role : (List<StudyUserRoleBean>)userAccountBean.getRoles()) {
+			ArrayList<HashMap<String, String>> rolesDTO = new ArrayList<>();
+			for (StudyUserRoleBean role : (List<StudyUserRoleBean>) userAccountBean.getRoles()) {
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("roleName", role.getRoleName());
 				map.put("studyOID", ((StudyBean) studyDAO.findByPK(role.getStudyId())).getOid());
 				rolesDTO.add(map);
 			}
-			userDTO.put("roles",rolesDTO);
-		}else{
+			userDTO.put("roles", rolesDTO);
+		} else {
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
 
 		}
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
+
+	/**
+	 * @api {get} /pages/accounts/study/:studyOid/crc/:crcUserName Get CRC User Account
+	 * @apiName getAccount1
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} crcUserName CRC Username .
+	 * @apiGroup User Account
+	 * @apiDescription This API is to get the CRC User Account by providing CRC Username and StudyOid
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": " S_BL101",
+	 *                  "crcUserName": "crc_user"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lName": "Jackson",
+	 *                    "mobile": "",
+	 *                    "accessCode": "",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "email": "abc@yahoo.com",
+	 *                    "userName": "crc_user",
+	 *                    "studySubjectId": null,
+	 *                    "fName": "joe"
+	 *                    }
+	 */
 
 	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
@@ -155,14 +213,42 @@ public class AccountController {
 		return false;
 	}
 
+	/**
+	 * @api {get} /pages/accounts/study/:studyOid/accesscode/:accessCode Get Participant User Account
+	 * @apiName getAccount2
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} accessCode Participant Access code .
+	 * @apiGroup User Account
+	 * @apiDescription This API is to get the Participant User Account by providing Study Subject Access Code and StudyOid
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": " S_BL101",
+	 *                  "accessCode": "yfzqpvDpiJftIZgNDphvxg=="
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lName": "",
+	 *                    "mobile": "jLGQwxkuVpPBLJCtnLdrAw==",
+	 *                    "accessCode": "yfzqpvDpiJftIZgNDphvxg==",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "email": "XzJadh3l3V7uUoPCggbSoIfoNW8IQU3qsvrtHfJH7J0=",
+	 *                    "userName": "S_BL101.SS_SUBA101",
+	 *                    "studySubjectId": null,
+	 *                    "fName": "07hQGfwT6LRXk0rLLYwkviwNdOEycnj4lOjrNMBdesk="
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/study/{studyOid}/accesscode/{accessCode}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
 		System.out.println("I'm in getAccount2");
- 
+
 		accessCode = URLDecoder.decode(accessCode, "UTF-8");
-		
+
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
 
@@ -186,6 +272,33 @@ public class AccountController {
 		return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 	}
 
+	/**
+	 * @api {get} /pages/accounts/study/:studyOid/studysubject/:studySubjectId Get Participant User Account
+	 * @apiName getAccount3
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} studySubjectId Study Subject Id .
+	 * @apiGroup User Account
+	 * @apiDescription This API is to get the Participant User Account by providing Study Subject Access Code and StudyOid
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": " S_BL101",
+	 *                  "studySubjectId": "Sub100"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lName": "",
+	 *                    "mobile": "JTaa7WGRdH5dGs42XyTrgA==",
+	 *                    "accessCode": "5s02UFpiMBijWuzaxSOojg==",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "email": "XzJadh3l3V7uUoPCggbSoIfoNW8IQU3qsvrtHfJH7J0=",
+	 *                    "userName": "S_BL101.SS_SUB100",
+	 *                    "studySubjectId": null,
+	 *                    "fName": "pdyGCN1CdAKIGOUEERz/yQ=="
+	 *                    }
+	 */
 	@RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectId}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
@@ -221,6 +334,47 @@ public class AccountController {
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		}
 	}
+
+	/**
+	 * @api {post} /pages/accounts/ Create Or Update Participate Account
+	 * @apiName createOrUpdateAccount
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} studySubjectId Study Subject Id .
+	 * @apiParam {String} fName First Name
+	 * @apiParam {String} lName Last Name
+	 * @apiParam {String} mobile Mobile Phone
+	 * @apiParam {String} accessCode Access Code
+	 * @apiParam {String} crcUserName CRC UserName
+	 * @apiParam {String} email Email Address
+	 * 
+	 * @apiGroup User Account
+	 * @apiDescription This API is to create or update Participate account
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "studySubjectId": "Sub100",
+	 *                  "fName": "Dany",
+	 *                  "lName": "Keegan",
+	 *                  "mobile": "617 865 4567",
+	 *                  "accessCode": "5s02UFpiMBijWuzaxSOojg==",
+	 *                  "crcUserName": "crc_user",
+	 *                  "email": "abc@yahoo.com"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "studySubjectId": null,
+	 *                    "email": "abc@yahoo.com",
+	 *                    "accessCode": "5s02UFpiMBijWuzaxSOojg==",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "userName": "S_BL101.SS_SUB100",
+	 *                    "fName": "Dany",
+	 *                    "lName": "Keegan",
+	 *                    "mobile": "617 865 4567"
+	 *                    }
+	 */
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> createOrUpdateAccount(@RequestBody HashMap<String, String> map) throws Exception {
@@ -300,6 +454,28 @@ public class AccountController {
 		}
 	}
 
+	/**
+	 * @api {post} /pages/accounts/timezone Update Subject TimeZone
+	 * @apiName updateTimezone
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} studySubjectId Study Subject Oid .
+	 * @apiParam {String} timeZone Time Zone .
+	 * @apiGroup TimeZone
+	 * @apiDescription This API is to update timezone
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "studySubjectId": "SS_SUB100",
+	 *                  "timeZone": "America/New_York"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/timezone", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> updateTimezone(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
@@ -312,23 +488,23 @@ public class AccountController {
 		String timeZone = map.get("timeZone");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("******************     You are in the Rest Service   *****************"); 
-		  
+		System.out.println("******************     You are in the Rest Service   *****************");
+
 		StudySubjectBean studySubjectBean = getStudySubjectByOidAndStudy(studySubjectId, parentStudy.getId());
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 
 		udao = new UserAccountDAO(dataSource);
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
-		
-        if (studySubjectBean.isActive()){
-        	studySubjectBean.setTime_zone(timeZone);
-        	studySubjectBean.setUpdater(userAccountBean);
-        	updateStudySubjectBean(studySubjectBean);
+
+		if (studySubjectBean.isActive()) {
+			studySubjectBean.setTime_zone(timeZone);
+			studySubjectBean.setUpdater(userAccountBean);
+			updateStudySubjectBean(studySubjectBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
-        }
+		}
 		return null;
-  }
+	}
 
 	private UserDTO buildUserDTO(UserAccountBean userAccountBean) {
 		uDTO = new UserDTO();
@@ -342,8 +518,8 @@ public class AccountController {
 		return uDTO;
 	}
 
-	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String accessCode, UserAccountBean ownerUserAccount, String pUserName, String email)
-			throws Exception {
+	private UserAccountBean buildUserAccount(String studyOid, String studySubjectOid, String fName, String lName, String mobile, String accessCode, UserAccountBean ownerUserAccount, String pUserName,
+			String email) throws Exception {
 
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
 
@@ -365,7 +541,6 @@ public class AccountController {
 		createdUserAccountBean.setEmail(email);
 		createdUserAccountBean.setEnableApiKey(false);
 		createdUserAccountBean.setApiKey("");
-
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
@@ -452,10 +627,9 @@ public class AccountController {
 
 	private void updateStudySubjectBean(StudySubjectBean sBean) {
 		ssdao = new StudySubjectDAO(dataSource);
-        ssdao.update(sBean) ;
+		ssdao.update(sBean);
 	}
 
-	
 	private Boolean isStudyDoesNotExist(String studyOid) {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean == null) {
@@ -684,7 +858,7 @@ public class AccountController {
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
 		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
-		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus  + "   siteStatus: " + siteStatus);
+		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
 		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
 		}
@@ -693,50 +867,48 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = "/study/{studyOid}", method = RequestMethod.GET)
-	public ResponseEntity <ArrayList <UserDTO>> getAllParticipantPerStudy(@PathVariable("studyOid") String studyOid) throws Exception {
+	public ResponseEntity<ArrayList<UserDTO>> getAllParticipantPerStudy(@PathVariable("studyOid") String studyOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		ArrayList <UserDTO> uDTOs = null;
+		ArrayList<UserDTO> uDTOs = null;
 		System.out.println("I'm in getAllParticipantPerStudy");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
 
-
 		if (isStudyDoesNotExist(oid))
-			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<ArrayList<UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		// build UserName
-	//	HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+		// HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 
 		udao = new UserAccountDAO(dataSource);
-		ArrayList <UserAccountBean> uBeans = (ArrayList<UserAccountBean>) udao.findAllParticipantsByStudyOid(oid);
-		if (uBeans !=null) {
-			uDTOs= new ArrayList<>();
-			for(UserAccountBean uBean : uBeans){
-                UserDTO uDTO = new UserDTO();
-                
-                String username =uBean.getName();
-        		String studySubjectOid= username.substring(username.indexOf(".")+1);
-                ssdao = new StudySubjectDAO<>(dataSource);
-        		String studySubjectId = ssdao.findByOid(studySubjectOid).getLabel();
-        		
-                uDTO.setfName(uBean.getFirstName());
-                uDTO.setEmail(uBean.getEmail());
-                uDTO.setMobile(uBean.getPhone());
-                uDTO.setAccessCode(uBean.getAccessCode());
-                uDTO.setUserName(uBean.getName());
-                uDTO.setPassword(uBean.getPasswd());
-                uDTO.setlName(uBean.getLastName());
-                uDTO.setStudySubjectId(studySubjectId);
-                
+		ArrayList<UserAccountBean> uBeans = (ArrayList<UserAccountBean>) udao.findAllParticipantsByStudyOid(oid);
+		if (uBeans != null) {
+			uDTOs = new ArrayList<>();
+			for (UserAccountBean uBean : uBeans) {
+				UserDTO uDTO = new UserDTO();
+
+				String username = uBean.getName();
+				String studySubjectOid = username.substring(username.indexOf(".") + 1);
+				ssdao = new StudySubjectDAO<>(dataSource);
+				String studySubjectId = ssdao.findByOid(studySubjectOid).getLabel();
+
+				uDTO.setfName(uBean.getFirstName());
+				uDTO.setEmail(uBean.getEmail());
+				uDTO.setMobile(uBean.getPhone());
+				uDTO.setAccessCode(uBean.getAccessCode());
+				uDTO.setUserName(uBean.getName());
+				uDTO.setPassword(uBean.getPasswd());
+				uDTO.setlName(uBean.getLastName());
+				uDTO.setStudySubjectId(studySubjectId);
+
 				uDTOs.add(uDTO);
 			}
-			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.OK);
+			return new ResponseEntity<ArrayList<UserDTO>>(uDTOs, org.springframework.http.HttpStatus.OK);
 		} else {
-			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<ArrayList<UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
-	
-	
+
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> updateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
@@ -760,7 +932,6 @@ public class AccountController {
 
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
-
 
 		// build UserName
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
