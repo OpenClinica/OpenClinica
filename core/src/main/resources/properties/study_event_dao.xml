@@ -316,7 +316,7 @@
 			      AND ss.oc_oid = ?
 			      AND id.item_data_id IS NOT NULL))
 			  ) filter ON se2.study_event_id = filter.study_event_id
-			ORDER BY se2.date_start ASC, filter.ordinal ASC, se2.sample_ordinal ASC
+			ORDER BY date(se2.date_start) ASC, filter.ordinal ASC, se2.sample_ordinal ASC
 			LIMIT 1
         </sql>
     </query>
