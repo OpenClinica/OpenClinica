@@ -211,7 +211,11 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 // Limit number of results (pagination)
                 terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
                 arguments.put("limit", filter.getPageSize());
-                arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
+                int offset = (filter.getPageNumber() - 1) * filter.getPageSize();
+                if (offset < 0) {
+                    offset = 0;
+                }
+                arguments.put("offset", offset);
             }
         }
 
