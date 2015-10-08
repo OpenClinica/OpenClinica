@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
@@ -248,6 +249,13 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setOwner(ub);
                 createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
                 createdUserAccountBean.setAccessCode("null");
+                createdUserAccountBean.setEnableApiKey(true);
+                
+                String apiKey=null; 		
+                do{
+                 	apiKey=getRandom32ChApiKey() ;
+                } while(isApiKeyExist(apiKey));                
+                createdUserAccountBean.setApiKey(apiKey);
                 
                 int studyId = fp.getInt(INPUT_STUDY);
                 Role r = Role.get(fp.getInt(INPUT_ROLE));
@@ -379,4 +387,20 @@ public class CreateUserAccountServlet extends SecureController {
     protected String getAdminServlet() {
         return SecureController.ADMIN_SERVLET_CODE;
     }
+
+	public Boolean isApiKeyExist(String uuid) {
+		UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+		UserAccountBean uBean = (UserAccountBean) udao.findByApiKey(uuid);
+		if (uBean == null || !uBean.isActive()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public String getRandom32ChApiKey() {
+		String uuid = UUID.randomUUID().toString();
+		System.out.print(uuid.replaceAll("-", ""));
+		return uuid.replaceAll("-", "");
+	}
 }

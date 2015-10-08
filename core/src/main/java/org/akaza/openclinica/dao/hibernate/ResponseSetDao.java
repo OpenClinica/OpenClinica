@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.List;
+
 import org.akaza.openclinica.domain.datamap.ResponseSet;
 
 public class ResponseSetDao extends AbstractDomainDao<ResponseSet> {
@@ -16,6 +18,13 @@ public class ResponseSetDao extends AbstractDomainDao<ResponseSet> {
         q.setString("label", label);
         q.setInteger("version", version);
         return (ResponseSet) q.uniqueResult();
+    }
+
+    public List<ResponseSet> findAllByItemId(int itemId) {
+        String query = "select rs.* from item_form_metadata ifm join response_set rs on ifm.response_set_id = rs.response_set_id " + "where ifm.item_id = "
+                + itemId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ResponseSet.class);
+        return ((List<ResponseSet>) q.list());
     }
 
 }

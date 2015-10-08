@@ -16,7 +16,9 @@ import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.xform.XformContainer;
@@ -33,6 +35,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,6 +49,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         CrfDao crfDao = (CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
+        CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
 
         // Retrieve submission data from multipart request
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -65,13 +70,35 @@ public class CreateXformCRFVersionServlet extends SecureController {
         Html html = parser.unMarshall(submittedXformText);
 
         // Create Database entries
+        // Create container for holding validation errors
+        DataBinder dataBinder = new DataBinder(new CrfVersion());
+        Errors errors = dataBinder.getBindingResult();
+
         XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
-        CrfVersion newVersion = xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText);
-        CrfBean newCrf = crfDao.findByName(submittedCrfName);
+        try {
+            xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
+                    submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
+        } catch (RuntimeException e) {
+            logger.error("Error encountered while saving CRF: " + e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            // If there are no logged validation errors, this was an unanticipated exception
+            // and should be allow to crash the page for now
+            if (!errors.hasErrors())
+                throw e;
+        }
+
+        // Save errors to request so they can be displayed to the user
+        if (errors.hasErrors()) {
+            request.setAttribute("errorList", errors.getAllErrors());
+            logger.debug("Found at least one error.  CRF data not saved.");
+        } else {
+            logger.debug("Didn't find any errors.  CRF data saved.");
+        }
 
         // Save any media files uploaded with xform
-        saveAttachedMedia(items, newCrf, newVersion);
+        CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
+        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
+        saveAttachedMedia(items, crf, newVersion);
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
@@ -104,7 +131,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     break;
                 }
             }
-            System.out.println("Found the primary instance element: " + instance.getTagName());
 
             // Get the form element
             Element form = null;
@@ -115,33 +141,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     break;
                 }
             }
-            System.out.println("Found the form element: " + form.getTagName());
-
-            // XformGroup defaultGroup = null;
-            // Get the ungrouped items
-            // for (int i = 0; i < form.getChildNodes().getLength(); i++) {
-            // if (form.getChildNodes().item(i) instanceof Element && !((Element)
-            // form.getChildNodes().item(i)).hasChildNodes()) {
-            // Element item = (Element) form.getChildNodes().item(i);
-            // System.out.println("Found a groupless item:" + (item.getTagName()));
-            // XformItem newItem = new XformItem();
-            // newItem.setItemPath("/" + form.getTagName() + "/" + item.getTagName());
-            // newItem.setItemName(item.getTagName());
-            // items.add(newItem);
-            // if (defaultGroup == null)
-            // defaultGroup = new XformGroup();
-            // defaultGroup.getItems().add(newItem);
-            // }
-            // }
-            // if (defaultGroup != null)
-            // groups.add(defaultGroup);
 
             // Get the groups and grouped items
             for (int i = 0; i < form.getChildNodes().getLength(); i++) {
                 if (form.getChildNodes().item(i) instanceof Element && ((Element) form.getChildNodes().item(i)).hasChildNodes()
                         && !((Element) form.getChildNodes().item(i)).getTagName().equals("meta")) {
                     Element group = (Element) form.getChildNodes().item(i);
-                    System.out.println("Found a group:" + (group.getTagName()));
                     XformGroup newGroup = new XformGroup();
                     newGroup.setGroupName(group.getTagName());
                     newGroup.setGroupPath("/" + form.getTagName() + "/" + group.getTagName());
@@ -149,7 +154,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
                     for (int j = 0; j < group.getChildNodes().getLength(); j++) {
                         if (group.getChildNodes().item(j) instanceof Element) {
                             Element item = (Element) group.getChildNodes().item(j);
-                            System.out.println("Found a grouped item:" + (item.getTagName()));
                             XformItem newItem = new XformItem();
                             newItem.setItemPath("/" + form.getTagName() + "/" + group.getTagName() + "/" + item.getTagName());
                             newItem.setItemName(item.getTagName());
@@ -161,6 +165,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
             XformContainer container = new XformContainer();
             container.setGroups(groups);
+            container.setInstanceName(form.getTagName());
             return container;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -169,10 +174,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
     }
 
-    private String retrieveFormFieldValue(List<FileItem> items, String fieldName) {
+    private String retrieveFormFieldValue(List<FileItem> items, String fieldName) throws Exception {
         for (FileItem item : items) {
             if (fieldName.equals(item.getFieldName()))
-                return item.getString();
+                return item.getString("UTF-8");
         }
         logger.warn("Form field '" + fieldName + "' missing from xform submission.");
         return "";
@@ -217,6 +222,14 @@ public class CreateXformCRFVersionServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
+
+        // Make sure xforms are enabled
+        String xformEnabled = CoreResources.getField("xform.enabled");
+        if (xformEnabled == null || !xformEnabled.equals("true")) {
+            addPageMessage(respage.getString("may_not_create_xforms"));
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_create_xforms"), "1");
+        }
+
         if (ub.isSysAdmin()) {
             return;
         }

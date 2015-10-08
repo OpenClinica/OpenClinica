@@ -22,6 +22,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -51,7 +52,7 @@ import java.util.Set;
 
 /**
  * Create a new CRF verison by uploading excel file
- *
+ * 
  * @author jxu
  */
 public class CreateCRFVersionServlet extends SecureController {
@@ -80,11 +81,11 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void processRequest() throws Exception {
         resetPanel();
         panel.setStudyInfoShown(true);
-       
+
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -94,7 +95,7 @@ public class CreateCRFVersionServlet extends SecureController {
         String module = fp.getString(MODULE);
         // keep the module in the session
         session.setAttribute(MODULE, module);
-
+        request.setAttribute("xformEnabled", CoreResources.getField("xform.enabled"));
         String action = request.getParameter("action");
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
 
@@ -118,7 +119,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 new File(theDir).mkdirs();
                 logger.debug("Made the directory " + theDir);
             }
-            //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
+            // MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
             String tempFile = "";
             try {
                 tempFile = uploadFile(theDir, version);
@@ -163,7 +164,7 @@ public class CreateCRFVersionServlet extends SecureController {
                         logger.debug("Version already exists; owner or not:" + ub.getId() + "," + version1.getOwnerId());
                         if (ub.getId() != version1.getOwnerId()) {// not owner
                             addPageMessage(respage.getString("CRF_version_try_upload_exists_database") + version1.getOwner().getName()
-                                + respage.getString("please_contact_owner_to_delete"));
+                                    + respage.getString("please_contact_owner_to_delete"));
                             forwardPage(Page.CREATE_CRF_VERSION);
                             return;
                         } else {// owner,
@@ -231,38 +232,42 @@ public class CreateCRFVersionServlet extends SecureController {
                     forwardPage(Page.CREATE_CRF_VERSION_NODELETE);
                     return;
                 }
-                    ArrayList<ItemBean> nonSharedItems = (ArrayList<ItemBean>)vdao.findNotSharedItemsByVersion(previousVersionId.intValue());
-                   //htaycher: here is the trick we need to put in nib1.setItemQueries()
-                    // update statements for shared items and insert for nonShared that were just deleted 5927
-                    HashMap item_table_statements = new HashMap();
-                    ArrayList<String> temp = new ArrayList<String>(nonSharedItems.size());
-                    
-                    for ( ItemBean item : nonSharedItems){
-                    	temp.add(item.getName());
-                    	item_table_statements.put(item.getName(),  nib.getBackupItemQueries().get(item.getName()));
-                    }
-                    for (String item_name : (Set<String>)nib.getItemQueries().keySet()){
-                    	//check if item shared 
-                    	if ( !temp.contains(item_name)){
-                        	item_table_statements.put(item_name,  nib.getItemQueries().get(item_name));
-                    	}
-                    }
-                    // statements to run
-                    if (!nonSharedItems.isEmpty()) {  request.setAttribute("openQueries", item_table_statements);}
-                
-                    //htaycher: put all statements in
-                    nib.setItemQueries(item_table_statements);
-                    session.setAttribute("nib", nib);
-           }
+                ArrayList<ItemBean> nonSharedItems = (ArrayList<ItemBean>) vdao.findNotSharedItemsByVersion(previousVersionId.intValue());
+                // htaycher: here is the trick we need to put in nib1.setItemQueries()
+                // update statements for shared items and insert for nonShared that were just deleted 5927
+                HashMap item_table_statements = new HashMap();
+                ArrayList<String> temp = new ArrayList<String>(nonSharedItems.size());
 
+                for (ItemBean item : nonSharedItems) {
+                    temp.add(item.getName());
+                    item_table_statements.put(item.getName(), nib.getBackupItemQueries().get(item.getName()));
+                }
+                for (String item_name : (Set<String>) nib.getItemQueries().keySet()) {
+                    // check if item shared
+                    if (!temp.contains(item_name)) {
+                        item_table_statements.put(item_name, nib.getItemQueries().get(item_name));
+                    }
+                }
+                // statements to run
+                if (!nonSharedItems.isEmpty()) {
+                    request.setAttribute("openQueries", item_table_statements);
+                }
+
+                // htaycher: put all statements in
+                nib.setItemQueries(item_table_statements);
+                session.setAttribute("nib", nib);
+            }
 
             // submit
             logger.debug("commit sql");
             NewCRFBean nib1 = (NewCRFBean) session.getAttribute("nib");
             if (nib1 != null) {
                 try {
-                	if ( canDelete){nib1.deleteInsertToDB();}
-                	else{    nib1.insertToDB();}
+                    if (canDelete) {
+                        nib1.deleteInsertToDB();
+                    } else {
+                        nib1.insertToDB();
+                    }
                     request.setAttribute("queries", nib1.getQueries());
                     // YW << for add a link to "View CRF Version Data Entry".
                     // For this purpose, CRFVersion id is needed.
@@ -365,10 +370,11 @@ public class CreateCRFVersionServlet extends SecureController {
             logger.debug("for overwrite CRF version, excelErr.isEmpty()=" + excelErr.isEmpty());
             if (excelErr != null && excelErr.isEmpty()) {
                 addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"));
-                session.setAttribute("deletePreviousVersion", Boolean.TRUE);//should be moved to excelErr != null block
+                session.setAttribute("deletePreviousVersion", Boolean.TRUE);// should be moved to excelErr != null block
                 forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW);
-             } else {
-                session.setAttribute("deletePreviousVersion", Boolean.FALSE);//should be moved to excelErr != null block
+            } else {
+                session.setAttribute("deletePreviousVersion", Boolean.FALSE);// should be moved to excelErr != null
+                                                                             // block
                 logger.debug("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
                 forwardPage(Page.CREATE_CRF_VERSION_CONFIRM);
             }
@@ -378,19 +384,19 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Uploads the excel version file
-     *
+     * 
      * @param version
      * @throws Exception
      */
     public String uploadFile(String theDir, CRFVersionBean version) throws Exception {
         List<File> theFiles = uploadHelper.returnFiles(request, context, theDir);
-        //Enumeration files = multi.getFileNames();
+        // Enumeration files = multi.getFileNames();
         errors.remove("excel_file");
         String tempFile = null;
         for (File f : theFiles) {
-            //while (files.hasMoreElements()) {
-            //String name = (String) files.nextElement();
-            //File f = multi.getFile(name);
+            // while (files.hasMoreElements()) {
+            // String name = (String) files.nextElement();
+            // File f = multi.getFile(name);
             if (f == null || f.getName() == null) {
                 logger.debug("file is empty.");
                 Validator.addError(errors, "excel_file", resword.getString("you_have_to_provide_spreadsheet"));
@@ -420,7 +426,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     // 06/07
                     htab = new SpreadSheetTableRepeating(inStream, ub,
                     // SpreadSheetTable htab = new SpreadSheetTable(new
-                            // FileInputStream(theDir + tempFile), ub,
+                    // FileInputStream(theDir + tempFile), ub,
                             version.getName(), locale, currentStudy.getId());
 
                     htab.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
@@ -501,15 +507,16 @@ public class CreateCRFVersionServlet extends SecureController {
                             ItemBean ib = (ItemBean) ibs.get(i);
                             if (ib.getOwner().getId() == ub.getId()) {
                                 warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-                                    + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
-                                    + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
-                                    + ib.isPhiStatus() + "). UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) " + resexception.getString("will_not_be_changed_if")
-                                    + " PHI, DESCRIPTION, DATA_TYPE from PDATE to DATE " + resexception.getString("will_be_changed_if_you_continue"));
+                                        + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
+                                        + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
+                                        + ib.isPhiStatus() + "). UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) "
+                                        + resexception.getString("will_not_be_changed_if") + " PHI, DESCRIPTION, DATA_TYPE from PDATE to DATE "
+                                        + resexception.getString("will_be_changed_if_you_continue"));
                             } else {
                                 warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-                                    + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
-                                    + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
-                                    + ib.isPhiStatus() + "). " + resexception.getString("these_field_cannot_be_modified_because_not_owner"));
+                                        + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
+                                        + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
+                                        + ib.isPhiStatus() + "). " + resexception.getString("these_field_cannot_be_modified_because_not_owner"));
                             }
 
                             request.setAttribute("warnings", warnings);
@@ -549,7 +556,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Checks whether the version can be deleted
-     *
+     * 
      * @param previousVersionId
      * @return
      */
@@ -595,9 +602,9 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     /**
-     * Checks whether the item with same name has the same other fields: units,
-     * phi_status if no, they are two different items, cannot have the same same
-     *
+     * Checks whether the item with same name has the same other fields: units, phi_status if no, they are two different
+     * items, cannot have the same same
+     * 
      * @param items
      *            items from excel
      * @return the items found
@@ -613,10 +620,10 @@ public class CreateCRFVersionServlet extends SecureController {
             ItemBean item = (ItemBean) items.get(name);
             if (newItem.getId() > 0) {
                 if (!item.getUnits().equalsIgnoreCase(newItem.getUnits()) || item.isPhiStatus() != newItem.isPhiStatus()
-                    || item.getDataType().getId() != newItem.getDataType().getId() || !item.getDescription().equalsIgnoreCase(newItem.getDescription())) {
+                        || item.getDataType().getId() != newItem.getDataType().getId() || !item.getDescription().equalsIgnoreCase(newItem.getDescription())) {
 
                     logger.debug("found two items with same name but different units/phi/datatype/description");
-                  
+
                     diffItems.add(newItem);
                 }
             }
@@ -660,16 +667,15 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     /**
-     * When the version is added, for each non-new item OpenClinica should check
-     * the RESPONSE_OPTIONS_TEXT, and RESPONSE_VALUES used for the item in other
-     * versions of the CRF.
-     *
-     * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT
-     * string is different than in a previous version
-     *
-     * For a given RESPONSE_OPTIONS_TEXT string, the associated RESPONSE_VALUES
-     * code is different than in a previous version
-     *
+     * When the version is added, for each non-new item OpenClinica should check the RESPONSE_OPTIONS_TEXT, and
+     * RESPONSE_VALUES used for the item in other versions of the CRF.
+     * 
+     * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT string is different than in a previous
+     * version
+     * 
+     * For a given RESPONSE_OPTIONS_TEXT string, the associated RESPONSE_VALUES code is different than in a previous
+     * version
+     * 
      * @param oldRes
      * @param newRes
      * @return The original option
@@ -719,7 +725,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Copy one file to another
-     *
+     * 
      * @param src
      * @param dst
      * @throws IOException
@@ -739,11 +745,10 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     /**
-     * restoreQuotes, utility function meant to replace double quotes in strings
-     * with single quote. Don''t -> Don't, for example. If the option text has
-     * single quote, it is changed to double quotes for SQL compatability, so we
-     * will change it back before the comparison
-     *
+     * restoreQuotes, utility function meant to replace double quotes in strings with single quote. Don''t -> Don't, for
+     * example. If the option text has single quote, it is changed to double quotes for SQL compatability, so we will
+     * change it back before the comparison
+     * 
      * @param subj
      *            the subject line
      * @return A string with all the quotes escaped.

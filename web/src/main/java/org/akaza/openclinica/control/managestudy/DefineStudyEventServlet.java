@@ -329,7 +329,8 @@ public class DefineStudyEventServlet extends SecureController {
             } else {
                 edcBean.setParticipantForm(false);
             }
-            if (!StringUtils.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim())) {
+            // when participant form is not selected, force allow anonymous to be not selected
+            if (edcBean.isParticipantForm() && !StringUtils.isBlank(allowAnonymousSubmission) && "yes".equalsIgnoreCase(allowAnonymousSubmission.trim())) {
                 edcBean.setAllowAnonymousSubmission(true);
             } else {
                 edcBean.setAllowAnonymousSubmission(false);
@@ -350,7 +351,12 @@ public class DefineStudyEventServlet extends SecureController {
             } else {
                 edcBean.setElectronicSignature(false);
             }
-            edcBean.setSubmissionUrl(submissionUrl.trim());
+            // only update submission url when participant form and allow anonymous was selected,
+            // otherwise keep old value for history sake
+            // also useful to protect from naughty submission not coming from our html form
+            if (edcBean.isParticipantForm() && edcBean.isAllowAnonymousSubmission()) {
+                edcBean.setSubmissionUrl(submissionUrl.trim());
+            }
             ArrayList <CRFVersionBean> versions = cvdao.findAllByCRFId(crfId);
             edcBean.setVersions(versions);
 
@@ -377,9 +383,8 @@ public class DefineStudyEventServlet extends SecureController {
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
              request.setAttribute("participateFormStatus",participateFormStatus );
              if (participateFormStatus.equals("enabled")) baseUrl();
-
+   
              request.setAttribute("participateFormStatus",participateFormStatus );
-
         
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
         session.setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
@@ -388,7 +393,8 @@ public class DefineStudyEventServlet extends SecureController {
         int parentStudyId=sed.getStudyId();
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
-
+       
+        if(eventDefCrfList.size()!=0)
         validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
         errors = v.validate();
 
@@ -604,7 +610,6 @@ public class DefineStudyEventServlet extends SecureController {
     Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
          String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
     	System.out.println("the url :  "+ url);
     	request.setAttribute("participantUrl",url+"/");
 
@@ -616,11 +621,14 @@ public class DefineStudyEventServlet extends SecureController {
             boolean isExist = false;
             for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
             		  sessionBean = edcsInSession.get(i);
-            		 
+                  	if(!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()){ 
+                    	isExist = true;
+                		break;
+                	}
             		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
             		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
             		System.out.println();
-            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
+            	if(sessionBean.getSubmissionUrl() == null || sessionBean.getSubmissionUrl()==""){
             		break;
             	}else{
                 if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()) ||

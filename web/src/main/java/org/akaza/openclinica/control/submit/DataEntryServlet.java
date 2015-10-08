@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -1563,9 +1565,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 boolean writeDN = true;
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
                                 LOGGER.debug("group item value: " + displayItem.getData().getValue());
-                                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
-                                    displayItem.getData().setValue("");
-                                }
+                //                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
+                //                    displayItem.getData().setValue("");
+                 //               }
                                
                                 //15350, this particular logic, takes into consideration that a DN is created properly as long as the item data record exists and it fails to get created when it doesnt.
                                 //so, we are expanding the logic from writeToDb method to avoid creating duplicate records.
@@ -1615,9 +1617,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                     displayItem.setEditFlag(displayGroup.getEditFlag());
                                     LOGGER.debug("group item value: " + displayItem.getData().getValue());
-                                    if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
-                                        displayItem.getData().setValue("");
-                                    }
+                     //               if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
+                     //                   displayItem.getData().setValue("");
+                     //               }
                                     temp = writeToDB(displayItem, iddao, 0, request);
                                     LOGGER.debug("just executed writeToDB - 2");
                                     if (temp && newUploadedFiles.containsKey(fileName)) {
@@ -1634,14 +1636,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         DisplayItemBean dib = diwb.getSingleItem();
                         // TODO work on this line
 
-                        this.addAttachedFilePath(dib, attachedFilePath);
+                      //  this.addAttachedFilePath(dib, attachedFilePath);
+                        String fileName= addAttachedFilePath(dib, attachedFilePath);
                         boolean writeDN = writeDN(dib);
                         temp = writeToDB(dib, iddao, 1, request);
                         LOGGER.debug("just executed writeToDB - 3");
-                        if (temp && newUploadedFiles.containsKey(dib.getItem().getId() + "")) {
+                        if (temp && (newUploadedFiles.containsKey(dib.getItem().getId() + "") || newUploadedFiles.containsKey(fileName))) {
                             // so newUploadedFiles will contain only failed file
                             // items;
                             newUploadedFiles.remove(dib.getItem().getId() + "");
+                            newUploadedFiles.remove(fileName);
                         }
 
                         String inputName = getInputName(dib);
@@ -3582,6 +3586,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             if (dib != null) {
                 dib.setData(idb);
+                dib.setDbData((ItemDataBean) BeanUtils.cloneBean(idb));
                 displayItems.put(new Integer(idb.getItemId()), dib);
             }
         }

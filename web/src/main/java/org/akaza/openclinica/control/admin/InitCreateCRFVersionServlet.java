@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -29,8 +30,8 @@ public class InitCreateCRFVersionServlet extends SecureController {
             return;
         }
 
-        if (!request.getParameter(MODULE).equals("admin") && (currentRole.getRole().equals(Role.STUDYDIRECTOR) 
-                || currentRole.getRole().equals(Role.COORDINATOR))) {
+        if (!request.getParameter(MODULE).equals("admin")
+                && (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR))) {
             return;
         }
 
@@ -54,9 +55,8 @@ public class InitCreateCRFVersionServlet extends SecureController {
 
         String idString = request.getParameter("crfId");
         /*
-         * now that we have automated the choice of crf id, we need to get it
-         * from someplace else besides the request...this is throwing off the
-         * generation of filenames and other processes downstream, tbh 06/2008
+         * now that we have automated the choice of crf id, we need to get it from someplace else besides the
+         * request...this is throwing off the generation of filenames and other processes downstream, tbh 06/2008
          */
         String name = request.getParameter("name");
         logger.info("*** ^^^ *** crf id:" + idString);
@@ -64,6 +64,7 @@ public class InitCreateCRFVersionServlet extends SecureController {
         // checks which module the requests are from
         String module = request.getParameter(MODULE);
         request.setAttribute(MODULE, module);
+        session.setAttribute("xformEnabled", CoreResources.getField("xform.enabled"));
 
         if (StringUtil.isBlank(idString) || StringUtil.isBlank(name)) {
             addPageMessage(respage.getString("please_choose_a_CRF_to_add_new_version_for"));

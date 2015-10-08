@@ -129,8 +129,8 @@
         <property name="dynamicsItemGroupMetadataDao" ref="dynamicsItemGroupMetadataDao"/>
         <property name="dynamicsItemFormMetadataDao" ref="dynamicsItemFormMetadataDao"/>
     </bean>
-    
-        <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
+     
+    <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>
     </bean>
         

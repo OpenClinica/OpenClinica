@@ -3,8 +3,17 @@ package org.akaza.openclinica.domain.xform.dto;
 import java.util.List;
 
 public class Model {
+    private Itext itext;
     private List<Bind> bind;
     private List<String> instance;// = "initialvalueinmodeldto";
+
+    public Itext getItext() {
+        return itext;
+    }
+
+    public void setItext(Itext itext) {
+        this.itext = itext;
+    }
 
     public List<String> getInstance() {
         return instance;

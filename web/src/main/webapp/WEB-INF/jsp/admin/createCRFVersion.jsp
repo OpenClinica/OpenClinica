@@ -110,13 +110,15 @@ function toggleSectionDisplay(showDivId,hideDivId){
 //-->
 </script>
 
-<table cellpadding="0" cellspacing="0">
-  <tr>
-    <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xlsUpload','xformUpload')"><b><fmt:message key="xls_file_upload" bundle="${resword}"/></b></a></td>
-    <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xformUpload','xlsUpload')"><b><fmt:message key="xform_file_upload" bundle="${resword}"/></b></a></td>
-  </tr>
-</table>
 
+<c:if test="${xformEnabled == 'true'}">
+ <table cellpadding="0" cellspacing="0">
+   <tr>
+     <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xlsUpload','xformUpload')"><b><fmt:message key="xls_file_upload" bundle="${resword}"/></b></a></td>
+     <td class="normal_tab"><a href="javascript:toggleSectionDisplay('xformUpload','xlsUpload')"><b><fmt:message key="xform_file_upload" bundle="${resword}"/></b></a></td>
+   </tr>
+ </table>
+</c:if>
 <div id="xlsUpload" class="crf-upload-div">
 <form action="CreateCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
 <div style="width: 800px">
@@ -159,6 +161,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
 
 </div>
 
+<c:if test="${xformEnabled == 'true'}">
 <div id="xformUpload" class="crf-upload-div-hidden">
   <form id="xformSubmit" action="CreateXformCRFVersion?action=confirm&crfId=<c:out value="${version.crfId}"/>&name=<c:out value="${version.name}"/>" method="post" ENCTYPE="multipart/form-data">
     <div style="width: 800px">
@@ -208,7 +211,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
     <table border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <input type="submit" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
+          <input type="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
         </td>
         <td>
           <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
@@ -217,7 +220,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
     </table>
     </form>
 </div>
-
+</c:if>
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">

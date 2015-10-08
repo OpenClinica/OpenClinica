@@ -9,9 +9,15 @@ private String userName;
 private String password;
 private String accessCode;
 private String email;
+private String studySubjectId;
 
 
-
+public String getStudySubjectId() {
+	return studySubjectId;
+}
+public void setStudySubjectId(String studySubjectId) {
+	this.studySubjectId = studySubjectId;
+}
 public String getfName() {
 	return fName;
 }

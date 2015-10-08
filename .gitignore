@@ -9,10 +9,14 @@ release.properties
 .settings/
 .idea/
 OpenClinica.iml
-OpenClinica-core.iml
-OpenClinica-web.iml
-OpenClinica-ws.iml
-core/src/main/resources/logback-test.xml
 web/src/main/resources/datainfo.properties
-*.iml?
-core/src/main/resources/logback-test.xml
+core/*.iml
+web/*.iml
+ws/*.iml
+.DS_Store
+core/.DS_Store
+web/.DS_Store
+ws/.DS_Store
+
+# git
+*.orig

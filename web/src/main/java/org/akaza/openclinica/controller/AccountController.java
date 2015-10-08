@@ -24,13 +24,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -45,6 +51,9 @@ public class AccountController {
 	@Autowired
 	ServletContext context;
 
+	@Autowired
+	AuthenticationManager authenticationManager;
+
 	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -56,6 +65,52 @@ public class AccountController {
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
+
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ResponseEntity<HashMap> getAccountByUserName(@RequestBody HashMap<String, String> requestMap) throws Exception {
+
+		System.out.println("I'm in getAccountByUserName");
+		String userName = requestMap.get("username");
+		String password = requestMap.get("password");
+
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userName,
+				password);
+
+		try{
+			authentication = authenticationManager.authenticate(authentication);
+		}catch (BadCredentialsException bce){
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
+		}
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+		StudyDAO studyDAO = new StudyDAO(dataSource);
+		HashMap<String,Object> userDTO = new HashMap<String,Object>();
+
+		UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
+		if(null != userAccountBean) {
+			userDTO.put("username", userName);
+			userDTO.put("password", userAccountBean.getPasswd());
+			userDTO.put("firstName",userAccountBean.getFirstName());
+			userDTO.put("lastName",userAccountBean.getLastName());
+			userDTO.put("apiKey",userAccountBean.getApiKey());
+
+
+
+			ArrayList<HashMap<String,String>> rolesDTO = new ArrayList<>();
+			for (StudyUserRoleBean role : (List<StudyUserRoleBean>)userAccountBean.getRoles()) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("roleName", role.getRoleName());
+				map.put("studyOID", ((StudyBean) studyDAO.findByPK(role.getStudyId())).getOid());
+				rolesDTO.add(map);
+			}
+			userDTO.put("roles",rolesDTO);
+		}else{
+			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
+
+		}
+		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/study/{studyOid}/crc/{crcUserName}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
@@ -105,7 +160,9 @@ public class AccountController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
 		System.out.println("I'm in getAccount2");
-
+ 
+		accessCode = URLDecoder.decode(accessCode, "UTF-8");
+		
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
 
@@ -157,7 +214,8 @@ public class AccountController {
 		udao = new UserAccountDAO(dataSource);
 		UserAccountBean userAccountBean = (UserAccountBean) udao.findByUserName(pUserName);
 		if (!userAccountBean.isActive()) {
-			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+			uDTO = new UserDTO();
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		} else {
 			buildUserDTO(userAccountBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
@@ -305,6 +363,9 @@ public class AccountController {
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
 		createdUserAccountBean.setEmail(email);
+		createdUserAccountBean.setEnableApiKey(false);
+		createdUserAccountBean.setApiKey("");
+
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
@@ -629,6 +690,106 @@ public class AccountController {
 		}
 
 		return accessPermission;
+	}
+
+	@RequestMapping(value = "/study/{studyOid}", method = RequestMethod.GET)
+	public ResponseEntity <ArrayList <UserDTO>> getAllParticipantPerStudy(@PathVariable("studyOid") String studyOid) throws Exception {
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		ArrayList <UserDTO> uDTOs = null;
+		System.out.println("I'm in getAllParticipantPerStudy");
+
+		StudyBean parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOid();
+
+
+		if (isStudyDoesNotExist(oid))
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		// build UserName
+	//	HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+
+		udao = new UserAccountDAO(dataSource);
+		ArrayList <UserAccountBean> uBeans = (ArrayList<UserAccountBean>) udao.findAllParticipantsByStudyOid(oid);
+		if (uBeans !=null) {
+			uDTOs= new ArrayList<>();
+			for(UserAccountBean uBean : uBeans){
+                UserDTO uDTO = new UserDTO();
+                
+                String username =uBean.getName();
+        		String studySubjectOid= username.substring(username.indexOf(".")+1);
+                ssdao = new StudySubjectDAO<>(dataSource);
+        		String studySubjectId = ssdao.findByOid(studySubjectOid).getLabel();
+        		
+                uDTO.setfName(uBean.getFirstName());
+                uDTO.setEmail(uBean.getEmail());
+                uDTO.setMobile(uBean.getPhone());
+                uDTO.setAccessCode(uBean.getAccessCode());
+                uDTO.setUserName(uBean.getName());
+                uDTO.setPassword(uBean.getPasswd());
+                uDTO.setlName(uBean.getLastName());
+                uDTO.setStudySubjectId(studySubjectId);
+                
+				uDTOs.add(uDTO);
+			}
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.OK);
+		} else {
+			return new ResponseEntity <ArrayList <UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+	
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public ResponseEntity<UserDTO> updateAccount(@RequestBody HashMap<String, String> map) throws Exception {
+		uDTO = null;
+		System.out.println("I'm in UpdateAccount");
+
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOid();
+
+		String studySubjectId = map.get("studySubjectId");
+		String fName = map.get("fName");
+		String lName = map.get("lName");
+		String mobile = map.get("mobile");
+		String accessCode = map.get("accessCode");
+		String crcUserName = map.get("crcUserName");
+		String email = map.get("email");
+
+		ResourceBundleProvider.updateLocale(new Locale("en_US"));
+		System.out.println("******************     You are in the Update Rest Service   *****************");
+
+		UserAccountBean uBean = null;
+
+		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
+
+
+		// build UserName
+		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+		String pUserName = mapValues.get("pUserName"); // Participant User Name
+		String studySubjectOid = mapValues.get("studySubjectOid");
+		Integer pStudyId = Integer.valueOf(mapValues.get("pStudyId"));
+
+		// Participant user account create (if does not exist in user table) or Update(if exist in user table)
+		uBean = buildUserAccount(oid, studySubjectOid, fName, lName, mobile, accessCode, ownerUserAccount, pUserName, email);
+		UserAccountBean participantUserAccountBean = getUserAccount(pUserName);
+		if (!participantUserAccountBean.isActive()) {
+			createUserAccount(uBean);
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			disableUserAccount(uBean);
+			logger.info("***New User Account is created***");
+			System.out.println("***New User Account is created***");
+			uDTO = buildUserDTO(uBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+
+		} else {
+			uBean.setId(getUserAccount(uBean.getName()).getId());
+			uBean.setUpdater(uBean.getOwner());
+			updateUserAccount(uBean);
+			logger.info("***User Account already exist in the system and data is been Updated ***");
+			System.out.println("***User Account already exist in the system and data is been Updated ***");
+			uDTO = buildUserDTO(uBean);
+			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
+		}
 	}
 
 }

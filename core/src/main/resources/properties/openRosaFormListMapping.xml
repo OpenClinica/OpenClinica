@@ -39,5 +39,9 @@
                type="java.lang.String">
             <bind-xml name="downloadUrl" node="element"/>
        </field>
+       <field name="ManifestURL"
+               type="java.lang.String">
+            <bind-xml name="manifestUrl" node="element"/>
+       </field>
     </class>
  </mapping>

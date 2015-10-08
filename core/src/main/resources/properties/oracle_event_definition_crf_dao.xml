@@ -30,6 +30,16 @@
             WHERE study_event_definition_id = ? AND crf_id = ? AND study_id = ?
             </sql>
         </query>
+
+    <!-- retrieve anonymous forms when their submission_url (unique) was known -->
+    <query>
+        <name>findAllSubmissionUriAndStudyId</name>
+        <sql>select edc.* from event_definition_crf edc where edc.participant_form = true and
+        edc.allow_anonymous_submission = true and edc.submission_url = ? and edc.study_id in 
+        (select study_id from study s where s.parent_study_id=? or s.study_id=?) 
+        </sql>
+    </query>
+
         <query>
 			<name>findAllParentsByDefinition</name>
 			<!-- find all which have unavailable parent_id.

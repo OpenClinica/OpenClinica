@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
+<mapping>
+
+    <class name="org.akaza.openclinica.web.pform.manifest.Manifest">
+        <map-to xml="manifest" ns-uri="http://openrosa.org/xforms/xformsManifest"/>
+        
+        <field name="MediaFile"
+            type="org.akaza.openclinica.web.pform.manifest.MediaFile"
+            collection="arraylist">
+            <bind-xml name="mediaFile"/>
+        </field>
+    </class>
+    
+    <class name="org.akaza.openclinica.web.pform.manifest.MediaFile">
+        <map-to xml="mediaFile" ns-uri="http://openrosa.org/xforms/xformsManifest"/>
+       
+       <field name="filename"
+               type="java.lang.String">
+            <bind-xml name="filename" node="element"/>
+       </field>
+       <field name="hash"
+               type="java.lang.String">
+            <bind-xml name="hash" node="element"/>
+       </field>
+       <field name="downloadUrl"
+               type="java.lang.String">
+            <bind-xml name="downloadUrl" node="element"/>
+       </field>
+    </class>
+ </mapping>

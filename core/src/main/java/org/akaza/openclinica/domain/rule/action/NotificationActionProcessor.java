@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.EmailEngine;
@@ -23,6 +24,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -79,6 +81,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	RuleSetRuleBean ruleSetRule;
 	StudySubjectDAO ssdao;
 	UserAccountDAO udao;
+	StudyParameterValueDAO spvdao;
 	RuleSetService ruleSetService;
 	RuleSetDao ruleSetDao;
 	ParticipantDTO pDTO;
@@ -92,6 +95,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String message;
 	String url;
 	String emailSubject;
+	String participateStatus;
 
 	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO, ParticipantPortalRegistrar participantPortalRegistrar,
 			String email) {
@@ -105,7 +109,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	public NotificationActionProcessor(String[] listOfEmails, UserAccountBean uBean, StudyBean studyBean, String message, String emailSubject, ParticipantPortalRegistrar participantPortalRegistrar,
-			JavaMailSenderImpl mailSender) {
+			JavaMailSenderImpl mailSender , String participateStatus) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
 		this.emailSubject = emailSubject;
@@ -113,6 +117,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.participantPortalRegistrar = participantPortalRegistrar;
 		this.mailSender = mailSender;
 		this.studyBean = studyBean;
+		this.participateStatus=participateStatus;
 
 	}
 
@@ -122,6 +127,9 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.ruleSetRule = ruleSetRule;
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
+  	   spvdao = new StudyParameterValueDAO(ds);
+
+
 
 	}
 
@@ -209,7 +217,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
 		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
 
-		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, uBean, studyBean, message, emailSubject, participantPortalRegistrar, mailSender));
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), "participantPortal");
+		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, uBean, studyBean, message, emailSubject, participantPortalRegistrar, mailSender,participateStatus));
 		thread.start();
 
 	}
@@ -247,20 +258,36 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			msg = msg.replaceAll("\\\\n", "\n");
 			eSubject = eSubject.replaceAll("\\\\n", "\n");
+			message = message.replaceAll("\\\\n", "\n");
+			emailSubject = emailSubject.replaceAll("\\\\n", "\n");
 			pDTO.setMessage(msg);
 			pDTO.setEmailSubject(eSubject);
+			pDTO.setUrl(url);
+			pDTO.setOrigMessage(message);
+			pDTO.setOrigEmailSubject(emailSubject);
+			pDTO.setParticipantEmailAccount(pDTO.getEmailAccount());
+
 
 		} else {
 			pDTO = buildNewPDTO();
 			System.out.println();
 		}
 
+		
+		
 		for (String email : listOfEmails) {
 
-			if (email.trim().equals("${participant}")) {
+			if (email.trim().equals("${participant}") || participateStatus.equals("enabled")) {
+			    if (email.trim().equals("${participant}")){ 
+				pDTO.setEmailAccount(pDTO.getParticipantEmailAccount());
+			    pDTO.setEncryptedEmailAccount(true);
+			    }else{
+				pDTO.setEmailAccount(email.trim());
+			    pDTO.setEncryptedEmailAccount(false);
+			    }
 				// Send Email thru Mandrill Mail Server
 				try {
-					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO);
+					participantPortalRegistrar.sendEmailThruMandrillViaOcui(pDTO,hostname);
 				} catch (Exception e) {
 					e.getStackTrace();
 				}

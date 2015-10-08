@@ -37,16 +37,15 @@
         and edc.status_id=1 
         </sql>
     </query>
-    
 
+    <!-- retrieve anonymous forms when their submission_url (unique) was known -->
     <query>
         <name>findAllSubmissionUriAndStudyId</name>
-        <sql>select edc.* from event_definition_crf edc where edc.submission_url = ? and edc.study_id in 
+        <sql>select edc.* from event_definition_crf edc where edc.participant_form = true and
+        edc.allow_anonymous_submission = true and edc.submission_url = ? and edc.study_id in
         (select study_id from study s where s.parent_study_id=? or s.study_id=?) 
         </sql>
     </query>
-    
-
     
 	<query>
 		<name>findAllParentsByDefinition</name>
@@ -139,6 +138,26 @@
           order by ordinal asc
         </sql>
 	</query>
+
+
+	<query>
+		<name>findAllDefIdandStudyId</name>
+		<sql>
+          SELECT * FROM event_definition_crf
+          WHERE study_event_definition_id=? and study_id=? and status_id=1
+          order by ordinal asc
+        </sql>
+	</query>
+
+	<query>
+		<name>findAllDefnIdandStudyIdForSite</name>
+		<sql>
+          SELECT * FROM event_definition_crf
+          WHERE study_event_definition_id=? and study_id=? and status_id=1 and hide_crf=false
+          order by ordinal asc
+        </sql>
+	</query>
+
 	<query>
 		<name>findAllActiveParentsByEventDefinitionId</name>
 		<sql>SELECT * FROM event_definition_crf

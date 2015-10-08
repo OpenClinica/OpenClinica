@@ -213,12 +213,12 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-		<dependency> 
- 			<groupId>javax.servlet.jsp</groupId> 
- 			<artifactId>jsp-api</artifactId> 
- 			<version>2.0</version> 
- 			<scope>provided</scope> 
- 		</dependency> 
+		<dependency>
+ 			<groupId>javax.servlet.jsp</groupId>
+ 			<artifactId>jsp-api</artifactId>
+ 			<version>2.0</version>
+ 			<scope>provided</scope>
+ 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
@@ -263,11 +263,11 @@
 		    <groupId>org.quartz-scheduler</groupId>
 		    <artifactId>quartz-oracle</artifactId>
 		</dependency>
-		
+
 		<!-- XML serializer-->
     	<dependency>
             <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>	
+            <artifactId>json-lib</artifactId>
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
@@ -335,7 +335,7 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
     <groupId>org.codehaus.jackson</groupId>
     <artifactId>jackson-core-lgpl</artifactId>

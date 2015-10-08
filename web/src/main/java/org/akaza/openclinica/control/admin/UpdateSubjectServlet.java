@@ -25,6 +25,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,7 +39,8 @@ public class UpdateSubjectServlet extends SecureController {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	// Changes
+    SimpleDateFormat yformat = new SimpleDateFormat("yyyy");
 	
     public static final String DATE_DOB = "localBirthDate";
     public static final String DATE_DOB_TO_SAVE = "localBirthDateToSave";
@@ -63,6 +65,7 @@ public class UpdateSubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 
+        
         String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
         if (StringUtils.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
@@ -96,7 +99,7 @@ public class UpdateSubjectServlet extends SecureController {
 	        }
             if ("show".equalsIgnoreCase(action)) {
             	
-            	 request.setAttribute("localBirthDate", " ");//no DOB collected
+            	 request.setAttribute("localBirthDate", "");//no DOB collected
             	if (!currentStudy.getStudyParameterConfig().getCollectDob().equals("3") &&
             			subject.getDateOfBirth() != null ){
             		setLocalDOB( subject);
@@ -124,13 +127,22 @@ public class UpdateSubjectServlet extends SecureController {
             	}
                 subject.setUpdater(ub);
                 if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
+                	if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+                    {
                 	String d_date = fp.getString(DATE_DOB_TO_SAVE);
                 	if ( !(d_date == null || d_date.trim().length()==0)){
-	                	Date date_new = local_df.parse(fp.getString(DATE_DOB_TO_SAVE));
+	                	Date date_new = yformat.parse(fp.getString(DATE_DOB_TO_SAVE));
 		                subject.setDateOfBirth(date_new);
                 	}
-                	
-                }
+                    }
+                	if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+                    {
+                		Date date_new = local_df.parse(fp.getString(DATE_DOB_TO_SAVE));
+		                subject.setDateOfBirth(date_new);
+                    }
+                    }
+                
+                
                 sdao.update(subject);
 
                 // save discrepancy notes into DB
@@ -166,9 +178,16 @@ public class UpdateSubjectServlet extends SecureController {
         DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
         FormProcessor fp = new FormProcessor(request);
 
-        v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.alwaysExecuteLastValidation("uniqueIdentifier");
+//        v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+//        v.alwaysExecuteLastValidation("uniqueIdentifier");
 
+        if (currentStudy.getStudyParameterConfig().getPersonIdShownOnCRF().equals("true")){
+        	v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+        	v.alwaysExecuteLastValidation("uniqueIdentifier");
+     	}
+        
+
+        
         if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1")){
         	if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
                 v.addValidation(DATE_DOB, Validator.IS_A_DATE);
@@ -184,19 +203,25 @@ public class UpdateSubjectServlet extends SecureController {
         	}
         	
         }
+        
         else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2")){
         	if (!StringUtils.isBlank(fp.getString(DATE_DOB))) {
                
                 // if DOB was not updated (and originally entered as a full day, post it as is
                 String submitted_date = fp.getString(DATE_DOB);
+                
+                
                 boolean isTheSameDate = false;
                 try{
-                	Date fakeDOB = local_df.parse(submitted_date);
-                	if (subject.getDateOfBirth().compareTo(fakeDOB)==0 ){
+                	Date fakeDOB = yformat.parse(submitted_date);
+                	if(subject.getDateOfBirth() != null)
+                	{
+                	if (subject.getDateOfBirth().getYear() == (fakeDOB.getYear())){
                 		isTheSameDate=true;
-                		String  converted_date = local_df.format(subject.getDateOfBirth());
+                		String  converted_date = yformat.format(subject.getDateOfBirth());
                 		request.setAttribute(DATE_DOB_TO_SAVE, converted_date);
                  	}
+                	}
                 }catch(ParseException pe){
                 	logger.debug("update subject: cannot convert date " + submitted_date);
                 	//I am putting on Pradnya's request the link to code review with a long discussion
@@ -217,13 +242,13 @@ public class UpdateSubjectServlet extends SecureController {
 	                int currentYear = c.get(Calendar.YEAR);
 	                v.addValidation(DATE_DOB, Validator.COMPARES_TO_STATIC_VALUE, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, currentYear);
 	                int yob = fp.getInt(DATE_DOB);
-	                Date fakeDate = new Date("01/01/" + yob);
-	                String dobString = local_df.format(fakeDate);
+	                Date fakeDate = new Date(yob);
+	                String dobString = yformat.format(fakeDate);
 	                try {
 	                	
-	                    Date fakeDOB = local_df.parse(dobString);
+	                    Date fakeDOB = yformat.parse(dobString);
 	                    if (yob != 0){subject.setDateOfBirth(fakeDOB);}
-	                    request.setAttribute(DATE_DOB_TO_SAVE, dobString);	
+	                    request.setAttribute(DATE_DOB_TO_SAVE, yob);	
 	                } catch (ParseException pe) {
 	                    logger.debug("Parse exception happened.");
 	                  //I am putting on Pradnya's request the link to code review with a long discussion
@@ -297,9 +322,13 @@ public class UpdateSubjectServlet extends SecureController {
         	//about what type of logging should be here: enjoy
         	//https://dev.openclinica.com/crucible/cru/OC-117
             logger.error("update subject validation errors");
+            
             setInputMessages(errors);
             setDNFlag( subjectId);
             setLocalDOB( subject);
+            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+            request.setAttribute("localBirthDate", "");
+            
             forwardPage(Page.UPDATE_SUBJECT);
         }
     }
@@ -319,13 +348,34 @@ public class UpdateSubjectServlet extends SecureController {
         	request.setAttribute("birthDNFlag",AbstractTableFactory.getDNFlagIconName(flagRStatusId));
         }
     }
+    
+//    private void setLocalDOB(SubjectBean subject){
+//    	Date birthDate = subject.getDateOfBirth();
+//        try {
+//            String localBirthDate = yformat.format(birthDate);
+//            request.setAttribute("localBirthDate", localBirthDate);
+//        } catch (NullPointerException e) {
+//        	logger.debug("update subject: cannot convert date " + birthDate);
+//        }
+//    }    
 
     private void setLocalDOB(SubjectBean subject){
+    	       
     	Date birthDate = subject.getDateOfBirth();
-        try {
+        
+    	try {
+            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+            {
             String localBirthDate = local_df.format(birthDate);
             request.setAttribute("localBirthDate", localBirthDate);
-        } catch (NullPointerException e) {
+        }
+            else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+            {
+                String localBirthDate = yformat.format(birthDate);
+                request.setAttribute("localBirthDate", localBirthDate);
+            }
+        }
+            	catch (NullPointerException e) {
         	logger.debug("update subject: cannot convert date " + birthDate);
         }
     }
