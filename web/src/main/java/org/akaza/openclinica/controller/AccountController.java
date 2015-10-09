@@ -67,14 +67,14 @@ public class AccountController {
 	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	/**
-	 * @api {post} /pages/accounts/login Get API-Key With Credentials
+	 * @api {post} /pages/accounts/login Get API-Key Using Login Credentials
 	 * @apiName getAccountByUserName
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} username OC login Username.
 	 * @apiParam {String} password OC login Password .
 	 * @apiGroup Login
-	 * @apiDescription This API is to get the API Key using Login Credentials in OC
+	 * @apiDescription This API returns the API Key using Login Credentials in OC
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "username": "usera",
