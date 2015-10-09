@@ -78,7 +78,7 @@ public class AccountController {
 
 		try{
 			authentication = authenticationManager.authenticate(authentication);
-		}catch (BadCredentialsException bce){
+		}catch (Exception bce){
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.UNAUTHORIZED);
 		}
 
