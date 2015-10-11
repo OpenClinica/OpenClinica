@@ -56,7 +56,7 @@ public class ViewRuleAssignmentServlet extends SecureController {
 
         String[] columns =
             { resword.getString("rule_study_event_definition"), resword.getString("CRF_name"), resword.getString("rule_group_label"),
-                resword.getString("rule_item_name"), resword.getString("rule_rules"), resword.getString("rule_ref_oid"), resword.getString("rule_action_type"), resword.getString("actions") };
+                resword.getString("rule_item_name"), resword.getString("rule_rules"), resword.getString("rule_ref_oid"), resword.getString("rule_action_type"), resword.getString("actions")};
 
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(4);
