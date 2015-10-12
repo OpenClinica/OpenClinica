@@ -93,6 +93,9 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -195,6 +198,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String MODULE = "module";// to determine which module
 
+    @Autowired
     private CRFLocker crfLocker;
 
     // user is in
@@ -243,8 +247,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     @Override
     public void init() throws ServletException {
+        super.init();
         context = getServletContext();
-        crfLocker = SpringServletAccess.getApplicationContext(context).getBean(CRFLocker.class);
+        // Setup dependency injection.
+        // see: http://stackoverflow.com/a/21914004
+        AutowireCapableBeanFactory beanFactory = SpringServletAccess.getApplicationContext(context).getAutowireCapableBeanFactory();
+        beanFactory.autowireBean(this);
     }
 
     /**

@@ -25,6 +25,12 @@ import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import org.akaza.openclinica.bean.service.EmailTemplateDTO;
+import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -34,6 +40,9 @@ import java.util.Date;
  *          Servlet of requesting password
  */
 public class RequestPasswordServlet extends SecureController {
+
+    @Autowired
+    private OpenClinicaMailSender mailSender;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -155,20 +164,21 @@ public class RequestPasswordServlet extends SecureController {
 
         logger.info("Sending email...");
 
-        StringBuffer email = new StringBuffer("Hello, " + ubDB.getFirstName() + ", <br>");
-        email.append(restext.getString("this_email_is_from_openclinica_admin") + "<br>");
-        email.append( restext.getString("your_password_has_been_reset_as") + ": " + passwd);
-        email.append("<br> " + restext.getString("you_will_be_required_to_change")+" ");
-        email.append(restext.getString("time_you_login_to_the_system")+" ");
-        email.append(restext.getString("use_the_following_link_to_log") + ":<br> ");
-        email.append(SQLInitServlet.getField("sysURL"));
+        HashMap<String, String> contentContext = new HashMap<>();
+        contentContext.put("userName", ubDB.getFirstName());
+        contentContext.put("password", passwd);
+        contentContext.put("loginUrl", SQLInitServlet.getField("sysURL"));
+        String content = mailSender.renderTemplate("requestPassword.part", contentContext, Locale.ENGLISH);
 
-        String emailBody = email.toString();
-        sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"), emailBody, true, respage
-                .getString("your_password_reset_new_password_emailed"), respage.getString("your_password_not_send_due_mail_server_problem"), true);
-
+        EmailTemplateDTO email = new EmailTemplateDTO();
+        email.addBody(null, content);
+        try {
+            mailSender.sendEmail(ubDB.getEmail().trim(), restext.getString("your_openclinica_password"), email);
+            addPageMessage(respage.getString("your_password_reset_new_password_emailed"));
+        } catch (OpenClinicaSystemException e) {
+            addPageMessage(respage.getString("your_password_not_send_due_mail_server_problem"));
+        }
         session.removeAttribute("challengeQuestions");
         forwardPage(Page.LOGIN);
-
     }
 }
