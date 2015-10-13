@@ -146,7 +146,7 @@ public class EditFormController {
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOID);
 
         // Return Enketo URL
-        editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance, formContext, redirectUrl).getEdit_url();
+        editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance, formContext, redirectUrl).getEdit_url() + "&ecid=" + formContext;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
