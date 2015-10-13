@@ -53,9 +53,11 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 request.getSession().setAttribute("userBean",ub);
                             }else{
                                 unauthorized(response, "Bad credentials");
+                                return;
                             }
                         } else {
                             unauthorized(response, "Invalid authentication token");
+                            return;
                         }
                     } catch (UnsupportedEncodingException e) {
                         throw new Error("Couldn't retrieve authentication", e);

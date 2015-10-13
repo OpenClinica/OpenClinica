@@ -82,6 +82,18 @@ public class OdmController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+    /**
+     * @api {get} /pages/odmk/studies/:studyOid/metadata Get Study Metadata
+     * @apiName getStudyMetadata
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiGroup Study
+     * @apiDescription This API is to get the Metadata of the provided Study
+     * @apiParamExample {json} Request-Example: { "studyOid": "S_BL101", }
+     * @apiSuccessExample {json} Success-Response: HTTP/1.1 200 OK { The whole Study Metadata }
+     */
+
     @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
     public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response)
             throws Exception {
@@ -98,6 +110,40 @@ public class OdmController {
      * @return
      * @throws Exception
      */
+    /**
+     * @api {get} /pages/odmk/study/:studyOid/studysubject/:studySubjectOid/events Get Event
+     * @apiName getEvent
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiParam {String} studySubjectOid Study Subject Oid
+     * @apiGroup Study Event
+     * @apiDescription This API is to get the Event with earliest start date and ordinal
+     * @apiParamExample {json} Request-Example: { "studyOid": "S_BL101", "studySubjectOid": "SS_DYN101" }
+     * @apiSuccessExample {json} Success-Response: HTTP/1.1 200 OK { "id": null, "signature": [], "clinicalData": [{
+     *                    "annotations": [], "subjectData": [{ "annotation": [], "signature": null, "status":
+     *                    "available", "dateOfBirth": null, "uniqueIdentifier": null, "studyEventData": [{ "annotation":
+     *                    [], "signature": null, "status": null, "eventName": "Scoring Visit", "studyEventRepeatKey":
+     *                    null, "endDate": null, "formData": [{ "annotation": [], "signature": null, "status":
+     *                    "Not Started", "interviewerName": null, "formOID": "F_SCORING2_CRF_V10", "itemGroupData": [],
+     *                    "url":
+     *                    "http://localhost:8006/::YYYF?iframe=true&ecid=a480dc4479409f6fe99a03d472f5cf77f4f12fb2b5ac471b9d35d737d934b042"
+     *                    , "version": null, "transactionType": null, "auditRecord": null, "archiveLayoutRef": null,
+     *                    "formDataElementExtension": [], "formRepeatKey": null, "interviewDate": null, "formName":
+     *                    "Scoring2_CRF", "versionDescription": "Scoring2", "statusChangeTimeStamp": null }],
+     *                    "studyEventOID": null, "transactionType": null, "auditRecord": null,
+     *                    "studyEventDataElementExtension": [], "studyEventLocation": null, "startDate":
+     *                    "2015-08-27 12:00:00.0", "subjectAgeAtEvent": null }], "studySubjectID": "DYN101",
+     *                    "transactionType": null, "yearOfBirth": null, "auditRecord": null, "investigatorRef": null,
+     *                    "siteRef": null, "subjectDataElementExtension": [], "subjectKey": "SS_DYN101", "secondaryID":
+     *                    null, "sex": null }], "studyName": "Baseline Study 101", "studyOID": "S_BL101",
+     *                    "metaDataVersionOID": null, "auditRecords": [], "signatures": [] }], "fileType": null,
+     *                    "fileOID": null, "description": null, "study": [], "association": [], "odmversion": null,
+     *                    "creationDateTime": null, "adminData": [], "referenceData": [], "granularity": null,
+     *                    "archival": null, "priorFileOID": null, "asOfDateTime": null, "originator": null,
+     *                    "sourceSystem": null, "sourceSystemVersion": null }
+     */
+
     @RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
     public @ResponseBody
     ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
@@ -397,5 +443,4 @@ public class OdmController {
         }
         return accessPermission;
     }
-
 }

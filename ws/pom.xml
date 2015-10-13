@@ -239,7 +239,7 @@
 				<exclusion>
 					<artifactId>antlr</artifactId>
 					<groupId>antlr</groupId>
-				</exclusion>				
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<!-- Postgres JDBC driver -->
@@ -259,7 +259,7 @@
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
 			<version>1.2</version>
-		</dependency>		
+		</dependency>
 	</dependencies>
     <build>
         <plugins>

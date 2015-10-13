@@ -39,7 +39,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<!-- This profile is not compatible with Maven v2. Use it with Maven v3 
+			<!-- This profile is not compatible with Maven v2. Use it with Maven v3
 				only. -->
 			<id>m2eclipse-config</id>
 			<activation>
@@ -71,10 +71,10 @@
 												<ignore />
 											</action>
 										</pluginExecution>
-										<!-- <pluginExecution> <pluginExecutionFilter> <groupId>org.codehaus.mojo</groupId> 
-											<artifactId>buildnumber-maven-plugin</artifactId> <versionRange>[1.0.0,)</versionRange> 
-											<goals> <goal>create</goal> </goals> <configuration> <doUpdate>false</doUpdate> 
-											<getRevisionOnlyOnce>true</getRevisionOnlyOnce> </configuration> </pluginExecutionFilter> 
+										<!-- <pluginExecution> <pluginExecutionFilter> <groupId>org.codehaus.mojo</groupId>
+											<artifactId>buildnumber-maven-plugin</artifactId> <versionRange>[1.0.0,)</versionRange>
+											<goals> <goal>create</goal> </goals> <configuration> <doUpdate>false</doUpdate>
+											<getRevisionOnlyOnce>true</getRevisionOnlyOnce> </configuration> </pluginExecutionFilter>
 											<action> <ignore /> </action> </pluginExecution> -->
 									</pluginExecutions>
 								</lifecycleMappingMetadata>
@@ -165,7 +165,7 @@
 			<version>1.7.6</version>
 			<scope>test</scope>
 		</dependency>
-		<!--@pgawade 02-DEC-2010 Added jul-to-slf4j-1.5.6.jar to get liquibase 
+		<!--@pgawade 02-DEC-2010 Added jul-to-slf4j-1.5.6.jar to get liquibase
 			logs using SLF4JBridgeHandler -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -179,7 +179,7 @@
 			<version>1.7.6</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- @pgawade 22-Nov-2010 Changed the logback dependency to default scope; 
+		<!-- @pgawade 22-Nov-2010 Changed the logback dependency to default scope;
 			it is needed to compile log filters -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -191,7 +191,7 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-		<!-- @pgawade 22-Nov-2010 Added the logback access; it will be needed to 
+		<!-- @pgawade 22-Nov-2010 Added the logback access; it will be needed to
 			get the web application usage pattern data -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -256,7 +256,7 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<!--@pgawade 10-DEC-2010 Added to get spring ContextLoaderListener class 
+		<!--@pgawade 10-DEC-2010 Added to get spring ContextLoaderListener class
 			in core -->
 		<dependency>
 			<groupId>org.springframework</groupId>
