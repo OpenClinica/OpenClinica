@@ -72,12 +72,12 @@ public class ViewRuleAssignmentFilter implements CriteriaCommand {
             if (property.equals("studyId") || property.equals("ruleSetRunSchedule")  || property.equals("actionType") || property.equals("actionExecuteOn") || property.equals("ruleSetRuleStatus")) {
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             }
-            if (property.equals("ruleSetRunTime") ){
+            else if (property.equals("ruleSetRunTime") ){
                 criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
 
             }
             else {
-                criteria += " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
+                criteria = " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
             }
         }
         return criteria;
