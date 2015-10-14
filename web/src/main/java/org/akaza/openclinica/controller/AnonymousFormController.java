@@ -60,18 +60,17 @@ public class AnonymousFormController {
 
 	
 	/**
-	 * @api {post} /pages/auth/api/v1/anonymousform/form Get Anonymous Form Link
+	 * @api {post} /pages/api/v1/anonymousform/form Get Anonymous Form Link
 	 * @apiName getEnketoForm
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid
 	 * @apiParam {String} submissionUri Submission Url
 	 * @apiGroup Form
-	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to get Anonymous Form Link.You need to provide your Api-key to be connected.
+	 * @apiDescription This API returns anonymous form url.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
-	 *                  "studyOid": "",
-	 *                  "submissionUri": ""
+	 *                  "studyOid": "S_BL101",
+	 *                  "submissionUri": "abcde"
 	 *                  }
 	 * @apiSuccessExample {json} Success-Response:
 	 *                    HTTP/1.1 200 OK
