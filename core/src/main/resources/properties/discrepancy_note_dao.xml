@@ -67,7 +67,7 @@
     </query>
     <query>
         <name>getCountWithFilter</name>
-        <sql>SELECT COUNT(dn.*) from discrepancy_note dn,study s, study_subject ss, user_account ua
+        <sql>SELECT COUNT(dn.*) from discrepancy_note dn,study s
             where dn.study_id = s.study_id
             and ( s.study_id =? or s.parent_study_id =?)
             and dn.parent_dn_id is null
