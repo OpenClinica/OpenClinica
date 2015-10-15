@@ -58,6 +58,27 @@ public class AnonymousFormController {
 	UserAccountDAO udao;
 	StudyDAO sdao;
 
+	
+	/**
+	 * @api {post} /pages/api/v1/anonymousform/form Get Anonymous Form Link
+	 * @apiName getEnketoForm
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid
+	 * @apiParam {String} submissionUri Submission Url
+	 * @apiGroup Form
+	 * @apiDescription This API returns anonymous form url.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "submissionUri": "abcde"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "http://localhost:8006/::YYYi?iframe=true&ecid=abb764d026830e98b895ece6d9dcaf3c5e817983cc00a4ebfaabcb6c3700b4d5"
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/form", method = RequestMethod.POST)
 	public ResponseEntity<String> getEnketoForm(@RequestBody HashMap<String, String> map) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));

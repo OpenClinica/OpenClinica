@@ -38,6 +38,37 @@ public class ReportController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	/**
+	 * @api {post} /pages/healthcheck/runonschedule Run On Schedule
+	 * @apiName ruleTrigger
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} serverZoneId Server TimeZone.
+	 * @apiParam {String} ssZoneId Study Subject TimeZone .
+	 * @apiParam {String} runTime Scheduled Run Time .
+	 * @apiParam {String} serverTime Server Time .
+	 * @apiGroup TimeZone
+	 * @apiDescription This API is to Test the RunTime with respect to Server and Subject TimeZones
+	 * @apiParamExample {json} Request-Example:
+	 * 
+	 *                  {
+	 *                  "serverZoneId" :"America/New_York",
+	 *                  "ssZoneId" :"America/New_York",
+	 *                  "runTime" :"11",
+	 *                  "serverTime" :"12"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "result": false
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "result": true
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/runonschedule", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> ruleTrigger(@RequestBody HashMap<String, String> hashMap) throws Exception {
 
@@ -55,10 +86,34 @@ public class ReportController {
 		if (result) {
 			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 		} else {
-			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+			return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 	}
+
+	/**
+	 * @api {post} /pages/healthcheck/rulecurrentdate Current Date Comparison
+	 * @apiName getSSZone
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} serverZoneId Server TimeZone.
+	 * @apiParam {String} ssZoneId Study Subject TimeZone .
+	 * @apiGroup TimeZone
+	 * @apiDescription This API is to Test the current date with respect to Server and Subject Timezones
+	 * @apiParamExample {json} Request-Example:
+	 * 
+	 *                  {
+	 *                  "serverZoneId" :"America/New_York",
+	 *                  "ssZoneId" :"America/New_York"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "ssDate": "2015-10-07",
+	 *                    "serverZoneId": "America/New_York",
+	 *                    "serverDate": "2015-10-07"
+	 *                    }
+	 */
 
 	@RequestMapping(value = "/rulecurrentdate", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> getSSZone(@RequestBody HashMap<String, String> hashMap) throws Exception {
@@ -66,19 +121,33 @@ public class ReportController {
 		String ssZoneId = hashMap.get("ssZoneId");
 		String serverZoneId = hashMap.get("serverZoneId");
 		System.out.println("I'm in rest call");
-		HashMap<String, String> map = expressionService.getSSDate(ssZoneId,serverZoneId );
+		HashMap<String, String> map = expressionService.getSSDate(ssZoneId, serverZoneId);
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
 	}
+
+	/**
+	 * @api {post} /pages/healthcheck/runtime Get RunTime when not set
+	 * @apiName getRunTime
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiGroup TimeZone
+	 * @apiDescription This API is to get the Runtime when is not set
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "result": 20
+	 *                    }
+	 */
 
 	@RequestMapping(value = "/runtime", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> getRunTime() throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		HashMap<String, Integer> map = new HashMap<>();
-	    System.out.println("I'm in rest call for RunTime");
+		System.out.println("I'm in rest call for RunTime");
 		int result = ruleSetService.getRunTimeWhenTimeIsNotSet();
- 		map.put("result", result);
-	return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+		map.put("result", result);
+		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
 	}
 

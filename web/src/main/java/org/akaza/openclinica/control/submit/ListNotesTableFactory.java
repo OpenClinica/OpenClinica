@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -179,8 +180,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
-            // Set any value greater than the maximum page size here, as it will be overriden once read from DB
-            tableFacade.setTotalRows(100);
+
+            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), currentStudy);
+            tableFacade.setTotalRows(totalRows);
         }
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
