@@ -1,5 +1,7 @@
 package org.akaza.openclinica.core;
 
+import java.io.File;
+import java.net.URL;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +19,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.akaza.openclinica.bean.service.EmailTemplateDTO;
+import org.springframework.core.io.Resource;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring3.SpringTemplateEngine;
 
 public class OpenClinicaMailSender {
 
@@ -77,6 +80,33 @@ public class OpenClinicaMailSender {
                 helper.setText(plainContent);
             } else {
                 helper.setText(htmlContent, true);
+            }
+
+            // Append inline images
+            ClassLoader classLoader = getClass().getClassLoader();
+            URL resource;
+
+            // Needed by emailTemplate.html
+            resource = classLoader.getResource("templates/email/images/blockquote-bottomright.png");
+            if (resource != null) {
+                helper.addInline("background-blockquote-bottomright", new File(resource.getFile()));
+            }
+            resource = classLoader.getResource("templates/email/images/blockquote-bottomright@2x.png");
+            if (resource != null) {
+                helper.addInline("background-blockquote-bottomright_2x", new File(resource.getFile()));
+            }
+            resource = classLoader.getResource("templates/email/images/blockquote-topleft.png");
+            if (resource != null) {
+                helper.addInline("background-blockquote-topleft", new File(resource.getFile()));
+            }
+            resource = classLoader.getResource("templates/email/images/blockquote-topleft@2x.png");
+            if (resource != null) {
+               helper.addInline("background-blockquote-topleft_2x", new File(resource.getFile()));
+            }
+
+            // User images
+            for (HashMap<String, String> img: emailContext.getInlineImages()) {
+                helper.addInline(img.get("id"), new File(img.get("filepath")));
             }
 
             mailSender.send(mimeMessage);

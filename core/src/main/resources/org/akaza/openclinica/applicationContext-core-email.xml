@@ -10,13 +10,13 @@
                         http://www.springframework.org/schema/util 
                         http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     
-    <bean id="emailTemplateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+    <bean id="emailTemplateResolver" class="org.thymeleaf.spring3.templateresolver.SpringResourceTemplateResolver">
         <property name="prefix" value="classpath:templates/email/"/>
         <property name="suffix" value=".html"/>
         <property name="templateMode" value="HTML5"/>
     </bean>
 
-    <bean id="emailTemplateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+    <bean id="emailTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
         <property name="templateResolver" ref="emailTemplateResolver"/>
     </bean>
 

@@ -1,5 +1,7 @@
 package org.akaza.openclinica.bean.service;
 
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +19,11 @@ public class EmailTemplateDTO {
     private HashMap<String, String> action;
     private HashMap<String, String> closing;
     private Locale locale;
+    private List<HashMap<String, String>> inlineImages;
 
     public EmailTemplateDTO() {
         this.body = new ArrayList<>();
+        this.inlineImages = new ArrayList<>();
     }
 
     private String getBaseUrl() {
@@ -122,6 +126,29 @@ public class EmailTemplateDTO {
 
     public void setLocale(Locale value) {
         this.locale = value;
+    }
+
+    public List<HashMap<String, String>> getInlineImages() {
+        return inlineImages;
+    }
+
+    public void addInlineImage(String imageId, String imagePath) {
+        HashMap<String, String> value = new HashMap<>();
+        value.put("id", imageId);
+        value.put("filepath", imagePath);
+        inlineImages.add(value);
+    }
+
+    public void addInlineImageFromResource(String imageId, String imagePath) throws FileNotFoundException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(imagePath);
+        if (resource == null) {
+            throw new FileNotFoundException(imagePath);
+        }
+        HashMap<String, String> value = new HashMap<>();
+        value.put("id", imageId);
+        value.put("filepath", resource.getFile());
+        inlineImages.add(value);
     }
 
     public HashMap<String, ?> getVariables() {

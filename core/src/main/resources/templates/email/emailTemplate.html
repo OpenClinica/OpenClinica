@@ -646,7 +646,7 @@ tr.border td {
 }
 @media only screen and (min-width: 0) {
   .one-col-feature .contents blockquote {
-    background-image: url([[@{${baseUrl + '/images/email-template/blockquote-bottomright.png'}]]);
+    background-image: url("cid:background-blockquote-bottomright.png");
     background-repeat: no-repeat;
     background-position: 100% 100%;
   }
@@ -660,7 +660,7 @@ tr.border td {
   background-position: 0px 0px;
 }
 .one-col-feature .contents blockquote p:first-child {
-  background-image: url([[@{${baseUrl + '/images/email-template/blockquote-topleft.png'}]]);
+  background-image: url("cid:background-blockquote-topleft.png");
   padding-top: 32px;
 }
 .one-col-feature .contents blockquote p:last-child {
@@ -845,12 +845,12 @@ tr.border td {
     margin: 0 auto 22px auto !important;
   }
   [class=wrapper] .one-col-feature blockquote {
-    background-image: url([[@{${baseUrl + '/images/email-template/blockquote-bottomright@2x.png'}]]);
+    background-image: url("cid:background-blockquote-bottomright_2x");
     background-size: 16px !important;
     padding: 0 !important;
   }
   [class=wrapper] .one-col-feature blockquote p:first-child {
-    background-image: url([[@{${baseUrl + '/images/email-template/blockquote-topleft@2x.png'}]]);
+    background-image: url("cid:background-blockquote-topleft_2x");
     background-size: 16px !important;
   }
   [class=wrapper] .column-wider,
@@ -1060,7 +1060,8 @@ blockquote{border-left:2px solid #cbcbd7}.one-col-feature blockquote p:first-chi
           <td style="padding: 0;vertical-align: middle">&nbsp;</td>
           <td class="logo emb-logo-padding-box" style="padding: 0;vertical-align: middle;mso-line-height-rule: at-least;width: 600px;padding-top: 12px;padding-bottom: 26px">
             <div th:if="${logoUrl != null}" class="logo-center" style="font-family: Avenir,sans-serif;color: #38434d;font-weight: bold;Margin-bottom: 0;text-align: center;font-size: 0px !important;line-height: 0 !important" align="center" id="emb-email-header">
-              <img th:src="@{${baseUrl + logoUrl}}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;Margin-left: auto;Margin-right: auto;max-width: 216px" alt="" width="144" height="140" />
+              <img th:src="${logoUrl}" th:if="${#strings.startsWith(logoUrl, 'cid:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;Margin-left: auto;Margin-right: auto;max-width: 216px" alt="" width="144" height="140" />
+              <img th:src="@{${baseUrl + logoUrl}}" th:unless="${#strings.startsWith(logoUrl, 'cid:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;Margin-left: auto;Margin-right: auto;max-width: 216px" alt="" width="144" height="140" />
             </div>
             <div th:unless="${logoUrl != null}" class="logo-center" style="font-family: Avenir,sans-serif;color: #38434d;font-size: 20px;margin-bottom: 0;text-align: center;line-height: 0 !important" align="center" id="emb-email-header">
               <strong style="color: orange">Open</strong> <span style="color: rgb(134, 134, 241)">Clinica</span>
@@ -1119,7 +1120,7 @@ blockquote{border-left:2px solid #cbcbd7}.one-col-feature blockquote p:first-chi
                                   <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
                                     
             <div class="btn" style="Margin-bottom: 22px;text-align: center">
-              <a th:href="@{${baseUrl + action['url']}}" th:text="${action['text']}" style='border-radius: 3px;display: inline-block;font-size: 14px;font-weight: 700;line-height: 24px;padding: 13px 35px 12px 35px;text-align: center;text-decoration: none !important;transition: opacity 0.2s ease-in;font-family: "PT Serif",Georgia,serif;background-color: #4eaacc;color: #fff' href="http://google.com">READ THE FULL BLOG POST</a>
+              <a th:href="@{${baseUrl + action['url']}}" th:text="${action['text']}" mc:disable-tracking="" style='border-radius: 3px;display: inline-block;font-size: 14px;font-weight: 700;line-height: 24px;padding: 13px 35px 12px 35px;text-align: center;text-decoration: none !important;transition: opacity 0.2s ease-in;font-family: "PT Serif",Georgia,serif;background-color: #4eaacc;color: #fff' href="http://google.com">READ THE FULL BLOG POST</a>
             </div>
                                   </td>
                                 </tr>
@@ -1139,7 +1140,8 @@ blockquote{border-left:2px solid #cbcbd7}.one-col-feature blockquote p:first-chi
                               </tbody></table>
                             
               <div th:if="${closing['imageUrl'] != null}" class="image" style='font-size: 12px;Margin-bottom: 22px;mso-line-height-rule: at-least;font-style: normal;font-weight: 400;font-family: "PT Serif",Georgia,serif;color: #7c7e7f' align="center">
-                <img th:src="@{${baseUrl + closing['imageUrl']}}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 600px" alt="" width="600" height="107" />
+                <img th:src="${closing['imageUrl']}" th:if="${#strings.startsWith(closing['imageUrl'], 'cid:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 600px" alt="" width="600" height="107" />
+                <img th:src="@{${baseUrl + closing['imageUrl']}}" th:unless="${#strings.startsWith(closing['imageUrl'], 'cid:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 600px" alt="" width="600" height="107" />
               </div>
             </th:block>
             
