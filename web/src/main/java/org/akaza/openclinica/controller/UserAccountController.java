@@ -77,7 +77,7 @@ public class UserAccountController {
 	UserAccountBean uBean;
 
 	/**
-	 * @api {post} /pages/auth/api/v1/createuseraccount Create New User Account
+	 * @api {post} /pages/auth/api/v1/createuseraccount Create a user account
 	 * @apiName createOrUpdateAccount2
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -90,9 +90,9 @@ public class UserAccountController {
 	 * @apiParam {String} role_name Role Name
 	 * @apiParam {String} user_type User Type
 	 * @apiParam {String} authorize_soap Authorize Soap
-	 * 
+	 *
 	 * @apiGroup User Account
-	 * @apiDescription This API is to create a new user account
+	 * @apiDescription Creates a user account
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "username": "testingUser",

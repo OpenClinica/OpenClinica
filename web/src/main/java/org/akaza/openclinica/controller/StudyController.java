@@ -76,9 +76,9 @@ public class StudyController {
 	StudyEventDefinitionDAO seddao;
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies Create New Study
+	 * @api {post} /pages/auth/api/v1/studies Create a study
 	 * @apiName createNewStudy
-	 * @apiPermission admin
+	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
@@ -146,7 +146,7 @@ public class StudyController {
 	 *                    }
 	 */
 
-	
+
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
@@ -396,7 +396,7 @@ public class StudyController {
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
             responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
-                        
+
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		}
 		return response;
@@ -404,9 +404,9 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create New Site
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
 	 * @apiName createNewSite
-	 * @apiPermission admin
+	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
@@ -416,11 +416,9 @@ public class StudyController {
 	 * @apiParam {Date} startDate Start date
 	 * @apiParam {Date} protocolDateVerification protocol Verification date
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
-	 * @apiGroup Study
+	 * @apiGroup Site
 	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to create a New Site in OC.
-	 *                 All the fields are required fields and can't be left blank.
-	 *                 You need to provide your Api-key to be connected.
+	 * @apiDescription Create a Site
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "briefTitle": "Site Protocol ID Name",
@@ -437,7 +435,7 @@ public class StudyController {
 	 *                  "secondaryProtocolID" : "Secondary Protocol ID 1" ,
 	 *                  "protocolDateVerification" : "2011-10-14"
 	 *                  }
-	 * 
+	 *
 	 * @apiErrorExample {json} Error-Response:
 	 *                  HTTP/1.1 400 Bad Request
 	 *                  {
@@ -716,7 +714,7 @@ public class StudyController {
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
             responseSuccess.setUniqueSiteProtocolID(siteDTO.getUniqueSiteProtocolID());
-                        
+
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
 		}
@@ -725,9 +723,9 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create Study Event Definition
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
 	 * @apiName createEventDefinition
-	 * @apiPermission admin
+	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
 	 * @apiParam {String} name Event Name.
@@ -737,9 +735,7 @@ public class StudyController {
 	 * @apiParam {String} type 'Scheduled' , 'UnScheduled' or 'Common'.
 	 * @apiGroup Study Event
 	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to create a New Study Event Definition in OC.
-	 *                 All the fields are required fields and can't be left blank.
-	 *                 You need to provide your Api-key to be connected.
+	 * @apiDescription Creates a study event definition.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "name": "Event Name",
@@ -922,8 +918,8 @@ public class StudyController {
         responseSuccess.setMessage(eventDefinitionDTO.getMessage());
         responseSuccess.setEventDefOid(eventDefinitionDTO.getEventDefOid());
         responseSuccess.setName(eventDefinitionDTO.getName());
-        
-                    
+
+
 		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		return response;
 

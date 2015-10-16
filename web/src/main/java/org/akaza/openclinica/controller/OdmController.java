@@ -83,20 +83,20 @@ public class OdmController {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
-	 * @api {get} /pages/odmk/studies/:studyOid/metadata Get Study Metadata
+	 * @api {get} /pages/odmk/studies/:studyOid/metadata Retrieve metadata
 	 * @apiName getStudyMetadata
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiGroup Study
-	 * @apiDescription This API is to get the Metadata of the provided Study
+	 * @apiDescription Retrieve the metadata of the specified study
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": "S_BL101",
 	 *                  }
 	 * @apiSuccessExample {json} Success-Response:
 	 *                    HTTP/1.1 200 OK
-	 *                    {	
+	 *                    {
 	 *                    The whole Study Metadata
 	 *                    }
 	 */
@@ -116,14 +116,14 @@ public class OdmController {
 	 * @throws Exception
 	 */
 	/**
-	 * @api {get} /pages/odmk/study/:studyOid/studysubject/:studySubjectOid/events Get Event
+	 * @api {get} /pages/odmk/study/:studyOid/studysubject/:studySubjectOid/events Retrieve an event - participant
 	 * @apiName getEvent
-	 * @apiPermission admin
+	 * @apiPermission Module participate - enabled
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectOid Study Subject Oid
 	 * @apiGroup Study Event
-	 * @apiDescription This API is to get the Event with earliest start date and ordinal
+	 * @apiDescription Retrieve an event with earliest start date and ordinal.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": "S_BL101",
@@ -412,7 +412,7 @@ public class OdmController {
 
 	/**
 	 * Currently not used, but keep here for future unit test
-	 * 
+	 *
 	 * @param clazz
 	 * @param odm
 	 * @return
