@@ -1,0 +1,20 @@
+<p>
+  <span th:text="#{email_header_1}">You received this email from</span>
+  <span th:text="${adminEmail}">admin@openclinica.org</span>
+  <span th:text="#{email_header_2}">regarding</span> Job Execution
+  <span th:text="#{email_header_3}">because you were listed as a person to contact. Please review the information below:</span>
+</p>
+<p>Dataset: <span th:text="${datasetName}">DATASET NAME</span></p>
+<p>Study: <span th:text="${studyName}">STUDY NAME</span></p>
+
+<th:block th:if="${databaseName != null}">
+  <p>Database: <span th:text="${databaseName}">DATABASE NAME</span></p>
+  <p>Schema: <span th:text="${databaseSchemaName}">SCHEMA NAME</span></p>
+  <p>Host: <span th:text="${databaseHost}">DATABASE HOST</span></p>
+</th:block>
+
+<p>
+  <span th:text="#{html_email_body_1}">Your Job, set to run on the dataset</span>
+  <span th:text="${datasetName}">DATASET NAME</span>
+  <span th:text="#{html_email_body_2_2}">, has completed running.</span>
+</p>

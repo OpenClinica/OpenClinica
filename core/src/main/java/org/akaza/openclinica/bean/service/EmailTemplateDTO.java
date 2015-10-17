@@ -1,29 +1,51 @@
 package org.akaza.openclinica.bean.service;
 
-import java.io.FileNotFoundException;
-import java.net.URL;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
+import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.thymeleaf.context.Context;
 
+/**
+ * To be used as context to render emailTemplate.html with thymeleaf-spring.
+ *
+ * You can add images as data uri (set resourceType to "datauri" in setImage()),
+ * or inline attachment, or external url (set resourceType to "external" in setImage()).
+ *
+ * For images as data-uri or external-url, the value will be available in template variable
+ * as `images` HashMap.
+ *
+ * For images as inline-attachment, you need to set `src` attribute of <img/> (in email content)
+ * as "cid:" + imageId (cid refers to content-id of attachment).
+ */
 public class EmailTemplateDTO {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private String baseUrl;
     private String subject;
     private String logoUrl;
     private String title;
-    private List<HashMap<String, String>> body;
+    private final List<HashMap<String, String>> body;
     private String plaintextBody;
     private HashMap<String, String> action;
     private HashMap<String, String> closing;
     private Locale locale;
-    private List<HashMap<String, String>> inlineImages;
+    private final HashMap<String, String> images;
 
     public EmailTemplateDTO() {
         this.body = new ArrayList<>();
-        this.inlineImages = new ArrayList<>();
+        this.images = new HashMap<>();
     }
 
     private String getBaseUrl() {
@@ -128,27 +150,32 @@ public class EmailTemplateDTO {
         this.locale = value;
     }
 
-    public List<HashMap<String, String>> getInlineImages() {
-        return inlineImages;
+    public HashMap<String, String> getImages() {
+        return images;
     }
 
-    public void addInlineImage(String imageId, String imagePath) {
-        HashMap<String, String> value = new HashMap<>();
-        value.put("id", imageId);
-        value.put("filepath", imagePath);
-        inlineImages.add(value);
+    public void setImage(String imageId, String imagePath) {
+        setImage(imageId, imagePath, "embed");
     }
 
-    public void addInlineImageFromResource(String imageId, String imagePath) throws FileNotFoundException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(imagePath);
-        if (resource == null) {
-            throw new FileNotFoundException(imagePath);
+    public void setImage(String imageId, String imagePath, String resourceType) {
+        switch (resourceType) {
+            case "datauri":
+                try {
+                    images.put(imageId, EmailTemplateDTO.createDataUri(imagePath));
+                } catch (IOException e) {
+                    logger.error("Failed to embed image {} as datauri in emails", imagePath);
+                };
+                break;
+            case "external":
+                // If not embedded than assume external url.
+                images.put(imageId, getBaseUrl() + imagePath);
+                break;
+            default:
+                // To be processed later by MimeMessageHelper.
+                images.put(imageId, imagePath);
+                break;
         }
-        HashMap<String, String> value = new HashMap<>();
-        value.put("id", imageId);
-        value.put("filepath", resource.getFile());
-        inlineImages.add(value);
     }
 
     public HashMap<String, ?> getVariables() {
@@ -161,19 +188,34 @@ public class EmailTemplateDTO {
         result.put("textBody", plaintextBody);
         result.put("action", action);
         result.put("closing", closing);
+
+        // If you embedded image as data-uri, or if the image is externally hosted uri,
+        // they will be available in the email template.
+        // For embedded image as inline-attachment, you need to set the image's src attribute.
+        HashMap<String, String> dataUriOrExternal = new HashMap<>();
+        for (Entry<String, String> entry : images.entrySet()) {
+            if (entry.getValue().matches("^(data|https?):.*")) {
+                dataUriOrExternal.put(entry.getKey(), entry.getValue());
+            }
+        }
+        result.put("images", dataUriOrExternal);
         return result;
     }
 
     public Context getContext() {
         Context result = new Context(getLocale());
-        result.setVariable("baseUrl", baseUrl);
-        result.setVariable("subject", subject);
-        result.setVariable("logoUrl", logoUrl);
-        result.setVariable("title", title);
-        result.setVariable("body", body);
-        result.setVariable("textBody", plaintextBody);
-        result.setVariable("action", action);
-        result.setVariable("closing", closing);
+        result.setVariables(getVariables());
         return result;
+    }
+
+    public static String createDataUri(String imagePath) throws IOException {
+        InputStream is;
+        if (imagePath.startsWith("classpath:")) {
+            is = new ClassPathResource(imagePath.substring(10)).getInputStream();
+        } else {
+            is = new FileInputStream(imagePath);
+        }
+        return "data:" + URLConnection.guessContentTypeFromName(imagePath) + ";base64," +
+                DatatypeConverter.printBase64Binary(IOUtils.toByteArray(is));
     }
 }
