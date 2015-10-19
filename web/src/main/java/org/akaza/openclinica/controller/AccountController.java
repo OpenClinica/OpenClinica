@@ -67,14 +67,14 @@ public class AccountController {
 	ParticipantPortalRegistrar participantPortalRegistrar;
 
 	/**
-	 * @api {post} /pages/accounts/login Get API-Key With Credentials
+	 * @api {post} /pages/accounts/login Retrieve a user account
 	 * @apiName getAccountByUserName
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} username OC login Username.
 	 * @apiParam {String} password OC login Password .
-	 * @apiGroup Login
-	 * @apiDescription This API is to get the API Key using Login Credentials in OC
+	 * @apiGroup User Account
+	 * @apiDescription Retrieve a user account
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "username": "usera",
@@ -143,14 +143,14 @@ public class AccountController {
 	}
 
 	/**
-	 * @api {get} /pages/accounts/study/:studyOid/crc/:crcUserName Get CRC User Account
+	 * @api {get} /pages/accounts/study/:studyOid/crc/:crcUserName Retrieve a user account - crc
 	 * @apiName getAccount1
-	 * @apiPermission admin
+	 * @apiPermission Module participate - enabled & admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} crcUserName CRC Username .
 	 * @apiGroup User Account
-	 * @apiDescription This API is to get the CRC User Account by providing CRC Username and StudyOid
+	 * @apiDescription Retrieves the crc user account with the given crcUserName and studyOid
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": " S_BL101",
@@ -214,14 +214,14 @@ public class AccountController {
 	}
 
 	/**
-	 * @api {get} /pages/accounts/study/:studyOid/accesscode/:accessCode Get Participant User Account
+	 * @api {get} /pages/accounts/study/:studyOid/accesscode/:accessCode Retrieve a user account - participant
 	 * @apiName getAccount2
-	 * @apiPermission admin
+	 * @apiPermission Module participate - enabled & admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} accessCode Participant Access code .
 	 * @apiGroup User Account
-	 * @apiDescription This API is to get the Participant User Account by providing Study Subject Access Code and StudyOid
+	 * @apiDescription Retrieves the participant user account with the given accessCode and studyOid
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": " S_BL101",
@@ -273,14 +273,14 @@ public class AccountController {
 	}
 
 	/**
-	 * @api {get} /pages/accounts/study/:studyOid/studysubject/:studySubjectId Get Participant User Account
+	 * @api {get} /pages/accounts/study/:studyOid/studysubject/:studySubjectId Retrieve a user account - participant
 	 * @apiName getAccount3
-	 * @apiPermission admin
+	 * @apiPermission Module participate - enabled & admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Id .
 	 * @apiGroup User Account
-	 * @apiDescription This API is to get the Participant User Account by providing Study Subject Access Code and StudyOid
+	 * @apiDescription Retrieves the participant user account with the given studySubjectId and studyOid
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": " S_BL101",
@@ -336,9 +336,9 @@ public class AccountController {
 	}
 
 	/**
-	 * @api {post} /pages/accounts/ Create Or Update Participate Account
-	 * @apiName createOrUpdateAccount
-	 * @apiPermission admin
+	 * @api {post} /pages/accounts/ Create a user account - participant
+	 * @apiName createParticipantUserAccount
+	 * @apiPermission Module participate - enabled & admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Id .
@@ -350,7 +350,47 @@ public class AccountController {
 	 * @apiParam {String} email Email Address
 	 *
 	 * @apiGroup User Account
-	 * @apiDescription This API is to create or update Participate account
+	 * @apiDescription Creates a participant user account
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "studySubjectId": "Sub100",
+	 *                  "fName": "Dany",
+	 *                  "lName": "Keegan",
+	 *                  "mobile": "617 865 4567",
+	 *                  "accessCode": "5s02UFpiMBijWuzaxSOojg==",
+	 *                  "crcUserName": "crc_user",
+	 *                  "email": "abc@yahoo.com"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "studySubjectId": null,
+	 *                    "email": "abc@yahoo.com",
+	 *                    "accessCode": "5s02UFpiMBijWuzaxSOojg==",
+	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
+	 *                    "userName": "S_BL101.SS_SUB100",
+	 *                    "fName": "Dany",
+	 *                    "lName": "Keegan",
+	 *                    "mobile": "617 865 4567"
+	 *                    }
+	 */
+	/**
+	 * @api {post} /pages/accounts/ Update a user account - participant
+	 * @apiName updateParticipantUserAccount
+	 * @apiPermission Module participate - enabled & admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} studySubjectId Study Subject Id .
+	 * @apiParam {String} fName First Name
+	 * @apiParam {String} lName Last Name
+	 * @apiParam {String} mobile Mobile Phone
+	 * @apiParam {String} accessCode Access Code
+	 * @apiParam {String} crcUserName CRC UserName
+	 * @apiParam {String} email Email Address
+	 *
+	 * @apiGroup User Account
+	 * @apiDescription Updates a participant user account
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": "S_BL101",
@@ -455,15 +495,15 @@ public class AccountController {
 	}
 
 	/**
-	 * @api {post} /pages/accounts/timezone Update Subject TimeZone
+	 * @api {post} /pages/accounts/timezone Update subject time zone
 	 * @apiName updateTimezone
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Oid .
 	 * @apiParam {String} timeZone Time Zone .
-	 * @apiGroup TimeZone
-	 * @apiDescription This API is to update timezone
+	 * @apiGroup Subject
+	 * @apiDescription Updates the subject time zone
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "studyOid": "S_BL101",

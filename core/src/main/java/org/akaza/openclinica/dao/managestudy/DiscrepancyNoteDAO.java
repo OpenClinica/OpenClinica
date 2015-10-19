@@ -249,7 +249,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudy.getId());
         variables.put(Integer.valueOf(2), currentStudy.getId());
         String sql = digester.getQuery("getCountWithFilter");
-        sql += filter.execute("");
+ //       sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();

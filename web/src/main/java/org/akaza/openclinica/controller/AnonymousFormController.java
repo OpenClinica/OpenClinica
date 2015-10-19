@@ -58,20 +58,20 @@ public class AnonymousFormController {
 	UserAccountDAO udao;
 	StudyDAO sdao;
 
-	
+
 	/**
-	 * @api {post} /pages/auth/api/v1/anonymousform/form Get Anonymous Form Link
+	 * @api {post} /pages/api/v1/anonymousform/form Retrieve anonymous form URL
 	 * @apiName getEnketoForm
+	 * @apiPermission Module participate - enabled
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} studyOid Study Oid
 	 * @apiParam {String} submissionUri Submission Url
 	 * @apiGroup Form
-	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to get Anonymous Form Link.You need to provide your Api-key to be connected.
+	 * @apiDescription Retrieve anonymous form url.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
-	 *                  "studyOid": "",
-	 *                  "submissionUri": ""
+	 *                  "studyOid": "S_BL101",
+	 *                  "submissionUri": "abcde"
 	 *                  }
 	 * @apiSuccessExample {json} Success-Response:
 	 *                    HTTP/1.1 200 OK
@@ -89,8 +89,8 @@ public class AnonymousFormController {
 
 		if (!mayProceed(studyOid))
 			return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-		
-		String submissionUri = map.get("submissionUri");	
+
+		String submissionUri = map.get("submissionUri");
 		if (submissionUri != "" && submissionUri != null) {
 
 
@@ -104,7 +104,7 @@ public class AnonymousFormController {
 				CRFVersionDAO cvdao = new CRFVersionDAO<>(dataSource);
 				CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
                 StudyBean sBean = (StudyBean) sdao.findByPK(edcBean.getStudyId());
-				
+
 				formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean ,edcBean.getStudyEventDefinitionId());
 				System.out.println("FormUrl:  " + formUrl);
 				return new ResponseEntity<String>(formUrl, org.springframework.http.HttpStatus.OK);
