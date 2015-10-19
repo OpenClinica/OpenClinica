@@ -115,7 +115,7 @@ public class OpenRosaServices {
      * @apiVersion 1.0.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
-     * @apiDescription This API is used to a listing of the available OpenClinica Forms.
+     * @apiDescription Retrieves a listing of the available OpenClinica forms.
      * @apiParamExample {json} Request-Example:
      *                  {
      *                  "studyOid": "S_SAMPLTE",
@@ -226,7 +226,7 @@ public class OpenRosaServices {
      * @apiVersion 1.0.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
-     * @apiDescription Get additional information on a particular Form, including links to associated media.
+     * @apiDescription Gets additional information on a particular Form, including links to associated media.
      */
 
     @GET
@@ -294,7 +294,7 @@ public class OpenRosaServices {
      * @apiVersion 1.0.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
-     * @apiDescription Download the contents of an Xform
+     * @apiDescription Downloads the contents of a form
      */
 
     @GET
@@ -345,7 +345,7 @@ public class OpenRosaServices {
      * @apiVersion 1.0.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
-     * @apiDescription This API is used to download media associated with a form, including images and video.
+     * @apiDescription Downloads media associated with a form, including images and video.
      */
 
     @GET
@@ -442,7 +442,7 @@ public class OpenRosaServices {
      * @apiParam {String} studyOid Study Oid.
      * @apiParam {String} ecid Key that will be used to look up subject context information while processing submission.
      * @apiGroup Form
-     * @apiDescription This API is to submit the data from a completed xform.
+     * @apiDescription Submits the data from a completed form.
      */
 
     @POST
