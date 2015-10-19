@@ -16,6 +16,8 @@ public class ParticipantDTO {
 		private String emailSubject;
 		private String url;
 		private String loginUrl;
+		private boolean encryptedEmailAccount;
+
 		
 		
 		
@@ -104,6 +106,12 @@ public class ParticipantDTO {
 		}
 		public void setParticipantEmailAccount(String participantEmailAccount) {
 			this.participantEmailAccount = participantEmailAccount;
+		}
+		public boolean isEncryptedEmailAccount() {
+			return encryptedEmailAccount;
+		}
+		public void setEncryptedEmailAccount(boolean encryptedEmailAccount) {
+			this.encryptedEmailAccount = encryptedEmailAccount;
 		}
 		
 	}

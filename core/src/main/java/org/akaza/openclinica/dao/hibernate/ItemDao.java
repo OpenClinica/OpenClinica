@@ -1,6 +1,9 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 
 public class ItemDao extends AbstractDomainDao<Item> {
 
@@ -28,5 +31,15 @@ public class ItemDao extends AbstractDomainDao<Item> {
         String query = "select item_data_type_id from item where item_id = " + item.getItemId();
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
         return ((Number) q.uniqueResult()).intValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<Item> findByItemGroupCrfVersionOrdered(Integer itemGroupId, Integer crfVersionId) {
+        String query = "select distinct i.* from item i, item_group fg, item_group_metadata fgim " + " where fg.item_group_id= " + String.valueOf(itemGroupId)
+                + " and fg.item_group_id=fgim.item_group_id and fgim.crf_version_id= " + String.valueOf(crfVersionId)
+                + " and fgim.item_id=i.item_id order by i.item_id";
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
+        return (ArrayList<Item>) q.list();
+
     }
 }

@@ -1,13 +1,17 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.hibernate.Criteria;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
     @Override
     Class<ItemGroup> domainClass() {
-        // TODO Auto-generated method stub
         return ItemGroup.class;
     }
 
@@ -26,5 +30,13 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
         q.setString("groupName", groupName);
         q.setEntity("crf", crf);
         return (ItemGroup) q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<ItemGroup> findByCrfVersionId(Integer crfVersionId) {
+        String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id = " + crfVersionId
+                + " and ig.item_group_id = igm.item_group_id";
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
+        return (ArrayList<ItemGroup>) q.list();
     }
 }

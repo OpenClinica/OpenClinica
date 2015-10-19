@@ -331,7 +331,7 @@ public class EditUserAccountServlet extends SecureController {
 
 	public String getRandom32ChApiKey() {
 		String uuid = UUID.randomUUID().toString();
-		System.out.print(uuid.replaceAll("-", ""));
+	//	System.out.print(uuid.replaceAll("-", ""));
 		return uuid.replaceAll("-", "");
 	}
     
