@@ -448,10 +448,11 @@ public class OpenRosaServices {
     @POST
     @Path("/{studyOID}/submission")
     @Produces(MediaType.APPLICATION_XML)
-    public String doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+    public Response doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
             @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
 
         String output = null;
+        Response.ResponseBuilder builder = Response.noContent();
         String studySubjectOid = null;
         Integer studyEventDefnId = null;
         Integer studyEventOrdinal = null;
@@ -465,7 +466,7 @@ public class OpenRosaServices {
             }
 
             if (!mayProceedSubmission(studyOID))
-                return null;
+                builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
@@ -507,14 +508,13 @@ public class OpenRosaServices {
             cal.setTime(currentDate);
             SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
             format.setCalendar(cal);
-            response.setHeader("Date", format.format(currentDate));
-            response.setHeader("X-OpenRosa-Version", "1.0");
-            response.setContentType("text/xml; charset=utf-8");
-            response.setStatus(201);
+            builder.header("Date", format.format(currentDate));
+            builder.header("X-OpenRosa-Version", "1.0");
+            builder.type("text/xml; charset=utf-8");
 
             if (!errors.hasErrors()) {
 
-                output = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
+                builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
                 LOGGER.debug("Successful OpenRosa submission");
 
             } else {
@@ -526,7 +526,7 @@ public class OpenRosaServices {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
-            return "<Error>" + e.getMessage() + "</Error>";
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
         try {
@@ -549,7 +549,7 @@ public class OpenRosaServices {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return output;
+        return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
     }
 
     @GET

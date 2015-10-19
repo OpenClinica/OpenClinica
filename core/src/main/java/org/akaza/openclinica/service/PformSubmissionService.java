@@ -622,7 +622,7 @@ public class PformSubmissionService {
                                 ItemDataBean existingValue = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemDataBean1.getItemId(),
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
-                                if (existingValue == null) {
+                                if (!existingValue.isActive()) {
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
@@ -767,7 +767,7 @@ public class PformSubmissionService {
                                 ItemDataBean existingValue = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemDataBean1.getItemId(),
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
-                                if (existingValue == null) {
+                                if (!existingValue.isActive()) {
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
