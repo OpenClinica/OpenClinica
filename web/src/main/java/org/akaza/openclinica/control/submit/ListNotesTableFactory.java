@@ -192,7 +192,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
-        if (firstRecordShown > notesSummary.getTotal()) { // The page selected goes beyond the dataset size
+        if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal()!=0) { // The page selected goes beyond the dataset size
             // Move to the last page
             limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
             filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
