@@ -3,6 +3,7 @@ package org.akaza.openclinica.web.pform;
 public class EnketoURLResponse {
     private String url = null;
     private String preview_url = null;
+    private String edit_url = null;
     private String code = null;
 
     public String getUrl() {
@@ -28,4 +29,13 @@ public class EnketoURLResponse {
     public void setCode(String code) {
         this.code = code;
     }
+
+    public String getEdit_url() {
+        return edit_url;
+    }
+
+    public void setEdit_url(String edit_url) {
+        this.edit_url = edit_url;
+    }
+
 }
