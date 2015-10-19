@@ -108,6 +108,43 @@ public class OpenRosaServices {
     StudyDAO sdao;
     StudySubjectDAO studySubjectDao;
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
+     * @apiName getFormList
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription This API is used to a listing of the available OpenClinica Forms.
+     * @apiParamExample {json} Request-Example:
+     *                  {
+     *                  "studyOid": "S_SAMPLTE",
+     *                  }
+     * @apiSuccessExample {xml} Success-Response:
+     *                    HTTP/1.1 200 OK
+     *                    {
+     *                    <xforms xmlns="http://openrosa.org/xforms/xformsList">
+     *                    <xform>
+     *                    <formID>F_FIRSTFORM_1</formID>
+     *                    <name>First Form</name>
+     *                    <majorMinorVersion>1</majorMinorVersion>
+     *                    <version>1</version>
+     *                    <hash>8678370cd92814d4e3216d58d821403f</hash>
+     *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
+     *                    formId=F_FIRSTFORM_1</downloadUrl>
+     *                    </xform>
+     *                    <xform>
+     *                    <formID>F_SECONDFORM_1</formID>
+     *                    <name>Second Form</name>
+     *                    <majorMinorVersion>1</majorMinorVersion>
+     *                    <version>1</version>
+     *                    <hash>7ee60d1c6516b730bbe9bdbd7cad942f</hash>
+     *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
+     *                    formId=F_SECONDFORM_1</downloadUrl>
+     *                    </xform>
+     *                    </xforms>
+     */
+
     @GET
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
@@ -182,6 +219,16 @@ public class OpenRosaServices {
         }
     }
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/manifest Get Form Manifest
+     * @apiName getManifest
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Get additional information on a particular Form, including links to associated media.
+     */
+
     @GET
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
@@ -240,6 +287,16 @@ public class OpenRosaServices {
         }
     }
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/formXml Get Form XML
+     * @apiName getFormXml
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Download the contents of an Xform
+     */
+
     @GET
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
@@ -280,6 +337,16 @@ public class OpenRosaServices {
         return xform;
 
     }
+
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
+     * @apiName getMediaFile
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription This API is used to download media associated with a form, including images and video.
+     */
 
     @GET
     @Path("/{studyOID}/downloadMedia")
@@ -366,6 +433,17 @@ public class OpenRosaServices {
         studyEventBean = (StudyEventBean) studyEventDao.create(studyEventBean);
         return studyEventBean;
     }
+
+    /**
+     * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
+     * @apiName doSubmission
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiParam {String} ecid Key that will be used to look up subject context information while processing submission.
+     * @apiGroup Form
+     * @apiDescription This API is to submit the data from a completed xform.
+     */
 
     @POST
     @Path("/{studyOID}/submission")

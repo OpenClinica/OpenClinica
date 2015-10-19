@@ -116,6 +116,30 @@ public class EditFormController {
     UserAccountDAO udao;
     StudyDAO sdao;
 
+    /**
+     * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
+     * @apiName getEditUrl
+     * @apiPermission admin
+     * @apiVersion 1.0.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiParam {String} ecid Key that will be used by enketo to cache form information.
+     * @apiGroup Form
+     * @apiDescription This API is used to retrieve a URL for a form with data pre-loaded into it
+     * @apiParamExample {json} Request-Example:
+     *                  {
+     *                  "studyOid": "S_BL101",
+     *                  "ecid":"a9f8f3aadea4b67e1f214140ccfdf70bad0b9e9b622a9776a3c85bbf6bb532cd"
+     *                  }
+     * @apiSuccessExample Success-Response:
+     *                    HTTP/1.1 200 OK
+     *                    {
+     *                    http://ocform.oc.com:8005/edit/::YYYM?instance_id=
+     *                    d16bba9200177fad34594e75d8b9565ff92b0bce4297e3b6c27275e531044a59
+     *                    &returnUrl=http%3A%2F%2Fstudy1.mystudy.me%3A8080%2F%23%2Fevent%2FSS_SUB001%2Fdashboard&ecid=
+     *                    d16bba9200177fad34594e75d8b9565ff92b0bce4297e3b6c27275e531044a59
+     *                    }
+     */
+
     @RequestMapping(value = "/{studyOid}/url", method = RequestMethod.GET)
     public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID) throws Exception {
 
