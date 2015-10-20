@@ -4,6 +4,8 @@
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<jsp:useBean scope='request' id='coreResources' class='org.akaza.openclinica.dao.core.CoreResources' />
+<c:set var="basePath" value="${coreResources.getField('sysURL.basePath')}" />
 
 <table border="0" cellpadding="0" cellspacing="0" <%--style="position: relative; top: -21px;"--%>>
  
@@ -23,7 +25,7 @@
 	<tr id="sidebar_Alerts_open" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${basePath}images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
 		<b><fmt:message key="alerts_messages" bundle="${resword}"/></b>
 
@@ -35,7 +37,7 @@
             <jsp:include page="../include/showSideMessage.jsp" />
             </c:when>
             <c:otherwise>             
-            <fmt:message key="have_logged_out_application" bundle="${resword}"/><a href="MainMenu"><fmt:message key="login_page" bundle="${resword}"/></a> <fmt:message key="in_order_to_re_enter_openclinica" bundle="${resword}"/>         
+            <fmt:message key="have_logged_out_application" bundle="${resword}"/><a href="${basePath}MainMenu"><fmt:message key="login_page" bundle="${resword}"/></a> <fmt:message key="in_order_to_re_enter_openclinica" bundle="${resword}"/>
 		
             </c:otherwise>
             </c:choose>
@@ -52,7 +54,7 @@
 	<tr id="sidebar_Alerts_closed" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${basePath}images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
 		<b><fmt:message key="alerts_messages" bundle="${resword}"/></b>
 
@@ -63,7 +65,7 @@
        <tr id="sidebar_Alerts_open" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${basePath}images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
 		<b><fmt:message key="alerts_messages" bundle="${resword}"/></b>
 
@@ -75,7 +77,7 @@
             <jsp:include page="../include/showSideMessage.jsp" />
             </c:when>
             <c:otherwise>             
-            <fmt:message key="have_logged_out_application" bundle="${resword}"/><a href="MainMenu"><fmt:message key="login_page" bundle="${resword}"/></a> <fmt:message key="in_order_to_re_enter_openclinica" bundle="${resword}"/>          
+            <fmt:message key="have_logged_out_application" bundle="${resword}"/><a href="${basePath}MainMenu"><fmt:message key="login_page" bundle="${resword}"/></a> <fmt:message key="in_order_to_re_enter_openclinica" bundle="${resword}"/>
 		
             </c:otherwise>
             </c:choose>
@@ -88,7 +90,7 @@
 	<tr id="sidebar_Alerts_closed" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Alerts_open'); leftnavExpand('sidebar_Alerts_closed');"><img src="${basePath}images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
 		<b><fmt:message key="alerts_messages" bundle="${resword}"/></b>
 

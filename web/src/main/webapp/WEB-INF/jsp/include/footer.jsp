@@ -1,16 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.licensing" var="licensing"/>
- 
+<jsp:useBean scope='request' id='coreResources' class='org.akaza.openclinica.dao.core.CoreResources' />
+<c:set var="basePath" value="${coreResources.getField('sysURL.basePath')}" />
+
 <!-- END MAIN CONTENT AREA -->
 </td>
             </tr>
         </table></td></tr></table>
         
-<script type="text/javascript" src="${pageContext.request.contextPath}/includes/wz_tooltip/wz_tooltip.js"></script>
+<script type="text/javascript" src="${basePath}includes/wz_tooltip/wz_tooltip.js"></script>
 <table border="0" cellpadding="0" width="100%"  >
             <tr>
                 <td class="footer_bottom" style="width:200px">
@@ -18,8 +21,8 @@
                 &nbsp;&nbsp;&nbsp;
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1')"><fmt:message key="help" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
-           <%-->     <a href="${pageContext.request.contextPath}Contact"><fmt:message key="contact" bundle="${resword}"/></a>--%>
-             <a href="${pageContext.request.contextPath}/Contact"><fmt:message key="contact" bundle="${resword}"/></a>
+           <%-->     <a href="${basePath}Contact"><fmt:message key="contact" bundle="${resword}"/></a>--%>
+             <a href="${basePath}Contact"><fmt:message key="contact" bundle="${resword}"/></a>
           
                 </td>
                 <td class="footer_bottom" >
@@ -41,7 +44,7 @@
         </table>
 
 <!-- End Footer -->
-<link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="${basePath}images/favicon.ico">
 
         
 

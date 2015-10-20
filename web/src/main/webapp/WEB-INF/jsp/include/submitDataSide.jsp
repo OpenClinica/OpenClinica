@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<jsp:useBean scope='request' id='coreResources' class='org.akaza.openclinica.dao.core.CoreResources' />
+<c:set var="basePath" value="${coreResources.getField('sysURL.basePath')}" />
+
   <c:choose>	   
 		<c:when test="${panel.orderedData}">
 		 <c:set var="count" value="0"/>
@@ -25,13 +29,13 @@
 			  <c:set var="eventCount" value="${eventCount+1}"/>
 			  <tr>
 	           <td valign="top" width="10" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
-		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><img 
-		          name="ExpandGroup<c:out value="${eventCount}"/>" src="images/bt_Expand.gif" border="0"></a></td>
+		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}" />images/bt_Collapse.gif');"><img
+		          name="ExpandGroup<c:out value="${eventCount}"/>" src="${basePath}images/bt_Expand.gif" border="0"></a></td>
 	            
 	            <c:choose>
                  <c:when test="${!line.current}">
 	              <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
-		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
+		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}" />images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
 		          </td>
 		         </c:when>
 		         <c:otherwise>
@@ -75,7 +79,7 @@
 		             <td valign="top" class="vline">
 		          </c:otherwise> 
 		         </c:choose>
-		         <img src="images/leftbar_hline.gif"></td>
+		         <img src="${basePath}images/leftbar_hline.gif"></td>
 		         <c:choose>
                	 <c:when test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed'}">
 		         	<td valign="top" class="leftmenu"><c:out value="${line.title}" escapeXml="false"/>&nbsp;<c:out value="${line.info}" escapeXml="false"/></td>
@@ -83,7 +87,7 @@
 	           	 <c:otherwise>
                		<c:choose>
                		<c:when test="${first == 0}">  
-		         		<td valign="top" class="leftmenu"><c:out value="<img src='images/icon_Invalid.gif' alt='Invalid'>" escapeXml="false"/>&nbsp;<c:out value="${line.info}" escapeXml="false"/></td>
+		         		<td valign="top" class="leftmenu"><img src="${basePath}images/icon_Invalid.gif" alt="Invalid">&nbsp;<c:out value="${line.info}" escapeXml="false"/></td>
 	           	 	</c:when>
 	           	 	<c:otherwise>
               			<c:set var="first" value="0"/>

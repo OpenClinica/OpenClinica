@@ -4,7 +4,8 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>  
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
-
+<jsp:useBean scope='request' id='coreResources' class='org.akaza.openclinica.dao.core.CoreResources' />
+<c:set var="basePath" value="${coreResources.getField('sysURL.basePath')}" />
 
 <%--<jsp:useBean scope="session" id="panel" class="org.akaza.openclinica.view.StudyInfoPanel" />--%>
 
@@ -20,7 +21,7 @@
 
 		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');">
 
-                <img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10">
+                <img src="${basePath}images/sidebar_collapse.gif" border="0" align="right" hspace="10">
 </a>
 
 		<b><fmt:message key="info" bundle="${restext}"/></b>
@@ -79,7 +80,7 @@
     <tr id="sidebar_Info_closed"<c:if test="${! closeInfoShowIcons}">style="display: none"</c:if>>
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><img src="${basePath}images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
 		<b>Info</b>
 
@@ -129,10 +130,10 @@
 			  <c:set var="eventCount" value="${eventCount+1}"/>
 			  <tr>
 	           <td valign="top" width="10" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
-		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','${pageContext.request.contextPath}/images/bt_Collapse.gif');"><img
-		          name="ExpandGroup<c:out value="${eventCount}"/>" src="${pageContext.request.contextPath}/images/bt_Expand.gif" border="0"></a></td>
+		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}" />images/bt_Collapse.gif');"><img
+		          name="ExpandGroup<c:out value="${eventCount}"/>" src="${basePath}images/bt_Expand.gif" border="0"></a></td>
 	              <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
-		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','${pageContext.request.contextPath}/images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
+		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}" />images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
 		       </td>
              </tr>  
              </c:when>
@@ -160,7 +161,7 @@
 		             <td valign="top" class="vline">
 		          </c:otherwise> 
 		         </c:choose>
-		         <img src="images/leftbar_hline.gif"></td>
+		         <img src="${basePath}images/leftbar_hline.gif"></td>
 		         <td valign="top" class="leftmenu" style="font-size:11px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
 	           </tr>
              </c:if>
@@ -184,18 +185,18 @@
 </c:when>
 <c:otherwise>
     <br><br>
-	<a href="MainMenu"><fmt:message key="login" bundle="${resword}"/></a>	
+	<a href="${basePath}MainMenu"><fmt:message key="login" bundle="${resword}"/></a>
 	<br><br>
-	<a href="RequestAccount"><fmt:message key="request_an_account" bundle="${resword}"/></a>
+	<a href="${basePath}RequestAccount"><fmt:message key="request_an_account" bundle="${resword}"/></a>
 	<br><br>
-	<a href="RequestPassword"><fmt:message key="forgot_password" bundle="${resword}"/></a>
+	<a href="${basePath}RequestPassword"><fmt:message key="forgot_password" bundle="${resword}"/></a>
 </c:otherwise>
 </c:choose>
 
 
 <!-- End Sidebar Contents -->
 
-				<br><img src="images/spacer.gif" width="120" height="1">
+				<br><img src="${basePath}images/spacer.gif" width="120" height="1">
 
 				</td>
 				<td class="aka_revised_content" valign="top">
