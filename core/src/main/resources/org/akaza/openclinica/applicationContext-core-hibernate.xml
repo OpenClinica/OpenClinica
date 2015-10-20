@@ -178,11 +178,13 @@
   <bean id="usageStatsServiceDAO" class="org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO" parent="abstractDomainDao" autowire="byName" />
   <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionMediaDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemGroupDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemDao" class="org.akaza.openclinica.dao.hibernate.ItemDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="itemDataDao" class="org.akaza.openclinica.dao.hibernate.ItemDataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemReferenceTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemReferenceTypeDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemDataTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemDataTypeDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="responseSetDao" class="org.akaza.openclinica.dao.hibernate.ResponseSetDao" parent="abstractDomainDao" autowire="byName" />
