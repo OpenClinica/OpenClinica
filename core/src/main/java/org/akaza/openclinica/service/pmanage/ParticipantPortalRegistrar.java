@@ -146,6 +146,7 @@ public class ParticipantPortalRegistrar {
         authStudy.setStudyOid(studyOid);
         authStudy.setInstanceUrl(ocUrl);
         authStudy.setHost(hostName);
+        authStudy.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
         authRequest.setStudy(authStudy);
 
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
