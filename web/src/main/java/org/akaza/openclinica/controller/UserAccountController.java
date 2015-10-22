@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -116,6 +117,7 @@ public class UserAccountController {
 		passwordHash = secm.encrytPassword(password, null);
 
 		// Validate Entry Fields
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), new Locale("en_US"));
 		Validator v = new Validator(request);
 		addValidationToFields(v, username);
 		HashMap errors = v.validate();
