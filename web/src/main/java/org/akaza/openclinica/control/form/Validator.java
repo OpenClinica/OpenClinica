@@ -476,8 +476,7 @@ public class Validator {
         validations = new HashMap();
         errors = new HashMap();
         this.request = request;
-         locale=request.getLocale();
- //      locale = LocaleResolver.getLocale(request);
+        locale = LocaleResolver.getLocale(request);
         resformat = ResourceBundleProvider.getFormatBundle(locale);
         restext = ResourceBundleProvider.getTextsBundle(locale);
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
