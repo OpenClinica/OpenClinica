@@ -207,9 +207,9 @@ public class SetUserRoleServlet extends SecureController {
                         + respage.getString("has_been_granted_the_role") + " \"" + sur.getRole().getDescription() + "\" " + respage.getString("in_the_study_site") + " "
                         + userStudy.getName() + ".");
                 }
-                String url=response.encodeRedirectURL("ListUserAccounts");
-                          response.sendRedirect(url);
-//                forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+      //          String url=response.encodeRedirectURL("ListUserAccounts");
+        //                  response.sendRedirect(url);
+                forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 
             }
 

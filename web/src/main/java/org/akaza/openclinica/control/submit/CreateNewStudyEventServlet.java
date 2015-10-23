@@ -116,6 +116,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                     + respage.getString("study_subject_has_been_deleted"));
                 request.setAttribute("id", new Integer(studySubjectId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                session.removeAttribute(SecureController.PAGE_MESSAGE);
             }
             // YW >>
             request.setAttribute(INPUT_REQUEST_STUDY_SUBJECT, "no");
@@ -228,6 +229,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
             setInputMessages(new HashMap());
             forwardPage(Page.CREATE_NEW_STUDY_EVENT);
+            session.removeAttribute(SecureController.PAGE_MESSAGE);
         } else {
             // tbh
             // String dateCheck = (String)request.getAttribute("startDate");
@@ -471,6 +473,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 setupBeans(subjects, eventDefinitions);
                 request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
                 forwardPage(Page.CREATE_NEW_STUDY_EVENT);
+                session.removeAttribute(SecureController.PAGE_MESSAGE);
             } else {
             	logger.debug("error is empty");
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
@@ -605,9 +608,9 @@ public class CreateNewStudyEventServlet extends SecureController {
 
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
-                String url=response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId());
-                response.sendRedirect(url);
-               // forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+           //     String url=response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId());
+          //      response.sendRedirect(url);
+                forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
                 // we want to actually have url of entering data in browser, so
                 // redirecting
                 // response.sendRedirect(response.encodeRedirectURL(
