@@ -605,9 +605,10 @@ public class CreateNewStudyEventServlet extends SecureController {
 
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
-                String url=response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId());
+                ArrayList <String> pMessage =  (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
+                String url=response.encodeRedirectURL("EnterDataForStudyEvent?eventId=" + studyEvent.getId()+"&alertmessage="+ pMessage.get(0));
                 response.sendRedirect(url);
-               // forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+//                forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
                 // we want to actually have url of entering data in browser, so
                 // redirecting
                 // response.sendRedirect(response.encodeRedirectURL(
