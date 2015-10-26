@@ -39,7 +39,7 @@ public class ReportController {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	/**
-	 * @api {post} /pages/healthcheck/runonschedule Run On Schedule
+	 * @api {post} /pages/healthcheck/runonschedule Evaluate runOnSchedule behavior
 	 * @apiName ruleTrigger
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -47,10 +47,10 @@ public class ReportController {
 	 * @apiParam {String} ssZoneId Study Subject TimeZone .
 	 * @apiParam {String} runTime Scheduled Run Time .
 	 * @apiParam {String} serverTime Server Time .
-	 * @apiGroup TimeZone
-	 * @apiDescription This API is to Test the RunTime with respect to Server and Subject TimeZones
+	 * @apiGroup Rule
+	 * @apiDescription Evaluate runOnSchedule behavior taking into consideration different time zones the subject and the server could be on.
 	 * @apiParamExample {json} Request-Example:
-	 * 
+	 *
 	 *                  {
 	 *                  "serverZoneId" :"America/New_York",
 	 *                  "ssZoneId" :"America/New_York",
@@ -92,16 +92,16 @@ public class ReportController {
 	}
 
 	/**
-	 * @api {post} /pages/healthcheck/rulecurrentdate Current Date Comparison
+	 * @api {post} /pages/healthcheck/rulecurrentdate Evaluate currentDate behavior
 	 * @apiName getSSZone
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
 	 * @apiParam {String} serverZoneId Server TimeZone.
 	 * @apiParam {String} ssZoneId Study Subject TimeZone .
-	 * @apiGroup TimeZone
-	 * @apiDescription This API is to Test the current date with respect to Server and Subject Timezones
+	 * @apiGroup Rule
+	 * @apiDescription Evaluate current date taking into consideration different time zones the subject and the server could be on.
 	 * @apiParamExample {json} Request-Example:
-	 * 
+	 *
 	 *                  {
 	 *                  "serverZoneId" :"America/New_York",
 	 *                  "ssZoneId" :"America/New_York"
@@ -127,12 +127,12 @@ public class ReportController {
 	}
 
 	/**
-	 * @api {post} /pages/healthcheck/runtime Get RunTime when not set
+	 * @api {post} /pages/healthcheck/runtime Retrieve runOnSchedule default runTime
 	 * @apiName getRunTime
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
-	 * @apiGroup TimeZone
-	 * @apiDescription This API is to get the Runtime when is not set
+	 * @apiGroup Rule
+	 * @apiDescription Retrieves the default runOnSchedule runtime for rules. The runOnSchedule when configured, allows you to run rules on a schedule.
 	 * @apiSuccessExample {json} Success-Response:
 	 *                    HTTP/1.1 200 OK
 	 *                    {

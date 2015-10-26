@@ -769,10 +769,10 @@ public class AddNewSubjectServlet extends SecureController {
                     createStudyEvent(fp, studySubject);
                     // YW <<
                     request.setAttribute("id", studySubject.getId() + "");
-                   String url= response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-                   response.sendRedirect(url);
+ //                  String url= response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
+ //                  response.sendRedirect(url);
 
- //                   forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                  forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     // YW >>
                     // we want to get the url of viewing study subject in
                     // browser to avoid page expired problem
@@ -823,10 +823,10 @@ public class AddNewSubjectServlet extends SecureController {
                     // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     // forwardPage(Page.SUBMIT_DATA_SERVLET);
                     request.setAttribute("id", studySubject.getId() + "");
-                    String url=response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
-                    response.sendRedirect(url);
+   //                 String url=response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
+   //                 response.sendRedirect(url);
 
-   //                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
 
                     return;
                 }

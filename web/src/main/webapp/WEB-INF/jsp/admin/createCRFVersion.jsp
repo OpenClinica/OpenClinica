@@ -96,12 +96,38 @@ function myCancel() {
 }
 function submitform(){
     var crfUpload = document.getElementById('excel_file_path');
-	//Does the user browse or select a file or not
+    //Does the user browse or select a file or not
     if (crfUpload.value =='' ) {
         alert("Select a file to upload!");
         return false;
     }
 }
+
+function submitXform(){
+    var crfName = document.getElementById('crfName');
+    var versionName = document.getElementById('versionName');
+    var versionDescription = document.getElementById('versionDescription');
+    var revisionNotes = document.getElementById('revisionNotes');
+    var xformText = document.getElementById('xformText');
+
+    if (crfName && crfName.value =='' ) {
+        alert('<fmt:message key="xform_upload_crfName" bundle="${resword}"/>');
+        return false;
+    } else if (versionName.value =='' ){
+        alert('<fmt:message key="xform_upload_version" bundle="${resword}"/>');
+        return false;
+	} else if (versionDescription.value =='' ){
+        alert('<fmt:message key="xform_upload_version_description" bundle="${resword}"/>');
+        return false;
+    } else if (revisionNotes.value =='' ){
+        alert('<fmt:message key="xform_upload_version_revision_notes" bundle="${resword}"/>');
+        return false;
+	} else if (xformText.value =='' ){
+	    alert('<fmt:message key="xform_upload_xform_contents" bundle="${resword}"/>');
+	    return false;
+	}
+}
+
 function toggleSectionDisplay(showDivId,hideDivId){
     document.getElementById(hideDivId).setAttribute("class","crf-upload-div-hidden");
     document.getElementById(showDivId).setAttribute("class","crf-upload-div");
@@ -211,7 +237,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
     <table border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <input type="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
+          <input type="submit" onclick="return submitXform()" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
         </td>
         <td>
           <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>

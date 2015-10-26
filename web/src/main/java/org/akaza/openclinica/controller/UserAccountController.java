@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -77,7 +78,7 @@ public class UserAccountController {
 	UserAccountBean uBean;
 
 	/**
-	 * @api {post} /pages/auth/api/v1/createuseraccount Create New User Account
+	 * @api {post} /pages/auth/api/v1/createuseraccount Create a user account
 	 * @apiName createOrUpdateAccount2
 	 * @apiPermission admin
 	 * @apiVersion 1.0.0
@@ -90,9 +91,9 @@ public class UserAccountController {
 	 * @apiParam {String} role_name Role Name
 	 * @apiParam {String} user_type User Type
 	 * @apiParam {String} authorize_soap Authorize Soap
-	 * 
+	 *
 	 * @apiGroup User Account
-	 * @apiDescription This API is to create a new user account
+	 * @apiDescription Creates a user account
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "username": "testingUser",
@@ -160,6 +161,7 @@ public class UserAccountController {
 		passwordHash = secm.encrytPassword(password, null);
 
 		// Validate Entry Fields
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), new Locale("en_US"));
 		Validator v = new Validator(request);
 		addValidationToFields(v, username);
 		HashMap errors = v.validate();
