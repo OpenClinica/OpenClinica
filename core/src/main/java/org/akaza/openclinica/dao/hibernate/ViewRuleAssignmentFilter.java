@@ -69,15 +69,11 @@ public class ViewRuleAssignmentFilter implements CriteriaCommand {
     private String buildCriteria(String criteria, String property, Object value) {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
-            if (property.equals("studyId") || property.equals("ruleSetRunSchedule")  || property.equals("actionType") || property.equals("actionExecuteOn") || property.equals("ruleSetRuleStatus")) {
+            if (property.equals("studyId") || property.equals("ruleSetRunSchedule") ||  property.equals("actionType") || property.equals("actionExecuteOn") || property.equals("ruleSetRuleStatus")) {
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             }
-            else if (property.equals("ruleSetRunTime") ){
-                criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
-
-            }
             else {
-                criteria = " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
+                criteria += " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
             }
         }
         return criteria;
