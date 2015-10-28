@@ -951,7 +951,7 @@ public class StudyController {
 		sed.setCategory(category);
 		sed.setType(type.toLowerCase());
 		sed.setDescription(description);
-		sed.setRepeating(Boolean.valueOf("repeating"));
+		sed.setRepeating(Boolean.valueOf(repeating));
 		sed.setStudyId(parentStudy.getId());
 		sed.setOwner(owner);
 		sed.setStatus(Status.AVAILABLE);
