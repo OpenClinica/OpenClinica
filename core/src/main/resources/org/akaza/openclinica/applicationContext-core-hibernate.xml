@@ -103,8 +103,8 @@
                 <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>  
                 <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>   -->
+                <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValueId</value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>   -->
@@ -179,6 +179,7 @@
   <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionMediaDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
@@ -192,6 +193,7 @@
   <bean id="itemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
     <property name="dataSource" ref="dataSource"/>

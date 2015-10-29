@@ -412,6 +412,8 @@ public class OdmController {
         studyEventData.setStartDate(studyEvent.getDateStarted().toString());
         StudyEventDefinitionBean studyEventDefBean = getStudyEventDefinitionBean(studyEvent.getStudyEventDefinitionId());
         studyEventData.setEventName(studyEventDefBean.getName());
+        studyEventData.setStudyEventOID(studyEventDefBean.getOid());
+        studyEventData.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
         return studyEventData;
     }
 
