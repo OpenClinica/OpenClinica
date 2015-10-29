@@ -780,9 +780,9 @@ public class PformSubmissionService {
 
                             }
                             
-                            /*
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+                            /*
                             // Study Event status
                             // update
                             int count;
