@@ -1,37 +1,26 @@
 package org.akaza.openclinica.service;
 
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
@@ -49,17 +38,8 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.akaza.openclinica.service.crfdata.BeanPropertyService;
-import org.apache.log4j.spi.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
@@ -143,31 +123,11 @@ public class PformSubmissionService {
         return inputUserName;
     }
 
-    private int getCountCompletedEventCrfsInAStudyEvent(StudyEventBean seBean) {
-        int count = 0;
-        count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
-        return count;
-    }
-
-    private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId, Integer studyId) {
-        int count = 0;
-        edcdao = new EventDefinitionCRFDAO(ds);
-        count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId, studyId).size();
-        return count;
-    }
-
     private EventDefinitionCRFBean getCrfVersionStatusInAEventDefCrf(String crfVersionOid, StudyBean studyBean, StudyEventBean studyEventBean) {
         edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean eventDefinitionCRFBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
                 getCRFVersion(crfVersionOid).getId());
         return eventDefinitionCRFBean;
-    }
-
-    private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId, Integer studyId) {
-        int count = 0;
-        edcdao = new EventDefinitionCRFDAO(ds);
-        count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId, studyId).size();
-        return count;
     }
 
     private StudyBean getStudy(Integer id) {
@@ -185,12 +145,6 @@ public class PformSubmissionService {
     private StudySubjectBean getStudySubject(String oid) {
         ssdao = new StudySubjectDAO(ds);
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByOid(oid);
-        return studySubjectBean;
-    }
-
-    private StudySubjectBean getStudySubject(Integer id) {
-        ssdao = new StudySubjectDAO(ds);
-        StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(id);
         return studySubjectBean;
     }
 
@@ -229,18 +183,6 @@ public class PformSubmissionService {
         ecdao = new EventCRFDAO(ds);
         ArrayList<EventCRFBean> eventCrfBeanList = ecdao.findByEventSubjectVersion(studyEventBean, studySubjectBean, getCRFVersion(crfVersionOid));
         return eventCrfBeanList;
-    }
-
-    // private ArrayList<ItemDataBean> getItemDataRecord(int itemDataId) {
-    // iddao = new ItemDataDAO(ds);
-    // ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
-    // return itemDataBeanList;
-    // }
-
-    private ArrayList<ItemDataBean> getItemDataRecords(int eventCRFId) {
-        iddao = new ItemDataDAO(ds);
-        ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
-        return itemDataBeanList;
     }
 
     private ItemBean getItemRecord(String itemName, CRFVersionBean crfVersion) {
@@ -634,32 +576,6 @@ public class PformSubmissionService {
                             
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-                            /*
-                            // Study Event status
-                            // update
-                            int count;
-                            if (studyBean.getParentStudyId() != 0) { // this is a site
-                                StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-                                count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
-                            } else { // a parent study
-                                count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
-
-                            }
-                            if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
-
-                                // if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
-                                // getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-                                // .getId(),studyBean.getId())) {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-                            } else {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-                            }
-                            ArrayList<Integer> ruleList = new ArrayList<Integer>();
-                            for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-                                setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
-                            }
-                            setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
-							*/
                         }
                     }
                 }
@@ -782,197 +698,12 @@ public class PformSubmissionService {
                             
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-                            /*
-                            // Study Event status
-                            // update
-                            int count;
-                            if (studyBean.getParentStudyId() != 0) { // this is a site
-                                StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-                                count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
-                            } else { // a parent study
-                                count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
-
-                            }
-                            if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
-
-                                // if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
-                                // getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-                                // .getId(),studyBean.getId())) {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-                            } else {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-                            }
-                            ArrayList<Integer> ruleList = new ArrayList<Integer>();
-                            for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-                                setDynItemFormMetadata(cvdao.findByOid(crfVersion.getOid()), eventCrfBean, itemDataBean1, ruleList);
-                            }
-                            setDynItemGroupMetadata(cvdao.findByOid(crfVersion.getOid()), eventCrfBean);
-							*/
-                        }
+                         }
                     }
                 }
             }
         }
         return errors;
-    }
-
-    @SuppressWarnings("null")
-    private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean, ArrayList<Integer> ruleList) {
-        iddao = new ItemDataDAO(ds);
-        ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getItemPropertyBean(itemBean.getOid());
-        RuleBean ruleBean;
-        if (propertyBeans.size() != 0) {
-            for (PropertyBean propertyBean : propertyBeans) {
-                logger.info("property bean oid:   " + propertyBean.getOid());
-                RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
-                if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-                    ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-                    getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
-                }
-
-            }
-        }
-
-    }
-
-    private void setDynItemGroupMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean) {
-        igdao = new ItemGroupDAO(ds);
-        ArrayList<Integer> ruleList = new ArrayList<Integer>();
-        ArrayList<ItemGroupBean> itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersionBean.getId());
-        for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-            ArrayList<PropertyBean> propertyBeans = null;
-            propertyBeans = getGroupPropertyBean(itemGroupBean.getOid());
-
-            if (propertyBeans.size() != 0) {
-                for (PropertyBean propertyBean : propertyBeans) {
-                    logger.info("property bean oid:   " + propertyBean.getOid());
-                    RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
-                    if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-                        getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
-                    }
-                }
-            }
-        }
-
-    }
-
-    private void getItemGroupMetaDataList(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
-        igmdao = new ItemGroupMetadataDAO(ds);
-        ArrayList<ItemGroupMetadataBean> itemGroupMetadataBeans = (ArrayList<ItemGroupMetadataBean>) igmdao.findMetaByGroupAndCrfVersion(itemGroupBean.getId(),
-                crfVersionBean.getId());
-        DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = null;
-        for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
-            DynamicsItemGroupMetadataBean dynGrpBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(itemGroupMetadataBean, eventCrfBean);
-            if (dynGrpBean == null) {
-                dynamicsItemGroupMetadataBean = createDynamicsItemGroupMetadataBean(itemGroupBean, eventCrfBean, itemGroupMetadataBean);
-                saveDynamicGroupMeta(dynamicsItemGroupMetadataBean);
-            }
-        }
-    }
-
-    private void getItemFormMetaDataList(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
-        DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = null;
-        ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
-
-        DynamicsItemFormMetadataBean dynBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
-        if (dynBean == null) {
-            dynamicsItemFormMetadataBean = createDynamicsItemFormMetadataBean(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
-            saveDynamicItemFormMeta(dynamicsItemFormMetadataBean);
-        }
-    }
-
-    private DynamicsItemFormMetadataBean createDynamicsItemFormMetadataBean(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean,
-            CRFVersionBean crfVersionBean) {
-
-        ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
-
-        DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = new DynamicsItemFormMetadataBean();
-        dynamicsItemFormMetadataBean.setEventCrfId(eventCrfBean.getId());
-        dynamicsItemFormMetadataBean.setCrfVersionId(crfVersionBean.getId());
-        dynamicsItemFormMetadataBean.setItemFormMetadataId(itemFormMetadataBean.getId());
-        dynamicsItemFormMetadataBean.setItemId(itemBean.getId());
-        dynamicsItemFormMetadataBean.setShowItem(true);
-        dynamicsItemFormMetadataBean.setItemDataId(itemDataBean.getId());
-        dynamicsItemFormMetadataBean.setVersion(0);
-        dynamicsItemFormMetadataBean.setPassedDde(0);
-
-        return dynamicsItemFormMetadataBean;
-    }
-
-    private DynamicsItemGroupMetadataBean createDynamicsItemGroupMetadataBean(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean,
-            ItemGroupMetadataBean itemGroupMetadataBean) {
-
-        DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = new DynamicsItemGroupMetadataBean();
-        dynamicsItemGroupMetadataBean.setEventCrfId(eventCrfBean.getId());
-        dynamicsItemGroupMetadataBean.setItemGroupId(itemGroupBean.getId());
-        dynamicsItemGroupMetadataBean.setItemGroupMetadataId(itemGroupMetadataBean.getId());
-        dynamicsItemGroupMetadataBean.setShowGroup(true);
-        dynamicsItemGroupMetadataBean.setVersion(0);
-        dynamicsItemGroupMetadataBean.setPassedDde(0);
-
-        return dynamicsItemGroupMetadataBean;
-    }
-
-    private void saveDynamicItemFormMeta(DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean) {
-        getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsItemFormMetadataBean);
-    }
-
-    private void saveDynamicGroupMeta(DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean) {
-        getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsItemGroupMetadataBean);
-    }
-
-    private ArrayList<PropertyBean> getGroupPropertyBean(String groupOid) {
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getRuleActionPropertyDao().findByOid(groupOid);
-        return propertyBeans;
-    }
-
-    private ArrayList<PropertyBean> getItemPropertyBean(String itemOid) {
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getRuleActionPropertyDao().findByOid(itemOid);
-        return propertyBeans;
-    }
-
-    public RuleActionPropertyDao getRuleActionPropertyDao() {
-        return ruleActionPropertyDao;
-    }
-
-    public void setRuleActionPropertyDao(RuleActionPropertyDao ruleActionPropertyDao) {
-        this.ruleActionPropertyDao = ruleActionPropertyDao;
-    }
-
-    public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
-        return dynamicsItemGroupMetadataDao;
-    }
-
-    public void setDynamicsItemGroupMetadataDao(DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao) {
-        this.dynamicsItemGroupMetadataDao = dynamicsItemGroupMetadataDao;
-    }
-
-    public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
-        return dynamicsItemFormMetadataDao;
-    }
-
-    public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
-        this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
-    }
-
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
-            return study;
-        } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-            return parentStudy;
-        }
-    }
-
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(ds);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
-        return studyBean;
     }
 
 }
