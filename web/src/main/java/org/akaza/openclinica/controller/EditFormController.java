@@ -61,6 +61,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.springframework.http.HttpHeaders;
 
 @Controller
 @RequestMapping(value = "/api/v1/editform")
@@ -173,7 +174,9 @@ public class EditFormController {
         editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance, formContext, redirectUrl).getEdit_url() + "&ecid=" + formContext;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
-        return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Access-Control-Allow-Origin", CoreResources.getField("portalURL"));
+        return new ResponseEntity<String>(editURL, headers,  org.springframework.http.HttpStatus.ACCEPTED);
 
     }
 

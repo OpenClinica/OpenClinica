@@ -643,15 +643,10 @@ public class PformSubmissionService {
                                 count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
 
                             }
-                            if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
-
-                                // if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
-                                // getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-                                // .getId(),studyBean.getId())) {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-                            } else {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-                            }
+                            // Before v3.8 surveys were automatically set to completed when all participant forms of said survey have
+                            // been filled, v3.8 changes that, participant can still change their submitted entries before they marks
+                            // the survey as completed.
+                            updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
                             ArrayList<Integer> ruleList = new ArrayList<Integer>();
                             for (ItemDataBean itemDataBean1 : itemDataBeanList) {
                                 setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
