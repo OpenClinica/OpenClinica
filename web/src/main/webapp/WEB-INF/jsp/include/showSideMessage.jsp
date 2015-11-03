@@ -20,7 +20,7 @@
 
 <c:if test="${empty pageMessages && param.alertmessage!=null  }">
 <div class="alert"> 
-<%= (new String(request.getParameter("alertmessage").getBytes("ISO-8859-1"),"UTF-8"))  %>
+ <c:out value="${param.alertmessage}" escapeXml="false"/> 
  <br><br>
 </div>
 </c:if>
