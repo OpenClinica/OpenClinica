@@ -280,11 +280,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			if (email.trim().equals("${participant}") || participateStatus.equals("enabled")) {
 			    if (email.trim().equals("${participant}")){ 
 				pDTO.setEmailAccount(pDTO.getParticipantEmailAccount());
-			    pDTO.setEncryptedEmailAccount(true);
+			    pDTO.setEncryptedEmailAccount(Boolean.TRUE);
 			    }else{
 				pDTO.setEmailAccount(email.trim());
 				pDTO.setPhone(null);
-			    pDTO.setEncryptedEmailAccount(false);
+			    pDTO.setEncryptedEmailAccount(Boolean.FALSE);
 			    }
 				// Send Email thru Mandrill Mail Server
 				try {
