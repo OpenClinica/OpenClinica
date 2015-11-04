@@ -272,9 +272,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			pDTO = buildNewPDTO();
             message = message.replaceAll("\\\\n", "\n");
             emailSubject = emailSubject.replaceAll("\\\\n", "\n");
-	         pDTO.setOrigMessage(message);
-             pDTO.setOrigEmailSubject(emailSubject);
-			System.out.println();
+            pDTO.setOrigMessage(message);
+            pDTO.setOrigEmailSubject(emailSubject);
 		}
 
 		
