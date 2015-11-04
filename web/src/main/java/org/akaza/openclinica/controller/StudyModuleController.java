@@ -155,7 +155,7 @@ public class StudyModuleController {
             return "redirect:/pages/studymodule";
         }
         String status = "";
-        String nameAvailability = registrar.getHostNameAvailability(hostName);        
+        String nameAvailability = registrar.getHostNameAvailability(hostName);
         if (nameAvailability.equals(ParticipantPortalRegistrar.UNAVAILABLE)) {
             addRegMessage(request, respage.getString("participate_hostname_not_available"));
             return "redirect:/pages/studymodule";
@@ -167,7 +167,7 @@ public class StudyModuleController {
             return "redirect:/pages/studymodule";
         } else {
             // Returned status was 'available'. Proceed with registration.
-            status = registrar.registerStudy(study.getOid(), hostName);
+            status = registrar.registerStudy(study.getOid(), hostName, study.getIdentifier());
         }
 
         // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
