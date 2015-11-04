@@ -112,7 +112,7 @@ public class OpenRosaServices {
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
      * @apiName getFormList
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
      * @apiDescription Retrieves a listing of the available OpenClinica forms.
@@ -223,7 +223,7 @@ public class OpenRosaServices {
      * @api {get} /rest2/openrosa/:studyOID/manifest Get Form Manifest
      * @apiName getManifest
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
      * @apiDescription Gets additional information on a particular Form, including links to associated media.
@@ -291,7 +291,7 @@ public class OpenRosaServices {
      * @api {get} /rest2/openrosa/:studyOID/formXml Get Form XML
      * @apiName getFormXml
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
      * @apiDescription Downloads the contents of a form
@@ -342,7 +342,7 @@ public class OpenRosaServices {
      * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
      * @apiName getMediaFile
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOID Study Oid.
      * @apiGroup Form
      * @apiDescription Downloads media associated with a form, including images and video.
@@ -438,7 +438,7 @@ public class OpenRosaServices {
      * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
      * @apiName doSubmission
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
      * @apiParam {String} ecid Key that will be used to look up subject context information while processing submission.
      * @apiGroup Form
@@ -499,8 +499,7 @@ public class OpenRosaServices {
                 body = "<instance>" + body + "</instance>";
             }
 
-            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
-                    crfvdao.findByOid(crfVersionOID));
+            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal, crfvdao.findByOid(crfVersionOID));
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));

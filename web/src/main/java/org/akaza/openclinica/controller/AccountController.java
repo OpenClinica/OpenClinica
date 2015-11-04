@@ -70,7 +70,7 @@ public class AccountController {
 	 * @api {post} /pages/accounts/login Retrieve a user account
 	 * @apiName getAccountByUserName
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} username OC login Username.
 	 * @apiParam {String} password OC login Password .
 	 * @apiGroup User Account
@@ -146,7 +146,7 @@ public class AccountController {
 	 * @api {get} /pages/accounts/study/:studyOid/crc/:crcUserName Retrieve a user account - crc
 	 * @apiName getAccount1
 	 * @apiPermission Module participate - enabled & admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} crcUserName CRC Username .
 	 * @apiGroup User Account
@@ -217,7 +217,7 @@ public class AccountController {
 	 * @api {get} /pages/accounts/study/:studyOid/accesscode/:accessCode Retrieve a user account - participant
 	 * @apiName getAccount2
 	 * @apiPermission Module participate - enabled & admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} accessCode Participant Access code .
 	 * @apiGroup User Account
@@ -276,7 +276,7 @@ public class AccountController {
 	 * @api {get} /pages/accounts/study/:studyOid/studysubject/:studySubjectId Retrieve a user account - participant
 	 * @apiName getAccount3
 	 * @apiPermission Module participate - enabled & admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Id .
 	 * @apiGroup User Account
@@ -339,7 +339,7 @@ public class AccountController {
 	 * @api {post} /pages/accounts/ Create a user account - participant
 	 * @apiName createParticipantUserAccount
 	 * @apiPermission Module participate - enabled & admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Id .
 	 * @apiParam {String} fName First Name
@@ -379,7 +379,7 @@ public class AccountController {
 	 * @api {post} /pages/accounts/ Update a user account - participant
 	 * @apiName updateParticipantUserAccount
 	 * @apiPermission Module participate - enabled & admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Id .
 	 * @apiParam {String} fName First Name
@@ -498,7 +498,7 @@ public class AccountController {
 	 * @api {post} /pages/accounts/timezone Update subject time zone
 	 * @apiName updateTimezone
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid.
 	 * @apiParam {String} studySubjectId Study Subject Oid .
 	 * @apiParam {String} timeZone Time Zone .

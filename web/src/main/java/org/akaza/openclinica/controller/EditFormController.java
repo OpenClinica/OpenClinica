@@ -120,7 +120,7 @@ public class EditFormController {
      * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
      * @apiName getEditUrl
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
      * @apiParam {String} ecid Key that will be used by enketo to cache form information.
      * @apiGroup Form
