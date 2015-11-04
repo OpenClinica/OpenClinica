@@ -63,7 +63,7 @@ public class AnonymousFormController {
 	 * @api {post} /pages/api/v1/anonymousform/form Retrieve anonymous form URL
 	 * @apiName getEnketoForm
 	 * @apiPermission Module participate - enabled
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} studyOid Study Oid
 	 * @apiParam {String} submissionUri Submission Url
 	 * @apiGroup Form

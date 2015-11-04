@@ -79,7 +79,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies Create a study
 	 * @apiName createNewStudy
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -407,7 +407,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
 	 * @apiName createNewSite
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -726,7 +726,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
 	 * @apiName createEventDefinition
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
 	 * @apiParam {String} name Event Name.
 	 * @apiParam {String} description Event Description.
@@ -850,7 +850,7 @@ public class StudyController {
 			ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
 			errorObjects.add(errorOBject);
 		}
-        
+
 		Validator v1 = new Validator(request);
 		v1.addValidation("name", Validator.NO_BLANKS);
 		HashMap vError1 = v1.validate();
