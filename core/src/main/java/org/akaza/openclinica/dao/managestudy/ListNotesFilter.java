@@ -78,6 +78,9 @@ public class ListNotesFilter implements CriteriaCommand {
                     criteria = criteria + " and ";
                     criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
                 }
+            } else if ("discrepancyNoteBean.createdDate".equalsIgnoreCase(property) || "discrepancyNoteBean.updatedDate".equalsIgnoreCase(property) ) {                
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + "::timestamp::date = '" + value.toString() + "' ";                
             } else {
                 criteria = criteria + " and ";
                 criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
