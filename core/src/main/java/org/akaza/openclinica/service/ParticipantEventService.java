@@ -32,36 +32,30 @@ public class ParticipantEventService {
 	}
 	
 	public StudyEventBean getNextParticipantEvent(StudySubjectBean studySubject) {
-		System.out.println("Finding next event for subject: " + studySubject.getOid() + "/"  + studySubject.getSubjectId());
 		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>)getStudyEventDAO().findAllBySubjectIdOrdered(studySubject.getSubjectId());
-		System.out.println("Found " + studyEvents.size() + " studyEvents for subject.");
 		
 		for (StudyEventBean studyEvent:studyEvents) {
 			List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
-			System.out.println("Found " + eventDefCrfs.size() + " eventDefCrfs for event " + studyEvent.getId());
 			
 			for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
 				boolean participantForm = eventDefCrf.isParticipantForm();
 				
 				if (participantForm) {
-					System.out.println("Found participant event def: " + eventDefCrf.getCrfName() + ":" + eventDefCrf.getId());
 					List<CRFVersionBean> crfVersions = getAllCrfVersions(eventDefCrf);
 					
 					boolean eventCrfExists = false;
-					System.out.println("Found " + crfVersions.size() + " CRF Versions.");
 					for (CRFVersionBean crfVersion:crfVersions) {
 						EventCRFBean eventCRF = getEventCRFDAO().findByEventCrfVersion(studyEvent, crfVersion);
-						if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) {System.out.println(eventCRF.getId() + " is a matching, available EventCRF.  Success!  Returning studyEvent: " + studyEvent.getId());return studyEvent; }
+						if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) return studyEvent;
 						else if (eventCRF != null) eventCrfExists = true;
 					}
-					if (!eventCrfExists) {System.out.println("No eventCRF exists for this eventDefCrf. Success!  Returning studyEvent: " + studyEvent.getId());return studyEvent;}
+					if (!eventCrfExists) return studyEvent;
 					
 				}
 			}
 		}
 		
 		// Did not find a next participant event
-		System.out.println("No events meeting criteria found.  Returning null");
 		return null;
 	}
 	

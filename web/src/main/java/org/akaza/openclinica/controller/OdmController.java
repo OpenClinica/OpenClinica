@@ -245,7 +245,6 @@ public class OdmController {
         	ParticipantEventService participantEventService = new ParticipantEventService(dataSource);
             StudyEventBean nextEvent = participantEventService.getNextParticipantEvent(studySubjectBean);
             logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
-            System.out.println("ODMController found the next studyEvent.  ID=" + nextEvent.getId());
 
             List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
             StudyBean study = studyDAO.findByOid(studyOID);
