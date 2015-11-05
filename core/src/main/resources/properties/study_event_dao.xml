@@ -190,6 +190,16 @@
         </sql>
     </query>
     <query>
+        <name>findAllBySubjectIdOrdered</name>
+        <sql>
+			SELECT se.*
+            FROM study_event se, study_event_definition sed
+            WHERE se.study_event_definition_id = sed.study_event_definition_id
+            	AND se.study_subject_id=?			 
+            ORDER BY date(se.date_start) ASC, sed.ordinal ASC, se.sample_ordinal ASC
+        </sql>
+    </query>
+    <query>
         <name>findAllByStudySubject</name>
         <sql>
             SELECT se.* FROM study_event se, study_event_definition sed
