@@ -466,7 +466,7 @@ public class OpenRosaServices {
             }
 
             if (!mayProceedSubmission(studyOID))
-                builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
+                return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
