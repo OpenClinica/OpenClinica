@@ -270,7 +270,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		} else {
 			pDTO = buildNewPDTO();
-			System.out.println();
+            message = message.replaceAll("\\\\n", "\n");
+            emailSubject = emailSubject.replaceAll("\\\\n", "\n");
+            pDTO.setOrigMessage(message);
+            pDTO.setOrigEmailSubject(emailSubject);
 		}
 
 		
@@ -280,10 +283,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			if (email.trim().equals("${participant}") || participateStatus.equals("enabled")) {
 			    if (email.trim().equals("${participant}")){ 
 				pDTO.setEmailAccount(pDTO.getParticipantEmailAccount());
-			    pDTO.setEncryptedEmailAccount(true);
+			    pDTO.setEncryptedEmailAccount(Boolean.TRUE);
 			    }else{
 				pDTO.setEmailAccount(email.trim());
-			    pDTO.setEncryptedEmailAccount(false);
+				pDTO.setPhone(null);
+			    pDTO.setEncryptedEmailAccount(Boolean.FALSE);
 			    }
 				// Send Email thru Mandrill Mail Server
 				try {

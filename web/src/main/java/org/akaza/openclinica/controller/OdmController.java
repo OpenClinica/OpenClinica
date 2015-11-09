@@ -86,7 +86,7 @@ public class OdmController {
      * @api {get} /pages/odmk/studies/:studyOid/metadata Retrieve metadata
      * @apiName getStudyMetadata
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
      * @apiGroup Study
      * @apiDescription Retrieve the metadata of the specified study
@@ -112,7 +112,7 @@ public class OdmController {
     /**
      * This URL needs to change ... Right now security disabled on this ... You can call this with
      * http://localhost:8080/OpenClinica-web-MAINLINE-SNAPSHOT /pages/odmk/studies/S_DEFAULTS1/events
-     * 
+     *
      * @param studyOid
      * @return
      * @throws Exception
@@ -121,7 +121,7 @@ public class OdmController {
      * @api {get} /pages/odmk/study/:studyOid/studysubject/:studySubjectOid/events Retrieve an event - participant
      * @apiName getEvent
      * @apiPermission Module participate - enabled
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
      * @apiParam {String} studySubjectOid Study Subject Oid
      * @apiGroup Study Event
@@ -437,7 +437,7 @@ public class OdmController {
 
     /**
      * Currently not used, but keep here for future unit test
-     * 
+     *
      * @param clazz
      * @param odm
      * @return

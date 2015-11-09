@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -208,9 +209,9 @@ public class SetUserRoleServlet extends SecureController {
                         + userStudy.getName() + ".");
                 }
                 ArrayList <String> pMessage =  (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
-                String url=response.encodeRedirectURL("ListUserAccounts"+"?alertmessage="+ pMessage.get(0));
+                String url=response.encodeRedirectURL("ListUserAccounts"+"?alertmessage="+  URLEncoder.encode(pMessage.get(0), "UTF-8"));
                           response.sendRedirect(url);
-        //        forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+          //   forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
 
             }
 
