@@ -283,6 +283,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			    pDTO.setEncryptedEmailAccount(true);
 			    }else{
 				pDTO.setEmailAccount(email.trim());
+				pDTO.setPhone(null);
 			    pDTO.setEncryptedEmailAccount(false);
 			    }
 				// Send Email thru Mandrill Mail Server
