@@ -8,6 +8,7 @@ public class Study {
     private String studyOid = null;
     private String host = null;
     private Organization organization = null;
+    private String studyName = null;
     private String OpenClinicaVersion = null;
 
     public String getInstanceUrl() {
@@ -40,6 +41,14 @@ public class Study {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    public String getStudyName() {
+        return studyName;
+    }
+
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
     }
 
     public String getOpenClinicaVersion() {

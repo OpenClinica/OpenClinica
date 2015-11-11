@@ -177,12 +177,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
+        int parentStudyId=0;
 
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
-
-            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), currentStudy);
-            tableFacade.setTotalRows(totalRows);
+ //                     tableFacade.setTotalRows(100);
+            if (currentStudy.getParentStudyId()==0){
+              parentStudyId = currentStudy.getId();
+            }else{
+                parentStudyId = currentStudy.getParentStudyId();
+            }
+                            
+            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), parentStudyId);
+           tableFacade.setTotalRows(totalRows);
         }
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),

@@ -17,6 +17,14 @@
 </div>
 </c:if>
 
+
+<c:if test="${empty pageMessages && param.alertmessage!=null  }">
+<div class="alert"> 
+ <c:out value="${param.alertmessage}" escapeXml="false"/> 
+ <br><br>
+</div>
+</c:if>
+
 <c:if test="${param.message == 'authentication_failed'}">
 <div class="alert">
     <fmt:message key="no_have_correct_privilege_current_study" bundle="${resmessages}"/>
