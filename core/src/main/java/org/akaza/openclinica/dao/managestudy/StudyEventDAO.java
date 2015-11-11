@@ -1078,7 +1078,6 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), studySubjectOID);
         variables.put(Integer.valueOf(2), studySubjectOID);
-        variables.put(Integer.valueOf(3), studySubjectOID);
 
         String sql = digester.getQuery("getNextScheduledEvent");
         ArrayList alist = this.select(sql, variables);
