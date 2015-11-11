@@ -241,13 +241,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public Integer getCountWithFilter(ListNotesFilter filter, StudyBean currentStudy) {
+    public Integer getCountWithFilter(ListNotesFilter filter, Integer currentStudyId) {
         DiscrepancyNoteBean discrepancyNoteBean = new DiscrepancyNoteBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), currentStudy.getId());
-        variables.put(Integer.valueOf(2), currentStudy.getId());
+        variables.put(Integer.valueOf(1), currentStudyId);
+        variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getCountWithFilter");
         sql += filter.execute("");
 

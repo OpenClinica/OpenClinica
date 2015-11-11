@@ -108,6 +108,43 @@ public class OpenRosaServices {
     StudyDAO sdao;
     StudySubjectDAO studySubjectDao;
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
+     * @apiName getFormList
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Retrieves a listing of the available OpenClinica forms.
+     * @apiParamExample {json} Request-Example:
+     *                  {
+     *                  "studyOid": "S_SAMPLTE",
+     *                  }
+     * @apiSuccessExample {xml} Success-Response:
+     *                    HTTP/1.1 200 OK
+     *                    {
+     *                    <xforms xmlns="http://openrosa.org/xforms/xformsList">
+     *                    <xform>
+     *                    <formID>F_FIRSTFORM_1</formID>
+     *                    <name>First Form</name>
+     *                    <majorMinorVersion>1</majorMinorVersion>
+     *                    <version>1</version>
+     *                    <hash>8678370cd92814d4e3216d58d821403f</hash>
+     *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
+     *                    formId=F_FIRSTFORM_1</downloadUrl>
+     *                    </xform>
+     *                    <xform>
+     *                    <formID>F_SECONDFORM_1</formID>
+     *                    <name>Second Form</name>
+     *                    <majorMinorVersion>1</majorMinorVersion>
+     *                    <version>1</version>
+     *                    <hash>7ee60d1c6516b730bbe9bdbd7cad942f</hash>
+     *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
+     *                    formId=F_SECONDFORM_1</downloadUrl>
+     *                    </xform>
+     *                    </xforms>
+     */
+
     @GET
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
@@ -182,6 +219,16 @@ public class OpenRosaServices {
         }
     }
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/manifest Get Form Manifest
+     * @apiName getManifest
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Gets additional information on a particular Form, including links to associated media.
+     */
+
     @GET
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
@@ -240,6 +287,16 @@ public class OpenRosaServices {
         }
     }
 
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/formXml Get Form XML
+     * @apiName getFormXml
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Downloads the contents of a form
+     */
+
     @GET
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
@@ -280,6 +337,16 @@ public class OpenRosaServices {
         return xform;
 
     }
+
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
+     * @apiName getMediaFile
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Downloads media associated with a form, including images and video.
+     */
 
     @GET
     @Path("/{studyOID}/downloadMedia")
@@ -367,13 +434,25 @@ public class OpenRosaServices {
         return studyEventBean;
     }
 
+    /**
+     * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
+     * @apiName doSubmission
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiParam {String} ecid Key that will be used to look up subject context information while processing submission.
+     * @apiGroup Form
+     * @apiDescription Submits the data from a completed form.
+     */
+
     @POST
     @Path("/{studyOID}/submission")
     @Produces(MediaType.APPLICATION_XML)
-    public String doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+    public Response doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
             @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
 
         String output = null;
+        Response.ResponseBuilder builder = Response.noContent();
         String studySubjectOid = null;
         Integer studyEventDefnId = null;
         Integer studyEventOrdinal = null;
@@ -387,7 +466,7 @@ public class OpenRosaServices {
             }
 
             if (!mayProceedSubmission(studyOID))
-                return null;
+                return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
 
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
@@ -420,8 +499,7 @@ public class OpenRosaServices {
                 body = "<instance>" + body + "</instance>";
             }
 
-            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
-                    crfvdao.findByOid(crfVersionOID));
+            Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal, crfvdao.findByOid(crfVersionOID));
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -429,14 +507,13 @@ public class OpenRosaServices {
             cal.setTime(currentDate);
             SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
             format.setCalendar(cal);
-            response.setHeader("Date", format.format(currentDate));
-            response.setHeader("X-OpenRosa-Version", "1.0");
-            response.setContentType("text/xml; charset=utf-8");
-            response.setStatus(201);
+            builder.header("Date", format.format(currentDate));
+            builder.header("X-OpenRosa-Version", "1.0");
+            builder.type("text/xml; charset=utf-8");
 
             if (!errors.hasErrors()) {
 
-                output = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
+                builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
                 LOGGER.debug("Successful OpenRosa submission");
 
             } else {
@@ -448,7 +525,7 @@ public class OpenRosaServices {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
-            return "<Error>" + e.getMessage() + "</Error>";
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
         try {
@@ -471,7 +548,7 @@ public class OpenRosaServices {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
-        return output;
+        return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
     }
 
     @GET

@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -76,6 +77,50 @@ public class UserAccountController {
 	StudySubjectDAO ssdao;
 	UserAccountBean uBean;
 
+	/**
+	 * @api {post} /pages/auth/api/v1/createuseraccount Create a user account
+	 * @apiName createOrUpdateAccount2
+	 * @apiPermission admin
+	 * @apiVersion 3.8.0
+	 * @apiParam {String} username UserName
+	 * @apiParam {String} fName First Name
+	 * @apiParam {String} lName Last Name
+	 * @apiParam {String} institution Institution
+	 * @apiParam {String} email Email Address
+	 * @apiParam {String} study_name Study Name
+	 * @apiParam {String} role_name Role Name
+	 * @apiParam {String} user_type User Type
+	 * @apiParam {String} authorize_soap Authorize Soap
+	 *
+	 * @apiGroup User Account
+	 * @apiDescription Creates a user account
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "username": "testingUser",
+	 *                  "fName": "Jimmy",
+	 *                  "lName": "Sander",
+	 *                  "institution": "OC",
+	 *                  "email": "abcde@yahoo.com",
+	 *                  "study_name": "Baseline Study 101",
+	 *                  "role_name": "Data Manager",
+	 *                  "user_type": "user",
+	 *                  "authorize_soap":"false"
+	 *                  }
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "lastName": "Sander",
+	 *                    "username": "testingUser",
+	 *                    "firstName": "Jimmy",
+	 *                    "password": "rgluVsO0",
+	 *                    "apiKey": "5f462a16b3b04b1b9747262968bd5d2f"
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
 		logger.info("I'm in createUserAccount");
@@ -116,6 +161,7 @@ public class UserAccountController {
 		passwordHash = secm.encrytPassword(password, null);
 
 		// Validate Entry Fields
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), new Locale("en_US"));
 		Validator v = new Validator(request);
 		addValidationToFields(v, username);
 		HashMap errors = v.validate();

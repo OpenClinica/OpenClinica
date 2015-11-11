@@ -76,10 +76,10 @@ public class StudyController {
 	StudyEventDefinitionDAO seddao;
 
 	/**
-	 * @api {post} /auth/api/v1/studies Create New Study in OC
+	 * @api {post} /pages/auth/api/v1/studies Create a study
 	 * @apiName createNewStudy
-	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiPermission Authenticate using api-key. admin
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -146,7 +146,7 @@ public class StudyController {
 	 *                    }
 	 */
 
-	
+
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
@@ -396,7 +396,7 @@ public class StudyController {
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
             responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
-                        
+
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		}
 		return response;
@@ -404,10 +404,10 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/sites Create New Site in OC
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
 	 * @apiName createNewSite
-	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiPermission Authenticate using api-key. admin
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -418,9 +418,7 @@ public class StudyController {
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
 	 * @apiGroup Site
 	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to create a New Site in OC.
-	 *                 All the fields are required fields and can't be left blank.
-	 *                 You need to provide your Api-key to be connected.
+	 * @apiDescription Create a Site
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "briefTitle": "Site Protocol ID Name",
@@ -437,7 +435,7 @@ public class StudyController {
 	 *                  "secondaryProtocolID" : "Secondary Protocol ID 1" ,
 	 *                  "protocolDateVerification" : "2011-10-14"
 	 *                  }
-	 * 
+	 *
 	 * @apiErrorExample {json} Error-Response:
 	 *                  HTTP/1.1 400 Bad Request
 	 *                  {
@@ -716,7 +714,7 @@ public class StudyController {
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
             responseSuccess.setUniqueSiteProtocolID(siteDTO.getUniqueSiteProtocolID());
-                        
+
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
 		}
@@ -725,21 +723,19 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create New Study Event Definition in OC
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
 	 * @apiName createEventDefinition
-	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiPermission Authenticate using api-key. admin
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
 	 * @apiParam {String} name Event Name.
 	 * @apiParam {String} description Event Description.
 	 * @apiParam {String} category Category Name.
 	 * @apiParam {Boolean} repeating 'True' or 'False'.
 	 * @apiParam {String} type 'Scheduled' , 'UnScheduled' or 'Common'.
-	 * @apiGroup Study Event Definition
+	 * @apiGroup Study Event
 	 * @apiHeader {String} api_key Users unique access-key.
-	 * @apiDescription This API is to create a New Study Event Definition in OC.
-	 *                 All the fields are required fields and can't be left blank.
-	 *                 You need to provide your Api-key to be connected.
+	 * @apiDescription Creates a study event definition.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
 	 *                  "name": "Event Name",
@@ -912,7 +908,7 @@ public class StudyController {
 			eventDefinitionDTO.setMessage(validation_failed_message);
 			response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 		} else {
-			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy.getId());
+			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy);
 
 			StudyEventDefinitionBean sedBean = createEventDefn(eventBean, ownerUserAccount);
 			eventDefinitionDTO.setEventDefOid(sedBean.getOid());
@@ -922,8 +918,8 @@ public class StudyController {
         responseSuccess.setMessage(eventDefinitionDTO.getMessage());
         responseSuccess.setEventDefOid(eventDefinitionDTO.getEventDefOid());
         responseSuccess.setName(eventDefinitionDTO.getName());
-        
-                    
+
+
 		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		return response;
 
@@ -938,16 +934,25 @@ public class StudyController {
 		return true;
 	}
 
-	public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner, int parentStudyId) {
+	public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner, StudyBean parentStudy) {
 
 		StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
+        seddao = new StudyEventDefinitionDAO(dataSource);
+        ArrayList defs = seddao.findAllByStudy(parentStudy);
+        if (defs == null || defs.isEmpty()) {
+            sed.setOrdinal(1);
+        } else {
+            int lastCount = defs.size() - 1;
+            StudyEventDefinitionBean last = (StudyEventDefinitionBean) defs.get(lastCount);
+            sed.setOrdinal(last.getOrdinal() + 1);
+        }
 
 		sed.setName(name);
 		sed.setCategory(category);
 		sed.setType(type.toLowerCase());
 		sed.setDescription(description);
-		sed.setRepeating(Boolean.valueOf("repeating"));
-		sed.setStudyId(parentStudyId);
+		sed.setRepeating(Boolean.valueOf(repeating));
+		sed.setStudyId(parentStudy.getId());
 		sed.setOwner(owner);
 		sed.setStatus(Status.AVAILABLE);
 		return sed;
@@ -1119,7 +1124,7 @@ public class StudyController {
 		ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
 		if (resword.getString("available").equalsIgnoreCase(status))
 			study.setStatus(Status.AVAILABLE);
-		else if (resword.getString("design").equalsIgnoreCase(status))
+		else if (resword.getString("design").equalsIgnoreCase(status) || status.equals(""))
 			study.setStatus(Status.PENDING);
 
 		study.setIdentifier(uniqueProtocolId);

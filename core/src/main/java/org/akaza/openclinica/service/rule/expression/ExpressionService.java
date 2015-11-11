@@ -842,6 +842,7 @@ public class ExpressionService {
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
                 throw new OpenClinicaSystemException("OCRER'R_0019", new String[] { expression });
+
             }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];

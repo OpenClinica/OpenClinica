@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -176,11 +177,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
+        int parentStudyId=0;
 
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
-            // Set any value greater than the maximum page size here, as it will be overriden once read from DB
-            tableFacade.setTotalRows(100);
+ //                     tableFacade.setTotalRows(100);
+            if (currentStudy.getParentStudyId()==0){
+              parentStudyId = currentStudy.getId();
+            }else{
+                parentStudyId = currentStudy.getParentStudyId();
+            }
+                            
+            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), parentStudyId);
+           tableFacade.setTotalRows(totalRows);
         }
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
@@ -190,7 +199,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
-        if (firstRecordShown > notesSummary.getTotal()) { // The page selected goes beyond the dataset size
+        if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal()!=0) { // The page selected goes beyond the dataset size
             // Move to the last page
             limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
             filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
