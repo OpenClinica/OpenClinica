@@ -28,6 +28,7 @@ import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -51,6 +52,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
         CrfDao crfDao = (CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
         CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
 
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundleProvider.updateLocale(locale);
+        resword = ResourceBundleProvider.getWordsBundle(locale);
+
+        
         // Retrieve submission data from multipart request
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
@@ -64,46 +70,90 @@ public class CreateXformCRFVersionServlet extends SecureController {
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
         logger.debug("Found original CRF ID for new CRF Version:" + version.getCrfId());
 
-        // Parse instance and xform
-        XformParser parser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-        XformContainer container = parseInstance(submittedXformText);
-        Html html = parser.unMarshall(submittedXformText);
-
-        // Create Database entries
         // Create container for holding validation errors
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
+        
+        // Validate all upload form fields were populated
+        validateFormFields(errors, submittedCrfName,submittedCrfVersionName,submittedCrfVersionDescription,
+        		submittedRevisionNotes,submittedXformText);
 
-        XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
-        try {
-            xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                    submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
-        } catch (RuntimeException e) {
-            logger.error("Error encountered while saving CRF: " + e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            // If there are no logged validation errors, this was an unanticipated exception
-            // and should be allow to crash the page for now
-            if (!errors.hasErrors())
-                throw e;
+        
+        if (!errors.hasErrors()){
+        	
+            // Parse instance and xform
+            XformParser parser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
+            XformContainer container = parseInstance(submittedXformText);
+            Html html = parser.unMarshall(submittedXformText);
+
+
+        	// Save meta-data in database
+	        XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
+	        try {
+	            xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
+	                    submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
+	        } catch (RuntimeException e) {
+	            logger.error("Error encountered while saving CRF: " + e.getMessage());
+	            logger.error(ExceptionUtils.getStackTrace(e));
+	            // If there are no logged validation errors, this was an unanticipated exception
+	            // and should be allow to crash the page for now
+	            if (!errors.hasErrors())
+	                throw e;
+	        }
         }
-
         // Save errors to request so they can be displayed to the user
         if (errors.hasErrors()) {
             request.setAttribute("errorList", errors.getAllErrors());
             logger.debug("Found at least one error.  CRF data not saved.");
         } else {
             logger.debug("Didn't find any errors.  CRF data saved.");
-        }
 
-        // Save any media files uploaded with xform
-        CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
-        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
-        saveAttachedMedia(items, crf, newVersion);
+            // Save any media files uploaded with xform
+	        CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
+	        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
+	        saveAttachedMedia(items, crf, newVersion);
+        }
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
-    private XformContainer parseInstance(String xform) throws Exception {
+    private void validateFormFields(Errors errors, String submittedCrfName, String submittedCrfVersionName,
+			String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
+
+    	// Verify CRF Name is populated
+        if (submittedCrfName == null || submittedCrfName.equals("")) {
+            DataBinder crfDataBinder = new DataBinder(new CrfBean());
+            Errors crfErrors = crfDataBinder.getBindingResult();
+            crfErrors.rejectValue("name","crf_val_crf_name_blank",resword.getString("CRF_name"));
+            errors.addAllErrors(crfErrors);
+        }
+
+        DataBinder crfVersionDataBinder = new DataBinder(new CrfVersion());
+        Errors crfVersionErrors = crfVersionDataBinder.getBindingResult();
+
+    	// Verify CRF Version Name is populated
+        if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
+        	crfVersionErrors.rejectValue("name","crf_ver_val_name_blank",resword.getString("version_name"));
+        }
+
+    	// Verify CRF Version Description is populated
+        if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
+        	crfVersionErrors.rejectValue("description","crf_ver_val_desc_blank",resword.getString("crf_version_description"));
+        }
+
+    	// Verify CRF Version Revision Notes is populated
+        if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
+        	crfVersionErrors.rejectValue("revisionNotes","crf_ver_val_rev_notes_blank",resword.getString("revision_notes"));
+        }
+
+    	// Verify Xform text is populated
+        if (submittedXformText == null || submittedXformText.equals("")) {
+        	crfVersionErrors.rejectValue("xform","crf_ver_val_xform_blank",resword.getString("xform"));
+        }
+        errors.addAllErrors(crfVersionErrors);
+    }
+
+	private XformContainer parseInstance(String xform) throws Exception {
 
         // Could use the following xpath to get all leaf nodes in the case
         // of multiple levels of groups: //*[count(./*) = 0]
