@@ -17,8 +17,9 @@
 </div>
 </c:if>
 
+
 <c:if test="${empty pageMessages && param.alertmessage!=null  }">
-<div class="alert">    
+<div class="alert"> 
  <c:out value="${param.alertmessage}" escapeXml="false"/> 
  <br><br>
 </div>

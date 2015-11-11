@@ -769,6 +769,26 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
 
     }
 
+    public ArrayList findAllBySubjectIdOrdered(int subjectId) {
+        ArrayList answer = new ArrayList();
+
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(subjectId));
+
+        ArrayList alist = this.select(digester.getQuery("findAllBySubjectIdOrdered"), variables);
+
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            StudyEventBean seb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(seb);
+        }
+
+        return answer;
+
+    }
+
     public void setNewCRFTypesExpected() {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
