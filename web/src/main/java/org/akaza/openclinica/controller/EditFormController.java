@@ -242,7 +242,11 @@ public class EditFormController {
                     groupElement.setTextContent(repeatGroupMin);
                 }
                 crfElement.appendChild(groupElement);
-
+                if (isrepeating) {
+                	Element ordinal = doc.createElement("REPEAT_ORDINAL");
+                	ordinal.setTextContent(String.valueOf(i+1));
+                	groupElement.appendChild(ordinal);
+                }
                 for (Item item : items) {
                     ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
@@ -277,6 +281,7 @@ public class EditFormController {
         DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);
         String instance = writer.toString();
+        System.out.println("Editable instance = " + instance);
         return instance;
     }
 

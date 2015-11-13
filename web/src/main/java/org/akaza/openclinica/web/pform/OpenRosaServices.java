@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.pform;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +31,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -66,6 +77,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.dom4j.Node;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
@@ -75,6 +87,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.akaza.openclinica.service.PformSubmissionService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.pmanage.Study;
@@ -314,23 +329,23 @@ public class OpenRosaServices {
         }
 
         try {
-
             CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
             CRFVersionBean crfVersion = versionDAO.findByOid(formId);
 
-            if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-                xform = crfVersion.getXform();
-            else {
+            if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")){
+                xform = updateRepeatGroupsWithOrdinal(crfVersion.getXform());
+            } else {
 
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
             }
         } catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	System.out.println(ExceptionUtils.getStackTrace(e));
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<error>" + e.getMessage() + "</error>";
         }
-
         response.setHeader("Content-Type", "text/xml; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + crfOID + ".xml" + "\";");
         response.setContentType("text/xml; charset=utf-8");
@@ -338,7 +353,7 @@ public class OpenRosaServices {
 
     }
 
-    /**
+	/**
      * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
      * @apiName getMediaFile
      * @apiPermission admin
@@ -499,6 +514,7 @@ public class OpenRosaServices {
                 body = "<instance>" + body + "</instance>";
             }
 
+            System.out.println("Submitted XForm Payload: " + body);
             Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
                     crfvdao.findByOid(crfVersionOID));
 
@@ -651,6 +667,41 @@ public class OpenRosaServices {
         }
 
     }
+
+    private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
+    	InputStream is = new ByteArrayInputStream(xform.getBytes());
+    	Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath(); 
+        XPathExpression expr = xpath.compile("/html/head/model/instance[1]");
+        
+        expr = xpath.compile("/html/body/group/repeat");
+        NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+        for (int k = 0; k < repeatNodes.getLength(); k++) {
+        	Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
+        	String groupRef = groupElement.getAttribute("ref");
+        	
+            expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
+            Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
+            Element ordinal = doc.createElement("REPEAT_ORDINAL");
+        	group.appendChild(ordinal);   	
+        }
+        
+        TransformerFactory transformFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        String modifiedXform = writer.toString();
+        System.out.println("Updated xform source: " + modifiedXform);
+    	return modifiedXform;
+	}
 
     private boolean mayProceedSubmission(String studyOid) throws Exception {
         boolean accessPermission = false;
