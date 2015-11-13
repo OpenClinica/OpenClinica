@@ -177,29 +177,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
-        int parentStudyId=0;
 
         Limit limit = tableFacade.getLimit();
-        if (!limit.isComplete()) {
- //                     tableFacade.setTotalRows(100);
-            if (currentStudy.getParentStudyId()==0){
-              parentStudyId = currentStudy.getId();
-            }else{
-                parentStudyId = currentStudy.getParentStudyId();
-            }
-                            
-            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), parentStudyId);
-           tableFacade.setTotalRows(totalRows);
-        }
-
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
                 discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
+        if (!limit.isComplete()) {
+            tableFacade.setTotalRows(notesSummary.getTotal());
+        }
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
-        if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal()!=0) { // The page selected goes beyond the dataset size
+        if (firstRecordShown > notesSummary.getTotal()) { // The page selected goes beyond the dataset size
             // Move to the last page
             limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
             filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
