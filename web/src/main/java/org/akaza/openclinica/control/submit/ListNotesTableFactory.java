@@ -184,7 +184,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
         if (!limit.isComplete()) {
-            // Set any value greater than the maximum page size here, as it will be overriden once read from DB
             tableFacade.setTotalRows(notesSummary.getTotal());
         }
 
@@ -196,9 +195,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
                     discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
         }
-
-        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
-
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
