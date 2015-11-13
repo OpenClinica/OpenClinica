@@ -112,7 +112,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // In this case we want to include all the discrepancy notes, despite the res status or
         // type filtering, because we don't want to filter out parents, thus leaving out a child note
         // that might match the desired res status
-        ListNotesFilter listNotesFilter = new ListNotesFilter();
 
         ViewNotesService viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(
         		getServletContext()).getBean("viewNotesService");
@@ -129,7 +128,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList
         		? (ArrayList<DiscrepancyNoteBean>) notes
         		: new ArrayList<DiscrepancyNoteBean>(notes);
-        
+
         allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
@@ -161,7 +160,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     private Map<String,String> makeDiscrepancyNoteTypesDecoder() {
     	Map<String,String> decoder = new HashMap<String,String>();
-    	
+
         ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
         for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
         	decoder.put(type.getName(), Integer.toString(type.getId()));
@@ -175,7 +174,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     private Map<String,String> makeResolutionStatusDecoder() {
     	Map<String,String> decoder = new HashMap<String,String>();
-    	
+
         ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
         for (ResolutionStatus status : ResolutionStatus.list) {
             decoder.put(status.getName(), Integer.toString(status.getId()));
@@ -185,7 +184,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     }
 
     private Map<String,String> resolutionStatusDecoder = makeResolutionStatusDecoder();
-    
+
     private String getDateFormat() {
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
@@ -231,7 +230,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     			"days",
     			"age"
     	};
-    	
+
     	List<Pair<String,String>> sortOrders = new ArrayList<Pair<String,String>>(4);
     	for (String s: ids) {
     		/*
@@ -249,7 +248,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     	}
     	return sortOrders;
     }
-    
+
     private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
         Locale l = LocaleResolver.getLocale(request);
         resword = ResourceBundleProvider.getWordsBundle(l);
