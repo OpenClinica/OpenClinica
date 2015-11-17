@@ -24,7 +24,7 @@ import javax.persistence.Transient;
 public class RandomizeActionBean extends RuleActionBean {
 
     private List<PropertyBean> properties;
-    private String oc_oid_reference;
+    private String factors;
 
     public RandomizeActionBean() {
         setActionType(ActionType.RANDOMIZE);
@@ -50,17 +50,14 @@ public class RandomizeActionBean extends RuleActionBean {
         }
         properties.add(property);
     }
-    
-    
-
-    
+     
    
-    public String getOc_oid_reference() {
-        return oc_oid_reference;
+    public String getFactors() {
+        return factors;
     }
 
-    public void setOc_oid_reference(String oc_oid_reference) {
-        this.oc_oid_reference = oc_oid_reference;
+    public void setFactors(String factors) {
+        this.factors = factors;
     }
 
     @Override
@@ -82,7 +79,7 @@ public class RandomizeActionBean extends RuleActionBean {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (properties == null ? 0 : properties.hashCode());
-        result = prime * result + (oc_oid_reference == null ? 0 : oc_oid_reference.hashCode());
+        result = prime * result + (factors == null ? 0 : factors.hashCode());
         return result;
     }
 
@@ -95,10 +92,10 @@ public class RandomizeActionBean extends RuleActionBean {
         if (getClass() != obj.getClass())
             return false;
         RandomizeActionBean other = (RandomizeActionBean) obj;
-        if (oc_oid_reference == null) {
-            if (other.oc_oid_reference != null)
+        if (factors == null) {
+            if (other.factors != null)
                 return false;
-        } else if (!oc_oid_reference.equals(other.oc_oid_reference))
+        } else if (!factors.equals(other.factors))
             return false;
         if (properties == null) {
             if (other.properties != null)

@@ -196,7 +196,7 @@
             collection="arraylist">
             <bind-xml name="DestinationProperty"/>
         </field>
-        <field name="Oc_oid_reference"
+        <field name="Factors"
                type="java.lang.String">
             <bind-xml name="StratificationFactor"/>
         </field>

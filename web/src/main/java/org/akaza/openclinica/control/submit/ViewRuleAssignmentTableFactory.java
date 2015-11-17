@@ -707,7 +707,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if(actionType==ActionType.RANDOMIZE) {
                 RandomizeActionBean a = (RandomizeActionBean)ruleAction;
                 appendDestProps(builder,a.getProperties());
-                appendStratificationFactors(builder, a.getOc_oid_reference());
+                appendStratificationFactors(builder, a.getFactors());
             }
             if(actionType==ActionType.INSERT) {
                 InsertActionBean a = (InsertActionBean)ruleAction;
