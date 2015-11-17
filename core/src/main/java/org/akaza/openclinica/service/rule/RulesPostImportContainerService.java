@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
@@ -43,6 +44,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
+import org.akaza.openclinica.validator.rule.action.RandomizeActionValidator;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -78,10 +80,12 @@ public class RulesPostImportContainerService {
     private final OidGenerator oidGenerator;
     private StudyBean currentStudy;
     private UserAccountBean userAccount;
+
     private RunOnSchedule runOnSchedule;
     private ExpressionService expressionService;
     private InsertActionValidator insertActionValidator;
     private EventActionValidator eventActionValidator;
+    private RandomizeActionValidator randomizeActionValidator;
     ResourceBundle respage;
 
     public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
@@ -419,6 +423,21 @@ public class RulesPostImportContainerService {
             }
         }
         } 	
+        if (ruleActionBean instanceof RandomizeActionBean) {
+            if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+
+            DataBinder dataBinder = new DataBinder(ruleActionBean);
+            Errors errors = dataBinder.getBindingResult();
+            RandomizeActionValidator randomizeActionValidator = getRandomizeActionValidator();
+            randomizeActionValidator.setEventDefinitionCRFBean(eventDefinitionCRFBean);
+            randomizeActionValidator.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
+            randomizeActionValidator.setExpressionService(expressionService);
+            randomizeActionValidator.validate(ruleActionBean, errors);
+            if (errors.hasErrors()) {
+                ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());
+            }
+        }
+        }   
         if (ruleActionBean instanceof EventActionBean) {
           
             DataBinder dataBinder = new DataBinder(ruleActionBean);
@@ -789,6 +808,15 @@ public class RulesPostImportContainerService {
     public void setEventActionValidator(EventActionValidator eventActionValidator) {
         this.eventActionValidator = eventActionValidator;
     }
+    
+    public RandomizeActionValidator getRandomizeActionValidator() {
+        return randomizeActionValidator;
+    }
+
+    public void setRandomizeActionValidator(RandomizeActionValidator randomizeActionValidator) {
+        this.randomizeActionValidator = randomizeActionValidator;
+    }
+
 
     /**
      * @return the respage

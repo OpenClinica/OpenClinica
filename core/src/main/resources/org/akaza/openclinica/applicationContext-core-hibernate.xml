@@ -40,6 +40,7 @@
                 <value>org.akaza.openclinica.domain.rule.action.HideActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.InsertActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.EventActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RandomizeActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
                 <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
                 <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>

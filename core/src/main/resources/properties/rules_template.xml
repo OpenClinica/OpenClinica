@@ -21,6 +21,12 @@
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</DestinationProperty>
 			</InsertAction>
+			<RandomizeAction IfExpressionEvaluates="true">
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true"/>
+				<DestinationProperty OID="" Value="">
+					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+				</DestinationProperty>
+			</RandomizeAction>
 			
 			<NotificationAction IfExpressionEvaluates="true">
                 <To></To>

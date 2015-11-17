@@ -526,6 +526,28 @@ public class ExpressionService {
         return result;
     }
 
+    public boolean isRandomizeActionExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
+        boolean result = false;
+        boolean isRuleExpressionValid = false;
+
+        Integer k = getExpressionSize(expression);
+        if (k.intValue() > allowedLength.intValue()) {
+            return false;
+        }
+
+        if (ruleSet != null) {
+            String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+            isRuleExpressionValid = checkInsertActionExpressionSyntax(fullExpression);
+
+            if (isRuleExpressionValid) {
+                isExpressionValid(fullExpression);
+                result = true;
+            }
+
+        }
+        return result;
+    }
+
     public boolean isExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
