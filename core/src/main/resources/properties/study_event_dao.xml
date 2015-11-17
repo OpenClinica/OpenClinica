@@ -193,9 +193,10 @@
         <name>findAllBySubjectIdOrdered</name>
         <sql>
 			SELECT se.*
-            FROM study_event se, study_event_definition sed
+            FROM study_event se, study_event_definition sed, study_subject ss
             WHERE se.study_event_definition_id = sed.study_event_definition_id
-            	AND se.study_subject_id=?			 
+                AND se.study_subject_id = ss.study_subject_id
+            	AND ss.subject_id=?
             ORDER BY date(se.date_start) ASC, sed.ordinal ASC, se.sample_ordinal ASC
         </sql>
     </query>
