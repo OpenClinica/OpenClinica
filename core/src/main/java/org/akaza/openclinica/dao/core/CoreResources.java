@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -295,6 +296,7 @@ public class CoreResources implements ResourceLoaderAware {
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
+        DATAINFO.setProperty("sysURL.basePath", URI.create(sysURLBase).getPath());
 
         if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
             DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");

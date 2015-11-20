@@ -3,6 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<jsp:useBean scope='request' id='coreResources' class='org.akaza.openclinica.dao.core.CoreResources' />
+<c:set var="basePath" value="${coreResources.getField('sysURL.basePath')}" />
 
 <c:choose>
 <c:when test="${panel.orderedData}">
@@ -28,10 +30,10 @@
                     <c:set var="eventCount" value="${eventCount+1}"/>
                     <tr>
                         <td valign="top" width="10" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
-		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><img
-                          name="ExpandGroup<c:out value="${eventCount}"/>" src="images/bt_Expand.gif" border="0"></a></td>
+		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}"/>images/bt_Collapse.gif');"><img
+                          name="ExpandGroup<c:out value="${eventCount}"/>" src="${basePath}images/bt_Expand.gif" border="0"></a></td>
                         <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
-		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
+		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','<c:out value="${basePath}"/>images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
                         </td>
                     </tr>
                 </c:when>
@@ -54,13 +56,13 @@
                 <c:choose>
                     <c:when test="${line.lastCRF}">
                         <td valign="top" class="vline_B">
-                            <img src="images/leftbar_hline.gif"></td>
+                            <img src="${basePath}images/leftbar_hline.gif"></td>
                         <td valign="top" class="leftmenu" style="font-size:11px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
                     </c:when>
                     <c:otherwise>
                         <c:if test="${line.title=='CRF'}">
                             <td valign="top" class="vline">
-                                <img src="images/leftbar_hline.gif"></td>
+                                <img src="${basePath}images/leftbar_hline.gif"></td>
                             <td valign="top" class="leftmenu" style="font-size:11px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
                         </c:if>
                     </c:otherwise>
@@ -76,16 +78,16 @@
         </table>
     </c:if>
 
-    <br><a href='SelectItems?eventAttr=1'><b><fmt:message key="event_attributes" bundle="${resword}"/></b></a><br><br>
-    <a href='SelectItems?subAttr=1'><b><fmt:message key="subject_attributes" bundle="${resword}"/></b></a><br><br>
-    <a href='SelectItems?CRFAttr=1'><b>CRF Attributes</b></a><br><br>
-    <a href='SelectItems?groupAttr=1'><b>Group Attributes</b></a><br><br>
+    <br><a href='${basePath}SelectItems?eventAttr=1'><b><fmt:message key="event_attributes" bundle="${resword}"/></b></a><br><br>
+    <a href='${basePath}SelectItems?subAttr=1'><b><fmt:message key="subject_attributes" bundle="${resword}"/></b></a><br><br>
+    <a href='${basePath}SelectItems?CRFAttr=1'><b>CRF Attributes</b></a><br><br>
+    <a href='${basePath}SelectItems?groupAttr=1'><b>Group Attributes</b></a><br><br>
     <%--
-        <a href='SelectItems?discAttr=1'><b>Discrepancy Note Attributes</b></a><br><br>
+        <a href='${basePath}SelectItems?discAttr=1'><b>Discrepancy Note Attributes</b></a><br><br>
     --%>
-    <a href='ViewSelected'><b><fmt:message key="view_selected_items" bundle="${resword}"/></b></a>
+    <a href='${basePath}ViewSelected'><b><fmt:message key="view_selected_items" bundle="${resword}"/></b></a>
     <br /><br>
-    <form id="selectAllItems" action="EditSelected" method="post" name="selectAllItems">
+    <form id="selectAllItems" action="${basePath}EditSelected" method="post" name="selectAllItems">
         <input type="hidden" name="all" value="1">
     </form>
 
@@ -102,7 +104,7 @@
     </c:if>
     <a href="javascript: openDocWindow('ViewSelected?status=html')"><b><fmt:message key="view_selected_items" bundle="${resword}"/></b></a><br />
     <br>
-    <form id="selectAllItems" action="EditSelected" method="post" name="selectAllItems">
+    <form id="selectAllItems" action="${basePath}EditSelected" method="post" name="selectAllItems">
         <input type="hidden" name="all" value="1">
     </form>
      <c:if test="${! EditSelectedSubmitted}"><a href='javascript:void 0' onclick="if(confirm('<fmt:message key="there_a_total_of" bundle="${resword}"><fmt:param value="${numberOfStudyItems}"/></fmt:message>')){document.getElementById('selectAllItems').submit();}"><b><fmt:message key="select_all_items_in_study" bundle="${resword}"/></b></a>
