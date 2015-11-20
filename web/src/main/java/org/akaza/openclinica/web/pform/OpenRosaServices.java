@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
@@ -68,6 +70,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.formlist.XForm;
@@ -87,8 +91,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.akaza.openclinica.service.PformSubmissionService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -474,6 +480,8 @@ public class OpenRosaServices {
         String crfVersionOID = null;
         CRFVersionDAO crfvdao = new CRFVersionDAO(dataSource);
 
+        Locale locale = LocaleResolver.getLocale(request);
+
         try {
 
             if (ServletFileUpload.isMultipartContent(request)) {
@@ -516,7 +524,7 @@ public class OpenRosaServices {
 
             System.out.println("Submitted XForm Payload: " + body);
             Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
-                    crfvdao.findByOid(crfVersionOID));
+                    crfvdao.findByOid(crfVersionOID), locale);
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -669,13 +677,16 @@ public class OpenRosaServices {
     }
 
     private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
+    	
+    	NamedNodeMap attribs = fetchXformAttributes(xform);
     	InputStream is = new ByteArrayInputStream(xform.getBytes());
-    	Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    	factory.setNamespaceAware(false);
+    	Document doc = factory.newDocumentBuilder().parse(is);
         
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath(); 
-        XPathExpression expr = xpath.compile("/html/head/model/instance[1]");
-        
+        XPathExpression expr = null;
         expr = xpath.compile("/html/body/group/repeat");
         NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
@@ -686,9 +697,9 @@ public class OpenRosaServices {
             expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
             Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
             Element ordinal = doc.createElement("REPEAT_ORDINAL");
-        	group.appendChild(ordinal);   	
-        }
-        
+        	group.appendChild(ordinal);
+            }
+
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
@@ -699,11 +710,33 @@ public class OpenRosaServices {
         DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);
         String modifiedXform = writer.toString();
-        System.out.println("Updated xform source: " + modifiedXform);
+        modifiedXform = applyXformAttributes(modifiedXform, attribs);
+        System.out.println("Finalized xform source: " + modifiedXform);
     	return modifiedXform;
 	}
 
-    private boolean mayProceedSubmission(String studyOid) throws Exception {
+    private String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
+    	String defaultNamespace = null;
+        for (int i=0;i<attribs.getLength();i++) {
+        	Attr attrib = (Attr) attribs.item(i);
+        	if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue(); 
+        }        
+        String xformArray[] = xform.split("html",2);
+        String modifiedXform = xformArray[0] + "html xmlns=\"" + defaultNamespace + "\" " + xformArray[1];
+        return modifiedXform;
+	}
+
+	private NamedNodeMap fetchXformAttributes(String xform) throws Exception {
+    	InputStream is = new ByteArrayInputStream(xform.getBytes());
+    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    	factory.setNamespaceAware(true);
+    	Document doc = factory.newDocumentBuilder().parse(is);
+        Element html = doc.getDocumentElement();
+        NamedNodeMap attribs = html.getAttributes();
+		return attribs;
+	}
+
+	private boolean mayProceedSubmission(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);

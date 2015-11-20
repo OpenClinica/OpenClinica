@@ -27,6 +27,7 @@ public class ItemDataBean extends AuditableEntityBean {
         result = prime * result + eventCRFId;
         result = prime * result + itemId;
         result = prime * result + ordinal;
+        result = prime * result + (ocformDeleted ? 1231 : 1237);
         result = prime * result + (selected ? 1231 : 1237);
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
@@ -49,6 +50,8 @@ public class ItemDataBean extends AuditableEntityBean {
             return false;
         if (ordinal != other.ordinal)
             return false;
+        if (ocformDeleted != other.ocformDeleted)
+            return false;
         if (selected != other.selected)
             return false;
         if (value == null) {
@@ -65,6 +68,8 @@ public class ItemDataBean extends AuditableEntityBean {
     private String value;// name will be null
     
     private int ordinal;// for repeating items
+    
+    private boolean ocformDeleted = false;
 
     private boolean selected;// for construct data only
 
@@ -154,7 +159,15 @@ public class ItemDataBean extends AuditableEntityBean {
         this.ordinal = ordinal;
     }
 
-    public boolean isAuditLog() {
+    public boolean isOcformDeleted() {
+		return ocformDeleted;
+	}
+
+	public void setOcformDeleted(boolean ocformDeleted) {
+		this.ocformDeleted = ocformDeleted;
+	}
+
+	public boolean isAuditLog() {
         return auditLog;
     }
 

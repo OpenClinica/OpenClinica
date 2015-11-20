@@ -282,7 +282,11 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
     }
 
     public List<ItemGroupBean> findGroupByCRFVersionID(int Id) {
-        this.setTypesExpected();
+        ItemGroupBean itemGroup = new ItemGroupBean();
+        this.unsetTypeExpected();
+        setTypesExpected();
+
+        
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(1, Id);
         List listofMaps = this.select(digester.getQuery("findGroupByCRFVersionID"), variables);
@@ -294,6 +298,38 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
             beanList.add(bean);
         }
         return beanList;
+    }
+
+    public ItemGroupBean findGroupByGroupNameAndCrfVersionId(String groupName, int crfVersionId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(new Integer(2), groupName);
+
+        ArrayList rows = this.select(digester.getQuery("findGroupByGroupNameCRFVersionID"), variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            return (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
+        } else {
+            return null;
+        }
+    }
+
+    public ItemGroupBean findGroupByItemIdCrfVersionId(int itemId, int crfVersionId) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(new Integer(2), new Integer(itemId));
+
+        ArrayList rows = this.select(digester.getQuery("findGroupByItemIdCRFVersionID"), variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            return (ItemGroupBean) this.getEntityFromHashMap((HashMap) it.next());
+        } else {
+            return null;
+        }
     }
 
     public List<ItemGroupBean> findOnlyGroupsByCRFVersionID(int Id) {
