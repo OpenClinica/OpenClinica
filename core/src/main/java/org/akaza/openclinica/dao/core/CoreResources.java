@@ -435,10 +435,15 @@ public class CoreResources implements ResourceLoaderAware {
             url = StringUtils.replace(url, "jdbc:", "jdbc:log4jdbc:");
         }
         DATAINFO.setProperty("dataBase", database);
-        DATAINFO.setProperty("url", url);
-        DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
-        DATAINFO.setProperty("driver", driver);
-
+        if (url != null) {
+            DATAINFO.setProperty("url", url);
+        }
+        if (hibernateDialect != null) {
+            DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
+        }
+        if (driver != null) {
+            DATAINFO.setProperty("driver", driver);
+        }
     }
 
     private void copyBaseToDest(ResourceLoader resourceLoader) {
