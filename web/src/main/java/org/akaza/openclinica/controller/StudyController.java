@@ -79,7 +79,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies Create a study
 	 * @apiName createNewStudy
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -407,7 +407,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
 	 * @apiName createNewSite
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
@@ -726,7 +726,7 @@ public class StudyController {
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
 	 * @apiName createEventDefinition
 	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
 	 * @apiParam {String} name Event Name.
 	 * @apiParam {String} description Event Description.
@@ -908,7 +908,7 @@ public class StudyController {
 			eventDefinitionDTO.setMessage(validation_failed_message);
 			response = new ResponseEntity(eventDefinitionDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 		} else {
-			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy.getId());
+			eventBean = buildEventDefBean(name, description, category, type, repeating, ownerUserAccount, parentStudy);
 
 			StudyEventDefinitionBean sedBean = createEventDefn(eventBean, ownerUserAccount);
 			eventDefinitionDTO.setEventDefOid(sedBean.getOid());
@@ -934,16 +934,25 @@ public class StudyController {
 		return true;
 	}
 
-	public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner, int parentStudyId) {
+	public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner, StudyBean parentStudy) {
 
 		StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
+        seddao = new StudyEventDefinitionDAO(dataSource);
+        ArrayList defs = seddao.findAllByStudy(parentStudy);
+        if (defs == null || defs.isEmpty()) {
+            sed.setOrdinal(1);
+        } else {
+            int lastCount = defs.size() - 1;
+            StudyEventDefinitionBean last = (StudyEventDefinitionBean) defs.get(lastCount);
+            sed.setOrdinal(last.getOrdinal() + 1);
+        }
 
 		sed.setName(name);
 		sed.setCategory(category);
 		sed.setType(type.toLowerCase());
 		sed.setDescription(description);
-		sed.setRepeating(Boolean.valueOf("repeating"));
-		sed.setStudyId(parentStudyId);
+		sed.setRepeating(Boolean.valueOf(repeating));
+		sed.setStudyId(parentStudy.getId());
 		sed.setOwner(owner);
 		sed.setStatus(Status.AVAILABLE);
 		return sed;

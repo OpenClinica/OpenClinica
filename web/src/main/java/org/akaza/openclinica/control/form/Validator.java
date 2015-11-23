@@ -699,8 +699,7 @@ public class Validator {
     }
 
     protected void addError(String fieldName, Validation v) {
-         locale=request.getLocale();
-      //  locale = LocaleResolver.getLocale(request);
+        locale = LocaleResolver.getLocale(request);
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
 

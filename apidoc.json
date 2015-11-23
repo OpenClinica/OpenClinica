@@ -1,0 +1,10 @@
+{
+  "name": "OpenClinica API",
+  "version": "3.8",
+  "description": "The OpenClinica REST API",
+  "title": "The OpenClinica REST API",
+  "template": {
+    "withCompare": false,
+    "withGenerator": false
+  }
+}

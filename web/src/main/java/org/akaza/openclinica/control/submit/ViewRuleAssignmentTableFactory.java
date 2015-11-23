@@ -99,7 +99,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
-        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_schedule"), null, new RunOnScheduleDroplistFilterEditor());
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_run_time"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
@@ -805,6 +805,17 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             return ruleSetRule.getStatus().getI18nDescription(locale);
         }
     }
+    
+    private class RunOnScheduleDroplistFilterEditor extends DroplistFilterEditor {
+        @Override
+        protected List<Option> getOptions() {
+            List<Option> options = new ArrayList<Option>();
+            options.add(new Option(Boolean.TRUE.toString(), "true"));
+            options.add(new Option(Boolean.FALSE.toString(), "false"));
+            return options;
+        }
+    }
+
 
     private class StatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override

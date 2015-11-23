@@ -27,6 +27,8 @@ public class ViewRuleAssignmentSort implements CriteriaCommand {
         columnMapping.put("actionExecuteOn", "ra.expression_evaluates_to");
         columnMapping.put("actionType", "ra.action_type");
         columnMapping.put("actionSummary", "ra.message");
+        columnMapping.put("ruleSetRunSchedule", "rs.run_schedule");
+        columnMapping.put("ruleSetRunTime", "rs.run_time");
     }
 
     public void addSort(String property, String order) {

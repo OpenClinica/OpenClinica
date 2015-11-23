@@ -373,7 +373,7 @@ public class PformSubmissionService {
         String inputUsername = getInputUsername(studyBean, studySubjectBean);
         ecBean.setUpdater(getUserAccount(inputUsername));
         ecBean.setUpdatedDate(new Date());
-        ecBean.setStatus(Status.UNAVAILABLE);
+        ecBean.setStatus(Status.AVAILABLE);
         ecBean = (EventCRFBean) ecdao.update(ecBean);
         logger.debug("*********UPDATED EVENT CRF");
         return ecBean;
@@ -631,33 +631,9 @@ public class PformSubmissionService {
                                     iddao.updateValue(itemDataBean1);
                                 }
                             }
+                            
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-                            // Study Event status
-                            // update
-                            int count;
-                            if (studyBean.getParentStudyId() != 0) { // this is a site
-                                StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-                                count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
-                            } else { // a parent study
-                                count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
-
-                            }
-                            if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
-
-                                // if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
-                                // getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-                                // .getId(),studyBean.getId())) {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-                            } else {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-                            }
-                            ArrayList<Integer> ruleList = new ArrayList<Integer>();
-                            for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-                                setDynItemFormMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean, itemDataBean1, ruleList);
-                            }
-                            setDynItemGroupMetadata(cvdao.findByOid(crfVersionOID), eventCrfBean);
-
                         }
                     }
                 }
@@ -777,33 +753,9 @@ public class PformSubmissionService {
                                 }
 
                             }
+                            
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
-                            // Study Event status
-                            // update
-                            int count;
-                            if (studyBean.getParentStudyId() != 0) { // this is a site
-                                StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-                                count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
-                            } else { // a parent study
-                                count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
-
-                            }
-                            if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
-
-                                // if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
-                                // getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-                                // .getId(),studyBean.getId())) {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
-                            } else {
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
-                            }
-                            ArrayList<Integer> ruleList = new ArrayList<Integer>();
-                            for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-                                setDynItemFormMetadata(cvdao.findByOid(crfVersion.getOid()), eventCrfBean, itemDataBean1, ruleList);
-                            }
-                            setDynItemGroupMetadata(cvdao.findByOid(crfVersion.getOid()), eventCrfBean);
-
                         }
                     }
                 }
