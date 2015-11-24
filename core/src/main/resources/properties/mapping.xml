@@ -198,9 +198,10 @@
             collection="arraylist">
             <bind-xml name="DestinationProperty"/>
         </field>
-        <field name="Factors"
-               type="java.lang.String">
-            <bind-xml name="StratificationFactor"/>
+        <field name="stratificationFactors" container="false"
+            type="org.akaza.openclinica.domain.rule.action.StratificationFactorBean"
+            collection="arraylist">
+            <bind-xml name="StratificationFactors"/>
         </field>
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
@@ -231,6 +232,14 @@
                <bind-xml name="RunOnStatus"/>
        </field>
      </class>
+     
+
+     <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" auto-complete="true">
+     	<field name="expressionAsString" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+            <bind-xml node="text"/>         
+        </field>
+     </class>
+
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
         <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">

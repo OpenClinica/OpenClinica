@@ -42,6 +42,7 @@
                 <value>org.akaza.openclinica.domain.rule.action.EventActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.RandomizeActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.StratificationFactorBean</value>
                 <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
                 <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
                 <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>

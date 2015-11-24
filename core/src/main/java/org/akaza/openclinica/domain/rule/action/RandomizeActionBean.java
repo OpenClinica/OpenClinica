@@ -24,8 +24,9 @@ import javax.persistence.Transient;
 public class RandomizeActionBean extends RuleActionBean {
 
     private List<PropertyBean> properties;
-    private String factors;
-
+    private List<StratificationFactorBean> stratificationFactors;
+      
+    
     public RandomizeActionBean() {
         setActionType(ActionType.RANDOMIZE);
         setRuleActionRun(new RuleActionRunBean(true, true, true, false, false));
@@ -52,13 +53,6 @@ public class RandomizeActionBean extends RuleActionBean {
     }
      
    
-    public String getFactors() {
-        return factors;
-    }
-
-    public void setFactors(String factors) {
-        this.factors = factors;
-    }
 
     @Override
     @Transient
@@ -79,7 +73,6 @@ public class RandomizeActionBean extends RuleActionBean {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (properties == null ? 0 : properties.hashCode());
-        result = prime * result + (factors == null ? 0 : factors.hashCode());
         return result;
     }
 
@@ -92,11 +85,6 @@ public class RandomizeActionBean extends RuleActionBean {
         if (getClass() != obj.getClass())
             return false;
         RandomizeActionBean other = (RandomizeActionBean) obj;
-        if (factors == null) {
-            if (other.factors != null)
-                return false;
-        } else if (!factors.equals(other.factors))
-            return false;
         if (properties == null) {
             if (other.properties != null)
                 return false;
@@ -110,6 +98,24 @@ public class RandomizeActionBean extends RuleActionBean {
         }
         return true;
     }
+
+    
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "rule_action_id", nullable = true)
+    public List<StratificationFactorBean> getStratificationFactors() {
+        return stratificationFactors;
+    }
+
+    public void setStratificationFactors(List<StratificationFactorBean> stratificationFactors) {
+        this.stratificationFactors = stratificationFactors;
+    }
+    
+    public void addStratificationFactor(StratificationFactorBean stratificationFactor) {
+        if (stratificationFactors == null) {
+            stratificationFactors = new ArrayList<StratificationFactorBean>();
+        }
+        stratificationFactors.add(stratificationFactor);
+    }    
 
 }
 

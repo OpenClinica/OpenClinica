@@ -707,7 +707,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if(actionType==ActionType.RANDOMIZE) {
                 RandomizeActionBean a = (RandomizeActionBean)ruleAction;
                 appendDestProps(builder,a.getProperties());
-                appendStratificationFactors(builder, a.getFactors());
+                appendStratificationFactors(builder, a.getStratificationFactors());
             }
             if(actionType==ActionType.INSERT) {
                 InsertActionBean a = (InsertActionBean)ruleAction;
@@ -752,16 +752,29 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
         }
 
-    
-        private void appendStratificationFactors(HtmlBuilder builder, String straficationFactors ) {
-            if(straficationFactors!=null) {
+
+        private void appendStratificationFactors(HtmlBuilder builder,
+                List<org.akaza.openclinica.domain.rule.action.StratificationFactorBean> factorBeans) {
+            if(factorBeans!=null && factorBeans.size()>0) {
+                String s = "";
+                for(org.akaza.openclinica.domain.rule.action.StratificationFactorBean p : factorBeans) {
+                   if(p.getStratificationFactor()!=null){
+                        s +=p.getStratificationFactor().getValue()+", ";
+                    }
+                        
+                }
+                s = s.trim(); 
+                
+                if(s.length()>0)
+                s = s.substring(0,s.length()-1);
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("stratification_factor_colon") + "</i>").tdEnd()
-                .td(1).close().append(straficationFactors.trim()).tdEnd().td(1).close().tdEnd();
+                .td(1).close().append(s).tdEnd().td(1).close().tdEnd();
                 builder.trEnd(1);
                 builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
                 builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
             }
         }
+
 
     }
 

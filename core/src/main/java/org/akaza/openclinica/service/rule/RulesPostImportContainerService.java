@@ -12,12 +12,16 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.rule.action.EmailActionBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -27,6 +31,8 @@ import org.akaza.openclinica.domain.rule.RunOnSchedule;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
+import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
@@ -41,6 +47,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
@@ -433,11 +440,52 @@ public class RulesPostImportContainerService {
             randomizeActionValidator.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
             randomizeActionValidator.setExpressionService(expressionService);
             randomizeActionValidator.validate(ruleActionBean, errors);
-            if (errors.hasErrors()) {
-                ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());
+            RandomizeActionBean randomizeActionBean = (RandomizeActionBean) ruleActionBean;
+           
+       //     RuleActionRunBean ruleActionRun = randomizeActionBean.getRuleActionRun();
+       //     if (ruleActionRun.getAdministrativeDataEntry() || ruleActionRun.getBatch() || ruleActionRun.getDoubleDataEntry() || ruleActionRun.getImportDataEntry())
+       //        ruleSetBeanWrapper.error(createError("OCRERR_0050"));
+            
+            for (StratificationFactorBean factor : randomizeActionBean.getStratificationFactors()){
+                if (factor.getStratificationFactor() != null && factor.getStratificationFactor().getValue()  != null
+                    && factor.getStratificationFactor().getValue().length() != 0) {
+
+                    String expressionContextName = factor.getStratificationFactor().getContextName();
+                    Context context = expressionContextName != null ? Context.getByName(expressionContextName) : Context.OC_RULES_V1;
+                    factor.getStratificationFactor().setContext(context);
+                    ExpressionBean expBean = factor.getStratificationFactor();
+                    String expValue = expBean.getValue(); 
+                    String prefix = "STUDYGROUPCLASSLIST";
+                    boolean sgcExist=false;
+
+                    if (expValue.startsWith("SS.") ){
+                         String param = expValue.split("\\.",-1)[1].trim() ;
+                       
+                         if (param.startsWith(prefix)){
+                        String gcName= param.substring(21,param.indexOf("\"]"));    
+                                                      
+                     StudyGroupClassDAO studyGroupClassDAO =new StudyGroupClassDAO(ds);
+                     ArrayList <StudyGroupClassBean> studyGroupClasses = studyGroupClassDAO.findAllByStudy(currentStudy);
+                     for (StudyGroupClassBean studyGroupClass :studyGroupClasses){
+                           if (studyGroupClass.getName().equalsIgnoreCase(gcName.trim())){
+                               sgcExist= true;
+                               break;
+                           }
+                       }
+                         }
+                     if (!param.equalsIgnoreCase("BIRTHDATE") && !param.equalsIgnoreCase("SEX") && !sgcExist){
+                          ruleSetBeanWrapper.error(createError("OCRERR_0051",expBean.getValue()));     
+                      }
+                    }else{
+                    isStratificationExpressionValid(expBean, ruleSetBeanWrapper);
+                  }
+                }
             }
-        }
+            if (errors.hasErrors()) 
+                ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());           
+          }
         }   
+        
         if (ruleActionBean instanceof EventActionBean) {
           
             DataBinder dataBinder = new DataBinder(ruleActionBean);
@@ -662,6 +710,16 @@ public class RulesPostImportContainerService {
         Object[] arguments = {};
         return key + ": " + mf.format(arguments);
     }
+    
+
+    private String createError(String key, String var) {
+        MessageFormat mf = new MessageFormat("");
+        mf.applyPattern(respage.getString(key));
+        Object[] arguments = { var };
+        return key + ": " + mf.format(arguments);
+    }
+
+    
 
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {
         boolean isValid = true;
@@ -677,6 +735,22 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
+    public boolean isStratificationExpressionValid(ExpressionBean expBean , AuditableBeanWrapper<RuleSetBean> beanWrapper) {
+        boolean isValid = true;
+        ExpressionBean expressionBean = isExpressionValid(expBean, beanWrapper);
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean,ExpressionObjectWrapper.CONTEXT_TARGET);
+        ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+        ep.setRespage(respage);
+        String errorString = ep.isRuleExpressionValid();
+        if (errorString != null) {
+            beanWrapper.error(errorString);
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    
+    
     private boolean isRuleSetExpressionValid(AuditableBeanWrapper<RuleSetBean> beanWrapper) {
         boolean isValid = true;
         ExpressionBean expressionBean = isExpressionValid(beanWrapper.getAuditableBean().getTarget(), beanWrapper);
