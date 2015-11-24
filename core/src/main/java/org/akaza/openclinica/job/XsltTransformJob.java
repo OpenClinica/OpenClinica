@@ -326,7 +326,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
-                            successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                            successMsg.replace("$linkURL", "<a mc:disable-tracking href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                                 + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                                 + " </a>");
                     }
@@ -438,7 +438,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 } else {
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
-                            successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                            successMsg.replace("$linkURL", "<a mc:disable-tracking href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                                 + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                                 + " </a>");
                     }

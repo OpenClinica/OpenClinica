@@ -1,0 +1,1299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style th:inline="text" type="text/css">
+.font-sans-serif {
+  font-family: sans-serif;
+}
+.font-avenir {
+  font-family: Avenir, sans-serif;
+}
+.mso .font-avenir {
+  font-family: sans-serif !important;
+}
+.font-lato {
+  font-family: Lato, Tahoma, sans-serif;
+}
+.mso .font-lato {
+  font-family: Tahoma, sans-serif !important;
+}
+.font-cabin {
+  font-family: Cabin, Avenir, sans-serif;
+}
+.mso .font-cabin {
+  font-family: sans-serif !important;
+}
+.font-open-Sans {
+  font-family: "Open Sans", sans-serif;
+}
+.mso .font-open-Sans {
+  font-family: sans-serif !important;
+}
+.font-roboto {
+  font-family: Roboto, Tahoma, sans-serif;
+}
+.mso .font-roboto {
+  font-family: Tahoma, sans-serif !important;
+}
+.font-ubuntu {
+  font-family: Ubuntu, sans-serif;
+}
+.mso .font-ubuntu {
+  font-family: sans-serif !important;
+}
+.font-pt-sans {
+  font-family: "PT Sans", "Trebuchet MS", sans-serif;
+}
+.mso .font-pt-sans {
+  font-family: "Trebuchet MS", sans-serif !important;
+}
+.font-georgia {
+  font-family: Georgia, serif;
+}
+.font-merriweather {
+  font-family: Merriweather, Georgia, serif;
+}
+.mso .font-merriweather {
+  font-family: Georgia, serif !important;
+}
+.font-bitter {
+  font-family: Bitter, Georgia, serif;
+}
+.mso .font-bitter {
+  font-family: Georgia, serif !important;
+}
+.font-pt-serif {
+  font-family: "PT Serif", Georgia, serif;
+}
+.mso .font-pt-serif {
+  font-family: Georgia, serif !important;
+}
+.font-pompiere {
+  font-family: Pompiere, "Trebuchet MS", sans-serif;
+}
+.mso .font-pompiere {
+  font-family: "Trebuchet MS", sans-serif !important;
+}
+.font-roboto-slab {
+  font-family: "Roboto Slab", Georgia, serif;
+}
+.mso .font-roboto-slab {
+  font-family: Georgia, serif !important;
+}
+@media only screen and (max-width: 620px) {
+  .wrapper .column .size-8 {
+    font-size: 8px !important;
+    line-height: 14px !important;
+  }
+  .wrapper .column .size-9 {
+    font-size: 9px !important;
+    line-height: 16px !important;
+  }
+  .wrapper .column .size-10 {
+    font-size: 10px !important;
+    line-height: 18px !important;
+  }
+  .wrapper .column .size-11 {
+    font-size: 11px !important;
+    line-height: 19px !important;
+  }
+  .wrapper .column .size-12 {
+    font-size: 12px !important;
+    line-height: 19px !important;
+  }
+  .wrapper .column .size-13 {
+    font-size: 13px !important;
+    line-height: 21px !important;
+  }
+  .wrapper .column .size-14 {
+    font-size: 14px !important;
+    line-height: 21px !important;
+  }
+  .wrapper .column .size-15 {
+    font-size: 15px !important;
+    line-height: 23px !important;
+  }
+  .wrapper .column .size-16 {
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+  .wrapper .column .size-17 {
+    font-size: 17px !important;
+    line-height: 26px !important;
+  }
+  .wrapper .column .size-18 {
+    font-size: 17px !important;
+    line-height: 26px !important;
+  }
+  .wrapper .column .size-20 {
+    font-size: 17px !important;
+    line-height: 26px !important;
+  }
+  .wrapper .column .size-22 {
+    font-size: 18px !important;
+    line-height: 26px !important;
+  }
+  .wrapper .column .size-24 {
+    font-size: 20px !important;
+    line-height: 28px !important;
+  }
+  .wrapper .column .size-26 {
+    font-size: 22px !important;
+    line-height: 31px !important;
+  }
+  .wrapper .column .size-28 {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+  .wrapper .column .size-30 {
+    font-size: 26px !important;
+    line-height: 34px !important;
+  }
+  .wrapper .column .size-32 {
+    font-size: 28px !important;
+    line-height: 36px !important;
+  }
+  .wrapper .column .size-34 {
+    font-size: 30px !important;
+    line-height: 38px !important;
+  }
+  .wrapper .column .size-36 {
+    font-size: 30px !important;
+    line-height: 38px !important;
+  }
+  .wrapper .column .size-40 {
+    font-size: 32px !important;
+    line-height: 40px !important;
+  }
+  .wrapper .column .size-44 {
+    font-size: 34px !important;
+    line-height: 43px !important;
+  }
+  .wrapper .column .size-48 {
+    font-size: 36px !important;
+    line-height: 43px !important;
+  }
+  .wrapper .column .size-56 {
+    font-size: 40px !important;
+    line-height: 47px !important;
+  }
+  .wrapper .column .size-64 {
+    font-size: 44px !important;
+    line-height: 50px !important;
+  }
+}
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 100%;
+}
+.mso body {
+  mso-line-height-rule: exactly;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td {
+  padding: 0;
+  vertical-align: top;
+}
+.spacer,
+.border {
+  font-size: 1px;
+  line-height: 1px;
+}
+.spacer {
+  height: 22px;
+  width: 100%;
+}
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+.image {
+  font-size: 12px;
+  Margin-bottom: 22px;
+  mso-line-height-rule: at-least;
+}
+.image img {
+  display: block;
+}
+.logo {
+  mso-line-height-rule: at-least;
+}
+.logo img {
+  display: block;
+}
+strong {
+  font-weight: bold;
+}
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+li {
+  Margin-top: 0;
+}
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+blockquote,
+.image {
+  font-style: normal;
+  font-weight: 400;
+}
+ol,
+ul,
+li {
+  padding-left: 0;
+}
+blockquote {
+  Margin-top: 0;
+  Margin-right: 0;
+  Margin-bottom: 0;
+  padding-right: 0;
+}
+.column-top {
+  font-size: 40px;
+  line-height: 40px;
+}
+.column-bottom {
+  font-size: 9px;
+  line-height: 9px;
+}
+.column {
+  text-align: left;
+}
+.contents {
+  table-layout: fixed;
+  width: 100%;
+}
+.padded {
+  padding-left: 56px;
+  padding-right: 56px;
+  word-break: break-word;
+  word-wrap: break-word;
+}
+.wrapper {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 620px;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+.wrapper a {
+  transition: opacity 0.2s ease-in;
+}
+table.wrapper {
+  table-layout: fixed;
+}
+.one-col,
+.two-col,
+.three-col {
+  Margin-left: auto;
+  Margin-right: auto;
+  width: 600px;
+}
+.centered {
+  Margin-left: auto;
+  Margin-right: auto;
+}
+.btn {
+  Margin-bottom: 22px;
+}
+.btn a {
+  border-radius: 3px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+  padding: 13px 35px 12px 35px;
+  text-align: center;
+  text-decoration: none !important;
+}
+.btn a:hover {
+  opacity: 0.8;
+}
+.two-col .btn {
+  Margin-bottom: 21px;
+}
+.two-col .btn a {
+  font-size: 12px;
+  line-height: 22px;
+  padding: 10px 28px;
+}
+.three-col .btn,
+.two-col .column-narrower .btn,
+.three-col .column .btn {
+  Margin-bottom: 20px;
+}
+.three-col .btn a,
+.two-col .column-narrower .btn a,
+.three-col .column .btn a {
+  font-size: 11px;
+  line-height: 19px;
+  padding: 6px 18px 5px 18px;
+}
+@media only screen and (max-width: 620px) {
+  .btn {
+    margin-bottom: 22px !important;
+  }
+  .btn a {
+    display: block !important;
+    font-size: 14px !important;
+    line-height: 24px !important;
+    padding: 13px 10px 12px 10px !important;
+  }
+}
+.two-col .image {
+  Margin-bottom: 21px;
+}
+.two-col .column-top {
+  font-size: 24px;
+  line-height: 24px;
+}
+.two-col .column-bottom {
+  font-size: 3px;
+  line-height: 3px;
+}
+.two-col .column {
+  width: 290px;
+}
+.two-col .gutter {
+  width: 20px;
+  font-size: 1px;
+  line-height: 1px;
+}
+.two-col .padded {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.three-col .image {
+  Margin-bottom: 20px;
+}
+.three-col .column-top {
+  font-size: 24px;
+  line-height: 24px;
+}
+.three-col .column-bottom {
+  font-size: 4px;
+  line-height: 4px;
+}
+.three-col .column {
+  width: 188px;
+}
+.three-col .gutter {
+  width: 18px;
+  font-size: 1px;
+  line-height: 1px;
+}
+.three-col .padded {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.wider {
+  width: 392px;
+}
+.narrower {
+  width: 188px;
+}
+@media only screen and (min-width: 0) {
+  .wrapper {
+    text-rendering: optimizeLegibility;
+  }
+}
+@media only screen and (max-width: 620px) {
+  [class=wrapper] {
+    min-width: 320px !important;
+    width: 100% !important;
+  }
+  [class=wrapper] .one-col,
+  [class=wrapper] .two-col,
+  [class=wrapper] .three-col {
+    width: 320px !important;
+  }
+  [class=wrapper] .column,
+  [class=wrapper] .gutter {
+    display: block;
+    float: left;
+    width: 320px !important;
+  }
+  [class=wrapper] .padded {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  [class=wrapper] .block {
+    display: block !important;
+  }
+  [class=wrapper] .hide {
+    display: none !important;
+  }
+  [class=wrapper] .image {
+    margin-bottom: 22px !important;
+  }
+  [class=wrapper] .image img {
+    height: auto !important;
+    width: 100% !important;
+  }
+}
+td {
+  vertical-align: middle;
+}
+td.border {
+  width: 1px;
+}
+tr.border {
+  height: 1px;
+}
+tr.border td {
+  line-height: 1px;
+}
+.divider {
+  font-size: 1px;
+  line-height: 1px;
+}
+.full-width {
+  width: 600px;
+  margin: 0 auto;
+}
+.contents {
+  width: 100%;
+}
+.image div {
+  display: block;
+}
+.padded .image {
+  font-size: 0;
+}
+.image-frame {
+  border-style: solid;
+  border-width: 6px;
+  display: inline-block;
+  font-size: 12px;
+}
+.image-frame a,
+.image-frame a:hover {
+  text-decoration: none;
+}
+.preheader {
+  width: 100%;
+}
+.preheader .title,
+.preheader .webversion,
+.preheader .webversion a {
+  font-size: 10px;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+.preheader .title {
+  text-align: left;
+  width: 385px;
+}
+.preheader .webversion {
+  text-align: right;
+  width: 215px;
+}
+.preheader .webversion a {
+  font-weight: bold;
+}
+.header {
+  width: 100%;
+  Margin-left: auto;
+  Margin-right: auto;
+}
+.header .logo {
+  width: 600px;
+}
+.header .logo div {
+  margin-bottom: 0;
+}
+.header .logo div a {
+  text-decoration: none;
+}
+.header .logo div.logo-center {
+  text-align: center;
+}
+.header .logo div.logo-center img {
+  Margin-left: auto;
+  Margin-right: auto;
+}
+.one-col-bg,
+.two-col-bg,
+.three-col-bg,
+.one-col-feature-bg {
+  width: 100%;
+}
+.one-col,
+.two-col,
+.three-col,
+.one-col-feature {
+  Margin-left: auto;
+  Margin-right: auto;
+  table-layout: fixed;
+}
+.column {
+  text-align: left;
+}
+.wrapper h1 {
+  font-size: 22px;
+  line-height: 30px;
+  Margin-bottom: 18px;
+}
+.wrapper h2 {
+  font-size: 16px;
+  line-height: 24px;
+  Margin-bottom: 16px;
+}
+.wrapper h3 {
+  font-size: 16px;
+  line-height: 24px;
+  Margin-bottom: 14px;
+}
+.wrapper p,
+.wrapper ol,
+.wrapper ul {
+  font-size: 13px;
+  line-height: 22px;
+  Margin-bottom: 22px;
+}
+.wrapper li {
+  Margin-bottom: 11px;
+}
+.wrapper h1 a,
+.wrapper h2 a,
+.wrapper h3 a {
+  text-decoration: none;
+}
+.wrapper blockquote {
+  padding-left: 16px;
+  Margin: 0;
+}
+.one-col ol,
+.one-col ul {
+  Margin-left: 18px;
+}
+.one-col li {
+  Margin-bottom: 11px;
+}
+.one-col .image-frame {
+  border-width: 8px;
+}
+.one-col .divider {
+  Margin-right: 475px;
+  Margin-bottom: 22px;
+}
+.one-col .contents table:nth-last-child(2) td h1:last-child,
+.one-col .contents table:nth-last-child(2) td h2:last-child,
+.one-col .contents table:nth-last-child(2) td h3:last-child,
+.one-col .contents table:nth-last-child(2) td p:last-child,
+.one-col .contents table:nth-last-child(2) td ol:last-child,
+.one-col .contents table:nth-last-child(2) td ul:last-child {
+  Margin-bottom: 22px;
+}
+.one-col-feature {
+  width: 504px;
+}
+.one-col-feature .column-top {
+  font-size: 40px;
+  line-height: 40px;
+}
+.one-col-feature .column-bottom {
+  font-size: 18px;
+  line-height: 18px;
+}
+.one-col-feature .divider {
+  Margin-left: 213px;
+  Margin-right: 214px;
+  Margin-bottom: 22px;
+}
+.one-col-feature .padded {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+.one-col-feature p,
+.one-col-feature h1,
+.one-col-feature h2,
+.one-col-feature h3,
+.one-col-feature .btn {
+  text-align: center;
+}
+.one-col-feature ol,
+.one-col-feature ul {
+  Margin-left: 20px;
+  text-align: left;
+}
+.one-col-feature li {
+  Margin-bottom: 11px;
+}
+.mso .one-col-feature li {
+  padding-left: 5px !important;
+  margin-left: 10px !important;
+}
+.one-col-feature .contents blockquote {
+  border-left: none;
+  padding: 0;
+  Margin: 0;
+}
+@media only screen and (min-width: 0) {
+  .one-col-feature .contents blockquote {
+    background-image: url("[[${images['background-blockquote-bottomright']}]]");
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+  }
+}
+.one-col-feature .contents blockquote p {
+  font-size: 16px;
+  text-align: center;
+  padding-left: 25px;
+  padding-right: 25px;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+}
+.one-col-feature .contents blockquote p:first-child {
+  background-image: url("[[${images['background-blockquote-topleft']}]]");
+  padding-top: 32px;
+}
+.one-col-feature .contents blockquote p:last-child {
+  padding-bottom: 32px;
+}
+.one-col-feature .contents table:nth-last-child(2) td h1:last-child,
+.one-col-feature .contents table:nth-last-child(2) td h2:last-child,
+.one-col-feature .contents table:nth-last-child(2) td h3:last-child,
+.one-col-feature .contents table:nth-last-child(2) td p:last-child,
+.one-col-feature .contents table:nth-last-child(2) td ol:last-child,
+.one-col-feature .contents table:nth-last-child(2) td ul:last-child {
+  Margin-bottom: 22px;
+}
+.two-col td {
+  vertical-align: middle;
+}
+.two-col ol,
+.two-col ul {
+  Margin-left: 15px;
+}
+.two-col li {
+  Margin-bottom: 10px;
+}
+.two-col .divider {
+  Margin-right: 241px;
+  Margin-bottom: 21px;
+}
+.two-col .contents table:nth-last-child(2) td h1:last-child,
+.two-col .contents table:nth-last-child(2) td h2:last-child,
+.two-col .contents table:nth-last-child(2) td h3:last-child,
+.two-col .contents table:nth-last-child(2) td p:last-child,
+.two-col .contents table:nth-last-child(2) td ol:last-child,
+.two-col .contents table:nth-last-child(2) td ul:last-child {
+  Margin-bottom: 21px;
+}
+.two-col .column-wider {
+  width: 392px;
+}
+.two-col .column-wider .divider {
+  Margin-right: 343px;
+}
+.two-col .column-narrower,
+.three-col .column {
+  width: 188px;
+}
+.two-col .column-narrower ol,
+.two-col .column-narrower ul,
+.three-col .column ol,
+.three-col .column ul {
+  Margin-left: 15px;
+}
+.two-col .column-narrower li,
+.three-col .column li {
+  Margin-bottom: 10px;
+}
+.two-col .column-narrower blockquote,
+.three-col .column blockquote {
+  padding-left: 10px;
+}
+.two-col .column-narrower .image,
+.three-col .column .image {
+  Margin-bottom: 20px;
+}
+.two-col .column-narrower .image-frame,
+.three-col .column .image-frame {
+  border-width: 4px;
+}
+.two-col .column-narrower .divider,
+.three-col .column .divider {
+  Margin-right: 139px;
+  Margin-bottom: 20px;
+}
+.two-col .column-narrower .contents table:nth-last-child(2) td h1:last-child,
+.two-col .column-narrower .contents table:nth-last-child(2) td h2:last-child,
+.two-col .column-narrower .contents table:nth-last-child(2) td h3:last-child,
+.two-col .column-narrower .contents table:nth-last-child(2) td p:last-child,
+.two-col .column-narrower .contents table:nth-last-child(2) td ol:last-child,
+.two-col .column-narrower .contents table:nth-last-child(2) td ul:last-child,
+.three-col .column .contents table:nth-last-child(2) td h1:last-child,
+.three-col .column .contents table:nth-last-child(2) td h2:last-child,
+.three-col .column .contents table:nth-last-child(2) td h3:last-child,
+.three-col .column .contents table:nth-last-child(2) td p:last-child,
+.three-col .column .contents table:nth-last-child(2) td ol:last-child,
+.three-col .column .contents table:nth-last-child(2) td ul:last-child {
+  Margin-bottom: 20px;
+}
+.three-col .contents table:nth-last-child(2) td h1:last-child,
+.three-col .contents table:nth-last-child(2) td h2:last-child,
+.three-col .contents table:nth-last-child(2) td h3:last-child,
+.three-col .contents table:nth-last-child(2) td p:last-child,
+.three-col .contents table:nth-last-child(2) td ol:last-child,
+.three-col .contents table:nth-last-child(2) td ul:last-child {
+  Margin-bottom: 20px;
+}
+.contents h1 a,
+.contents h2 a,
+.contents h3 a {
+  text-decoration: none;
+}
+.wrapper h2 {
+  font-weight: bold;
+}
+.footer {
+  table-layout: fixed;
+  width: 100%;
+}
+.footer .inner {
+  padding-top: 40px;
+  padding-bottom: 75px;
+  width: 464px;
+}
+.footer .inner table {
+  width: 100%;
+}
+.footer .divider {
+  width: 13px;
+}
+.mso .footer .divider {
+  Margin-right: 451px;
+}
+.footer td {
+  text-align: left;
+  vertical-align: top;
+}
+.footer .campaign {
+  font-size: 12px;
+  line-height: 20px;
+}
+.footer .campaign a {
+  font-weight: bold;
+  text-decoration: none;
+}
+.footer .social {
+  text-transform: uppercase;
+  width: 190px;
+}
+.footer .social .padded {
+  Margin-left: 20px;
+  padding: 0;
+}
+.footer .social .padded div {
+  Margin-bottom: 10px;
+}
+.footer .social img {
+  vertical-align: middle;
+}
+.footer .social a {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  line-height: 12px;
+  text-decoration: none;
+}
+.footer .social a span {
+  mso-text-raise: 11px;
+}
+@media only screen and (max-width: 620px) {
+  [class=wrapper] .divider {
+    margin: 0 0 22px 0 !important;
+    width: 13px;
+  }
+  [class=wrapper] .one-col .column-top {
+    font-size: 32px !important;
+    line-height: 32px !important;
+  }
+  [class=wrapper] .one-col .column-bottom {
+    font-size: 10px !important;
+    line-height: 10px !important;
+  }
+  [class=wrapper] .one-col-feature {
+    width: 320px !important;
+  }
+  [class=wrapper] .one-col-feature .column-top {
+    font-size: 32px !important;
+    line-height: 32px !important;
+  }
+  [class=wrapper] .one-col-feature .column-bottom {
+    font-size: 10px !important;
+    line-height: 10px !important;
+  }
+  [class=wrapper] .one-col-feature .divider {
+    margin: 0 auto 22px auto !important;
+  }
+  [class=wrapper] .one-col-feature blockquote {
+    background-image: url("[[${images['background-blockquote-bottomright_2x']}]]");
+    background-size: 16px !important;
+    padding: 0 !important;
+  }
+  [class=wrapper] .one-col-feature blockquote p:first-child {
+    background-image: url("[[${images['background-blockquote-topleft_2x']}]]");
+    background-size: 16px !important;
+  }
+  [class=wrapper] .column-wider,
+  [class=wrapper] .column-narrower {
+    display: block;
+    float: left;
+    width: 320px !important;
+  }
+  [class="wrapper"] .spacer {
+    display: block !important;
+    height: 22px !important;
+    width: 320px !important;
+  }
+  [class=wrapper] .padded {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  [class=wrapper] .image-frame {
+    border-width: 8px !important;
+  }
+  [class=wrapper] h1 {
+    font-size: 22px !important;
+    line-height: 28px !important;
+    margin-bottom: 18px !important;
+  }
+  [class=wrapper] h2 {
+    font-size: 16px !important;
+    line-height: 22px !important;
+    margin-bottom: 16px !important;
+  }
+  [class=wrapper] h3 {
+    font-size: 16px !important;
+    line-height: 24px !important;
+    margin-bottom: 14px !important;
+  }
+  [class=wrapper] p,
+  [class=wrapper] ol,
+  [class=wrapper] ul {
+    font-size: 14px !important;
+    line-height: 22px !important;
+    margin-bottom: 22px !important;
+  }
+  [class=wrapper] ol,
+  [class=wrapper] ul {
+    margin-left: 19px !important;
+  }
+  [class=wrapper] li {
+    margin-bottom: 11px !important;
+    padding: 0 !important;
+  }
+  [class=wrapper] blockquote {
+    margin: 0 0 21px 0 !important;
+    padding-left: 14px !important;
+  }
+  [class=wrapper] .two-col .column-narrower h2,
+  [class=wrapper] .three-col .column h2,
+  [class=wrapper] .three-col .column h2 {
+    margin-bottom: 16px !important;
+  }
+  [class=wrapper] .gutter {
+    font-size: 20px !important;
+    line-height: 20px !important;
+    height: 20px !important;
+  }
+  [class=wrapper] .header .logo {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    width: 320px !important;
+  }
+  [class=wrapper] .header .logo div {
+    margin-bottom: 0 !important;
+  }
+  [class=wrapper] .header .logo div img {
+    display: inline-block !important;
+    max-width: 280px !important;
+    height: auto !important;
+  }
+  [class=wrapper] .header .logo div a {
+    text-decoration: none;
+  }
+  [class=wrapper] .contents table:nth-last-child(2) td h1:last-child,
+  [class=wrapper] .contents table:nth-last-child(2) td h2:last-child,
+  [class=wrapper] .contents table:nth-last-child(2) td h3:last-child,
+  [class=wrapper] .contents table:nth-last-child(2) td p:last-child,
+  [class=wrapper] .contents table:nth-last-child(2) td ol:last-child,
+  [class=wrapper] .contents table:nth-last-child(2) td ul:last-child {
+    Margin-bottom: 22px !important;
+  }
+  [class=wrapper] .webversion,
+  [class=wrapper] .preheader table {
+    width: 320px !important;
+  }
+  [class=wrapper] .preheader .webversion,
+  [class=wrapper] .header .logo a {
+    text-align: center !important;
+  }
+  [class=wrapper] .footer td {
+    display: none;
+  }
+  [class=wrapper] .footer .inner {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+    display: block !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  [class=wrapper] .footer table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 90% !important;
+  }
+  [class=wrapper] .footer .divider {
+    margin: 0 auto 0 auto !important;
+    width: 13px !important;
+  }
+  [class=wrapper] .footer .divider td {
+    display: table-cell !important;
+  }
+  [class=wrapper] .footer .campaign,
+  [class=wrapper] .footer .social {
+    display: block !important;
+    margin-bottom: 15px !important;
+    padding-top: 15px !important;
+    text-align: center !important;
+    width: auto !important;
+  }
+  [class=wrapper] .footer .padded {
+    margin: 0 !important;
+  }
+  [class=wrapper] .full-width {
+    width: 320px !important;
+  }
+  [class=wrapper] .footer *[class*="column"],
+  [class=wrapper] .preheader *[class*="column"] {
+    display: block !important;
+    text-align: center;
+  }
+  [class=wrapper] .footer *[class*="column"] table,
+  [class=wrapper] .preheader *[class*="column"] table,
+  [class=wrapper] .footer *[class*="column"] hr,
+  [class=wrapper] .preheader *[class*="column"] hr {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  [class=wrapper] .footer *[class*="column"] table.social,
+  [class=wrapper] .preheader *[class*="column"] table.social {
+    margin: 0 auto !important;
+    float: none !important;
+  }
+  [class=wrapper] .footer .column-social,
+  [class=wrapper] .preheader .column-social {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  [class=wrapper] .footer .title,
+  [class=wrapper] .preheader .title {
+    display: none !important;
+  }
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+  .one-col ul {
+    border-left: 30px solid transparent;
+  }
+}
+  </style>
+  <style type="text/css">
+  </style>
+  <!--[if !mso]><!--><style type="text/css">
+@import url(https://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic|Ubuntu:400,700,400italic,700italic);
+</style><link href="https://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic|Ubuntu:400,700,400italic,700italic" rel="stylesheet" type="text/css" /><!--<![endif]--><style type="text/css">
+.wrapper h1{}.wrapper h1{font-family:Ubuntu,sans-serif}.mso .wrapper h1{font-family:sans-serif !important}.wrapper h2{}.wrapper h2{font-family:Ubuntu,sans-serif}.mso .wrapper h2{font-family:sans-serif !important}.wrapper h3{}.wrapper h3{font-family:"PT Serif",Georgia,serif}.mso .wrapper h3{font-family:Georgia,serif !important}.wrapper p,.wrapper ol,.wrapper ul,.wrapper .image{}.wrapper p,.wrapper ol,.wrapper ul,.wrapper .image{font-family:"PT Serif",Georgia,serif}.mso .wrapper p,.mso .wrapper ol,.mso .wrapper ul,.mso .wrapper .image{font-family:Georgia,serif !important}.wrapper .btn a{}.wrapper .btn a{font-family:"PT Serif",Georgia,serif}.mso .wrapper .btn a{font-family:Georgia,serif !important}.logo div{}.logo div{font-family:Avenir,sans-serif}.mso .logo div{font-family:sans-serif 
+!important}.title,.webversion,.facebook,.twitter,.forward,.permission,.left,.right,.social,.address,.campaign{}.title,.webversion,.facebook,.twitter,.forward,.permission,.left,.right,.social,.address,.campaign{font-family:Ubuntu,sans-serif}.mso .title,.mso .webversion,.mso .facebook,.mso .twitter,.mso .forward,.mso .permission,.mso .left,.mso .right,.mso .social,.mso .address,.mso .campaign{font-family:sans-serif !important}body,.wrapper,.emb-editor-canvas{background-color:#f6f6f8}.mso body{background-color:#fff !important}.mso .spacer,.mso .header,.mso .one-col-bg,.mso .two-col-bg,.mso .three-col-bg,.mso .one-col-feature-bg{background-color:#f6f6f8}.wrapper h1{color:#3e4751}.wrapper h2{color:#3e4751}.wrapper h3{color:#788991}.wrapper p,.wrapper ol,.wrapper ul{color:#7c7e7f}.wrapper .image{color:#7c7e7f}.wrapper h1 a,.wrapper h2 a,.wrapper h3 a,.wrapper p a,.wrapper li 
+a{color:#4eaacc}.wrapper h1 a:hover,.wrapper h2 a:hover,.wrapper h3 a:hover,.wrapper p a:hover,.wrapper li a:hover{text-decoration:none}.wrapper .btn a{background-color:#4eaacc;color:#fff}.wrapper .btn a:hover{color:#fff !important}.logo div{color:#38434d}.logo div a{color:#38434d}.logo div a:hover{color:#38434d !important}.header{color:gray}.header a{color:gray}.one-col .contents,.two-col .contents,.three-col .contents,.sidebar .contents{background-color:#fff}.image-frame{background-color:#fff;border-color:#f2efe9}.preheader{background-color:#ededf1}.preheader .title,.preheader .webversion{color:gray}.preheader .title a,.preheader .webversion a{color:gray}.preheader .title a:hover,.preheader .webversion a:hover{color:#5a5a5a !important}.divider{background-color:#cbcbd7}.one-col blockquote{border-left:4px solid #cbcbd7}.two-col blockquote,.narrower blockquote,.three-col 
+blockquote{border-left:2px solid #cbcbd7}.one-col-feature blockquote p:first-child{border-top:1px solid #cbcbd7}.one-col-feature blockquote p:last-child{border-bottom:1px solid #cbcbd7}td.border{background-color:#f6f6f8}.contents{background-color:#fff}.footer .campaign,.footer .social{color:gray}.footer .campaign a{color:gray}.footer .campaign a:hover{color:#5a5a5a !important}.footer .divider{background-color:#c2c2d0}.footer .social a{color:gray}.footer .social a:hover{color:#5a5a5a !important}.footer,.emb-editor-canvas{background-color:#ededf1}@media (min-width:0){body{background-color:#ededf1}}
+</style><!--[if mso]>
+<style type="text/css">
+@import url(https://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic|Ubuntu:400,700,400italic,700italic);
+</style>
+<![endif]--><meta name="robots" content="noindex,nofollow" />
+  <meta property="og:title" th:content="${subject}" />
+</head>
+<!--[if mso]>
+  <body class="mso">
+<![endif]-->
+<!--[if !mso]><!-->
+  <body style="margin: 0;padding: 0;min-width: 100%;background-color: #f6f6f8">
+<!--<![endif]-->
+    <center class="wrapper" style="display: table;table-layout: fixed;width: 100%;min-width: 620px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;background-color: #f6f6f8">
+      <table class="preheader" style="border-collapse: collapse;border-spacing: 0;width: 100%;background-color: #ededf1">
+        <tbody><tr>
+          <td style="padding: 10px 0 12px 0;vertical-align: middle">
+            <center>
+              <table class="full-width centered" style="border-collapse: collapse;border-spacing: 0;Margin-left: auto;Margin-right: auto;width: 600px;margin: 0 auto">
+                <tbody><tr>
+                  <td th:text="${subject}" class="title column" style="padding: 0;vertical-align: middle;text-align: left;font-family: Ubuntu,sans-serif;font-size: 10px;line-height: 16px;letter-spacing: 0.01em;text-decoration: none;width: 385px;color: gray">
+                  </td>
+                </tr>
+              </tbody></table>
+            </center>
+          </td>
+        </tr>
+      </tbody></table>
+      <div class="spacer" style="font-size: 1px;line-height: 20px;width: 100%">&nbsp;</div>
+      <table class="header centered" style="border-collapse: collapse;border-spacing: 0;Margin-left: auto;Margin-right: auto;width: 100%;color: gray">
+        <tbody><tr>
+          <td style="padding: 0;vertical-align: middle">&nbsp;</td>
+          <td class="logo emb-logo-padding-box" style="padding: 0;vertical-align: middle;mso-line-height-rule: at-least;width: 600px;padding-top: 12px;padding-bottom: 26px">
+            <div th:if="${logoUrl != null}" class="logo-center" style="font-family: Avenir,sans-serif;color: #38434d;font-weight: bold;Margin-bottom: 0;text-align: center;font-size: 0px !important;line-height: 0 !important" align="center" id="emb-email-header">
+              <img th:src="${logoUrl}" th:if="${#strings.startsWith(logoUrl, 'cid:') or #strings.startsWith(logoUrl, 'data:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;Margin-left: auto;Margin-right: auto;max-width: 216px" alt="" height="" width="" />
+              <img th:src="@{${baseUrl + logoUrl}}" th:unless="${#strings.startsWith(logoUrl, 'cid:') or #strings.startsWith(logoUrl, 'data:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;Margin-left: auto;Margin-right: auto;max-width: 216px" alt="" height="" width="" />
+            </div>
+            <div th:unless="${logoUrl != null}" class="logo-center" style="font-family: Avenir,sans-serif;color: #38434d;font-size: 20px;margin-bottom: 0;text-align: center;line-height: 0 !important" align="center" id="emb-email-header">
+              <strong style="color: orange">Open</strong> <span style="color: rgb(134, 134, 241)">Clinica</span>
+            </div>
+          </td>
+          <td style="padding: 0;vertical-align: middle">&nbsp;</td>
+        </tr>
+      </tbody></table>
+      
+          <table class="one-col-bg" style="border-collapse: collapse;border-spacing: 0;width: 100%">
+            <tbody><tr>
+              <td style="padding: 0;vertical-align: middle" align="center">
+                <table class="one-col centered" style="border-collapse: collapse;border-spacing: 0;Margin-left: auto;Margin-right: auto;width: 600px;table-layout: fixed">
+                  <tbody><tr>
+                    <td class="column" style="padding: 0;vertical-align: middle;text-align: left">
+                      <table class="contents" style="border-collapse: collapse;border-spacing: 0;table-layout: fixed;width: 100%;background-color: #fff">
+                        <tbody><tr>
+                          <td style="padding: 0;vertical-align: middle">
+                            <div><div class="column-top" style="font-size: 40px;line-height: 40px">&nbsp;</div></div>
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
+                                    
+            <h3 th:if="${chapter != null}" th:text="${chapter}" style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 16px;line-height: 24px;Margin-bottom: 14px;font-family: "PT Serif",Georgia,serif;color: #788991;text-align: center'>THE LATEST NEWS:</h3>
+            <h1 th:text="${title}" style="Margin-top: 0;font-style: normal;font-weight: 400;font-size: 22px;line-height: 30px;Margin-bottom: 18px;font-family: Ubuntu,sans-serif;color: #3e4751;text-align: center">New Partnership with Payback</h1>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+            <th:block th:each="bodyItem,loop : ${body}">
+                              <table th:unless="${loop.first}" style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
+                                    <div class="divider" style="font-size: 1px;line-height: 1px;background-color: #cbcbd7;Margin-right: 475px;Margin-bottom: 22px">&nbsp;</div>
+                                  </td>
+                                </tr></tbody>
+                              </table>
+                            
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
+
+              <h2 th:if="${bodyItem['heading'] != null}" th:text="${bodyItem['heading']}" style="Margin-top: 0;font-style: normal;font-weight: bold;font-size: 16px;line-height: 24px;Margin-bottom: 16px;font-family: Ubuntu,sans-serif;color: #3e4751">What does this mean for me?</h2>
+              <div th:utext="${bodyItem['content']}" style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 13px;line-height: 22px;Margin-bottom: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f'>
+                <p>As a loyal Co.Banking customer, you will now have free access to the Payback platform including the integration between the two apps. Now when you share payments on Payback, all the details will be available in your Co.Banking account and transactions made through Payback will be free for all your Co.Banking accounts. Additionally with this integration, you'll be able to leverage Co.Banking reporting services for all your activity.</p>
+                <p>If you're already a Payback user, all you have to do is update your app and enter in your Co.Banking login details. If you're not already using Payback, feel free to give it free trial and see how easy it is to start making payments. For more information, please check out our official blog.</p>
+             </div>
+
+                                  </td>
+                                </tr>
+                              </tbody></table>
+            </th:block>
+
+                              <table th:if="${action != null}" style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
+                                    
+            <div class="btn" style="Margin-bottom: 22px;text-align: center">
+              <a th:href="@{${baseUrl + action['url']}}" th:text="${action['text']}" mc:disable-tracking="" style='border-radius: 3px;display: inline-block;font-size: 14px;font-weight: 700;line-height: 24px;padding: 13px 35px 12px 35px;text-align: center;text-decoration: none !important;transition: opacity 0.2s ease-in;font-family: "PT Serif",Georgia,serif;background-color: #4eaacc;color: #fff' href="http://google.com">READ THE FULL BLOG POST</a>
+            </div>
+                                  </td>
+                                </tr>
+                              </tbody></table>
+ 
+            <th:block th:if="${closing != null}">
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word">
+              <p style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 13px;line-height: 22px;Margin-bottom: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f'>
+                <span th:if="${closing['greeting'] != null}"><span th:text="${closing['greeting']}">Kind regards,</span><br /></span>
+                <span th:utext="${closing['name']}">Jacinta McIntyre, CEO of Co.Banking</span>
+              </p>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            
+              <div th:if="${closing['imageUrl'] != null}" class="image" style='font-size: 12px;Margin-bottom: 22px;mso-line-height-rule: at-least;font-style: normal;font-weight: 400;font-family: "PT Serif",Georgia,serif;color: #7c7e7f' align="center">
+                <img th:src="${closing['imageUrl']}" th:if="${#strings.startsWith(closing['imageUrl'], 'cid:') or #strings.startsWith(closing['imageUrl'], 'data:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 600px" alt="" height="" width="" />
+                <img th:src="@{${baseUrl + closing['imageUrl']}}" th:unless="${#strings.startsWith(closing['imageUrl'], 'cid:') or #strings.startsWith(closing['imageUrl'], 'data:')}" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 600px" alt="" height="" width=""/>
+              </div>
+            </th:block>
+            
+                            <div class="column-bottom" style="font-size: 9px;line-height: 9px">&nbsp;</div>
+                          </td>
+                        </tr>
+                      </tbody></table>
+                    </td>
+                  </tr>
+                </tbody></table>
+              </td>
+            </tr>
+          </tbody></table>
+<!--/*-->
+          <div class="spacer" style="font-size: 1px;line-height: 20px;width: 100%">&nbsp;</div>
+        
+          <table class="two-col-bg" style="border-collapse: collapse;border-spacing: 0;width: 100%">
+            <tbody><tr>
+              <td style="padding: 0;vertical-align: middle" align="center">
+                <table class="two-col centered" style="border-collapse: collapse;border-spacing: 0;Margin-left: auto;Margin-right: auto;width: 600px;table-layout: fixed">
+                  <tbody><tr>
+                    <td class="column" style="padding: 0;vertical-align: middle;text-align: left;width: 290px">
+                      <table class="contents" style="border-collapse: collapse;border-spacing: 0;table-layout: fixed;width: 100%;background-color: #fff">
+                        <tbody><tr>
+                          <td style="padding: 0;vertical-align: middle">
+                            <div><div class="column-top" style="font-size: 24px;line-height: 24px">&nbsp;</div></div>
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 24px;padding-right: 24px;word-break: break-word;word-wrap: break-word">
+                                    
+            <h2 style="Margin-top: 0;font-style: normal;font-weight: bold;font-size: 16px;line-height: 24px;Margin-bottom: 16px;font-family: Ubuntu,sans-serif;color: #3e4751">Frequently Asked Questions</h2>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 24px;padding-right: 24px;word-break: break-word;word-wrap: break-word">
+                                    
+            <ul style='Margin-top: 0;font-style: normal;font-weight: 400;padding-left: 0;font-size: 13px;line-height: 22px;Margin-bottom: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;Margin-left: 15px'><li style="Margin-top: 0;padding-left: 0;Margin-bottom: 10px"><a style="transition: opacity 0.2s ease-in;color: #4eaacc" href="http://google.com">Do I have to download a new app? &#187;</a></li><li style="Margin-top: 0;padding-left: 0;Margin-bottom: 10px"><a style="transition: opacity 0.2s ease-in;color: #4eaacc" href="http://google.com">What if I don't use Payback yet? &#187;</a></li><li style="Margin-top: 0;padding-left: 0;Margin-bottom: 10px"><a style="transition: opacity 0.2s ease-in;color: #4eaacc" href="http://google.com">What other apps does Co.Banking integrate with? &#187;</a></li></ul>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            
+              <div class="image" style='font-size: 12px;Margin-bottom: 21px;mso-line-height-rule: at-least;font-style: normal;font-weight: 400;font-family: "PT Serif",Georgia,serif;color: #7c7e7f' align="center">
+                <img class="gnd-corner-image gnd-corner-image-center gnd-corner-image-bottom" style="border: 0;-ms-interpolation-mode: bicubic;display: block;max-width: 480px" src="images/tes.jpg" alt="" width="290" height="281" />
+              </div>
+            
+                            <div class="column-bottom" style="font-size: 3px;line-height: 3px">&nbsp;</div>
+                          </td>
+                        </tr>
+                      </tbody></table>
+                    </td>
+                    <td class="gutter" style="padding: 0;vertical-align: middle;width: 20px;font-size: 1px;line-height: 1px">&nbsp;</td>
+                    <td class="column last" style="padding: 0;vertical-align: middle;text-align: left;width: 290px">
+                      <table class="contents" style="border-collapse: collapse;border-spacing: 0;table-layout: fixed;width: 100%;background-color: #fff">
+                        <tbody><tr>
+                          <td style="padding: 0;vertical-align: middle">
+                            <div><div class="column-top" style="font-size: 24px;line-height: 24px">&nbsp;</div></div>
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 24px;padding-right: 24px;word-break: break-word;word-wrap: break-word">
+                                    
+            <h2 style="Margin-top: 0;font-style: normal;font-weight: bold;font-size: 16px;line-height: 24px;Margin-bottom: 16px;font-family: Ubuntu,sans-serif;color: #3e4751">Contact</h2>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            
+                              <table style="border-collapse: collapse;border-spacing: 0" width="100%">
+                                <tbody><tr>
+                                  <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 24px;padding-right: 24px;word-break: break-word;word-wrap: break-word">
+                                    
+            <p style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 13px;line-height: 22px;Margin-bottom: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f'><strong style="font-weight: bold">General inquiries:</strong><br />
++1 (888) 555-1234</p><p style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 13px;line-height: 22px;Margin-bottom: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f'><strong style="font-weight: bold">Calling from overseas:</strong><br />
++1 (888) 555-8392&nbsp;</p><p style='Margin-top: 0;font-style: normal;font-weight: 400;font-size: 13px;line-height: 22px;Margin-bottom: 21px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f'><strong style="font-weight: bold">Email inquiries:</strong><br />
+<a style="transition: opacity 0.2s ease-in;color: #4eaacc" href="http://google.com">help@banking.co</a></p>
+          
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            
+                            <div class="column-bottom" style="font-size: 3px;line-height: 3px">&nbsp;</div>
+                          </td>
+                        </tr>
+                      </tbody></table>
+                    </td>
+                  </tr>
+                </tbody></table>
+              </td>
+            </tr>
+          </tbody></table>
+<!--*/-->
+          <div class="spacer" style="font-size: 1px;line-height: 9px;width: 100%">&nbsp;</div>
+        
+      <table class="footer" style="border-collapse: collapse;border-spacing: 0;table-layout: fixed;width: 100%;background-color: #ededf1">
+        <tbody><tr>
+          <td style="padding: 0;vertical-align: top;text-align: left">&nbsp;</td>
+<!--/*-->
+          <td class="inner" style="padding: 0;vertical-align: top;text-align: left;padding-top: 40px;padding-bottom: 75px;width: 464px">
+            <table style="border-collapse: collapse;border-spacing: 0;width: 100%">
+              <tbody><tr>
+                <td class="campaign" style="padding: 0;vertical-align: top;font-family: Ubuntu,sans-serif;text-align: left;font-size: 12px;line-height: 20px;color: gray">
+                  
+                  <div style="line-height: 22px; font-size: 22px;">&nbsp;</div>
+                  <div class="divider" style="font-size: 1px;line-height: 1px;background-color: #c2c2d0;width: 13px">&nbsp;</div>
+                  <div style="line-height: 22px; font-size: 22px;">&nbsp;</div>
+                  
+                  <div>
+                    <span>
+                      <span class="block">
+                        <preferences lang="en">
+                          Preferences
+                        </preferences>
+                        <span class="hide"> &nbsp;|&nbsp; </span>
+                      </span>
+                    </span>
+                    <span class="block">
+                      <unsubscribe>
+                        Unsubscribe
+                      </unsubscribe>
+                    </span>
+                  </div>
+                </td>
+                
+              </tr>
+            </tbody></table>
+          </td>
+<!--*/-->
+          <td style="padding: 0;vertical-align: top;text-align: left">&nbsp;</td>
+        </tr>
+      </tbody></table>
+    </center>
+  
+</body></html>
+<!--/*
+Supported variables:
+
+- baseUrl
+- subject
+- logoUrl
+- title
+- body (Array):
+  - heading
+  - content
+- action:
+  - url
+  - text
+- closing:
+  - greeting
+  - name
+  - imageUrl
+*/-->

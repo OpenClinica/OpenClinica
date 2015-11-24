@@ -10,7 +10,16 @@
                         http://www.springframework.org/schema/util 
                         http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     
-   
+    <bean id="emailTemplateResolver" class="org.thymeleaf.spring3.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="classpath:templates/email/"/>
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
+    </bean>
+
+    <bean id="emailTemplateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+        <property name="templateResolver" ref="emailTemplateResolver"/>
+    </bean>
+
      <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
       <property name="host" value="s[mail.host]" />
       <property name="username" value="s[mail.username]"/>
@@ -29,11 +38,9 @@
         </props>
       </property>
      </bean>
-     
+
      <bean id="openClinicaMailSender" class="org.akaza.openclinica.core.OpenClinicaMailSender">
         <property name="mailSender" ref="mailSender"/>
+        <property name="templateEngine" ref="emailTemplateEngine"/>
      </bean>
-     
-     
-     
 </beans>

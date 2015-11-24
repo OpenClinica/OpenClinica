@@ -8,6 +8,9 @@
         <artifactId>OpenClinica</artifactId>
       <version>MAINLINE-SNAPSHOT</version>
     </parent>
+    <properties>
+        <thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
+    </properties>
     <dependencies>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -246,6 +249,22 @@
 		    <groupId>log4jdbc</groupId>
 		    <artifactId>log4jdbc4</artifactId>
 		</dependency>
+
+    <!-- @fireh 09-OCT-2015 thymeleaf templating library for emails -->
+	<dependency>
+		<groupId>org.thymeleaf</groupId>
+		<artifactId>thymeleaf</artifactId>
+		<version>${thymeleaf.version}</version>
+		<type>jar</type>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.thymeleaf</groupId>
+		<artifactId>thymeleaf-spring3</artifactId>
+		<version>${thymeleaf.version}</version>
+		<type>jar</type>
+		<scope>compile</scope>
+	</dependency>
 
 		<dependency>
     <groupId>org.codehaus.jackson</groupId>

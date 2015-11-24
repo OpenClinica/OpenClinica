@@ -35,8 +35,13 @@ public class EmailEngine {
         return CoreResources.getField(AdminEmailField);
     }
 
+    public static String getBaseUrl() {
+        return CoreResources.getField(BaseURL);
+    }
+
     public static String SMTPHostField = "smtpHost";
     public static String AdminEmailField = "adminEmail";
+    public static String BaseURL = "baseURL";
 
     Properties props = new Properties();
     Session s = null;
