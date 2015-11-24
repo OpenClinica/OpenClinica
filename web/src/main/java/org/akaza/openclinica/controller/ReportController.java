@@ -42,7 +42,7 @@ public class ReportController {
 	 * @api {post} /pages/healthcheck/runonschedule Evaluate runOnSchedule behavior
 	 * @apiName ruleTrigger
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} serverZoneId Server TimeZone.
 	 * @apiParam {String} ssZoneId Study Subject TimeZone .
 	 * @apiParam {String} runTime Scheduled Run Time .
@@ -95,7 +95,7 @@ public class ReportController {
 	 * @api {post} /pages/healthcheck/rulecurrentdate Evaluate currentDate behavior
 	 * @apiName getSSZone
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} serverZoneId Server TimeZone.
 	 * @apiParam {String} ssZoneId Study Subject TimeZone .
 	 * @apiGroup Rule
@@ -130,7 +130,7 @@ public class ReportController {
 	 * @api {post} /pages/healthcheck/runtime Retrieve runOnSchedule default runTime
 	 * @apiName getRunTime
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiGroup Rule
 	 * @apiDescription Retrieves the default runOnSchedule runtime for rules. The runOnSchedule when configured, allows you to run rules on a schedule.
 	 * @apiSuccessExample {json} Success-Response:

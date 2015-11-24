@@ -204,6 +204,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			eventName = eventName + "(" + eventOrdinal + ")";
 
 		String studyName = getStudyBean(studyId).getName();
+		if (message==null) message="";
+        if (emailSubject==null) emailSubject="";
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 		message = message.replaceAll("\\$\\{study.name}", studyName);
 		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);
@@ -270,7 +272,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		} else {
 			pDTO = buildNewPDTO();
-			System.out.println();
+            message = message.replaceAll("\\\\n", "\n");
+            emailSubject = emailSubject.replaceAll("\\\\n", "\n");
+            pDTO.setOrigMessage(message);
+            pDTO.setOrigEmailSubject(emailSubject);
 		}
 
 		
@@ -280,11 +285,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			if (email.trim().equals("${participant}") || participateStatus.equals("enabled")) {
 			    if (email.trim().equals("${participant}")){ 
 				pDTO.setEmailAccount(pDTO.getParticipantEmailAccount());
-			    pDTO.setEncryptedEmailAccount(true);
+			    pDTO.setEncryptedEmailAccount(Boolean.TRUE);
 			    }else{
 				pDTO.setEmailAccount(email.trim());
 				pDTO.setPhone(null);
-			    pDTO.setEncryptedEmailAccount(false);
+			    pDTO.setEncryptedEmailAccount(Boolean.FALSE);
 			    }
 				// Send Email thru Mandrill Mail Server
 				try {

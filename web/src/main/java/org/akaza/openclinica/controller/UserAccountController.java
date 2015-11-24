@@ -81,7 +81,7 @@ public class UserAccountController {
 	 * @api {post} /pages/auth/api/v1/createuseraccount Create a user account
 	 * @apiName createOrUpdateAccount2
 	 * @apiPermission admin
-	 * @apiVersion 1.0.0
+	 * @apiVersion 3.8.0
 	 * @apiParam {String} username UserName
 	 * @apiParam {String} fName First Name
 	 * @apiParam {String} lName Last Name

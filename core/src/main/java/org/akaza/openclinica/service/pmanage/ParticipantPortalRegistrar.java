@@ -7,8 +7,6 @@ import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.akaza.openclinica.service.pmanage.Study;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,13 +116,13 @@ public class ParticipantPortalRegistrar {
     }
 
     public String registerStudy(String studyOid) {
-        return registerStudy(studyOid, null);
+        return registerStudy(studyOid, null, null);
     }
 
     public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
     	String host = hostname.substring(0,hostname.indexOf("/#/login"));
        	String pManageUrl =host + "/app/rest/oc/email";
-        
+
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
@@ -138,7 +136,7 @@ public class ParticipantPortalRegistrar {
         return "";
     }
 
-    public String registerStudy(String studyOid, String hostName) {
+    public String registerStudy(String studyOid, String hostName, String studyName) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         Authorization authRequest = new Authorization();
@@ -146,6 +144,8 @@ public class ParticipantPortalRegistrar {
         authStudy.setStudyOid(studyOid);
         authStudy.setInstanceUrl(ocUrl);
         authStudy.setHost(hostName);
+        authStudy.setStudyName(studyName);
+        authStudy.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
         authRequest.setStudy(authStudy);
 
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
