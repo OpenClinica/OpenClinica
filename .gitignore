@@ -4,21 +4,12 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+web/src/main/resources/datainfo.properties
 .classpath
 .project
 .settings/
 .idea/
-OpenClinica.iml
-web/src/main/resources/datainfo.properties
-core/*.iml
-web/*.iml
-ws/*.iml
-.DS_Store
-core/.DS_Store
-web/.DS_Store
-ws/.DS_Store
-
-# git
+*.iml
 *.orig
 /ws/*.iml
 /web/OpenClinica-web.iml
