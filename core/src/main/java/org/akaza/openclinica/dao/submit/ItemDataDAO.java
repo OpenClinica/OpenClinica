@@ -164,7 +164,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(5), new Integer(idb.getUpdaterId()));
         variables.put(new Integer(6), new Integer(idb.getOrdinal()));
         variables.put(new Integer(7), new Integer(idb.getOldStatus().getId()));
-        variables.put(new Integer(8), new Boolean(idb.isOcformDeleted()));
+        variables.put(new Integer(8), new Boolean(idb.isDeleted()));
         variables.put(new Integer(9), new Integer(idb.getId()));
         this.execute(digester.getQuery("update"), variables);
 
@@ -331,7 +331,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(6), new Integer(idb.getOwnerId()));
         variables.put(new Integer(7), new Integer(idb.getOrdinal()));
         variables.put(new Integer(8), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(9), new Boolean(idb.isOcformDeleted()));
+        variables.put(new Integer(9), new Boolean(idb.isDeleted()));
         this.execute(digester.getQuery("create"), variables);
 
         if (isQuerySuccessful()) {
@@ -362,7 +362,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(6), new Integer(idb.getOwnerId()));
         variables.put(new Integer(7), new Integer(idb.getOrdinal()));
         variables.put(new Integer(8), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(9), new Boolean(idb.isOcformDeleted()));
+        variables.put(new Integer(9), new Boolean(idb.isDeleted()));
         this.execute(digester.getQuery("upsert"), variables);
 
         if (isQuerySuccessful()) {
@@ -455,7 +455,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         }
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
-        eb.setOcformDeleted(((Boolean) hm.get("ocform_deleted")).booleanValue());
+        eb.setDeleted(((Boolean) hm.get("deleted")).booleanValue());
         eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : ((Integer) hm.get("old_status_id")).intValue()));
         return eb;
     }

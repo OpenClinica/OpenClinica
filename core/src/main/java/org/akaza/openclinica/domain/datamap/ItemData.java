@@ -47,7 +47,7 @@ public class ItemData  extends DataMapDomainObject {
 	private Date dateUpdated;
 	private Integer updateId;
 	private Integer ordinal;
-	private Boolean ocformDeleted;
+	private Boolean deleted;
 	private List<DnItemDataMap> dnItemDataMaps;
 
 	public ItemData() {
@@ -178,13 +178,13 @@ public class ItemData  extends DataMapDomainObject {
 		this.ordinal = ordinal;
 	}
 
-	@Column(name = "ocform_deleted", nullable = false)
-	public Boolean isOcformDeleted() {
-		return this.ocformDeleted;
+	@Column(name = "deleted", nullable = false)
+	public Boolean isDeleted() {
+		return this.deleted;
 	}
 
-	public void setOcformDeleted(Boolean ocformDeleted) {
-		this.ocformDeleted = ocformDeleted;
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	

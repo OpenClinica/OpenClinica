@@ -5,7 +5,7 @@
 	<changeSet author="sdibona" id="2015-11-18-OC-6777-1">
 		<comment>adding a column in item_data</comment>
 		<addColumn tableName="item_data">
-			<column name="ocform_deleted" type="boolean" defaultValueBoolean="false"/>
+			<column name="deleted" type="boolean" defaultValueBoolean="false"/>
 		</addColumn>
 	</changeSet>
 

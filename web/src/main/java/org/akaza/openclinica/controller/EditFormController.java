@@ -264,7 +264,7 @@ public class EditFormController {
 
                         question.setTextContent(itemValue);
                     }
-                    if (!itemData.isOcformDeleted()) { 
+                    if (!itemData.isDeleted()) { 
                     	hasItemData = true; 
                     	groupElement.appendChild(question);
                     }
