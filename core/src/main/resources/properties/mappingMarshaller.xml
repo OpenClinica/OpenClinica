@@ -237,19 +237,14 @@
         </field>
      </class>
 
-     <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean"  >
-       <field name="stratificationFactor"
-               type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
-            <bind-xml name= "StratificationFactor"/>         
-        </field>
-     </class>
-       
-      <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" >
-     	<field name="expressionAsString" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+     <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" >
+        <map-to xml="StratificationFactorBean"/>
+        <field name="stratificationFactor.value" type="string">
             <bind-xml node="text"/>         
-        </field>
-     </class>
-     
+       </field>
+     </class>            
+ 
+ 
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" >
         <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
             <bind-xml name="OID" node="attribute"/>
