@@ -96,6 +96,17 @@ public class RandomizeActionBean extends RuleActionBean {
                     return false;
             }
         }
+        if (stratificationFactors == null) {
+            if (other.stratificationFactors != null)
+                return false;
+        } else {// if (!properties.equals(other.properties))
+            if (stratificationFactors.size() != other.stratificationFactors.size())
+                return false;
+            for (StratificationFactorBean stratificationFactorBean : other.stratificationFactors) {
+                if (!stratificationFactors.contains(stratificationFactorBean))
+                    return false;
+            }
+        }
         return true;
     }
 
