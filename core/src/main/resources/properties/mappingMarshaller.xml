@@ -238,7 +238,7 @@
      </class>
 
      <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" >
-        <map-to xml="StratificationFactorBean"/>
+        <map-to xml="StratificationFactor"/>
         <field name="stratificationFactor.value" type="string">
             <bind-xml node="text"/>         
        </field>
