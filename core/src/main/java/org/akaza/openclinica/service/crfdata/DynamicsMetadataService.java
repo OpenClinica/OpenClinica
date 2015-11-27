@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.crfdata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -10,7 +11,12 @@ import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.rule.expression.ExpressionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
@@ -24,8 +30,13 @@ import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -37,8 +48,10 @@ import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -469,7 +482,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return oidBasedItemData;
     }
 
-    private String getValue(PropertyBean property, RuleSetBean ruleSet, EventCRFBean eventCrfBean) {
+    private String getValue(PropertyBean property, RuleSetBean ruleSet, EventCRFBean eventCrfBean,List<StratificationFactorBean> stratificationFactorBeans) {
         String value = null;
         if (property.getValue() != null && property.getValue().length() > 0) {
             logger.info("Value from property value is : {}", value);
@@ -477,6 +490,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         if(property.getValueExpression() == null) {
             logger.info("There is no ValueExpression for property ="+property.getOid());
+             if (stratificationFactorBeans!=null)
+            value=getRandomizationCode(eventCrfBean,stratificationFactorBeans,ruleSet);
+            
         } else {
             String expression =
                 getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
@@ -510,15 +526,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return format;
     }
 
-    public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
-        insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus());
+    public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,List<StratificationFactorBean> stratificationFactorBeans) {
+        insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus(), stratificationFactorBeans);
     }
 
-    public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
-        insert(itemDataId, properties, ub, ruleSet, null);
+    public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,List<StratificationFactorBean> stratificationFactorBeans) {
+        insert(itemDataId, properties, ub, ruleSet, null,stratificationFactorBeans);
     }
 
-    private void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Status itemDataStatus) {
+    private void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Status itemDataStatus , List<StratificationFactorBean> stratificationFactorBeans) {
         ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
         EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
         StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
@@ -526,7 +542,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByItemAndCrfVersion(itemDataBeanA.getItemId(), eventCrfBeanA.getCRFVersionId());
         Boolean isGroupARepeating = isGroupRepeating(itemGroupMetadataBeanA);
         String itemGroupAOrdinal = getExpressionService().getGroupOrdninalCurated(ruleSet.getTarget().getValue());
-
+        
+        
         for (PropertyBean propertyBean : properties) {
             String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(), ruleSet.getTarget().getValue());
             ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
@@ -574,7 +591,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             if (!isGroupARepeating && !isGroupBRepeating) {
                 ItemDataBean oidBasedItemData =
                     oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
-                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
+                
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
@@ -583,7 +602,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 List<ItemDataBean> oidBasedItemDatas =
                     oneToMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
-                    oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                    oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
                     if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                     getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
                 }
@@ -593,7 +612,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
-                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
@@ -601,7 +620,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             if (isGroupBRepeating && itemGroupBOrdinal.equals("END")) {
                 ItemDataBean oidBasedItemData =
                     oneToEndMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
-                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
@@ -610,7 +629,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
-                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
@@ -619,7 +638,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupAOrdinal));
-                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
@@ -967,6 +986,89 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
     }
 
+    private String getRandomizationCode(EventCRFBean eventCrfBean, List <StratificationFactorBean> stratificationFactorBeans,RuleSetBean ruleSet){
+        StudySubjectDAO ssdao = new StudySubjectDAO<>(ds);       
+        StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eventCrfBean.getStudySubjectId());
+        String identifier = ssBean.getOid();    // study subject oid
+        StudyDAO sdao = new StudyDAO<>(ds);
+        StudyBean sBean= (StudyBean) sdao.findByPK(ssBean.getStudyId());
+        String siteIdentifier= sBean.getOid();     // site or study oid   
+        String name =sBean.getName();             // site or study name
+        UserAccountDAO udao = new UserAccountDAO(ds);
+        int userId=0;
+        if(eventCrfBean.getUpdaterId()==0){
+            userId=eventCrfBean.getOwnerId();
+        }else{
+            userId=eventCrfBean.getUpdaterId();            
+        }
+        UserAccountBean uBean = (UserAccountBean) udao.findByPK(userId);
+        String user = uBean.getName();   // event crf updater username
+        String timezone ="America/New_York";
+        int i = 1;
+        String questions="";
+        String exp="";
+        for (StratificationFactorBean stratificationFactorBean :stratificationFactorBeans){
+            i++;      
+            exp =stratificationFactorBean.getStratificationFactor().getValue();
+            if (exp.startsWith("SS.")){
+                questions=questions+"question"+i+"="+getStudySubjectAttrValue(exp, eventCrfBean,ruleSet)+"&";
+            }else{                
+                questions=questions+"question"+i+"="+getExpressionValue(exp, eventCrfBean,ruleSet)+"&";
+            }
+          }
+        
+        String url="identifier="+identifier+"&"+questions+"siteIdentifier="+siteIdentifier+"&user="+user;        
+        System.out.println("The randomize url:  "+ url);
+        
+        return url;
+    }
+    
+    
+    private String getExpressionValue(String expr , EventCRFBean eventCrfBean,RuleSetBean ruleSet){
+        String expression =
+                getExpressionService().constructFullExpressionIfPartialProvided(expr, ruleSet.getTarget().getValue());
+        ItemDataBean itemData =null;
+        if(expression != null && !expression.isEmpty()) {
+                ItemBean itemBean = getExpressionService().getItemBeanFromExpression(expression);
+                String itemGroupBOrdinal = getExpressionService().getGroupOrdninalCurated(expression);
+                 itemData =
+                    getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCrfBean.getId(),
+                            itemGroupBOrdinal == "" ? 1 : Integer.valueOf(itemGroupBOrdinal));
+            }
+            return itemData.getValue();
+        }
+        
+    private String getStudySubjectAttrValue(String expr , EventCRFBean eventCrfBean,RuleSetBean ruleSet){
+      String value="";
+      StudySubjectDAO<String, ArrayList> ssdao = new StudySubjectDAO<>(ds); 
+      StudyGroupClassDAO sgcdao =new StudyGroupClassDAO(ds);
+      StudyGroupDAO sgdao =new StudyGroupDAO(ds);
+      StudyDAO<String, ArrayList> sdao = new StudyDAO<>(ds);
+      StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eventCrfBean.getStudySubjectId());
+      
+      String prefix = "STUDYGROUPCLASSLIST";
+        String param = expr.split("\\.",-1)[1].trim() ;
+           
+        if (param.equalsIgnoreCase("BIRTHDATE")){
+            value = ssBean.getDateOfBirth().toString();
+        }else if (param.equalsIgnoreCase("SEX")){
+            value =String.valueOf(ssBean.getGender());
+        }else if (param.startsWith(prefix)){
+            String gcName= param.substring(21,param.indexOf("\"]"));    
+            
+          StudyGroupBean sgBean = sgdao.findSubjectStudyGroup(ssBean.getId(),gcName);
+         if (sgBean!=null)
+          value = sgBean.getName();
+            
+             }
+   return value;
+    }
+
+    
+    
+    
+    
+    
     public Boolean hasShowingDynGroupInSection(int sectionId, int crfVersionId, int eventCrfId) {
         return dynamicsItemGroupMetadataDao.hasShowingInSection(sectionId, crfVersionId, eventCrfId);
     }

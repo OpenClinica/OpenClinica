@@ -741,7 +741,8 @@ public class RulesPostImportContainerService {
         ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean,ExpressionObjectWrapper.CONTEXT_TARGET);
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
         ep.setRespage(respage);
-        String errorString = ep.isRuleExpressionValid();
+    //    String errorString = ep.isRuleExpressionValid();
+        String errorString = ep.isRuleAssignmentExpressionValid();
         if (errorString != null) {
             beanWrapper.error(errorString);
             isValid = false;
