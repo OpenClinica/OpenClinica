@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import java.util.Date;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -112,6 +113,9 @@ public class StudyEventController {
 		
 		
         try {
+            // Store state that all the participant forms has been filled by the participant.
+            studyEvent.setDateParticipantFormsSubmitted(new Date(System.currentTimeMillis()));
+
             completeData(studyEvent, eventDefCrfs, eventCrfs);
         } catch (Exception e) {
             // Transaction has been rolled back due to an exception.
