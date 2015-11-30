@@ -281,7 +281,7 @@ public class AuditDAO extends EntityDAO {
     */
     public Collection findEventCRFAudit(int eventCRFId) {
         this.setTypesExpectedWithItemDataType();
-
+        
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(eventCRFId));
 
@@ -434,6 +434,27 @@ public class AuditDAO extends EntityDAO {
         }
         return al;
 
+    }
+
+    /*
+     * Find Last Modified Date By Event CRF Id
+     *
+     */
+    public EntityBean findLastModifiedDateByEventCrfId(int eventCRFId) {
+        AuditBean eb = new AuditBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCRFId));
+
+        String sql = digester.getQuery("findLastModifiedDateByEventCrfId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
     }
 
 
