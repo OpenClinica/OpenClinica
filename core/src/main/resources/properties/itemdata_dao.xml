@@ -12,21 +12,21 @@
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID)
-		VALUES (?,?,?,?,?,?,NOW(),?,?)</sql>
+		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID,DELETED)
+		VALUES (?,?,?,?,?,?,NOW(),?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
-		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=? WHERE
+		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=?, DELETED=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	<!-- added tbh 09/03/2008 -->
 	<query>
 		<name>upsert</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED, ORDINAL, DATE_UPDATED, UPDATE_ID)
-		VALUES (?,?,?,?,?,?,NOW(),?,NOW(),?)</sql>
+		OWNER_ID, DATE_CREATED, ORDINAL, DATE_UPDATED, UPDATE_ID, DELETED)
+		VALUES (?,?,?,?,?,?,NOW(),?,NOW(),?,?)</sql>
 	</query>
 	<!-- added tbh 09/2008 -->
 	<query>
@@ -221,7 +221,17 @@
 		<name>updateStatus</name>
 		<sql>UPDATE item_data SET status_id=? WHERE item_data_id=?</sql>
 	</query>
-	
+	<query>
+		<name>findAllByEventCRFIdAndItemGroupId</name>
+		<sql>select id.* 
+			from item_data id 
+			join item i on id.item_id = i.item_id
+			join event_crf ec on id.event_crf_id=ec.event_crf_id
+			join item_group_metadata igm on i.item_id=igm.item_id and igm.crf_version_id = ec.crf_version_id
+			where id.event_crf_id = ? and igm.item_group_id = ?
+			order by id.ordinal, igm.ordinal
+		</sql>
+	</query>
 	<query>
 		<name>isItemExists</name>
 		<sql>select item_data_id from item_data where item_id=? and ordinal=? AND event_crf_id = ?</sql>
