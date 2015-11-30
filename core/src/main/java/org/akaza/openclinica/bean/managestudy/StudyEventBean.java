@@ -16,6 +16,7 @@ import org.akaza.openclinica.patterns.ocobserver.Observer;
 
 import java.util.ArrayList;
 import java.util.Date;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * @author jxu
@@ -363,6 +364,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.studySubject = studySubject;
     }
 
+    @JsonIgnore
     public Date getDateParticipantFormsSubmitted() {
         return dateParticipantFormsSubmitted;
     }

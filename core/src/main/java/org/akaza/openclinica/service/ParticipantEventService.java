@@ -6,6 +6,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -35,6 +36,9 @@ public class ParticipantEventService {
 		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>)getStudyEventDAO().findAllBySubjectIdOrdered(studySubject.getId());
 		
 		for (StudyEventBean studyEvent:studyEvents) {
+            if (studyEvent.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+                continue;
+            }
             if (studyEvent.getDateParticipantFormsSubmitted() != null) {
                 // dateParticipantFormsSubmitted is an explicit state that the participant forms has been completed by the
                 // participant, no need to check further just skip this study-event.
