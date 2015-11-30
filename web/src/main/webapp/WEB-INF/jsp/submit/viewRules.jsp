@@ -304,17 +304,31 @@
 
 		    		
 		    		</c:forEach>
+		    		
 		        	<c:if test="${fn:length(props)>0}">
 		    			<tr valign="top">
 	                		<td ><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i></td>
-    
-
-
                 			<td ><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
     
                 		</tr>
                 	</c:if>
                 </c:if>
+              
+              <c:if test="${val.actionType.code==8 }">                
+                    <c:set var="factors" value=""/>                
+		    		<c:forEach items="${val.stratificationFactors}" var="factor" varStatus="status">
+  		    			<c:set var="factors"><c:out value="${factors}"/> <c:out value="${factor.stratificationFactor.value}"/>,</c:set>
+		    		</c:forEach>
+                
+                		    <c:if test="${fn:length(factors)>0}">
+		    			<tr valign="top">
+	                		<td ><i><fmt:message key="stratification_factor_colon" bundle="${resword}" /></i></td>
+                			<td ><c:out value="${fn:substring(factors,0,fn:length(factors)-1)}"/></td>
+    
+                		</tr>
+                	</c:if>
+                   </c:if>
+                
             </table>
             </td>
             <td class="table_cell">&nbsp;</td>

@@ -2,4 +2,5 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
        <include file="migration/3.9/2015-11-18-OC-6777.xml"/>
        <include file="migration/3.9/2015-11-12-OC-6820.xml"/>
+       <include file="migration/3.9/2015-11-18-OC-6825.xml"/>
 </databaseChangeLog>
