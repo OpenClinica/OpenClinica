@@ -348,7 +348,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         //List<ItemDataBean> itemDataBeans = new ArrayList<ItemDataBean>();
         Integer size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
-        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB.getId(), eventCrfBeanB);
         if (size > 0 || maxOrdinal > 0) {
             List<ItemDataBean> itemDataBeans = getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId());
             for (ItemDataBean oidBasedItemData : itemDataBeans) {
@@ -378,7 +378,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         ItemDataBean theOidBasedItemData = null;
         int size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
-        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB.getId(), eventCrfBeanB);
         if (size > 0 && size >= index) {
             List<ItemDataBean> theItemDataBeans = getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId());
             theOidBasedItemData = theItemDataBeans.get(index - 1);
@@ -406,7 +406,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         ItemDataBean theOidBasedItemData = null;
         int size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
-        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB.getId(), eventCrfBeanB);
         List<ItemBean> items = getItemDAO().findAllItemsByGroupId(itemGroupBeanB.getId(), eventCrfBeanB.getCRFVersionId());
         if (1 + maxOrdinal > itemGroupMetadataBeanB.getRepeatMax()) {
             logger.debug("Cannot add new repeat of this group because it has reached MaxRepeat.");
@@ -428,7 +428,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         List<ItemDataBean> itemDataBeans = new ArrayList<ItemDataBean>();
         Integer size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
-        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB.getId(), eventCrfBeanB);
         if (size > 0 || maxOrdinal > 0) {
             itemDataBeans.addAll(getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId()));
         } else {
@@ -497,15 +497,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return value;
 
     }
-    
+
     private String getDateFormat(PropertyBean property){
     	String format = "yyyy-MM-dd";
-    	
+
         if(property.getValueExpression() != null) {
         	logger.info("The Value is ValueExpression in the property so the date format will be : {}", "dd-MMM-yyyy");
         	format = "dd-MMM-yyyy";
         }
-        
+
         logger.info("The format of the date will be : {}", format);
         return format;
     }
@@ -623,11 +623,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
-//            // If A is repeating group with index & B is none-repeating group 
+//            // If A is repeating group with index & B is none-repeating group
 //            if (isGroupARepeating && !isGroupBRepeating ) {
 //                ItemDataBean oidBasedItemData =
 //                        oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
-//                 
+//
 //                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
 //                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
 //            }
