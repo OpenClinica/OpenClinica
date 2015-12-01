@@ -174,6 +174,10 @@
      </class>
      <class name="org.akaza.openclinica.domain.rule.action.InsertActionBean">
         <map-to xml="InsertAction" />
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
         <field name="Properties"
             type="org.akaza.openclinica.domain.rule.action.PropertyBean"
             collection="arraylist">
@@ -183,14 +187,14 @@
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
-       <field name="RuleActionRun"
-               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
-               <bind-xml name="Run"/>
-       </field>
      </class>
      
      <class name="org.akaza.openclinica.domain.rule.action.RandomizeActionBean">
         <map-to xml="RandomizeAction" />
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
         <field name="Properties"
             type="org.akaza.openclinica.domain.rule.action.PropertyBean"
             collection="arraylist">
@@ -205,10 +209,6 @@
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
-       </field>
-       <field name="RuleActionRun"
-               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
-               <bind-xml name="Run"/>
        </field>
      </class>
 
