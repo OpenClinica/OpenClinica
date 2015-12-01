@@ -35,6 +35,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,15 +232,9 @@ public class RandomizeService {
             if (exp.startsWith("SS.")){
                 subjectMap.add("question"+i,getStudySubjectAttrValue(exp, eventCrfBean,ruleSet));
 
-            }else{                
-               String output =getExpressionValue(exp, eventCrfBean,ruleSet);
-                if (output.equals("1")){
-                   output="<60";
-                } else if(output.equals("2")){
-                    output="60-100";
-                }else if(output.equals("3")){
-                    output=">100";
-               }
+            }else{      
+                
+               String output =StringEscapeUtils.unescapeHtml(getExpressionValue(exp, eventCrfBean,ruleSet));
                 subjectMap.add("question"+i,output);
             }
           }
