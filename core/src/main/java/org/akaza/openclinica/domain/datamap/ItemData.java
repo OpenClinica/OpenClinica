@@ -72,8 +72,8 @@ public class ItemData  extends DataMapDomainObject {
 		this.dateUpdated = dateUpdated;
 		this.updateId = updateId;
 		this.ordinal = ordinal;
-		this.ocformDeleted = ocformDeleted;
-		
+		this.deleted = ocformDeleted;
+
 		this.dnItemDataMaps = dnItemDataMaps;
 	}
 
@@ -187,7 +187,7 @@ public class ItemData  extends DataMapDomainObject {
 		this.deleted = deleted;
 	}
 
-	
+
 	@OneToMany(fetch = FetchType.LAZY,cascade = {CascadeType.ALL}, mappedBy = "itemData")
 	@OrderBy("discrepancyNote")
 	public List<DnItemDataMap> getDnItemDataMaps() {

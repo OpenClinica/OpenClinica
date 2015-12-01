@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 public class PformSubmissionServiceTest extends TestCase {
 
-	PformSubmissionService pformSubmissionService = new PformSubmissionService(null, null);
+	PformSubmissionService pformSubmissionService = new PformSubmissionService(null);
 	Errors errors = pformSubmissionService.instanciateErrors();
 	ItemDataBean itemDataBean = new ItemDataBean();
 	ItemBean itemBean = new ItemBean();
