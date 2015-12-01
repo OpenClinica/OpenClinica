@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -112,7 +114,7 @@ public class RandomizeService {
           if (jsonRandomisedObject!=null)
               return (String) jsonRandomisedObject.get("code");
           else
-              return null;
+              return "";
         }
 
     }
@@ -135,18 +137,20 @@ public class RandomizeService {
     private String getStudySubjectAttrValue(String expr , EventCRFBean eventCrfBean,RuleSetBean ruleSet){
       String value="";
       StudySubjectDAO<String, ArrayList> ssdao = new StudySubjectDAO<>(ds); 
+      SubjectDAO subdao= new SubjectDAO(ds);
       StudyGroupClassDAO sgcdao =new StudyGroupClassDAO(ds);
       StudyGroupDAO sgdao =new StudyGroupDAO(ds);
       StudyDAO<String, ArrayList> sdao = new StudyDAO<>(ds);
       StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eventCrfBean.getStudySubjectId());
+      SubjectBean subjectBean = (SubjectBean) subdao.findByPK(ssBean.getSubjectId());
       
       String prefix = "STUDYGROUPCLASSLIST";
         String param = expr.split("\\.",-1)[1].trim() ;
            
         if (param.equalsIgnoreCase("BIRTHDATE")){
-            value = ssBean.getDateOfBirth().toString();
+            value = subjectBean.getDateOfBirth().toString();
         }else if (param.equalsIgnoreCase("SEX")){
-            if (String.valueOf(ssBean.getGender()).equals("m"))
+            if (String.valueOf(subjectBean.getGender()).equals("m"))
                 value = "Male";
             else
                 value="Female";
