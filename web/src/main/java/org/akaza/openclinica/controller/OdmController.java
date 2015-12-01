@@ -384,9 +384,9 @@ public class OdmController {
         } else {
             formData.setStatus(eventCRFBean.getStatus().getName());
             AuditDAO auditDAO = new AuditDAO(dataSource);
-            AuditBean auditBeans = (AuditBean) auditDAO.findLastModifiedDateByEventCrfId(eventCRFBean.getId());
-            if (auditBeans != null) {
-                formData.setStatusChangeTimeStamp(auditBeans.getAuditDate().toString());
+            List<AuditBean> auditBeans = (List<AuditBean>) auditDAO.findEventCRFAudit(eventCRFBean.getId());
+            if (auditBeans.size() > 0) {
+                formData.setStatusChangeTimeStamp(auditBeans.get(0).getAuditDate().toString());
             }
         }
         return formData;
