@@ -183,7 +183,9 @@ public class RandomizeService {
         try {
              response = rest.exchange(randomiseUrl, HttpMethod.GET, request, String.class);
              body = response.getBody();
-             jsonObject = new JSONObject(body);             
+             jsonObject = new JSONObject(body);
+  //           if (!jsonObject.get("error").equals("0")) 
+  //               jsonObject= null;
              
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -217,7 +219,6 @@ public class RandomizeService {
         // method : POST
         int i=1;
         String exp="";
-        String questions="";
  
         randomiseUrl=randomiseUrl+"/api/randomise";   
         RestTemplate rest = new RestTemplate(requestFactory);

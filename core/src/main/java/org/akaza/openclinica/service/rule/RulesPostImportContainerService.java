@@ -445,7 +445,7 @@ public class RulesPostImportContainerService {
        //     RuleActionRunBean ruleActionRun = randomizeActionBean.getRuleActionRun();
        //     if (ruleActionRun.getAdministrativeDataEntry() || ruleActionRun.getBatch() || ruleActionRun.getDoubleDataEntry() || ruleActionRun.getImportDataEntry())
        //        ruleSetBeanWrapper.error(createError("OCRERR_0050"));
-            
+            if (randomizeActionBean.getStratificationFactors()!=null){
             for (StratificationFactorBean factor : randomizeActionBean.getStratificationFactors()){
                 if (factor.getStratificationFactor() != null && factor.getStratificationFactor().getValue()  != null
                     && factor.getStratificationFactor().getValue().length() != 0) {
@@ -480,7 +480,9 @@ public class RulesPostImportContainerService {
                     isStratificationExpressionValid(expBean, ruleSetBeanWrapper);
                   }
                 }
+             }
             }
+            
             if (errors.hasErrors()) 
                 ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());           
           }

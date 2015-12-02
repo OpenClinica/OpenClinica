@@ -100,7 +100,7 @@ public class RandomizeActionBean extends RuleActionBean {
             if (other.stratificationFactors != null)
                 return false;
         } else {// if (!properties.equals(other.properties))
-            if (stratificationFactors.size() != other.stratificationFactors.size())
+            if (other.stratificationFactors==null || stratificationFactors.size() != other.stratificationFactors.size())
                 return false;
             for (StratificationFactorBean stratificationFactorBean : other.stratificationFactors) {
                 if (!stratificationFactors.contains(stratificationFactorBean))
