@@ -229,7 +229,6 @@ public class PformSubmissionService {
      */
     public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal, CRFVersionBean crfVersion, Locale locale)
             throws Exception {
-
         Errors errors = instanciateErrors();
         // Study Subject Validation check
         StudySubjectBean studySubjectBean = getStudySubject(studySubjectOid);
@@ -257,9 +256,9 @@ public class PformSubmissionService {
                 && (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED)) {
             // Read and Parse Payload from Pform
             if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion, locale);
+                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion, locale, userAccountBean);
             else
-                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, locale);
+                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, locale, userAccountBean);
         } else {
             logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
             errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
@@ -487,7 +486,7 @@ public class PformSubmissionService {
      * @throws Exception
      */
     private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean, Locale locale) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, Locale locale, UserAccountBean userAccountBean) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -602,6 +601,7 @@ public class PformSubmissionService {
                                     // Value unchanged. Do nothing.
                                 } else {
                                     itemDataBean1.setId(existingValue.getId());
+                                    itemDataBean1.setUpdaterId(userAccountBean.getId());
                                     iddao.updateValue(itemDataBean1);
                                 }
                             }
@@ -632,7 +632,7 @@ public class PformSubmissionService {
      * @throws Exception
      */
     private Errors readDownloadFileNew(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale, UserAccountBean userAccountBean) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -744,6 +744,7 @@ public class PformSubmissionService {
                                     // Value unchanged. Do nothing.
                                 } else {
                                     itemDataBean1.setId(existingValue.getId());
+                                    itemDataBean1.setUpdaterId(userAccountBean.getId());
                                     iddao.updateValue(itemDataBean1);
                                 }
 
