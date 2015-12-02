@@ -75,7 +75,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
         Errors errors = dataBinder.getBindingResult();
         
         // Validate all upload form fields were populated
-        validateFormFields(errors, submittedCrfName,submittedCrfVersionName,submittedCrfVersionDescription,
+        validateFormFields(errors, version, submittedCrfName,submittedCrfVersionName,submittedCrfVersionDescription,
         		submittedRevisionNotes,submittedXformText);
 
         
@@ -117,11 +117,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
-    private void validateFormFields(Errors errors, String submittedCrfName, String submittedCrfVersionName,
+    private void validateFormFields(Errors errors, CRFVersionBean version, String submittedCrfName, String submittedCrfVersionName,
 			String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
 
     	// Verify CRF Name is populated
-        if (submittedCrfName == null || submittedCrfName.equals("")) {
+        if (version.getCrfId() == 0 && (submittedCrfName == null || submittedCrfName.equals(""))) {
             DataBinder crfDataBinder = new DataBinder(new CrfBean());
             Errors crfErrors = crfDataBinder.getBindingResult();
             crfErrors.rejectValue("name","crf_val_crf_name_blank",resword.getString("CRF_name"));
