@@ -677,7 +677,7 @@ public class PformSubmissionService {
                                     //    itemOrdinal++;
                                     //}
                                     groupNodeName = groupNode.getNodeName();
-                                    ItemGroupBean itemGroup = getItemGroup(crfVersion.getCrfId(), groupNodeName);
+                                    ItemGroupBean itemGroup = getItemGroup(crfVersion.getId(), groupNodeName);
                                     if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getId(),new TreeSet<Integer>());
 
                                     NodeList itemNodeList = groupNode.getChildNodes();
