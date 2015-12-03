@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.io.Serializable;
+
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,6 +43,13 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         getSessionFactory().getStatistics().logSummary();
         getCurrentSession().saveOrUpdate(domainObject);
         return domainObject;
+    }
+
+    @Transactional
+    public Serializable save(T domainObject) {
+        getSessionFactory().getStatistics().logSummary();
+        Serializable id = getCurrentSession().save(domainObject);
+        return id;
     }
 
     

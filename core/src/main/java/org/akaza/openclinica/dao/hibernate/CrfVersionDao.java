@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
+import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 
 public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
@@ -31,5 +33,28 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(CrfVersion.class);
         return ((CrfVersion) q.uniqueResult());
     }
+    
+    private String getOid(CrfVersion crfVersion, String crfName, String crfVersionName) {
+        OidGenerator oidGenerator = new CrfVersionOidGenerator();
+        String oid;
+        try {
+            oid = crfVersion.getOcOid() != null ? crfVersion.getOcOid() : oidGenerator.generateOid(crfName, crfVersionName);
+            return oid;
+        } catch (Exception e) {
+            throw new RuntimeException("CANNOT GENERATE OID");
+        }
+    }
+
+    public String getValidOid(CrfVersion crfVersion, String crfName, String crfVersionName) {
+        OidGenerator oidGenerator = new CrfVersionOidGenerator();
+        String oid = getOid(crfVersion, crfName, crfVersionName);
+        String oidPreRandomization = oid;
+        while (findByOcOID(oid) != null) {
+            oid = oidGenerator.randomizeOid(oidPreRandomization);
+        }
+        return oid;
+
+    }
+
 
 }

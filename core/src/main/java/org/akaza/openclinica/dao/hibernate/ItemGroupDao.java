@@ -2,11 +2,10 @@ package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
 
+import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
+import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.hibernate.Criteria;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
@@ -38,5 +37,26 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
                 + " and ig.item_group_id = igm.item_group_id";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
         return (ArrayList<ItemGroup>) q.list();
+    }
+
+    public String getValidOid(ItemGroup itemGroup, String crfName, String itemGroupLabel, ArrayList<String> oidList) {
+    OidGenerator oidGenerator = new ItemGroupOidGenerator();
+        String oid = getOid(itemGroup, crfName, itemGroupLabel);
+        String oidPreRandomization = oid;
+        while (findByOcOID(oid) != null || oidList.contains(oid)) {
+            oid = oidGenerator.randomizeOid(oidPreRandomization);
+        }
+        return oid;
+    }
+
+    private String getOid(ItemGroup itemGroup, String crfName, String itemGroupLabel) {
+        OidGenerator oidGenerator = new ItemGroupOidGenerator();
+        String oid;
+        try {
+            oid = itemGroup.getOcOid() != null ? itemGroup.getOcOid() : oidGenerator.generateOid(crfName, itemGroupLabel);
+            return oid;
+        } catch (Exception e) {
+            throw new RuntimeException("CANNOT GENERATE OID");
+        }
     }
 }

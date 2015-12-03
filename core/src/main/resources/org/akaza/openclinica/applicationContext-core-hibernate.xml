@@ -122,15 +122,13 @@
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">true</prop>
                 <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
-           <!-- <prop key="hibernate.cache.region.factory_class"> net.sf.ehcache.hibernate.EhCacheRegionFactory</prop> -->
-           <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>           
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
-               
-               <!--  <prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop> -->
-				<prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
-            <prop key="hibernate.generate_statistics">true</prop>
-               <prop key="hibernate.cache.use_query_cache">true</prop>
-               <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
+                <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
+                <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
             </props>
         </property>
         <property name="namingStrategy">
