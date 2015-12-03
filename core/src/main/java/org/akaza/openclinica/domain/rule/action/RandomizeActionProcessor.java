@@ -57,13 +57,14 @@ public class RandomizeActionProcessor implements ActionProcessor {
 
     private RuleActionBean saveWithStatusUpdated(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         itemDataBean.setStatus(Status.UNAVAILABLE);
-        getItemMetadataService().insert(itemDataBean, ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet);
+        getItemMetadataService().insert(itemDataBean, ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet,((RandomizeActionBean) ruleAction).getStratificationFactors());
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().insert(itemDataBean.getId(), ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet);
+        
+        getItemMetadataService().insert(itemDataBean.getId(), ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet ,((RandomizeActionBean) ruleAction).getStratificationFactors());
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }

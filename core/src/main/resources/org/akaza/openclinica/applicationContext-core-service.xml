@@ -39,6 +39,9 @@
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
+    <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
     <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
         <constructor-arg ref="dataSource"/>
