@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
- * Call Super Class SecurityContextLogoutHandler that Performs a logout by modifying the {@link org.springframework.security.context.SecurityContextHolder}.
+ * Call Super Class SecurityContextLogoutHandler that Performs a logout by modifying the {@see org.springframework.security.context.SecurityContextHolder}.
  * <p>
  * Will log this event to an OpenClinica user logging table
  * 

@@ -1,29 +1,30 @@
 package org.akaza.openclinica.service;
 
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -31,12 +32,9 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
-import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
-import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -49,17 +47,9 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.akaza.openclinica.service.crfdata.BeanPropertyService;
-import org.apache.log4j.spi.ErrorCode;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
@@ -101,9 +91,6 @@ public class PformSubmissionService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     DataSource ds;
-    private RuleActionPropertyDao ruleActionPropertyDao;
-    private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
-    private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
 
     EventDefinitionCRFDAO edcdao;
     UserAccountDAO udao;
@@ -119,10 +106,10 @@ public class PformSubmissionService {
     AuthoritiesDao authoritiesDao;
     ItemGroupDAO igdao;
     ItemGroupMetadataDAO igmdao;
+    DiscrepancyNoteDAO dndao;
 
-    public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
+    public PformSubmissionService(DataSource ds) {
         this.ds = ds;
-        this.authoritiesDao = authoritiesDao;
     }
 
     /**
@@ -143,31 +130,11 @@ public class PformSubmissionService {
         return inputUserName;
     }
 
-    private int getCountCompletedEventCrfsInAStudyEvent(StudyEventBean seBean) {
-        int count = 0;
-        count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
-        return count;
-    }
-
-    private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId, Integer studyId) {
-        int count = 0;
-        edcdao = new EventDefinitionCRFDAO(ds);
-        count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId, studyId).size();
-        return count;
-    }
-
     private EventDefinitionCRFBean getCrfVersionStatusInAEventDefCrf(String crfVersionOid, StudyBean studyBean, StudyEventBean studyEventBean) {
         edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean eventDefinitionCRFBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
                 getCRFVersion(crfVersionOid).getId());
         return eventDefinitionCRFBean;
-    }
-
-    private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId, Integer studyId) {
-        int count = 0;
-        edcdao = new EventDefinitionCRFDAO(ds);
-        count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId, studyId).size();
-        return count;
     }
 
     private StudyBean getStudy(Integer id) {
@@ -185,12 +152,6 @@ public class PformSubmissionService {
     private StudySubjectBean getStudySubject(String oid) {
         ssdao = new StudySubjectDAO(ds);
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByOid(oid);
-        return studySubjectBean;
-    }
-
-    private StudySubjectBean getStudySubject(Integer id) {
-        ssdao = new StudySubjectDAO(ds);
-        StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(id);
         return studySubjectBean;
     }
 
@@ -231,18 +192,6 @@ public class PformSubmissionService {
         return eventCrfBeanList;
     }
 
-    // private ArrayList<ItemDataBean> getItemDataRecord(int itemDataId) {
-    // iddao = new ItemDataDAO(ds);
-    // ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
-    // return itemDataBeanList;
-    // }
-
-    private ArrayList<ItemDataBean> getItemDataRecords(int eventCRFId) {
-        iddao = new ItemDataDAO(ds);
-        ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
-        return itemDataBeanList;
-    }
-
     private ItemBean getItemRecord(String itemName, CRFVersionBean crfVersion) {
         idao = new ItemDAO(ds);
         ItemBean itemBean = (ItemBean) idao.findByNameAndCRFId(itemName, crfVersion.getCrfId());
@@ -261,6 +210,12 @@ public class PformSubmissionService {
         return ifmBean;
     }
 
+    private ItemGroupMetadataBean getItemGroupMetadata(Integer itemId, Integer crfVersionId) {
+        igmdao = new ItemGroupMetadataDAO(ds);
+        ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(itemId, crfVersionId);
+        return igmBean;
+    }
+
     /**
      * Main Method to Start Saving Process the Pform Submission
      * 
@@ -268,10 +223,11 @@ public class PformSubmissionService {
      * @param studySubjectOid
      * @param studyEventDefnId
      * @param studyEventOrdinal
+     * @param locale 
      * @return
      * @throws Exception
      */
-    public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal, CRFVersionBean crfVersion)
+    public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal, CRFVersionBean crfVersion, Locale locale)
             throws Exception {
 
         Errors errors = instanciateErrors();
@@ -301,33 +257,15 @@ public class PformSubmissionService {
                 && (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED)) {
             // Read and Parse Payload from Pform
             if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion);
+                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion, locale);
             else
-                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean);
+                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, locale);
         } else {
             logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
             errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
             // return errors;
         }
         return errors;
-    }
-
-    /**
-     * Update Study Event to Data Entry Started / Completed
-     * 
-     * @param seBean
-     * @param status
-     * @param studyBean
-     * @param studySubjectBean
-     * @return
-     */
-    private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status, StudyBean studyBean, StudySubjectBean studySubjectBean) {
-        seBean.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
-        seBean.setUpdatedDate(new Date());
-        seBean.setSubjectEventStatus(status);
-        seBean = (StudyEventBean) sedao.update(seBean);
-        logger.debug("*********UPDATED STUDY EVENT ");
-        return seBean;
     }
 
     /**
@@ -359,6 +297,25 @@ public class PformSubmissionService {
         ecBean = (EventCRFBean) ecdao.create(ecBean);
         logger.debug("*********CREATED EVENT CRF");
         return ecBean;
+    }
+
+    /**
+     * Update Study Event to Data Entry Started / Completed
+     * 
+     * @param seBean
+     * @param status
+     * @param studyBean
+     * @param studySubjectBean
+     * @return
+     */
+    private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status, StudyBean studyBean, StudySubjectBean studySubjectBean) {
+        sedao = new StudyEventDAO(ds);
+        seBean.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+        seBean.setUpdatedDate(new Date());
+        seBean.setSubjectEventStatus(status);
+        seBean = (StudyEventBean) sedao.update(seBean);
+        logger.debug("*********UPDATED STUDY EVENT ");
+        return seBean;
     }
 
     /**
@@ -530,13 +487,13 @@ public class PformSubmissionService {
      * @throws Exception
      */
     private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, Locale locale) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(body));
         Document doc = db.parse(is);
-        Integer itemOrdinal = 1;
+        //Integer itemOrdinal = 1;
         String itemOID;
         String itemValue;
         String groupNodeName = "";
@@ -551,11 +508,14 @@ public class PformSubmissionService {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
                         String crfVersionOID = crfNode.getNodeName().trim();
+                        CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
                         logger.info("***crf_version_ :  " + crfVersionOID + " *** ");
 
                         EventCRFBean eventCrfBean = getCrfVersionCheck(crfVersionOID, errors, studyBean, studyEventBean, studySubjectBean);
                         ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
                         iddao = new ItemDataDAO(ds);
+
+                        HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
 
                         if (eventCrfBean == null)
                             return errors;
@@ -567,25 +527,29 @@ public class PformSubmissionService {
 
                                 if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
 
-                                    if (groupNode.getNodeName() != groupNodeName) {
-                                        itemOrdinal = 1;
-                                    } else {
-                                        itemOrdinal++;
-                                    }
+                                  // if (groupNode.getNodeName() != groupNodeName) {
+                                   //     itemOrdinal = 1;
+                                  //  } else {
+                                  //      itemOrdinal++;
+                                  //  }
                                     groupNodeName = groupNode.getNodeName();
+                                    ItemGroupBean itemGroup = getItemGroupByOID(groupNodeName);
+                                    if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getId(),new TreeSet<Integer>());
 
                                     NodeList itemNodeList = groupNode.getChildNodes();
 
                                     for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
                                         Node itemNode = itemNodeList.item(m);
                                         if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
-                                                && !itemNode.getNodeName().endsWith(".SUBHEADER")) {
+                                                && !itemNode.getNodeName().endsWith(".SUBHEADER")
+                                                && !itemNode.getNodeName().equals("REPEAT_ORDINAL")) {
 
                                             itemOID = itemNode.getNodeName().trim();
                                             itemValue = itemNode.getTextContent();
 
                                             ArrayList<ItemBean> iBean = getItemRecord(itemOID);
-                                            CRFVersionBean cvBean = getCRFVersion(crfVersionOID);
+                                            ItemGroupMetadataBean itemGroupMeta = getItemGroupMetadata(iBean.get(0).getId(),cvBean.getId());
+                                            Integer itemOrdinal = fetchItemOrdinalFromXml(groupNode, itemGroupMeta.isRepeatingGroup());
                                             Integer itemId = iBean.get(0).getId();
                                             Integer crfVersionId = cvBean.getId();
                                             ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
@@ -594,6 +558,11 @@ public class PformSubmissionService {
                                             if (responseTypeId == 3 || responseTypeId == 7) {
                                                 itemValue = itemValue.replaceAll(" ", ",");
                                             }
+
+                                            // Build set of submitted row numbers to be used to find deleted DB rows later
+                                            Set<Integer> ordinals = groupOrdinalMapping.get(itemGroup.getId());
+                                            ordinals.add(itemOrdinal);
+                                            groupOrdinalMapping.put(itemGroup.getId(),ordinals);
 
                                             idao = new ItemDAO(ds);
 
@@ -623,6 +592,11 @@ public class PformSubmissionService {
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
                                 if (!existingValue.isActive()) {
+                                	if (itemDataBean1.getOrdinal() < 0) {
+                                		itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
+                                		ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
+                                		groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
+                                	}
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
@@ -631,6 +605,9 @@ public class PformSubmissionService {
                                     iddao.updateValue(itemDataBean1);
                                 }
                             }
+                            
+                            // Delete rows that have been removed
+                            removeDeletedRows(groupOrdinalMapping,eventCrfBean,cvBean,studyBean,studySubjectBean, locale);
                             
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
@@ -650,17 +627,18 @@ public class PformSubmissionService {
      * @param studyBean
      * @param studyEventBean
      * @param studySubjectBean
+     * @param locale 
      * @return
      * @throws Exception
      */
     private Errors readDownloadFileNew(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(body));
         Document doc = db.parse(is);
-        Integer itemOrdinal = 1;
+        //Integer itemOrdinal = 1;
         String itemName;
         String itemValue;
         String groupNodeName = "";
@@ -681,6 +659,8 @@ public class PformSubmissionService {
                         ArrayList<ItemDataBean> itemDataBeanList = new ArrayList<ItemDataBean>();
                         iddao = new ItemDataDAO(ds);
 
+                        HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
+
                         if (eventCrfBean == null)
                             return errors;
                         if (eventCrfBean != null) {
@@ -689,27 +669,31 @@ public class PformSubmissionService {
                             // Group loop
                             for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
                                 Node groupNode = groupNodeList.item(k);
-
                                 if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
-
-                                    if (groupNode.getNodeName() != groupNodeName) {
-                                        itemOrdinal = 1;
-                                    } else {
-                                        itemOrdinal++;
-                                    }
+                                	//itemOrdinal = fetchItemOrdinalFromXml(groupNode, groupMeta.isRepeatingGroup());
+                                    //if (groupNode.getNodeName() != groupNodeName) {
+                                    //    itemOrdinal = 1;
+                                    //} else {
+                                    //    itemOrdinal++;
+                                    //}
                                     groupNodeName = groupNode.getNodeName();
+                                    ItemGroupBean itemGroup = getItemGroup(crfVersion.getCrfId(), groupNodeName);
+                                    if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getId(),new TreeSet<Integer>());
 
                                     NodeList itemNodeList = groupNode.getChildNodes();
                                     // Item loop
                                     for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
                                         Node itemNode = itemNodeList.item(m);
                                         if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
-                                                && !itemNode.getNodeName().endsWith(".SUBHEADER")) {
+                                                && !itemNode.getNodeName().endsWith(".SUBHEADER")
+                                                && !itemNode.getNodeName().equals("REPEAT_ORDINAL")) {
 
                                             itemName = itemNode.getNodeName().trim();
                                             itemValue = itemNode.getTextContent();
 
                                             ItemBean iBean = getItemRecord(itemName, crfVersion);
+                                            ItemGroupMetadataBean itemGroupMeta = getItemGroupMetadata(iBean.getId(),crfVersion.getId());
+                                            Integer itemOrdinal = fetchItemOrdinalFromXml(groupNode, itemGroupMeta.isRepeatingGroup());
                                             CRFVersionBean cvBean = getCRFVersion(crfVersion.getOid());
                                             Integer itemId = iBean.getId();
                                             Integer crfVersionId = cvBean.getId();
@@ -720,6 +704,12 @@ public class PformSubmissionService {
                                                 itemValue = itemValue.replaceAll(" ", ",");
                                             }
 
+                                            // Build set of submitted row numbers to be used to find deleted DB rows later
+                                            Set<Integer> ordinals = groupOrdinalMapping.get(itemGroup.getId());
+                                            ordinals.add(itemOrdinal);
+                                            groupOrdinalMapping.put(itemGroup.getId(),ordinals);
+
+                                            
                                             idao = new ItemDAO(ds);
 
                                             ItemDataBean itemDataBean = createItemData(iBean, itemValue, itemOrdinal, eventCrfBean, studyBean, studySubjectBean);
@@ -744,6 +734,11 @@ public class PformSubmissionService {
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
                                 if (!existingValue.isActive()) {
+	                                	if (itemDataBean1.getOrdinal() < 0) {
+	                                		itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
+	                                		ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
+	                                		groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
+	                                	}
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
@@ -754,8 +749,16 @@ public class PformSubmissionService {
 
                             }
                             
+                            // Delete rows that have been removed
+                            removeDeletedRows(groupOrdinalMapping,eventCrfBean,crfVersion,studyBean,studySubjectBean, locale);
+                            
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+                            
+                            // Update Study Event to Data Entry Started if currently Scheduled
+                            if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))
+                            	updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+
                         }
                     }
                 }
@@ -764,163 +767,125 @@ public class PformSubmissionService {
         return errors;
     }
 
-    @SuppressWarnings("null")
-    private void setDynItemFormMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean, ArrayList<Integer> ruleList) {
+    private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping, EventCRFBean eventCrf, CRFVersionBean crfVersion, StudyBean studyBean, StudySubjectBean studySubjectBean, Locale locale) {
+    	System.out.println("Attempting to remove deleted rows...");
+    	Iterator<Integer> keys = groupOrdinalMapping.keySet().iterator();
+    	while (keys.hasNext()) {
+    		Integer itemGroupId = keys.next();
+        	System.out.println("Checking group " + itemGroupId);
+        	List<ItemDataBean> itemDatas = getItemDataByEventCrfGroup(eventCrf.getId(),itemGroupId);
+        	for (ItemDataBean itemData:itemDatas) {
+        		if (!groupOrdinalMapping.get(itemGroupId).contains(itemData.getOrdinal())){
+        			System.out.println("Found an item to delete.  Ordinal: " + itemData.getOrdinal() + ". Value: " + itemData.getValue());
+        			itemData.setDeleted(true);
+					itemData.setValue("");
+					itemData.setOldStatus(itemData.getStatus());
+					itemData.setOwner(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+					itemData.setStatus(Status.AVAILABLE);
+					itemData.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+					iddao.updateUser(itemData);
+					iddao.update(itemData);					
+        			// Set update ID
+        		}
+        		
+        		//Close discrepancy notes
+        		closeItemDiscrepancyNotes(itemData, studyBean, studySubjectBean, locale);
+        		
+        	}
+        	
+    	}
+    	
+	}
+
+	private List<ItemDataBean> getItemDataByEventCrfGroup(int id, Integer itemGroupId) {
+		iddao = new ItemDataDAO(ds);
+		List<ItemDataBean> itemDatas= iddao.findAllByEventCRFIdAndItemGroupId(id,itemGroupId);
+		return itemDatas;
+	}
+
+	private Integer getNextItemDataOrdinal(Integer itemId, EventCRFBean eventCrf) {
         iddao = new ItemDataDAO(ds);
-        ItemBean itemBean = (ItemBean) idao.findByPK(itemDataBean.getItemId());
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getItemPropertyBean(itemBean.getOid());
-        RuleBean ruleBean;
-        if (propertyBeans.size() != 0) {
-            for (PropertyBean propertyBean : propertyBeans) {
-                logger.info("property bean oid:   " + propertyBean.getOid());
-                RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
-                if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-                    ruleBean = ruleActionBean.getRuleSetRule().getRuleBean();
-                    getItemFormMetaDataList(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
-                }
+        Integer maxOrdinal = iddao.getMaxOrdinalForGroupByItemAndEventCrf(itemId, eventCrf);
+		return maxOrdinal + 1;
+	}
 
-            }
-        }
+	private ItemGroupBean getItemGroup(int id, String nodeName) {	
+		igdao = new ItemGroupDAO(ds);
+		return igdao.findGroupByGroupNameAndCrfVersionId(nodeName, id);
+	}
 
-    }
+	private ItemGroupBean getItemGroupByOID(String oid) {	
+		igdao = new ItemGroupDAO(ds);
+		return igdao.findByOid(oid);
+	}
 
-    private void setDynItemGroupMetadata(CRFVersionBean crfVersionBean, EventCRFBean eventCrfBean) {
-        igdao = new ItemGroupDAO(ds);
-        ArrayList<Integer> ruleList = new ArrayList<Integer>();
-        ArrayList<ItemGroupBean> itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersionBean.getId());
-        for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-            ArrayList<PropertyBean> propertyBeans = null;
-            propertyBeans = getGroupPropertyBean(itemGroupBean.getOid());
+	private ItemGroupBean getItemGroupByItemIdCrfVersionId(Integer itemId, Integer crfVersionId) {	
+		igdao = new ItemGroupDAO(ds);
+		return igdao.findGroupByItemIdCrfVersionId(itemId, crfVersionId);
+	}
 
-            if (propertyBeans.size() != 0) {
-                for (PropertyBean propertyBean : propertyBeans) {
-                    logger.info("property bean oid:   " + propertyBean.getOid());
-                    RuleActionBean ruleActionBean = propertyBean.getRuleActionBean();
-                    if (ruleActionBean.getActionType().getCode() == 3 && ruleActionBean.getRuleSetRule().getStatus().getCode() == 1) {
-                        getItemGroupMetaDataList(itemGroupBean, eventCrfBean, crfVersionBean);
-                    }
-                }
-            }
-        }
+	private Integer fetchItemOrdinalFromXml(Node groupNode, boolean isRepeating) {
+    	if (!isRepeating) return 1;
+    	
+    	int ordinal = -1;
+    	NodeList items = groupNode.getChildNodes();
+    	for(int i=0; i<items.getLength();i++){
+    		Node item = items.item(i);
+    		if (item instanceof Element && ((Element) item).getTagName().equals("REPEAT_ORDINAL") && !((Element) item).getTextContent().equals(""))
+    			ordinal = Integer.valueOf(((Element)item).getTextContent());
+    	}
+		return ordinal;
+	}
 
-    }
+	private void closeItemDiscrepancyNotes(ItemDataBean itemdata, StudyBean study, StudySubjectBean studySubject, Locale locale) {
+		
+        ResourceBundleProvider.updateLocale(locale);
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
+		dndao = new DiscrepancyNoteDAO(ds);
+			
+		// Notes & Discrepancies must be set to "closed" when event CRF is deleted
+		// parentDiscrepancyNoteList is the list of the parent DNs records only
+		ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dndao.findParentNotesOnlyByItemData(itemdata.getId());
+		for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
+			if (parentDiscrepancyNote.getResolutionStatusId() != 4) { // if the DN's resolution status is not set to Closed
+				String description = resword.getString("dn_auto-closed_description");
+				String detailedNotes =resword.getString("dn_auto_closed_item_detailed_notes");
+				// create new DN record , new DN Map record , also update the parent record
+				DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+				dnb.setEntityId(itemdata.getId()); // this is needed for DN Map object
+				dnb.setStudyId(study.getId());
+				dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+				dnb.setDescription(description);
+				dnb.setDetailedNotes(detailedNotes);
+				dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
+				dnb.setResolutionStatusId(4); // set to closed
+				dnb.setColumn("value"); // this is needed for DN Map object
+				dnb.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
+				dnb.setOwner(getUserAccount(getInputUsername(study, studySubject)));
+				dnb.setParentDnId(parentDiscrepancyNote.getId());
+				dnb.setActivated(false);
+				dnb = (DiscrepancyNoteBean) dndao.create(dnb); // create child DN
+				dndao.createMapping(dnb); // create DN mapping
 
-    private void getItemGroupMetaDataList(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
-        igmdao = new ItemGroupMetadataDAO(ds);
-        ArrayList<ItemGroupMetadataBean> itemGroupMetadataBeans = (ArrayList<ItemGroupMetadataBean>) igmdao.findMetaByGroupAndCrfVersion(itemGroupBean.getId(),
-                crfVersionBean.getId());
-        DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = null;
-        for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
-            DynamicsItemGroupMetadataBean dynGrpBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(itemGroupMetadataBean, eventCrfBean);
-            if (dynGrpBean == null) {
-                dynamicsItemGroupMetadataBean = createDynamicsItemGroupMetadataBean(itemGroupBean, eventCrfBean, itemGroupMetadataBean);
-                saveDynamicGroupMeta(dynamicsItemGroupMetadataBean);
-            }
-        }
-    }
+				DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
+				itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+				itemParentNote.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
+				dndao.update(itemParentNote); // update parent DN
+				dndao.updateAssignedUser(itemParentNote); // update parent DN assigned user
+			}
+		}
+		iddao = new ItemDataDAO(ds);
+		ItemDataBean idBean = (ItemDataBean) iddao.findByPK(itemdata.getId());
 
-    private void getItemFormMetaDataList(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
-        DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = null;
-        ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
+		// Updating Dn_item_data_map actovated column into false for the existing DNs
+		ArrayList<DiscrepancyNoteBean> dnBeans = dndao.findExistingNotesForItemData(itemdata.getId());
+		if (dnBeans.size() != 0) {
+			DiscrepancyNoteBean dnBean = new DiscrepancyNoteBean();
+			dnBean.setEntityId(itemdata.getId());
+			dnBean.setActivated(false);
+			dndao.updateDnMapActivation(dnBean);
+		}
 
-        DynamicsItemFormMetadataBean dynBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
-        if (dynBean == null) {
-            dynamicsItemFormMetadataBean = createDynamicsItemFormMetadataBean(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
-            saveDynamicItemFormMeta(dynamicsItemFormMetadataBean);
-        }
-    }
-
-    private DynamicsItemFormMetadataBean createDynamicsItemFormMetadataBean(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean,
-            CRFVersionBean crfVersionBean) {
-
-        ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
-
-        DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = new DynamicsItemFormMetadataBean();
-        dynamicsItemFormMetadataBean.setEventCrfId(eventCrfBean.getId());
-        dynamicsItemFormMetadataBean.setCrfVersionId(crfVersionBean.getId());
-        dynamicsItemFormMetadataBean.setItemFormMetadataId(itemFormMetadataBean.getId());
-        dynamicsItemFormMetadataBean.setItemId(itemBean.getId());
-        dynamicsItemFormMetadataBean.setShowItem(true);
-        dynamicsItemFormMetadataBean.setItemDataId(itemDataBean.getId());
-        dynamicsItemFormMetadataBean.setVersion(0);
-        dynamicsItemFormMetadataBean.setPassedDde(0);
-
-        return dynamicsItemFormMetadataBean;
-    }
-
-    private DynamicsItemGroupMetadataBean createDynamicsItemGroupMetadataBean(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean,
-            ItemGroupMetadataBean itemGroupMetadataBean) {
-
-        DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = new DynamicsItemGroupMetadataBean();
-        dynamicsItemGroupMetadataBean.setEventCrfId(eventCrfBean.getId());
-        dynamicsItemGroupMetadataBean.setItemGroupId(itemGroupBean.getId());
-        dynamicsItemGroupMetadataBean.setItemGroupMetadataId(itemGroupMetadataBean.getId());
-        dynamicsItemGroupMetadataBean.setShowGroup(true);
-        dynamicsItemGroupMetadataBean.setVersion(0);
-        dynamicsItemGroupMetadataBean.setPassedDde(0);
-
-        return dynamicsItemGroupMetadataBean;
-    }
-
-    private void saveDynamicItemFormMeta(DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean) {
-        getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsItemFormMetadataBean);
-    }
-
-    private void saveDynamicGroupMeta(DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean) {
-        getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsItemGroupMetadataBean);
-    }
-
-    private ArrayList<PropertyBean> getGroupPropertyBean(String groupOid) {
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getRuleActionPropertyDao().findByOid(groupOid);
-        return propertyBeans;
-    }
-
-    private ArrayList<PropertyBean> getItemPropertyBean(String itemOid) {
-        ArrayList<PropertyBean> propertyBeans = null;
-        propertyBeans = getRuleActionPropertyDao().findByOid(itemOid);
-        return propertyBeans;
-    }
-
-    public RuleActionPropertyDao getRuleActionPropertyDao() {
-        return ruleActionPropertyDao;
-    }
-
-    public void setRuleActionPropertyDao(RuleActionPropertyDao ruleActionPropertyDao) {
-        this.ruleActionPropertyDao = ruleActionPropertyDao;
-    }
-
-    public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
-        return dynamicsItemGroupMetadataDao;
-    }
-
-    public void setDynamicsItemGroupMetadataDao(DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao) {
-        this.dynamicsItemGroupMetadataDao = dynamicsItemGroupMetadataDao;
-    }
-
-    public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
-        return dynamicsItemFormMetadataDao;
-    }
-
-    public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
-        this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
-    }
-
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
-            return study;
-        } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-            return parentStudy;
-        }
-    }
-
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(ds);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
-        return studyBean;
-    }
-
+	}
+	
 }

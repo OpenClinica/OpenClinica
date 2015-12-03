@@ -6,6 +6,7 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
@@ -21,6 +22,7 @@ public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
     AuditUserLoginDao auditUserLoginDao;
     UserAccountDAO userAccountDao;
     DataSource dataSource;
+    CRFLocker crfLocker;
 
     @Override
     public void removeSessionInformation(String sessionId) {
@@ -43,6 +45,8 @@ public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
     void auditLogout(String username) {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         UserAccountBean userAccount = (UserAccountBean) getUserAccountDao().findByUserName(username);
+        crfLocker.unlockAllForUser(userAccount.getId());
+
         AuditUserLoginBean auditUserLogin = new AuditUserLoginBean();
         auditUserLogin.setUserName(username);
         auditUserLogin.setLoginStatus(LoginStatus.SUCCESSFUL_LOGOUT);
@@ -69,5 +73,9 @@ public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
 
     public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
         this.auditUserLoginDao = auditUserLoginDao;
+    }
+
+    public void setCrfLocker(CRFLocker crfLocker) {
+        this.crfLocker = crfLocker;
     }
 }

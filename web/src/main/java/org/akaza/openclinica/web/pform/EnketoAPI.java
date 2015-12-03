@@ -80,7 +80,7 @@ public class EnketoAPI {
             return null;
 
         try {
-            URL eURL = new URL(enketoURL + "/api/v1/instance");
+            URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
 
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 

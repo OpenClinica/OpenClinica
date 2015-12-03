@@ -131,10 +131,6 @@
    
 <bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
       <constructor-arg ref="dataSource"/>
-      <constructor-arg ref="authoritiesDao"/>
-        <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
-        <property name="dynamicsItemGroupMetadataDao" ref="dynamicsItemGroupMetadataDao"/>
-        <property name="dynamicsItemFormMetadataDao" ref="dynamicsItemFormMetadataDao"/>
     </bean>
      
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">

@@ -32,7 +32,7 @@ public class ParticipantEventService {
 	}
 	
 	public StudyEventBean getNextParticipantEvent(StudySubjectBean studySubject) {
-		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>)getStudyEventDAO().findAllBySubjectIdOrdered(studySubject.getSubjectId());
+		List<StudyEventBean> studyEvents = (ArrayList<StudyEventBean>)getStudyEventDAO().findAllBySubjectIdOrdered(studySubject.getId());
 		
 		for (StudyEventBean studyEvent:studyEvents) {
 			List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
