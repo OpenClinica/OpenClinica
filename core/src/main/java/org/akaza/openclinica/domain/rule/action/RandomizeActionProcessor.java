@@ -65,7 +65,7 @@ public class RandomizeActionProcessor implements ActionProcessor {
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         
         getItemMetadataService().insert(itemDataBean.getId(), ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet ,((RandomizeActionBean) ruleAction).getStratificationFactors());
-        ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
+  //      ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }
 
