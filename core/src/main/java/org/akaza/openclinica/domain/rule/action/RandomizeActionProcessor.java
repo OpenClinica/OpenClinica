@@ -38,20 +38,18 @@ public class RandomizeActionProcessor implements ActionProcessor {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
                 return null;
             } else {
-                dryRun(ruleAction, itemDataBean, itemData, currentStudy, ub);
+                return ruleAction;
             }
         }
         case SAVE: {
-            if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-                save(ruleAction, itemDataBean, itemData, currentStudy, ub);
-            } else if(ruleRunnerMode == RuleRunnerMode.IMPORT_DATA) {
-                saveWithStatusUpdated(ruleAction, itemDataBean, itemData, currentStudy, ub);
+            if (ruleRunnerMode == RuleRunnerMode.IMPORT_DATA) {
+                return saveWithStatusUpdated(ruleAction, itemDataBean, itemData, currentStudy, ub);
             } else {
-                save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+                return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
             }
         }
         default:
-            return null;
+            return ruleAction;
         }
     }
 
@@ -59,14 +57,14 @@ public class RandomizeActionProcessor implements ActionProcessor {
         itemDataBean.setStatus(Status.UNAVAILABLE);
         getItemMetadataService().insert(itemDataBean, ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet,((RandomizeActionBean) ruleAction).getStratificationFactors());
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
-        return null;
+        return ruleAction;
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         
         getItemMetadataService().insert(itemDataBean.getId(), ((RandomizeActionBean) ruleAction).getProperties(), ub, ruleSet ,((RandomizeActionBean) ruleAction).getStratificationFactors());
   //      ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
-        return null;
+        return ruleAction;
     }
 
     private void ruleActionRunLogSaveOrUpdate(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
@@ -84,9 +82,6 @@ public class RandomizeActionProcessor implements ActionProcessor {
         return ruleAction;
     }
 
-    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        return ruleAction;
-    }
 
     private DynamicsMetadataService getItemMetadataService() {
         return itemMetadataService;
