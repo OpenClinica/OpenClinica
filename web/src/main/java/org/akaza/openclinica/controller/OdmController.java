@@ -247,43 +247,45 @@ public class OdmController {
         try {
             // Retrieve crfs for next event
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
-        	ParticipantEventService participantEventService = new ParticipantEventService(dataSource);
+            ParticipantEventService participantEventService = new ParticipantEventService(dataSource);
             StudyEventBean nextEvent = participantEventService.getNextParticipantEvent(studySubjectBean);
-            logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
+            if (nextEvent != null) {
+                logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 
-            List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
-            StudyBean study = studyDAO.findByOid(studyOID);
-            if (!mayProceed(studyOID, studySubjectBean))
-                return odm;
+                List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
+                StudyBean study = studyDAO.findByOid(studyOID);
+                if (!mayProceed(studyOID, studySubjectBean))
+                    return odm;
 
-            List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
-            for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
-            	if (eventDefCrf.isParticipantForm()) {
-	            	EventCRFBean eventCRF = participantEventService.getExistingEventCRF(studySubjectBean, nextEvent, eventDefCrf);
-	            	boolean itemDataExists = false;
-	            	boolean validStatus = true;
-	            	CRFVersionBean crfVersion = null;
-	            	if (eventCRF!=null) {
-	            		if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
-	            			validStatus = false;
-	                    if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
-	                        itemDataExists = true;
-	                    crfVersion = (CRFVersionBean) versionDAO.findByPK(eventCRF.getCRFVersionId());
-	            	} else crfVersion = (CRFVersionBean) versionDAO.findByPK(eventDefCrf.getDefaultVersionId());
+                List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
+                for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
+                    if (eventDefCrf.isParticipantForm()) {
+                        EventCRFBean eventCRF = participantEventService.getExistingEventCRF(studySubjectBean, nextEvent, eventDefCrf);
+                        boolean itemDataExists = false;
+                        boolean validStatus = true;
+                        CRFVersionBean crfVersion = null;
+                        if (eventCRF!=null) {
+                            if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
+                                validStatus = false;
+                            if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
+                                itemDataExists = true;
+                            crfVersion = (CRFVersionBean) versionDAO.findByPK(eventCRF.getCRFVersionId());
+                        } else crfVersion = (CRFVersionBean) versionDAO.findByPK(eventDefCrf.getDefaultVersionId());
 
-	                if (validStatus) {
-	                    String formUrl = null;
-	                    if (!itemDataExists)
-	                        formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
-	                    else
-	                        formUrl = createEditUrl(studyOID, crfVersion, nextEvent, ssoid);
-	                    formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));
-	                }
-	            }
-            }
-
+                        if (validStatus) {
+                            String formUrl = null;
+                            if (!itemDataExists)
+                                formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
+                            else
+                                formUrl = createEditUrl(studyOID, crfVersion, nextEvent, ssoid);
+                            formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));
+                        }
+                    }
+                }
             return createOdm(study, studySubjectBean, nextEvent, formDatas);
-
+            } else {
+                logger.debug("Unable to find next event for subject.");
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
