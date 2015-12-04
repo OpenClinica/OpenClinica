@@ -21,7 +21,9 @@
 
     <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
         <constructor-arg ref="dataSource"/>
+        <property name="randomizeService" ref="randomizeService"/>
     </bean>
+    
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
         <property name="dataSource" ref="dataSource"/>
         <property name="beanPropertyService" ref="beanPropertyService"/>

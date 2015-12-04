@@ -94,8 +94,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
     private RandomizeService randomizeService;
-
-
+    
     public DynamicsMetadataService(DataSource ds) {
     	// itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
@@ -1099,10 +1098,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
 
-
     public RandomizeService getRandomizeService() {
-        return new RandomizeService(ds);
+        return randomizeService;
     }
+
+    public void setRandomizeService(RandomizeService randomizeService) {
+        this.randomizeService = randomizeService;
+    }
+
+
 
 
 
