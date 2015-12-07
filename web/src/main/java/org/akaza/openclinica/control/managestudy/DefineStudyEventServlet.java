@@ -601,19 +601,7 @@ public class DefineStudyEventServlet extends SecureController {
         addPageMessage(respage.getString("the_new_event_definition_created_succesfully"));
 
     }
-    private void baseUrl() throws MalformedURLException{
-    	String portalURL = CoreResources.getField("portalURL");
-        URL pManageUrl = new URL(portalURL);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-    	System.out.println("the url :  "+ url);
-    	request.setAttribute("participantUrl",url+"/");
-
-    }
     public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
     	for (int i = 0; i < edcsInSession.size(); i++) {
             v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	

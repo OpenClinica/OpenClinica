@@ -157,19 +157,6 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
     }
 
-    private void baseUrl() throws MalformedURLException{
-    	String portalURL = CoreResources.getField("portalURL");
-        URL pManageUrl = new URL(portalURL);
-    
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();    
-    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
-    	System.out.println("the url :  "+ url);
-    	request.setAttribute("participantUrl",url+"/");
-
-    }
     
     private HashMap processNullValues(EventDefinitionCRFBean edc) {
         HashMap flags = new LinkedHashMap();
