@@ -611,6 +611,10 @@ public class PformSubmissionService {
                             
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+                            
+                            // Update Study Event to Data Entry Started if currently Scheduled
+                            if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))
+                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
                         }
                     }
                 }
