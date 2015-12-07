@@ -488,9 +488,16 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         ordinal = ordinal == null ? 1 : ordinal;
         itemGroupMetadataBeanB.getRepeatNum();
         ItemDataBean oidBasedItemData = getItemData(itemBeanB, eventCrfBeanB, ordinal);
+        
         if (oidBasedItemData.getId() == 0) {
             oidBasedItemData = createItemData(oidBasedItemData, itemBeanB, ordinal, eventCrfBeanB, ub);
-        }
+            oidBasedItemData.setUpdaterId(oidBasedItemData.getOwnerId());
+        }else{
+                if(oidBasedItemData.getUpdaterId()==0)
+                    oidBasedItemData.setUpdaterId(oidBasedItemData.getOwnerId());
+                
+            }
+            
         return oidBasedItemData;
     }
 
