@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
@@ -137,9 +138,12 @@ public class CrfBean  extends DataMapDomainObject {
 	}
 
 	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
+	@Column(name = "date_created", length = 4, updatable = false)
 	public Date getDateCreated() {
-		return this.dateCreated;
+        if (dateCreated != null) {
+            return dateCreated;
+        } else
+            return new Date();
 	}
 
 	public void setDateCreated(Date dateCreated) {

@@ -162,9 +162,12 @@ public class CrfVersion extends DataMapDomainObject {
     }
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "date_created", length = 4)
+    @Column(name = "date_created", length = 4, updatable = false)
     public Date getDateCreated() {
-        return this.dateCreated;
+        if (dateCreated != null) {
+            return dateCreated;
+        } else
+            return new Date();
     }
 
     public void setDateCreated(Date dateCreated) {
