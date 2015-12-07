@@ -123,11 +123,14 @@ public class ItemGroup  extends DataMapDomainObject {
 		this.name = name;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
-	public Date getDateCreated() {
-		return this.dateCreated;
-	}
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_created", length = 4, updatable = false)
+    public Date getDateCreated() {
+        if (dateCreated != null) {
+            return dateCreated;
+        } else
+            return new Date();
+    }
 
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;

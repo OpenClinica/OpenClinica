@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.crfdata;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.Utils;
@@ -132,6 +133,9 @@ public class XformMetaDataService {
         CrfBean crf = null;
         if (version.getCrfId() > 0) {
             crf = (CrfBean) crfDao.findById(version.getCrfId());
+            crf.setUpdateId(ub.getId());
+            crf.setDateUpdated(new Date());
+            crfDao.saveOrUpdate(crf);
         } else {
             crf = new CrfBean();
             crf.setName(submittedCrfName);
@@ -140,6 +144,8 @@ public class XformMetaDataService {
             crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             crf.setStudy(studyDao.findById(currentStudy.getId()));
             crf.setOcOid(crfDao.getValidOid(new CrfBean(), submittedCrfName));
+            crf.setUpdateId(ub.getId());
+            crf.setDateUpdated(new Date());
             Integer crfId = (Integer) crfDao.save(crf);
             crf.setCrfId(crfId);
         }
@@ -233,7 +239,6 @@ public class XformMetaDataService {
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
                 itemGroup.setOcOid(itemGroupDao.getValidOid(new ItemGroup(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
                 usedGroupOids.add(itemGroup.getOcOid());
-                // dbgroup.setDateCreated(dateCreated)
                 Integer itemGroupId = (Integer) itemGroupDao.save(itemGroup);
                 itemGroup.setItemGroupId(itemGroupId);
             }
@@ -354,7 +359,6 @@ public class XformMetaDataService {
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
-            // TODO: DATE_CREATED,
             item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
             usedItemOids.add(item.getOcOid());
             Integer itemId = (Integer) itemDao.save(item);
