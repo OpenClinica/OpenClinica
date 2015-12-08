@@ -24,3 +24,6 @@ ws/.DS_Store
 /web/OpenClinica-web.iml
 /core/OpenClinica-core.iml
 /core/OpenClinica-core.iml
+
+# netbeans
+nb-configuration.xml
