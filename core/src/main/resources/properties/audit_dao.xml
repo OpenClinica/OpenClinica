@@ -194,7 +194,7 @@
 			ale.new_value, ale.event_crf_id, ua.user_name, alet.name
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
 			JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
-			WHERE ale.event_crf_id=? and ale.audit_log_event_type_id = 8;
+			WHERE ale.event_crf_id=? and (ale.audit_log_event_type_id = 1 OR ale.audit_log_event_type_id = 41) ORDER BY ale.audit_date DESC;
 		</sql>
 	</query>
 </queries>
