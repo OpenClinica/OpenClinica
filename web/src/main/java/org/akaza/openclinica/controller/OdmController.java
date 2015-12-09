@@ -59,11 +59,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/odmk")
@@ -392,6 +389,11 @@ public class OdmController {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             formData.setStatus(eventCRFBean.getStatus().getName());
             formData.setStatusChangeTimeStamp(eventCrf.getDateUpdated().toString());
+
+            // returns time as UTC
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            formData.setStatusChangeTimeStamp(sdf.format(eventCrf.getDateUpdated()));
         }
         return formData;
     }
