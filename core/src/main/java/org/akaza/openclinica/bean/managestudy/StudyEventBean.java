@@ -16,6 +16,7 @@ import org.akaza.openclinica.patterns.ocobserver.Observer;
 
 import java.util.ArrayList;
 import java.util.Date;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * @author jxu
@@ -76,7 +77,9 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
       public void setDiscBeanList(ArrayList<DiscrepancyNoteBean> discBeanList) {
           this.discBeanList = discBeanList;
       }
-    
+
+    // FH 27-11-2015
+    private Date dateParticipantFormsSubmitted;
 
     /**
      * @return startTimeFlag
@@ -359,6 +362,15 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public void setStudySubject(StudySubjectBean studySubject) {
         this.studySubject = studySubject;
+    }
+
+    @JsonIgnore
+    public Date getDateParticipantFormsSubmitted() {
+        return dateParticipantFormsSubmitted;
+    }
+
+    public void setDateParticipantFormsSubmitted(Date value) {
+        this.dateParticipantFormsSubmitted = value;
     }
 
 	@Override

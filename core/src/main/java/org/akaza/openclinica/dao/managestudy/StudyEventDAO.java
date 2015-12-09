@@ -109,6 +109,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
         // YW >>
 
+        this.setTypeExpected(16, TypeNames.TIMESTAMP); // FH 27-11-2015
     }
 
     public void setTypesExpected(boolean withSubject) {
@@ -136,8 +137,11 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // YW 08-17-2007 <<
         this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
         this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
+
+        this.setTypeExpected(16, TypeNames.TIMESTAMP); // FH 27-11-2015
+
         if (withSubject) {
-            this.setTypeExpected(16, TypeNames.STRING);
+            this.setTypeExpected(17, TypeNames.STRING);
         }
         // YW >>
     }
@@ -183,6 +187,11 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // YW 08-17-2007
         eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
         eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
+        try {
+            eb.setDateParticipantFormsSubmitted((Date) hm.get("date_participant_forms_submitted"));
+        } catch(NullPointerException e) {
+            // Do nothing, allow null value.
+        }
 
         return eb;
     }

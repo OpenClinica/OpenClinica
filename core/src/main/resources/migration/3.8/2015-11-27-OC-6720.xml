@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="fahri" id="2015-11-27-6720_1" dbms="postgresql">
+        <comment>Store completion date of all the study event's participant forms</comment>
+        <sql>ALTER TABLE study_event ADD COLUMN date_participant_forms_submitted TIMESTAMP WITH TIME ZONE;</sql>
+        <rollback>
+            <sql></sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

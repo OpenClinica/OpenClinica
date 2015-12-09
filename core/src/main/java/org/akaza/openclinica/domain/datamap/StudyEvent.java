@@ -59,6 +59,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	private List<DnStudyEventMap> dnStudyEventMaps ;
 	private List<EventCrf> eventCrfs ;
 	private Integer sedOrdinal;
+    private Date dateParticipantFormsSubmitted;
 	
 	public StudyEvent() {
 	}
@@ -272,7 +273,15 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.statusId = statusId;
 	}
 
+	@Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date_participant_forms_submitted", length = 8)
+    public Date getDateParticipantFormsSubmitted() {
+        return dateParticipantFormsSubmitted;
+    }
 
+    public void setDateParticipantFormsSubmitted(Date value) {
+        this.dateParticipantFormsSubmitted = value;
+    }
 
 	/*@Column(name="sed_ordinal",insertable=false,updatable=false,table="study_event_definition")
 	
