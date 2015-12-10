@@ -388,12 +388,12 @@ public class OdmController {
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             formData.setStatus(eventCRFBean.getStatus().getName());
-            formData.setStatusChangeTimeStamp(eventCrf.getDateUpdated().toString());
-
-            // returns time as UTC
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            formData.setStatusChangeTimeStamp(sdf.format(eventCrf.getDateUpdated()));
+            if (eventCrf.getDateUpdated() != null) {
+                // returns time as UTC
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                formData.setStatusChangeTimeStamp(sdf.format(eventCrf.getDateUpdated()));
+            }
         }
         return formData;
     }
