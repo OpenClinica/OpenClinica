@@ -493,7 +493,6 @@ public class PformSubmissionService {
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(body));
         Document doc = db.parse(is);
-        //Integer itemOrdinal = 1;
         String itemOID;
         String itemValue;
         String groupNodeName = "";
@@ -527,11 +526,6 @@ public class PformSubmissionService {
 
                                 if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
 
-                                  // if (groupNode.getNodeName() != groupNodeName) {
-                                   //     itemOrdinal = 1;
-                                  //  } else {
-                                  //      itemOrdinal++;
-                                  //  }
                                     groupNodeName = groupNode.getNodeName();
                                     ItemGroupBean itemGroup = getItemGroupByOID(groupNodeName);
                                     if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getId(),new TreeSet<Integer>());
@@ -549,7 +543,7 @@ public class PformSubmissionService {
 
                                             ArrayList<ItemBean> iBean = getItemRecord(itemOID);
                                             ItemGroupMetadataBean itemGroupMeta = getItemGroupMetadata(iBean.get(0).getId(),cvBean.getId());
-                                            Integer itemOrdinal = fetchItemOrdinalFromXml(groupNode, itemGroupMeta.isRepeatingGroup());
+                                            Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataBeanList,iBean.get(0));
                                             Integer itemId = iBean.get(0).getId();
                                             Integer crfVersionId = cvBean.getId();
                                             ItemFormMetadataBean ifmBean = getItemFromMetadata(itemId, crfVersionId);
@@ -592,16 +586,17 @@ public class PformSubmissionService {
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
                                 if (!existingValue.isActive()) {
-                                	if (itemDataBean1.getOrdinal() < 0) {
-                                		itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
-                                		ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
-                                		groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
-                                	}
+                                    if (itemDataBean1.getOrdinal() < 0) {
+                                        itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
+                                        ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
+                                        groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
+                                    }
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
                                 } else {
                                     itemDataBean1.setId(existingValue.getId());
+                                    itemDataBean1.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
                                     iddao.updateValue(itemDataBean1);
                                 }
                             }
@@ -638,7 +633,6 @@ public class PformSubmissionService {
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(body));
         Document doc = db.parse(is);
-        //Integer itemOrdinal = 1;
         String itemName;
         String itemValue;
         String groupNodeName = "";
@@ -670,12 +664,6 @@ public class PformSubmissionService {
                             for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
                                 Node groupNode = groupNodeList.item(k);
                                 if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
-                                	//itemOrdinal = fetchItemOrdinalFromXml(groupNode, groupMeta.isRepeatingGroup());
-                                    //if (groupNode.getNodeName() != groupNodeName) {
-                                    //    itemOrdinal = 1;
-                                    //} else {
-                                    //    itemOrdinal++;
-                                    //}
                                     groupNodeName = groupNode.getNodeName();
                                     ItemGroupBean itemGroup = getItemGroup(crfVersion.getId(), groupNodeName);
                                     if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getId(),new TreeSet<Integer>());
@@ -693,7 +681,8 @@ public class PformSubmissionService {
 
                                             ItemBean iBean = getItemRecord(itemName, crfVersion);
                                             ItemGroupMetadataBean itemGroupMeta = getItemGroupMetadata(iBean.getId(),crfVersion.getId());
-                                            Integer itemOrdinal = fetchItemOrdinalFromXml(groupNode, itemGroupMeta.isRepeatingGroup());
+                                            Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataBeanList,iBean);
+
                                             CRFVersionBean cvBean = getCRFVersion(crfVersion.getOid());
                                             Integer itemId = iBean.getId();
                                             Integer crfVersionId = cvBean.getId();
@@ -709,7 +698,6 @@ public class PformSubmissionService {
                                             ordinals.add(itemOrdinal);
                                             groupOrdinalMapping.put(itemGroup.getId(),ordinals);
 
-                                            
                                             idao = new ItemDAO(ds);
 
                                             ItemDataBean itemDataBean = createItemData(iBean, itemValue, itemOrdinal, eventCrfBean, studyBean, studySubjectBean);
@@ -734,16 +722,17 @@ public class PformSubmissionService {
                                         itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
                                 iddao.setFormatDates(true);
                                 if (!existingValue.isActive()) {
-	                                	if (itemDataBean1.getOrdinal() < 0) {
-	                                		itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
-	                                		ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
-	                                		groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
-	                                	}
+                                        if (itemDataBean1.getOrdinal() < 0) {
+                                            itemDataBean1.setOrdinal(getNextItemDataOrdinal(itemDataBean1.getItemId(),eventCrfBean));
+                                            ItemGroupBean itemGroup = getItemGroupByItemIdCrfVersionId(itemDataBean1.getItemId(),eventCrfBean.getCRFVersionId());
+                                            groupOrdinalMapping.get(itemGroup.getId()).add(itemDataBean1.getOrdinal());
+                                        }
                                     iddao.create(itemDataBean1);
                                 } else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
                                     // Value unchanged. Do nothing.
                                 } else {
                                     itemDataBean1.setId(existingValue.getId());
+                                    itemDataBean1.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
                                     iddao.updateValue(itemDataBean1);
                                 }
 
@@ -757,7 +746,7 @@ public class PformSubmissionService {
                             
                             // Update Study Event to Data Entry Started if currently Scheduled
                             if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))
-                            	updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
 
                         }
                     }
@@ -768,124 +757,133 @@ public class PformSubmissionService {
     }
 
     private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping, EventCRFBean eventCrf, CRFVersionBean crfVersion, StudyBean studyBean, StudySubjectBean studySubjectBean, Locale locale) {
-    	System.out.println("Attempting to remove deleted rows...");
-    	Iterator<Integer> keys = groupOrdinalMapping.keySet().iterator();
-    	while (keys.hasNext()) {
-    		Integer itemGroupId = keys.next();
-        	System.out.println("Checking group " + itemGroupId);
-        	List<ItemDataBean> itemDatas = getItemDataByEventCrfGroup(eventCrf.getId(),itemGroupId);
-        	for (ItemDataBean itemData:itemDatas) {
-        		if (!groupOrdinalMapping.get(itemGroupId).contains(itemData.getOrdinal())){
-        			System.out.println("Found an item to delete.  Ordinal: " + itemData.getOrdinal() + ". Value: " + itemData.getValue());
-        			itemData.setDeleted(true);
-					itemData.setValue("");
-					itemData.setOldStatus(itemData.getStatus());
-					itemData.setOwner(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
-					itemData.setStatus(Status.AVAILABLE);
-					itemData.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
-					iddao.updateUser(itemData);
-					iddao.update(itemData);					
-        			// Set update ID
-        		}
-        		
-        		//Close discrepancy notes
-        		closeItemDiscrepancyNotes(itemData, studyBean, studySubjectBean, locale);
-        		
-        	}
-        	
-    	}
-    	
-	}
+        Iterator<Integer> keys = groupOrdinalMapping.keySet().iterator();
+        while (keys.hasNext()) {
+            Integer itemGroupId = keys.next();
+            List<ItemDataBean> itemDatas = getItemDataByEventCrfGroup(eventCrf.getId(),itemGroupId);
+            for (ItemDataBean itemData:itemDatas) {
+                if (!groupOrdinalMapping.get(itemGroupId).contains(itemData.getOrdinal()) && !itemData.isDeleted()){
+                    itemData.setDeleted(true);
+                    itemData.setValue("");
+                    itemData.setOldStatus(itemData.getStatus());
+                    itemData.setOwner(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+                    itemData.setStatus(Status.AVAILABLE);
+                    itemData.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+                    iddao.updateUser(itemData);
+                    iddao.update(itemData);                    
+                    // Set update ID
+                }
+                
+                //Close discrepancy notes
+                closeItemDiscrepancyNotes(itemData, studyBean, studySubjectBean, locale);
+                
+            }
+            
+        }
+        
+    }
 
-	private List<ItemDataBean> getItemDataByEventCrfGroup(int id, Integer itemGroupId) {
-		iddao = new ItemDataDAO(ds);
-		List<ItemDataBean> itemDatas= iddao.findAllByEventCRFIdAndItemGroupId(id,itemGroupId);
-		return itemDatas;
-	}
+    private List<ItemDataBean> getItemDataByEventCrfGroup(int id, Integer itemGroupId) {
+        iddao = new ItemDataDAO(ds);
+        List<ItemDataBean> itemDatas= iddao.findAllByEventCRFIdAndItemGroupId(id,itemGroupId);
+        return itemDatas;
+    }
 
-	private Integer getNextItemDataOrdinal(Integer itemId, EventCRFBean eventCrf) {
+    private Integer getNextItemDataOrdinal(Integer itemId, EventCRFBean eventCrf) {
         iddao = new ItemDataDAO(ds);
         Integer maxOrdinal = iddao.getMaxOrdinalForGroupByItemAndEventCrf(itemId, eventCrf);
-		return maxOrdinal + 1;
-	}
+        return maxOrdinal + 1;
+    }
 
-	private ItemGroupBean getItemGroup(int id, String nodeName) {	
-		igdao = new ItemGroupDAO(ds);
-		return igdao.findGroupByGroupNameAndCrfVersionId(nodeName, id);
-	}
+    private ItemGroupBean getItemGroup(int id, String nodeName) {    
+        igdao = new ItemGroupDAO(ds);
+        return igdao.findGroupByGroupNameAndCrfVersionId(nodeName, id);
+    }
 
-	private ItemGroupBean getItemGroupByOID(String oid) {	
-		igdao = new ItemGroupDAO(ds);
-		return igdao.findByOid(oid);
-	}
+    private ItemGroupBean getItemGroupByOID(String oid) {    
+        igdao = new ItemGroupDAO(ds);
+        return igdao.findByOid(oid);
+    }
 
-	private ItemGroupBean getItemGroupByItemIdCrfVersionId(Integer itemId, Integer crfVersionId) {	
-		igdao = new ItemGroupDAO(ds);
-		return igdao.findGroupByItemIdCrfVersionId(itemId, crfVersionId);
-	}
+    private ItemGroupBean getItemGroupByItemIdCrfVersionId(Integer itemId, Integer crfVersionId) {    
+        igdao = new ItemGroupDAO(ds);
+        return igdao.findGroupByItemIdCrfVersionId(itemId, crfVersionId);
+    }
 
-	private Integer fetchItemOrdinalFromXml(Node groupNode, boolean isRepeating) {
-    	if (!isRepeating) return 1;
-    	
-    	int ordinal = -1;
-    	NodeList items = groupNode.getChildNodes();
-    	for(int i=0; i<items.getLength();i++){
-    		Node item = items.item(i);
-    		if (item instanceof Element && ((Element) item).getTagName().equals("REPEAT_ORDINAL") && !((Element) item).getTextContent().equals(""))
-    			ordinal = Integer.valueOf(((Element)item).getTextContent());
-    	}
-		return ordinal;
-	}
+    private Integer getItemOrdinal(Node groupNode, boolean isRepeating, ArrayList<ItemDataBean> itemDataBeanList, ItemBean iBean) {
+        if (!isRepeating) return 1;
+        
+        int ordinal = -1;
+        NodeList items = groupNode.getChildNodes();
+        for(int i=0; i<items.getLength();i++){
+            Node item = items.item(i);
+            if (item instanceof Element && ((Element) item).getTagName().equals("REPEAT_ORDINAL") && !((Element) item).getTextContent().equals(""))
+                ordinal = Integer.valueOf(((Element)item).getTextContent());
+        }
+        
+        // Enketo specific code here due to Enketo behavior of defaulting in values from first repeat on new repeating
+        // group row entries, including the REPEAT_ORDINAL value.
+        // If the current value of REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current 
+        // value must be reset to -1 as this is a new repeating group row.
+        for (ItemDataBean itemdata:itemDataBeanList) {
+            if (itemdata.getItemId() == iBean.getId() && itemdata.getOrdinal() == ordinal) {
+                ordinal = -1;
+                break;
+            }
+        }
 
-	private void closeItemDiscrepancyNotes(ItemDataBean itemdata, StudyBean study, StudySubjectBean studySubject, Locale locale) {
-		
+        return ordinal;
+    }
+
+    private void closeItemDiscrepancyNotes(ItemDataBean itemdata, StudyBean study, StudySubjectBean studySubject, Locale locale) {
+        
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
-		dndao = new DiscrepancyNoteDAO(ds);
-			
-		// Notes & Discrepancies must be set to "closed" when event CRF is deleted
-		// parentDiscrepancyNoteList is the list of the parent DNs records only
-		ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dndao.findParentNotesOnlyByItemData(itemdata.getId());
-		for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
-			if (parentDiscrepancyNote.getResolutionStatusId() != 4) { // if the DN's resolution status is not set to Closed
-				String description = resword.getString("dn_auto-closed_description");
-				String detailedNotes =resword.getString("dn_auto_closed_item_detailed_notes");
-				// create new DN record , new DN Map record , also update the parent record
-				DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-				dnb.setEntityId(itemdata.getId()); // this is needed for DN Map object
-				dnb.setStudyId(study.getId());
-				dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-				dnb.setDescription(description);
-				dnb.setDetailedNotes(detailedNotes);
-				dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
-				dnb.setResolutionStatusId(4); // set to closed
-				dnb.setColumn("value"); // this is needed for DN Map object
-				dnb.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
-				dnb.setOwner(getUserAccount(getInputUsername(study, studySubject)));
-				dnb.setParentDnId(parentDiscrepancyNote.getId());
-				dnb.setActivated(false);
-				dnb = (DiscrepancyNoteBean) dndao.create(dnb); // create child DN
-				dndao.createMapping(dnb); // create DN mapping
+        dndao = new DiscrepancyNoteDAO(ds);
+            
+        // Notes & Discrepancies must be set to "closed" when event CRF is deleted
+        // parentDiscrepancyNoteList is the list of the parent DNs records only
+        ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dndao.findParentNotesOnlyByItemData(itemdata.getId());
+        for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
+            if (parentDiscrepancyNote.getResolutionStatusId() != 4) { // if the DN's resolution status is not set to Closed
+                String description = resword.getString("dn_auto-closed_description");
+                String detailedNotes =resword.getString("dn_auto_closed_item_detailed_notes");
+                // create new DN record , new DN Map record , also update the parent record
+                DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                dnb.setEntityId(itemdata.getId()); // this is needed for DN Map object
+                dnb.setStudyId(study.getId());
+                dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                dnb.setDescription(description);
+                dnb.setDetailedNotes(detailedNotes);
+                dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
+                dnb.setResolutionStatusId(4); // set to closed
+                dnb.setColumn("value"); // this is needed for DN Map object
+                dnb.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
+                dnb.setOwner(getUserAccount(getInputUsername(study, studySubject)));
+                dnb.setParentDnId(parentDiscrepancyNote.getId());
+                dnb.setActivated(false);
+                dnb = (DiscrepancyNoteBean) dndao.create(dnb); // create child DN
+                dndao.createMapping(dnb); // create DN mapping
 
-				DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
-				itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-				itemParentNote.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
-				dndao.update(itemParentNote); // update parent DN
-				dndao.updateAssignedUser(itemParentNote); // update parent DN assigned user
-			}
-		}
-		iddao = new ItemDataDAO(ds);
-		ItemDataBean idBean = (ItemDataBean) iddao.findByPK(itemdata.getId());
+                DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
+                itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                itemParentNote.setAssignedUserId(getUserAccount(getInputUsername(study, studySubject)).getId());
+                dndao.update(itemParentNote); // update parent DN
+                dndao.updateAssignedUser(itemParentNote); // update parent DN assigned user
+            }
+        }
+        iddao = new ItemDataDAO(ds);
+        ItemDataBean idBean = (ItemDataBean) iddao.findByPK(itemdata.getId());
 
-		// Updating Dn_item_data_map actovated column into false for the existing DNs
-		ArrayList<DiscrepancyNoteBean> dnBeans = dndao.findExistingNotesForItemData(itemdata.getId());
-		if (dnBeans.size() != 0) {
-			DiscrepancyNoteBean dnBean = new DiscrepancyNoteBean();
-			dnBean.setEntityId(itemdata.getId());
-			dnBean.setActivated(false);
-			dndao.updateDnMapActivation(dnBean);
-		}
+        // Updating Dn_item_data_map actovated column into false for the existing DNs
+        ArrayList<DiscrepancyNoteBean> dnBeans = dndao.findExistingNotesForItemData(itemdata.getId());
+        if (dnBeans.size() != 0) {
+            DiscrepancyNoteBean dnBean = new DiscrepancyNoteBean();
+            dnBean.setEntityId(itemdata.getId());
+            dnBean.setActivated(false);
+            dndao.updateDnMapActivation(dnBean);
+        }
 
-	}
-	
+    }
+    
 }
