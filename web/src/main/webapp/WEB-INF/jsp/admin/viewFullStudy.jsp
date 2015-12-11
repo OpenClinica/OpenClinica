@@ -657,14 +657,20 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
-
+    
+    
+    <c:choose>
+    <c:when test="${studyToView.studyParameterConfig.participantPortal=='enabled'}">    
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
         <td class="table_cell">
             <fmt:message key="${studyToView.studyParameterConfig.participantPortal}" bundle="${resword}"/>
        </td>
-    </tr>
-
+      </tr>
+    </c:when>
+    </c:choose>
+    
+    
 </table>
 
 </div>
