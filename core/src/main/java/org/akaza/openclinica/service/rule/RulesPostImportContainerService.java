@@ -362,10 +362,10 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean ,List<RuleSetBean> eventActionsRuleSetBean ) {
         RuleActionRunBean ruleActionRun= ruleActionBean.getRuleActionRun(); 
-        if ( !ruleActionRun.getInitialDataEntry() && !ruleActionRun.getAdministrativeDataEntry() && !ruleActionRun.getBatch() && !ruleActionRun.getDoubleDataEntry() && !ruleActionRun.getImportDataEntry())
+           if (ruleActionBean.getActionType().getCode() !=6 && !ruleActionRun.getInitialDataEntry() && !ruleActionRun.getAdministrativeDataEntry() && !ruleActionRun.getBatch() && !ruleActionRun.getDoubleDataEntry() && !ruleActionRun.getImportDataEntry())
                ruleSetBeanWrapper.error(createError("OCRERR_0050"));
-        
-         String message ="";
+
+           String message ="";
          String emailSubject="";
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.NotificationActionBean){
 			 message = ((NotificationActionBean) ruleActionBean).getMessage();
