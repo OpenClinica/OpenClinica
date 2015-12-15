@@ -147,6 +147,11 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject impleme
                 return false;
         } else if (!summary.equals(other.summary))
             return false;
+        if (ruleActionRun == null) {
+            if (other.ruleActionRun != null)
+                return false;
+        } else if (!ruleActionRun.equals(other.ruleActionRun))
+            return false;
         return true;
     }
 

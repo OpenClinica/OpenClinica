@@ -190,6 +190,16 @@
         </sql>
     </query>
     <query>
+        <name>findAllBySubjectIdOrdered</name>
+        <sql>
+			SELECT se.*
+            FROM study_event se, study_event_definition sed
+            WHERE se.study_event_definition_id = sed.study_event_definition_id
+            	AND se.study_subject_id=?			 
+            ORDER BY date(se.date_start) ASC, sed.ordinal ASC, se.sample_ordinal ASC
+        </sql>
+    </query>
+    <query>
         <name>findAllByStudySubject</name>
         <sql>
             SELECT se.* FROM study_event se, study_event_definition sed
@@ -307,16 +317,7 @@
 			  JOIN event_definition_crf edc ON sed.study_event_definition_id = edc.study_event_definition_id
 			  JOIN crf_version cv ON cv.crf_version_id = edc.default_version_id
 			  LEFT JOIN event_crf ec on edc.default_version_id = ec.crf_version_id AND ec.study_event_id = se.study_event_id
-			WHERE se.status_id = 1 AND se.subject_event_status_id = 3 AND ss.oc_oid = ? AND edc.participant_form = TRUE AND (ec.event_crf_id IS NULL OR event_crf_id NOT IN 
-			  (SELECT DISTINCT ec.event_crf_id 
-			    FROM study_event se, study_subject ss, event_crf ec,item_data id
-			    WHERE se.study_subject_id = ss.study_subject_id
-			      AND se.study_event_id = ec.study_event_id
-			      AND id.event_crf_id = ec.event_crf_id
-			      AND se.status_id = 1
-			      AND se.subject_event_status_id = 3
-			      AND ss.oc_oid = ?
-			      AND id.item_data_id IS NOT NULL))
+			WHERE se.status_id = 1 AND se.subject_event_status_id = 3 AND ss.oc_oid = ? AND edc.participant_form = TRUE AND (ec.event_crf_id IS NULL OR ec.status_id = 1) 
 			  ) filter ON se2.study_event_id = filter.study_event_id
 			ORDER BY date(se2.date_start) ASC, filter.ordinal ASC, se2.sample_ordinal ASC
 			LIMIT 1

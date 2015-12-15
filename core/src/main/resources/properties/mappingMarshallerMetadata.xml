@@ -225,6 +225,28 @@
      </class>
      
      
+     <class name="org.akaza.openclinica.domain.rule.action.RandomizeActionBean">
+        <map-to xml="RandomizeAction" ns-prefix="OpenClinicaRules" />
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
+        </field>
+           <field name="stratificationFactors" container="false"
+            type="org.akaza.openclinica.domain.rule.action.StratificationFactorBean"
+            collection="arraylist">
+            <bind-xml name="StratificationFactors"/>
+        </field>
+        
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+     </class>
      
          <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
         <map-to xml="EventAction" ns-prefix="OpenClinicaRules" />
@@ -252,6 +274,13 @@
 
        
      </class>
+ 
+     <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" >
+        <map-to xml="StratificationFactor"/>
+        <field name="stratificationFactor.value" type="string">
+            <bind-xml node="text"/>         
+       </field>
+     </class>            
  
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" >

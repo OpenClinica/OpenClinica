@@ -57,13 +57,13 @@ public class InsertActionProcessor implements ActionProcessor {
 
     private RuleActionBean saveWithStatusUpdated(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         itemDataBean.setStatus(Status.UNAVAILABLE);
-        getItemMetadataService().insert(itemDataBean, ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
+        getItemMetadataService().insert(itemDataBean, ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet,null);
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
+        getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet,null);
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }

@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
@@ -703,6 +704,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         
         public void appendDest(HtmlBuilder builder, RuleActionBean ruleAction) {
             ActionType actionType = ruleAction.getActionType();
+            if(actionType==ActionType.RANDOMIZE) {
+                RandomizeActionBean a = (RandomizeActionBean)ruleAction;
+                appendDestProps(builder,a.getProperties());
+                appendStratificationFactors(builder, a.getStratificationFactors());
+            }
             if(actionType==ActionType.INSERT) {
                 InsertActionBean a = (InsertActionBean)ruleAction;
                 appendDestProps(builder,a.getProperties());
@@ -745,6 +751,31 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
             }
         }
+
+
+        private void appendStratificationFactors(HtmlBuilder builder,
+                List<org.akaza.openclinica.domain.rule.action.StratificationFactorBean> factorBeans) {
+            if(factorBeans!=null && factorBeans.size()>0) {
+                String s = "";
+                for(org.akaza.openclinica.domain.rule.action.StratificationFactorBean p : factorBeans) {
+                   if(p.getStratificationFactor()!=null){
+                        s +=p.getStratificationFactor().getValue()+", ";
+                    }
+                        
+                }
+                s = s.trim(); 
+                
+                if(s.length()>0)
+                s = s.substring(0,s.length()-1);
+                builder.tr(1).close().td(1).close().append("<i>" + resword.getString("stratification_factor_colon") + "</i>").tdEnd()
+                .td(1).close().append(s).tdEnd().td(1).close().tdEnd();
+                builder.trEnd(1);
+                builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
+                builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
+            }
+        }
+
+
     }
 
     private class ActionTypeDroplistFilterEditor extends DroplistFilterEditor {

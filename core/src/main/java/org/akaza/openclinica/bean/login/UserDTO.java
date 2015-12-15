@@ -8,6 +8,7 @@ private String mobile;
 private String userName;
 private String password;
 private String accessCode;
+private String apiKey;
 private String email;
 private String studySubjectId;
 
@@ -47,6 +48,12 @@ public String getAccessCode() {
 }
 public void setAccessCode(String accessCode) {
 	this.accessCode = accessCode;
+}
+public String getApiKey() {
+    return apiKey;
+}
+public void setApiKey(String value) {
+    this.apiKey = value;
 }
 public String getPassword() {
 	return password;

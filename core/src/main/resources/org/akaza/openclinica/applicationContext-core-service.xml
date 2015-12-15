@@ -21,7 +21,9 @@
 
     <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
         <constructor-arg ref="dataSource"/>
+        <property name="randomizeService" ref="randomizeService"/>
     </bean>
+    
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
         <property name="dataSource" ref="dataSource"/>
         <property name="beanPropertyService" ref="beanPropertyService"/>
@@ -39,12 +41,19 @@
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
+    <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
     <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
         <constructor-arg ref="dataSource"/>
     </bean>
 
     <bean id="eventActionValidator" class="org.akaza.openclinica.validator.rule.action.EventActionValidator">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="randomizeActionValidator" class="org.akaza.openclinica.validator.rule.action.RandomizeActionValidator">
         <constructor-arg ref="dataSource"/>
     </bean>
 
@@ -124,10 +133,6 @@
    
 <bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
       <constructor-arg ref="dataSource"/>
-      <constructor-arg ref="authoritiesDao"/>
-        <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
-        <property name="dynamicsItemGroupMetadataDao" ref="dynamicsItemGroupMetadataDao"/>
-        <property name="dynamicsItemFormMetadataDao" ref="dynamicsItemFormMetadataDao"/>
     </bean>
      
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">

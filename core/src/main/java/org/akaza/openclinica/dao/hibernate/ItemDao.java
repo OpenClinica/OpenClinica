@@ -2,8 +2,9 @@ package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
 
+import org.akaza.openclinica.bean.oid.ItemOidGenerator;
+import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 
 public class ItemDao extends AbstractDomainDao<Item> {
 
@@ -40,6 +41,27 @@ public class ItemDao extends AbstractDomainDao<Item> {
                 + " and fgim.item_id=i.item_id order by i.item_id";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
         return (ArrayList<Item>) q.list();
-
     }
+
+    public String getValidOid(Item item, String crfName, String itemLabel, ArrayList<String> oidList) {
+    OidGenerator oidGenerator = new ItemOidGenerator();
+        String oid = getOid(item, crfName, itemLabel);
+        String oidPreRandomization = oid;
+        while (findByOcOID(oid) != null || oidList.contains(oid)) {
+            oid = oidGenerator.randomizeOid(oidPreRandomization);
+        }
+        return oid;
+    }
+
+    private String getOid(Item item, String crfName, String itemLabel) {
+        OidGenerator oidGenerator = new ItemOidGenerator();
+        String oid;
+        try {
+            oid = item.getOcOid() != null ? item.getOcOid() : oidGenerator.generateOid(crfName, itemLabel);
+            return oid;
+        } catch (Exception e) {
+            throw new RuntimeException("CANNOT GENERATE OID");
+        }
+    }
+
 }

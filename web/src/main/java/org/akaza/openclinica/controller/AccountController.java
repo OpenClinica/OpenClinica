@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @Controller
 @RequestMapping(value = "/accounts")
@@ -162,6 +163,7 @@ public class AccountController {
 	 *                    "lName": "Jackson",
 	 *                    "mobile": "",
 	 *                    "accessCode": "",
+	 *                    "apiKey": "6e8b69f6fb774e899f9a6c349c5adace",
 	 *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
 	 *                    "email": "abc@yahoo.com",
 	 *                    "userName": "crc_user",
@@ -268,7 +270,24 @@ public class AccountController {
 		if (!accessCodeAccountBean.isActive())
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
+        // Since 3.8, openclinica participate needs to be able to use api from openclinica using api_key
+        // Copied from UserAccountController.java
+        // This code should've been in liquibase migration for better readability.
+        if (accessCodeAccountBean.getApiKey() == null || accessCodeAccountBean.getApiKey().isEmpty()) {
+            String apiKey = null;
+            do {
+                apiKey = getRandom32ChApiKey();
+            } while (isApiKeyExist(apiKey));
+            accessCodeAccountBean.setEnableApiKey(true);
+            accessCodeAccountBean.setApiKey(apiKey);
+            updateUserAccount(accessCodeAccountBean);
+        }
+
 		buildUserDTO(accessCodeAccountBean);
+        // Client want to trade access_code for api_key, for later usage of our api.
+        if (accessCodeAccountBean.isEnableApiKey()) {
+            uDTO.setApiKey(accessCodeAccountBean.getApiKey());
+        }
 		return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 	}
 
@@ -579,8 +598,15 @@ public class AccountController {
 		createdUserAccountBean.setAccessCode(accessCode);
 		createdUserAccountBean.setPasswd("5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
 		createdUserAccountBean.setEmail(email);
-		createdUserAccountBean.setEnableApiKey(false);
-		createdUserAccountBean.setApiKey("");
+
+        // Since 3.8, openclinica participate needs to be able to use api from openclinica using api_key
+        // Copied from UserAccountController.java
+        String apiKey = null;
+        do {
+            apiKey = getRandom32ChApiKey();
+        } while (isApiKeyExist(apiKey));
+        createdUserAccountBean.setEnableApiKey(true);
+        createdUserAccountBean.setApiKey(apiKey);
 
 		Role r = Role.RESEARCHASSISTANT2;
 		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
@@ -1003,4 +1029,18 @@ public class AccountController {
 		}
 	}
 
+    public Boolean isApiKeyExist(String uuid) {
+        UserAccountDAO udao = new UserAccountDAO(dataSource);
+        UserAccountBean uBean = (UserAccountBean) udao.findByApiKey(uuid);
+        if (uBean == null || !uBean.isActive()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public String getRandom32ChApiKey() {
+        String uuid = UUID.randomUUID().toString();
+        return uuid.replaceAll("-", "");
+    }
 }

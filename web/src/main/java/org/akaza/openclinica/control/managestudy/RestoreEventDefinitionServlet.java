@@ -197,20 +197,6 @@ public class RestoreEventDefinitionServlet extends SecureController {
         }
         logger.info("Sending email done..");
     }
-    private void baseUrl() throws MalformedURLException{
-    	String portalURL = CoreResources.getField("portalURL");
-        URL pManageUrl = new URL(portalURL);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-
-    	System.out.println("the url :  "+ url);
-    	request.setAttribute("participantUrl",url+"/");
-
-    }
 
 
 }

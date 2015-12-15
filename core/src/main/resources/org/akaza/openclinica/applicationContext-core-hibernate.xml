@@ -40,7 +40,9 @@
                 <value>org.akaza.openclinica.domain.rule.action.HideActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.InsertActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.EventActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RandomizeActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.StratificationFactorBean</value>
                 <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
                 <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
                 <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>
@@ -103,8 +105,8 @@
                 <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>  
                 <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>   -->
+                <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValueId</value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>   -->
@@ -120,15 +122,13 @@
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">true</prop>
                 <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
-           <!-- <prop key="hibernate.cache.region.factory_class"> net.sf.ehcache.hibernate.EhCacheRegionFactory</prop> -->
-           <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>           
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
-               
-               <!--  <prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop> -->
-				<prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
-            <prop key="hibernate.generate_statistics">true</prop>
-               <prop key="hibernate.cache.use_query_cache">true</prop>
-               <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
+                <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
+                <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
             </props>
         </property>
         <property name="namingStrategy">
@@ -179,6 +179,7 @@
   <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfVersionMediaDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
@@ -192,6 +193,7 @@
   <bean id="itemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
     <property name="dataSource" ref="dataSource"/>

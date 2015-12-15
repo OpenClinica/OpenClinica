@@ -1,18 +1,13 @@
 package org.akaza.openclinica.service.crfdata;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
@@ -22,15 +17,11 @@ import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemReferenceTypeDao;
-import org.akaza.openclinica.dao.hibernate.ResponseSetDao;
 import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
 import org.akaza.openclinica.dao.hibernate.SectionDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
@@ -99,9 +90,6 @@ public class XformMetaDataService {
     private ItemFormMetadataDao itemFormMetadataDao;
 
     @Autowired
-    private ResponseSetDao responseSetDao;
-
-    @Autowired
     private ItemDao itemDao;
 
     @Autowired
@@ -112,9 +100,6 @@ public class XformMetaDataService {
 
     @Autowired
     private ResponseTypeDao responseTypeDao;
-
-    @Autowired
-    private DataSource datasource;
 
     @Autowired
     private ResponseSetService responseSetService;
@@ -148,21 +133,24 @@ public class XformMetaDataService {
         CrfBean crf = null;
         if (version.getCrfId() > 0) {
             crf = (CrfBean) crfDao.findById(version.getCrfId());
+            crf.setUpdateId(ub.getId());
+            crf.setDateUpdated(new Date());
+            crfDao.saveOrUpdate(crf);
         } else {
-            CRFDAO oldCRFDAO = new CRFDAO(datasource);
             crf = new CrfBean();
             crf.setName(submittedCrfName);
             crf.setDescription(submittedCrfVersionDescription);
             crf.setUserAccount(userDao.findById(ub.getId()));
             crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             crf.setStudy(studyDao.findById(currentStudy.getId()));
-            crf.setOcOid(oldCRFDAO.getValidOid(new CRFBean(), submittedCrfName));
-            crfDao.saveOrUpdate(crf);
-            crf = (CrfBean) crfDao.findByName(crf.getName());
+            crf.setOcOid(crfDao.getValidOid(new CrfBean(), submittedCrfName));
+            crf.setUpdateId(ub.getId());
+            crf.setDateUpdated(new Date());
+            Integer crfId = (Integer) crfDao.save(crf);
+            crf.setCrfId(crfId);
         }
 
         // Create new CRF Version
-        CRFVersionDAO oldCRFVersionDAO = new CRFVersionDAO(datasource);
         CrfVersion crfVersion = new CrfVersion();
         crfVersion.setName(submittedCrfVersionName);
         crfVersion.setDescription(submittedCrfVersionDescription);
@@ -170,11 +158,11 @@ public class XformMetaDataService {
         crfVersion.setUserAccount(userDao.findById(ub.getId()));
         crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         crfVersion.setRevisionNotes(submittedRevisionNotes);
-        crfVersion.setOcOid(oldCRFVersionDAO.getValidOid(new CRFVersionBean(), crf.getOcOid(), crfVersion.getName()));
+        crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
         crfVersion.setXform(submittedXformText);
         crfVersion.setXformName(container.getInstanceName());
-        crfVersionDao.saveOrUpdate(crfVersion);
-        crfVersion = crfVersionDao.findByOcOID(crfVersion.getOcOid());
+        Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
+        crfVersion.setCrfVersionId(crfVersionId);
 
         // Create Section
         Section section = new Section();
@@ -234,7 +222,6 @@ public class XformMetaDataService {
 
     private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion version, Section section,
             UserAccountBean ub, Errors errors) throws Exception {
-        ItemGroupDAO itemGroupDAO = new ItemGroupDAO(datasource);
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
         ArrayList<String> usedItemOids = new ArrayList<String>();
@@ -250,11 +237,10 @@ public class XformMetaDataService {
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
-                itemGroup.setOcOid(itemGroupDAO.getValidOid(new ItemGroupBean(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
+                itemGroup.setOcOid(itemGroupDao.getValidOid(new ItemGroup(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
                 usedGroupOids.add(itemGroup.getOcOid());
-                // dbgroup.setDateCreated(dateCreated)
-                itemGroupDao.saveOrUpdate(itemGroup);
-                itemGroup = itemGroupDao.findByOcOID(itemGroup.getOcOid());
+                Integer itemGroupId = (Integer) itemGroupDao.save(itemGroup);
+                itemGroup.setItemGroupId(itemGroupId);
             }
             List<UserControl> widgets = null;
             boolean isRepeating = false;
@@ -352,7 +338,6 @@ public class XformMetaDataService {
 
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
             ArrayList<String> usedItemOids, Errors errors) throws Exception {
-        ItemDAO itemDAO = new ItemDAO(datasource);
         ItemDataType newDataType = getItemDataType(html, xformItem);
 
         if (newDataType == null) {
@@ -374,11 +359,10 @@ public class XformMetaDataService {
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
-            // TODO: DATE_CREATED,
-            item.setOcOid(itemDAO.getValidOid(new ItemBean(), crf.getName(), xformItem.getItemName(), usedItemOids));
+            item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
             usedItemOids.add(item.getOcOid());
-            itemDao.saveOrUpdate(item);
-            item = itemDao.findByOcOID(item.getOcOid());
+            Integer itemId = (Integer) itemDao.save(item);
+            item.setItemId(itemId);
         }
         ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType);
         DataBinder dataBinder = new DataBinder(item);

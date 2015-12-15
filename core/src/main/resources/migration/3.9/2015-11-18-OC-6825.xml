@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+    <changeSet author="jkeremian" id="2015-11-18-6825-02" dbms="postgresql">
+        <comment>Create a new table named rule_action_factor</comment>
+        <createTable tableName="rule_action_stratification_factor">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="rule_action_id" type="int"/>
+            <column name="version" type="INT"/>
+            <column name="rule_expression_id" type="INT"/>
+        </createTable>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>
+    
+    

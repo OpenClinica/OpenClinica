@@ -87,6 +87,31 @@
 				<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</DestinationProperty>
 			</InsertAction>
+			<RandomizeAction IfExpressionEvaluates="true">
+			<!-- Run defines when the Rule Action should be executed. Specify when the Rule should execute 
+				by indicating "true" or "false" for each given condition. -->
+				<Run AdministrativeDataEntry="true" InitialDataEntry="true"	DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
+				<!-- DestinationProperty is the item that will get the value inserted 
+					based on the rule expression. If it is part of the same group as the target, 
+					you only need to provide the ITEM OID. If it is in a different group, but 
+					the same CRF, you must provide the GROUP OID with the ITEM OID. If the item 
+					is in a different CRF, you must provide the CRF OID, GROUP OID, and ITEM OID. 
+					If you want to insert a static value into the specified DestinationProperty, specify 
+					that value in the Value="" clause. If you want to insert the value of another item into 
+					the specified DestinationProperty, remove the Value="" clause and use the ValueExpression 
+					clause below instead. -->
+				<DestinationProperty OID="" Value="">
+				<!-- ValueExpression is used to copy a value from one item into the DestinationProperty Item. 
+					If it is part of the same group as the Target, you only need to provide the 
+					ITEM OID. If it is in a different Group, but the same CRF, you must provide 
+					the GROUP OID with the ITEM OID. If the item is in a different CRF, you must 
+					provide the CRF OID, GROUP OID, and ITEM OID. If you are inserting a static value
+					into the DestinationProperty, use the Value="" clause above and delete the ValueExpression 
+					clause.-->
+				<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+				</DestinationProperty>
+			</RandomizeAction>
+
 			<!-- The NotificationAction is used to send an SMS and/or email notification to a Study Participant, 
 				or an email notification to any specified email address. You can specify that the 
 				NotificationAction should occur based on the Expression evaluating to either "true" or "false".-->

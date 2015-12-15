@@ -54,6 +54,22 @@
     </sql>
   </query>
   <query>
+    <name>findGroupByGroupNameCRFVersionID</name>
+    <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm
+      where ig.item_group_id = igm.item_group_id
+      and igm.crf_version_id=? and ig.name=?
+    </sql>
+  </query>
+  <query>
+    <name>findGroupByItemIdCRFVersionID</name>
+    <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm
+      where ig.item_group_id = igm.item_group_id
+      and igm.crf_version_id=? and igm.item_id=?
+    </sql>
+  </query>
+  <query>
     <name>findGroupBySectionId</name>
     <sql>
       select distinct ig.* from item_group ig, item_group_metadata igm,

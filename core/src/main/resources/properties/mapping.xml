@@ -191,6 +191,27 @@
        </field>
      </class>
      
+     <class name="org.akaza.openclinica.domain.rule.action.RandomizeActionBean">
+        <map-to xml="RandomizeAction" />
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
+        </field>
+        <field name="stratificationFactors" container="false"
+            type="org.akaza.openclinica.domain.rule.action.StratificationFactorBean"
+            collection="arraylist">
+            <bind-xml name="StratificationFactors"/>
+        </field>
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+     </class>
      <class name="org.akaza.openclinica.domain.rule.action.EventActionBean">
         <map-to xml="EventAction" />
         <field name="Properties"
@@ -211,6 +232,14 @@
                <bind-xml name="RunOnStatus"/>
        </field>
      </class>
+     
+
+     <class name="org.akaza.openclinica.domain.rule.action.StratificationFactorBean" auto-complete="true">
+     	<field name="expressionAsString" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+            <bind-xml node="text"/>         
+        </field>
+     </class>
+
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
         <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">

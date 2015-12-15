@@ -204,6 +204,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			eventName = eventName + "(" + eventOrdinal + ")";
 
 		String studyName = getStudyBean(studyId).getName();
+		if (message==null) message="";
+        if (emailSubject==null) emailSubject="";
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 		message = message.replaceAll("\\$\\{study.name}", studyName);
 		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2015-12-07-OC-1176-01" dbms="postgresql">
+		<comment>Change character width for expression column of Rule_Expression Table</comment>
+		<sql>
+        ALTER TABLE rule_expression ALTER COLUMN value TYPE varchar(2040);
+ </sql>
+		<rollback>
+			<sql></sql>
+		</rollback>
+	</changeSet>
+
+
+
+</databaseChangeLog>
+    
+    

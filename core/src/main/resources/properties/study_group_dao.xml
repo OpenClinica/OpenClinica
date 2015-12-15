@@ -40,6 +40,19 @@
     </query>
 
 	<query>
+		<name>findSubjectStudyGroup</name>
+		<sql>
+select * from study_group sg, subject_group_map sgm, study_group_class sgc where 
+sgm.study_group_class_id=sgc.study_group_class_id
+and
+sgm.study_group_id=sg.study_group_id
+and sgm.study_subject_id =?
+and sgc.name=?
+		</sql>
+    </query>
+
+
+	<query>
 		<name>findSubjectGroupMaps</name>
 		<sql>
 			SELECT sg.*, sgmap.study_subject_id

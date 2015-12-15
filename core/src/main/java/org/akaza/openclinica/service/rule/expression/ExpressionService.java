@@ -387,58 +387,59 @@ public class ExpressionService {
 				}
         	}
         	
+        	
+        	String fullExpression="";
             if (isExpressionPartial(expression)) {
-                String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
-                List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
-               
-                fullExpression =
-                    fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
-                if (checkSyntax(fullExpression)) {
-                    String valueFromForm = null;
-                    if (items == null) {
-                        valueFromForm = getValueFromForm(fullExpression);
-                    } else {
-                        valueFromForm = getValueFromForm(fullExpression, items);
-                    }
-                    String valueFromDb = null;
-                    if (itemBeansI == null) {
-                        valueFromDb = getValueFromDb(fullExpression, itemDatas);
-                    } else {
-                        valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
-                    }
-                    logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
-                    if (valueFromForm == null && valueFromDb == null) {
-                        throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
-                            expressionWrapper.getRuleSet().getTarget().getValue() });
-                    }
-                    /*
-                     * if (valueFromForm != null) { // TODO: Do this if type a
-                     * date String dateFormat =
-                     * ResourceBundleProvider.getFormatBundle
-                     * ().getString("date_format_string"); String dateRegexp =
-                     * ResourceBundleProvider
-                     * .getFormatBundle().getString("date_regexp");
-                     * valueFromForm =
-                     * ExpressionTreeHelper.isValidDate(valueFromForm,
-                     * dateFormat, dateRegexp); }
-                     */
-                    value = valueFromForm == null ? valueFromDb : valueFromForm;
-                }
+                 fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
+                 value = getValueFromDbOrForm(fullExpression,itemBeansI);
+
             } else {
-                // So Expression is not Partial
-                if (checkSyntax(expression)) {
-                    String valueFromDb = getValueFromDbb(expression);
-                    if (valueFromDb == null) {
-                        throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
-                    }
-                    logger.debug("valueFromDb : {}", valueFromDb);
-                    value = valueFromDb;
-                }
-            }
+                
+                String ruleSetExpression = expressionWrapper.getRuleSet().getTarget().getValue();
+                String ruleSetExpressionStudyEventId = getStudyEventDefinitionOidOrdinalFromExpression(ruleSetExpression);
+                StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(Integer.valueOf(ruleSetExpressionStudyEventId));
+
+                int index = expression.indexOf(".",1);
+                String eventOidPart = expression.substring(0, index);
+                int subIndex = eventOidPart.indexOf("[");
+                if (subIndex!=-1)
+                    eventOidPart=expression.substring(0, subIndex);   // Get rid of brackets
+                
+                fullExpression = eventOidPart +"["+studyEvent.getId()+"]" + expression.substring(index);
+               value = getValueFromDbOrForm(fullExpression,itemBeansI);
+           }
         }
         return value;
     }
 
+    
+    private String getValueFromDbOrForm(String fullExpression, Map<Integer, ItemBean> itemBeansI){
+        List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
+        fullExpression =
+                fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
+        checkSyntax(fullExpression);
+        String valueFromForm = null;
+        if (items == null) {
+            valueFromForm = getValueFromForm(fullExpression);
+        } else {
+            valueFromForm = getValueFromForm(fullExpression, items);
+        }
+        String valueFromDb = null;
+        if (itemBeansI == null) {
+            valueFromDb = getValueFromDb(fullExpression, itemDatas);
+        } else {
+            valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
+        }
+        logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+        if (valueFromForm == null && valueFromDb == null) {
+            throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+                expressionWrapper.getRuleSet().getTarget().getValue() });
+        }
+        return  valueFromForm == null ? valueFromDb : valueFromForm;
+    }
+    
+    
+    
     public boolean checkIfExpressionIsForScheduling(String expression){
     	if(expression.toUpperCase().startsWith("SE_")&&(expression.toUpperCase().endsWith(this.STARTDATE)|| expression.toUpperCase().endsWith(this.STATUS))){
     		return true;
@@ -505,6 +506,28 @@ public class ExpressionService {
     }
 
     public boolean isInsertActionExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
+        boolean result = false;
+        boolean isRuleExpressionValid = false;
+
+        Integer k = getExpressionSize(expression);
+        if (k.intValue() > allowedLength.intValue()) {
+            return false;
+        }
+
+        if (ruleSet != null) {
+            String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+            isRuleExpressionValid = checkInsertActionExpressionSyntax(fullExpression);
+
+            if (isRuleExpressionValid) {
+                isExpressionValid(fullExpression);
+                result = true;
+            }
+
+        }
+        return result;
+    }
+
+    public boolean isRandomizeActionExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
 
@@ -841,7 +864,7 @@ public class ExpressionService {
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-                throw new OpenClinicaSystemException("OCRER'R_0019", new String[] { expression });
+                throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
 
             }
         }

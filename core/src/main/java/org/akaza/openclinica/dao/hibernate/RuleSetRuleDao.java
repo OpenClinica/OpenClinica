@@ -10,6 +10,7 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.hibernate.stat.Statistics;
@@ -70,6 +71,9 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
         // Forcing eager fetch of actions & their properties
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetRules) {
             for (RuleActionBean action : ruleSetRuleBean.getActions()) {
+                if (action instanceof RandomizeActionBean) {
+                    ((RandomizeActionBean) action).getProperties().size();
+                }
                 if (action instanceof InsertActionBean) {
                     ((InsertActionBean) action).getProperties().size();
                 }

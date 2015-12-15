@@ -134,6 +134,7 @@ public class OpenRosaXmlGenerator {
             String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
             String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
             logger.debug(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
+            System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -491,6 +492,8 @@ public class OpenRosaXmlGenerator {
             if (isrepeating) {
                 groupElement.setTextContent(repeatGroupMin);
                 groupElement.setAttribute("jr:template", "");
+                Element hiddenOrdinalItem = doc.createElement("REPEAT_ORDINAL");
+                groupElement.appendChild(hiddenOrdinalItem);
             }
             crfElement.appendChild(groupElement);
 
