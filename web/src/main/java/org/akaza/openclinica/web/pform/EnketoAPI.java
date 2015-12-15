@@ -1,6 +1,8 @@
 package org.akaza.openclinica.web.pform;
 
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 public class EnketoAPI {
@@ -75,13 +78,19 @@ public class EnketoAPI {
         return null;
     }
 
-    public EnketoURLResponse getEditURL(String crfOid, String instance, String instanceId, String redirect) {
+    public EnketoURLResponse getEditURL(String crfOid, String instance, String ecid, String redirect) {
         if (enketoURL == null)
             return null;
 
         try {
-            URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
+            // Build instanceId to cache populated instance at Enketo with
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
+            ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
+            String instanceId = encoder.encodePassword(hashString,null);
 
+            URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
             HttpHeaders headers = new HttpHeaders();
