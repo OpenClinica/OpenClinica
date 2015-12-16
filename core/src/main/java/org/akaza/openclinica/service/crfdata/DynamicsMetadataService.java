@@ -604,6 +604,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     }
                     // Create new event crf
                     eventCrfBeanB = eventCrfBeanA.copy();
+                    eventCrfBeanB.setStatus(Status.AVAILABLE);
                     eventCrfBeanB.setId(0);
                     eventCrfBeanB.setCRFVersionId(crfVersionId);
                     eventCrfBeanB = (EventCRFBean) getEventCRFDAO().create(eventCrfBeanB);
