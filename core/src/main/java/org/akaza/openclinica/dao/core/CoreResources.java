@@ -363,7 +363,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         String supportURL = DATAINFO.getProperty("supportURL");
         if (supportURL == null || supportURL.isEmpty())
-            supportURL = "https://www.openclinica.com/support/";
+            supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
 
         DATAINFO.setProperty("show_unique_id", "1");
