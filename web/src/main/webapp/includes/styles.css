@@ -2089,3 +2089,19 @@ margin: 2px;;
 
 #excel_file_path{ width: 307px; 
 }
+
+
+div.formfieldFile_BG {
+    width: 120px;
+    height: 25px;
+    background: url(../images/upload.png);
+    overflow: hidden;
+}
+
+div.formfieldFile_BG input {
+    display: block !important;
+    width: 120px !important;
+    height: 25px !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+}
