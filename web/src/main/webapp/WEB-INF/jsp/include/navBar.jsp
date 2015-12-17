@@ -7,12 +7,12 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <script language="JavaScript">
-        function reportBug() {
+        /*function reportBug() {
             var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
             var user= "<c:out value="${userBean.name}"/>";
             bugtrack = bugtrack + user+ "&url=" + window.location.href;
             openDocWindow(bugtrack);
-        }
+        }*/
         function confirmCancel(pageName){
             var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
             if(confirm1){
@@ -140,7 +140,7 @@
                                     <td align="right" style="font-weight: normal;">
 
                                         <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                            <a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;
+                                            <!--<a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;-->
                                             <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
                                             <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
