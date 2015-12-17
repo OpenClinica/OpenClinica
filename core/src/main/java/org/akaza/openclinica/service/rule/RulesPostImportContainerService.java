@@ -370,6 +370,10 @@ public class RulesPostImportContainerService {
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.NotificationActionBean){
 			 message = ((NotificationActionBean) ruleActionBean).getMessage();
 			 emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
+			if (emailSubject.length() > 510) 
+			ruleSetBeanWrapper.error(createError("OCRERR_0048"));
+			if (message.length() > 2040) 
+			ruleSetBeanWrapper.error(createError("OCRERR_0049"));		
 		}
 
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean)
