@@ -842,4 +842,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return this.executeFindAllQuery("findAllByEventCRFIdAndItemGroupId", variables);
     }
+
+	public void undelete(int itemDataId, int updaterId) {
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+        variables.put(new Integer(1), new Integer(updaterId));
+        variables.put(new Integer(2), new Integer(itemDataId));
+
+        this.execute(digester.getQuery("undelete"), variables);
+        return;
+
+	}
 }

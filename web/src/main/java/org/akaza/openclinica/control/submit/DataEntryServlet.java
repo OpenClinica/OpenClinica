@@ -1559,6 +1559,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             // update an item data won't touch its ordinal
                           //  int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
 
+                            // Determine if any items in this group have data.  If so we need to undelete and previously deleted items.
+                            boolean undelete = false;
+                            for (DisplayItemBean displayItem : items) {
+                                String currItemVal = displayItem.getData().getValue();
+                                if (currItemVal != null && !currItemVal.equals("")){ 
+                                    undelete = true;
+                                    break;
+                                }
+                            }
 
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
@@ -1574,9 +1583,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 writeDN = writeDN(displayItem);
                                 //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
                                 nextOrdinal =      displayItem.getData().getOrdinal();
+                                
                                 temp = writeToDB(displayItem, iddao, nextOrdinal, request);
                                 LOGGER.debug("just executed writeToDB - 1");
                                 LOGGER.debug("next ordinal: " + nextOrdinal);
+                                
+                                // Undelete item if any item in the repeating group has data.
+                                if (undelete && displayItem.getDbData() != null && displayItem.getDbData().isDeleted()) {
+                                    iddao.undelete(displayItem.getDbData().getId(),ub.getId());
+                                }
+
                                 if (temp && newUploadedFiles.containsKey(fileName)) {
                                     newUploadedFiles.remove(fileName);
                                 }

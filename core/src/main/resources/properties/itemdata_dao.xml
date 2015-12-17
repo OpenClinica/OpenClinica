@@ -42,11 +42,17 @@
 		VALUE=?,UPDATE_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
-	<query>
+    <query>
         <name>updateUser</name>
         <sql>UPDATE ITEM_DATA SET
             DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
         ITEM_DATA_ID=?</sql>
+    </query>
+    <query>
+        <name>undelete</name>
+        <sql>UPDATE item_data SET
+            date_updated=NOW(), update_id=?, deleted=false WHERE
+        item_data_id=?</sql>
     </query>
 	<query>
 		<name>delete</name>
