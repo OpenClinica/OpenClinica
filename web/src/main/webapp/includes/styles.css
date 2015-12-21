@@ -2074,6 +2074,42 @@ margin: 2px;;
 	padding-right:10px;
 	display:none;
 }
+.randomization-text {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #4D4D4D;	
+}
+
+.randomization-sample-url {
+	font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #B6B6B4;
+}
+
+.randomization-warnings {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #D00000;
+}
+
+.randomization-inactive-status {
+	color: #FF0000;
+}
+
+.randomization-active-status {
+	color: #006633;
+}
+
+.randomization-registration-div {
+	padding-left:10px;
+	padding-bottom:10px;
+	padding-right:10px;
+	display:none;
+}
+
 .crf-upload-div {
 	display:inline;
 }
@@ -2089,20 +2125,3 @@ margin: 2px;;
 
 #excel_file_path{ width: 307px; 
 }
-
-/*
-div.formfieldFile_BG {
-    width: 120px;
-    height: 25px;
-    background: url(../images/upload.png);
-    overflow: hidden;
-}
-
-div.formfieldFile_BG input {
-    display: block !important;
-    width: 120px !important;
-    height: 25px !important;
-    opacity: 0 !important;
-    overflow: hidden !important;
-}
-*/
