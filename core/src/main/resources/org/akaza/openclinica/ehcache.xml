@@ -65,5 +65,13 @@
   overflowToDisk="false">
 </cache>
 
+<cache name="randomizeObject"
+  maxElementsInMemory="200"
+  eternal="false"
+  timeToIdleSeconds="10000"
+  timeToLiveSeconds="10000"
+  overflowToDisk="false">
+</cache>
+
 </ehcache>
 

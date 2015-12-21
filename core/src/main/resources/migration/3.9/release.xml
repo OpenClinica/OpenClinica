@@ -5,4 +5,5 @@
        <include file="migration/3.9/2015-11-18-OC-6825.xml"/>
        <include file="migration/3.9/2015-12-07-OC-6483.xml"/>
        <include file="migration/3.9/2015-12-07-OC-1176.xml"/>
+       <include file="migration/3.9/2015-12-08-OC-6847.xml"/>
 </databaseChangeLog>
