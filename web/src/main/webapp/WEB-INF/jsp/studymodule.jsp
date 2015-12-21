@@ -78,6 +78,36 @@
     }
     
 </script>
+  
+ <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+  
+      <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#requestRandomizationAccess').click(function() {
+                jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+            });
+
+            jQuery('#cancelRandomizationAccessRequest').click(function() {
+                jQuery.unblockUI();
+                $('#randomizationWarnings').empty();
+            });
+            // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
+            var warnings = "${regMessages}";
+            if (warnings.length > 0) { 
+            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } }); 
+            }
+        });
+        
+        // Hide the popup window if the escape key is pressed
+        jQuery(document).keyup(function(keyPressed) {
+            if(keyPressed.keyCode === 27) {
+                $('#randomizationWarnings').empty();
+                jQuery.unblockUI();
+            }
+        });
+    </script>
+</c:if>
+  
     
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <script type="text/javascript">
@@ -557,7 +587,7 @@
   <br>
   <br>
 
-  <c:if test="${portalURL!= '' && portalURL!= null}">
+ 
       <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
           <thead>
           <tr>
@@ -568,6 +598,9 @@
               <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
               </tr>
           </thead>
+          
+            <c:if test="${portalURL!= '' && portalURL!= null}">
+          
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -609,10 +642,44 @@
                   </td>
               </tr>
           </tbody>
+          </c:if>
+          
+          <tbody>
+              <tr>
+                  <td>&nbsp;</td>
+                  <td><fmt:message key="randomization" bundle="${resword}"/></td>
+                  <td>
+                      <c:choose>
+                          <c:when test="${randomizationOCStatus == 'disabled'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_deactivated" bundle="${resword}"/></span></c:when>
+                          <c:when test="${empty randomizationStatus}"><span id="randomizationStatus"><fmt:message key="randomization_status_notfound" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'PENDING'}"><span id="randomizationStatus"><fmt:message key="randomization_status_pending" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'ACTIVE'}"><span id="randomizationStatus" class="randomization-active-status"><fmt:message key="randomization_status_active" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'INACTIVE'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_inactive" bundle="${resword}"/></span></c:when>
+                      </c:choose>
+                  </td>
+                  <td>
+                  </td>
+                  <td>
+                      <c:url var="reactivateRandomization" value="studymodule/${currentStudy.oid}/reactivaterandomization"/>
+                      <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oid}/deactivaterandomization"/>
+                      <c:choose>
+                          <c:when test="${randomizationOCStatus == 'disabled' && !empty randomizationStatus}">
+                              <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                          </c:when>
+                          <c:when test="${randomizationOCStatus == 'disabled'}">
+                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                          </c:when>
+                          <c:otherwise>
+                              <a href="${deactivateRandomization}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                          </c:otherwise>
+                      </c:choose>
+                  </td>
+              </tr>
+          </tbody>
+
       </table>
       <br>
       <br>
-  </c:if>
   
   <%-- additional table added tbh, 09/05/2009 --%>
   <c:if test="${!empty childStudyUserCount }">
@@ -671,4 +738,22 @@
         </form>
     </div>
 </c:if>
+
+    <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
+        <form action="studymodule/${currentStudy.oid}/randomize" method="post">
+            <h1>
+                <fmt:message key="randomization_reg_title" bundle="${resword}"/>
+                <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">
+                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
+                </a>
+            </h1>
+            <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
+            <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part2" bundle="${resword}"/></p>
+            <br>
+            <input type="submit" id="submitRandomizationAccessRequest" class="button_medium" value="Request Access"/>
+            <input type="button" id="cancelRandomizationAccessRequest" class="button" value="Cancel"/>
+        </form>
+    </div>
+
+
 <jsp:include page="include/footer.jsp"/>

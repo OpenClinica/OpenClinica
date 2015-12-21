@@ -50,7 +50,18 @@ public class StudyParameterConfig {
     private String eventLocationRequired;
     
     private String participantPortal;
-                   
+
+    private String randomization;                       
+    
+    public String getRandomization() {
+        return randomization;
+    }
+
+    public void setRandomization(String randomization) {
+        this.randomization = randomization;
+    }
+
+    
     public String getParticipantPortal() {
 		return participantPortal;
 	}

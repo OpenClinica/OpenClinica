@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -34,6 +35,8 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
+import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -43,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -91,6 +95,8 @@ public class StudyModuleController {
     public static ResourceBundle respage;
     @Autowired
     CoreResources coreResources;
+    @Autowired
+    private JavaMailSenderImpl mailSender;
 
     public StudyModuleController() {
 
@@ -101,9 +107,9 @@ public class StudyModuleController {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
         spv.setStudyId(study.getId());
-        spv.setParameter("participantPortal");
+        spv.setParameter("randomization");
         spv.setValue("disabled");
 
         if (spv.getId() > 0)
@@ -112,6 +118,26 @@ public class StudyModuleController {
             spvdao.create(spv);
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
         currentStudy.getStudyParameterConfig().setParticipantPortal("disabled");
+
+        return "redirect:/pages/studymodule";
+    }
+
+    @RequestMapping(value = "/{study}/deactivaterandomization", method = RequestMethod.GET)
+    public String deactivateRandomization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
+        spv.setStudyId(study.getId());
+        spv.setParameter("randomization");
+        spv.setValue("disabled");
+
+        if (spv.getId() > 0)
+            spvdao.update(spv);
+        else
+            spvdao.create(spv);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        currentStudy.getStudyParameterConfig().setRandomization("disabled");
 
         return "redirect:/pages/studymodule";
     }
@@ -136,6 +162,27 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
+    @RequestMapping(value = "/{study}/reactivaterandomization", method = RequestMethod.GET)
+    public String reactivateRandomization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
+        spv.setStudyId(study.getId());
+        spv.setParameter("randomization");
+        spv.setValue("enabled");
+
+        if (spv.getId() > 0)
+            spvdao.update(spv);
+        else
+            spvdao.create(spv);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        currentStudy.getStudyParameterConfig().setRandomization("enabled");
+
+        return "redirect:/pages/studymodule";
+    }
+
+    
     @RequestMapping(value = "/{study}/register", method = RequestMethod.POST)
     public String registerParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
@@ -186,6 +233,45 @@ public class StudyModuleController {
             StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
             currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
         }
+
+        return "redirect:/pages/studymodule";
+    }
+
+    @RequestMapping(value = "/{study}/randomize", method = RequestMethod.POST)
+    public String registerRandimization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+        studyDao = new StudyDAO(dataSource);
+        StudyBean study = studyDao.findByOid(studyOid);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
+        RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
+
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundleProvider.updateLocale(locale);
+        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+        String status = "";
+
+            // Update OC Study configuration
+    //    randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
+
+        // send another email to sales@openclinica.com thru MandrillViaOcUi                
+        status = randomizationRegistrar.randomizeStudy(study.getOid(), study.getIdentifier());
+
+        if (status.equals("")) {
+    //        addRegMessage(request, respage.getString("randomization_not_available"));
+        } else {
+            // Update OC Study configuration
+         
+            spv.setStudyId(study.getId());
+            spv.setParameter("randomization");
+            spv.setValue("enabled");
+            if (spv.getId() > 0)
+                spvdao.update(spv);
+            else
+                spvdao.create(spv);
+
+            StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+            currentStudy.getStudyParameterConfig().setRandomization("enabled");
+           }
 
         return "redirect:/pages/studymodule";
     }
@@ -332,7 +418,36 @@ public class StudyModuleController {
             map.addAttribute("participateURLDisplay", url);
             map.addAttribute("participateURLFull", url + "/#/login");
         }
+        
 
+        // Load Randomization  information
+        String configServerUrl = CoreResources.getField("configServerUrl");
+        map.addAttribute("configServerUrl", configServerUrl);
+        if (configServerUrl != null && !configServerUrl.equals("")) {
+
+        String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
+            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
+            SeRandomizationDTO randomization=null;
+                randomization = randomizationRegistrar.getRandomizationDTOObject(currentStudy.getOid());
+            String randomizationStatus = "";
+                
+                URL randomizeUrl=null;
+                try {
+                    randomizeUrl = new URL(configServerUrl);
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if (randomization != null && randomization.getStatus() != null)
+                    randomizationStatus = randomization.getStatus();
+                
+                map.addAttribute("randomizeURL", randomizeUrl);
+              map.addAttribute("randomizationOCStatus", randomizationOCStatus);
+                map.addAttribute("randomizationStatus", randomizationStatus);
+
+        }
+            
+        
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
