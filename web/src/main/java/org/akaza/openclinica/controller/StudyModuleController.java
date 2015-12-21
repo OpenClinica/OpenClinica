@@ -249,9 +249,10 @@ public class StudyModuleController {
         ResourceBundleProvider.updateLocale(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         String status = "";
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
             // Update OC Study configuration
-    //    randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
+        randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
 
         // send another email to sales@openclinica.com thru MandrillViaOcUi                
         status = randomizationRegistrar.randomizeStudy(study.getOid(), study.getIdentifier());
@@ -428,7 +429,12 @@ public class StudyModuleController {
         String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
             SeRandomizationDTO randomization=null;
-                randomization = randomizationRegistrar.getRandomizationDTOObject(currentStudy.getOid());
+                try {
+                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid());
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
             String randomizationStatus = "";
                 
                 URL randomizeUrl=null;
