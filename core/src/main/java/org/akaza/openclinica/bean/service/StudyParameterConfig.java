@@ -90,8 +90,11 @@ public class StudyParameterConfig {
         adminForcedReasonForChange = "true";
         eventLocationRequired = "not_used";
         participantPortal="disabled";
+        randomization="disabled";
     }
 
+	
+	
     /**
      * @return Returns the collectDob.
      */
