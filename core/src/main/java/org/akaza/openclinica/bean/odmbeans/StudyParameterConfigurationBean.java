@@ -32,7 +32,15 @@ public class StudyParameterConfigurationBean {
     private String secondatryLabelViewable;
     private String forcedReasonForChangeInAdministrativeEditing;
     private String participantPortal;
+    private String randomization;
     
+    
+    public String getRandomization() {
+        return randomization;
+    }
+    public void setRandomization(String randomization) {
+        this.randomization = randomization;
+    }
     public String getParticipantPortal() {
 		return participantPortal;
 	}
