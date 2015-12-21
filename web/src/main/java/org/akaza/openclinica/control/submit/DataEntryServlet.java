@@ -120,6 +120,7 @@ import org.akaza.openclinica.view.form.DataEntryInputGenerator;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -2196,6 +2197,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // added to allow sections shown on this page
         DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
         displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+        // escape apostrophe in event name
+        displayBean.getStudyEventDefinition().setName(StringEscapeUtils.escapeJavaScript(displayBean.getStudyEventDefinition().getName()));
         request.setAttribute(TOC_DISPLAY, displayBean);
 
         int sectionId = fp.getInt(INPUT_SECTION_ID, true);
