@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -14,6 +15,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -33,6 +35,8 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
+import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -51,7 +55,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class RandomizeService {
+public class RandomizeService extends RandomizationRegistrar {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String ESCAPED_SEPERATOR = "\\.";
     private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
@@ -69,11 +73,14 @@ public class RandomizeService {
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
     CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+    public static final int RANDOMIZATION_READ_TIMEOUT = 10000;
 
     public RandomizeService(DataSource ds) {
         this.ds = ds;
         this.expressionService = new ExpressionService(ds);
     }
+
+    // Rest Call to OCUI to get Randomization
 
     public String getRandomizationCode(EventCRFBean eventCrfBean, List<StratificationFactorBean> stratificationFactorBeans, RuleSetBean ruleSet)
             throws JSONException {
@@ -94,28 +101,48 @@ public class RandomizeService {
         UserAccountBean uBean = (UserAccountBean) udao.findByPK(userId);
         String user = uBean.getName();
 
-        String timezone = "America/New_York";
-        String randomiseUrl = "https://evaluation.sealedenvelope.com/redpill/seti2";
-        String username = "oc";
-        String password = "secret";
-        HttpHeaders headers = createHeaders(username, password);
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        // retrieve json object if Randomization exist ,otherwise return a null object
-        JSONObject jsonRandObject = retrieveARandomisation(randomiseUrl, ssBean, headers);
-        if (jsonRandObject != null) {
-            return (String) jsonRandObject.get("code");
-        } else {
-            // if Site identifier exists ,then update otherwise create new Site identifier
-            addOrUpdateASite(randomiseUrl, sBean, headers, timezone);
+        // sBean should be parent study
+        // put randomization object in cache
+        SeRandomizationDTO randomization = null;
 
-            // send for Randomization
-            JSONObject jsonRandomisedObject = randomiseSubject(randomiseUrl, ssBean, sBean, headers, user, stratificationFactorBeans, eventCrfBean, ruleSet);
-            if (jsonRandomisedObject != null)
-                return (String) jsonRandomisedObject.get("code");
-            else
-                return "";
+        try {
+            randomization = getRandomizationDTOObject(sBean.getOid());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
+        String randomiseUrl = randomization.getUrl();
+        String username = randomization.getUsername();
+        String password = randomization.getPassword();
+        String timezone = "America/New_York";
+
+        if (randomization.getStatusId() == 3) {
+            // String randomiseUrl = "https://evaluation.sealedenvelope.com/redpill/seti2";
+            // String username = "oc";
+            // String password = "secret";
+
+            HttpHeaders headers = createHeaders(username, password);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            // retrieve json object if Randomization exist ,otherwise return a null object
+            JSONObject jsonRandObject = retrieveARandomisation(randomiseUrl, ssBean, headers);
+            if (jsonRandObject != null) {
+                return (String) jsonRandObject.get("code");
+            } else {
+                // if Site identifier exists ,then update otherwise create new Site identifier
+                addOrUpdateASite(randomiseUrl, sBean, headers, timezone);
+
+                // send for Randomization
+                JSONObject jsonRandomisedObject = randomiseSubject(randomiseUrl, ssBean, sBean, headers, user, stratificationFactorBeans, eventCrfBean, ruleSet);
+                if (jsonRandomisedObject != null)
+                    return (String) jsonRandomisedObject.get("code");
+                else
+                    return "";
+            }
+        } else {
+            return "";
+
+        }
     }
 
     private String getExpressionValue(String expr, EventCRFBean eventCrfBean, RuleSetBean ruleSet) {
