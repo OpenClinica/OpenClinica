@@ -130,6 +130,27 @@ public class PformSubmissionService {
         return inputUserName;
     }
 
+    private int getCountCompletedEventCrfsInAStudyEvent(StudyEventBean seBean) {
+        int count = 0;
+        count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
+        return count;
+    }
+    
+    private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId , Integer studyId) {
+        int count = 0;
+        edcdao = new EventDefinitionCRFDAO(ds);
+        count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId , studyId).size();
+        return count;
+    }
+
+    private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId , Integer studyId) {
+        int count = 0;
+        edcdao = new EventDefinitionCRFDAO(ds);
+        count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId , studyId).size();
+        return count;
+    }
+
+
     private EventDefinitionCRFBean getCrfVersionStatusInAEventDefCrf(String crfVersionOid, StudyBean studyBean, StudyEventBean studyEventBean) {
         edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean eventDefinitionCRFBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(),
@@ -147,6 +168,22 @@ public class PformSubmissionService {
         sdao = new StudyDAO(ds);
         StudyBean studyBean = (StudyBean) sdao.findByStudySubjectId(studySubjectBean.getId());
         return studyBean;
+    }
+
+    private StudyBean getStudy(String oid) {
+        sdao = new StudyDAO(ds);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+        return studyBean;
+    }
+
+    private StudyBean getParentStudy(String studyOid) {
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
     }
 
     private StudySubjectBean getStudySubject(String oid) {
@@ -224,10 +261,11 @@ public class PformSubmissionService {
      * @param studyEventDefnId
      * @param studyEventOrdinal
      * @param locale 
+     * @param isAnonymous 
      * @return
      * @throws Exception
      */
-    public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal, CRFVersionBean crfVersion, Locale locale)
+    public Errors saveProcess(String body, String studySubjectOid, Integer studyEventDefnId, Integer studyEventOrdinal, CRFVersionBean crfVersion, Locale locale, boolean isAnonymous)
             throws Exception {
 
         Errors errors = instanciateErrors();
@@ -257,9 +295,9 @@ public class PformSubmissionService {
                 && (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED)) {
             // Read and Parse Payload from Pform
             if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion, locale);
+                errors = readDownloadFileNew(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, crfVersion, locale, isAnonymous);
             else
-                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, locale);
+                errors = readDownloadFile(body, errors, studyBean, studyEventBean, studySubjectBean, studyEventDefinitionBean, locale, isAnonymous);
         } else {
             logger.info("***StudyEvent has a Status Other than Scheduled or Started ***");
             errors.reject("StudyEvent has a Status Other than  Scheduled or Started");
@@ -308,13 +346,39 @@ public class PformSubmissionService {
      * @param studySubjectBean
      * @return
      */
-    private StudyEventBean updateStudyEvent(StudyEventBean seBean, SubjectEventStatus status, StudyBean studyBean, StudySubjectBean studySubjectBean) {
-        sedao = new StudyEventDAO(ds);
-        seBean.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
-        seBean.setUpdatedDate(new Date());
-        seBean.setSubjectEventStatus(status);
-        seBean = (StudyEventBean) sedao.update(seBean);
-        logger.debug("*********UPDATED STUDY EVENT ");
+    private StudyEventBean updateStudyEvent(StudyEventBean seBean, StudyEventDefinitionBean sedBean, StudyBean studyBean, StudySubjectBean studySubjectBean, boolean isAnonymous) {
+        SubjectEventStatus newStatus = null;
+        int crfCount = 0;
+        int completedCrfCount = 0;
+
+        if (!isAnonymous) { 
+            if (seBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
+        } else {
+            // Get a count of CRFs defined for the event
+            if (studyBean.getParentStudyId()!=0)
+                crfCount = getCountCrfsInAEventDefCrfForSite(sedBean.getId(),getParentStudy(studyBean.getOid()).getId());
+            else 
+                crfCount = getCountCrfsInAEventDefCrf(sedBean.getId(),studyBean.getId());
+            // Get a count of completed CRFs for the event
+            completedCrfCount = getCountCompletedEventCrfsInAStudyEvent(seBean);
+
+            if (crfCount == completedCrfCount){
+                if (seBean.getStatus().equals(SubjectEventStatus.SCHEDULED) || seBean.getStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) {
+                    newStatus = SubjectEventStatus.COMPLETED;
+                } 
+            } else if (seBean.getStatus().equals(SubjectEventStatus.SCHEDULED)) {
+                newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
+            }
+        }
+
+        if (newStatus != null) {
+            sedao = new StudyEventDAO(ds);
+            seBean.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
+            seBean.setUpdatedDate(new Date());
+            seBean.setSubjectEventStatus(newStatus);
+            seBean = (StudyEventBean) sedao.update(seBean);
+            logger.debug("*********UPDATED STUDY EVENT ");
+        }
         return seBean;
     }
 
@@ -324,13 +388,15 @@ public class PformSubmissionService {
      * @param ecBean
      * @param studyBean
      * @param studySubjectBean
+     * @param isAnonymous 
      * @return
      */
-    private EventCRFBean updateEventCRF(EventCRFBean ecBean, StudyBean studyBean, StudySubjectBean studySubjectBean) {
+    private EventCRFBean updateEventCRF(EventCRFBean ecBean, StudyBean studyBean, StudySubjectBean studySubjectBean, boolean isAnonymous) {
         String inputUsername = getInputUsername(studyBean, studySubjectBean);
         ecBean.setUpdater(getUserAccount(inputUsername));
         ecBean.setUpdatedDate(new Date());
-        ecBean.setStatus(Status.AVAILABLE);
+        if (isAnonymous) ecBean.setStatus(Status.UNAVAILABLE);
+        else ecBean.setStatus(Status.AVAILABLE);
         ecBean = (EventCRFBean) ecdao.update(ecBean);
         logger.debug("*********UPDATED EVENT CRF");
         return ecBean;
@@ -483,11 +549,12 @@ public class PformSubmissionService {
      * @param studyBean
      * @param studyEventBean
      * @param studySubjectBean
+     * @param isAnonymous 
      * @return
      * @throws Exception
      */
     private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean, Locale locale) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, Locale locale, boolean isAnonymous) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -605,11 +672,10 @@ public class PformSubmissionService {
                             removeDeletedRows(groupOrdinalMapping,eventCrfBean,cvBean,studyBean,studySubjectBean, locale);
                             
                             // Update Event Crf Bean and change the status to Completed
-                            eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+                            eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean, isAnonymous);
                             
-                            // Update Study Event to Data Entry Started if currently Scheduled
-                            if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+                            // Update Study Event to Data Entry Started or Completed
+                            updateStudyEvent(studyEventBean, studyEventDefinitionBean, studyBean, studySubjectBean, isAnonymous);
                         }
                     }
                 }
@@ -627,11 +693,12 @@ public class PformSubmissionService {
      * @param studyEventBean
      * @param studySubjectBean
      * @param locale 
+     * @param isAnonymous 
      * @return
      * @throws Exception
      */
     private Errors readDownloadFileNew(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale) throws Exception {
+            StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale, boolean isAnonymous) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -746,11 +813,10 @@ public class PformSubmissionService {
                             removeDeletedRows(groupOrdinalMapping,eventCrfBean,crfVersion,studyBean,studySubjectBean, locale);
                             
                             // Update Event Crf Bean and change the status to Completed
-                            eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
+                            eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean, isAnonymous);
                             
-                            // Update Study Event to Data Entry Started if currently Scheduled
-                            if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED))
-                                updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
+                            // Update Study Event to Data Entry Started or Completed
+                            updateStudyEvent(studyEventBean, studyEventDefinitionBean, studyBean, studySubjectBean, isAnonymous);
 
                         }
                     }
