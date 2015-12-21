@@ -643,7 +643,9 @@
               </tr>
           </tbody>
           </c:if>
-          
+
+
+          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">          
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -676,6 +678,7 @@
                   </td>
               </tr>
           </tbody>
+          </c:if>
 
       </table>
       <br>
@@ -739,6 +742,7 @@
     </div>
 </c:if>
 
+    <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>
@@ -754,6 +758,7 @@
             <input type="button" id="cancelRandomizationAccessRequest" class="button" value="Cancel"/>
         </form>
     </div>
+</c:if>
 
 
 <jsp:include page="include/footer.jsp"/>
