@@ -106,7 +106,7 @@ public class RandomizeService extends RandomizationRegistrar {
         SeRandomizationDTO randomization = null;
 
         try {
-            randomization = getRandomizationDTOObject(sBean.getOid());
+            randomization = getCachedRandomizationDTOObject(sBean.getOid());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -117,7 +117,6 @@ public class RandomizeService extends RandomizationRegistrar {
         String password = randomization.getPassword();
         String timezone = "America/New_York";
 
-        if (randomization.getStatusId() == 3) {
             // String randomiseUrl = "https://evaluation.sealedenvelope.com/redpill/seti2";
             // String username = "oc";
             // String password = "secret";
@@ -139,11 +138,10 @@ public class RandomizeService extends RandomizationRegistrar {
                 else
                     return "";
             }
-        } else {
-            return "";
+          }
 
-        }
-    }
+        
+    
 
     private String getExpressionValue(String expr, EventCRFBean eventCrfBean, RuleSetBean ruleSet) {
         String expression = getExpressionService().constructFullExpressionIfPartialProvided(expr, ruleSet.getTarget().getValue());
