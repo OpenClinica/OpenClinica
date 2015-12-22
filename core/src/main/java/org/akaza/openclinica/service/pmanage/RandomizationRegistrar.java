@@ -1,37 +1,22 @@
 package org.akaza.openclinica.service.pmanage;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpSession;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionGlobalVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +28,7 @@ public class RandomizationRegistrar {
     public static final String UNAVAILABLE = "unavailable";
     public static final String INVALID = "invalid";
     public static final String UNKNOWN = "unknown";
-    public static final int RANDOMIZATION_READ_TIMEOUT = 10000;
+    public static final int RANDOMIZATION_READ_TIMEOUT = 5000;
     private static final String CACHE_KEY = "randomizeObject";
     private CacheManager cacheManager;
     private net.sf.ehcache.Cache cache;
@@ -81,12 +66,12 @@ public class RandomizationRegistrar {
         return null;
     }
 
-    public SeRandomizationDTO getCachedRandomizationDTOObject(String studyOid) throws Exception {
+    public SeRandomizationDTO getCachedRandomizationDTOObject(String studyOid, Boolean resetCache) throws Exception {
         SeRandomizationDTO seRandomizationDTO = null; // check if exist in cache ;
         String ocUrl = CoreResources.getField("sysURL.base");
         String mapKey = ocUrl + studyOid;
         Element element = cache.get(mapKey);
-        if (element != null && element.getObjectValue() != null) {
+        if (element != null && element.getObjectValue() != null && !resetCache) {
             seRandomizationDTO = (SeRandomizationDTO) element.getObjectValue();
         }
 

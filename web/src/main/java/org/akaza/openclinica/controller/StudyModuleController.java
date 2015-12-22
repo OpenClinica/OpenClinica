@@ -14,12 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
@@ -41,7 +39,6 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.cdisc.ns.odm.v130_api.ODM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +53,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -182,7 +178,7 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    
+
     @RequestMapping(value = "/{study}/register", method = RequestMethod.POST)
     public String registerParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
@@ -254,14 +250,14 @@ public class StudyModuleController {
             // Update OC Study configuration
         randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
 
-        // send another email to sales@openclinica.com thru MandrillViaOcUi                
+        // send another email to sales@openclinica.com thru MandrillViaOcUi
         status = randomizationRegistrar.randomizeStudy(study.getOid(), study.getIdentifier());
 
         if (status.equals("")) {
     //        addRegMessage(request, respage.getString("randomization_not_available"));
         } else {
             // Update OC Study configuration
-         
+
             spv.setStudyId(study.getId());
             spv.setParameter("randomization");
             spv.setValue("enabled");
@@ -419,7 +415,7 @@ public class StudyModuleController {
             map.addAttribute("participateURLDisplay", url);
             map.addAttribute("participateURLFull", url + "/#/login");
         }
-        
+
 
         // Load Randomization  information
         String configServerUrl = CoreResources.getField("configServerUrl");
@@ -430,13 +426,13 @@ public class StudyModuleController {
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
             SeRandomizationDTO randomization=null;
                 try {
-                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid());
+                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             String randomizationStatus = "";
-                
+
                 URL randomizeUrl=null;
                 try {
                     randomizeUrl = new URL(configServerUrl);
@@ -446,14 +442,14 @@ public class StudyModuleController {
                 }
                 if (randomization != null && randomization.getStatus() != null)
                     randomizationStatus = randomization.getStatus();
-                
+
                 map.addAttribute("randomizeURL", randomizeUrl);
               map.addAttribute("randomizationOCStatus", randomizationOCStatus);
                 map.addAttribute("randomizationStatus", randomizationStatus);
 
         }
-            
-        
+
+
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
