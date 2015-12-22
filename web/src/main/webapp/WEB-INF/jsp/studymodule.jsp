@@ -752,7 +752,6 @@
                 </a>
             </h1>
             <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
-            <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part2" bundle="${resword}"/></p>
             <br>
             <input type="submit" id="submitRandomizationAccessRequest" class="button_medium" value="Request Access"/>
             <input type="button" id="cancelRandomizationAccessRequest" class="button" value="Cancel"/>

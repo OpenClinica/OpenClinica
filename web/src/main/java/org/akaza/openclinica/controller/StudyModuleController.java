@@ -251,8 +251,7 @@ public class StudyModuleController {
         randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
 
         // send another email to sales@openclinica.com thru MandrillViaOcUi
-        status = randomizationRegistrar.randomizeStudy(study.getOid(), study.getIdentifier());
-
+         status = randomizationRegistrar.randomizeStudy(study.getOid(),study.getIdentifier() , userBean); 
         if (status.equals("")) {
     //        addRegMessage(request, respage.getString("randomization_not_available"));
         } else {
