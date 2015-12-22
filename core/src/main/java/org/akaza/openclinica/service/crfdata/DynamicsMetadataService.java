@@ -96,7 +96,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private RandomizeService randomizeService;
     
     public DynamicsMetadataService(DataSource ds) {
-    	// itemsAlreadyShown = new ArrayList<Integer>();
+        // itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
     }
 
@@ -549,11 +549,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     private String getDateFormat(PropertyBean property){
-    	String format = "yyyy-MM-dd";
+        String format = "yyyy-MM-dd";
 
         if(property.getValueExpression() != null) {
-        	logger.info("The Value is ValueExpression in the property so the date format will be : {}", "dd-MMM-yyyy");
-        	format = "dd-MMM-yyyy";
+            logger.info("The Value is ValueExpression in the property so the date format will be : {}", "dd-MMM-yyyy");
+            format = "dd-MMM-yyyy";
         }
 
         logger.info("The format of the date will be : {}", format);
@@ -604,6 +604,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     }
                     // Create new event crf
                     eventCrfBeanB = eventCrfBeanA.copy();
+                    eventCrfBeanB.setStatus(Status.AVAILABLE);
                     eventCrfBeanB.setId(0);
                     eventCrfBeanB.setCRFVersionId(crfVersionId);
                     eventCrfBeanB = (EventCRFBean) getEventCRFDAO().create(eventCrfBeanB);

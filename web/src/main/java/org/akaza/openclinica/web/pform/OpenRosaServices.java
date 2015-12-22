@@ -494,8 +494,12 @@ public class OpenRosaServices {
             PFormCache cache = PFormCache.getInstance(servletContext);
             HashMap<String, String> userContext = cache.getSubjectContext(context);
 
+            boolean isAnonymous = false;
+            if (userContext.get("studySubjectOID") == null) isAnonymous = true;
+
             StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
             StudySubjectBean ssBean = getSSBean(userContext);
+            
 
             if (!mayProceedSubmission(studyOID, ssBean))
                 return null;
@@ -524,7 +528,7 @@ public class OpenRosaServices {
 
             System.out.println("Submitted XForm Payload: " + body);
             Errors errors = getPformSubmissionService().saveProcess(body, ssBean.getOid(), studyEventDefnId, studyEventOrdinal,
-                    crfvdao.findByOid(crfVersionOID), locale);
+                    crfvdao.findByOid(crfVersionOID), locale, isAnonymous);
 
             // Set response headers
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));

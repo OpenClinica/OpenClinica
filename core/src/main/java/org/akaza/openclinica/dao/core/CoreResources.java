@@ -363,7 +363,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         String supportURL = DATAINFO.getProperty("supportURL");
         if (supportURL == null || supportURL.isEmpty())
-            supportURL = "http://www.openclinica.org/OpenClinica/3.1/support/";
+            supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
 
         DATAINFO.setProperty("show_unique_id", "1");
@@ -389,6 +389,14 @@ public class CoreResources implements ResourceLoaderAware {
         } else {
             logger.debug("Portal URL IS Defined in datainfo:  " + portalURL);
         }
+        String configServerUrl = DATAINFO.getProperty("configServerUrl");
+        if (configServerUrl == null || configServerUrl.isEmpty()) {
+            DATAINFO.setProperty("configServerUrl.url", "");
+            logger.debug(" Configuration Server URL NOT Defined in datainfo ");
+        } else {
+            logger.debug("Configuration Server URL IS Defined in datainfo:  " + configServerUrl);
+        }
+
         return DATAINFO;
 
     }

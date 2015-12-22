@@ -50,7 +50,18 @@ public class StudyParameterConfig {
     private String eventLocationRequired;
     
     private String participantPortal;
-                   
+
+    private String randomization;                       
+    
+    public String getRandomization() {
+        return randomization;
+    }
+
+    public void setRandomization(String randomization) {
+        this.randomization = randomization;
+    }
+
+    
     public String getParticipantPortal() {
 		return participantPortal;
 	}
@@ -79,8 +90,11 @@ public class StudyParameterConfig {
         adminForcedReasonForChange = "true";
         eventLocationRequired = "not_used";
         participantPortal="disabled";
+        randomization="disabled";
     }
 
+	
+	
     /**
      * @return Returns the collectDob.
      */
