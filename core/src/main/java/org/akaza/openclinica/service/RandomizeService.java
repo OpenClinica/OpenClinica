@@ -71,6 +71,8 @@ public class RandomizeService extends RandomizationRegistrar {
     private ExpressionService expressionService;
     CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
     public static final int RANDOMIZATION_READ_TIMEOUT = 10000;
+    StudyDAO sdao=null;
+
 
     public RandomizeService(DataSource ds) {
         this.ds = ds;
@@ -100,10 +102,12 @@ public class RandomizeService extends RandomizationRegistrar {
 
         // sBean should be parent study
         // put randomization object in cache
+       
+        StudyBean study = getParentStudy(sBean.getOid());        
         SeRandomizationDTO randomization = null;
 
         try {
-            randomization = getCachedRandomizationDTOObject(sBean.getOid(), false);
+            randomization = getCachedRandomizationDTOObject(study.getOid(), false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -300,6 +304,22 @@ public class RandomizeService extends RandomizationRegistrar {
 
     public void setItemDataDAO(ItemDataDAO itemDataDAO) {
         this.itemDataDAO = itemDataDAO;
+    }
+    private StudyBean getStudy(String oid) {
+        sdao = new StudyDAO(ds);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+        return studyBean;
+    }
+
+    private StudyBean getParentStudy(String studyOid) {
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
+
     }
 
 }
