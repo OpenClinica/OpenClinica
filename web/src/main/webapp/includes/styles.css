@@ -2073,6 +2073,41 @@ margin: 2px;;
 .participate-inactive-status {
 	color: #FF0000;
 }
+.randomization-text {
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    line-height: 15px;
+    color: #4D4D4D;
+}
+
+.randomization-sample-url {
+     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+     font-size: 11px;
+     line-height: 15px;
+     color: #B6B6B4;
+}
+
+.randomization-warnings {
+     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+     font-size: 11px;
+     line-height: 15px;
+     color: #D00000;
+}
+
+.randomization-inactive-status {
+     color: #FF0000;
+}
+
+.randomization-active-status {
+     color: #006633;
+}
+
+.randomization-registration-div {
+     padding-left:10px;
+     padding-bottom:10px;
+     padding-right:10px;
+     display:none;
+}
 
 .participate-active-status {
 	color: #006633;
