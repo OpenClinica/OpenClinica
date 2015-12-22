@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -15,7 +14,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -39,7 +37,6 @@ import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +103,7 @@ public class RandomizeService extends RandomizationRegistrar {
         SeRandomizationDTO randomization = null;
 
         try {
-            randomization = getCachedRandomizationDTOObject(sBean.getOid());
+            randomization = getCachedRandomizationDTOObject(sBean.getOid(), false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -140,8 +137,8 @@ public class RandomizeService extends RandomizationRegistrar {
             }
           }
 
-        
-    
+
+
 
     private String getExpressionValue(String expr, EventCRFBean eventCrfBean, RuleSetBean ruleSet) {
         String expression = getExpressionService().constructFullExpressionIfPartialProvided(expr, ruleSet.getTarget().getValue());

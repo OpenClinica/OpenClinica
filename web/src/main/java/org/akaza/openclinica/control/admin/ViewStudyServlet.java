@@ -7,11 +7,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -19,12 +16,10 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
@@ -35,7 +30,7 @@ import java.util.ArrayList;
 
 /**
  * @author jxu
- * 
+ *
  * Processes the reuqest of 'view study details'
  */
 public class ViewStudyServlet extends SecureController {
@@ -77,15 +72,15 @@ public class ViewStudyServlet extends SecureController {
 
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
             study = scs.setParametersForStudy(study);
-            
+
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "randomization").getValue();
             String participantStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "participantPortal").getValue();
-            if(participantStatusInOC=="") participantStatusInOC="disabled"; 
-            if(randomizationStatusInOC=="") randomizationStatusInOC="disabled"; 
-            
+            if(participantStatusInOC=="") participantStatusInOC="disabled";
+            if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
+
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid());
+            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
 
             if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
                 study.getStudyParameterConfig().setRandomization("enabled");
@@ -93,7 +88,7 @@ public class ViewStudyServlet extends SecureController {
                 study.getStudyParameterConfig().setRandomization("disabled");
              };
 
-            
+
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
              String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOid(), session);
              if (participantPortalRegistrar!=null && pStatus.equalsIgnoreCase("ACTIVE") && participantStatusInOC.equalsIgnoreCase("enabled")){
@@ -101,8 +96,8 @@ public class ViewStudyServlet extends SecureController {
              }else{
                  study.getStudyParameterConfig().setParticipantPortal("disabled");
               };
-            
-                
+
+
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

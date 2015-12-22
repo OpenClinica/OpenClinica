@@ -32,7 +32,7 @@ public class RandomizeActionProcessor implements ActionProcessor {
     RandomizationRegistrar randomizationRegistrar=null ;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    
+
     public RandomizeActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleActionRunLogDao ruleActionRunLogDao, RuleSetBean ruleSet,
             RuleSetRuleBean ruleSetRule) {
         this.itemMetadataService = itemMetadataService;
@@ -112,18 +112,18 @@ public class RandomizeActionProcessor implements ActionProcessor {
         return itemMetadataService;
     }
 
-    
+
     private boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean siteStudy = getStudy(studyOid);
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "randomization");
-      
+
         randomizationRegistrar = new RandomizationRegistrar();
-        SeRandomizationDTO seRandomizationDTO =randomizationRegistrar.getRandomizationDTOObject(study.getOid().toString());
+        SeRandomizationDTO seRandomizationDTO =randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid().toString(),false);
         String randomizationStatusFromOCUI =seRandomizationDTO.getStatus();
-        
+
         String randomizationStatusFromOC = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
@@ -141,7 +141,7 @@ public class RandomizeActionProcessor implements ActionProcessor {
         StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
         return studyBean;
     }
-    
+
     private StudyBean getParentStudy(String studyOid) {
         StudyBean study = getStudy(studyOid);
         if (study.getParentStudyId() == 0) {
@@ -152,6 +152,6 @@ public class RandomizeActionProcessor implements ActionProcessor {
         }
 
     }
-    
-    
+
+
 }
