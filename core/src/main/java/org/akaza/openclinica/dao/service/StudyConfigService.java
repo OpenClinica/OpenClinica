@@ -52,7 +52,7 @@ public class StudyConfigService {
      * studys parent has a defined parameter value; OR ? * the parameter is not
      * inheritable and there is a row for this studyId/parameter pair in the
      * study_parameter_value table
-     * 
+     *
      * @param studyId
      * @param parameterHandle
      * @return
@@ -87,7 +87,7 @@ public class StudyConfigService {
 
     /**
      * This method construct an object which has all the study parameter values
-     * 
+     *
      * @param study
      * @return
      */
@@ -140,6 +140,8 @@ public class StudyConfigService {
                     spc.setEventLocationRequired(spv.getValue());
                 } else if (handle.equalsIgnoreCase("participantPortal")) {
                     spc.setParticipantPortal(spv.getValue());
+                } else if (handle.equalsIgnoreCase("randomization")) {
+                    spc.setRandomization(spv.getValue());
                 }
             }
         }
