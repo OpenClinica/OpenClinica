@@ -1,5 +1,7 @@
 package org.akaza.openclinica.service.pmanage;
 
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -9,9 +11,18 @@ public class Study {
     private String host = null;
     private Organization organization = null;
     private String studyName = null;
-    private String OpenClinicaVersion = null;
+    private String openclinicaVersion = null;
+    private String logoOriginal = null;
 
-    public String getInstanceUrl() {
+    public String getLogoOriginal() {
+		return logoOriginal;
+	}
+
+	public void setLogoOriginal(String logoOriginal) {
+		this.logoOriginal = logoOriginal;
+	}
+
+	public String getInstanceUrl() {
         return instanceUrl;
     }
 
@@ -51,11 +62,11 @@ public class Study {
         this.studyName = studyName;
     }
 
-    public String getOpenClinicaVersion() {
-        return OpenClinicaVersion;
+    public String getOpenclinicaVersion() {
+        return openclinicaVersion;
     }
 
-    public void setOpenClinicaVersion(String OpenClinicaVersion) {
-        this.OpenClinicaVersion = OpenClinicaVersion;
+    public void setOpenclinicaVersion(String openclinicaVersion) {
+        this.openclinicaVersion = openclinicaVersion;
     }
 }
