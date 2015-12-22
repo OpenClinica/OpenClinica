@@ -1234,11 +1234,21 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     margin-bottom: 6px;
 }
 
-.formfieldFile_BG { background-image: url(../images/formfieldXXL_BG.gif);
-    background-repeat: no-repeat;
-    width: 307px;
+.formfieldFile_BG { 
+    /*background-image: url(../images/formfieldXXL_BG.gif);
     height: 26px;
+    background-repeat: no-repeat;*/
+    background: none #fff;
+    padding: 1px;
+    border: 1px solid #ccc;
+    width: 307px;
     margin-bottom: 6px;
+    -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.37);
+    -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.37);
+    box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.37);
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    -webkit-border-radius: 3px 3px 3px 3px;
 }
 
 .vline { background-image: url(../images/leftbar_vline.gif);
@@ -2104,4 +2114,5 @@ div.formfieldFile_BG input {
     height: 25px !important;
     opacity: 0 !important;
     overflow: hidden !important;
-}*/
+}
+*/
