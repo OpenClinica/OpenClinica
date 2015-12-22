@@ -100,10 +100,8 @@ public class RandomizationRegistrar {
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
             logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
         } catch (MessagingException me) {
             logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
         }
     }
 

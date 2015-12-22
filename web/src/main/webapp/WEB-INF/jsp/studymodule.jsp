@@ -76,11 +76,11 @@
             document.forms[1].submit();
         }
     }
-    
+
 </script>
-  
+
  <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
-  
+
       <script type="text/javascript">
         jQuery(document).ready(function() {
             jQuery('#requestRandomizationAccess').click(function() {
@@ -93,11 +93,11 @@
             });
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
-            if (warnings.length > 0) { 
-            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } }); 
+            if (warnings.length > 0) {
+            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
             }
         });
-        
+
         // Hide the popup window if the escape key is pressed
         jQuery(document).keyup(function(keyPressed) {
             if(keyPressed.keyCode === 27) {
@@ -107,8 +107,8 @@
         });
     </script>
 </c:if>
-  
-    
+
+
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -122,11 +122,11 @@
             });
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
-            if (warnings.length > 0) { 
-            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } }); 
+            if (warnings.length > 0) {
+            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
             }
         });
-        
+
         // Hide the popup window if the escape key is pressed
         jQuery(document).keyup(function(keyPressed) {
             if(keyPressed.keyCode === 27) {
@@ -291,13 +291,13 @@
                         <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -346,13 +346,13 @@
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -401,13 +401,13 @@
                         <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -457,18 +457,18 @@
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
 						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
 						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                 
+
                     </c:otherwise>
-					
+
                 </c:choose>
-				
+
             </td>
         </tr>
         <tr>
@@ -513,13 +513,13 @@
                         <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -571,13 +571,13 @@
                         <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -587,7 +587,7 @@
   <br>
   <br>
 
- 
+
       <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
           <thead>
           <tr>
@@ -598,9 +598,9 @@
               <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
               </tr>
           </thead>
-          
+
             <c:if test="${portalURL!= '' && portalURL!= null}">
-          
+
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -645,7 +645,7 @@
           </c:if>
 
 
-          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">          
+          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -660,6 +660,15 @@
                       </c:choose>
                   </td>
                   <td>
+                    <span id="randomizeURL">
+                      <c:choose>
+                          <c:when test="${!empty randomizeURL && !empty randomizationStatus && randomizationStatus == 'ACTIVE'}">
+                              <a href="<c:url value="${randomizeURL}"/>" target="_blank">${randomizeURL}</a>
+                          </c:when>
+                          <c:when test="${!empty randomizeURL}">${randomizeURL}</c:when>
+                          <c:otherwise>&nbsp;</c:otherwise>
+                      </c:choose>
+                    </span>
                   </td>
                   <td>
                       <c:url var="reactivateRandomization" value="studymodule/${currentStudy.oid}/reactivaterandomization"/>
@@ -683,7 +692,7 @@
       </table>
       <br>
       <br>
-  
+
   <%-- additional table added tbh, 09/05/2009 --%>
   <c:if test="${!empty childStudyUserCount }">
   <table width="4%" style="border-left: 0px; border-top: 0px; border-bottom: 0px; border-right: 0px;" align="left" cellspacing="0" cellpadding="0">
@@ -731,7 +740,7 @@
             <c:if test="${!empty regMessages}">
                 <div id="participateWarnings" class="participate-warnings">
                     <c:forEach var="message" items="${regMessages}">
-                        <c:out value="${message}" escapeXml="false"/> 
+                        <c:out value="${message}" escapeXml="false"/>
                         <br>
                     </c:forEach>
                 </div>
