@@ -415,7 +415,6 @@ public class PformSubmissionService {
      */
     private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean, StudyBean studyBean,
             StudySubjectBean studySubjectBean) {
-        logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
         ItemDataBean itemDataBean = new ItemDataBean();
         itemDataBean.setItemId(itemBean.getId());
         itemDataBean.setEventCRFId(eventCrfBean.getId());
