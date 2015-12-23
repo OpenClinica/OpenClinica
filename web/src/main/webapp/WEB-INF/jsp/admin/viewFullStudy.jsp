@@ -669,7 +669,7 @@
    </c:if>
     
 
-    <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+    <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="randomization" bundle="${resword}"/></td>
         <td class="table_cell">

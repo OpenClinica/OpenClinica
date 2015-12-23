@@ -144,8 +144,8 @@ public class ViewStudyServlet extends SecureController {
                     def.setCrfNum(crfs.size());
 
                 }
-                String configServerUrl = CoreResources.getField("configServerUrl");
-                request.setAttribute("configServerUrl", configServerUrl);
+                String moduleManager = CoreResources.getField("moduleManager");
+                request.setAttribute("moduleManager", moduleManager);
 
                 String portalURL = CoreResources.getField("portalURL");
                 request.setAttribute("portalURL", portalURL);

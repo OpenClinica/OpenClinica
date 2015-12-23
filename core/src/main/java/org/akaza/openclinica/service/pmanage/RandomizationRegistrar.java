@@ -42,7 +42,7 @@ public class RandomizationRegistrar {
     // Rest Call to OCUI to get Randomization
     public SeRandomizationDTO getRandomizationDTOObject(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String randomizationUrl = CoreResources.getField("configServerUrl") + "/app/rest/oc/se_randomizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
+        String randomizationUrl = CoreResources.getField("moduleManager") + "/app/rest/oc/se_randomizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
 
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
@@ -108,7 +108,7 @@ public class RandomizationRegistrar {
         public String randomizeStudy(String studyOid, String studyName,UserAccountBean userAccount) {
             
             String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-            String randomizationUrl = CoreResources.getField("configServerUrl") + "/app/rest/oc/se_randomizations";
+            String randomizationUrl = CoreResources.getField("moduleManager") + "/app/rest/oc/se_randomizations";
             SeRandomizationDTO seRandomizationDTO = new SeRandomizationDTO();
             seRandomizationDTO.setStudyOid(studyOid);
             seRandomizationDTO.setInstanceUrl(ocUrl);
