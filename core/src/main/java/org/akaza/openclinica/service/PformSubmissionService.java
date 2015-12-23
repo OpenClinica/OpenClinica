@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
  */
 /**
  * @author joekeremian
- * 
+ *
  */
 public class PformSubmissionService {
 
@@ -114,7 +114,7 @@ public class PformSubmissionService {
 
     /**
      * This method will generate new UserName combining Study and Study Subject OIDs
-     * 
+     *
      * @param studyBean
      * @param studySubjectBean
      * @return
@@ -135,7 +135,7 @@ public class PformSubmissionService {
         count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
         return count;
     }
-    
+
     private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId , Integer studyId) {
         int count = 0;
         edcdao = new EventDefinitionCRFDAO(ds);
@@ -255,13 +255,13 @@ public class PformSubmissionService {
 
     /**
      * Main Method to Start Saving Process the Pform Submission
-     * 
+     *
      * @param body
      * @param studySubjectOid
      * @param studyEventDefnId
      * @param studyEventOrdinal
-     * @param locale 
-     * @param isAnonymous 
+     * @param locale
+     * @param isAnonymous
      * @return
      * @throws Exception
      */
@@ -308,7 +308,7 @@ public class PformSubmissionService {
 
     /**
      * Create Event CRF (Insert a record in event_crf table)
-     * 
+     *
      * @param crfVersionOid
      * @param studyBean
      * @param studyEventBean
@@ -339,7 +339,7 @@ public class PformSubmissionService {
 
     /**
      * Update Study Event to Data Entry Started / Completed
-     * 
+     *
      * @param seBean
      * @param status
      * @param studyBean
@@ -351,13 +351,13 @@ public class PformSubmissionService {
         int crfCount = 0;
         int completedCrfCount = 0;
 
-        if (!isAnonymous) { 
+        if (!isAnonymous) {
             if (seBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)) newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
         } else {
             // Get a count of CRFs defined for the event
             if (studyBean.getParentStudyId()!=0)
                 crfCount = getCountCrfsInAEventDefCrfForSite(sedBean.getId(),getParentStudy(studyBean.getOid()).getId());
-            else 
+            else
                 crfCount = getCountCrfsInAEventDefCrf(sedBean.getId(),studyBean.getId());
             // Get a count of completed CRFs for the event
             completedCrfCount = getCountCompletedEventCrfsInAStudyEvent(seBean);
@@ -365,7 +365,7 @@ public class PformSubmissionService {
             if (crfCount == completedCrfCount){
                 if (seBean.getStatus().equals(SubjectEventStatus.SCHEDULED) || seBean.getStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) {
                     newStatus = SubjectEventStatus.COMPLETED;
-                } 
+                }
             } else if (seBean.getStatus().equals(SubjectEventStatus.SCHEDULED)) {
                 newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
             }
@@ -384,11 +384,11 @@ public class PformSubmissionService {
 
     /**
      * Update Status in Event CRF Table
-     * 
+     *
      * @param ecBean
      * @param studyBean
      * @param studySubjectBean
-     * @param isAnonymous 
+     * @param isAnonymous
      * @return
      */
     private EventCRFBean updateEventCRF(EventCRFBean ecBean, StudyBean studyBean, StudySubjectBean studySubjectBean, boolean isAnonymous) {
@@ -404,7 +404,7 @@ public class PformSubmissionService {
 
     /**
      * Create a single item data bean record , but not insert in table yet
-     * 
+     *
      * @param itemBean
      * @param itemValue
      * @param itemOrdinal
@@ -415,7 +415,6 @@ public class PformSubmissionService {
      */
     private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean, StudyBean studyBean,
             StudySubjectBean studySubjectBean) {
-        logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
         ItemDataBean itemDataBean = new ItemDataBean();
         itemDataBean.setItemId(itemBean.getId());
         itemDataBean.setEventCRFId(eventCrfBean.getId());
@@ -429,7 +428,7 @@ public class PformSubmissionService {
 
     /**
      * Instantiate an Error object
-     * 
+     *
      * @return
      */
     public Errors instanciateErrors() {
@@ -440,7 +439,7 @@ public class PformSubmissionService {
 
     /**
      * Errors Object to Validate Item Data
-     * 
+     *
      * @param itemDataBean
      * @param itemBean
      * @param responseTypeId
@@ -457,7 +456,7 @@ public class PformSubmissionService {
 
     /**
      * Check for CRF Version if exist in system if submitted same version twice or other versions of the same CRF
-     * 
+     *
      * @param crfVersionOID
      * @param errors
      * @param studyBean
@@ -507,7 +506,7 @@ public class PformSubmissionService {
 
     /**
      * Check if Event CRF exist or not in the system , if not , create ,
-     * 
+     *
      * @param isEventCrfInOC
      * @param isSameCrfVersion
      * @param crfVersionOID
@@ -543,13 +542,13 @@ public class PformSubmissionService {
 
     /**
      * Read from Pform Submission Payload or the Body
-     * 
+     *
      * @param body
      * @param errors
      * @param studyBean
      * @param studyEventBean
      * @param studySubjectBean
-     * @param isAnonymous 
+     * @param isAnonymous
      * @return
      * @throws Exception
      */
@@ -667,13 +666,13 @@ public class PformSubmissionService {
                                     iddao.updateValue(itemDataBean1);
                                 }
                             }
-                            
+
                             // Delete rows that have been removed
                             removeDeletedRows(groupOrdinalMapping,eventCrfBean,cvBean,studyBean,studySubjectBean, locale);
-                            
+
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean, isAnonymous);
-                            
+
                             // Update Study Event to Data Entry Started or Completed
                             updateStudyEvent(studyEventBean, studyEventDefinitionBean, studyBean, studySubjectBean, isAnonymous);
                         }
@@ -686,14 +685,14 @@ public class PformSubmissionService {
 
     /**
      * Read from Pform Submission Payload or the Body
-     * 
+     *
      * @param body
      * @param errors
      * @param studyBean
      * @param studyEventBean
      * @param studySubjectBean
-     * @param locale 
-     * @param isAnonymous 
+     * @param locale
+     * @param isAnonymous
      * @return
      * @throws Exception
      */
@@ -808,13 +807,13 @@ public class PformSubmissionService {
                                 }
 
                             }
-                            
+
                             // Delete rows that have been removed
                             removeDeletedRows(groupOrdinalMapping,eventCrfBean,crfVersion,studyBean,studySubjectBean, locale);
-                            
+
                             // Update Event Crf Bean and change the status to Completed
                             eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean, isAnonymous);
-                            
+
                             // Update Study Event to Data Entry Started or Completed
                             updateStudyEvent(studyEventBean, studyEventDefinitionBean, studyBean, studySubjectBean, isAnonymous);
 
@@ -840,17 +839,17 @@ public class PformSubmissionService {
                     itemData.setStatus(Status.AVAILABLE);
                     itemData.setUpdater(getUserAccount(getInputUsername(studyBean, studySubjectBean)));
                     iddao.updateUser(itemData);
-                    iddao.update(itemData);                    
+                    iddao.update(itemData);
                     // Set update ID
                 }
-                
+
                 //Close discrepancy notes
                 closeItemDiscrepancyNotes(itemData, studyBean, studySubjectBean, locale);
-                
+
             }
-            
+
         }
-        
+
     }
 
     private List<ItemDataBean> getItemDataByEventCrfGroup(int id, Integer itemGroupId) {
@@ -865,24 +864,24 @@ public class PformSubmissionService {
         return maxOrdinal + 1;
     }
 
-    private ItemGroupBean getItemGroup(int id, String nodeName) {    
+    private ItemGroupBean getItemGroup(int id, String nodeName) {
         igdao = new ItemGroupDAO(ds);
         return igdao.findGroupByGroupNameAndCrfVersionId(nodeName, id);
     }
 
-    private ItemGroupBean getItemGroupByOID(String oid) {    
+    private ItemGroupBean getItemGroupByOID(String oid) {
         igdao = new ItemGroupDAO(ds);
         return igdao.findByOid(oid);
     }
 
-    private ItemGroupBean getItemGroupByItemIdCrfVersionId(Integer itemId, Integer crfVersionId) {    
+    private ItemGroupBean getItemGroupByItemIdCrfVersionId(Integer itemId, Integer crfVersionId) {
         igdao = new ItemGroupDAO(ds);
         return igdao.findGroupByItemIdCrfVersionId(itemId, crfVersionId);
     }
 
     private Integer getItemOrdinal(Node groupNode, boolean isRepeating, ArrayList<ItemDataBean> itemDataBeanList, ItemBean iBean) {
         if (!isRepeating) return 1;
-        
+
         int ordinal = -1;
         NodeList items = groupNode.getChildNodes();
         for(int i=0; i<items.getLength();i++){
@@ -890,10 +889,10 @@ public class PformSubmissionService {
             if (item instanceof Element && ((Element) item).getTagName().equals("REPEAT_ORDINAL") && !((Element) item).getTextContent().equals(""))
                 ordinal = Integer.valueOf(((Element)item).getTextContent());
         }
-        
+
         // Enketo specific code here due to Enketo behavior of defaulting in values from first repeat on new repeating
         // group row entries, including the REPEAT_ORDINAL value.
-        // If the current value of REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current 
+        // If the current value of REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current
         // value must be reset to -1 as this is a new repeating group row.
         for (ItemDataBean itemdata:itemDataBeanList) {
             if (itemdata.getItemId() == iBean.getId() && itemdata.getOrdinal() == ordinal) {
@@ -906,11 +905,11 @@ public class PformSubmissionService {
     }
 
     private void closeItemDiscrepancyNotes(ItemDataBean itemdata, StudyBean study, StudySubjectBean studySubject, Locale locale) {
-        
+
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
         dndao = new DiscrepancyNoteDAO(ds);
-            
+
         // Notes & Discrepancies must be set to "closed" when event CRF is deleted
         // parentDiscrepancyNoteList is the list of the parent DNs records only
         ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dndao.findParentNotesOnlyByItemData(itemdata.getId());
@@ -955,5 +954,5 @@ public class PformSubmissionService {
         }
 
     }
-    
+
 }

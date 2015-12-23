@@ -10,6 +10,7 @@ public class Study {
     private Organization organization = null;
     private String studyName = null;
     private String OpenClinicaVersion = null;
+    private String logoOriginal = null;
 
     public String getInstanceUrl() {
         return instanceUrl;
@@ -57,5 +58,13 @@ public class Study {
 
     public void setOpenClinicaVersion(String OpenClinicaVersion) {
         this.OpenClinicaVersion = OpenClinicaVersion;
+    }
+
+    public String getLogoOriginal() {
+        return logoOriginal;
+    }
+
+    public void setLogoOriginal(String logoOriginal) {
+        this.logoOriginal = logoOriginal;
     }
 }
