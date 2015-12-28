@@ -435,12 +435,14 @@ public class StudyModuleController {
                 URL randomizeUrl=null;
                 if (randomization != null && randomization.getStatus() != null){
                     randomizationStatus = randomization.getStatus();
+                    if (randomization.getUrl()!=null){
                     try {
                         randomizeUrl= new URL (randomization.getUrl());
                     } catch (MalformedURLException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                   } 
                 }
                 map.addAttribute("randomizeURL", randomizeUrl);
               map.addAttribute("randomizationOCStatus", randomizationOCStatus);
