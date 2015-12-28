@@ -388,31 +388,59 @@ public class ExpressionService {
         	}
         	
         	
-        	String fullExpression="";
             if (isExpressionPartial(expression)) {
-                 fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
-                 value = getValueFromDbOrForm(fullExpression,itemBeansI);
-
-            } else {
-                
-                String ruleSetExpression = expressionWrapper.getRuleSet().getTarget().getValue();
-                String ruleSetExpressionStudyEventId = getStudyEventDefinitionOidOrdinalFromExpression(ruleSetExpression);
-                StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(Integer.valueOf(ruleSetExpressionStudyEventId));
-
-                int index = expression.indexOf(".",1);
-                String eventOidPart = expression.substring(0, index);
-                int subIndex = eventOidPart.indexOf("[");
-                if (subIndex!=-1)
-                    eventOidPart=expression.substring(0, subIndex);   // Get rid of brackets
-                
-                fullExpression = eventOidPart +"["+studyEvent.getId()+"]" + expression.substring(index);
-               value = getValueFromDbOrForm(fullExpression,itemBeansI);
+                String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
+                List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
+               
+                fullExpression =
+                    fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
+                if (checkSyntax(fullExpression)) {
+                    String valueFromForm = null;
+                    if (items == null) {
+                        valueFromForm = getValueFromForm(fullExpression);
+                    } else {
+                        valueFromForm = getValueFromForm(fullExpression, items);
+                    }
+                    String valueFromDb = null;
+                    if (itemBeansI == null) {
+                        valueFromDb = getValueFromDb(fullExpression, itemDatas);
+                    } else {
+                        valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
+                    }
+                    logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+                    if (valueFromForm == null && valueFromDb == null) {
+                        throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+                            expressionWrapper.getRuleSet().getTarget().getValue() });
+                    }
+                    /*
+                     * if (valueFromForm != null) { // TODO: Do this if type a
+                     * date String dateFormat =
+                     * ResourceBundleProvider.getFormatBundle
+                     * ().getString("date_format_string"); String dateRegexp =
+                     * ResourceBundleProvider
+                     * .getFormatBundle().getString("date_regexp");
+                     * valueFromForm =
+                     * ExpressionTreeHelper.isValidDate(valueFromForm,
+                     * dateFormat, dateRegexp); }
+                     */
+                    value = valueFromForm == null ? valueFromDb : valueFromForm;
+                }
+             } else {
+                // So Expression is not Partial
+                if (checkSyntax(expression)) {
+                    String valueFromDb = getValueFromDbb(expression);
+                    if (valueFromDb == null) {
+                        throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
+                    }
+                    logger.debug("valueFromDb : {}", valueFromDb);
+                    value = valueFromDb;
+                }
+            
+             }
            }
+            return value;
         }
-        return value;
-    }
-
-    
+            
     private String getValueFromDbOrForm(String fullExpression, Map<Integer, ItemBean> itemBeansI){
         List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
         fullExpression =
