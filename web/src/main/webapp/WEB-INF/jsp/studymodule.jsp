@@ -79,7 +79,7 @@
 
 </script>
 
- <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+ <c:if test="${moduleManager!= '' && moduleManager!= null}">
 
       <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -645,7 +645,7 @@
           </c:if>
 
 
-          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+         <c:if test="${moduleManager!= '' && moduleManager!= null}">
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -748,7 +748,7 @@
     </div>
 </c:if>
 
-    <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+ <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>

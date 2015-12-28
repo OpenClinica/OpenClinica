@@ -389,12 +389,12 @@ public class CoreResources implements ResourceLoaderAware {
         } else {
             logger.debug("Portal URL IS Defined in datainfo:  " + portalURL);
         }
-        String configServerUrl = DATAINFO.getProperty("configServerUrl");
-        if (configServerUrl == null || configServerUrl.isEmpty()) {
-            DATAINFO.setProperty("configServerUrl.url", "");
-            logger.debug(" Configuration Server URL NOT Defined in datainfo ");
+        String moduleManager = DATAINFO.getProperty("moduleManager");
+        if (moduleManager == null || moduleManager.isEmpty()) {
+            DATAINFO.setProperty("moduleManager.url", "");
+            logger.debug(" Module Manager URL NOT Defined in datainfo ");
         } else {
-            logger.debug("Configuration Server URL IS Defined in datainfo:  " + configServerUrl);
+            logger.debug("Module Manager URL IS Defined in datainfo:  " + moduleManager);
         }
 
         return DATAINFO;

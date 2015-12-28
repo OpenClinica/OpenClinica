@@ -417,9 +417,9 @@ public class StudyModuleController {
 
 
         // Load Randomization  information
-        String configServerUrl = CoreResources.getField("configServerUrl");
-        map.addAttribute("configServerUrl", configServerUrl);
-        if (configServerUrl != null && !configServerUrl.equals("")) {
+        String moduleManager = CoreResources.getField("moduleManager");
+        map.addAttribute("moduleManager", moduleManager);
+        if (moduleManager != null && !moduleManager.equals("")) {
 
         String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
