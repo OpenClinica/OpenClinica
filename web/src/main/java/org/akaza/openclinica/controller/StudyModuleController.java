@@ -103,9 +103,9 @@ public class StudyModuleController {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         spv.setStudyId(study.getId());
-        spv.setParameter("randomization");
+        spv.setParameter("participantPortal");
         spv.setValue("disabled");
 
         if (spv.getId() > 0)
