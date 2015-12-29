@@ -157,7 +157,7 @@ public class RulesPostImportContainerService {
 
     public RulesPostImportContainer validateRuleSetDefs(RulesPostImportContainer importContainer) {
         List<RuleSetBean> eventActionsRuleSetBean = getRuleSetDao().findAllEventActions(currentStudy);
-        
+
     	for (RuleSetBean ruleSetBean : importContainer.getRuleSets()) {
             AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
             ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
@@ -171,20 +171,20 @@ public class RulesPostImportContainerService {
                             ruleSetBean.setRunOnSchedule(new RunOnSchedule(ruleSetBean.getRunTime()));
                         }
                     }
-                    if(ruleSetBean.getRunOnSchedule()!=null){ 
+                    if(ruleSetBean.getRunOnSchedule()!=null){
                     	persistentRuleSetBean.setRunSchedule(true);
                       if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
                      	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
                           persistentRuleSetBean.setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
                      	 }
-                      }else{ 
+                      }else{
                           persistentRuleSetBean.setRunTime(null);     // supposed to act like 23:00
-                      }	  
+                      }
                     }else{
                     	persistentRuleSetBean.setRunSchedule(false);
-                        persistentRuleSetBean.setRunTime(null);                    	
+                        persistentRuleSetBean.setRunTime(null);
                     }
-                    	                    
+
                     persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
                     ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
                     Iterator<RuleSetRuleBean> itr = importedRuleSetRules.iterator();
@@ -361,7 +361,7 @@ public class RulesPostImportContainerService {
 
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean ,List<RuleSetBean> eventActionsRuleSetBean ) {
-        RuleActionRunBean ruleActionRun= ruleActionBean.getRuleActionRun(); 
+        RuleActionRunBean ruleActionRun= ruleActionBean.getRuleActionRun();
            if (ruleActionBean.getActionType().getCode() !=6 && !ruleActionRun.getInitialDataEntry() && !ruleActionRun.getAdministrativeDataEntry() && !ruleActionRun.getBatch() && !ruleActionRun.getDoubleDataEntry() && !ruleActionRun.getImportDataEntry())
                ruleSetBeanWrapper.error(createError("OCRERR_0050"));
 
@@ -370,21 +370,21 @@ public class RulesPostImportContainerService {
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.NotificationActionBean){
 			 message = ((NotificationActionBean) ruleActionBean).getMessage();
 			 emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
-			if (emailSubject.length() > 510) 
+			if (emailSubject.length() > 330)
 			ruleSetBeanWrapper.error(createError("OCRERR_0048"));
-			if (message.length() > 2040) 
-			ruleSetBeanWrapper.error(createError("OCRERR_0049"));		
+			if (message.length() > 2040)
+			ruleSetBeanWrapper.error(createError("OCRERR_0049"));
 		}
 
 		if (ruleActionBean instanceof org.akaza.openclinica.domain.rule.action.EmailActionBean)
 			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
 
 		if (ruleActionBean instanceof DiscrepancyNoteActionBean)
-			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);              	
-              	
+			isUploadedRuleSupportedForEventAction(ruleSetBeanWrapper);
+
     	if (ruleActionBean instanceof ShowActionBean) {
-          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
-          	  
+          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
+
         	List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
             //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
             if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
@@ -400,9 +400,9 @@ public class RulesPostImportContainerService {
                 }
             }
         }
-        }  	
+        }
         if (ruleActionBean instanceof HideActionBean) {
-          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+          	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
           	            List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
             //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
             if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
@@ -418,9 +418,9 @@ public class RulesPostImportContainerService {
                 }
             }
         }
-      }  	
+      }
         if (ruleActionBean instanceof InsertActionBean) {
-        	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+        	if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
 
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
@@ -433,9 +433,9 @@ public class RulesPostImportContainerService {
                 ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getCode());
             }
         }
-        } 	
+        }
         if (ruleActionBean instanceof RandomizeActionBean) {
-            if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){ 
+            if (!isUploadedRuleSupportedForEventAction (ruleSetBeanWrapper)){
 
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
@@ -445,7 +445,7 @@ public class RulesPostImportContainerService {
             randomizeActionValidator.setExpressionService(expressionService);
             randomizeActionValidator.validate(ruleActionBean, errors);
             RandomizeActionBean randomizeActionBean = (RandomizeActionBean) ruleActionBean;
-           
+
        //     RuleActionRunBean ruleActionRun = randomizeActionBean.getRuleActionRun();
        //     if (ruleActionRun.getAdministrativeDataEntry() || ruleActionRun.getBatch() || ruleActionRun.getDoubleDataEntry() || ruleActionRun.getImportDataEntry())
        //        ruleSetBeanWrapper.error(createError("OCRERR_0050"));
@@ -458,16 +458,16 @@ public class RulesPostImportContainerService {
                     Context context = expressionContextName != null ? Context.getByName(expressionContextName) : Context.OC_RULES_V1;
                     factor.getStratificationFactor().setContext(context);
                     ExpressionBean expBean = factor.getStratificationFactor();
-                    String expValue = expBean.getValue(); 
+                    String expValue = expBean.getValue();
                     String prefix = "STUDYGROUPCLASSLIST";
                     boolean sgcExist=false;
 
                     if (expValue.startsWith("SS.") ){
                          String param = expValue.split("\\.",-1)[1].trim() ;
-                       
+
                          if (param.startsWith(prefix)){
-                        String gcName= param.substring(21,param.indexOf("\"]"));    
-                                                      
+                        String gcName= param.substring(21,param.indexOf("\"]"));
+
                      StudyGroupClassDAO studyGroupClassDAO =new StudyGroupClassDAO(ds);
                      ArrayList <StudyGroupClassBean> studyGroupClasses = studyGroupClassDAO.findAllByStudy(currentStudy);
                      for (StudyGroupClassBean studyGroupClass :studyGroupClasses){
@@ -478,7 +478,7 @@ public class RulesPostImportContainerService {
                        }
                          }
                      if (!param.equalsIgnoreCase("BIRTHDATE") && !param.equalsIgnoreCase("SEX") && !sgcExist){
-                          ruleSetBeanWrapper.error(createError("OCRERR_0051",expBean.getValue()));     
+                          ruleSetBeanWrapper.error(createError("OCRERR_0051",expBean.getValue()));
                       }
                     }else{
                     isStratificationExpressionValid(expBean, ruleSetBeanWrapper);
@@ -486,21 +486,21 @@ public class RulesPostImportContainerService {
                 }
              }
             }
-            
-            if (errors.hasErrors()) 
-                ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());           
+
+            if (errors.hasErrors())
+                ruleSetBeanWrapper.error("Randomize Action is not valid: " + errors.getAllErrors().get(0).getCode());
           }
-        }   
-        
+        }
+
         if (ruleActionBean instanceof EventActionBean) {
-          
+
             DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
             eventActionValidator.setRuleSetBeanWrapper(ruleSetBeanWrapper);
             eventActionValidator.setExpressionService(expressionService);
             eventActionValidator.setRespage(respage);
             eventActionValidator.validate(ruleActionBean, errors);
-          
+
             String currentTarget=null;
             currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
             if (currentTarget.contains(".STARTDATE") || currentTarget.contains(".STATUS")){
@@ -508,16 +508,16 @@ public class RulesPostImportContainerService {
             	inValidateInfiniteLoop(ruleActionBean,ruleSetBeanWrapper, eventActionsRuleSetBean);            //Validation , move to Validate Rule page under eventActinValidator
             }else{
             	ruleSetBeanWrapper.error(createError("OCRERR_0044"));
-               		
+
             }
-            
-            
+
+
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("EventAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
     }
-    
+
 	private boolean isUploadedRuleSupportedForEventAction(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
 		String currentTarget = null;
 		currentTarget = ruleSetBeanWrapper.getAuditableBean().getOriginalTarget().getValue();
@@ -526,8 +526,8 @@ public class RulesPostImportContainerService {
 			return true;
 		}
 		return false;
-	}  
-  
+	}
+
 	public void inValidateInfiniteLoop(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, List<RuleSetBean> eventActionsRuleSetBean) {
 		String target = null;
 		String destination = null;
@@ -544,7 +544,7 @@ public class RulesPostImportContainerService {
 		// getRuleSetDao().findAllEventActions(currentStudy);
 		runValidationInList(target, destination, ruleSetBeanWrapper, eventActionsRuleSetBean);
 	}
-    
+
 	public void runValidationInList(String target, String destination, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, List<RuleSetBean> eventActionsRuleSetBean) {
 		// eventActionsRuleSetBean is the list of all events from rule set table
 		Boolean isDestinationATarget = false;
@@ -576,7 +576,7 @@ public class RulesPostImportContainerService {
 					ruleSetBeanWrapper.error(createError("OCRERR_0043"));
 					break;
 				}
-				
+
 				runValidationInList(target, ((EventActionBean) ruleActionBean).getOc_oid_reference(), ruleSetBeanWrapper, eventActionsRuleSetBean);
 				}
 				}
@@ -585,7 +585,7 @@ public class RulesPostImportContainerService {
 			addNewRuleSetBeanInList(target, destination, eventActionsRuleSetBean);
 		}
 	}
-	
+
 	private void addNewRuleSetBeanInList(String target, String destination, List<RuleSetBean> eventActionsRuleSetBean) {
 		ExpressionBean expression = new ExpressionBean();
 		expression.setValue(target);
@@ -605,9 +605,9 @@ public class RulesPostImportContainerService {
 		ruleSetBean.addRuleSetRule(ruleSetRuleBean);
 
 		eventActionsRuleSetBean.add(ruleSetBean);
-	}	
-	
-	
+	}
+
+
 	private List<RuleActionBean> getAllRuleActions(RuleSetBean ruleSetBean) {
 		List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
 
@@ -622,9 +622,9 @@ public class RulesPostImportContainerService {
 		StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 		StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByOid(event);
 		return studyEventDefinition.isRepeating();
-	}    	
-    	
-    	
+	}
+
+
 	public Map<String, String> parseTarget(String target) {
 		target = (target.contains(".STARTDATE")) ? target : target + ".STARTDATE";
 		Map<String, String> targetValues = new HashMap<String, String>();
@@ -674,8 +674,8 @@ public class RulesPostImportContainerService {
 		destinationValues.put("destinationStudyEventRepeatNumber", destinationStudyEventRepeatNumber);
 		destinationValues.put("destinationProperty", destinationProperty);
 		return destinationValues;
-	}    	
-    
+	}
+
 	private boolean isDestinationAndTargetMatch(Map<String, String> target, Map<String, String> destination) {
 
 		String targetProperty = (String) target.get("targetProperty");
@@ -709,14 +709,14 @@ public class RulesPostImportContainerService {
 		}
 
 	}
-    
+
     private String createError(String key) {
         MessageFormat mf = new MessageFormat("");
         mf.applyPattern(respage.getString(key));
         Object[] arguments = {};
         return key + ": " + mf.format(arguments);
     }
-    
+
 
     private String createError(String key, String var) {
         MessageFormat mf = new MessageFormat("");
@@ -725,7 +725,7 @@ public class RulesPostImportContainerService {
         return key + ": " + mf.format(arguments);
     }
 
-    
+
 
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {
         boolean isValid = true;
@@ -756,8 +756,8 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
-    
-    
+
+
     private boolean isRuleSetExpressionValid(AuditableBeanWrapper<RuleSetBean> beanWrapper) {
         boolean isValid = true;
         ExpressionBean expressionBean = isExpressionValid(beanWrapper.getAuditableBean().getTarget(), beanWrapper);
@@ -795,19 +795,19 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
-    
+
 
     private boolean isRunTimeValid(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper , String runTime) {
         boolean isValid = true;
-        
+
         DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm");
         try {
             formatter.parseDateTime(runTime);
              if(!runTime.matches("\\d{2}:\\d{2}")){
                  ruleSetBeanWrapper.error(createError("OCRERR_0047"));
-                 isValid = false;            	 
+                 isValid = false;
              }
-        	
+
         } catch (Exception e) {
             ruleSetBeanWrapper.error(createError("OCRERR_0047"));
             isValid = false;
@@ -815,8 +815,8 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
-    
-    
+
+
     private boolean doesPersistentRuleBeanBelongToCurrentStudy(AuditableBeanWrapper<RuleBean> ruleBeanWrapper) {
         boolean isValid = true;
         if (ruleBeanWrapper.getAuditableBean().getRuleSetRules().size() > 0) {
@@ -889,7 +889,7 @@ public class RulesPostImportContainerService {
     public void setEventActionValidator(EventActionValidator eventActionValidator) {
         this.eventActionValidator = eventActionValidator;
     }
-    
+
     public RandomizeActionValidator getRandomizeActionValidator() {
         return randomizeActionValidator;
     }
