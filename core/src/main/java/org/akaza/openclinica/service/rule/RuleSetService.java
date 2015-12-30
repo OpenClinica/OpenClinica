@@ -767,8 +767,11 @@ public class RuleSetService implements RuleSetServiceInterface {
         if (logger.isDebugEnabled()) {
             for (RuleSetBean ruleSetBean : validRuleSets) {
                 logger.debug("Expression : {} ", ruleSetBean.getTarget().getValue());
-                for (ExpressionBean expression : ruleSetBean.getExpressions()) {
-                    logger.debug("Expression post filtering SEDs : {} ", expression.getValue());
+                List<ExpressionBean> expressions = ruleSetBean.getExpressions();
+                if (expressions != null) {
+                    for (ExpressionBean expression : expressions) {
+                        logger.debug("Expression post filtering SEDs : {} ", expression.getValue());
+                    }
                 }
             }
         }
