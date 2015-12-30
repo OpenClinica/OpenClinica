@@ -96,9 +96,9 @@ public class PauseJobServlet extends SecureController {
         // forward back to view job servlet here
         // set a message
         if ("".equals(gName) || "0".equals(gName)) {
-            forwardPage(Page.VIEW_JOB_SERVLET);
+            response.sendRedirect(request.getContextPath() + Page.VIEW_JOB_SERVLET.getFileName());
         } else {
-            forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
+            response.sendRedirect(request.getContextPath() + Page.VIEW_IMPORT_JOB_SERVLET.getFileName());
         }
     }
 

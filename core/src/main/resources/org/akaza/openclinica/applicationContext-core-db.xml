@@ -46,7 +46,7 @@
          -->
         
         
-      <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+      <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource" init-method="init">
       <property name="driverClassName" value="s[driver]"/>
       <property name="maxActive" value="50"/>
       <property name="maxIdle" value="2"/>

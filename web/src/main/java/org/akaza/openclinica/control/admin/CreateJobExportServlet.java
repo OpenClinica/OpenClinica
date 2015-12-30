@@ -258,12 +258,12 @@ public class CreateJobExportServlet extends SecureController {
                     se.printStackTrace();
                     setUpServlet();
                     addPageMessage("Error creating Job.");
-                    forwardPage(Page.VIEW_JOB_SERVLET);
+                    response.sendRedirect(request.getContextPath() + Page.VIEW_JOB_SERVLET.getFileName());
                     return;
                 }
                 setUpServlet();
                 addPageMessage("You have successfully created a new job: " + jobName + " which is now set to run at the time you specified.");
-                forwardPage(Page.VIEW_JOB_SERVLET);
+                response.sendRedirect(request.getContextPath() + Page.VIEW_JOB_SERVLET.getFileName());
             }
         } else {
             forwardPage(Page.ADMIN_SYSTEM);
