@@ -28,7 +28,6 @@ public class LogoutServlet extends SecureController {
     public void processRequest() throws Exception {
         sm = null;// set sm to null after user logs out
         logger.info("User  : {} , email address : {} Logged Out ", ub.getName(), ub.getEmail());
-    	System.out.println("Unlocking all crfs for user " + ub.getId() + " from LogoutServlet.processRequest()");
         getCrfLocker().unlockAllForUser(ub.getId());
         session.removeAttribute("userBean");
         session.removeAttribute("study");

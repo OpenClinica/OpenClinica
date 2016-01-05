@@ -978,8 +978,7 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public void unlockCRFsForUser(int userId) {
-    	System.out.println("Unlocking crf " + "???" + " by user " + userId + " in CoreSecureController.unlocksCRFsForUser (Could be calling wrong function here.  should be calling unlock all for user.");
-        crfLocker.unlock(userId);
+        crfLocker.unlockAllForUser(userId);
     }
 
 
