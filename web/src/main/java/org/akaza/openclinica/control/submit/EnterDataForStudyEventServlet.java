@@ -115,6 +115,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
        // removeLockedCRF(ub.getId());
+    	System.out.println("Unlocking all crfs for user " + ub.getId() + " from EnterDataForStudyEventServlet.processRequest()");
         getCrfLocker().unlockAllForUser(ub.getId());
         FormProcessor fp = new FormProcessor(request);
 

@@ -105,6 +105,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
 //        mayAccess();
+    	System.out.println("Unlocking all crfs for user " + ub.getId() + " from ViewStudySubjectServlet.mayProceed()");
         getCrfLocker().unlockAllForUser(ub.getId());
         if (ub.isSysAdmin()) {
             return;

@@ -332,21 +332,25 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
         request.setAttribute( "isFirstTimeOnSection",isFirstTimeOnSection+"");
 
-
-        if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
+        System.out.println("user " + ub.getName() + "(" + ub.getId() + ") attempting to lock....");
+        //if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
             //HashMap unavailableCRF = getUnavailableCRFList();
-            if (getCrfLocker().isLocked(ecb.getId())) {
-                int userId = getCrfLocker().getLockOwner(ecb.getId());
-                UserAccountDAO udao = new UserAccountDAO(getDataSource());
-                UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+        if (getCrfLocker().isLocked(ecb.getId())) {
+        	System.out.println("crf is locked. about to check if by the same user....");
+            int userId = getCrfLocker().getLockOwner(ecb.getId());
+            UserAccountDAO udao = new UserAccountDAO(getDataSource());
+            UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+            if (ubean.getId() != ub.getId()) {
+            	System.out.println("crf is locked by a different user.  redirecting....");
                 addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName() + " " + resword.getString("Currently_entering_data") + " "
                     + resword.getString("Leave_the_CRF"), request);
-
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-            } else {
-                getCrfLocker().lock(ecb.getId(), ub.getId());
             }
+        } else {
+        	System.out.println("crf was not locked. locking now and proceeding....");
+            getCrfLocker().lock(ecb.getId(), ub.getId());
         }
+        //}
 
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
@@ -447,7 +451,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
             //Removing the user and EventCRF from the locked CRF List
-            getCrfLocker().unlock(ecb.getId());
+        	if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId()) {
+            	System.out.println("Unlocking crf " + ecb.getId() + " by user " + ub.getId() + " in DataEntryServlet.processRequest");
+            	getCrfLocker().unlock(ecb.getId());
+        	}
             if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
 

@@ -43,6 +43,7 @@ public class CRFLocker implements Serializable {
      * @param crfId The ID of the CRF to be unlocked
      */
     public void unlock(int crfId) {
+    	System.out.println("Unlocking crf: " + crfId);
         lockedCRFs.remove(crfId);
     }
 
@@ -53,6 +54,7 @@ public class CRFLocker implements Serializable {
      */
     public void unlockAllForUser(int userId) {
         synchronized (lockedCRFs) {
+        //	System.out.println("Unlocking all crfs for user " + userId);
             Set<Entry<Integer, Integer>> entries = lockedCRFs.entrySet();
             Iterator<Entry<Integer, Integer>> it = entries.iterator();
             while (it.hasNext()) {

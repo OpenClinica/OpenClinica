@@ -294,8 +294,16 @@ public abstract class CoreSecureController extends HttpServlet {
     private void unlockCRFOnError(HttpServletRequest req) {
         if (req != null) {
             EventCRFBean eventCrf = (EventCRFBean) req.getAttribute("event");
-            if (eventCrf != null) {
+            UserAccountBean ub = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
+
+            if (eventCrf != null && crfLocker.isLocked(eventCrf.getId())) {
+            	if (ub != null && ub.getId() == crfLocker.getLockOwner(eventCrf.getId())) {
+            	System.out.println("Unlocking crf " + eventCrf.getId() + " by user " + ub.getId() + " in CoreSecureController.unlockCRFOnError");
                 crfLocker.unlock(eventCrf.getId());
+            	} else if (ub == null) {
+                	System.out.println("Unlocking crf " + eventCrf.getId() + " by user " + "???" + " in CoreSecureController.unlockCRFOnError");
+                    crfLocker.unlock(eventCrf.getId());
+            	}
             }
         }
     }
@@ -970,6 +978,7 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public void unlockCRFsForUser(int userId) {
+    	System.out.println("Unlocking crf " + "???" + " by user " + userId + " in CoreSecureController.unlocksCRFsForUser (Could be calling wrong function here.  should be calling unlock all for user.");
         crfLocker.unlock(userId);
     }
 

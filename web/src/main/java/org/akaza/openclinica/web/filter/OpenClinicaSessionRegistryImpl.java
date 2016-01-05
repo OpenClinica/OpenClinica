@@ -45,6 +45,7 @@ public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
     void auditLogout(String username) {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         UserAccountBean userAccount = (UserAccountBean) getUserAccountDao().findByUserName(username);
+    	System.out.println("Unlocking all crfs for user " + userAccount.getId() + " from OpenClinicaSessionRegistryImpl.auditLogout()");
         crfLocker.unlockAllForUser(userAccount.getId());
 
         AuditUserLoginBean auditUserLogin = new AuditUserLoginBean();

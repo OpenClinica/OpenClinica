@@ -30,6 +30,7 @@ public class CheckCRFLocked extends SecureController {
             }
             return;
         }else if(request.getParameter("userId")!=null) {
+        	System.out.println("Unlocking all crfs for user " + request.getParameter("userId") + " from CheckCRFLocked.processRequest()");
             getCrfLocker().unlockAllForUser(Integer.parseInt(request.getParameter("userId")));
             if(request.getParameter("exitTo")!=null){
                 response.sendRedirect(request.getParameter("exitTo"));

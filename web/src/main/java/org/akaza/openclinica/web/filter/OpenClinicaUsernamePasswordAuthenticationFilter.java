@@ -136,6 +136,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             request.getSession().setAttribute(SecureController.USER_BEAN_NAME, userAccountBean);
             //To remove the locking of Event CRFs previusly locked by this user.
+        	System.out.println("Unlocking all crfs for user " + userAccountBean.getId() + " from OpenClinicaUsernamePasswordAuthenticationFileter.attemptAuthentication().");
             crfLocker.unlockAllForUser(userAccountBean.getId());
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);

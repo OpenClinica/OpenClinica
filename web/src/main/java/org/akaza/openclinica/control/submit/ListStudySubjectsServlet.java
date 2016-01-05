@@ -77,6 +77,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
+    	System.out.println("Unlocking all crfs for user " + ub.getId() + " from ListStudySubjectServlet.processRequest()");
         getCrfLocker().unlockAllForUser(ub.getId());
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
