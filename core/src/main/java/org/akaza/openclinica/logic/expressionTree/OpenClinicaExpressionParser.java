@@ -82,6 +82,8 @@ public class OpenClinicaExpressionParser {
     }
 
     public String parseAndTestEvaluateExpression(String expression) throws OpenClinicaSystemException {
+        if(expression.length()>2040)
+            throw new OpenClinicaSystemException("OCRERR_0052");
         getTextIO().fillBuffer(expression);
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();

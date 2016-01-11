@@ -636,7 +636,7 @@
                               <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateParticipate}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -678,7 +678,7 @@
                               <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateRandomization}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>

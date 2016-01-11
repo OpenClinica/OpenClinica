@@ -15,9 +15,16 @@ public class SeRandomizationDTO {
     private String ocUser_lastname;
     private String ocUser_emailAddress;
     private String studyName;
+    private String OpenClinicaVersion;
     
     
     
+    public String getOpenClinicaVersion() {
+        return OpenClinicaVersion;
+    }
+    public void setOpenClinicaVersion(String openClinicaVersion) {
+        OpenClinicaVersion = openClinicaVersion;
+    }
     public String getStudyName() {
         return studyName;
     }

@@ -50,7 +50,7 @@ public class RandomizationRegistrar {
 
         try {
             SeRandomizationDTO response = rest.getForObject(randomizationUrl, SeRandomizationDTO.class);
-            if (response != null) {
+            if (response.getStudyOid() != null) {
                 return response;
             } else {
                 return null;
@@ -117,7 +117,8 @@ public class RandomizationRegistrar {
             seRandomizationDTO.setOcUser_lastname(userAccount.getLastName());
             seRandomizationDTO.setOcUser_emailAddress(userAccount.getEmail());
             seRandomizationDTO.setStudyName(studyName);
-        
+            seRandomizationDTO.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
+
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
