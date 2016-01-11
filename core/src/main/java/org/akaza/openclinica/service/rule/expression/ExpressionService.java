@@ -453,7 +453,10 @@ public class ExpressionService {
                      }
                      logger.debug("valueFromDb : {}", valueFromDb);
                      value = valueFromForm == null ? valueFromDb : valueFromForm;
-                    
+                     if (value == null) {
+                         logger.info("The value is " + value + "  for expression" + expression);
+                         throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
+                     }
                      
                  }
              }
