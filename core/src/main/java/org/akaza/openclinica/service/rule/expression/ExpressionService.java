@@ -49,6 +49,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1172,7 +1173,9 @@ public class ExpressionService {
         if (length > 1 && !isEventStartDateAndStatusParamExist) {
             String itemGroupOid = getItemGroupOidFromExpression(expression);
             itemGroup = getItemGroupDao().findByOid(itemGroupOid);
-            if(itemGroup == null )
+           ArrayList <ItemGroupBean> igBean = (ArrayList<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(item.getId());
+            
+            if(itemGroup == null || itemGroup.getId() != igBean.get(0).getId())
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
         }
