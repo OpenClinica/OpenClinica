@@ -79,6 +79,7 @@
                 <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>  
                 <value>org.akaza.openclinica.domain.datamap.Item                 </value>  
                 <value>org.akaza.openclinica.domain.datamap.ItemData             </value>  
+                <value>org.akaza.openclinica.domain.datamap.MonitorView           </value>  
                 <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>  
                 <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>  
                 <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>  
@@ -186,6 +187,7 @@
   <bean id="itemGroupDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemDao" class="org.akaza.openclinica.dao.hibernate.ItemDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemDataDao" class="org.akaza.openclinica.dao.hibernate.ItemDataDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="monitorViewDao" class="org.akaza.openclinica.dao.hibernate.MonitorViewDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemReferenceTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemReferenceTypeDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemDataTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemDataTypeDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="responseSetDao" class="org.akaza.openclinica.dao.hibernate.ResponseSetDao" parent="abstractDomainDao" autowire="byName" />
