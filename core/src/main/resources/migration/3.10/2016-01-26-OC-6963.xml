@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jkeremian" id="2016-01-26-OC-6963-1">
+      <comment>Create a new table called Tag for Monitoring Feature</comment>
+        <createTable tableName="tag">
+            <column autoIncrement="true" name="tag_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+			<column name="tag_name" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    
+    <changeSet author="jkeremian" id="2016-01-26-OC-6963-2">
+      <comment>Create a new table called Item_Data_Toolkit_Config for Monitoring Feature</comment>
+        <createTable tableName="item_data_toolkit_config">
+            <column autoIncrement="true" name="config_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+			<column name="path" type="varchar(255)"/>
+			<column name="tag_id" type="int"/>
+			<column name="active" type="boolean"/>
+        </createTable>
+    </changeSet>
+    
+    <changeSet author="jkeremian" id="2016-01-26-OC-6963-3">   
+      <comment>Create a new table called Entity_Flag for Monitoring Feature</comment>
+        <createTable tableName="entity_flag">
+            <column autoIncrement="true" name="entity_flag_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+			<column name="entity_name" type="varchar(255)"/>
+			<column name="entity_id" type="int"/>
+			<column name="tag_status" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2016-01-26-OC-6963-4">
+        <comment>Insert a new record into Tag table</comment>
+        <insert tableName="tag">
+            <column name="tag_id" valueNumeric="1"/>
+            <column name="tag_name" value="SDV"/>
+        </insert>
+    </changeSet>
+
+    
+    
+</databaseChangeLog>
