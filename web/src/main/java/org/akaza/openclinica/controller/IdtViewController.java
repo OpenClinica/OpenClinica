@@ -69,9 +69,9 @@ public class IdtViewController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
 
-    @RequestMapping(value = "/paginated", params = { "studyoid", "page", "per_page" }, method = RequestMethod.GET)
+    @RequestMapping(value = "/paginated", params = { "studyoid", "page", "per_page" , "filter" }, method = RequestMethod.GET)
     public ResponseEntity<List<IdtView>> getPaginatedIdtViewData(@RequestParam("studyoid") String studyOid, @RequestParam("page") int page,
-            @RequestParam("per_page") int per_page) throws Exception {
+            @RequestParam("per_page") int per_page ,@RequestParam("filter") int filter) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         List<IdtView> idtDTO = null;
         if (page == 0)
@@ -85,20 +85,31 @@ public class IdtViewController {
         Integer pStudyId = parentStudy.getId();
         Integer studyId = getStudy(studyOid).getId();
 
-    //    String crf_name="Groups_Adverse_Events";
-        String crf_name="";
         
-    //    String study_subject_label="Sub B 101";
-        String study_subject_label="";
+        ArrayList <String> studySubjects = new ArrayList<>();
+ //       studySubjects.add("Sub B 101");
+ //       studySubjects.add("FIEL01");
+ //       studySubjects.add("104Waltham");
+        
+        ArrayList <String> studyEventDefinitions = new ArrayList<>();
+    //    studyEventDefinitions.add("SE_FOLLOWUPVISIT");
+        
+        ArrayList <String> crfs = new ArrayList<>();
+ //       crfs.add("Groups_Adverse_Events");
+
         String option="";   // either null or "not" to reverse filter
+        if (filter==2)
+           option ="not";
         
+            
+            
         if (studyId == pStudyId) {
             // parent Study
             
-            idtDTO = getIdtViewDao().findPaginatedIdtViewDataFiltered(studyId, pStudyId, per_page, page, "OR" ,crf_name,study_subject_label,option);
+            idtDTO = getIdtViewDao().findPaginatedIdtViewDataFiltered(studyId, pStudyId, per_page, page, "OR" ,studySubjects,studyEventDefinitions,crfs,option);
         } else {
             // Site
-            idtDTO = getIdtViewDao().findPaginatedIdtViewDataFiltered(studyId, pStudyId, per_page, page, "AND",crf_name ,study_subject_label,option);
+            idtDTO = getIdtViewDao().findPaginatedIdtViewDataFiltered(studyId, pStudyId, per_page, page, "AND",studySubjects,studyEventDefinitions,crfs,option);
         }
         return new ResponseEntity<List<IdtView>>(idtDTO, HttpStatus.OK);
 
