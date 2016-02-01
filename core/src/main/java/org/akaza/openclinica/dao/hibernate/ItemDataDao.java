@@ -1,12 +1,12 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.List;
+
 import org.akaza.openclinica.domain.datamap.ItemData;
 
 public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
-    @Override
     Class<ItemData> domainClass() {
-        // TODO Auto-generated method stub
         return ItemData.class;
     }
 
@@ -20,6 +20,20 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (ItemData) q.uniqueResult();
     }
 
+    public List<ItemData> findByEventCrfGroup(Integer eventCrfId, Integer itemGroupId) {
+        String query = "select id.* " + 
+            "from item_data id " + 
+            "join item i on id.item_id = i.item_id " + 
+            "join event_crf ec on id.event_crf_id=ec.event_crf_id " + 
+            "join item_group_metadata igm on i.item_id=igm.item_id and igm.crf_version_id = ec.crf_version_id " + 
+            "where id.event_crf_id = " + eventCrfId + " and igm.item_group_id = " + itemGroupId + " " + 
+            "order by id.ordinal, igm.ordinal";
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemData.class);
+        
+        return (List<ItemData>) q.list();
+      
+    }
+    
     public int getMaxGroupRepeat(Integer eventCrfId, Integer itemId) {
         String query = "select max(ordinal) from item_data where event_crf_id = " + eventCrfId + " and item_id = " + itemId;
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query);

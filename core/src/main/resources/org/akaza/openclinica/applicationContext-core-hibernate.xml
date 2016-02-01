@@ -60,14 +60,14 @@
                 <value>org.akaza.openclinica.domain.user.UserAccount</value>
                 <value>org.akaza.openclinica.domain.user.UserType</value>
                 <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
-                <value>org.akaza.openclinica.domain.datamap.CompletionStatus     </value>  
+                <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>  
                 <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>  
                 <value>org.akaza.openclinica.domain.datamap.CrfVersionMedia</value>  
                 <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>  
                 <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>  
                 <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value>
                 <value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value>
-                <value>org.akaza.openclinica.domain.datamap.DnItemDataMap   </value>
+                <value>org.akaza.openclinica.domain.datamap.DnItemDataMap</value>
                 <value>org.akaza.openclinica.domain.datamap.DnItemDataMapId </value>
                 <value>org.akaza.openclinica.domain.datamap.DnStudyEventMap      </value>
                 <value>org.akaza.openclinica.domain.datamap.DnStudySubjectMap                 </value>
@@ -194,6 +194,13 @@
   <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="dnItemDataMapDao" class="org.akaza.openclinica.dao.hibernate.DnItemDataMapDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="completionStatusDao" class="org.akaza.openclinica.dao.hibernate.CompletionStatusDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="discrepancyNoteDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="discrepancyNoteTypeDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteTypeDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="resolutionStatusDao" class="org.akaza.openclinica.dao.hibernate.ResolutionStatusDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="studyUserRoleDao" class="org.akaza.openclinica.dao.hibernate.StudyUserRoleDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
     <property name="dataSource" ref="dataSource"/>
@@ -211,5 +218,6 @@
    <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
   </bean>
   <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
+  <bean id="userTypeDao" class="org.akaza.openclinica.dao.hibernate.UserTypeDao" parent="abstractDomainDao" autowire="byName"/>
   <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean> 
 </beans>

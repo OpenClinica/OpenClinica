@@ -47,6 +47,7 @@ public class ItemData  extends DataMapDomainObject {
 	private Date dateUpdated;
 	private Integer updateId;
 	private Integer ordinal;
+	private Status oldStatus;
 	private Boolean deleted;
 	private List<DnItemDataMap> dnItemDataMaps;
 
@@ -174,7 +175,17 @@ public class ItemData  extends DataMapDomainObject {
 		return this.ordinal;
 	}
 
-	public void setOrdinal(Integer ordinal) {
+    @Type(type = "status")
+    @Column(name = "old_status_id")
+	public Status getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(Status oldStatus) {
+        this.oldStatus = oldStatus;
+    }
+
+    public void setOrdinal(Integer ordinal) {
 		this.ordinal = ordinal;
 	}
 

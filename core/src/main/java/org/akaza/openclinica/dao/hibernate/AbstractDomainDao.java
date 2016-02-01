@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
@@ -28,11 +29,20 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         q.setInteger("id", id);
         return (T) q.uniqueResult();
     }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public ArrayList<T> findAll() {
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        return (ArrayList<T>) q.list();
+    }
     
     @SuppressWarnings("unchecked")
 	public T findByOcOID(String OCOID){
     	 getSessionFactory().getStatistics().logSummary();
-         String query = "from " + getDomainClassName() + " do  where do.oc_oid = :OCOID";
+         String query = "from " + getDomainClassName() + " do  where do.oc_oid = :oc_oid";
          org.hibernate.Query q = getCurrentSession().createQuery(query);
          q.setString("oc_oid", OCOID);
          return (T) q.uniqueResult();

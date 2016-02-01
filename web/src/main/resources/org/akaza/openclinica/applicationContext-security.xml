@@ -30,6 +30,7 @@
     <security:intercept-url pattern="/Contact" filters="none"/>
     <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
+    <security:intercept-url pattern="/pages/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/studies/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmss/**" filters="none"/>
