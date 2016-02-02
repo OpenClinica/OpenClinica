@@ -24,18 +24,22 @@ public class EventDefinitionCrfDao extends AbstractDomainDao<EventDefinitionCrf>
     
     @SuppressWarnings("unchecked")
     public List<EventDefinitionCrf> findAvailableByStudyEventDefStudy(Integer studyEventDefinitionId, Integer studyId) {
-        String query = "from " + getDomainClassName() + " do where do.studyEventDefintion.studyEventDefinitionId = :studyeventdefid " + 
-                " and do.study.studyId = :studyid and do.status.code = 1";
+        String query = "from " + getDomainClassName() + " do where do.studyEventDefinition.studyEventDefinitionId = :studyeventdefid " + 
+                " and do.study.studyId = :studyid and do.statusId = 1";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventdefid", studyEventDefinitionId);
+        q.setInteger("studyid", studyId);
         return (List<EventDefinitionCrf>) q.list();
         
     }
 
     @SuppressWarnings("unchecked")
     public List<EventDefinitionCrf> findSiteAvailableByStudyEventDefStudy(Integer studyEventDefinitionId, Integer studyId) {
-        String query = "from " + getDomainClassName() + " do where do.studyEventDefintion.studyEventDefinitionId = :studyeventdefid " + 
-                " and do.study.studyId = :studyid and do.status.code = 1 and do.hideCrf = false";
+        String query = "from " + getDomainClassName() + " do where do.studyEventDefinition.studyEventDefinitionId = :studyeventdefid " + 
+                " and do.study.studyId = :studyid and do.statusId = 1 and do.hideCrf = false";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventdefid", studyEventDefinitionId);
+        q.setInteger("studyid", studyId);
         return (List<EventDefinitionCrf>) q.list();
         
     }

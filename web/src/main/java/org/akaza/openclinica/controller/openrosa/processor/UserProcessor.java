@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -10,6 +12,7 @@ import org.akaza.openclinica.dao.hibernate.UserTypeDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
+import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.user.UserType;
 import org.slf4j.Logger;
@@ -85,12 +88,16 @@ public class UserProcessor implements Processor, Ordered {
             container.setUser(userAccountDao.findByUserName(createdUser.getUserName()));
             
             //Create study user role
-            StudyUserRole studyUserRole = new StudyUserRole();
+            Date date = new Date();
+            StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
+                    rootUser.getUserId(), date,date,
+                    rootUser.getUserId(), createdUser.getUserName());
+            StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
             studyUserRole.setStudy(container.getStudy());
-            studyUserRole.setStatus(Status.AUTO_DELETED);
-            studyUserRole.setUserAccount(rootUser);
-            studyUserRole.setRoleName(Role.RESEARCHASSISTANT2.getName());
-            studyUserRole.setUserName(createdUser.getUserName());
+            studyUserRole.setStatusId(Status.AUTO_DELETED.getCode());
+            //studyUserRole.setUserAccount(rootUser);
+            //studyUserRole.setRoleName(Role.RESEARCHASSISTANT2.getName());
+            //studyUserRole.setUserName(createdUser.getUserName());
             studyUserRoleDao.saveOrUpdate(studyUserRole);
             //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified
             // doesn't exist in role table.  May need to fix that.

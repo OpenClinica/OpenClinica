@@ -109,9 +109,9 @@
                 <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValueId</value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>   -->
-                <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>  
+                <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>
+                <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>
 
        
                 

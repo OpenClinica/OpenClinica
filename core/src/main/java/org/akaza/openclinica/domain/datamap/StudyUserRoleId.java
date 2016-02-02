@@ -2,6 +2,7 @@
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 package org.akaza.openclinica.domain.datamap;
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 

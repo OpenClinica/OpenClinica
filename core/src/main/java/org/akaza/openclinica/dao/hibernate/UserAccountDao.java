@@ -19,7 +19,7 @@ public class UserAccountDao extends AbstractDomainDao<UserAccount> {
 
     public UserAccount findByUserId(Integer userId) {
         getSessionFactory().getStatistics().logSummary();
-        String query = "from " + getDomainClassName() + " do  where do.user_id = :user_id";
+        String query = "from " + getDomainClassName() + " do  where do.userId = :user_id";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("user_id", userId);
         return (UserAccount) q.uniqueResult();
