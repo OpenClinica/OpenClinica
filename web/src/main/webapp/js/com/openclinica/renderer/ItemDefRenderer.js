@@ -31,7 +31,7 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
   
   if (this.studyEventOID!=undefined && app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]) { 
     this.itemValue = app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]; 
-    
+    this.itemValue = this.itemValue.replace(new RegExp('##', 'g'), ',');
     }
   
   if(this.studyEventOID!=undefined && app_displayAudits=='y' && app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID])

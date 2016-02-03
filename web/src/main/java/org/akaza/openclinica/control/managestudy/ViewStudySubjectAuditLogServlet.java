@@ -208,6 +208,11 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     ItemDataBean idBean = (ItemDataBean)itemDataDao.findByPK(ab.getEntityId());
                     ab.setOrdinal(idBean.getOrdinal());
                 }
+
+                if (ab.getAuditEventTypeId() == 1) {
+                    ab.setOldValue(ab.getOldValue().replaceAll("##", ","));
+                    ab.setNewValue(ab.getNewValue().replaceAll("##", ","));
+                }
             }
             request.setAttribute("events", events);
             request.setAttribute("eventCRFAudits", eventCRFAudits);

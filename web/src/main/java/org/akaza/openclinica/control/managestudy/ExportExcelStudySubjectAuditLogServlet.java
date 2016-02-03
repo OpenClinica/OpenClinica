@@ -587,6 +587,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 							}
 						}
 						else {
+							if (eventCrfAudit.getAuditEventTypeId() == 1) {
+			                    eventCrfAudit.setOldValue(eventCrfAudit.getOldValue().replaceAll("##", ","));
+			                }
 							oldValue = eventCrfAudit.getOldValue();
 						}
 							
@@ -624,6 +627,9 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
 						}
 						else {
+							if (eventCrfAudit.getAuditEventTypeId() == 1) {
+			                    eventCrfAudit.setNewValue(eventCrfAudit.getNewValue().replaceAll("##", ","));
+			                }
 							newValue = eventCrfAudit.getNewValue();
 						}
 						String ordinal="";
