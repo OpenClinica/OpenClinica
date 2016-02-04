@@ -66,11 +66,71 @@
         </sql>
     </query>
     <query>
-        <name>getCountWithFilter</name>
-        <sql>SELECT COUNT(DISTINCT (dn.*)) from discrepancy_note dn,study s , user_account ua , study_subject ss
-            where dn.study_id = s.study_id 
-            and ( s.study_id =? or s.parent_study_id =?)
-            and dn.parent_dn_id is null
+        <name>getSubjectDNCountWithFilter</name>
+        <sql>SELECT COUNT(DISTINCT(dn.*)) 
+             FROM discrepancy_note dn 
+               JOIN dn_subject_map dnsm ON dnsm.discrepancy_note_id=dn.discrepancy_note_id AND dn.entity_type='subject'
+               JOIN subject su ON dnsm.subject_id = su.subject_id
+               JOIN study_subject ss ON ss.subject_id = su.subject_id
+               JOIN study s ON ss.study_id=s.study_id
+               LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
+             WHERE ( s.study_id = ? OR s.parent_study_id = ?)
+               AND (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0)
+        </sql>
+    </query>
+    <query>
+        <name>getStudySubjectDNCountWithFilter</name>
+        <sql>SELECT COUNT(DISTINCT(dn.*)) 
+             FROM discrepancy_note dn 
+               JOIN study s ON dn.study_id=s.study_id
+               JOIN dn_study_subject_map dnssm ON dnssm.discrepancy_note_id=dn.discrepancy_note_id AND dn.entity_type='studySub'
+               JOIN study_subject ss ON dnssm.study_subject_id = ss.study_subject_id
+               JOIN study ON ss.study_id = s.study_id
+               LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
+             WHERE ( s.study_id = ? OR s.parent_study_id = ?)
+               AND (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0)
+        </sql>
+    </query>
+    <query>
+        <name>getStudyEventDNCountWithFilter</name>
+        <sql>SELECT COUNT(DISTINCT(dn.*)) 
+             FROM discrepancy_note dn 
+               JOIN dn_study_event_map dnsem ON dnsem.discrepancy_note_id=dn.discrepancy_note_id AND dn.entity_type='studyEvent'
+               JOIN study_event se on dnsem.study_event_id = se.study_event_id
+               JOIN study_subject ss ON ss.study_subject_id = se.study_subject_id
+               JOIN study s ON ss.study_id=s.study_id
+               LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
+             WHERE ( s.study_id = ? OR s.parent_study_id = ?)
+               AND (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0)
+        </sql>
+    </query>
+    <query>
+        <name>getEventCrfDNCountWithFilter</name>
+        <sql>SELECT COUNT(DISTINCT(dn.*)) 
+             FROM discrepancy_note dn 
+               JOIN dn_event_crf_map dnecm ON dnecm.discrepancy_note_id=dn.discrepancy_note_id AND dn.entity_type='eventCrf'
+               JOIN event_crf ec on dnecm.event_crf_id = ec.event_crf_id
+               JOIN study_event se ON ec.study_event_id = se.study_event_id
+               JOIN study_subject ss ON ss.study_subject_id = se.study_subject_id
+               JOIN study s ON ss.study_id=s.study_id
+               LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
+             WHERE ( s.study_id = ? OR s.parent_study_id = ?)
+               AND (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0)
+        </sql>
+    </query>
+    <query>
+        <name>getItemDataDNCountWithFilter</name>
+        <sql>SELECT COUNT(DISTINCT(dn.*)) 
+             FROM discrepancy_note dn 
+               JOIN dn_item_data_map dnidm ON dnidm.discrepancy_note_id=dn.discrepancy_note_id AND dn.entity_type='itemData'
+               JOIN item_data id ON dnidm.item_data_id = id.item_data_id
+               JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
+               JOIN study_event se ON ec.study_event_id = se.study_event_id
+               JOIN study_subject ss ON ss.study_subject_id = se.study_subject_id
+               JOIN study s ON ss.study_id=s.study_id
+               LEFT JOIN user_account ua ON dn.assigned_user_id = ua.user_id
+             WHERE ( s.study_id = ? OR s.parent_study_id = ?)
+               AND (dn.parent_dn_id IS NULL OR dn.parent_dn_id = 0)
         </sql>
     </query>
     <query>
