@@ -15,6 +15,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -24,14 +25,16 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "event_definition_crf_tag")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "tag_tag_id_seq") })
-public class Tag extends DataMapDomainObject {
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_definition_crf_tag_id_seq") })
+public class EventDefinitionCrfTag extends DataMapDomainObject {
 
     private Integer id;
-    private String tag_name;
-    private String workflow;
+    private String path;
+    private int tagId;
+    private boolean active;
+
     private UserAccount userAccount;
     private Date dateCreated;
     private Date dateUpdated;
@@ -48,13 +51,32 @@ public class Tag extends DataMapDomainObject {
         this.id = id;
     }
 
-    @Column(name = "tag_name")
-    public String getTag_name() {
-        return tag_name;
+    @Column(name = "path")
+    public String getPath() {
+        return path;
     }
 
-    public void setTag_name(String tag_name) {
-        this.tag_name = tag_name;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    @Column(name = "tag_id")
+    public int getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(int tagId) {
+        this.tagId = tagId;
+    }
+
+
+    @Column(name = "active")
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -92,15 +114,6 @@ public class Tag extends DataMapDomainObject {
 
     public void setUpdateId(Integer updateId) {
         this.updateId = updateId;
-    }
-
-    @Column(name = "workflow")
-    public String getWorkflow() {
-        return workflow;
-    }
-
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
     }
 
 }

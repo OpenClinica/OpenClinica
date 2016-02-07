@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,14 +23,16 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "item_data_flag")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "tag_tag_id_seq") })
-public class Tag extends DataMapDomainObject {
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_data_flag_id_seq") })
+public class ItemDataFlag extends DataMapDomainObject {
 
     private Integer id;
-    private String tag_name;
-    private String workflow;
+    private int tagId;
+    private String path;
+    private int flagWorkflowId;
+    private ItemDataFlagWorkflow ItemDataFlagWorkflow;
     private UserAccount userAccount;
     private Date dateCreated;
     private Date dateUpdated;
@@ -48,14 +49,24 @@ public class Tag extends DataMapDomainObject {
         this.id = id;
     }
 
-    @Column(name = "tag_name")
-    public String getTag_name() {
-        return tag_name;
+    @Column(name = "path")
+    public String getPath() {
+        return path;
     }
 
-    public void setTag_name(String tag_name) {
-        this.tag_name = tag_name;
+    public void setPath(String path) {
+        this.path = path;
     }
+
+    @Column(name = "tag_id")
+    public int getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(int tagId) {
+        this.tagId = tagId;
+    }
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -94,13 +105,15 @@ public class Tag extends DataMapDomainObject {
         this.updateId = updateId;
     }
 
-    @Column(name = "workflow")
-    public String getWorkflow() {
-        return workflow;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flag_workflow_id")
+    public ItemDataFlagWorkflow getItemDataFlagWorkflow() {
+        return ItemDataFlagWorkflow;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setItemDataFlagWorkflow(ItemDataFlagWorkflow itemDataFlagWorkflow) {
+        ItemDataFlagWorkflow = itemDataFlagWorkflow;
     }
+
 
 }

@@ -24,18 +24,18 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "event_crf_flag_workflow")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "tag_tag_id_seq") })
-public class Tag extends DataMapDomainObject {
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_crf_flag_workflow_id_seq") })
+public class EventCrfFlagWorkflow extends DataMapDomainObject {
 
     private Integer id;
-    private String tag_name;
-    private String workflow;
+    private String workflowId;
+    private String workflowStatus;
     private UserAccount userAccount;
+    private Integer updateId;
     private Date dateCreated;
     private Date dateUpdated;
-    private Integer updateId;
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
@@ -48,14 +48,15 @@ public class Tag extends DataMapDomainObject {
         this.id = id;
     }
 
-    @Column(name = "tag_name")
-    public String getTag_name() {
-        return tag_name;
+    @Column(name = "workflow_status")
+    public String getWorkflowStatus() {
+        return workflowStatus;
     }
 
-    public void setTag_name(String tag_name) {
-        this.tag_name = tag_name;
+    public void setWorkflowStatus(String workflowStatus) {
+        this.workflowStatus = workflowStatus;
     }
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -94,13 +95,13 @@ public class Tag extends DataMapDomainObject {
         this.updateId = updateId;
     }
 
-    @Column(name = "workflow")
-    public String getWorkflow() {
-        return workflow;
+    @Column(name = "workflow_id")
+    public String getWorkflowId() {
+        return workflowId;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
     }
 
 }

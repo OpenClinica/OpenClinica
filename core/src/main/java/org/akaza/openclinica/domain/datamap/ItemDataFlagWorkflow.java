@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,14 +23,14 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "item_data_flag_workflow")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "tag_tag_id_seq") })
-public class Tag extends DataMapDomainObject {
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_data_flag_workflow_id_seq") })
+public class ItemDataFlagWorkflow extends DataMapDomainObject {
 
     private Integer id;
-    private String tag_name;
-    private String workflow;
+    private String workflowId;
+    private String workflowStatus;
     private UserAccount userAccount;
     private Date dateCreated;
     private Date dateUpdated;
@@ -48,14 +47,6 @@ public class Tag extends DataMapDomainObject {
         this.id = id;
     }
 
-    @Column(name = "tag_name")
-    public String getTag_name() {
-        return tag_name;
-    }
-
-    public void setTag_name(String tag_name) {
-        this.tag_name = tag_name;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -94,13 +85,23 @@ public class Tag extends DataMapDomainObject {
         this.updateId = updateId;
     }
 
-    @Column(name = "workflow")
-    public String getWorkflow() {
-        return workflow;
+    @Column(name = "workflow_id")
+    public String getWorkflowId() {
+        return workflowId;
     }
 
-    public void setWorkflow(String workflow) {
-        this.workflow = workflow;
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
     }
+
+    @Column(name = "workflow_status")
+    public String getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(String workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
 
 }
