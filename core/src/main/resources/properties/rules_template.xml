@@ -1,7 +1,7 @@
 <RuleImport>
 	<RuleAssignment>
 		<Target Context="OC_RULES_V1"></Target>
-		<RunOnSchedule Time="17:00"/>
+	  		<!-- <RunOnSchedule Time="17:00"/> -->	  
 		<RuleRef OID="">
 		
 			<DiscrepancyNoteAction IfExpressionEvaluates="true">
@@ -20,14 +20,8 @@
 				<DestinationProperty OID="" Value="">
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</DestinationProperty>
-			</InsertAction>
-			<RandomizeAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true"/>
-				<DestinationProperty OID="" Value="">
-					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
-				</DestinationProperty>
-			</RandomizeAction>
-			
+			</InsertAction>			
+
 			<NotificationAction IfExpressionEvaluates="true">
                 <To></To>
                 <Subject></Subject>
