@@ -27,7 +27,7 @@ public class IdtViewDao extends AbstractDomainDao<IdtView> {
         if (eventDefs.size()!=0)
             query = query + " and sedOid in (" + getListOf(eventDefs) + ")";
 
-         query = query + " and eventCrfId not in (select eventCrfId from " +getDomainClassName() + " where  path is not null and itemDataWorkflowStatus='done' group by event_crf_id))";  // EventCrf done       
+         query = query + " and eventCrfId in (select eventCrfId from " +getDomainClassName() + " where  path is not null and (itemDataWorkflowStatus is null or itemDataWorkflowStatus!='done') group by eventCrfId))";  // EventCrf done       
         
         query = query + " and ((";
 
