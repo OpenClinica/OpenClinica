@@ -29,7 +29,6 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -181,15 +180,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
- //                     tableFacade.setTotalRows(100);
-            if (currentStudy.getParentStudyId()==0){
-              parentStudyId = currentStudy.getId();
-            }else{
-                parentStudyId = currentStudy.getParentStudyId();
-            }
-                            
-            int totalRows = getDiscrepancyNoteDao().getCountWithFilter(getListNoteFilter(limit), parentStudyId);
-           tableFacade.setTotalRows(totalRows);
+            parentStudyId = currentStudy.getId();
+
+            //Build row count of various DN types
+            int totalRows = getDiscrepancyNoteDao().getSubjectDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
+            totalRows += getDiscrepancyNoteDao().getStudySubjectDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
+            totalRows += getDiscrepancyNoteDao().getStudyEventDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
+            totalRows += getDiscrepancyNoteDao().getEventCrfDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
+            totalRows += getDiscrepancyNoteDao().getItemDataDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
+            tableFacade.setTotalRows(totalRows);
         }
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
