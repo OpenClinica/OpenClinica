@@ -248,7 +248,6 @@ public class StudyModuleController {
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
             // Update OC Study configuration
-        randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
 
         // send another email to sales@openclinica.com thru MandrillViaOcUi
          status = randomizationRegistrar.randomizeStudy(study.getOid(),study.getIdentifier() , userBean); 
@@ -256,7 +255,8 @@ public class StudyModuleController {
     //        addRegMessage(request, respage.getString("randomization_not_available"));
         } else {
             // Update OC Study configuration
-
+            randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
+         
             spv.setStudyId(study.getId());
             spv.setParameter("randomization");
             spv.setValue("enabled");
