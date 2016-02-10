@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-10">
+		<comment>Insert a Row in Tag Table </comment>
+		<sql splitStatements="false">
+
+			INSERT INTO tag(
+			id, tag_name, workflow,
+			owner_id, update_id, date_created,
+			date_updated)
+			VALUES (1, 'SDV',
+			'Tagging', 1, null, now(), null);
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-11">
+		<comment>Insert a Row in Tag Table </comment>
+		<sql splitStatements="false">
+
+			INSERT INTO tag(
+			id, tag_name, workflow,
+			owner_id, update_id, date_created,
+			date_updated)
+			VALUES (2, 'OffLine',
+			'Tagging', 1, null, now(), null);
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-12">
+		<comment>Apply Uniqueness Constraint to Event_Definition_Crf_Item_Tag</comment>
+		<sql splitStatements="false">
+
+			ALTER TABLE event_definition_crf_item_tag ADD CONSTRAINT
+			duplicate_itempath_tag_uniqueness_key UNIQUE (path, tag_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-13">
+		<comment>Apply Uniqueness Constraint to Event_Definition_Crf_Tag</comment>
+		<sql splitStatements="false">
+
+			ALTER TABLE event_definition_crf_tag ADD CONSTRAINT
+			duplicate_crfpath_tag_uniqueness_key UNIQUE (path, tag_id);
+		</sql>
+	</changeSet>
+
+
+
+</databaseChangeLog>
