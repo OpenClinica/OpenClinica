@@ -84,20 +84,15 @@ public class UserProcessor implements Processor, Ordered {
             createdUser.setActiveStudy(container.getStudy());
             UserType type = userTypeDao.findByUserTypeId(2);
             createdUser.setUserType(type);
-            userAccountDao.saveOrUpdate(createdUser);
-            container.setUser(userAccountDao.findByUserName(createdUser.getUserName()));
+            createdUser = userAccountDao.saveOrUpdate(createdUser);
+            container.setUser(createdUser);
             
             //Create study user role
             Date date = new Date();
             StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
-                    rootUser.getUserId(), date,date,
+                    rootUser.getUserId(), date,
                     rootUser.getUserId(), createdUser.getUserName());
             StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
-            studyUserRole.setStudy(container.getStudy());
-            studyUserRole.setStatusId(Status.AUTO_DELETED.getCode());
-            //studyUserRole.setUserAccount(rootUser);
-            //studyUserRole.setRoleName(Role.RESEARCHASSISTANT2.getName());
-            //studyUserRole.setUserName(createdUser.getUserName());
             studyUserRoleDao.saveOrUpdate(studyUserRole);
             //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified
             // doesn't exist in role table.  May need to fix that.

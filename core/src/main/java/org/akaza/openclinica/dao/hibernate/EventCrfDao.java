@@ -49,7 +49,7 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
     public List<EventCrf> findByStudyEventStatus(Integer studyEventId, Integer statusCode) {
         String query = "from "
                 + getDomainClassName()
-                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid and event_crf.status.code = :statuscode";
+                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid and event_crf.statusId = :statusid";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyeventid", studyEventId);
         q.setInteger("statusid", statusCode);

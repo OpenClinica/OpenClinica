@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "item_data")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_data_item_data_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class ItemData  extends DataMapDomainObject {

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -118,6 +119,7 @@ public class UserAccount extends DataMapDomainObject {
 
 	@Id
 	@Column(name = "user_id", unique = true, nullable = false)
+    @GeneratedValue(generator = "id-generator")
 	public int getUserId() {
 		return this.userId;
 	}

@@ -1,10 +1,15 @@
 package org.akaza.openclinica.service.extract;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -426,7 +431,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	// This logic is taken from eventCRFBean. 
 	private String fetchEventCRFStatus(EventCrf ecrf) {
 		String stage = null;
-		Status status = ecrf.getStatus();
+		Status status = Status.getByCode(ecrf.getStatusId());
 		 
       if (ecrf.getEventCrfId()<=0 || status.getCode()<=0) {
 	            stage =EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());

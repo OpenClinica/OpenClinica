@@ -40,12 +40,13 @@ public class StudySubjectProcessor implements Processor, Ordered {
             
             // create subject
             Subject subject = new Subject();
-            subject.setGender('\0'); // setting null character
+            //subject.setGender('\0'); // setting null character
             subject.setUserAccount(rootUser);
             subject.setStatus(Status.AVAILABLE);
             Date currentDate = new Date();
             String uniqueIdentifier = "anonymous-" + String.valueOf(nextLabel) + "-" + Long.toString(currentDate.getTime());
             subject.setUniqueIdentifier(uniqueIdentifier);
+            subject.setDobCollected(false);
             subjectDao.saveOrUpdate(subject);
             subject = subjectDao.findByUniqueIdentifier(uniqueIdentifier);
 
@@ -57,9 +58,10 @@ public class StudySubjectProcessor implements Processor, Ordered {
             studySubject.setSubject(subject);
             studySubject.setStatus(Status.AVAILABLE);
             studySubject.setUserAccount(rootUser);
-            studySubject.setEnrollmentDate(new Date());
-            studySubjectOid = studySubjectDao.getValidOid(studySubject,new ArrayList<String>());
+            studySubject.setEnrollmentDate(currentDate);
+            studySubject.setDateCreated(currentDate);
             studySubject.setLabel(Integer.toString(nextLabel));
+            studySubjectOid = studySubjectDao.getValidOid(studySubject,new ArrayList<String>());
             studySubject.setOcOid(studySubjectOid);
             studySubjectDao.saveOrUpdate(studySubject);
             container.setSubject(studySubjectDao.findByOcOID(studySubjectOid));

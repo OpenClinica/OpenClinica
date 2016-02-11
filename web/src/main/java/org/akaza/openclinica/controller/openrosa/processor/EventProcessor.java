@@ -123,7 +123,7 @@ public class EventProcessor implements Processor, Ordered {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setStatus(Status.AVAILABLE);
+        eventCrf.setStatusId(Status.AVAILABLE.getCode());
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));//setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);
@@ -184,8 +184,8 @@ public class EventProcessor implements Processor, Ordered {
     private EventCrf updateEventCrf(EventCrf eventCrf, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
         eventCrf.setUpdateId(user.getUserId());
         eventCrf.setDateUpdated(new Date());
-        if (isAnonymous) eventCrf.setStatus(Status.UNAVAILABLE);
-        else eventCrf.setStatus(Status.AVAILABLE);
+        if (isAnonymous) eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
+        else eventCrf.setStatusId(Status.AVAILABLE.getCode());
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********UPDATED EVENT CRF");
         return eventCrf;

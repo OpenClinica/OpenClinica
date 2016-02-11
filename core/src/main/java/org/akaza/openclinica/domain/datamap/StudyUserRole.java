@@ -6,13 +6,9 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.akaza.openclinica.domain.DataMapDomainObject;
-import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.CompositeIdDomainObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -22,27 +18,15 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "study_user_role")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class StudyUserRole  extends DataMapDomainObject {
+public class StudyUserRole implements CompositeIdDomainObject {
 
     private StudyUserRoleId id;
-    private UserAccount userAccount;
-    
-    private Study study;
-    private Integer statusId;
 
     public StudyUserRole() {
     }
 
     public StudyUserRole(StudyUserRoleId id) {
         this.id = id;
-    }
-
-    public StudyUserRole(StudyUserRoleId id, UserAccount userAccount,
-            Study study, Integer statusId) {
-        this.id = id;
-        this.userAccount = userAccount;
-        this.study = study;
-        this.statusId = statusId;
     }
 
     @EmbeddedId
@@ -55,41 +39,13 @@ public class StudyUserRole  extends DataMapDomainObject {
             @AttributeOverride(name = "dateUpdated", column = @Column(name = "date_updated", length = 4)),
             @AttributeOverride(name = "updateId", column = @Column(name = "update_id")),
             @AttributeOverride(name = "userName", column = @Column(name = "user_name", length = 40)) })
-    /*public StudyUserRoleId getId() {
+    public StudyUserRoleId getId() {
         return this.id;
     }
 
-    public void setId(StudyUserRoleId id) {
-        this.id = id;
-    }*/
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
-    public UserAccount getUserAccount() {
-        return this.userAccount;
+    public void setId(Object id) {
+        this.id = (StudyUserRoleId) id;
     }
 
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "study_id", insertable = false, updatable = false)
-    public Study getStudy() {
-        return this.study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-    }
-
-    @Column(name = "status_id")
-    public Integer getStatusId() {
-        return this.statusId;
-    }
-
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
-    }
 
 }
