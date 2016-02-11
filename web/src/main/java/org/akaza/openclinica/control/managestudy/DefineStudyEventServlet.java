@@ -303,6 +303,7 @@ public class DefineStudyEventServlet extends SecureController {
             String participantForm = fp.getString("participantForm" + i);
             String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
             String submissionUrl = fp.getString("submissionUrl" + i);
+            String offline = fp.getString("offline" + i);
             
 
             // issue 312 BWP<<
@@ -334,6 +335,11 @@ public class DefineStudyEventServlet extends SecureController {
                 edcBean.setAllowAnonymousSubmission(true);
             } else {
                 edcBean.setAllowAnonymousSubmission(false);
+            }
+            if (!StringUtils.isBlank(offline) && "yes".equalsIgnoreCase(offline.trim())) {
+                edcBean.setOffline(true);
+            } else {
+                edcBean.setOffline(false);
             }
             if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);
@@ -580,6 +586,8 @@ public class DefineStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sed1 = (StudyEventDefinitionBean) edao.create(sed);
 
         EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         ArrayList eventDefinitionCRFs = new ArrayList();
         if (session.getAttribute("edCRFs") != null) {
             eventDefinitionCRFs = (ArrayList) session.getAttribute("edCRFs");
@@ -591,6 +599,11 @@ public class DefineStudyEventServlet extends SecureController {
             edc.setStatus(Status.AVAILABLE);
             edc.setStudyEventDefinitionId(sed1.getId());
             edc.setOrdinal(i + 1);
+            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(sed.getId());
+            CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());                
+            String crfPath=sedBean.getOid()+"."+cBean.getOid();
+            saveEventDefnCrfOfflineTag(2, crfPath, edc ,sedBean);
+          
             cdao.create(edc);
         }
 

@@ -85,6 +85,10 @@ public class RestoreEventDefinitionServlet extends SecureController {
             edc.setCrfName(crf.getName());
             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
             edc.setDefaultVersionName(defaultVersion.getName());
+            CRFBean cBean = (CRFBean) cdao.findByPK(edc.getCrfId());                
+            String crfPath=sed.getOid()+"."+cBean.getOid();
+            edc.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+
         }
 
         // finds all events

@@ -97,6 +97,7 @@
     <td class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="submission_url" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="offline" bundle="${resword}"/></td>
     </c:when>  
    </c:choose>
     
@@ -161,6 +162,15 @@
          </c:otherwise>
            
      </c:choose>
+    
+    
+    <td class="table_cell">
+     <c:choose>
+      <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true && crf.offline == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+   </td>
+    
     
   </c:when>  
  </c:choose>

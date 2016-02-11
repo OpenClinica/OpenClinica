@@ -68,6 +68,10 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
                 edc.setOwner(crf.getOwner());
             }
 
+            CRFBean cBean = (CRFBean) cdao.findByPK(edc.getCrfId());                
+            String crfPath=sed.getOid()+"."+cBean.getOid();
+            edc.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+
             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
             edc.setDefaultVersionName(defaultVersion.getName());
         }

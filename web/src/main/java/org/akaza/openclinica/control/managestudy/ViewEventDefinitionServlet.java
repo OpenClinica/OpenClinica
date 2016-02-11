@@ -28,6 +28,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -101,6 +102,10 @@ public class ViewEventDefinitionServlet extends SecureController {
 
                 CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
                 edc.setDefaultVersionName(defaultVersion.getName());
+  
+                CRFBean cBean = (CRFBean) cdao.findByPK(edc.getCrfId());                
+                String crfPath=sed.getOid()+"."+cBean.getOid();
+                edc.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
             }
             
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    

@@ -50,6 +50,7 @@ import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -67,6 +68,8 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -78,6 +81,9 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -144,6 +150,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author ssachs
  */
 public abstract class SecureController extends HttpServlet implements SingleThreadModel {
+    EventDefinitionCrfTagDao eventDefinitionCrfTagDao=null;
     protected ServletContext context;
     protected SessionManager sm;
     // protected final Logger logger =
@@ -158,7 +165,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected StudyBean currentStudy;
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
-
+    protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
 
     private StdScheduler scheduler;
@@ -1185,4 +1192,84 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
+    public boolean getEventDefnCrfOfflineStatus(int tagId, String crfPath, boolean active){
+        EventDefinitionCrfTag eventDefinitionCrfTag = getEventDefinitionCrfTagDao().findByCrfPath(tagId, crfPath, active);
+        if (eventDefinitionCrfTag==null)
+            return false;
+        else
+            return true;
+    }
+    
+    
+    
+    
+    public EventDefinitionCrfTagDao getEventDefinitionCrfTagDao() {
+        eventDefinitionCrfTagDao=
+        this.eventDefinitionCrfTagDao != null ? eventDefinitionCrfTagDao : (EventDefinitionCrfTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagDao");
+
+        return eventDefinitionCrfTagDao;
+    }
+
+    public void saveEventDefnCrfOfflineTag(int tagId, String crfPath, EventDefinitionCRFBean edc,StudyEventDefinitionBean sed) {
+        boolean active = edc.isOffline();
+        EventDefinitionCrfTag eventDefinitionCrfTagActive = getEventDefinitionCrfTagDao().findByCrfPath(tagId, crfPath, true);
+        EventDefinitionCrfTag eventDefinitionCrfTagNonActive = getEventDefinitionCrfTagDao().findByCrfPath(tagId, crfPath, false);
+
+        if (active) {
+            if (eventDefinitionCrfTagActive != null && sed.isRepeating()) {
+                
+            } else if (eventDefinitionCrfTagActive != null && !sed.isRepeating()) {
+                updateEventDefnCrfTagObject(eventDefinitionCrfTagActive, false ,edc);
+                
+            } else if (eventDefinitionCrfTagNonActive != null && sed.isRepeating()) {
+                updateEventDefnCrfTagObject(eventDefinitionCrfTagNonActive, true ,edc);
+                
+            } else if (eventDefinitionCrfTagNonActive != null && !sed.isRepeating()) {
+            } else {
+                buildAndSaveEventDefnCrfTagObject(tagId, crfPath, active ,edc);
+            }
+
+        } else {
+            if (eventDefinitionCrfTagNonActive != null) {
+            } else if (eventDefinitionCrfTagActive != null) {
+                updateEventDefnCrfTagObject(eventDefinitionCrfTagActive, false,edc);
+            }
+
+        }
+    }
+
+    public void updateEventDefnCrfTagObject(EventDefinitionCrfTag eventDefinitionCrfTag, boolean active, EventDefinitionCRFBean edc) {
+        int userId = (edc.getUpdaterId() !=0) ? edc.getUpdaterId() : edc.getOwnerId();  
+
+        eventDefinitionCrfTag.setActive(active);
+        eventDefinitionCrfTag.setDateUpdated(new Date());
+        eventDefinitionCrfTag.setUpdateId(userId);
+        getEventDefinitionCrfTagDao().saveOrUpdate(eventDefinitionCrfTag);
+
+    }
+
+    public void buildAndSaveEventDefnCrfTagObject(int tagId, String crfPath, boolean active , EventDefinitionCRFBean edc) {
+       int userId = (edc.getUpdaterId() !=0) ? edc.getUpdaterId() : edc.getOwnerId();  
+              
+        UserAccount userAccount = getUserDaoDomain().findById(userId);
+        EventDefinitionCrfTag eventDefinitionCrfTag = new EventDefinitionCrfTag();
+        eventDefinitionCrfTag.setTagId(tagId);
+        eventDefinitionCrfTag.setPath(crfPath);
+        eventDefinitionCrfTag.setActive(active);
+        eventDefinitionCrfTag.setDateCreated(new Date());
+        eventDefinitionCrfTag.setUserAccount(userAccount);
+        getEventDefinitionCrfTagDao().saveOrUpdate(eventDefinitionCrfTag);
+
+    }
+
+    public UserAccountDao getUserDaoDomain() {
+        userDaoDomain=
+        this.userDaoDomain != null ? userDaoDomain : (UserAccountDao) SpringServletAccess.getApplicationContext(context).getBean("userDaoDomain");
+       return userDaoDomain;
+    }
+
+
+ 
+    
+    
 }

@@ -489,11 +489,11 @@ public class CreateSubStudyServlet extends SecureController {
 
          //   EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList<EventDefinitionCRFBean> edcs = sed.getCrfs();
+            
             int start = 0;
             for (EventDefinitionCRFBean edcBean : edcs) {
             	EventDefinitionCRFBean persistEventDefBean = (EventDefinitionCRFBean) edcdao.findByPK(edcBean.getId());
-
-
+            	            	
                 int edcStatusId = edcBean.getStatus().getId();
                 if (edcStatusId == 5 || edcStatusId == 7) {
                 } else {
@@ -507,6 +507,7 @@ public class CreateSubStudyServlet extends SecureController {
                     String participantForm = fp.getString("participantForm"+order);
                     String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + order);
                     String submissionUrl = fp.getString("submissionUrl" + order);
+                    String offline = fp.getString("offline" + order);
 
                     ArrayList<String> selectedVersionIdList = fp.getStringArray("versionSelection" + order);
                     int selectedVersionIdListSize = selectedVersionIdList.size();
@@ -767,6 +768,9 @@ public class CreateSubStudyServlet extends SecureController {
             ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
             // sed.setCrfNum(edcs.size());
             for (EventDefinitionCRFBean edcBean : edcs) {
+                CRFBean cBean = (CRFBean) cdao.findByPK(edcBean.getCrfId());                
+                String crfPath=sed.getOid()+"."+cBean.getOid();
+                edcBean.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
             	
 
                 int edcStatusId = edcBean.getStatus().getId();

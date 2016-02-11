@@ -165,6 +165,10 @@ public class InitUpdateSubStudyServlet extends SecureController {
             ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
             // sed.setCrfNum(edcs.size());
             for (EventDefinitionCRFBean edcBean : edcs) {
+                CRFBean cBean = (CRFBean) cdao.findByPK(edcBean.getCrfId());                
+                String crfPath=sed.getOid()+"."+cBean.getOid();
+                edcBean.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+                
                 int edcStatusId = edcBean.getStatus().getId();
                 CRFBean crf = (CRFBean) cdao.findByPK(edcBean.getCrfId());
                 int crfStatusId = crf.getStatusId();

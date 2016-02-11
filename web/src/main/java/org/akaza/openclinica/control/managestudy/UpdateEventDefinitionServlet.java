@@ -15,11 +15,13 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -30,6 +32,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -143,6 +146,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     String participantForm = fp.getString("participantForm"+i);
                     String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
                     String submissionUrl = fp.getString("submissionUrl" + i);
+                    String offline = fp.getString("offline" + i);
 
                     System.out.println("submission :"+ submissionUrl);
                     
@@ -187,7 +191,14 @@ public class UpdateEventDefinitionServlet extends SecureController {
                         edcBean.setAllowAnonymousSubmission(false);
                     }
                     edcBean.setSubmissionUrl(submissionUrl.trim());
+                    if (!StringUtils.isBlank(offline) && "yes".equalsIgnoreCase(offline.trim())) {
+                        edcBean.setOffline(true);
+                    } else {
+                        edcBean.setOffline(false);
+                    }
 
+                    
+                    
                     String nullString = "";
                     // process null values
                     ArrayList nulls = NullValue.toArrayList();
@@ -255,11 +266,17 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 logger.info("version:" + edc.getDefaultVersionId());
                 logger.info("Electronic Signature [" + edc.isElectronicSignature() + "]");
                 cdao.update(edc);
+
+                
+                String crfPath=sed.getOid()+"."+edc.getCrf().getOid();
+                saveEventDefnCrfOfflineTag(2, crfPath, edc ,sed);
                 
                 ArrayList <EventDefinitionCRFBean> eventDefCrfBeans = cdao.findAllByCrfDefinitionInSiteOnly(edc.getStudyEventDefinitionId(), edc.getCrfId());
                 for (EventDefinitionCRFBean eventDefCrfBean :eventDefCrfBeans){
                 	eventDefCrfBean.setParticipantForm(edc.isParticipantForm());
-                	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());
+                	eventDefCrfBean.setAllowAnonymousSubmission(edc.isAllowAnonymousSubmission());          
+                	
+                	
                 	cdao.update(eventDefCrfBean);
                 }
                 
@@ -428,3 +445,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
     
 
 }
+        
+        
+        
+    
+    
+
