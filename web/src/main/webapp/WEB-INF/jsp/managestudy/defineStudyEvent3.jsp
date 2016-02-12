@@ -157,6 +157,14 @@
       <td class="table_cell" colspan="2">
         <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>" style="display : none">
           <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value="">
+                <c:choose>
+                  <c:when test="${definition.repeating == true }">
+                          </br>
+                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
+                  </c:when>
+                </c:choose>
+          
         </span>
       </td>
    </c:when>  

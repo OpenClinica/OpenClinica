@@ -179,6 +179,7 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     private boolean participantForm;
     private boolean allowAnonymousSubmission;
     private String submissionUrl;
+    private boolean offline;
     
     //Not in db
     private String eventName;
@@ -608,6 +609,16 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
 	public void setSubmissionUrl(String submissionUrl) {
 		this.submissionUrl = submissionUrl;
+		
 	}
 
+    public boolean isOffline() {
+        return offline;
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
+
+	
 }

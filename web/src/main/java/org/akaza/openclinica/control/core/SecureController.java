@@ -50,6 +50,7 @@ import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -67,6 +68,8 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -78,6 +81,9 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -158,7 +164,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected StudyBean currentStudy;
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
-
+    protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
 
     private StdScheduler scheduler;
@@ -1185,4 +1191,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
+
+    
+    
+    
 }

@@ -355,6 +355,7 @@ public class UpdateSubStudyServlet extends SecureController {
                     String participantForm = fp.getString("participantForm"+order);
                     String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + order);
                     String submissionUrl = fp.getString("submissionUrl" + order);
+                    String offline = fp.getString("offline" + order);
 
                     
                     int sdvId = fp.getInt("sdvOption" + order);
