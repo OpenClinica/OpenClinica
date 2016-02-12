@@ -14,6 +14,10 @@ import java.util.TreeSet;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
@@ -698,16 +702,25 @@ public class PformSubmissionService {
      */
     private Errors readDownloadFileNew(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
             StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion, Locale locale, boolean isAnonymous) throws Exception {
+        // Parse submitted instance
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(body));
-        Document doc = db.parse(is);
+        Document submission = db.parse(is);
+        //Parse Xform
+        Document xform = null;
+        if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")){
+            InputSource is2 = new InputSource();
+            is2.setCharacterStream(new StringReader(crfVersion.getXform()));
+            xform = db.parse(is2);
+        }
+        
         String itemName;
         String itemValue;
         String groupNodeName = "";
 
-        NodeList instanceNodeList = doc.getElementsByTagName("instance");
+        NodeList instanceNodeList = submission.getElementsByTagName("instance");
         // Instance loop
         for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
             Node instanceNode = instanceNodeList.item(i);
@@ -746,9 +759,12 @@ public class PformSubmissionService {
                                                 && !itemNode.getNodeName().endsWith(".SUBHEADER")
                                                 && !itemNode.getNodeName().equals("REPEAT_ORDINAL")) {
 
+                                            // Skip read-only items (native xforms only)
+                                            boolean readOnly = isItemReadonly(xform, crfNode.getNodeName(), groupNode.getNodeName(),itemNode.getNodeName(), crfVersion);
+                                            if (readOnly) continue;
+                                            
                                             itemName = itemNode.getNodeName().trim();
                                             itemValue = itemNode.getTextContent();
-
                                             ItemBean iBean = getItemRecord(itemName, crfVersion);
                                             ItemGroupMetadataBean itemGroupMeta = getItemGroupMetadata(iBean.getId(),crfVersion.getId());
                                             Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataBeanList,iBean);
@@ -769,7 +785,6 @@ public class PformSubmissionService {
                                             groupOrdinalMapping.put(itemGroup.getId(),ordinals);
 
                                             idao = new ItemDAO(ds);
-
                                             ItemDataBean itemDataBean = createItemData(iBean, itemValue, itemOrdinal, eventCrfBean, studyBean, studySubjectBean);
                                             errors = validateItemData(itemDataBean, iBean, responseTypeId);
                                             if (errors.hasErrors()) {
@@ -823,6 +838,21 @@ public class PformSubmissionService {
             }
         }
         return errors;
+    }
+
+    private boolean isItemReadonly(Document xform, String crfNode, String groupNode, String itemNode, CRFVersionBean crfVersion) throws Exception {
+        if (xform == null) return false;
+        // Build path to item
+        String refPath = "/" + crfNode + "/" + groupNode + "/" + itemNode;
+        // Scan bindings for match
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xPath = factory.newXPath();
+
+        String expression = "/html/head/model/bind[@nodeset='" + refPath + "' and @readonly='true()']";
+        XPathExpression xPathExpression = xPath.compile(expression);
+        NodeList list = (NodeList) xPathExpression.evaluate(xform,XPathConstants.NODESET);
+        if (list.getLength() > 0) return true;
+        else return false;
     }
 
     private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping, EventCRFBean eventCrf, CRFVersionBean crfVersion, StudyBean studyBean, StudySubjectBean studySubjectBean, Locale locale) {
