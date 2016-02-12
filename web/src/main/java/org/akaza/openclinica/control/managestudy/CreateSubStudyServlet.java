@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -53,6 +55,8 @@ import java.util.List;
  *         parameters of a sub study.
  */
 public class CreateSubStudyServlet extends SecureController {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
+
     public static final String INPUT_VER_DATE = "protocolDateVerification";
     public static final String INPUT_START_DATE = "startDate";
     public static final String INPUT_END_DATE = "endDate";
@@ -770,7 +774,7 @@ public class CreateSubStudyServlet extends SecureController {
             for (EventDefinitionCRFBean edcBean : edcs) {
                 CRFBean cBean = (CRFBean) cdao.findByPK(edcBean.getCrfId());                
                 String crfPath=sed.getOid()+"."+cBean.getOid();
-                edcBean.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+                edcBean.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
             	
 
                 int edcStatusId = edcBean.getStatus().getId();
@@ -866,5 +870,11 @@ public class CreateSubStudyServlet extends SecureController {
         }
     	return eventDefCrfList;
     }
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }

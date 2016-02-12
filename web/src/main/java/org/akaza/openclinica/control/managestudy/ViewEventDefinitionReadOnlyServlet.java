@@ -12,12 +12,14 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
  *
  */
 public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServlet {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     public static String EVENT_ID = "id";
     public static String EVENT_OID = "Oid";
@@ -70,7 +73,7 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
 
             CRFBean cBean = (CRFBean) cdao.findByPK(edc.getCrfId());                
             String crfPath=sed.getOid()+"."+cBean.getOid();
-            edc.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+            edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
 
             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
             edc.setDefaultVersionName(defaultVersion.getName());
@@ -91,5 +94,11 @@ public class ViewEventDefinitionReadOnlyServlet extends ViewEventDefinitionServl
             forwardPage(Page.VIEW_EVENT_DEFINITION_NOSIDEBAR);
         }
     }
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }

@@ -33,6 +33,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -53,6 +54,8 @@ import java.util.ListIterator;
  * Preferences - Java - Code Style - Code Templates
  */
 public class UpdateEventDefinitionServlet extends SecureController {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
+
 
     /**
      * 
@@ -269,7 +272,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
                 
                 String crfPath=sed.getOid()+"."+edc.getCrf().getOid();
-                saveEventDefnCrfOfflineTag(2, crfPath, edc ,sed);
+                getEventDefinitionCrfTagService().saveEventDefnCrfOfflineTag(2, crfPath, edc ,sed);
                 
                 ArrayList <EventDefinitionCRFBean> eventDefCrfBeans = cdao.findAllByCrfDefinitionInSiteOnly(edc.getStudyEventDefinitionId(), edc.getCrfId());
                 for (EventDefinitionCRFBean eventDefCrfBean :eventDefCrfBeans){
@@ -443,6 +446,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     }
     
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }
         

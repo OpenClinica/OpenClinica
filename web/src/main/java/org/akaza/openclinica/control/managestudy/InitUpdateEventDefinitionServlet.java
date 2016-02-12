@@ -39,6 +39,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -51,6 +52,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  *
  */
 public class InitUpdateEventDefinitionServlet extends SecureController {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     /**
      * Checks whether the user has the correct privilege
@@ -142,7 +144,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 edc.setDefaultVersionName(defaultVersion.getName());
 
                 String crfPath=sed.getOid()+"."+edc.getCrf().getOid();
-                edc.setOffline(getEventDefnCrfOfflineStatus(2,crfPath,true));
+                edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
                 newEventDefinitionCRFs.add(edc);
             }
 
@@ -197,5 +199,11 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
         return flags;
     }
     
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }
