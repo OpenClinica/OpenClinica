@@ -175,6 +175,12 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.BOOL);// participant_form
         ++i;
+        this.setTypeExpected(i, TypeNames.BOOL);// allow_anonymous_submission
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// submission_url
+        ++i;
+        this.setTypeExpected(i, TypeNames.BOOL);// offline
+        ++i;
         this.setTypeExpected(i, TypeNames.INT);// source_data_verification_code
     }
 
@@ -1460,7 +1466,10 @@ public class OdmExtractDAO extends DatasetDAO {
             Boolean doubleEntry = (Boolean) row.get("double_entry");
             Boolean hideCrf = (Boolean) row.get("hide_crf");
             Boolean participantForm = (Boolean) row.get("participant_form");
+            Boolean allowAnonymousSubmission = (Boolean) row.get("allow_anonymous_submission");
+            String submissionUrl = (String) row.get("submission_url");
             Integer sdvId = (Integer) row.get("source_data_verification_code");
+            Boolean offline = (Boolean) row.get("active");
 
             if(sedDetails.containsKey(sedOID)) {
             } else {
@@ -1482,6 +1491,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 p.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
                 p.setNullValues(nullValue);
                 p.setPasswordRequired(pwdRequired==false?"No":"Yes");
+                p.setAllowAnonymousSubmission(allowAnonymousSubmission==false?"No":"Yes");
+                p.setOffline((offline==false) ?"No":"Yes");
+                p.setSubmissionUrl(submissionUrl);
                 p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
                 formDetail.getPresentInEventDefinitions().add(p);
             }else {
@@ -1500,6 +1512,10 @@ public class OdmExtractDAO extends DatasetDAO {
                p.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
                p.setNullValues(nullValue);
                p.setPasswordRequired(pwdRequired==false?"No":"Yes");
+               p.setAllowAnonymousSubmission(allowAnonymousSubmission == false?"No":"Yes");
+               p.setOffline((offline==false) ?"No":"Yes");
+              p.setSubmissionUrl(submissionUrl);
+
                p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
                formDetail.getPresentInEventDefinitions().add(p);
        
@@ -3209,13 +3225,16 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
             + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
             + " crf.oc_oid as crf_oid, edc.null_values, edc.default_version_id, edc.electronic_signature,"
-            + " edc.double_entry, edc.hide_crf, edc.participant_form, edc.source_data_verification_code"
+            + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code"
             + " from " + this.studyEventAndFormMetaTables()
             + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite);
     }
 
     protected String studyEventAndFormMetaTables() {
-        return "study_event_definition sed, event_definition_crf edc, crf, crf_version cv ";
+   //     return "study_event_definition sed, event_definition_crf edc, crf, crf_version cv ";
+        return "event_definition_crf edc Join crf crf on crf.crf_id = edc.crf_id "
+              +" Join crf_version cv on cv.crf_id=crf.crf_id Join study_event_definition sed on sed.study_event_definition_id = edc.study_event_definition_id"
+              +"  left Join  event_definition_crf_tag edc_tag on edc_tag.path::text = ((sed.oc_oid::text || '.'::text) || crf.oc_oid::text)";
     }
 
     protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite) {
@@ -3223,13 +3242,15 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
         + parentStudyId
         + " and sed.status_id not in (5,7) and "
         + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite)
-        + " and sed.study_event_definition_id = edc.study_event_definition_id"
         + " and edc.status_id not in (5,7) and edc.crf_id = crf.crf_id and crf.status_id not in (5,7) and crf.crf_id = cv.crf_id and (cv.status_id not in (5,7))"
         + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
         + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
         + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
+    
+    
+    
     protected String getItemDataMaxLengths(String crfVersionIds) {
         return "select item_id, max(length(value)) as max_length from item_data where item_id in ("
             + " select distinct ifm.item_id from item_form_metadata ifm where ifm.crf_version_id in (" + crfVersionIds

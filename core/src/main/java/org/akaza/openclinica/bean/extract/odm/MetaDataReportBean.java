@@ -1000,6 +1000,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(" PasswordRequired=\"" + p.getPasswordRequired() + "\"");
                 temp = p.getDoubleDataEntry();
                 xml.append((temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "") + " HideCRF=\"" + p.getHideCrf() + "\""+" ParticipantForm=\"" + p.getParticipantForm() + "\"");
+                xml.append(" AllowAnonymousSubmission=\"" + p.getAllowAnonymousSubmission() + "\""); 
+                
+                temp = p.getSubmissionUrl();
+                xml.append(temp != null && temp.length() > 0 ? " SubmissionUrl=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+                xml.append(" Offline=\"" + p.getOffline() + "\"");                 
                 temp = p.getSourceDataVerification();
                 xml.append(temp != null && temp.length() > 0 ? " SourceDataVerification=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
                 xml.append("/>");
