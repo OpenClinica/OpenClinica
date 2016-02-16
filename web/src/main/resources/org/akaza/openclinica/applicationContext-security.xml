@@ -161,6 +161,11 @@
     <property name="dataSource" ref="dataSource"></property>
     <property name="coreResources" ref="coreResources"/>
     <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
-    <property name="pformSubmissionService" ref="pformSubmissionService" />
+    <property name="openRosaSubmissionController" ref="openRosaSubmissionController" />
 </bean>
+
+<bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
+</bean>
+
+
 </beans>

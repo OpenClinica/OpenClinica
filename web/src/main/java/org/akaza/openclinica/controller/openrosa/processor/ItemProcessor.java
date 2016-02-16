@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
+import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -127,7 +128,7 @@ public class ItemProcessor implements Processor, Ordered {
                             if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
                                 groupNodeName = groupNode.getNodeName();
                                 ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion);
-                                if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getId())) groupOrdinalMapping.put(itemGroup.getItemGroupId(),new TreeSet<Integer>());
+                                if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getItemGroupId())) groupOrdinalMapping.put(itemGroup.getItemGroupId(),new TreeSet<Integer>());
 
                                 NodeList itemNodeList = groupNode.getChildNodes();
                                 // Item loop
@@ -160,14 +161,15 @@ public class ItemProcessor implements Processor, Ordered {
                                         Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
                                         if (itemErrors.hasErrors()) {
                                             container.getErrors().addAllErrors(itemErrors);
-                                            System.out.println("Encountered an item validation error.  Bailing out.");
                                             throw new Exception("Item validation error.  Rolling back submission changes.");
+                                        } else {
+                                            itemDataList.add(newItemData);
                                         }
                                         ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
                                         if (existingItemData == null) {
                                             // No existing value, create new item.
                                             if (newItemData.getOrdinal() < 0) {
-                                                newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()));
+                                                newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
                                                 groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                                             }
                                             itemDataDao.saveOrUpdate(newItemData);
@@ -248,7 +250,7 @@ public class ItemProcessor implements Processor, Ordered {
         // If the current value of REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current
         // value must be reset to -1 as this is a new repeating group row.
         for (ItemData itemdata:itemDataList) {
-            if (itemdata.getItemDataId() == item.getId() && itemdata.getOrdinal() == ordinal) {
+            if (itemdata.getItem().getItemId() == item.getItemId() && itemdata.getOrdinal() == ordinal) {
                 ordinal = -1;
                 break;
             }
@@ -302,24 +304,30 @@ public class ItemProcessor implements Processor, Ordered {
                 dn.setUserAccount(user);
                 dn.setUserAccountByOwnerId(user);
                 dn.setParentDiscrepancyNote(parentDiscrepancyNote);
-                discrepancyNoteDao.saveOrUpdate(dn);
+                dn.setDateCreated(new Date());
+                dn = discrepancyNoteDao.saveOrUpdate(dn);
 
-                //TODO:  Verify Hibernate populates the id column on a save.
-                //TODO:  Need to test value here.
                 // Create Mapping for new Discrepancy Note
+                DnItemDataMapId dnItemDataMapId = new DnItemDataMapId();
+                dnItemDataMapId.setDiscrepancyNoteId(dn.getDiscrepancyNoteId());
+                dnItemDataMapId.setItemDataId(itemData.getItemDataId());
+                dnItemDataMapId.setStudySubjectId(studySubject.getStudySubjectId());
+                dnItemDataMapId.setColumnName("value");
+
                 DnItemDataMap mapping = new DnItemDataMap();
+                mapping.setDnItemDataMapId(dnItemDataMapId);
                 mapping.setItemData(itemData);
                 mapping.setStudySubject(studySubject);
                 mapping.setActivated(false);
                 mapping.setDiscrepancyNote(dn);
                 dnItemDataMapDao.saveOrUpdate(mapping);
 
-                DiscrepancyNote itemParentNote = discrepancyNoteDao.findByParentId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
+                DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
                 itemParentNote.setResolutionStatus(resStatus);
                 itemParentNote.setUserAccount(user);
+                discrepancyNoteDao.saveOrUpdate(itemParentNote);
             }
         }
-        //ItemDataBean idBean = (ItemDataBean) iddao.findByPK(itemdata.getId());
 
         // Deactivate existing mappings for this ItemData
         List<DnItemDataMap> existingMappings = dnItemDataMapDao.findByItemData(itemData.getItemDataId());

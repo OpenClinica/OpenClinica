@@ -33,6 +33,11 @@ public class StudySubjectProcessor implements Processor, Ordered {
         if (studySubjectOid != null)  {
             StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOid);
             container.setSubject(studySubject);
+            
+            if (studySubject.getStatus() != Status.AVAILABLE) {
+                container.getErrors().reject("value.incorrect.STATUS");
+                throw new Exception("StudySubject status is not Available.");
+            }
         } else {
             UserAccount rootUser = userAccountDao.findByUserId(1);
             int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;

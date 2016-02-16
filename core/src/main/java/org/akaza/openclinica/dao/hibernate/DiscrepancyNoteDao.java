@@ -3,8 +3,6 @@ package org.akaza.openclinica.dao.hibernate;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
 
@@ -13,23 +11,18 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         return DiscrepancyNote.class;
     }
 
-    public DiscrepancyNote findByParentId(int discrepancyNoteId) {
-        String query = "from " + getDomainClassName() + " do where do.parentDnId = :discrepancynoteid ";
+    public List<DiscrepancyNote> findParentNotesByItemData(Integer itemDataId) {
+        String query = "select dn.* from discrepancy_note dn, dn_item_data_map didm where didm.item_data_id=" + itemDataId + " AND dn.parent_dn_id isnull " + 
+            "AND dn.discrepancy_note_id=didm.discrepancy_note_id";
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(DiscrepancyNote.class);
+        return ((List<DiscrepancyNote>) q.list());
+    }
+
+    public DiscrepancyNote findByDiscrepancyNoteId(int discrepancyNoteId) {
+        String query = "from " + getDomainClassName() + " do where do.discrepancyNoteId = :discrepancynoteid ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("discrepancynoteid", discrepancyNoteId);
         return (DiscrepancyNote) q.uniqueResult();
-    }
-
-    public List<DiscrepancyNote> findParentNotesByItemData(Integer itemDataId) {
-        //String query = "from " + getDomainClassName() + " do where do.itemData.itemDataId = :itemdataid ";
-        //org.hibernate.Query q = getCurrentSession().createQuery(query);
-        //q.setInteger("itemdataid", itemDataId);
-        //return (List<DiscrepancyNote>) q.list();
-
-        Criteria criteria = getCurrentSession().createCriteria(getDomainClassName());
-        criteria.add(Restrictions.isNull("parentDnId"));
-        criteria.add(Restrictions.eq("itemData.itemDataId", itemDataId));
-        return (List<DiscrepancyNote>) criteria.list();
     }
 
 

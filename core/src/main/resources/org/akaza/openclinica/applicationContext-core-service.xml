@@ -136,10 +136,6 @@
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
 
-    <bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>
     </bean>
