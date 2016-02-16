@@ -394,15 +394,19 @@
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
                  </br>              
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes"  checked>
                   </c:when>
-                  <c:otherwise>
+                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == false}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >
-                  </c:otherwise>
+                  </c:when>
                 </c:choose>
+                
+                               
+                
                 
               </span>
             </c:otherwise>
