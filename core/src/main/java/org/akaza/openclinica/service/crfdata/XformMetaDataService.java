@@ -422,6 +422,8 @@ public class XformMetaDataService {
                     return itemDataTypeDao.findByItemDataTypeCode("REAL");
                 else if (dataType.equals("select") || dataType.equals("select1"))
                     return itemDataTypeDao.findByItemDataTypeCode("ST");
+                else if (dataType.equals("binary"))
+                    return itemDataTypeDao.findByItemDataTypeCode("FILE");
             }
         }
         return null;
@@ -444,6 +446,8 @@ public class XformMetaDataService {
                     return responseTypeDao.findByResponseTypeName("checkbox");
                 else if (responseType.equals("select1"))
                     return responseTypeDao.findByResponseTypeName("radio");
+                else if (responseType.equals("binary"))
+                    return responseTypeDao.findByResponseTypeName("file");
                 else
                     return null;
             }
