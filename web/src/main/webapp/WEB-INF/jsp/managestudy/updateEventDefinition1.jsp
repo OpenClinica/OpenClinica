@@ -393,21 +393,13 @@
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-                 </br>              
                 <c:choose>
-                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
-                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes"  checked>
+                  <c:when test="${definition.repeating == true }">
+                          </br>
+                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
                   </c:when>
-                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == false}">
-                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
-                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >
-                  </c:when>
-                </c:choose>
-                
-                               
-                
-                
+                </c:choose>                
               </span>
             </c:otherwise>
           </c:choose>
