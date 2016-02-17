@@ -75,7 +75,7 @@
 </div>
 <br>
 <span class="table_title_manage"><fmt:message key="CRFs" bundle="${resword}"/></span>
-<div style="width: 800px">
+<div style="width: 900px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
         <div class="tablebox_center">
