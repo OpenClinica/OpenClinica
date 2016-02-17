@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "item_data")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "event_definition_crf_event_definition_crf_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "item_data_item_data_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class ItemData  extends DataMapDomainObject {
@@ -47,6 +47,7 @@ public class ItemData  extends DataMapDomainObject {
 	private Date dateUpdated;
 	private Integer updateId;
 	private Integer ordinal;
+	private Status oldStatus;
 	private Boolean deleted;
 	private List<DnItemDataMap> dnItemDataMaps;
 
@@ -174,7 +175,17 @@ public class ItemData  extends DataMapDomainObject {
 		return this.ordinal;
 	}
 
-	public void setOrdinal(Integer ordinal) {
+    @Type(type = "status")
+    @Column(name = "old_status_id")
+	public Status getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(Status oldStatus) {
+        this.oldStatus = oldStatus;
+    }
+
+    public void setOrdinal(Integer ordinal) {
 		this.ordinal = ordinal;
 	}
 

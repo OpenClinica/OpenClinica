@@ -35,12 +35,15 @@
     <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>
+
     <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService">
         <constructor-arg ref="dataSource"/>
     </bean>
+
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
+
     <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">
         <constructor-arg ref="dataSource"/>
     </bean>
@@ -76,29 +79,31 @@
     <bean id="studyeventdaojdbc" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
     </bean>
+
     <bean id="studyEventBeanListener" class="org.akaza.openclinica.service.rule.StudyEventBeanListener">
-    <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
- <property name="dataSource" ref="dataSource"/>
-     </bean>
-    
+        <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
-    
+
     <bean id="archivedDatasetFileDao" class="org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
-    
+
     <bean id="ruleSetListenerService" class="org.akaza.openclinica.service.rule.RuleSetListenerService">
-    	<property name="ruleSetService" ref="ruleSetService"/>
-    	<property name="ruleSetDao" ref="ruleSetDao"/>
+        <property name="ruleSetService" ref="ruleSetService"/>
+        <property name="ruleSetDao" ref="ruleSetDao"/>
     </bean>
+
     <bean id="generateExtractFileService" class="org.akaza.openclinica.service.extract.GenerateExtractFileService">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="coreResources"/>
         <constructor-arg ref="ruleSetRuleDao"/>
     </bean>
-    
+
     <bean id="odmFileCreation" class="org.akaza.openclinica.service.extract.OdmFileCreation">
         <property name="dataSource" ref="dataSource"/>
         <property name="coreResources" ref="coreResources"/>
@@ -108,7 +113,6 @@
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-  
 
     <bean id="eventDefinitionCrfTagService" class="org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService" autowire="byName">
         <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>
@@ -118,44 +122,29 @@
     <bean id="viewNotesService" class="org.akaza.openclinica.service.managestudy.ViewNotesServiceImpl">
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
-    
-    <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
-<bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl">
-	<property name="studyDao" ref="studyDaoDomain"></property>
-	<property name="studySubjectDao" ref="studySubjectDaoDomain"/>
-	<property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
-	<property name="auditEventDAO" ref="auditLogEventDaoDomain"/>
-	<property name="userAccountDao" ref="userDaoDomain"/>
-</bean>
 
-<bean id="beanPropertyService" class="org.akaza.openclinica.service.crfdata.BeanPropertyService" autowire="byName">
-      <constructor-arg ref="dataSource"/>
-		<property name="studyEventDAO" ref="studyEventDaoDomain"/>
-		<property name="studyEventDefinitionDao" ref="studyEventDefDaoDomain"/>
-		<property name="studySubjectDao" ref = "studySubjectDaoDomain"/>
+    <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
+
+    <bean id = "generateClinicalDataService" class="org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl">
+        <property name="studyDao" ref="studyDaoDomain"></property>
+        <property name="studySubjectDao" ref="studySubjectDaoDomain"/>
+        <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
+        <property name="auditEventDAO" ref="auditLogEventDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
-   
-<bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
-      <constructor-arg ref="dataSource"/>
+
+    <bean id="beanPropertyService" class="org.akaza.openclinica.service.crfdata.BeanPropertyService" autowire="byName">
+        <constructor-arg ref="dataSource"/>
+        <property name="studyEventDAO" ref="studyEventDaoDomain"/>
+        <property name="studyEventDefinitionDao" ref="studyEventDefDaoDomain"/>
+        <property name="studySubjectDao" ref = "studySubjectDaoDomain"/>
+        <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
-     
+
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>
     </bean>
-        
-    <!-- 
-<bean id="expressionBeanService" class="org.akaza.openclinica.service.rule.expression.ExpressionBeanService" autowire="byName">
-     
-     <constructor-arg ref="datasource">
-     </constructor-arg>
-     
-     <constructor-arg ref="studyEventDaoDomain" name="studyEventDAO">
-     </constructor-arg>
-     
-	<constructor-arg ref="studyEventDefDaoDomain" name="studyEventDefDao">
-     </constructor-arg>
-     
-     	
-    </bean> -->
+
+    <context:component-scan base-package="org.akaza.openclinica.controller.openrosa"/>
+
 </beans>

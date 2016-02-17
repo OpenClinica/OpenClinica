@@ -1,5 +1,11 @@
 package org.akaza.openclinica.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -24,13 +30,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studyevent")
@@ -143,9 +146,9 @@ public class StudyEventController {
 				if (eventDefCrf.getCrf().getCrfId() == eventCrf.getCrfVersion().getCrf().getCrfId()) {
 					foundEventCrfMatch = true;
 					if (eventDefCrf.getParicipantForm()) {
-						eventCrf.setStatus(Status.UNAVAILABLE);
+						eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
 						eventCrfDao.saveOrUpdate(eventCrf);					
-					} else if (!eventCrf.getStatus().getName().equals(Status.UNAVAILABLE.getName())) completeStudyEvent = false;
+					} else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
 				}
 			}
 			if (!foundEventCrfMatch && !eventDefCrf.getParicipantForm()) completeStudyEvent = false;

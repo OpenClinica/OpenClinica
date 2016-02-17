@@ -30,6 +30,7 @@
     <security:intercept-url pattern="/Contact" filters="none"/>
     <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
+    <security:intercept-url pattern="/pages/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
     <security:intercept-url pattern="/pages/itemdata/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/studies/**" filters="none"/>
@@ -161,6 +162,11 @@
     <property name="dataSource" ref="dataSource"></property>
     <property name="coreResources" ref="coreResources"/>
     <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
-    <property name="pformSubmissionService" ref="pformSubmissionService" />
+    <property name="openRosaSubmissionController" ref="openRosaSubmissionController" />
 </bean>
+
+<bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
+</bean>
+
+
 </beans>
