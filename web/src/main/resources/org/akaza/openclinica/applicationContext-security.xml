@@ -32,6 +32,7 @@
     <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
     <security:intercept-url pattern="/pages/openrosa/**" filters="none"/>
     <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
+    <security:intercept-url pattern="/pages/itemdata/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/studies/**" filters="none"/>
     <security:intercept-url pattern="/pages/odmss/**" filters="none"/>
     <security:intercept-url pattern="/pages/healthcheck/**" filters="none"/>

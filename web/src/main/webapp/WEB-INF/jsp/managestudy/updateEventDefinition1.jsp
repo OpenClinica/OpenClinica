@@ -368,10 +368,23 @@
           <c:choose>
             <c:when test="${edc.participantForm == true && edc.allowAnonymousSubmission == true}">
               <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>">
+                
                 <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}
-                <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
+                <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">               
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+                </br>
+                <c:choose>
+                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes"  checked>
+                  </c:when>
+                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == false}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >
+                  </c:when>
+                </c:choose>
+                
               </span>
             </c:when>
             <c:otherwise>
@@ -380,10 +393,20 @@
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+                <c:choose>
+                  <c:when test="${definition.repeating == true }">
+                          </br>
+                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
+                  </c:when>
+                </c:choose>                
               </span>
             </c:otherwise>
           </c:choose>
         </td>
+
+
+
       </c:when>
     </c:choose>
 

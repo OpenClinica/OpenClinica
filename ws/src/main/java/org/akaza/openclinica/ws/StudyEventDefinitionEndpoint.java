@@ -204,6 +204,18 @@ public class StudyEventDefinitionEndpoint {
                 element.setTextContent(String.valueOf(eventCrf.isParticipantForm()));
                 eventDefinitionCrfElement.appendChild(element);
 
+                element = document.createElementNS(NAMESPACE_URI_V1, "allowAnonymousSubmission");
+                element.setTextContent(String.valueOf(eventCrf.isAllowAnonymousSubmission()));
+                eventDefinitionCrfElement.appendChild(element);
+
+                element = document.createElementNS(NAMESPACE_URI_V1, "submissionUrl");
+                element.setTextContent(String.valueOf(eventCrf.getSubmissionUrl()));
+                eventDefinitionCrfElement.appendChild(element);
+
+                element = document.createElementNS(NAMESPACE_URI_V1, "offline");
+                element.setTextContent(String.valueOf(eventCrf.isOffline()));
+                eventDefinitionCrfElement.appendChild(element);
+
                 element = document.createElementNS(NAMESPACE_URI_V1, "sourceDataVerificaiton");
                 element.setTextContent(String.valueOf(eventCrf.getSourceDataVerification()));
                 eventDefinitionCrfElement.appendChild(element);

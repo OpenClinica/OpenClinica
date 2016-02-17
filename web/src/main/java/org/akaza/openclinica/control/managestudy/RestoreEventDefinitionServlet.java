@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -45,6 +47,7 @@ import java.util.Date;
  * Restores a removed study event definition and all its related data
  */
 public class RestoreEventDefinitionServlet extends SecureController {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
     /**
      *
      */
@@ -85,6 +88,10 @@ public class RestoreEventDefinitionServlet extends SecureController {
             edc.setCrfName(crf.getName());
             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
             edc.setDefaultVersionName(defaultVersion.getName());
+            CRFBean cBean = (CRFBean) cdao.findByPK(edc.getCrfId());                
+            String crfPath=sed.getOid()+"."+cBean.getOid();
+            edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
+
         }
 
         // finds all events
@@ -198,5 +205,11 @@ public class RestoreEventDefinitionServlet extends SecureController {
         logger.info("Sending email done..");
     }
 
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }

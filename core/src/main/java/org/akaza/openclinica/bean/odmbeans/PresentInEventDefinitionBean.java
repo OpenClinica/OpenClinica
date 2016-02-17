@@ -18,6 +18,9 @@ public class PresentInEventDefinitionBean {
 	private String hideCrf;
 	private String sourceDataVerification;
 	private String participantForm;
+    private String allowAnonymousSubmission;
+    private String submissionUrl;
+    private String offline;
 
 	public String getStudyEventOid() {
 		return studyEventOid;
@@ -82,5 +85,29 @@ public class PresentInEventDefinitionBean {
 	public void setParticipantForm(String participantForm) {
 		this.participantForm = participantForm;
 	}
+
+    public String getAllowAnonymousSubmission() {
+        return allowAnonymousSubmission;
+    }
+
+    public void setAllowAnonymousSubmission(String allowAnonymousSubmission) {
+        this.allowAnonymousSubmission = allowAnonymousSubmission;
+    }
+
+    public String getSubmissionUrl() {
+        return submissionUrl;
+    }
+
+    public void setSubmissionUrl(String submissionUrl) {
+        this.submissionUrl = submissionUrl;
+    }
+
+    public String getOffline() {
+        return offline;
+    }
+
+    public void setOffline(String offline) {
+        this.offline = offline;
+    }
 
 }

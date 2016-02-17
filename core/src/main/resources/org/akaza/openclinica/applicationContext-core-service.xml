@@ -114,6 +114,11 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="eventDefinitionCrfTagService" class="org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService" autowire="byName">
+        <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>
+        <property name="userDaoDomain" ref="userDaoDomain"/>
+    </bean>
+
     <bean id="viewNotesService" class="org.akaza.openclinica.service.managestudy.ViewNotesServiceImpl">
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
