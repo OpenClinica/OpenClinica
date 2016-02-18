@@ -43,6 +43,8 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
@@ -87,13 +89,14 @@ public class ItemProcessor implements Processor, Ordered {
     @Autowired
     DnItemDataMapDao dnItemDataMapDao;
     
-    
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     public int getOrder() {
         return 4;
     }
 
     public void process(SubmissionContainer container) throws Exception {
-        System.out.println("Executing Item Processor.");
+        logger.debug("Executing Item Processor.");
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();

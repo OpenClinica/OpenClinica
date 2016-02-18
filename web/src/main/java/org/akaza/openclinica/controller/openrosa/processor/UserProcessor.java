@@ -45,7 +45,7 @@ public class UserProcessor implements Processor, Ordered {
 
     @Override
     public void process(SubmissionContainer container) throws Exception{
-        System.out.println("Executing User Processor.");
+        logger.debug("Executing User Processor.");
         Errors errors = container.getErrors();
 
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");

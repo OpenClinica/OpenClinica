@@ -15,6 +15,8 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.Subject;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
@@ -34,9 +36,11 @@ public class StudySubjectProcessor implements Processor, Ordered {
     @Autowired
     SubjectDao subjectDao;
     
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    
     @Override
     public void process(SubmissionContainer container) throws Exception {
-        System.out.println("Executing study subject processor.");
+        logger.debug("Executing study subject processor.");
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
