@@ -1,7 +1,11 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
@@ -14,6 +18,11 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 @Component
 public class StudySubjectProcessor implements Processor, Ordered {
@@ -30,6 +39,9 @@ public class StudySubjectProcessor implements Processor, Ordered {
         System.out.println("Executing study subject processor.");
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
+        String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
+        StudySubject embeddedStudySubject = null;
+        if (embeddedStudySubjectId != null) embeddedStudySubject = studySubjectDao.findByLabelAndStudy(embeddedStudySubjectId, container.getStudy());
         if (studySubjectOid != null)  {
             StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOid);
             container.setSubject(studySubject);
@@ -38,14 +50,18 @@ public class StudySubjectProcessor implements Processor, Ordered {
                 container.getErrors().reject("value.incorrect.STATUS");
                 throw new Exception("StudySubject status is not Available.");
             }
+        } else if (embeddedStudySubject != null) {
+            if (embeddedStudySubject.getStatus() != Status.AVAILABLE) {
+                container.getErrors().reject("value.incorrect.STATUS");
+                throw new Exception("Embedded StudySubject status is not Available");
+            }
+            container.setSubject(embeddedStudySubject);
         } else {
             UserAccount rootUser = userAccountDao.findByUserId(1);
             int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
             
-            
             // create subject
             Subject subject = new Subject();
-            //subject.setGender('\0'); // setting null character
             subject.setUserAccount(rootUser);
             subject.setStatus(Status.AVAILABLE);
             Date currentDate = new Date();
@@ -57,8 +73,6 @@ public class StudySubjectProcessor implements Processor, Ordered {
 
             // create study subject
             StudySubject studySubject = new StudySubject();
-            //TODO: Why was the following line in OpenRosaServices?
-            //subjectBean.setGender('\0'); // setting null character
             studySubject.setStudy(container.getStudy());
             studySubject.setSubject(subject);
             studySubject.setStatus(Status.AVAILABLE);
@@ -78,5 +92,42 @@ public class StudySubjectProcessor implements Processor, Ordered {
     public int getOrder() {
         return 1;
     }
+    
+    private String getEmbeddedStudySubjectOid(SubmissionContainer container) throws Exception {
+        String studySubjectId = null;
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(container.getRequestBody()));
+        Document doc = db.parse(is);
+        Node instanceNode = doc.getElementsByTagName("instance").item(0);
+        NodeList crfNodeList = instanceNode.getChildNodes();
+
+        // Form loop
+        for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
+            Node crfNode = crfNodeList.item(j);
+            if (!(crfNode instanceof Element)) continue;
+            NodeList groupNodeList = crfNode.getChildNodes();
+
+            // Group loop
+            for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
+                Node groupNode = groupNodeList.item(k);
+                if (!(groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_"))) continue; 
+                NodeList itemNodeList = groupNode.getChildNodes();
+
+                // Item loop
+                for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
+                    Node itemNode = itemNodeList.item(m);
+                    if (itemNode instanceof Element && itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")) { //{
+                        String nodeValue = itemNode.getTextContent();
+                        if (nodeValue != null && !nodeValue.equals("")) studySubjectId = nodeValue;
+                    }
+                } // Item loop
+            } // Group loop
+        } // Form loop
+        return studySubjectId;
+    }
+
 
 }

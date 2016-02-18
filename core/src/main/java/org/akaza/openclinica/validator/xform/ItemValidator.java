@@ -28,6 +28,10 @@ public class ItemValidator implements Validator {
 
         // Reject if item name is empty
         ValidationUtils.rejectIfEmpty(errors, "name", "crf_val_item_nameempty");
+        // Reject if item name is a reserved word
+        if (item.getName().equals("OC.REPEAT_ORDINAL")) {
+            errors.rejectValue("itemName", "crf_item_reserveditemname", item.getName());
+        }
         // Reject if item data type changes from a previous version
         if (oldDataType != null && oldDataType.getItemDataTypeId() != newDataType.getItemDataTypeId()) {
             errors.rejectValue("itemDataType", "crf_val_item_invaliddatatypechange", item.getName());

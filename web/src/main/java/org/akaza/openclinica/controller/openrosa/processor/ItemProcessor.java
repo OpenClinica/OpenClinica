@@ -136,7 +136,8 @@ public class ItemProcessor implements Processor, Ordered {
                                     Node itemNode = itemNodeList.item(m);
                                     if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
                                             && !itemNode.getNodeName().endsWith(".SUBHEADER")
-                                            && !itemNode.getNodeName().equals("REPEAT_ORDINAL")) {
+                                            && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL")
+                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")) {
 
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
@@ -241,13 +242,13 @@ public class ItemProcessor implements Processor, Ordered {
         NodeList items = groupNode.getChildNodes();
         for(int i=0; i<items.getLength();i++){
             Node xmlItem = items.item(i);
-            if (xmlItem instanceof Element && ((Element) xmlItem).getTagName().equals("REPEAT_ORDINAL") && !((Element) xmlItem).getTextContent().equals(""))
+            if (xmlItem instanceof Element && ((Element) xmlItem).getTagName().equals("OC.REPEAT_ORDINAL") && !((Element) xmlItem).getTextContent().equals(""))
                 ordinal = Integer.valueOf(((Element)xmlItem).getTextContent());
         }
 
         // Enketo specific code here due to Enketo behavior of defaulting in values from first repeat on new repeating
-        // group row entries, including the REPEAT_ORDINAL value.
-        // If the current value of REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current
+        // group row entries, including the OC.REPEAT_ORDINAL value.
+        // If the current value of OC.REPEAT_ORDINAL already exists in the ItemDataBean list for this Item, the current
         // value must be reset to -1 as this is a new repeating group row.
         for (ItemData itemdata:itemDataList) {
             if (itemdata.getItem().getItemId() == item.getItemId() && itemdata.getOrdinal() == ordinal) {

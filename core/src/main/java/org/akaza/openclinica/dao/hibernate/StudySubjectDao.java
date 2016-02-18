@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudySubjectOidGenerator;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 
@@ -21,6 +22,15 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setString("OCOID", OCOID);
+        return (StudySubject) q.uniqueResult();
+    }
+
+    public StudySubject findByLabelAndStudy(String embeddedStudySubjectId, Study study) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do  where do.study.studyId = :studyid and do.label = :label";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", study.getStudyId());
+        q.setString("label", embeddedStudySubjectId);
         return (StudySubject) q.uniqueResult();
     }
 
@@ -70,4 +80,5 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         }
         return greatestLabel;
     }
+
 }
