@@ -379,7 +379,7 @@
                 <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes"  checked>
                   </c:when>
-                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == false}">
+                  <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline != true}">
                 <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >
                   </c:when>
