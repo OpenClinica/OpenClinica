@@ -626,7 +626,8 @@ public class ExpressionService {
     public boolean ruleExpressionChecker(String expression) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
-        
+        isExpressionValid(expression);
+
         if (checkIfExpressionIsForScheduling(expression)) {
             if (checkSyntax(expression)) return true;
             else return false;
