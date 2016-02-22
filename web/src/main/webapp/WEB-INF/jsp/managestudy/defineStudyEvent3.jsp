@@ -159,7 +159,7 @@
           <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value="">
                 <c:choose>
                   <c:when test="${definition.repeating == true }">
-                          </br>
+                          <br />
                     <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
                   </c:when>

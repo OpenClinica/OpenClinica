@@ -537,8 +537,8 @@
                 <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
           <c:set var="summary" value="submissionUrl${num}"/>
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-                          <c:choose>
-                                                           </br>
+                                                           <br />                     
+                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && def.repeating == true  && edc.offline == true}">
                 <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                     <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" disabled checked>
