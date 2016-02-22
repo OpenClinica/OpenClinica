@@ -251,7 +251,7 @@
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-                                </br>
+                                <br />
                 <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
@@ -270,7 +270,7 @@
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
-                                </br>
+                                <br />
                 <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
                 <c:choose>
                   <c:when test="${edc.allowAnonymousSubmission == true && definition.repeating == true  && edc.offline == true}">
