@@ -525,7 +525,7 @@ public class OpenRosaServices {
         	
             expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
             Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
-            Element ordinal = doc.createElement("REPEAT_ORDINAL");
+            Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
         	group.appendChild(ordinal);
             }
 

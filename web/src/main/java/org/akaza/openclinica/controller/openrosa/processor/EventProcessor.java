@@ -49,7 +49,7 @@ public class EventProcessor implements Processor, Ordered {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public void process(SubmissionContainer container) throws Exception {
-        System.out.println("Executing Event Processor.");
+        logger.debug("Executing Event Processor.");
         Errors errors = container.getErrors();
 
         //Create study event if it doesn't exist

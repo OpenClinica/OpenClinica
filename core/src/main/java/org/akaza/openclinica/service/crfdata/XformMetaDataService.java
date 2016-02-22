@@ -253,10 +253,10 @@ public class XformMetaDataService {
             // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
             for (UserControl widget : widgets) {
 
-                // Skip read-only items here
+                // Skip reserved name and read-only items here
+                XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (readonly == null || !readonly.trim().equals("true()")) {
-                    XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
+                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && (readonly == null || !readonly.trim().equals("true()"))) {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
