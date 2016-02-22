@@ -4,6 +4,7 @@ public class EnketoURLResponse {
     private String url = null;
     private String preview_url = null;
     private String edit_url = null;
+    private String offline_url = null;
     private String code = null;
 
     public String getUrl() {
@@ -38,4 +39,11 @@ public class EnketoURLResponse {
         this.edit_url = edit_url;
     }
 
+    public String getOffline_url() {
+        return offline_url;
+    }
+
+    public void setOffline_url(String offline_url) {
+        this.offline_url = offline_url;
+    }
 }
