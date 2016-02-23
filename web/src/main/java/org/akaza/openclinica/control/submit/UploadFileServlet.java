@@ -134,7 +134,7 @@ public class UploadFileServlet extends SecureController {
     }
     */
 
-    class OCFileRename implements org.akaza.openclinica.bean.rule.FileRenamePolicy {
+   public class OCFileRename implements org.akaza.openclinica.bean.rule.FileRenamePolicy {
     	private String checksum(File f, InputStream content) throws Exception {
     		byte[] buffer = new byte[8192];
     		MessageDigest md = MessageDigest.getInstance("SHA-1");

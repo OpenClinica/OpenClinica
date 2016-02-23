@@ -84,7 +84,7 @@ public class PformValidator implements Validator {
                 break;
             }
             case 11: { // ItemDataType.FILE
-                e.reject("value.notSupported.file");
+           //     e.reject("value.notSupported.file");
                 break;
             }
 

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +15,7 @@ import org.springframework.validation.Errors;
 
 public class SubmissionContainer {
     private String requestBody = null;
-    private HashMap<String,String> subjectContext = null;
+    private HashMap<String, String> subjectContext = null;
     private Study study = null;
     private StudyEvent studyEvent = null;
     private StudySubject subject = null;
@@ -23,13 +24,15 @@ public class SubmissionContainer {
     private List<ItemData> items = null;
     private Errors errors = null;
     private Locale locale = null;
+    private ArrayList<HashMap> listOfUploadFilePaths;
 
-    public SubmissionContainer(Study study, String requestBody, HashMap<String,String> subjectContext, Errors errors, Locale locale) {
+    public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList<HashMap> listOfUploadFilePaths) {
         this.study = study;
         this.requestBody = requestBody;
         this.subjectContext = subjectContext;
         this.errors = errors;
         this.locale = locale;
+        this.listOfUploadFilePaths=listOfUploadFilePaths;
     }
 
     public String getRequestBody() {
@@ -110,6 +113,14 @@ public class SubmissionContainer {
 
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    public ArrayList<HashMap> getListOfUploadFilePaths() {
+        return listOfUploadFilePaths;
+    }
+
+    public void setListOfUploadFilePaths(ArrayList<HashMap> listOfUploadFilePaths) {
+        this.listOfUploadFilePaths = listOfUploadFilePaths;
     }
 
 }
