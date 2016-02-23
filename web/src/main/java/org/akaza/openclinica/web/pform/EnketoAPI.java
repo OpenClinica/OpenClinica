@@ -28,6 +28,21 @@ public class EnketoAPI {
         this.ocURL = credentials.getOcInstanceUrl();
     }
 
+    public String getOfflineFormURL(String crfOID) throws Exception {
+        if (enketoURL == null)
+            return "";
+        URL eURL = new URL(enketoURL + "/api/v2/survey/offline");
+        EnketoURLResponse response = getURL(eURL, crfOID);
+        if (response != null) {
+            String myUrl = response.getOffline_url();
+            if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
+                myUrl = myUrl.replaceFirst("http", "https");
+            }
+            return myUrl;
+        } else
+            return "";
+    }
+
     public String getFormURL(String crfOID) throws Exception {
         if (enketoURL == null)
             return "";
@@ -57,7 +72,6 @@ public class EnketoAPI {
     private EnketoURLResponse getURL(URL url, String crfOID) {
         try {
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Basic " + userPasswdCombo);

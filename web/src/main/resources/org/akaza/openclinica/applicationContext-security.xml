@@ -37,6 +37,7 @@
     <security:intercept-url pattern="/pages/odmss/**" filters="none"/>
     <security:intercept-url pattern="/pages/healthcheck/**" filters="none"/>
     <security:intercept-url pattern="/pages/api/v1/anonymousform/**" filters="none"/>
+    <security:intercept-url pattern="/pages/api/v2/anonymousform/**" filters="none"/>
     <security:intercept-url pattern="/pages/api/v1/editform/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/**" filters="none"/>
