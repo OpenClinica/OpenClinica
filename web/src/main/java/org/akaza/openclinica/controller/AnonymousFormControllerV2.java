@@ -148,7 +148,7 @@ public class AnonymousFormControllerV2 {
         String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), crfVersion.getOid(), isOffline);
         String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid(),edcBean.getStudyEventDefinitionId());
 
-        String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
+        String url = enketoURL.split("#",2)[0] + "?" + FORM_CONTEXT + "=" + contextHash + "#" + enketoURL.split("#",2)[1];
         logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
         return url;
 
