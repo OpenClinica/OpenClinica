@@ -57,12 +57,16 @@ public class ResponseSetService {
             // Create the response set
             ResponseSet responseSet = new ResponseSet();
             responseSet.setLabel(xformItem.getItemName());
-            responseSet.setOptionsText(getOptionsText(html, submittedXformText, xformItem, responseType));
+            String optionText =getOptionsText(html, submittedXformText, xformItem, responseType);
+            
+            if (optionText !=null){
+            responseSet.setOptionsText(optionText);
             responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
             responseSet.setResponseType(responseType);
             responseSet.setVersionId(version.getCrfVersionId());
             responseSetDao.saveOrUpdate(responseSet);
             responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+            }
             // Run validation against it
             ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);
             DataBinder dataBinder = new DataBinder(responseSet);
@@ -99,7 +103,7 @@ public class ResponseSetService {
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
-                    }else if (control instanceof Upload) {
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
                           return responseType.getName();  
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
@@ -191,7 +195,7 @@ public class ResponseSetService {
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
-                    } else if (control instanceof Upload){
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
                             return responseType.getName();
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
