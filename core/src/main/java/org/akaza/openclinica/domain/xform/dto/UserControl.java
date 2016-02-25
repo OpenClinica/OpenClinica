@@ -18,4 +18,6 @@ public interface UserControl {
 
     public void setHint(Hint hint);
 
+    public String getMediatype();
+
 }

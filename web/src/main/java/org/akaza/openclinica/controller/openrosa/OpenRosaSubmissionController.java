@@ -109,7 +109,7 @@ public class OpenRosaSubmissionController {
             int ordinal=1;
             for (FileItem item : items) {
                 System.out.println("Processing " + item.getFieldName() + ". Content type: " + item.getContentType());
-                if (item.getContentType() != null && (item.getContentType().equals("image/jpeg")  || item.getContentType().equals("image/png") ) ) {
+                if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
               
                     if (!new File(dir).exists()) {
                         new File(dir).mkdirs();
