@@ -1,6 +1,10 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
@@ -8,14 +12,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.rule.FileProperties;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
+import org.akaza.openclinica.control.submit.UploadFileServlet;
+import org.akaza.openclinica.control.submit.UploadFileServlet.OCFileRename;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -64,21 +79,69 @@ public class OpenRosaSubmissionController {
     public ResponseEntity<String> doSubmission(HttpServletRequest request, HttpServletResponse response,
             @PathVariable("studyOID") String studyOID, @RequestParam(FORM_CONTEXT) String ecid) {
 
-        HashMap<String, String> subjectContext = null;
+         HashMap<String, String> subjectContext = null;
         Locale locale = LocaleResolver.getLocale(request);
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
-
+        Study study = studyDao.findByOcOID(studyOID);           
+        String requestBody=null;
+        
+        HashMap<String,String> map = new HashMap();
+        ArrayList <HashMap> listOfUploadFilePaths = new ArrayList();
+        
         try {
-            // Verify Study is allowed to submit
             if (!mayProceed(studyOID))
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            if (ServletFileUpload.isMultipartContent(request)) {
+                logger.warn("WARNING: This prototype doesn't support multipart content.");
 
-            Study study = studyDao.findByOcOID(studyOID);
-            
+                System.out.println("Reading multipart submission");
+            // Verify Study is allowed to submit
+            String dir = getAttachedFilePath(studyOID);
+            FileProperties fileProperties= new FileProperties();
+
+            DiskFileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            upload.setFileSizeMax(fileProperties.getFileSizeMax());
+            List<FileItem> items = upload.parseRequest(request);
+            System.out.println("Found " + items.size() + " parts.");
+            int ordinal=1;
+            for (FileItem item : items) {
+                System.out.println("Processing " + item.getFieldName() + ". Content type: " + item.getContentType());
+                if (item.getContentType() != null && (item.getContentType().equals("image/jpeg")  || item.getContentType().equals("image/png") ) ) {
+              
+                    if (!new File(dir).exists()) {
+                        new File(dir).mkdirs();
+                        System.out.println("Made the directory " + dir);
+                    }
+                   File file =processUploadedFile(item, dir);
+               //    String filename=file.getPath();
+                    System.out.println("FileName with Path:  " + file.getPath());
+
+                    if (listOfUploadFilePaths.size()!=0){
+                        for(HashMap uploadFilePath :listOfUploadFilePaths){
+                            if ((boolean) uploadFilePath.containsKey(item.getFieldName()+"."+ordinal) ){
+                            ordinal++;
+                            break;
+                        }
+                        ordinal=1;
+                    }      
+                    }
+                    map.put(item.getFieldName()+"."+ordinal, file.getPath());
+                    listOfUploadFilePaths.add(map);
+                    
+                } else if (item.getFieldName().equals("xml_submission_file")) {
+                     requestBody = item.getString();
+                    System.out.println("XML payload: " + item.getString());
+                }
+            }
+
+            }else{
+            System.out.println("Not a multiPart");
+            requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
+            }
             // Parse submission to extract payload
-            String requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
 
             // Load user context from ecid
             PFormCache cache = PFormCache.getInstance(context);
@@ -86,7 +149,7 @@ public class OpenRosaSubmissionController {
 
             // Execute save as Hibernate transaction to avoid partial imports
             //OpenRosaSubmissionService service = new OpenRosaSubmissionService(locale, errors);
-            openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale);
+            openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale , listOfUploadFilePaths);
         
         } catch (Exception e) {
             logger.error("Unsuccessful xform submission.");
@@ -110,7 +173,7 @@ public class OpenRosaSubmissionController {
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
     }
-
+    
     private Study getParentStudy(String studyOid) {
         Study study = studyDao.findByOcOID(studyOid);
         Study parentStudy = study.getStudy();
@@ -152,5 +215,39 @@ public class OpenRosaSubmissionController {
                 accessPermission = true;
         }
         return accessPermission;
+    }
+
+    public static String getAttachedFilePath(String studyOid) {
+        String attachedFilePath = CoreResources.getField("attached_file_location");
+        if (attachedFilePath == null || attachedFilePath.length() <= 0) {
+            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + studyOid + File.separator;
+        } else {
+            attachedFilePath += studyOid + File.separator;
+        }
+        return attachedFilePath;
+    }
+
+    private File processUploadedFile(FileItem item, String dirToSaveUploadedFileIn) {
+        dirToSaveUploadedFileIn = dirToSaveUploadedFileIn == null ? System.getProperty("java.io.tmpdir") : dirToSaveUploadedFileIn;
+        String fileName = item.getName();
+        // Some browsers IE 6,7 getName returns the whole path
+        int startIndex = fileName.lastIndexOf('\\');
+        if (startIndex != -1) {
+            fileName = fileName.substring(startIndex + 1, fileName.length());
+        }
+
+        File uploadedFile = new File(dirToSaveUploadedFileIn + File.separator + fileName);
+        try {
+            uploadedFile = new UploadFileServlet().new OCFileRename().rename(uploadedFile, item.getInputStream());
+        } catch (IOException e) {
+            throw new OpenClinicaSystemException(e.getMessage());
+        }
+
+        try {
+            item.write(uploadedFile);
+        } catch (Exception e) {
+            throw new OpenClinicaSystemException(e.getMessage());
+        }
+        return uploadedFile;
     }
 }

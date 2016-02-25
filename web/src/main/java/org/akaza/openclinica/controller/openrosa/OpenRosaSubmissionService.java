@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -25,12 +26,12 @@ public class OpenRosaSubmissionService {
     @Autowired
     CrfVersionDao crfVersionDao;
     
-    public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors, Locale locale) throws Exception {
+    public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths) throws Exception {
         // Execute save as Hibernate transaction to avoid partial imports
         try {
             CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
             String requestPayload = parseSubmission(requestBody, crfVersion);
-            runAsTransaction(study, requestPayload, subjectContext, errors, locale);
+            runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths);
         } catch (Throwable t) {
             System.out.println(t.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(t));
@@ -38,9 +39,9 @@ public class OpenRosaSubmissionService {
     }
     
     @Transactional
-    private void runAsTransaction(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale) throws Exception{
+    private void runAsTransaction(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList <HashMap> listOfUploadFilePaths) throws Exception{
 
-        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale);
+        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);
         submissionProcessorChain.processSubmission(container);
 
     }
