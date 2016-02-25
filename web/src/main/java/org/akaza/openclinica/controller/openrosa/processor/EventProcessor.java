@@ -101,14 +101,18 @@ public class EventProcessor implements Processor, Ordered {
     }
 
     private StudyEvent createStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, Integer ordinal, UserAccount user) {
+        Date currentDate = new Date();
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudySubject(studySubject);
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setUserAccount(user);
-        studyEvent.setDateStart(new Date());
+        studyEvent.setDateStart(currentDate);
         studyEvent.setSubjectEventStatusId(SubjectEventStatus.SCHEDULED.getCode());
+        studyEvent.setStartTimeFlag(false);
+        studyEvent.setEndTimeFlag(false);
+        studyEvent.setDateCreated(currentDate);
         studyEventDao.saveOrUpdate(studyEvent);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
         return studyEvent;
