@@ -57,4 +57,10 @@ public class Select implements UserControl {
     public void setItemSet(ItemSet itemSet) {
         this.itemSet = itemSet;
     }
+
+    @Override
+    public String getMediatype() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

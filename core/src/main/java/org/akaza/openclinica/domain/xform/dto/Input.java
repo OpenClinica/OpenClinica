@@ -38,4 +38,10 @@ public class Input implements UserControl {
         this.hint = hint;
     }
 
+    @Override
+    public String getMediatype() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
