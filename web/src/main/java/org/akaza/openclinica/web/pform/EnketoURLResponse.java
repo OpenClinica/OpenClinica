@@ -9,6 +9,7 @@ public class EnketoURLResponse {
     private String edit_url = null;
     private String offline_url = null;
     private String offline_iframe_url;
+    private String iframe_url = null;
     private String code = null;
 
     public String getUrl() {
@@ -57,5 +58,13 @@ public class EnketoURLResponse {
 
     public void setOffline_iframe_url(String offline_iframe_url) {
         this.offline_iframe_url = offline_iframe_url;
+    }
+
+    public String getIframe_url() {
+        return iframe_url;
+    }
+
+    public void setIframe_url(String iframe_url) {
+        this.iframe_url = iframe_url;
     }
 }
