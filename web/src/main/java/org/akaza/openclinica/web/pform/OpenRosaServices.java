@@ -179,9 +179,14 @@ public class OpenRosaServices {
                         // TODO: For now all XForms get a date based hash to
                         // trick Enketo into always downloading
                         // TODO: them.
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTime(new Date());
-                        form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                        if (version.getXformName() != null){
+                            form.setHash(DigestUtils.md5Hex(version.getXform()));
+                        }else {
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(new Date());
+                            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                        }
+
 
                         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                         form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
@@ -506,15 +511,15 @@ public class OpenRosaServices {
     }
 
     private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
-    	
+
     	NamedNodeMap attribs = fetchXformAttributes(xform);
     	InputStream is = new ByteArrayInputStream(xform.getBytes());
     	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     	factory.setNamespaceAware(false);
     	Document doc = factory.newDocumentBuilder().parse(is);
-        
+
         XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath(); 
+        XPath xpath = xPathfactory.newXPath();
         XPathExpression expr = null;
         expr = xpath.compile("/html/body/group/repeat");
         NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
@@ -522,7 +527,7 @@ public class OpenRosaServices {
         for (int k = 0; k < repeatNodes.getLength(); k++) {
         	Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
         	String groupRef = groupElement.getAttribute("ref");
-        	
+
             expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
             Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
             Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
@@ -548,8 +553,8 @@ public class OpenRosaServices {
     	String defaultNamespace = null;
         for (int i=0;i<attribs.getLength();i++) {
         	Attr attrib = (Attr) attribs.item(i);
-        	if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue(); 
-        }        
+        	if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue();
+        }
         String xformArray[] = xform.split("html",2);
         String modifiedXform = xformArray[0] + "html xmlns=\"" + defaultNamespace + "\" " + xformArray[1];
         return modifiedXform;
