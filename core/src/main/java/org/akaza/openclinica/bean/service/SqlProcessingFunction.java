@@ -57,7 +57,7 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
             // props.setProperty("ssl","true");
             conn = DriverManager.getConnection(databaseUrl, props);
 
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             File sqlFile = new File(getTransformFileName());
             // String[] statements = getFileContents(sqlFile);
 
@@ -95,7 +95,7 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
                     stmt.close();
                 if (conn != null) {
                     conn.commit();
-                    conn.setAutoCommit(false);
+                    conn.setAutoCommit(true);
 
                     conn.close();
                 }
