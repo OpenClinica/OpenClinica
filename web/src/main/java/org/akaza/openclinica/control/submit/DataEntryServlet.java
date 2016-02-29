@@ -530,11 +530,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
         Phase phase2 = Phase.INITIAL_DATA_ENTRY;
-        if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-            phase2 = Phase.DOUBLE_DATA_ENTRY;
-        } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
-            phase2 = Phase.ADMIN_EDITING;
-        }
+        {
+            String servletPage = getServletPage(request);
+            if (servletPage != null && servletPage.startsWith(Page.DOUBLE_DATA_ENTRY_SERVLET.getFileName())) {
+                phase2 = Phase.DOUBLE_DATA_ENTRY;
+            } else if (servletPage != null && servletPage.startsWith(Page.ADMIN_EDIT_SERVLET.getFileName())) {
+                phase2 = Phase.ADMIN_EDITING;
+            }
+	}
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread()+"currentStudy?"+currentStudy+"studyEventDefinition"+studyEventDefinition+"crfVersionBean"+crfVersionBean+"studyEventBean"+studyEventBean+"ecb"+ecb);
       //  List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
