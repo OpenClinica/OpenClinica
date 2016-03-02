@@ -530,7 +530,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
         Phase phase2 = Phase.INITIAL_DATA_ENTRY;
-        if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+       if (getServletPage(request).startsWith(Page.DOUBLE_DATA_ENTRY_SERVLET.getFileName())) {
             phase2 = Phase.DOUBLE_DATA_ENTRY;
         } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
             phase2 = Phase.ADMIN_EDITING;

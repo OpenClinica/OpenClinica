@@ -1564,9 +1564,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
                                             + crfId
-                                            + " LIMIT 1),'"
+                                            + " LIMIT 1),E'"
                                             + igMeta.getHeader()
-                                            + "', '"
+                                            + "', E'"
                                             + igMeta.getSubheader()
                                             + "', '"
                                             +

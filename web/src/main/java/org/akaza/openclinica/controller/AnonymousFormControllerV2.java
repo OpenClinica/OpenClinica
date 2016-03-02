@@ -108,15 +108,15 @@ public class AnonymousFormControllerV2 {
                 StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(edcBean.getStudyEventDefinitionId());
 
                 String tagPath = sedBean.getOid() + "." + crf.getOid();
-                
+
                 boolean isOffline = tagService.getEventDefnCrfOfflineStatus(2,tagPath,true);
                 String offline = null;
                 if (isOffline) offline = "true";
                 else offline = "false";
-                
+
                 formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean, edcBean, isOffline);
                 AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl,offline);
-                
+
                 return new ResponseEntity<AnonymousUrlResponse>(anonResponse, org.springframework.http.HttpStatus.OK);
             } else {
                 return new ResponseEntity<AnonymousUrlResponse>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -173,11 +173,11 @@ public class AnonymousFormControllerV2 {
 
         return accessPermission;
     }
-    
+
     private class AnonymousUrlResponse {
         private String url = null;
         private String offline = null;
-        
+
         public AnonymousUrlResponse(String url, String offline) {
             this.url = url;
             this.offline = offline;
@@ -198,8 +198,8 @@ public class AnonymousFormControllerV2 {
         public void setOffline(String offline) {
             this.offline = offline;
         }
-        
-        
+
+
     }
 
 }

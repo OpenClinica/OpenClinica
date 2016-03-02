@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -20,6 +21,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -259,6 +261,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
         edao.update(sed);
 
         EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
 
         for (int i = 0; i < edcs.size(); i++) {
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
@@ -298,6 +301,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 edc.setCreatedDate(new Date());
                 edc.setStatus(Status.AVAILABLE);
                 cdao.create(edc);
+                CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());                
+                String crfPath=sed.getOid()+"."+cBean.getOid();
+                getEventDefinitionCrfTagService().saveEventDefnCrfOfflineTag(2, crfPath, edc ,sed);
 
             }
         }

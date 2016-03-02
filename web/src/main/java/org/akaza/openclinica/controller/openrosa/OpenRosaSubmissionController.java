@@ -54,13 +54,16 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private OpenRosaSubmissionService openRosaSubmissionService;
-    
+
     @Autowired
     private StudyDao studyDao;
-    
+
     @Autowired
     private StudyParameterValueDao studyParameterValueDao;
-    
+
+    @Autowired
+    PformSubmissionNotificationService notifier;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
 
@@ -84,12 +87,12 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
-        Study study = studyDao.findByOcOID(studyOID);           
+        Study study = studyDao.findByOcOID(studyOID);
         String requestBody=null;
-        
+
         HashMap<String,String> map = new HashMap();
         ArrayList <HashMap> listOfUploadFilePaths = new ArrayList();
-        
+
         try {
             if (!mayProceed(studyOID))
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -110,7 +113,7 @@ public class OpenRosaSubmissionController {
             for (FileItem item : items) {
                 System.out.println("Processing " + item.getFieldName() + ". Content type: " + item.getContentType());
                 if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
-              
+
                     if (!new File(dir).exists()) {
                         new File(dir).mkdirs();
                         System.out.println("Made the directory " + dir);
@@ -126,11 +129,11 @@ public class OpenRosaSubmissionController {
                             break;
                         }
                         ordinal=1;
-                    }      
+                    }
                     }
                     map.put(item.getFieldName()+"."+ordinal, file.getPath());
                     listOfUploadFilePaths.add(map);
-                    
+
                 } else if (item.getFieldName().equals("xml_submission_file")) {
                      requestBody = item.getString();
                     System.out.println("XML payload: " + item.getString());
@@ -150,21 +153,20 @@ public class OpenRosaSubmissionController {
             // Execute save as Hibernate transaction to avoid partial imports
             //OpenRosaSubmissionService service = new OpenRosaSubmissionService(locale, errors);
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale , listOfUploadFilePaths);
-        
+
         } catch (Exception e) {
             logger.error("Unsuccessful xform submission.");
             System.out.println(e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
-            
+
             // Send a failure response
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         if (!errors.hasErrors()) {
             // Log submission with Participate
-            PformSubmissionNotificationService notifier = new PformSubmissionNotificationService();
             notifier.notify(studyOID, subjectContext);
 
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
@@ -173,13 +175,13 @@ public class OpenRosaSubmissionController {
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
     }
-    
+
     private Study getParentStudy(String studyOid) {
         Study study = studyDao.findByOcOID(studyOid);
         Study parentStudy = study.getStudy();
         if (parentStudy != null && parentStudy.getStudyId() > 0)
             return parentStudy;
-        else 
+        else
             return study;
     }
 
@@ -201,7 +203,7 @@ public class OpenRosaSubmissionController {
         String participateStatus = pStatus.getValue().toString();
 
         // available, pending, frozen, or locked
-        String studyStatus = study.getStatus().getName().toString(); 
+        String studyStatus = study.getStatus().getName().toString();
 
         if (ssBean == null) {
             logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
