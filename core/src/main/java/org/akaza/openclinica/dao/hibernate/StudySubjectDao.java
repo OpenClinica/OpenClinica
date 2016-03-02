@@ -34,6 +34,24 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (StudySubject) q.uniqueResult();
     }
 
+    public StudySubject findByLabelAndStudyOrParentStudy(String embeddedStudySubjectId, Study study) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do  where (do.study.studyId = :studyid or do.study.study.studyId = :studyid) and do.label = :label";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", study.getStudyId());
+        q.setString("label", embeddedStudySubjectId);
+        return (StudySubject) q.uniqueResult();
+    }
+
+    public ArrayList<StudySubject> findByLabelAndParentStudy(String embeddedStudySubjectId, Study parentStudy) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do  where do.study.study.studyId = :studyid and do.label = :label";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", parentStudy.getStudyId());
+        q.setString("label", embeddedStudySubjectId);
+        return (ArrayList<StudySubject>) q.list();
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public ArrayList<StudyEvent> fetchListSEs(String id) {
         String query = " from StudyEvent se where se.studySubject.ocOid = :id order by se.studyEventDefinition.ordinal,se.sampleOrdinal";

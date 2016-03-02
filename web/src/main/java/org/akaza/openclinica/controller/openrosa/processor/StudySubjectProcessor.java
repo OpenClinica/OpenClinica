@@ -1,17 +1,21 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.SubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.Subject;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -35,6 +39,8 @@ public class StudySubjectProcessor implements Processor, Ordered {
     UserAccountDao userAccountDao;
     @Autowired
     SubjectDao subjectDao;
+    @Autowired
+    StudyDao studyDao;
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     
@@ -44,8 +50,12 @@ public class StudySubjectProcessor implements Processor, Ordered {
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
-        StudySubject embeddedStudySubject = null;
-        if (embeddedStudySubjectId != null) embeddedStudySubject = studySubjectDao.findByLabelAndStudy(embeddedStudySubjectId, container.getStudy());
+        int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
+        Date currentDate = new Date();
+        UserAccount rootUser = userAccountDao.findByUserId(1);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd.HHmmss");
+
+        // Standard Participant Dashboard submission
         if (studySubjectOid != null)  {
             StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOid);
             container.setSubject(studySubject);
@@ -54,47 +64,86 @@ public class StudySubjectProcessor implements Processor, Ordered {
                 container.getErrors().reject("value.incorrect.STATUS");
                 throw new Exception("StudySubject status is not Available.");
             }
-        } else if (embeddedStudySubject != null) {
-            if (embeddedStudySubject.getStatus() != Status.AVAILABLE) {
+        // Embedded Study Subject ID in form.  An offline submission.
+        } else if (embeddedStudySubjectId != null) {
+            Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
+            StudySubject embeddedStudySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(embeddedStudySubjectId, study);
+
+            //If Study Subject exists in current study and is available use that
+            if (embeddedStudySubject != null && embeddedStudySubject.getStatus() == Status.AVAILABLE) {
+                container.setSubject(embeddedStudySubject);
+            //If it exists but is in the wrong status, throw an exception
+            } else if (embeddedStudySubject != null && embeddedStudySubject.getStatus() != Status.AVAILABLE) {
                 container.getErrors().reject("value.incorrect.STATUS");
                 throw new Exception("Embedded StudySubject status is not Available");
+            //If Study Subject exists in a parent/sibling study, create study subject with 'FIXME-<timestamp>' label to avoid data loss and mark it
+            } else if (subjectExistsInParentSiblingStudy(embeddedStudySubjectId, study)) {
+                String subjectLabel = "FIXME-" + dateFormatter.format(currentDate);
+                Subject subject = createSubject(currentDate);
+                StudySubject studySubject = createStudySubject(subjectLabel, subject, study,rootUser,currentDate,embeddedStudySubjectId);
+                container.setSubject(studySubject);
+            //Study Subject does not exist. Create it
+            } else {
+                Subject subject = createSubject(currentDate);
+                StudySubject studySubject = createStudySubject(embeddedStudySubjectId, subject, study,rootUser,currentDate, null);
+                container.setSubject(studySubject);
             }
-            container.setSubject(embeddedStudySubject);
+        // Anonymous submission or offline submission with no embedded Study Subject ID
         } else {
-            UserAccount rootUser = userAccountDao.findByUserId(1);
-            int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
-            
-            // create subject
-            Subject subject = new Subject();
-            subject.setUserAccount(rootUser);
-            subject.setStatus(Status.AVAILABLE);
-            Date currentDate = new Date();
-            String uniqueIdentifier = "anonymous-" + String.valueOf(nextLabel) + "-" + Long.toString(currentDate.getTime());
-            subject.setUniqueIdentifier(uniqueIdentifier);
-            subject.setDobCollected(false);
-            subjectDao.saveOrUpdate(subject);
-            subject = subjectDao.findByUniqueIdentifier(uniqueIdentifier);
-
-            // create study subject
-            StudySubject studySubject = new StudySubject();
-            studySubject.setStudy(container.getStudy());
-            studySubject.setSubject(subject);
-            studySubject.setStatus(Status.AVAILABLE);
-            studySubject.setUserAccount(rootUser);
-            studySubject.setEnrollmentDate(currentDate);
-            studySubject.setDateCreated(currentDate);
-            studySubject.setLabel(Integer.toString(nextLabel));
-            studySubjectOid = studySubjectDao.getValidOid(studySubject,new ArrayList<String>());
-            studySubject.setOcOid(studySubjectOid);
-            studySubjectDao.saveOrUpdate(studySubject);
-            container.setSubject(studySubjectDao.findByOcOID(studySubjectOid));
-      
+            // create Subject & Study Subject
+            Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
+            Subject subject = createSubject(currentDate);
+            StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
+            container.setSubject(studySubject);
         }
+    }
+
+    private boolean subjectExistsInParentSiblingStudy(String embeddedStudySubjectId, Study study) {
+        boolean subjectExists = false;
+        
+        // Check parent studies
+        if (study.getStudy() != null && studySubjectDao.findByLabelAndStudy(embeddedStudySubjectId, study.getStudy()) != null) subjectExists = true;
+        // Check sibling studies
+        if (study.getStudy() != null) {
+            List<StudySubject> siblingSubjects = studySubjectDao.findByLabelAndParentStudy(embeddedStudySubjectId, study.getStudy());
+            for (StudySubject subject:siblingSubjects) {
+                if (subject.getStudy().getStudyId() != study.getStudyId()) subjectExists = true;
+            }
+        }
+        return subjectExists;
     }
 
     @Override
     public int getOrder() {
         return 1;
+    }
+    
+    private Subject createSubject(Date currentDate) {
+        UserAccount rootUser = userAccountDao.findByUserId(1);
+
+        Subject subject = new Subject();
+        subject.setUserAccount(rootUser);
+        subject.setStatus(Status.AVAILABLE);
+        subject.setDobCollected(false);
+        subject.setDateCreated(currentDate);
+        subject = subjectDao.saveOrUpdate(subject);
+        return subject;
+    }
+    
+    private StudySubject createStudySubject(String label, Subject subject, Study study, UserAccount rootUser, Date currentDate, String secondaryLabel) {
+        StudySubject studySubject = new StudySubject();
+        studySubject.setStudy(study);
+        studySubject.setSubject(subject);
+        studySubject.setStatus(Status.AVAILABLE);
+        studySubject.setUserAccount(rootUser);
+        studySubject.setEnrollmentDate(currentDate);
+        studySubject.setDateCreated(currentDate);
+        studySubject.setLabel(label);
+        if (secondaryLabel != null && !secondaryLabel.equals("")) studySubject.setSecondaryLabel(secondaryLabel);
+        String studySubjectOid = studySubjectDao.getValidOid(studySubject,new ArrayList<String>());
+        studySubject.setOcOid(studySubjectOid);
+        studySubject = studySubjectDao.saveOrUpdate(studySubject);
+        return studySubject;
     }
     
     private String getEmbeddedStudySubjectOid(SubmissionContainer container) throws Exception {
@@ -132,6 +181,4 @@ public class StudySubjectProcessor implements Processor, Ordered {
         } // Form loop
         return studySubjectId;
     }
-
-
 }
