@@ -48,12 +48,13 @@ public class UserProcessor implements Processor, Ordered {
         logger.debug("Executing User Processor.");
         Errors errors = container.getErrors();
 
-        String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
+        String contextStudySubjectOid = container.getSubjectContext().get("studySubjectOID");
+        String studySubjectOid = container.getSubject().getOcOid();
         String parentStudyOid = getParentStudy(container.getStudy().getOc_oid()).getOc_oid();
 
         // if study subject oid is not null, just look up user account
-        if (studySubjectOid != null) {
-            String userName = parentStudyOid + "." + studySubjectOid;
+        if (contextStudySubjectOid != null) {
+            String userName = parentStudyOid + "." + contextStudySubjectOid;
             UserAccount existingAccount = userAccountDao.findByUserName(userName);
             if (existingAccount == null) {
                 logger.info("Could not find existing user account.  Aborting submission.");
@@ -62,41 +63,47 @@ public class UserProcessor implements Processor, Ordered {
             }
             container.setUser(existingAccount);
         } else {
-            //Create user account
-            UserAccount rootUser = userAccountDao.findByUserId(1);
-            UserAccount createdUser = new UserAccount();
-            createdUser.setUserName(parentStudyOid + "." + container.getSubject().getOcOid());
-            createdUser.setFirstName(INPUT_FIRST_NAME);
-            createdUser.setLastName(INPUT_LAST_NAME);
-            createdUser.setEmail(INPUT_EMAIL);
-            createdUser.setInstitutionalAffiliation(INPUT_INSTITUTION);
-            createdUser.setActiveStudy(container.getStudy());
-            String passwordHash = UserAccountBean.LDAP_PASSWORD;
-            createdUser.setPasswd(passwordHash);
-            createdUser.setPasswdTimestamp(null);
-            createdUser.setDateLastvisit(null);
-            createdUser.setStatus(Status.DELETED);
-            createdUser.setPasswdChallengeQuestion("");
-            createdUser.setPasswdChallengeAnswer("");
-            createdUser.setPhone("");
-            createdUser.setUserAccount(rootUser);
-            createdUser.setRunWebservices(false);
-            createdUser.setActiveStudy(container.getStudy());
-            UserType type = userTypeDao.findByUserTypeId(2);
-            createdUser.setUserType(type);
-            createdUser = userAccountDao.saveOrUpdate(createdUser);
-            container.setUser(createdUser);
-            
-            //Create study user role
-            Date date = new Date();
-            StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
-                    rootUser.getUserId(), date,
-                    rootUser.getUserId(), createdUser.getUserName());
-            StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
-            studyUserRoleDao.saveOrUpdate(studyUserRole);
-            //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified
-            // doesn't exist in role table.  May need to fix that.
-            // This table should also foreign key to user_account but doesn't.
+            String userName = parentStudyOid + "." + studySubjectOid;
+            UserAccount existingAccount = userAccountDao.findByUserName(userName);
+            if (existingAccount != null) {
+                container.setUser(existingAccount);;
+            } else {
+                //Create user account
+                UserAccount rootUser = userAccountDao.findByUserId(1);
+                UserAccount createdUser = new UserAccount();
+                createdUser.setUserName(parentStudyOid + "." + container.getSubject().getOcOid());
+                createdUser.setFirstName(INPUT_FIRST_NAME);
+                createdUser.setLastName(INPUT_LAST_NAME);
+                createdUser.setEmail(INPUT_EMAIL);
+                createdUser.setInstitutionalAffiliation(INPUT_INSTITUTION);
+                createdUser.setActiveStudy(container.getStudy());
+                String passwordHash = UserAccountBean.LDAP_PASSWORD;
+                createdUser.setPasswd(passwordHash);
+                createdUser.setPasswdTimestamp(null);
+                createdUser.setDateLastvisit(null);
+                createdUser.setStatus(Status.DELETED);
+                createdUser.setPasswdChallengeQuestion("");
+                createdUser.setPasswdChallengeAnswer("");
+                createdUser.setPhone("");
+                createdUser.setUserAccount(rootUser);
+                createdUser.setRunWebservices(false);
+                createdUser.setActiveStudy(container.getStudy());
+                UserType type = userTypeDao.findByUserTypeId(2);
+                createdUser.setUserType(type);
+                createdUser = userAccountDao.saveOrUpdate(createdUser);
+                container.setUser(createdUser);
+                
+                //Create study user role
+                Date date = new Date();
+                StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
+                        rootUser.getUserId(), date,
+                        rootUser.getUserId(), createdUser.getUserName());
+                StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
+                studyUserRoleDao.saveOrUpdate(studyUserRole);
+                //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified
+                // doesn't exist in role table.  May need to fix that.
+                // This table should also foreign key to user_account but doesn't.
+            }
         }
     }
 
