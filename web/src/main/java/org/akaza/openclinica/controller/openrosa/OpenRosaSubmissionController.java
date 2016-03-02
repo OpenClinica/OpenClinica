@@ -12,13 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.submit.UploadFileServlet;
-import org.akaza.openclinica.control.submit.UploadFileServlet.OCFileRename;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
@@ -94,70 +90,55 @@ public class OpenRosaSubmissionController {
         ArrayList <HashMap> listOfUploadFilePaths = new ArrayList();
 
         try {
+            // Verify Study is allowed to submit
             if (!mayProceed(studyOID))
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+
             if (ServletFileUpload.isMultipartContent(request)) {
                 logger.warn("WARNING: This prototype doesn't support multipart content.");
 
-                System.out.println("Reading multipart submission");
-            // Verify Study is allowed to submit
-            String dir = getAttachedFilePath(studyOID);
-            FileProperties fileProperties= new FileProperties();
+                String dir = getAttachedFilePath(studyOID);
+                FileProperties fileProperties= new FileProperties();
+    
+                DiskFileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                upload.setFileSizeMax(fileProperties.getFileSizeMax());
+                List<FileItem> items = upload.parseRequest(request);
+                int ordinal=1;
+                for (FileItem item : items) {
+                    if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
+                        if (!new File(dir).exists()) new File(dir).mkdirs();
 
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            upload.setFileSizeMax(fileProperties.getFileSizeMax());
-            List<FileItem> items = upload.parseRequest(request);
-            System.out.println("Found " + items.size() + " parts.");
-            int ordinal=1;
-            for (FileItem item : items) {
-                System.out.println("Processing " + item.getFieldName() + ". Content type: " + item.getContentType());
-                if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
-
-                    if (!new File(dir).exists()) {
-                        new File(dir).mkdirs();
-                        System.out.println("Made the directory " + dir);
-                    }
-                   File file =processUploadedFile(item, dir);
-               //    String filename=file.getPath();
-                    System.out.println("FileName with Path:  " + file.getPath());
-
-                    if (listOfUploadFilePaths.size()!=0){
-                        for(HashMap uploadFilePath :listOfUploadFilePaths){
-                            if ((boolean) uploadFilePath.containsKey(item.getFieldName()+"."+ordinal) ){
-                            ordinal++;
-                            break;
+                        File file = processUploadedFile(item, dir);
+                        if (listOfUploadFilePaths.size()!=0) {
+                            for(HashMap uploadFilePath :listOfUploadFilePaths){
+                                if ((boolean) uploadFilePath.containsKey(item.getFieldName()+"."+ordinal) ){
+                                    ordinal++;
+                                    break;
+                                }
+                                ordinal=1;
+                            }
                         }
-                        ordinal=1;
-                    }
-                    }
-                    map.put(item.getFieldName()+"."+ordinal, file.getPath());
-                    listOfUploadFilePaths.add(map);
+                        map.put(item.getFieldName()+"."+ordinal, file.getPath());
+                        listOfUploadFilePaths.add(map);
 
-                } else if (item.getFieldName().equals("xml_submission_file")) {
-                     requestBody = item.getString();
-                    System.out.println("XML payload: " + item.getString());
+                    } else if (item.getFieldName().equals("xml_submission_file")) {
+                        requestBody = item.getString("UTF-8");
+                    }
                 }
+            } else {
+                requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
             }
-
-            }else{
-            System.out.println("Not a multiPart");
-            requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
-            }
-            // Parse submission to extract payload
 
             // Load user context from ecid
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
 
             // Execute save as Hibernate transaction to avoid partial imports
-            //OpenRosaSubmissionService service = new OpenRosaSubmissionService(locale, errors);
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale , listOfUploadFilePaths);
 
         } catch (Exception e) {
             logger.error("Unsuccessful xform submission.");
-            System.out.println(e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
 
