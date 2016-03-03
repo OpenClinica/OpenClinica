@@ -142,8 +142,9 @@ public class ItemProcessor implements Processor, Ordered {
                                     if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
                                             && !itemNode.getNodeName().endsWith(".SUBHEADER")
                                             && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL")
-                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")) {
-
+                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")
+                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") ) {
+                                        
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
 
