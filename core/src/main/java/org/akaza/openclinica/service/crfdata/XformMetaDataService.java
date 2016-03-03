@@ -256,7 +256,7 @@ public class XformMetaDataService {
                 // Skip reserved name and read-only items here
                 XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && (readonly == null || !readonly.trim().equals("true()"))) {
+                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") && (readonly == null || !readonly.trim().equals("true()"))) {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
