@@ -126,6 +126,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
         subject.setStatus(Status.AVAILABLE);
         subject.setDobCollected(false);
         subject.setDateCreated(currentDate);
+        subject.setUniqueIdentifier("");
         subject = subjectDao.saveOrUpdate(subject);
         return subject;
     }
@@ -138,6 +139,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
         studySubject.setUserAccount(rootUser);
         studySubject.setEnrollmentDate(currentDate);
         studySubject.setDateCreated(currentDate);
+        studySubject.setSecondaryLabel("");
         studySubject.setLabel(label);
         if (secondaryLabel != null && !secondaryLabel.equals("")) studySubject.setSecondaryLabel(secondaryLabel);
         String studySubjectOid = studySubjectDao.getValidOid(studySubject,new ArrayList<String>());

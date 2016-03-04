@@ -167,8 +167,8 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.detailedNotes = detailedNotes;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "date_created", length = 8)
 	public Date getDateCreated() {
 		return this.dateCreated;
 	}
