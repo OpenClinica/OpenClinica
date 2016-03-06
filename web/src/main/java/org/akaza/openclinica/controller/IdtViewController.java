@@ -66,7 +66,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Controller
-@RequestMapping(value = "/itemdata")
+@RequestMapping(value = "auth/api/itemdata")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class IdtViewController {
     @Autowired

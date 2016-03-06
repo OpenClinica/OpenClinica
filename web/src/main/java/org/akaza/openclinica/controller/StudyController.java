@@ -76,7 +76,7 @@ public class StudyController {
 	StudyEventDefinitionDAO seddao;
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies Create a study
+	 * @api {post} /pages/auth/api/v1/studies/ Create a study
 	 * @apiName createNewStudy
 	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 3.8.0
