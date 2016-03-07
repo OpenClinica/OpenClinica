@@ -78,7 +78,8 @@ public class OpenRosaSubmissionController {
     public ResponseEntity<String> doSubmission(HttpServletRequest request, HttpServletResponse response,
             @PathVariable("studyOID") String studyOID, @RequestParam(FORM_CONTEXT) String ecid) {
 
-         HashMap<String, String> subjectContext = null;
+        logger.info("Processing xform submission.");
+        HashMap<String, String> subjectContext = null;
         Locale locale = LocaleResolver.getLocale(request);
 
         DataBinder dataBinder = new DataBinder(null);
@@ -91,12 +92,11 @@ public class OpenRosaSubmissionController {
 
         try {
             // Verify Study is allowed to submit
-            if (!mayProceed(studyOID))
+            if (!mayProceed(studyOID)) {
+                logger.info("Submissions to the study not allowed.  Aborting submission.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
+            }
             if (ServletFileUpload.isMultipartContent(request)) {
-                logger.warn("WARNING: This prototype doesn't support multipart content.");
-
                 String dir = getAttachedFilePath(studyOID);
                 FileProperties fileProperties= new FileProperties();
     
@@ -149,10 +149,11 @@ public class OpenRosaSubmissionController {
         if (!errors.hasErrors()) {
             // Log submission with Participate
             notifier.notify(studyOID, subjectContext);
-
+            logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
         } else {
+            logger.info("Submission contained errors. Sending error response");
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
     }

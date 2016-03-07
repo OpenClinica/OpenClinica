@@ -96,7 +96,7 @@ public class ItemProcessor implements Processor, Ordered {
     }
 
     public void process(SubmissionContainer container) throws Exception {
-        logger.debug("Executing Item Processor.");
+        logger.info("Executing Item Processor.");
         ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
 
         
@@ -133,6 +133,11 @@ public class ItemProcessor implements Processor, Ordered {
                             if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
                                 groupNodeName = groupNode.getNodeName();
                                 ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion);
+                                if (itemGroup == null) {
+                                    logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
+                                    continue;
+                                }
+                                
                                 if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getItemGroupId())) groupOrdinalMapping.put(itemGroup.getItemGroupId(),new TreeSet<Integer>());
 
                                 NodeList itemNodeList = groupNode.getChildNodes();
@@ -149,6 +154,12 @@ public class ItemProcessor implements Processor, Ordered {
                                         itemValue = itemNode.getTextContent();
 
                                         Item item = lookupItem(itemName, crfVersion);
+                                        
+                                        if (item == null) {
+                                            logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
+                                            continue;
+                                        }
+
                                         ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                                         ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                                         Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);

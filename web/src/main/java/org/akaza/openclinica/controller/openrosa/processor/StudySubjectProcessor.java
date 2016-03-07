@@ -46,7 +46,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
     
     @Override
     public void process(SubmissionContainer container) throws Exception {
-        logger.debug("Executing study subject processor.");
+        logger.info("Executing study subject processor.");
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
