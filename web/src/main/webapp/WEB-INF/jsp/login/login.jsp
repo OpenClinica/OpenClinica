@@ -68,7 +68,7 @@
                     "<fmt:message key="choose_browser" bundle="${restext}"/> "+
                     "</h4></td> </tr>");
         	
-        else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
+        }else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
             var ieversion=new Number(RegExp.$1) 
             if (!(ieversion>=11)){ 
             	
