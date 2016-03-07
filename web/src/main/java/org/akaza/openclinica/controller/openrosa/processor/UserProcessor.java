@@ -90,6 +90,10 @@ public class UserProcessor implements Processor, Ordered {
                 createdUser.setActiveStudy(container.getStudy());
                 UserType type = userTypeDao.findByUserTypeId(2);
                 createdUser.setUserType(type);
+                createdUser.setEnabled(true);
+                createdUser.setAccountNonLocked(true);
+                createdUser.setAccessCode("");
+                createdUser.setApiKey("");
                 createdUser = userAccountDao.saveOrUpdate(createdUser);
                 container.setUser(createdUser);
                 
@@ -97,7 +101,7 @@ public class UserProcessor implements Processor, Ordered {
                 Date date = new Date();
                 StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
                         rootUser.getUserId(), date,
-                        rootUser.getUserId(), createdUser.getUserName());
+                        createdUser.getUserName());
                 StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
                 studyUserRoleDao.saveOrUpdate(studyUserRole);
                 //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified

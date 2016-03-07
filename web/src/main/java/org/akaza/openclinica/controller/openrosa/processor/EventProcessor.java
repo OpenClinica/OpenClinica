@@ -113,6 +113,7 @@ public class EventProcessor implements Processor, Ordered {
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
         studyEvent.setDateCreated(currentDate);
+        studyEvent.setLocation("");
         studyEventDao.saveOrUpdate(studyEvent);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
         return studyEvent;
@@ -135,6 +136,9 @@ public class EventProcessor implements Processor, Ordered {
         eventCrf.setValidatorAnnotations("");
         eventCrf.setUpdateId(user.getUserId());
         eventCrf.setDateUpdated(new Date());
+        eventCrf.setValidatorId(0);
+        eventCrf.setOldStatusId(0);
+        eventCrf.setSdvUpdateId(0);
         eventCrfDao.saveOrUpdate(eventCrf);
         eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), crfVersion.getCrfVersionId());
         logger.debug("*********CREATED EVENT CRF");

@@ -265,7 +265,7 @@ public class EventCrf  extends DataMapDomainObject {
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "date_created", length = 4)
+	@Column(name = "date_created", length = 8)
 	public Date getDateCreated() {
 		return this.dateCreated;
 	}
@@ -275,7 +275,7 @@ public class EventCrf  extends DataMapDomainObject {
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "date_updated", length = 4)
+	@Column(name = "date_updated", length = 8)
 	public Date getDateUpdated() {
 		return this.dateUpdated;
 	}

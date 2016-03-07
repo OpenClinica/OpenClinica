@@ -79,6 +79,11 @@ public class UserAccount extends DataMapDomainObject {
 	private boolean accountNonLocked;
 	private int lockCounter;
 	private boolean runWebservices;
+	private String accessCode;
+	private String timeZone;
+	private boolean enableApiKey;
+	private String apiKey;
+	
 	private List userRoleAccesses ;
 	private List<Item> items;
 	private List<Section> sections ;
@@ -335,6 +340,8 @@ public class UserAccount extends DataMapDomainObject {
 		this.runWebservices = runWebservices;
 	}
 
+	
+	
 	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List getUserRoleAccesses() {
 		return this.userRoleAccesses;
@@ -344,7 +351,43 @@ public class UserAccount extends DataMapDomainObject {
 		this.userRoleAccesses = userRoleAccesses;
 	}*/
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+    @Column(name = "access_code", length = 64)
+	public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
+    }
+
+    @Column(name = "time_zone", length = 255)
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    @Column(name = "enable_api_key")
+    public boolean isEnableApiKey() {
+        return enableApiKey;
+    }
+
+    public void setEnableApiKey(boolean enableApiKey) {
+        this.enableApiKey = enableApiKey;
+    }
+
+    @Column(name = "api_key", length = 255)
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<Item> getItems() {
 		return this.items;
 	}

@@ -27,13 +27,12 @@ public class StudyUserRoleId implements Serializable {
 
 	public StudyUserRoleId(String roleName, Integer studyId, Integer statusId,
 			Integer ownerId, Date dateCreated,
-			Integer updateId, String userName) {
+			String userName) {
 		this.roleName = roleName;
 		this.studyId = studyId;
 		this.statusId = statusId;
 		this.ownerId = ownerId;
 		this.dateCreated = dateCreated;
-		this.updateId = updateId;
 		this.userName = userName;
 	}
 
