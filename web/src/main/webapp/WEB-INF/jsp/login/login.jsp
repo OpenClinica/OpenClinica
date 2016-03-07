@@ -59,26 +59,21 @@
         <table width="720 px">
         <script type="text/javascript">
         
+        var ua = navigator.userAgent;        
 
-        if (!/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && 
-        		!/Chrome[\/\s](\d+\.\d+)/.test(navigator.userAgent) && 
-        		! /MSIE (\d+\.\d+);/.test(navigator.userAgent)){
-
-        	document.write("<tr> <td align='center' > <h4>"+
+        if (ua.indexOf('Firefox')> 0){
+      	// it is firefox
+        }else if (ua.indexOf('Chrome')> 0){
+      	 // it is chrome 
+        }else if (ua.indexOf('Trident/7.0') > 0 && ua.indexOf('rv:11.0') > 0){
+      	  // it is IE 11
+        }else{
+         	document.write("<tr> <td align='center' > <h4>"+
                     "<fmt:message key="choose_browser" bundle="${restext}"/> "+
-                    "</h4></td> </tr>");
-        	
-        }else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
-            var ieversion=new Number(RegExp.$1) 
-            if (!(ieversion>=11)){ 
-            	
-            	document.write("<tr> <td align='center' > <h4>"+
-                        "<fmt:message key="choose_browser" bundle="${restext}"/> "+
-                        "</h4></td> </tr>");        	        	            	
-            }
+                    "</h4></td> </tr>");        		 
         }
-        
-         
+      	
+      	
              </script>
             </table>
 
