@@ -34,6 +34,14 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
       
     }
     
+    public List<ItemData> findByEventCrfId(Integer eventCrfId) {
+        String query = "from " + getDomainClassName() + " item_data where item_data.eventCrf.eventCrfId = :eventcrfid";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("eventcrfid", eventCrfId);
+        return (List<ItemData>) q.list();
+      
+    }
+    
     public int getMaxGroupRepeat(Integer eventCrfId, Integer itemId) {
         String query = "select max(ordinal) from item_data where event_crf_id = " + eventCrfId + " and item_id = " + itemId;
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query);

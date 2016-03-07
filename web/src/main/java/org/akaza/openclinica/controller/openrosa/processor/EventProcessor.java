@@ -1,17 +1,21 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
 import java.util.Date;
+import java.util.List;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.dao.hibernate.CompletionStatusDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
@@ -46,16 +50,47 @@ public class EventProcessor implements Processor, Ordered {
     @Autowired
     EventDefinitionCrfDao eventDefinitionCrfDao;
     
+    @Autowired
+    ItemDataDao itemDataDao;
+    
+    @Autowired
+    StudyDao studyDao;
+    
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public void process(SubmissionContainer container) throws Exception {
         logger.debug("Executing Event Processor.");
         Errors errors = container.getErrors();
-
-        //Create study event if it doesn't exist
         StudySubject studySubject = container.getSubject();
         StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(container.getSubjectContext().get("studyEventDefinitionID")));
+
+        boolean isAnonymous = false;
+        if (container.getSubjectContext().get("studySubjectOID") == null) isAnonymous = true;
+
+        //Create study event if it doesn't exist
+        if (isAnonymous) processAnonymous(container,errors, studySubject, studyEventDefinition);
+        else processParticipant(container,errors, studySubject, studyEventDefinition);
+        
+        //TODO:  May need to move this to a new processor that runs at the end
+        // Update the EventCrf and StudyEvent to the proper status.
+        // Don't do it in the initial save so it will have the expected audit trail entries.
+        Study study = null;
+        if (container.getSubjectContext().get("studyOID") != null)
+            study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
+        else study = container.getStudy();
+        container.setEventCrf(updateEventCrf(container.getEventCrf(), study, studySubject, container.getUser(), isAnonymous));
+        container.setStudyEvent(updateStudyEvent(container.getStudyEvent(), studyEventDefinition, study, studySubject, container.getUser(), isAnonymous));
+    }
+
+    @Override
+    public int getOrder() {
+        return 3;
+    }
+    
+    private void processParticipant(SubmissionContainer container, Errors errors, StudySubject studySubject, StudyEventDefinition studyEventDefinition) throws Exception {
         Integer ordinal = Integer.valueOf(container.getSubjectContext().get("studyEventOrdinal"));
+
+        
         StudyEvent existingEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
         if (existingEvent == null) {
             container.setStudyEvent(createStudyEvent(studySubject,studyEventDefinition,ordinal,container.getUser()));
@@ -84,22 +119,61 @@ public class EventProcessor implements Processor, Ordered {
             logger.info("***  Existing EventCrf with other CRF version  ***");
             throw new Exception("***  Existing EventCrf with other CRF version  ***");
         }
-        
-        
-        //TODO:  May need to move this to a new processor that runs at the end
-        // Update the EventCrf and StudyEvent to the proper status.
-        // Don't do it in the initial save so it will have the expected audit trail entries.
-        boolean isAnonymous = false;
-        if (container.getSubjectContext().get("studySubjectOID") == null) isAnonymous = true;
-        container.setEventCrf(updateEventCrf(container.getEventCrf(), container.getStudy(), studySubject, container.getUser(), isAnonymous));
-        container.setStudyEvent(updateStudyEvent(container.getStudyEvent(), studyEventDefinition, container.getStudy(), studySubject, container.getUser(), isAnonymous));
+
     }
 
-    @Override
-    public int getOrder() {
-        return 3;
-    }
+    private void processAnonymous(SubmissionContainer container, Errors errors, StudySubject studySubject, StudyEventDefinition studyEventDefinition) throws Exception {
+        Integer ordinal = 1; //Integer.valueOf(container.getSubjectContext().get("studyEventOrdinal"));
+        Integer maxExistingOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(),studyEventDefinition.getStudyEventDefinitionId());
+        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
 
+        while (ordinal <= maxExistingOrdinal + 1) {
+            StudyEvent existingStudyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
+
+            if (existingStudyEvent == null) {
+                container.setStudyEvent(createStudyEvent(studySubject,studyEventDefinition,ordinal,container.getUser()));
+                container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
+                break;
+            } else if (existingStudyEvent.getStatusId().intValue() != Status.AVAILABLE.getCode().intValue()){
+                if (studyEventDefinition.getRepeating()) {
+                    ordinal++;
+                    continue;
+                } else {
+                    errors.reject("Existing StudyEvent is not Available and EventDef is not repeating");
+                    logger.info("***  Existing StudyEvent is not Available and EventDef is not repeating  ***");
+                    throw new Exception("***  Existing StudyEvent is not Available and EventDef is not repeating  ***");
+                }
+            } else {
+                EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(existingStudyEvent.getStudyEventId(), container.getSubject().getStudySubjectId(), crfVersion.getCrf().getCrfId());
+                if (existingEventCrf == null) {
+                    container.setStudyEvent(existingStudyEvent);
+                    container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
+                    break;
+                } else {
+                    
+                    List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
+                    if (existingEventCrf.getStatusId().intValue() == Status.AVAILABLE.getCode().intValue() && itemDataList.size() == 0) {
+                        container.setStudyEvent(existingStudyEvent);
+                        container.setEventCrf(existingEventCrf);
+                        break;
+                    }else if (studyEventDefinition.getRepeating()) {
+                        ordinal++;
+                        continue;
+                    } else {
+                        errors.reject("Existing EventCRF is not usable and EventDef is not repeating");
+                        logger.info("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
+                        throw new Exception("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
+                    }
+                }
+            }
+        }
+        if (container.getStudyEvent() == null || container.getEventCrf() == null) {
+            errors.reject("Unable to identify StudyEvent or EventCrf.");
+            logger.info("***  Unable to identify StudyEvent or EventCrf.  ***");
+            throw new Exception("***  Unable to identify StudyEvent or EventCrf.  ***");
+        }
+    }
+    
     private StudyEvent createStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, Integer ordinal, UserAccount user) {
         Date currentDate = new Date();
         StudyEvent studyEvent = new StudyEvent();
@@ -148,24 +222,27 @@ public class EventProcessor implements Processor, Ordered {
     private StudyEvent updateStudyEvent(StudyEvent studyEvent, StudyEventDefinition studyEventDefinition, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
         SubjectEventStatus newStatus = null;
         int crfCount = 0;
+        int hiddenSiteCrfCount = 0;
         int completedCrfCount = 0;
 
         if (!isAnonymous) {
             if (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue()) newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
         } else {
             // Get a count of CRFs defined for the event
-            if (study.getStudy() != null )
-                crfCount = eventDefinitionCrfDao.findSiteAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(),study.getStudy().getStudyId()).size();
-            else
+            // TODO: What i need to do to fix this is get the study from the context
+            // Then i need to query the site for hidden crfs then subtract that from the count of study defined crfs to get the crf count
+            if (study.getStudy() != null ) {
+                hiddenSiteCrfCount = eventDefinitionCrfDao.findSiteHiddenByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(),study.getStudyId()).size();
+                crfCount = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(),study.getStudy().getStudyId()).size();
+            } else
                 crfCount = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(),study.getStudyId()).size();
             // Get a count of completed CRFs for the event
             completedCrfCount = eventCrfDao.findByStudyEventStatus(studyEvent.getStudyEventId(), Status.UNAVAILABLE.getCode()).size();
-
-            if (crfCount == completedCrfCount){
-                if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode() || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.DATA_ENTRY_STARTED.getCode()) {
+            if ((crfCount - hiddenSiteCrfCount) == completedCrfCount){
+                if (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue() || studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.DATA_ENTRY_STARTED.getCode().intValue()) {
                     newStatus = SubjectEventStatus.COMPLETED;
                 }
-            } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
+            } else if (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue()) {
                 newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
             }
         }

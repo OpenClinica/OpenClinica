@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.StudyEvent;
@@ -9,8 +8,8 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(propagation = Propagation.NEVER)
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
@@ -42,9 +41,17 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
          StudyEvent se = (StudyEvent) q.uniqueResult();
         // this.eventPublisher.publishEvent(new OnStudyEventUpdated(se));
          return se;
-       
-		
 	}
+	
+    public Integer findMaxOrdinalByStudySubjectStudyEventDefinition(int studySubjectId, int studyEventDefinitionId) {
+        String query = "select max(sample_ordinal) from study_event where study_subject_id = " + studySubjectId + " and study_event_definition_id = " + studyEventDefinitionId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        Number result = (Number) q.uniqueResult();
+        if (result == null) return 0;
+        else return result.intValue();
+    }
+    
+
 	
 	public List<StudyEvent> fetchListByStudyEventDefOID(String oid,Integer studySubjectId){
 		List<StudyEvent> eventList = null;
@@ -81,6 +88,5 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	public void setChangeDetails(StudyEventChangeDetails changeDetails) {
 		this.changeDetails = changeDetails;
 	}
-	
 	
 }
