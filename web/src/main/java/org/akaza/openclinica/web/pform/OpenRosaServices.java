@@ -256,13 +256,12 @@ public class OpenRosaServices {
         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getId());
         if (mediaList != null && mediaList.size() > 0) {
             for (CrfVersionMedia media : mediaList) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
                 String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
 
                 MediaFile mediaFile = new MediaFile();
                 mediaFile.setFilename(media.getName());
-                mediaFile.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                File image = new File(media.getPath() + media.getName());
+                mediaFile.setHash(DigestUtils.md5Hex(media.getName()) + Double.toString(image.length()));
                 mediaFile.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?crfVersionMediaId=" + media.getCrfVersionMediaId());
                 manifest.add(mediaFile);
             }
