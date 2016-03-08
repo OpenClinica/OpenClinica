@@ -445,7 +445,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
             //Removing the user and EventCRF from the locked CRF List
-            if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId()) 
+            if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId())
                 getCrfLocker().unlock(ecb.getId());
 
             if (newUploadedFiles.size() > 0) {
@@ -532,7 +532,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         Phase phase2 = Phase.INITIAL_DATA_ENTRY;
        if (getServletPage(request).startsWith(Page.DOUBLE_DATA_ENTRY_SERVLET.getFileName())) {
             phase2 = Phase.DOUBLE_DATA_ENTRY;
-        } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
+        } else if (getServletPage(request).startsWith(Page.ADMIN_EDIT_SERVLET.getFileName())) {
             phase2 = Phase.ADMIN_EDITING;
         }
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
@@ -1286,11 +1286,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         ItemDataBean idb = displayItem.getData();
                         ItemBean item_bean = displayItem.getItem();
                         ItemFormMetadataBean ifmb = displayItem.getMetadata();
-                        
-                        	
+
+
                         LOGGER.debug("-- found group label " + ifmb.getGroupLabel());
                         if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase(""))
-                        
+
                         {
                             // << tbh 11/2009 sometimes the group label is blank instead of ungrouped???
                             Iterator iter = changedItemsMap.entrySet().iterator();
@@ -1563,7 +1563,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             boolean undelete = false;
                             for (DisplayItemBean displayItem : items) {
                                 String currItemVal = displayItem.getData().getValue();
-                                if (currItemVal != null && !currItemVal.equals("")){ 
+                                if (currItemVal != null && !currItemVal.equals("")){
                                     undelete = true;
                                     break;
                                 }
@@ -1577,17 +1577,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                 //                    displayItem.getData().setValue("");
                  //               }
-                               
+
                                 //15350, this particular logic, takes into consideration that a DN is created properly as long as the item data record exists and it fails to get created when it doesnt.
                                 //so, we are expanding the logic from writeToDb method to avoid creating duplicate records.
                                 writeDN = writeDN(displayItem);
                                 //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
                                 nextOrdinal =      displayItem.getData().getOrdinal();
-                                
+
                                 temp = writeToDB(displayItem, iddao, nextOrdinal, request);
                                 LOGGER.debug("just executed writeToDB - 1");
                                 LOGGER.debug("next ordinal: " + nextOrdinal);
-                                
+
                                 // Undelete item if any item in the repeating group has data.
                                 if (undelete && displayItem.getDbData() != null && displayItem.getDbData().isDeleted()) {
                                     iddao.undelete(displayItem.getDbData().getId(),ub.getId());
@@ -2072,14 +2072,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean writeDN(DisplayItemBean displayItem)
     {
     	boolean writeDN=true;
-    	
+
     	if (StringUtils.isBlank(displayItem.getEditFlag())){
  	   if (!displayItem.getData().isActive()) {
  		   writeDN = true;
  	   }
  	   else
  		   writeDN=false;
- 	   
+
  }
  else{
  	 if ("add".equalsIgnoreCase(displayItem.getEditFlag())){
@@ -3847,7 +3847,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 int itemId = dib.getItem().getId();
                 int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
                 int numNotes1 = dndao.findNumOfActiveExistingNotesForItemData(itemDataId);
-               
+
                 String inputFieldName = "input" + itemId;
 
                 discNotes.setNumExistingFieldNotes(inputFieldName, numNotes1);
@@ -4987,7 +4987,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
            ItemDataBean existingItemData =  oldItemdata.get(tempKey);
         	String oldValue =existingItemData.getValue();
         	int oldOrdinal = existingItemData.getOrdinal();
-        	
+
             if (oldValue != null) {
                 if (value == null)
                 { if(ordinal==oldOrdinal)
@@ -5446,7 +5446,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
         int manualRows = 0;
         HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
         FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(CreateDiscrepancyNoteServlet.FLAG_DISCREPANCY_RFC);
-       
+
         ArrayList<DiscrepancyNoteBean> fieldNote = null;
         String intendedKey = null;
         String replacementKey = null;
