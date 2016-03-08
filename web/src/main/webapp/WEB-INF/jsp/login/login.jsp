@@ -25,6 +25,7 @@
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/ua-parser.min.js'/>"></script>
 </head>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -57,23 +58,16 @@
   	<%}%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
-        <script type="text/javascript">
-        
-        var ua = navigator.userAgent;        
+<script type="text/javascript">
 
-        if (ua.indexOf('Firefox')> 0){
-      	// it is firefox
-        }else if (ua.indexOf('Chrome')> 0){
-      	 // it is chrome 
-        }else if (ua.indexOf('Trident/7.0') > 0 && ua.indexOf('rv:11.0') > 0){
-      	  // it is IE 11
-        }else{
-         	document.write("<tr> <td align='center' > <h4>"+
-                    "<fmt:message key="choose_browser" bundle="${restext}"/> "+
-                    "</h4></td> </tr>");        		 
-        }
-      	
-      	
+   var parser = new UAParser();
+    
+    if (!parser.getBrowser().name == 'Firefox' && !parser.getBrowser().name=='Chrome' && !(parser.getBrowser().name=='IE' && parser.getBrowser().major=='11')      ){
+        document.write("<tr> <td align='center' ><h4>"+
+                " <fmt:message key="choose_browser" bundle="${restext}"/>"+
+                "</h4></td> </tr>");
+    }
+    
              </script>
             </table>
 
