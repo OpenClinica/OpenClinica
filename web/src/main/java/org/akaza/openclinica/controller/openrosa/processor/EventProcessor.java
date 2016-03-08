@@ -129,12 +129,14 @@ public class EventProcessor implements Processor, Ordered {
 
         while (ordinal <= maxExistingOrdinal + 1) {
             StudyEvent existingStudyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
-
             if (existingStudyEvent == null) {
                 container.setStudyEvent(createStudyEvent(studySubject,studyEventDefinition,ordinal,container.getUser()));
                 container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
                 break;
-            } else if (existingStudyEvent.getStatusId().intValue() != Status.AVAILABLE.getCode().intValue()){
+            } else if (!existingStudyEvent.getStatusId().equals(Status.AVAILABLE.getCode()) 
+                    || (!existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.SCHEDULED.getCode())
+                    && !existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.NOT_SCHEDULED.getCode())
+                    && !existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.DATA_ENTRY_STARTED.getCode()))){
                 if (studyEventDefinition.getRepeating()) {
                     ordinal++;
                     continue;
@@ -152,7 +154,7 @@ public class EventProcessor implements Processor, Ordered {
                 } else {
                     
                     List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
-                    if (existingEventCrf.getStatusId().intValue() == Status.AVAILABLE.getCode().intValue() && itemDataList.size() == 0) {
+                    if (existingEventCrf.getStatusId().equals(Status.AVAILABLE.getCode()) && itemDataList.size() == 0) {
                         container.setStudyEvent(existingStudyEvent);
                         container.setEventCrf(existingEventCrf);
                         break;
