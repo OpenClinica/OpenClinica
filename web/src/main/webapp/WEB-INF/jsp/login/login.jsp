@@ -58,17 +58,23 @@
   	<%}%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
-<script type="text/javascript">
 
-   var parser = new UAParser();
-    
-    if (!parser.getBrowser().name == 'Firefox' && !parser.getBrowser().name=='Chrome' && !(parser.getBrowser().name=='IE' && parser.getBrowser().major=='11')      ){
-        document.write("<tr> <td align='center' ><h4>"+
-                " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                "</h4></td> </tr>");
-    }
-    
-             </script>
+    <script type="text/javascript">
+        var parser = new UAParser();
+        var showMessage = false;
+
+        if (parser.getBrowser().name == 'IE' && parseInt(parser.getBrowser().major) < 11){
+            showMessage = true;
+        }else if (parser.getBrowser().name != 'Firefox' && parser.getBrowser().name !='Chrome' && parser.getBrowser().name != 'IE'){
+            showMessage = true;
+        }
+
+        if (showMessage){
+            document.write("<tr> <td align='center' ><h4>"+
+                        " <fmt:message key="choose_browser" bundle="${restext}"/>"+
+                        "</h4></td> </tr>");
+        }
+    </script>
             </table>
 
     <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">
