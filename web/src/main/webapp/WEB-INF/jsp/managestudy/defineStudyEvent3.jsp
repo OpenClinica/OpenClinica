@@ -148,7 +148,17 @@
                            <tr valign="top">
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
-      <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')"></td>
+    
+       <c:choose>
+       <c:when test="${definition.repeating == true }">
+            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')"></td>                                      
+       </c:when>
+         <c:otherwise>
+            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" ></td>
+         </c:otherwise>
+       </c:choose>
+    
+    
       <td class="table_cell" colspan="1">
         <span id="enabledIfParticipantForm<c:out value="${count}"/>" style="display : none">
           <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:<input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')">
