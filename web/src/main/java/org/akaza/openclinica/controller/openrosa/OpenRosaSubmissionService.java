@@ -8,7 +8,6 @@ import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +27,9 @@ public class OpenRosaSubmissionService {
     
     public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths) throws Exception {
         // Execute save as Hibernate transaction to avoid partial imports
-        try {
-            CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
-            String requestPayload = parseSubmission(requestBody, crfVersion);
-            runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths);
-        } catch (Throwable t) {
-            System.out.println(t.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(t));
-        }
+        CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
+        String requestPayload = parseSubmission(requestBody, crfVersion);
+        runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths);
     }
     
     @Transactional
