@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -29,15 +30,16 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
     public DynamicsItemFormMetadataBean findByMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean,
             ItemDataBean itemDataBean) {
 
-        String query = "from DynamicsItemFormMetadataBean metadata where metadata.itemFormMetadataId = :id and " +
+        String query = "from DynamicsItemFormMetadataBean metadata where " +
         		"metadata.itemId = :item_id and metadata.eventCrfId = :event_crf_id and " +
-        		"metadata.itemDataId = :item_data_id ";
+                "metadata.itemDataId = :item_data_id order by metadata.id desc ";
+
         Query q = getCurrentSession().createQuery(query);
-        q.setInteger("id", new Integer(metadataBean.getId()));
         q.setInteger("item_id", new Integer(metadataBean.getItemId()));
         q.setInteger("event_crf_id", new Integer(eventCrfBean.getId()));
         q.setInteger("item_data_id", new Integer(itemDataBean.getId()));
-        return (DynamicsItemFormMetadataBean) q.uniqueResult();
+        ArrayList <DynamicsItemFormMetadataBean> list = (ArrayList<DynamicsItemFormMetadataBean>) q.list();
+        return list.size() !=0 ? list.get(0) : null;
     }
 
     public DynamicsItemFormMetadataBean findByItemDataBean(ItemDataBean itemDataBean) {
