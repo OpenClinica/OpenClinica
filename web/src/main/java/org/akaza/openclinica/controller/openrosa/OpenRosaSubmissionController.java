@@ -138,12 +138,15 @@ public class OpenRosaSubmissionController {
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale , listOfUploadFilePaths);
 
         } catch (Exception e) {
-            logger.error("Unsuccessful xform submission.");
+            logger.error("Exception while processing xform submission.");
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
 
-            // Send a failure response
-            return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!errors.hasErrors()) {
+                // Send a failure response
+                logger.info("Submission caused internal error.  Sending error response.");
+                return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
 
         if (!errors.hasErrors()) {
