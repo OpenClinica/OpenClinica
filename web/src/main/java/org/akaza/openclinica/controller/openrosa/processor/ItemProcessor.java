@@ -208,6 +208,7 @@ public class ItemProcessor implements Processor, Ordered {
                                             // Existing item. Value changed. Update existing value.
                                             existingItemData.setValue(newItemData.getValue());
                                             existingItemData.setUpdateId(container.getUser().getUserId());
+                                            existingItemData.setDateUpdated(new Date());
                                             itemDataDao.saveOrUpdate(existingItemData);
                                         }
                                     }
