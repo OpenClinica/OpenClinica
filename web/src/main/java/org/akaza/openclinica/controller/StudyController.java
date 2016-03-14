@@ -641,13 +641,6 @@ public class StudyController {
 			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "PrincipleInvestigator");
 			errorObjects.add(errorOBject);
 		}
-		Validator v4 = new Validator(request);
-		v4.addValidation("secondProId", Validator.NO_BLANKS);
-		HashMap vError4 = v4.validate();
-		if (!vError4.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "SecondaryProtocolID");
-			errorObjects.add(errorOBject);
-		}
 
 		Validator v6 = new Validator(request);
 		HashMap vError6 = v6.validate();
