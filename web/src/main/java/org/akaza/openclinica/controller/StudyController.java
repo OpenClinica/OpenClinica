@@ -547,10 +547,7 @@ public class StudyController {
 		} else {
 			expectedTotalEnrollment = expectedTotalEnrollment.trim();
 		}
-		if (secondaryProId == null) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "SecondaryProtocolID");
-			errorObjects.add(errorOBject);
-		} else {
+		if (secondaryProId != null) {
 			secondaryProId = secondaryProId.trim();
 		}
 
