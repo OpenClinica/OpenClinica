@@ -412,7 +412,7 @@ public class StudyController {
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
 	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
-	 * @apiParam {String} briefSummary Study Summary
+	 * @apiParam {String} secondaryProtocolID Site Secondary Protocol Id
 	 * @apiParam {Date} startDate Start date
 	 * @apiParam {Date} protocolDateVerification protocol Verification date
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
