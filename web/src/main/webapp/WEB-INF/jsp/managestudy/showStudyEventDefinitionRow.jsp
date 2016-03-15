@@ -8,6 +8,7 @@
 
 <c:set var="count" value="${param.eblRowCount}" />
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
+<c:set var="isFirstLink" value="${param.isFirstLink}" />
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
 
@@ -23,6 +24,8 @@
 <tr valign="top">     
       <td class="table_cell_left">
       <%--<c:out value="${currRow.bean.ordinal}"/>--%>
+      <c:choose>
+      <c:when test="${isFirstLink}">
       <c:choose>
         <c:when test="${count==0}">
             <c:choose>
@@ -42,6 +45,9 @@
           <a href="ChangeDefinitionOrdinal?previous=<c:out value="${currRow.bean.id}"/>&current=<c:out value="${nextRow.bean.id}"/>"><img src="images/bt_sort_descending.gif" alt="<fmt:message key="move_down" bundle="${resword}"/>" title="<fmt:message key="move_down" bundle="${resword}"/>" border="0" /></a>
         </c:otherwise>
       </c:choose>
+        </c:when>
+      </c:choose>
+
       </td>   
       <td class="table_cell"><c:out value="${currRow.bean.name}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.oid}"/></td>
