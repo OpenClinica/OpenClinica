@@ -33,6 +33,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -57,6 +64,9 @@ public class ViewStudyEventsServlet extends SecureController {
     public static final String DEFINITION_MAP = "definitions";
 
     public static final String PRINT = "print";
+
+    @Autowired
+    private EventDefinitionCrfTagService eventDefinitionCrfTagService;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -173,6 +183,12 @@ public class ViewStudyEventsServlet extends SecureController {
      */
     private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+
+        // needed to get CRF information about participate form
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
@@ -197,6 +213,18 @@ public class ViewStudyEventsServlet extends SecureController {
                     if(!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()){
                         seb.setEditable(false);
                     }
+
+                    // needed to get CRF information about participate form
+                    StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
+                    seb.setStudyEventDefinition(sedb);
+                    ArrayList<EventDefinitionCRFBean> edcrfs = (ArrayList) edcdao.findAllParentsByDefinition(sedb.getId());
+                    for (EventDefinitionCRFBean edcrf : edcrfs) {
+                        CRFBean crf = (CRFBean) crfdao.findByPK(edcrf.getCrfId());
+                        edcrf.setCrf(crf);
+                        EventDefinitionCRFBean.updateOfflineProperty(edcrf, seb.getStudyEventDefinition(), getEventDefinitionCrfTagService());
+                    }
+                    seb.setEventDefinitionCRFs(edcrfs);
+
                     events.add(seb);
                 }
             }
@@ -275,7 +303,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
             String[] columns =
                 { resword.getString("study_subject_ID"), resword.getString("event_date_started"), resword.getString("subject_event_status"),
-                    resword.getString("actions") };
+                    resword.getString("has_offline_form"), resword.getString("actions") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(3);
             HashMap args = new HashMap();
@@ -456,4 +484,11 @@ public class ViewStudyEventsServlet extends SecureController {
         }
         return a;
     }
+    
+    private EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        if (eventDefinitionCrfTagService == null) {
+            this.eventDefinitionCrfTagService = (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+        }
+        return eventDefinitionCrfTagService;
+     }
 }

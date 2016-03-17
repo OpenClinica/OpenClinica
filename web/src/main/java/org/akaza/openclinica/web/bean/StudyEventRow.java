@@ -10,6 +10,7 @@ package org.akaza.openclinica.web.bean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 
 import java.util.ArrayList;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
 /**
  * @author jxu
@@ -25,6 +26,17 @@ public class StudyEventRow extends EntityBeanRow {
     public static final int COL_START_DATE = 1;
 
     public static final int COL_SUBJECT_EVENT_STATUS = 2;
+
+    public Boolean getHasOfflineParticipateForm() {
+        StudyEventBean event = (StudyEventBean) this.bean;
+        for (Object eventDefCrfObj : event.getEventDefinitionCRFs()) {
+            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefCrfObj;
+            if (edc.isOffline()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /*
      * (non-Javadoc)
