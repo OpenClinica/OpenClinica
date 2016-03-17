@@ -25,6 +25,7 @@ public class OpenRosaSubmissionService {
     @Autowired
     CrfVersionDao crfVersionDao;
     
+    @Transactional
     public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths) throws Exception {
         // Execute save as Hibernate transaction to avoid partial imports
         CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
@@ -32,7 +33,6 @@ public class OpenRosaSubmissionService {
         runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths);
     }
     
-    @Transactional
     private void runAsTransaction(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList <HashMap> listOfUploadFilePaths) throws Exception{
 
         SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);

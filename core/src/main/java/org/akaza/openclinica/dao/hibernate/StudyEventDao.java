@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(propagation = Propagation.NEVER)
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
 
 	private ApplicationEventPublisher eventPublisher;
@@ -66,6 +65,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
       
 	}
 	
+	@Transactional(propagation = Propagation.NEVER)
 	public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
