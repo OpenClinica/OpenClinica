@@ -22,6 +22,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class ScheduledJobController {
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
         ModelMap gridMap = new ModelMap();
-        String[] triggersInGroup;
+        String[] triggerNames;
 
         boolean showMoreLink = false;
         if(request.getParameter("showMoreLink")!=null){
@@ -96,13 +97,15 @@ public class ScheduledJobController {
         int index1 =0;
         for (String triggerGroup : triggerGroups) {
             logger.debug("Group: " + triggerGroup + " contains the following triggers");
-            triggersInGroup = scheduler.getTriggerNames(triggerGroup);
-
-            for (String element : triggersInGroup) {
-               logger.debug("- " + element);
-                 simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(element, triggerGroup));
+              triggerNames = scheduler.getTriggerNames(triggerGroup) ;
+            
+            for (String triggerName : triggerNames) {
+             int state = scheduler.getTriggerState(triggerName, triggerGroup);
+               logger.debug("- " + triggerName);
+               if (state != Trigger.STATE_PAUSED) {
+               simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroup));
                  index1++;
-
+               }
             }
          }
 
