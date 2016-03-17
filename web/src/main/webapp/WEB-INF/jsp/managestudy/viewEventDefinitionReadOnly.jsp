@@ -194,8 +194,6 @@
               </c:when>
             </c:choose>
           </td>
-        </c:when>
-      </c:choose>
                <td class="table_cell">
         <c:choose>
           <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true}">
@@ -207,7 +205,9 @@
             </c:choose>
           </c:when>
         </c:choose>
-      </td>
+      </td>          
+        </c:when>
+      </c:choose>
 
    <td class="table_cell"> 
     <c:out value="${crf.nullValues}"/> &nbsp;    
