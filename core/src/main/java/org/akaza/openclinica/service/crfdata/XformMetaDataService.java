@@ -328,7 +328,8 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        itemFormMetadata.setRequired(false);
+        if (getItemFormMetadataRequired(html,xformItem)) itemFormMetadata.setRequired(true);
+        else itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
@@ -427,6 +428,18 @@ public class XformMetaDataService {
             }
         }
         return null;
+    }
+
+    private boolean getItemFormMetadataRequired(Html html, XformItem xformItem) {
+        boolean required = false;
+
+        for (Bind bind : html.getHead().getModel().getBind()) {
+            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
+                if (bind.getRequired().equals("true()")) required = true;
+                else if (bind.getRequired().equals("false()")) required = false;
+            }
+        }
+        return required;
     }
 
     private ResponseType getResponseType(Html html, XformItem xformItem) {
