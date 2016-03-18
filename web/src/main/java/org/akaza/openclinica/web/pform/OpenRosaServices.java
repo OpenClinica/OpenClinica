@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -374,7 +375,7 @@ public class OpenRosaServices {
     }
 
     /**
-     * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
+     * @api {post} /rest2/openrosa/:studyOid/submission Submit form data
      * @apiName doSubmission
      * @apiPermission admin
      * @apiVersion 3.8.0
@@ -406,6 +407,50 @@ public class OpenRosaServices {
         } else {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
             return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * @api {head} /rest2/openrosa/:studyOid/submission Submit form data
+     * @apiName doSubmissionHead
+     * @apiPermission admin
+     * @apiVersion 3.11.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiGroup Form
+     * @apiDescription Returns the HTTP headers for a form submission request.
+     */
+
+    @HEAD
+    @Path("/{studyOID}/submission")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doSubmissionHead(@PathParam("studyOID") String studyOID) {
+
+        Response.ResponseBuilder builder = Response.noContent();
+        String maxSubmissionSize = CoreResources.getField("pformMaxSubmissionSize");
+        int maxSubmissionSizeInt = -1;
+
+        try {
+            maxSubmissionSizeInt = Integer.valueOf(maxSubmissionSize);
+        } catch (Exception e) {
+            logger.error("Unable to parse pformMaxSubmissionSize as an integer.");
+        }
+        
+        
+        // Build response headers
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        Date currentDate = new Date();
+        cal.setTime(currentDate);
+        SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss zz");
+        format.setCalendar(cal);
+        builder = builder.header("Date", format.format(currentDate));
+        builder = builder.header("X-OpenRosa-Version", "1.0");
+
+        if (maxSubmissionSizeInt < 1) {
+            logger.error("pformMaxSubmissionSize does not contain an integer value greater than 0.");
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            builder = builder.header("X-OpenRosa-Accept-Content-Length", maxSubmissionSizeInt);
+            return builder.status(javax.ws.rs.core.Response.Status.ACCEPTED).build();
         }
     }
 
