@@ -115,7 +115,7 @@ public class AnonymousFormControllerV2 {
                 else offline = "false";
 
                 formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean, edcBean, isOffline);
-                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl,offline);
+                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl, offline, crf.getName(), crf.getDescription());
 
                 return new ResponseEntity<AnonymousUrlResponse>(anonResponse, org.springframework.http.HttpStatus.OK);
             } else {
@@ -177,10 +177,14 @@ public class AnonymousFormControllerV2 {
     private class AnonymousUrlResponse {
         private String url = null;
         private String offline = null;
+        private String name = null;
+        private String description = null;
 
-        public AnonymousUrlResponse(String url, String offline) {
+        public AnonymousUrlResponse(String url, String offline, String name, String description) {
             this.url = url;
             this.offline = offline;
+            this.name = name;
+            this.description = description;
         }
 
         public String getUrl() {
@@ -197,6 +201,22 @@ public class AnonymousFormControllerV2 {
 
         public void setOffline(String offline) {
             this.offline = offline;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
         }
 
 
