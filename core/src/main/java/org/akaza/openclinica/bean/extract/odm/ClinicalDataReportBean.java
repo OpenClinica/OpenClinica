@@ -166,7 +166,15 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
-                        ArrayList<ImportItemDataBean> items = ig.getItemData();          
+                        ArrayList<ImportItemDataBean> itemList = ig.getItemData();   
+
+                        ArrayList<ImportItemDataBean> items = new ArrayList<>();          
+                        for (ImportItemDataBean item : itemList) {
+                            if (item.getValue().trim().length()!=0){
+                                items.add(item);
+                            }                            
+                        }
+
                         sortImportItemDataBeanList(items);                        
                         for (ImportItemDataBean item : items) {
                         	boolean printValue = true;

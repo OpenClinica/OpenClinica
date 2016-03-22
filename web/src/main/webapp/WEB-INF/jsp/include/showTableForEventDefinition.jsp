@@ -226,13 +226,7 @@
 						  </c:choose>
 						</c:otherwise>
 						</c:choose>
-							<c:if test="${column.showLink}"><a href="<c:out value="${orderByQuery}"/>"></c:if><c:out value="${column.name}" /><c:if test="${column.showLink}"></a></c:if>
-							<c:if test="${(table.sortingColumnInd == i) && column.showLink}">
-								<c:choose>
-									<c:when test="${table.ascendingSort}"><img src="images/bt_sort_ascending.gif" alt="<fmt:message key="ascending_sort" bundle="${resword}"/>" title="<fmt:message key="ascending_sort" bundle="${resword}"/>" /></c:when>
-									<c:otherwise><img src="images/bt_sort_descending.gif" alt="<fmt:message key="descending_sort" bundle="${resword}"/>" title="<fmt:message key="descending_sort" bundle="${resword}"/>" /></c:otherwise>
-								</c:choose>
-							</c:if>
+							<c:out value="${column.name}" />
 						</td>
 						<c:set var="i" value="${i + 1}" />
 					</c:forEach>
@@ -262,6 +256,7 @@
 								<c:set var="currRow" scope="request" value="${row}" />
 								<c:import url="${rowURL}">
 									<c:param name="eblRowCount" value="${eblRowCount}" />
+									<c:param name="isFirstLink" value="${isFirstLink}" />	
 								</c:import>
 								<c:set var="eblRowCount" value="${eblRowCount + 1}" />
 								<c:set var="prevRow" scope="request" value="${currRow}" />

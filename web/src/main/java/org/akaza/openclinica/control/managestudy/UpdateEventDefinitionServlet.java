@@ -271,6 +271,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 logger.info("Status:" + edc.getStatus().getName());
                 logger.info("version:" + edc.getDefaultVersionId());
                 logger.info("Electronic Signature [" + edc.isElectronicSignature() + "]");
+                if (!sed.isRepeating()){
+                    edc.setAllowAnonymousSubmission(false);
+                    edc.setSubmissionUrl("");
+                }
                 cdao.update(edc);
 
                 
@@ -300,6 +304,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 edc.setOwner(ub);
                 edc.setCreatedDate(new Date());
                 edc.setStatus(Status.AVAILABLE);
+                if (!sed.isRepeating()){
+                    edc.setAllowAnonymousSubmission(false);
+                    edc.setSubmissionUrl("");
+                }
                 cdao.create(edc);
                 CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());                
                 String crfPath=sed.getOid()+"."+cBean.getOid();

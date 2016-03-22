@@ -325,10 +325,28 @@
           <fmt:message key="participant_form" bundle="${resword}"/>:
           <c:choose>
             <c:when test="${edc.participantForm == true}">
+      <c:choose>
+       <c:when test="${definition.repeating == true }">
               <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')" checked>
+       </c:when>
+         <c:otherwise>
+              <input type="checkbox" checked name="participantForm<c:out value="${count}"/>" value="yes" >
+         </c:otherwise>
+       </c:choose>
+            
             </c:when>
-            <c:otherwise>
+            
+        <c:otherwise>
+       
+        <c:choose>
+          <c:when test="${definition.repeating == true }">
                 <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')">
+          </c:when>
+         <c:otherwise>
+              <input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" >
+         </c:otherwise>
+        </c:choose>
+               
             </c:otherwise>
           </c:choose>
         </td>
@@ -337,14 +355,34 @@
           <c:choose>
             <c:when test="${edc.participantForm == true}">
               <span id="enabledIfParticipantForm<c:out value="${count}"/>">
-                <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
                 <c:choose>
+                
                   <c:when test="${edc.allowAnonymousSubmission == true}">
-                    <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')" checked>
-                  </c:when>
+                  
+                        <c:choose>
+       <c:when test="${definition.repeating == true }">
+           <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
+           <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')" checked>
+       </c:when>
+         <c:otherwise>
+         </c:otherwise>
+       </c:choose>
+            </c:when>
+                  
                   <c:otherwise>
+
+                        <c:choose>
+       <c:when test="${definition.repeating == true }">
+           <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:
                     <input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')">
+       </c:when>
+         <c:otherwise>
+         </c:otherwise>
+       </c:choose>
+
+
                   </c:otherwise>
+                  
                 </c:choose>
               </span>
             </c:when>
@@ -366,7 +404,7 @@
 
         <td class="table_cell" colspan="2">
           <c:choose>
-            <c:when test="${edc.participantForm == true && edc.allowAnonymousSubmission == true}">
+            <c:when test="${edc.participantForm == true && definition.repeating == true && edc.allowAnonymousSubmission == true}">
               <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>">
                 
                 <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}

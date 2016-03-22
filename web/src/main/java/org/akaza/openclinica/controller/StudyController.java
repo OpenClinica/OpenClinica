@@ -412,7 +412,7 @@ public class StudyController {
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
 	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
-	 * @apiParam {String} briefSummary Study Summary
+	 * @apiParam {String} secondaryProtocolID Site Secondary Protocol Id  (Optional)
 	 * @apiParam {Date} startDate Start date
 	 * @apiParam {Date} protocolDateVerification protocol Verification date
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
@@ -547,10 +547,7 @@ public class StudyController {
 		} else {
 			expectedTotalEnrollment = expectedTotalEnrollment.trim();
 		}
-		if (secondaryProId == null) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "SecondaryProtocolID");
-			errorObjects.add(errorOBject);
-		} else {
+		if (secondaryProId != null) {
 			secondaryProId = secondaryProId.trim();
 		}
 
@@ -642,13 +639,6 @@ public class StudyController {
 		HashMap vError3 = v3.validate();
 		if (!vError3.isEmpty()) {
 			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "PrincipleInvestigator");
-			errorObjects.add(errorOBject);
-		}
-		Validator v4 = new Validator(request);
-		v4.addValidation("secondProId", Validator.NO_BLANKS);
-		HashMap vError4 = v4.validate();
-		if (!vError4.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "SecondaryProtocolID");
 			errorObjects.add(errorOBject);
 		}
 
