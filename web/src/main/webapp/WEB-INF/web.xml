@@ -293,6 +293,7 @@
 
     <servlet>
         <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
+        <display-name>DiscrepancyNoteOutputServlet</display-name>
         <description>DiscrepancyNoteOutputServlet</description>
         <servlet-class>org.akaza.openclinica.control.extract.DiscrepancyNoteOutputServlet</servlet-class>
     </servlet>
