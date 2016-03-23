@@ -14,7 +14,6 @@ import org.akaza.openclinica.bean.login.EventDefinitionDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
-import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -59,10 +58,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.controller.dto.ResponseSuccessUserRolesOfStudyDTO;
+import org.akaza.openclinica.controller.dto.UserRolesOfStudyDTO;
+import org.akaza.openclinica.dao.login.StudyUserRoleDAO;
+import org.akaza.openclinica.exception.DAOInsertFailureException;
+import org.akaza.openclinica.exception.DAOUpdateFailureException;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
 public class StudyController {
+
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public static final	String VALIDATION_FAILED_MESSAGE = "VALIDATION FAILED";
 
 	@Autowired
 	@Qualifier("dataSource")
@@ -74,6 +82,7 @@ public class StudyController {
 	UserAccountDAO udao;
 	StudyDAO sdao;
 	StudyEventDefinitionDAO seddao;
+    private SimpleDateFormat dateFormatter = null;
 
 	/**
 	 * @api {post} /pages/auth/api/v1/studies/ Create a study
@@ -166,33 +175,16 @@ public class StudyController {
 		String startDate = (String) map.get("startDate");
 		String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
 		String status = (String) map.get("status");
-		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
-		ArrayList<UserRole> userList = new ArrayList<>();
+        ArrayList<HashMap> newUserRoleMaps;
+        if (map.containsKey("assignUserRoles")) {
+            newUserRoleMaps = (ArrayList) map.get("assignUserRoles");
+            validateNewRoles(newUserRoleMaps, errorObjects, false);
+        } else {
+            newUserRoleMaps = new ArrayList();
+        }
 
-		if (assignUserRoles != null) {
-			for (Object userRole : assignUserRoles) {
-				UserRole uRole = new UserRole();
-				uRole.setUsername((String) ((HashMap<String, Object>) userRole).get("username"));
-				uRole.setRole((String) ((HashMap<String, Object>) userRole).get("role"));
-				udao = new UserAccountDAO(dataSource);
-				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(uRole.getUsername());
-				if (assignedUserBean == null || !assignedUserBean.isActive()) {
-					ErrorObject errorOBject = createErrorObject("Study Object", "The Assigned Username " + uRole.getUsername() + " is not a Valid User", "Assigned User");
-					errorObjects.add(errorOBject);
-				}
-
-				ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-
-				if (getStudyRole(uRole.getRole(), resterm) == null) {
-					ErrorObject errorOBject = createErrorObject("Study Object", "Assigned Role for " + uRole.getUsername() + " is not a Valid Study Role", "Assigned Role");
-					errorObjects.add(errorOBject);
-				}
-				userList.add(uRole);
-			}
-		}
-
-		StudyDTO studyDTO = buildStudyDTO(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, expectedTotalEnrollment, protocolType, status, startDate, userList);
+		StudyDTO studyDTO = buildStudyDTO(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, expectedTotalEnrollment, protocolType, status, startDate, newUserRoleMaps);
 
 		if (uniqueProtocolID == null) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
@@ -249,11 +241,6 @@ public class StudyController {
 			status = status.trim();
 		}
 
-		if (assignUserRoles == null) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "AssignUserRoles");
-			errorObjects.add(errorOBject);
-		}
-
 		if (status != null && !status.equalsIgnoreCase("available") && !status.equalsIgnoreCase("design") && !status.equals("")) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Status Field Should have 'Available' or 'Design' Status only, If left empty , will default to 'Design' Mode", "Status");
 			errorObjects.add(errorOBject);
@@ -268,19 +255,16 @@ public class StudyController {
 		request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
 		request.setAttribute("status", status);
 
-		String format = "yyyy-MM-dd";
-		SimpleDateFormat formatter = null;
 		Date formattedDate = null;
 		if (startDate != "" && startDate != null) {
 			try {
-				formatter = new SimpleDateFormat(format);
-				formattedDate = formatter.parse(startDate);
+				formattedDate = getDateFormatter().parse(startDate);
 			} catch (ParseException e) {
 				ErrorObject errorOBject = createErrorObject("Study Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
 				errorObjects.add(errorOBject);
 			}
 			if (formattedDate != null) {
-				if (!startDate.equals(formatter.format(formattedDate))) {
+				if (!startDate.equals(getDateFormatter().format(formattedDate))) {
 					ErrorObject errorOBject = createErrorObject("Study Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
 					errorObjects.add(errorOBject);
 				}
@@ -373,25 +357,17 @@ public class StudyController {
 			studyDTO.setStudyOid(sBean.getOid());
 			studyDTO.setMessage(validation_passed_message);
 
-			StudyUserRoleBean sub = new StudyUserRoleBean();
-			sub.setRole(Role.COORDINATOR);
-			sub.setStudyId(sBean.getId());
-			sub.setStatus(Status.AVAILABLE);
-			sub.setOwner(ownerUserAccount);
-			StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+            HashMap coordinatorRole = new HashMap();
+            coordinatorRole.put("role", Role.COORDINATOR.getName());
+            coordinatorRole.put("username", ownerUserAccount.getName());
+            newUserRoleMaps.add(coordinatorRole);
 
-			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+            // setup StudyUserRoleBean objects
+            ArrayList<StudyUserRoleBean> newRoles = createObjects_StudyUserRole(sBean, newUserRoleMaps,
+                    ownerUserAccount);
+            StudyUserRoleDAO surdao = new StudyUserRoleDAO(dataSource);
+            surdao.bulkUpsert(sBean.getId(), newRoles);
 
-			for (UserRole userRole : userList) {
-				sub = new StudyUserRoleBean();
-				sub.setRole(getStudyRole(userRole.getRole(), resterm));
-				sub.setStudyId(sBean.getId());
-				sub.setStatus(Status.AVAILABLE);
-				sub.setOwner(ownerUserAccount);
-				udao = new UserAccountDAO(dataSource);
-				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-				surb = createRole(assignedUserBean, sub);
-			}
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
@@ -484,32 +460,16 @@ public class StudyController {
 		String startDate = (String) map.get("startDate");
 		String protocolDateVerification = (String) map.get("protocolDateVerification");
 		String secondaryProId = (String) map.get("secondaryProtocolID");
-		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
-		ArrayList<UserRole> userList = new ArrayList<>();
-		if (assignUserRoles != null) {
-			for (Object userRole : assignUserRoles) {
-				UserRole uRole = new UserRole();
-				uRole.setUsername((String) ((HashMap<String, Object>) userRole).get("username"));
-				uRole.setRole((String) ((HashMap<String, Object>) userRole).get("role"));
-				udao = new UserAccountDAO(dataSource);
-				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(uRole.getUsername());
-				if (assignedUserBean == null || !assignedUserBean.isActive()) {
-					ErrorObject errorOBject = createErrorObject("Study Object", "The Assigned Username " + uRole.getUsername() + " is not a Valid User", "Assigned User");
-					errorObjects.add(errorOBject);
-				}
+        ArrayList<HashMap> newUserRoleMaps;
+        if (map.containsKey("assignUserRoles")) {
+            newUserRoleMaps = (ArrayList) map.get("assignUserRoles");
+            validateNewRoles(newUserRoleMaps, errorObjects, true);
+        } else {
+            newUserRoleMaps = new ArrayList();
+        }
 
-				ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-
-				if (getSiteRole(uRole.getRole(), resterm) == null) {
-					ErrorObject errorOBject = createErrorObject("Study Object", "Assigned Role for " + uRole.getUsername() + " is not a Valid Site Role", "Assigned Role");
-					errorObjects.add(errorOBject);
-				}
-				userList.add(uRole);
-			}
-		}
-
-		SiteDTO siteDTO = buildSiteDTO(uniqueSiteProtocolID, name, principalInvestigator, expectedTotalEnrollment, startDate, protocolDateVerification, secondaryProId, userList);
+		SiteDTO siteDTO = buildSiteDTO(uniqueSiteProtocolID, name, principalInvestigator, expectedTotalEnrollment, startDate, protocolDateVerification, secondaryProId, newUserRoleMaps);
 
 		if (uniqueSiteProtocolID == null) {
 			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "UniqueProtocolID");
@@ -551,11 +511,6 @@ public class StudyController {
 			secondaryProId = secondaryProId.trim();
 		}
 
-		if (assignUserRoles == null) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "AssignUserRoles");
-			errorObjects.add(errorOBject);
-		}
-
 		request.setAttribute("uniqueProId", uniqueSiteProtocolID);
 		request.setAttribute("name", name);
 		request.setAttribute("prinInvestigator", principalInvestigator);
@@ -564,21 +519,18 @@ public class StudyController {
 		request.setAttribute("protocolDateVerification", protocolDateVerification);
 		request.setAttribute("secondProId", secondaryProId);
 
-		String format = "yyyy-MM-dd";
-		SimpleDateFormat formatter = null;
 		Date formattedStartDate = null;
 		Date formattedProtocolDate = null;
 
 		if (startDate != "" && startDate != null) {
 			try {
-				formatter = new SimpleDateFormat(format);
-				formattedStartDate = formatter.parse(startDate);
+				formattedStartDate = getDateFormatter().parse(startDate);
 			} catch (ParseException e) {
 				ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
 				errorObjects.add(errorOBject);
 			}
 			if (formattedStartDate != null) {
-				if (!startDate.equals(formatter.format(formattedStartDate))) {
+				if (!startDate.equals(getDateFormatter().format(formattedStartDate))) {
 					ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
 					errorObjects.add(errorOBject);
 				}
@@ -587,14 +539,13 @@ public class StudyController {
 
 		if (protocolDateVerification != "" && protocolDateVerification != null) {
 			try {
-				formatter = new SimpleDateFormat(format);
-				formattedProtocolDate = formatter.parse(protocolDateVerification);
+				formattedProtocolDate = getDateFormatter().parse(protocolDateVerification);
 			} catch (ParseException e) {
 				ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
 				errorObjects.add(errorOBject);
 			}
 			if (formattedProtocolDate != null) {
-				if (!protocolDateVerification.equals(formatter.format(formattedProtocolDate))) {
+				if (!protocolDateVerification.equals(getDateFormatter().format(formattedProtocolDate))) {
 					ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
 					errorObjects.add(errorOBject);
 				}
@@ -688,18 +639,12 @@ public class StudyController {
 			StudyBean sBean = createStudy(siteBean, ownerUserAccount);
 			siteDTO.setSiteOid(sBean.getOid());
 			siteDTO.setMessage(validation_passed_message);
-			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-			StudyUserRoleBean sub = null;
-			for (UserRole userRole : userList) {
-				sub = new StudyUserRoleBean();
-				sub.setRole(getSiteRole(userRole.getRole(), resterm));
-				sub.setStudyId(sBean.getId());
-				sub.setStatus(Status.AVAILABLE);
-				sub.setOwner(ownerUserAccount);
-				udao = new UserAccountDAO(dataSource);
-				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-				StudyUserRoleBean surb = createRole(assignedUserBean, sub);
-			}
+
+            // setup StudyUserRoleBean objects
+            ArrayList<StudyUserRoleBean> newRoles = createObjects_StudyUserRole(siteBean, newUserRoleMaps, ownerUserAccount);
+            StudyUserRoleDAO surdao = new StudyUserRoleDAO(dataSource);
+            surdao.bulkUpsert(siteBean.getId(), newRoles);
+
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
@@ -711,6 +656,176 @@ public class StudyController {
 		return response;
 
 	}
+
+    /**
+     * @api {get}  /pages/auth/api/v1/studies/:uniqueProtocolId/userRoles Get user roles assigned to a study
+     * @apiName getUserRolesOfStudy
+     * @apiPermission Authenticate using api-key. admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} uniqueProtocolId Study unique protocol ID.
+     * @apiGroup Study
+     * @apiHeader {String} api_key Users unique access-key.
+     * @apiDescription Get an up-to-date user roles assigned to a study.
+     * @apiSuccessExample {json} Success-Response:
+     *                    HTTP/1.1 200 OK
+     *                    {
+     *                    "message": "SUCCESS",
+     *                    "studyOid": "S_STUDYPRO",
+     *                    "uniqueProtocolID": "Study Protocol ID",
+     *                    "userRoles": [
+     *                    {
+     *                        "username": "usera",
+     *                        "role": "Data Manager",
+     *                        "createdDate": "2016-03-01",
+     *                        "updatedDate": "2016-03-01",
+     *                        "statusId": 1,
+     *                        "updaterId": 23,
+     *                        "ownerId": 23
+     *                    },
+     *                    {
+     *                        "username": "userb",
+     *                        "role": "Study Director",
+     *                        "createdDate": "2016-03-01",
+     *                        "updatedDate": "2016-03-01",
+     *                        "statusId": 1,
+     *                        "updaterId": 23,
+     *                        "ownerId": 23
+     *                    }
+     *                    ]}
+     */
+    @RequestMapping(value = "/{uniqueProtocolID}/userRoles", method = RequestMethod.GET)
+    public ResponseEntity<Object> getUserRolesOfStudy(HttpServletRequest request, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
+        logger.debug("I'm in getUserRolesOfStudy");
+        sdao = new StudyDAO(dataSource);
+        StudyBean study;
+        try {
+            study = (StudyBean) sdao.findByUniqueIdentifier(uniqueProtocolID);
+        } catch (NullPointerException e) {
+            return new ResponseEntity(org.springframework.http.HttpStatus.NOT_FOUND);
+        }
+        StudyUserRoleDAO surdao = new StudyUserRoleDAO(dataSource);
+
+        ResponseSuccessUserRolesOfStudyDTO responseSuccess = new ResponseSuccessUserRolesOfStudyDTO();
+        responseSuccess.setDateFormatter(getDateFormatter());
+        responseSuccess.setStudyOid(study.getOid());
+        responseSuccess.setUniqueProtocolID(uniqueProtocolID);
+        for (StudyUserRoleBean role : surdao.findAllByStudyId(study.getId())) {
+            responseSuccess.addUserRole(role);
+        }
+        return new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+    }
+
+    /**
+     * @api {put}  /pages/auth/api/v1/studies/:uniqueProtocolId/userRoles Update user roles assigned to a study
+     * @apiName updateUserRolesOfStudy
+     * @apiPermission Authenticate using api-key. admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} uniqueProtocolId Study unique protocol ID.
+     * @apiGroup Study
+     * @apiHeader {String} api_key Users unique access-key.
+     * @apiDescription Update user roles assigned to a study.
+     * @apiParamExample {json} Request-Example:
+     *                  {
+     *                  "userRoles": [
+     *                  {"username": "usera", "role": "Data Manager"},
+     *                  {"username": "userb", "role": "Study Director"}
+     *                  ]}
+	 * @apiErrorExample {json} Error-Response:
+	 *                  HTTP/1.1 400 Bad Request
+	 *                  {
+	 *                  "message": "VALIDATION FAILED",
+	 *                  "errors": [
+	 *                  {"field": "userRoles","resource": "Study User Role Object","code": "Required Field"}
+	 *                  ],
+	 *                  "userRoles": [
+	 *                  {"username": "usera","role": "Data Manager"},
+	 *                  {"username": "userb","role": "Study Director"},
+	 *                  {"username": "userc","role": "Data Specialist"}
+	 *                  ],
+	 *                  "uniqueStudyProtocolID": "Study Protocol ID",
+	 *                  "uniqueSiteProtocolID": null,
+	 *                  }
+     * @apiSuccessExample {json} Success-Response:
+     *                    HTTP/1.1 200 OK
+     *                    {
+     *                    "message": "SUCCESS",
+     *                    "studyOid": "S_STUDYPRO",
+     *                    "uniqueStudyProtocolID": "Study Protocol ID",
+     *                    "uniqueSiteProtocolID": null,
+     *                    "userRoles": [
+     *                    {
+     *                        "username": "usera",
+     *                        "role": "Data Manager",
+     *                        "createdDate": "2016-03-01",
+     *                        "updatedDate": "2016-03-01",
+     *                        "statusId": 1,
+     *                        "updaterId": 23,
+     *                        "ownerId": 23
+     *                    },
+     *                    {
+     *                        "username": "userb",
+     *                        "role": "Study Director",
+     *                        "createdDate": "2016-03-01",
+     *                        "updatedDate": "2016-03-01",
+     *                        "statusId": 1,
+     *                        "updaterId": 23,
+     *                        "ownerId": 23
+     *                    }
+     *                    ]}
+     */
+    @RequestMapping(value = "/{uniqueProtocolID}/userRoles", method = RequestMethod.PUT)
+    public ResponseEntity<Object> updateUserRolesOfStudy(HttpServletRequest request, @PathVariable("uniqueProtocolID") String uniqueProtocolID,
+            @RequestBody HashMap<String, Object> map) throws Exception {
+
+        logger.debug("I'm in updateUserRolesOfStudy");
+        sdao = new StudyDAO(dataSource);
+        StudyBean study;
+        try {
+            study = (StudyBean) sdao.findByUniqueIdentifier(uniqueProtocolID);
+        } catch (NullPointerException e) {
+            return new ResponseEntity(org.springframework.http.HttpStatus.NOT_FOUND);
+        }
+
+        ArrayList<ErrorObject> errorObjects = new ArrayList();
+        ArrayList<HashMap> newUserRoleMaps;
+
+        // required submission field
+        if (map.containsKey("userRoles")) {
+            newUserRoleMaps = (ArrayList) map.get("userRoles");
+            // validate incoming new roles
+            validateNewRoles(newUserRoleMaps, errorObjects,  study.getParentStudyId() != 0);
+        } else {
+            newUserRoleMaps = null;
+            errorObjects.add(createErrorObject("Study User Role Object", "Required Field", "userRoles"));
+        }
+
+        UserRolesOfStudyDTO dto = buildUserRolesOfStudyDTO(uniqueProtocolID, newUserRoleMaps);
+        dto.setErrors(errorObjects);
+        if (errorObjects.size() > 0) {
+            dto.setMessage(VALIDATION_FAILED_MESSAGE);
+            return new ResponseEntity(dto, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        StudyUserRoleDAO surdao = new StudyUserRoleDAO(dataSource);
+        try {
+            // setup StudyUserRoleBean objects
+            UserAccountBean currentUser = (UserAccountBean) request.getSession().getAttribute(SecureController.USER_BEAN_NAME);
+            ArrayList<StudyUserRoleBean> newRoles = createObjects_StudyUserRole(study, newUserRoleMaps, currentUser);
+            // delete previous entries, then update if exists or insert new records
+            surdao.bulkUpsert(study.getId(), newRoles);
+        } catch (DAOUpdateFailureException|DAOInsertFailureException e) {
+            return new ResponseEntity(e.getLocalizedMessage(), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        ResponseSuccessUserRolesOfStudyDTO responseSuccess = new ResponseSuccessUserRolesOfStudyDTO();
+        responseSuccess.setDateFormatter(getDateFormatter());
+        responseSuccess.setStudyOid(study.getOid());
+        responseSuccess.setUniqueProtocolID(uniqueProtocolID);
+        for (StudyUserRoleBean role : (ArrayList<StudyUserRoleBean>) udao.findAllUsersByStudy(study.getId())) {
+            responseSuccess.addUserRole(role);
+        }
+        return new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+    }
 
 	/**
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
@@ -1055,7 +1170,7 @@ public class StudyController {
 	}
 
 	public StudyDTO buildStudyDTO(String uniqueProtocolID, String name, String briefSummary, String principalInvestigator, String sponsor, String expectedTotalEnrollment, String protocolType,
-			String status, String startDate, ArrayList<UserRole> userList) {
+			String status, String startDate, ArrayList<HashMap> userList) {
 		if (status != null) {
 			if (status.equals(""))
 				status = "design";
@@ -1076,7 +1191,7 @@ public class StudyController {
 	}
 
 	public SiteDTO buildSiteDTO(String uniqueSiteProtocolID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate, String protocolDateVerification,
-			String secondaryProId, ArrayList<UserRole> userList) {
+			String secondaryProId, ArrayList<HashMap> userList) {
 
 		SiteDTO siteDTO = new SiteDTO();
 		siteDTO.setUniqueSiteProtocolID(uniqueSiteProtocolID);
@@ -1138,34 +1253,92 @@ public class StudyController {
 		return errorOBject;
 	}
 
-	public Role getStudyRole(String roleName, ResourceBundle resterm) {
-		if (roleName.equalsIgnoreCase(resterm.getString("Study_Director").trim())) {
-			return Role.STUDYDIRECTOR;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("Study_Coordinator").trim())) {
-			return Role.COORDINATOR;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("Investigator").trim())) {
-			return Role.INVESTIGATOR;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("Data_Entry_Person").trim())) {
-			return Role.RESEARCHASSISTANT;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("Monitor").trim())) {
-			return Role.MONITOR;
-		} else
-			return null;
-	}
+    private SimpleDateFormat getDateFormatter() {
+        if (dateFormatter == null) {
+            this.dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+        }
+        return dateFormatter;
+    }
 
-	public Role getSiteRole(String roleName, ResourceBundle resterm) {
-		if (roleName.equalsIgnoreCase(resterm.getString("site_investigator").trim())) {
-			return Role.INVESTIGATOR;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person").trim())) {
-			return Role.RESEARCHASSISTANT;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("site_monitor").trim())) {
-			return Role.MONITOR;
-		} else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person2").trim())) {
-			return Role.RESEARCHASSISTANT2;
-		} else
-			return null;
-	}
+    private void validateNewRoles(ArrayList<HashMap> newRoleMaps, ArrayList<ErrorObject> errorObjects, Boolean isSite) {
+        logger.debug("I'm in validateNewRoles");
 
+        udao = new UserAccountDAO(dataSource);
+
+        // validate each new roles
+        for (HashMap role : newRoleMaps) {
+            if (!role.containsKey("role")) {
+                errorObjects.add(createErrorObject("Study User Role Object",
+                            "Required Field: role", "userRoles"));
+
+                break;
+            } else if (!role.containsKey("username")) {
+                errorObjects.add(createErrorObject("Study User Role Object",
+                            "Required Field: username", "userRoles"));
+
+                break;
+            }
+
+            // validate that user is active
+            String userName = (String) role.get("username");
+            UserAccountBean roleUser = (UserAccountBean) udao.findByUserName(userName);
+            if (roleUser == null || !roleUser.isActive()) {
+                errorObjects.add(createErrorObject("Study User Role Object",
+                            "The Assigned Username " + userName + " is not a Valid User",
+                            "userRoles"));
+            }
+
+            // validate role
+            String roleName = (String) role.get("role");
+            if (!isSite && StudyUserRoleBean.fromSerializedToNativeStudyRole(roleName) == null) {
+                errorObjects.add(createErrorObject("Study User Role Object",
+                            "Assigned Role for " + userName + " is not a Valid Study Role",
+                            "userRoles"));
+
+            } else if (isSite && StudyUserRoleBean.fromSerializedToNativeSiteRole(roleName) == null) {
+                errorObjects.add(createErrorObject("Study User Role Object",
+                            "Assigned Role for " + userName + " is not a Valid Site Role",
+                            "userRoles"));
+            }
+        }
+    }
+
+    private ArrayList<StudyUserRoleBean> createObjects_StudyUserRole(StudyBean study, ArrayList<HashMap> newRoleMaps,
+            UserAccountBean updater) {
+
+        logger.debug("I'm in createObjects_StudyUserRole");
+
+        ArrayList<StudyUserRoleBean> newRoles = new ArrayList();
+        Date currentDate = new Date();
+
+        for (HashMap role : newRoleMaps) {
+            StudyUserRoleBean sur = new StudyUserRoleBean();
+            sur.setParentStudyId(study.getParentStudyId());
+            if (study.getParentStudyId() == 0) {
+                sur.setRole(StudyUserRoleBean.fromSerializedToNativeStudyRole((String) role.get("role")));
+            } else {
+                sur.setRole(StudyUserRoleBean.fromSerializedToNativeSiteRole((String) role.get("role")));
+            }
+            sur.setStudyId(study.getId());
+            if (role.containsKey("statusId")) {
+                sur.setStatus(Status.get((Integer) role.get("statusId")));
+            } else {
+                sur.setStatus(Status.AVAILABLE);
+            }
+            sur.setOwner(study.getOwner());
+            sur.setUpdatedDate(currentDate);
+            sur.setUpdater(updater);
+            sur.setUserName((String) role.get("username"));
+            newRoles.add(sur);
+        }
+
+        return newRoles;
+    }
+
+    private UserRolesOfStudyDTO buildUserRolesOfStudyDTO(String uniqueProtocolID, ArrayList<HashMap> newUserRoleMaps) {
+        UserRolesOfStudyDTO dto = new UserRolesOfStudyDTO();
+        dto.setUniqueProtocolID(uniqueProtocolID);
+        dto.setUserRoles(newUserRoleMaps);
+        return dto;
+    }
 }
-
-

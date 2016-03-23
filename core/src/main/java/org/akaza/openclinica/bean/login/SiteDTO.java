@@ -1,7 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class SiteDTO {
@@ -15,7 +14,7 @@ public class SiteDTO {
     private String siteOid;
     private ArrayList<ErrorObject> errors;
     private String message;
-    private ArrayList<UserRole> assignUserRoles;
+    private ArrayList<HashMap> assignUserRoles;
 
 
 	public SiteDTO() {
@@ -120,12 +119,12 @@ public class SiteDTO {
 	}
 
 
-	public ArrayList<UserRole> getAssignUserRoles() {
+	public ArrayList<HashMap> getAssignUserRoles() {
 		return assignUserRoles;
 	}
 
 
-	public void setAssignUserRoles(ArrayList<UserRole> assignUserRoles) {
+	public void setAssignUserRoles(ArrayList<HashMap> assignUserRoles) {
 		this.assignUserRoles = assignUserRoles;
 	}
 

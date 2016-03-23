@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<queries>
+    <query>
+        <name>create</name>
+        <sql>
+            INSERT INTO study_user_role (role_name, status_id, owner_id, date_created,
+                date_updated, update_id, study_id, user_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        </sql>
+    </query>
+
+    <query>
+        <name>deleteAllByNonParticipantUserAndStudyId</name>
+        <sql>UPDATE study_user_role set status_id = 5 where status_id = 1 AND study_id = ? AND user_name NOT LIKE '%.SS_%'</sql>
+    </query>
+
+	<query>
+		<name>findAllByNonParticipantUser</name>
+		<sql>SELECT * FROM study_user_role WHERE user_name NOT LIKE '%.SS_%'</sql>
+	</query>
+
+	<query>
+		<name>findAllByNonParticipantUserAndStudyId</name>
+		<sql>SELECT * FROM study_user_role WHERE study_id = ? AND user_name NOT LIKE '%.SS_%'</sql>
+	</query>
+
+    <query>
+        <name>findByStudyIdAndUserName</name>
+        <sql>SELECT * FROM study_user_role WHERE sur.study_id = ? AND sur.user_name = ? LIMIT 1</sql>
+    </query>
+
+    <query>
+        <name>update</name>
+        <sql>
+            UPDATE study_user_role
+            SET role_name=?, status_id=?, owner_id=?, date_created=?, date_updated=?, update_id=?
+            WHERE study_id=? AND user_name=?
+        </sql>
+    </query>
+    
+    <query>
+        <name>lockTableExclusively</name>
+        <sql>LOCK TABLE study_user_role IN EXCLUSIVE MODE</sql>
+    </query>
+    
+    <query>
+        <name>upsert</name>
+        <sql>
+            UPDATE study_user_role
+            SET role_name=?, status_id=?, owner_id=?, date_created=?, date_updated=?, update_id=?
+            WHERE study_id=? AND user_name=?;
+
+            INSERT INTO study_user_role (role_name, status_id, owner_id, date_created,
+                date_updated, update_id, study_id, user_name)
+            SELECT v.*
+                FROM (VALUES (?, ?, ?, ?, ?, ?, ?, ?)) AS v(role_name, status_id, owner_id,
+                    date_created, date_updated, update_id, study_id, user_name)
+                LEFT JOIN study_user_role t ON t.study_id = v.study_id AND
+                    t.user_name = v.user_name
+                WHERE t.user_name IS NULL;
+        </sql>
+    </query>
+</queries>

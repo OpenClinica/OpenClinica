@@ -58,7 +58,7 @@
 		<name>deleteStudyUserRolesByUserID</name>
 		<sql>update study_user_role set status_id = 5 where user_name = ?</sql>
 	</query>
-    <query>
+	<query>
 		<name>deleteStudyUserRolesIncludeAutoRemove</name>
 		<sql>update study_user_role set status_id = 7 where user_name = ? AND status_id = 1</sql>
 	</query>
