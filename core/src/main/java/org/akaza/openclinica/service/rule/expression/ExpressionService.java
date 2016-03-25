@@ -1269,11 +1269,11 @@ public class ExpressionService {
             // ItemBean item =
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
-            ItemBean item = (ItemBean) getItemDao().findByOid(oid).get(0);
-            if (item != null) {
+            ArrayList <ItemBean> items = (ArrayList<ItemBean>) getItemDao().findByOid(oid);
+            if (items.size() !=0){
                 return "OK";
+                        }
             }
-        }
 
         return oid;
     }
