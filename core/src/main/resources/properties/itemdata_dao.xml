@@ -159,7 +159,7 @@
 		<sql>
 		   select distinct id.* from item_data id, item_form_metadata ifm
 		   where id.event_crf_id=?
-		   and id.item_id = ifm.item_id and ifm.show_item=true
+		   and id.item_id = ifm.item_id 
 		   and ifm.required=true
 		</sql>
 	</query>

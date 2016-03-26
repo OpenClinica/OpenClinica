@@ -370,6 +370,48 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         return answer;
     }
 
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndShownByCrfVersionId(int crfVersionId)  {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+
+        this.setTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+
+        String sql = digester.getQuery("findAllItemsRequiredAndShownByCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndHiddenByCrfVersionId(int crfVersionId)  {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+
+        this.setTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+
+        String sql = digester.getQuery("findAllItemsRequiredAndHiddenByCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    
     public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
