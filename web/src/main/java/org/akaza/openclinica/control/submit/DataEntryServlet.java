@@ -4167,10 +4167,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList<ItemDataBean> itemdatas = null;
         for (ItemFormMetadataBean shownItemMeta : shownRequiredAllItemsInCrfVersion) {
             itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), shownItemMeta.getItemId());
-            if (itemdatas == null)
+            if (itemdatas == null || itemdatas.size()==0)
                 return false;
             for (ItemDataBean itemdata : itemdatas) {
-                if (itemdata.getValue() == null || itemdata.getValue().equals("")) {
+                System.out.println(itemdata.getItemId() +"  :  "+   itemdata.getValue());
+                if (itemdata.getValue()==null || itemdata.getValue().equals(null)  || itemdata.getValue().equals("") || itemdata.getValue().length()==0 || itemdata.getValue().isEmpty()) {
                     return false;
                 }
             }
