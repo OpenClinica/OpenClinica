@@ -97,10 +97,8 @@ public class ItemProcessor implements Processor, Ordered {
 
     public void process(SubmissionContainer container) throws Exception {
         logger.info("Executing Item Processor.");
-        System.out.println("Executing Item Processor.");
         ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
 
-        System.out.println("Submitted instance is \n" + container.getRequestBody());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -133,7 +131,6 @@ public class ItemProcessor implements Processor, Ordered {
                             Node groupNode = groupNodeList.item(k);
                             if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
                                 groupNodeName = groupNode.getNodeName();
-                                System.out.println("\n\nProcessing group " + groupNodeName);
                                 ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion);
                                 if (itemGroup == null) {
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
@@ -154,7 +151,6 @@ public class ItemProcessor implements Processor, Ordered {
                                         
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
-                                        System.out.println("Processing  xform item: " + itemName + ". Value: " + itemValue + ".");
 
                                         Item item = lookupItem(itemName, crfVersion);
                                         
@@ -166,8 +162,6 @@ public class ItemProcessor implements Processor, Ordered {
                                         ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                                         ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                                         Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
-                                        System.out.println("ItemOrdinal is " + itemOrdinal);
-                                        System.out.println("DB item name: " + item.getName() + ".  ResponseTypeId: " + itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId());
 
                                         // Convert space separated Enketo multiselect values to comma separated OC multiselect values
                                         Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
@@ -175,14 +169,9 @@ public class ItemProcessor implements Processor, Ordered {
                                             itemValue = itemValue.replaceAll(" ", ",");
                                         }
                                         if (responseTypeId == 4) {
-                                            //if (itemOrdinal < 0) {
-                                            //    itemOrdinal = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1;
-                                            //    System.out.println("From responseTypeId == 4, updating itemOrdinal to " + itemOrdinal);
-                                            //}
                                            for (HashMap  uploadFilePath : listOfUploadFilePaths){
                                                if ((boolean) uploadFilePath.containsKey(itemName+"."+itemValue)  && itemValue!=""){
                                                    itemValue = (String) uploadFilePath.get(itemName+"."+itemValue);
-                                                   System.out.println("Changing itemValue to "+ itemValue);
                                                    break;
                                                }
                                                
@@ -207,18 +196,12 @@ public class ItemProcessor implements Processor, Ordered {
                                             // No existing value, create new item.
                                             if (newItemData.getOrdinal() < 0) {
                                                 newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
-                                                System.out.println("From save section, setting itemOrdinal to " + newItemData.getOrdinal());
                                                 groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                                             }
-                                            System.out.println("Previous itemdata did not exist, creating new itemdata.");
                                             itemDataDao.saveOrUpdate(newItemData);
                                         } else if (existingItemData.getValue().equals(newItemData.getValue())) {
-                                            System.out.println("No change to item value.  No update made.");
                                             // Existing item. Value unchanged. Do nothing.
                                         } else {
-                                            System.out.println("Updating existing item data.");
-                                            System.out.println("Old value = " + existingItemData.getValue());
-                                            System.out.println("New value = " + newItemData.getValue());
                                             // Existing item. Value changed. Update existing value.
                                             existingItemData.setValue(newItemData.getValue());
                                             existingItemData.setUpdateId(container.getUser().getUserId());
