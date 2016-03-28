@@ -1270,7 +1270,7 @@ public class ExpressionService {
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
             ArrayList <ItemBean> items = (ArrayList<ItemBean>) getItemDao().findByOid(oid);
-            if (items.size() !=0){
+            if (items==null || items.size() !=0){
                 return "OK";
                         }
             }
