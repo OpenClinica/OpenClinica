@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.commons.beanutils.BeanUtils;
-
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -84,6 +83,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -99,6 +99,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -4157,19 +4158,42 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ItemDAO idao = new ItemDAO(getDataSource());
         ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(getDataSource());
-        int allRequiredNum = idao.findAllRequiredByCRFVersionId(ecb.getCRFVersionId());
-        int allRequiredFilledOut = iddao.findAllRequiredByEventCRFId(ecb);
-        int allRequiredButHidden = itemFormMetadataDao.findCountAllHiddenByCRFVersionId(ecb.getCRFVersionId());
-        int allHiddenButShown = itemFormMetadataDao.findCountAllHiddenButShownByEventCRFId(ecb.getId());
-        // add all hidden items minus all hidden but now shown items to the allRequiredFilledOut variable
+   
+       // Below code will iterate all shown and hidden required fields/items in a crf version and verify if the data field is filled up with value or if not , then it is a hidden field with no show rule triggered for the item.        
+        ArrayList<ItemFormMetadataBean> shownRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndShownByCrfVersionId(ecb.getCRFVersionId());
+        ArrayList<ItemFormMetadataBean> hiddenRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndHiddenByCrfVersionId(ecb
+                .getCRFVersionId());
 
-        if (allRequiredNum > allRequiredFilledOut + allRequiredButHidden - allHiddenButShown) {
-            LOGGER.debug("using crf version number: " + ecb.getCRFVersionId());
-            LOGGER.debug("allRequiredNum > allRequiredFilledOut:" + allRequiredNum + " " + allRequiredFilledOut + " plus " + allRequiredButHidden + " minus "
-                + allHiddenButShown);
-            return false;
+        ArrayList<ItemDataBean> itemdatas = null;
+        for (ItemFormMetadataBean shownItemMeta : shownRequiredAllItemsInCrfVersion) {
+            itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), shownItemMeta.getItemId());
+            if (itemdatas == null)
+                return false;
+            for (ItemDataBean itemdata : itemdatas) {
+                if (itemdata.getValue() == null || itemdata.getValue().equals("")) {
+                    return false;
+                }
+            }
         }
-        // had to change the query below to allow for hidden items here, tbh 04/2010
+
+        ArrayList<DynamicsItemFormMetadataBean> dynamicsItemFormMetadataBeans = null;
+        for (ItemFormMetadataBean hiddenItemMeta : hiddenRequiredAllItemsInCrfVersion) {
+            itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), hiddenItemMeta.getItemId());
+            dynamicsItemFormMetadataBeans = getItemMetadataService().getDynamicsItemFormMetadataDao().findByItemAndEventCrfShown(ecb,
+                    hiddenItemMeta.getItemId());
+            if (itemdatas.size() == 0 && dynamicsItemFormMetadataBeans.size() > 0) {
+                return false;
+            }
+            for (ItemDataBean itemdata : itemdatas) {
+                if (itemdata.getValue() == null && dynamicsItemFormMetadataBeans.size() > 0) {
+                        return false;
+                }
+            }
+        }        
+        
+        
+        
+      // had to change the query below to allow for hidden items here, tbh 04/2010
         ArrayList allFilled = iddao.findAllBlankRequiredByEventCRFId(ecb.getId(), ecb.getCRFVersionId());
         int numNotes = 0;
         if (!allFilled.isEmpty()) {

@@ -48,6 +48,22 @@
            and dyn.show_item=true
         </sql>
     </query>
+    <query>
+		<name>findAllItemsRequiredAndShownByCrfVersionId</name>
+		<sql>
+			SELECT * FROM item_form_metadata
+			WHERE crf_version_id=?
+				AND required =true AND show_item =true;
+		</sql>
+	</query>
+    <query>
+		<name>findAllItemsRequiredAndHiddenByCrfVersionId</name>
+		<sql>
+			SELECT * FROM item_form_metadata
+			WHERE crf_version_id=?
+				AND required =true AND show_item =false;
+		</sql>
+	</query>
 
     <query>
 		<name>findAllByCRFVersionId</name>
