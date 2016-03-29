@@ -463,7 +463,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 } else {
                     value = NO;
                 }
-            } else {
+            } else if(theItem !=null) {
                 ArrayList<ItemFormMetadataBean> itemFormMetadatas = getItemFormMetadataDAO().findAllByItemIdAndHasValidations(theItem.getId());
                 if (itemFormMetadatas.size() > 0) {
                     value =
@@ -472,6 +472,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     value = NO;
                 }
 
+            }else{
+                value =null;
             }
 
             return value;
