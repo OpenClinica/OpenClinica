@@ -203,7 +203,7 @@ public class RemoveEventCRFServlet extends SecureController {
         // to study director
 
         sendEmail(ub.getEmail().trim(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
+ //       sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
         logger.info("Sending email done..");
     }
 
