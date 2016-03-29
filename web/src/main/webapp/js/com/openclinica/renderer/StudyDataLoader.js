@@ -361,6 +361,7 @@ function StudyDataLoader(study, json) {
 	        }
 	        
 	        var itemsData = util_ensureArray(itemGroupData[i]["ItemData"]);
+	        if (itemsData!=undefined && itemsData.length !=0){
 	        for (var j=0;j<itemsData.length;j++) {
 	          var itemValue = itemsData[j]["@Value"];
 	          var itemOID = itemsData[j]["@ItemOID"];
@@ -380,7 +381,7 @@ if (app_displayDNs =='y')   app_dns[studyEventOID+studyEventRepeatKey+itemOID][r
 	        }
 	      }
 	    
-	   
+	    }
   }
 
   
