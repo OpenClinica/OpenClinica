@@ -4080,6 +4080,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
             newStatus = Status.UNAVAILABLE;
             ecb.setDateValidateCompleted(new Date());
+            ecb.setUpdaterId(ub.getId());
+            ecb.setUpdater(ub);
             ide = false;
         }
 
