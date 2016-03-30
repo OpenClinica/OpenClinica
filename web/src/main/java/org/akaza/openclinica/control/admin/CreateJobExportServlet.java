@@ -1,5 +1,15 @@
 package org.akaza.openclinica.control.admin;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -22,16 +32,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -275,6 +275,7 @@ public class CreateJobExportServlet extends SecureController {
     public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
         Validator v = new Validator(request);
         v.addValidation(JOB_NAME, Validator.NO_BLANKS);
+        v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
         // need to be unique too
         v.addValidation(JOB_DESC, Validator.NO_BLANKS);
         v.addValidation(EMAIL, Validator.IS_A_EMAIL);

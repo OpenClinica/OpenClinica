@@ -455,6 +455,8 @@ public class Validator {
     public static final int NO_SEMI_COLONS_OR_COLONS = 43;
     public static final int NO_SPACES_ALLOWED = 44;
     public static final int SUBMISSION_URL_NOT_UNIQUE = 45;
+    
+    public static final int NO_LEADING_OR_TRAILING_SPACES = 46;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -712,6 +714,9 @@ public class Validator {
             case NO_BLANKS:
                 errorMessage = resexception.getString("field_not_blank");
                 break;
+            case NO_LEADING_OR_TRAILING_SPACES:
+                errorMessage = resexception.getString("field_no_leading_or_trailing_spaces");
+                break;
             case IS_A_NUMBER:
                 errorMessage = resexception.getString("field_should_number");
                 break;
@@ -894,6 +899,11 @@ public class Validator {
         switch (v.getType()) {
         case NO_BLANKS:
             if (isBlank(fieldName)) {
+                addError(fieldName, v);
+            }
+            break;
+        case NO_LEADING_OR_TRAILING_SPACES:
+            if (isLeadingTrailingSpaces(fieldName)) {
                 addError(fieldName, v);
             }
             break;
@@ -1161,6 +1171,17 @@ break;
             return true;
         }
 
+        return false;
+    }
+
+    protected boolean isLeadingTrailingSpaces(String fieldName) {
+        String fieldValue = getFieldValue(fieldName);
+
+        if (fieldValue != null) {
+            if (!fieldValue.trim().equals(fieldValue)) {
+                return true;
+            }
+        }
         return false;
     }
 
