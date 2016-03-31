@@ -170,7 +170,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                         ArrayList<ImportItemDataBean> items = new ArrayList<>();          
                         for (ImportItemDataBean item : itemList) {
-                            if (item.getValue().trim().length()!=0){
+                            if (item.getValue()!=null && item.getValue().trim().length()!=0){
                                 items.add(item);
                             }                            
                         }
