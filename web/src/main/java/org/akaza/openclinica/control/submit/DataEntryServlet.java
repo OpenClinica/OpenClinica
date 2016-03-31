@@ -4173,7 +4173,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 return false;
             for (ItemDataBean itemdata : itemdatas) {
                 System.out.println(itemdata.getItemId() +"  :  "+   itemdata.getValue());
-                if (itemdata.getValue()==null || itemdata.getValue().equals(null)  || itemdata.getValue().equals("") || itemdata.getValue().length()==0 || itemdata.getValue().isEmpty()) {
+                if ((itemdata.getValue()==null || itemdata.getValue().equals("") || itemdata.getValue().trim().length()==0) && dndao.findNumExistingNotesForItem(itemdata.getId())<1 ) {
                     return false;
                 }
             }
@@ -4188,7 +4188,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 return false;
             }
             for (ItemDataBean itemdata : itemdatas) {
-                if (itemdata.getValue() == null && dynamicsItemFormMetadataBeans.size() > 0) {
+                if ((itemdata.getValue()==null || itemdata.getValue().equals("") || itemdata.getValue().trim().length()==0) && dndao.findNumExistingNotesForItem(itemdata.getId())<1 && dynamicsItemFormMetadataBeans.size() > 0) {
                         return false;
                 }
             }
