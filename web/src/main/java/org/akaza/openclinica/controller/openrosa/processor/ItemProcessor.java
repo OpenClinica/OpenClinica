@@ -164,6 +164,12 @@ public class ItemProcessor implements Processor, Ordered {
                                         ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                                         Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
 
+                                        if (itemValue.equals("")) {
+                                            if (!itemFormMetadata.getDefaultValue().equals("")) {
+                                                itemValue = itemFormMetadata.getDefaultValue();
+                                            }
+                                        }
+                                        
                                         // Convert space separated Enketo multiselect values to comma separated OC multiselect values
                                         Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
                                         if (responseTypeId == 3 || responseTypeId == 7) {
