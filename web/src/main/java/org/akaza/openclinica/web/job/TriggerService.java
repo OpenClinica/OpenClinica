@@ -1,6 +1,13 @@
 package org.akaza.openclinica.web.job;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
@@ -15,14 +22,6 @@ import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class TriggerService {
 
@@ -354,6 +353,7 @@ public class TriggerService {
     public HashMap validateImportJobForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
         Validator v = new Validator(request);
         v.addValidation(JOB_NAME, Validator.NO_BLANKS);
+        v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
         // need to be unique too
         v.addValidation(JOB_DESC, Validator.NO_BLANKS);
         if (!"".equals(fp.getString(EMAIL))) {
