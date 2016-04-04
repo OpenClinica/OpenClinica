@@ -958,12 +958,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwb = allItems.get(i);
                 if (diwb.isInGroup()) {
+                    // for the items in groups
+                    DisplayItemGroupBean digb = diwb.getItemGroup();
+                    
                     List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
                     for (int j = 0; j < dbGroups.size(); j++) {
                         DisplayItemGroupBean displayGroup = dbGroups.get(j);
                         List<DisplayItemBean> items = displayGroup.getItems();
                         if ("remove".equalsIgnoreCase(displayGroup.getEditFlag())) {
                             for (DisplayItemBean displayItem : items) {
+                                if(displayItem.getMetadata().isShowItem() && digb.getGroupMetaBean().isShowGroup()){
                                 int itemId = displayItem.getItem().getId();
                                 int ordinal = displayItem.getData().getOrdinal();
                                 if (itemOrdinals.containsKey(itemId)) {
@@ -989,6 +993,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 changedItemsMap.put(formName, displayGroup);
                                 LOGGER.debug("adding to changed items map: " + formName);
                             }
+                           }
                         }
                     }
 
