@@ -99,34 +99,23 @@ public class OpenRosaSubmissionController {
             if (ServletFileUpload.isMultipartContent(request)) {
                 String dir = getAttachedFilePath(studyOID);
                 FileProperties fileProperties= new FileProperties();
-    
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setFileSizeMax(fileProperties.getFileSizeMax());
                 List<FileItem> items = upload.parseRequest(request);
-                int ordinal=1;
                 for (FileItem item : items) {
                     if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
                         if (!new File(dir).exists()) new File(dir).mkdirs();
 
                         File file = processUploadedFile(item, dir);
-                        if (listOfUploadFilePaths.size()!=0) {
-                            for(HashMap uploadFilePath :listOfUploadFilePaths){
-                                if ((boolean) uploadFilePath.containsKey(item.getFieldName()+"."+ordinal) ){
-                                    ordinal++;
-                                    break;
-                                }
-                                ordinal=1;
-                            }
-                        }
-                        map.put(item.getFieldName()+"."+ordinal, file.getPath());
+                        map.put(item.getFieldName()+"."+item.getName(), file.getPath());
                         listOfUploadFilePaths.add(map);
 
                     } else if (item.getFieldName().equals("xml_submission_file")) {
                         requestBody = item.getString("UTF-8");
                     }
                 }
-            } else {
+            } else  {
                 requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
             }
 

@@ -99,7 +99,6 @@ public class ItemProcessor implements Processor, Ordered {
         logger.info("Executing Item Processor.");
         ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
 
-        
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         InputSource is = new InputSource();
@@ -170,11 +169,9 @@ public class ItemProcessor implements Processor, Ordered {
                                             itemValue = itemValue.replaceAll(" ", ",");
                                         }
                                         if (responseTypeId == 4) {
-                                            if (itemOrdinal < 0) 
-                                                itemOrdinal = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1;
                                            for (HashMap  uploadFilePath : listOfUploadFilePaths){
-                                               if ((boolean) uploadFilePath.containsKey(itemName+"."+itemOrdinal)  && itemValue!=""){
-                                                   itemValue = (String) uploadFilePath.get(itemName+"."+itemOrdinal);
+                                               if ((boolean) uploadFilePath.containsKey(itemName+"."+itemValue)  && itemValue!=""){
+                                                   itemValue = (String) uploadFilePath.get(itemName+"."+itemValue);
                                                    break;
                                                }
                                                
