@@ -36,7 +36,7 @@ public class AuditUserLoginBean extends AbstractMutableDomainObject {
     private UserAccountBean userAccount;
     private Date loginAttemptDate;
     private LoginStatus loginStatus;
-
+    private String details;
     private Integer userAccountId;
 
     public String getUserName() {
@@ -73,6 +73,15 @@ public class AuditUserLoginBean extends AbstractMutableDomainObject {
 
     public void setUserAccountId(Integer userAccountId) {
         this.userAccountId = userAccountId;
+    }
+
+    
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 
     @Type(type = "loginStatus")

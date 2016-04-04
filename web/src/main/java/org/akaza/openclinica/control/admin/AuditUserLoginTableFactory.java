@@ -44,11 +44,12 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
 
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
-        tableFacade.setColumnProperties("userName", "loginAttemptDate", "loginStatus", "actions");
+        tableFacade.setColumnProperties("userName", "loginAttemptDate", "loginStatus","details", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("userName"), "User Name", null, null);
-        configureColumn(row.getColumn("loginAttemptDate"), "Login Attempt Date", new DateCellEditor("yyyy-MM-dd HH:mm:ss"), null);
-        configureColumn(row.getColumn("loginStatus"), "Login Status", null, new AvailableDroplistFilterEditor());
+        configureColumn(row.getColumn("loginAttemptDate"), "Attempt Date", new DateCellEditor("yyyy-MM-dd HH:mm:ss"), null);
+        configureColumn(row.getColumn("loginStatus"), "Status", null, new AvailableDroplistFilterEditor());
+        configureColumn(row.getColumn("details"), "Details", null, null);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
 
