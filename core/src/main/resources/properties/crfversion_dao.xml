@@ -98,10 +98,14 @@
 	</query>
 	
 	<!-- all deletes are not prepareStatements-->
-	<query>
-		<name>delete</name>
-		<sql>delete from CRF_VERSION where crf_version_id=</sql>
-	</query>	
+    <query>
+        <name>delete</name>
+        <sql>delete from CRF_VERSION where crf_version_id=</sql>
+    </query>    
+    <query>
+        <name>deleteCrfVersionMediaByVersion</name>
+        <sql>delete from crf_version_media where crf_version_id=</sql>
+    </query>    
 	<query>
 		<name>deleteItemsByVersion</name>
 		<sql>delete from item where item_id=</sql>
