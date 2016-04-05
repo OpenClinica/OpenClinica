@@ -186,14 +186,14 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
                 html.tdEnd().trEnd(0);
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                printDataEntry(html, eventCrfBean);
+                html.nbsp().nbsp();
+                printDataEntry(html, eventCrfBean, reswords.getString("print"));
+                html.tdEnd().trEnd(0);
             }
 
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            printDataEntry(html, eventCrfBean);
-            html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, reswords.getString("print"));
-            html.tdEnd().trEnd(0);
             //if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
             if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (! hiddenCrf()) {
@@ -229,13 +229,13 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
                 html.tdEnd().trEnd(0);
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewEventCrfContentLinkPrint(html, studySubject, eventCrfBean, getStudyEvent());
+                html.nbsp().nbsp();
+                viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
+                html.tdEnd().trEnd(0);
             }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewEventCrfContentLinkPrint(html, studySubject, eventCrfBean, getStudyEvent());
-            html.nbsp().nbsp();
-            viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
-            html.tdEnd().trEnd(0);
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -264,19 +264,19 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntryParameterized(html, eventDefinitionCrf, reswords.getString("view"));
                 html.tdEnd().trEnd(0);
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                if(eventCrfBean==null)
+                printCrf(html, eventDefinitionCrf);
+                else
+                    printDataEntry(html,eventCrfBean);
+                html.nbsp().nbsp();
+                if(eventCrfBean==null)
+                printCrf(html, eventDefinitionCrf, reswords.getString("print"));
+                else
+                    printDataEntry(html, eventCrfBean, reswords.getString("print"));
+                html.tdEnd().trEnd(0);
             }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            if(eventCrfBean==null)
-            printCrf(html, eventDefinitionCrf);
-            else
-            	printDataEntry(html,eventCrfBean);
-            html.nbsp().nbsp();
-            if(eventCrfBean==null)
-            printCrf(html, eventDefinitionCrf, reswords.getString("print"));
-            else
-            	printDataEntry(html, eventCrfBean, reswords.getString("print"));
-            html.tdEnd().trEnd(0);
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
             if (! hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -285,13 +285,13 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
                 html.tdEnd().trEnd(0);
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                printDataEntry(html, eventCrfBean);
+                html.nbsp().nbsp();
+                printDataEntry(html, eventCrfBean, reswords.getString("print"));
+                html.tdEnd().trEnd(0);
             }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            printDataEntry(html, eventCrfBean);
-            html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, reswords.getString("print"));
-            html.tdEnd().trEnd(0);
             if (studySubject.getStatus() != Status.DELETED && studySubject.getStatus() != Status.AUTO_DELETED
                 && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
@@ -329,14 +329,14 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                html.tdEnd().trEnd(0);            
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                printDataEntry(html, eventCrfBean);
+                html.nbsp().nbsp();
+                printDataEntry(html, eventCrfBean, reswords.getString("print"));
                 html.tdEnd().trEnd(0);
-            }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            printDataEntry(html, eventCrfBean);
-            html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, reswords.getString("print"));
-            html.tdEnd().trEnd(0);
+              }
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
