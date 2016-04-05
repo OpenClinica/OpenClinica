@@ -10,11 +10,14 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -35,6 +38,7 @@ import javax.servlet.ServletContext;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +70,7 @@ public class AccountController {
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
+	AuditUserLoginDao auditUserLoginDao;
 
 	/**
 	 * @api {post} /pages/accounts/login Retrieve a user account
@@ -565,6 +570,48 @@ public class AccountController {
 		return null;
 	}
 
+		/**
+	 * @api {post} /pages/accounts/auditcrc Add audit user log
+	 * @apiName addAuditUserLog
+	 * @apiPermission admin
+	 * @apiVersion 3.10.0
+	 * @apiParam {String} crcUserName crc username .
+	 * @apiParam {String} studySubjectId Study Subject Oid .
+	 * @apiParam {String} studyOid Study OID .
+	 * @apiGroup Subject
+	 * @apiDescription Add audit user log
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "studySubjectId": "SS_SUB100",
+	 *                  "crcUserName": "crc_auto2_user"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    }
+	 */
+
+	@RequestMapping(value = "/auditcrc", method = RequestMethod.POST)
+	public ResponseEntity addAuditUserLog(@RequestBody HashMap<String, String> map) throws Exception {
+
+		AuditUserLoginBean auditUserLogin = new AuditUserLoginBean();
+		String crcUserName = map.get("crcUserName");
+		UserAccountBean userAccount = getUserAccount(crcUserName);
+		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOid();
+		StudySubjectBean studySubjectBean = getStudySubject(map.get("studySubjectId"), parentStudy);
+		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+
+        auditUserLogin.setUserName(crcUserName);
+        auditUserLogin.setLoginStatus(LoginStatus.ACCESS_CODE_VIEWED);
+        auditUserLogin.setDetail(mapValues.get("pUserName"));
+        auditUserLogin.setLoginAttemptDate(new Date());
+        auditUserLogin.setUserAccountId( userAccount != null ? userAccount.getId() : null);
+        getAuditUserLoginDao().saveOrUpdate(auditUserLogin);
+		return new ResponseEntity<String>("saved", org.springframework.http.HttpStatus.OK);
+	}
+
 	private UserDTO buildUserDTO(UserAccountBean userAccountBean) {
 		uDTO = new UserDTO();
 		uDTO.setfName(userAccountBean.getFirstName());
@@ -1042,5 +1089,12 @@ public class AccountController {
     public String getRandom32ChApiKey() {
         String uuid = UUID.randomUUID().toString();
         return uuid.replaceAll("-", "");
+    }
+
+    public AuditUserLoginDao getAuditUserLoginDao() {
+        auditUserLoginDao =
+            this.auditUserLoginDao != null ? auditUserLoginDao : (AuditUserLoginDao) SpringServletAccess.getApplicationContext(context).getBean(
+                    "auditUserLoginDao");
+        return auditUserLoginDao;
     }
 }
