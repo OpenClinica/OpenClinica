@@ -7,18 +7,22 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Krikor Krumlian
@@ -27,6 +31,8 @@ public class ViewRuleSetServlet extends SecureController {
 
     private static String RULESET_ID = "ruleSetId";
     private static String RULESET = "ruleSet";
+    private static String TARGET = "target";
+    private static String RULE_OID = "ruleOid";
     private RuleSetServiceInterface ruleSetService;
 
     /**
@@ -49,8 +55,11 @@ public class ViewRuleSetServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
+        String target = request.getParameter(TARGET);
+        String ruleOID = request.getParameter(RULE_OID);
         String ruleSetId = request.getParameter(RULESET_ID);
-        if (ruleSetId == null) {
+        
+        if (ruleSetId == null || target == null || ruleOID == null) {
             addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
             forwardPage(Page.CRF_LIST);
         } else {
@@ -69,11 +78,27 @@ public class ViewRuleSetServlet extends SecureController {
                 }
 
             }
+            
+            CoreResources core = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+            String designerUrl = core.getField("designer.url")+"access?host="+getHostPathFromSysUrl(core.getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request);
+            UserAccountBean currentUser = (UserAccountBean) request.getSession().getAttribute("userBean");
+            designerUrl += "&target=" + target + "&ruleOid=" + ruleOID +"&study_oid=" +currentStudy.getOid()+"&provider_user="+currentUser.getName();
+
+            request.setAttribute("designerUrl", designerUrl);
             request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
             request.setAttribute("ruleSetRuleBeans", orderRuleSetRulesByStatus(ruleSetBean));
             request.setAttribute(RULESET, ruleSetBean);
             forwardPage(Page.VIEW_RULES);
         }
+    }
+
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+        return sysURL.replaceAll(contextPath+"/", "");
+    }
+
+    public String getContextPath(HttpServletRequest request) {
+        String contextPath = request.getContextPath().replaceAll("/", "");
+        return contextPath;
     }
 
     List<RuleSetRuleBean> orderRuleSetRulesByStatus(RuleSetBean ruleSet) {
