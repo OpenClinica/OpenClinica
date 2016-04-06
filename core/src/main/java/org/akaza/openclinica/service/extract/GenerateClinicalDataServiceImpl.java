@@ -342,22 +342,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if(formVersionOID!=null)formCheck = false;
 		boolean hiddenCrfCheckPassed=true;
 		List<CrfBean> hiddenCrfs= new ArrayList<CrfBean>();
-		
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			
-			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
+			List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
 			hiddenCrfCheckPassed=true;
-			
-			if(isActiveRoleAtSite){
-				Integer parentStudyId =0;
-				if(ss.getStudy()!=null)
-				{
-		//			parentStudyId= ss.getStudy().getStudy().getStudyId();
-					parentStudyId= ss.getStudy().getStudyId();
+           int siteId=0;
+           int parentStudyId = 0;
+           Study study = ss.getStudy();
+  		if (study.getStudy()!=null && isActiveRoleAtSite){
+                //it is site subject
+                 siteId = study.getStudyId(); 
+                 parentStudyId = study.getStudy().getStudyId(); 
 				
-				}
-				
-				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),parentStudyId,seds);
+                 hiddenCrfs	 = listOfHiddenCrfs(siteId,parentStudyId,edcs,ecrf);
 				
 				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
 				{
@@ -403,31 +400,35 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	
-	private List<CrfBean> listOfHiddenCrfs(Integer siteId,Integer parentStudyId,List<EventDefinitionCrf> seds) {
-	
-		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
-		LOGGER.info("The study subject is at the site/study"+siteId);
-		for(EventDefinitionCrf eventDefCrf:seds){
-			
-			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId ||parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()))
-			{
-				hiddenCrfs.add(eventDefCrf.getCrf());
-			}
-			/*else if(eventDefCrf.getHideCrf()&&parentStudyId!=0)
-			
-			{
-	
-				if(parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()){
-					hiddenCrfs.add(eventDefCrf.getCrf());
-				}
-			}*/
-	
-		}
 
-		
-		return hiddenCrfs;
-	}
 
+    private List<CrfBean> listOfHiddenCrfs(Integer siteId, Integer parentStudyId, List<EventDefinitionCrf> edcs, EventCrf ecrf) {
+        boolean found = false;
+        int crfId = ecrf.getCrfVersion().getCrf().getCrfId();
+        List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+        LOGGER.info("The study subject is at the site/study " + siteId);
+        for (EventDefinitionCrf eventDefCrf : edcs) {
+
+            if (eventDefCrf.getCrf().getCrfId() == crfId && eventDefCrf.getStudy().getStudyId() == siteId) {
+                found = true;
+                if (eventDefCrf.getHideCrf()) {
+                    hiddenCrfs.add(eventDefCrf.getCrf());
+                }
+            }
+        }
+
+        if (!found) {
+            for (EventDefinitionCrf eventDefCrf : edcs) {
+                if (eventDefCrf.getCrf().getCrfId() == crfId && eventDefCrf.getStudy().getStudyId() == parentStudyId && eventDefCrf.getHideCrf()) {
+                    hiddenCrfs.add(eventDefCrf.getCrf());
+                }
+            }
+        }
+
+        return hiddenCrfs;
+    }
+	
+	
 	// This logic is taken from eventCRFBean. 
 	private String fetchEventCRFStatus(EventCrf ecrf) {
 		String stage = null;
@@ -855,14 +856,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		UserAccount userAccount = getUserAccountDao().findByColumnName(userId,"userId");
 		LOGGER.debug("Entering the URL with "+studyOID+":"+studySubjectOID+":"+studyEventOID+":"+formVersionOID+":DNS:"+collectDNs+":Audits:"+collectAudit);
 		LOGGER.info("Determining the generic paramters...");
-		
-		if(userAccount.getActiveStudy().getStudy()!=null){
-			isActiveRoleAtSite=true;
-		}
-		else{
-			isActiveRoleAtSite=false;
-		}
-		
+		Study study = getStudyDao().findByOcOID(studyOID);
+         if (study.getStudy()!=null){
+              isActiveRoleAtSite=true;
+         }else{
+             isActiveRoleAtSite=false;             
+         }
+
 		// This piece of code identifies if the study subject is assigned to study level or site level. If the study subject assigned to site  is pulled from study level this will get the site OID correctly displayed. 
 		if(!studySubjectOID.equals(INDICATE_ALL))
 		{
@@ -980,5 +980,4 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.userAccountDao = userAccountDao;
 	}
 
-	
 }
