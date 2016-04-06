@@ -816,11 +816,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             //} else
                 if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
-                    viewLinkBuilder(ruleSetId,ruleOid,target) + executeLinkBuilder(ruleSetId, ruleId , target) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
+                    viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId , target) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
             } else {
                 value +=
-                    viewLinkBuilder(ruleSetId,ruleOid,target) + restoreLinkBuilder(ruleSetRuleId, ruleSetId) + extractXmlLinkBuilder(ruleSetRuleId)
+                    viewLinkBuilder(ruleSetId) + restoreLinkBuilder(ruleSetRuleId, ruleSetId) + extractXmlLinkBuilder(ruleSetRuleId)
                         + testLinkBuilder(ruleSetRuleId);
             }
             return value;
@@ -858,9 +858,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         }
     }
 
-    private String viewLinkBuilder(Integer ruleSetId, String ruleOid, String target) {
+    private String viewLinkBuilder(Integer ruleSetId) {
         HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("ViewRuleSet?ruleSetId=" + ruleSetId + "&ruleOid=" + ruleOid + "&target=" + target);
+        actionLink.a().href("ViewRuleSet?ruleSetId=" + ruleSetId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
         actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt("View").title("View").append("hspace=\"2\"").end().aEnd();

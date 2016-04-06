@@ -205,11 +205,9 @@
       </td>
 
      <td>
-
       <a onmouseup="javascript:setImage('bt_run','images/bt_EnterData.gif');" 
          onmousedown="javascript:setImage('bt_run','images/bt_EnterData_d.gif');" 
-         href="${designerUrl}&path=ViewRuleSet?ruleSetId=${ruleSet.id}"><img align="left" hspace="6" border="0" title="Rule Designer" alt="Rule Designer" src="images/bt_EnterData.gif" name="Test"></a>
-      
+         href="${designerUrl}&target=${ruleSet.target.value}&ruleOid=${ruleSetRule.ruleBean.oid}&study_oid=${currentStudy}&provider_user=${providerUser}&path=ViewRuleSet?ruleSetId=${ruleSet.id}"><img align="left" hspace="6" border="0" title="Rule Designer" alt="Rule Designer" src="images/bt_EnterData.gif" name="Test"></a>
       </td>
       <%--</c:when>--%>
       <%--<c:otherwise>--%>

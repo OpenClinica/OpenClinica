@@ -55,11 +55,9 @@ public class ViewRuleSetServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        String target = request.getParameter(TARGET);
-        String ruleOID = request.getParameter(RULE_OID);
         String ruleSetId = request.getParameter(RULESET_ID);
         
-        if (ruleSetId == null || target == null || ruleOID == null) {
+        if (ruleSetId == null) {
             addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
             forwardPage(Page.CRF_LIST);
         } else {
@@ -82,9 +80,10 @@ public class ViewRuleSetServlet extends SecureController {
             CoreResources core = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
             String designerUrl = core.getField("designer.url")+"access?host="+getHostPathFromSysUrl(core.getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request);
             UserAccountBean currentUser = (UserAccountBean) request.getSession().getAttribute("userBean");
-            designerUrl += "&target=" + target + "&ruleOid=" + ruleOID +"&study_oid=" +currentStudy.getOid()+"&provider_user="+currentUser.getName();
 
             request.setAttribute("designerUrl", designerUrl);
+            request.setAttribute("currentStudy", currentStudy.getOid());
+            request.setAttribute("providerUser", currentUser.getName());
             request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
             request.setAttribute("ruleSetRuleBeans", orderRuleSetRulesByStatus(ruleSetBean));
             request.setAttribute(RULESET, ruleSetBean);
