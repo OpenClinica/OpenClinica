@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
@@ -85,6 +87,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private Locale locale;
 	
 	private UserAccountDao userAccountDao;
+    private StudyUserRoleDao studyUserRoleDao;
 	
 	public AuditLogEventDao getAuditEventDAO() {
 		return auditEventDAO;
@@ -857,12 +860,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		LOGGER.debug("Entering the URL with "+studyOID+":"+studySubjectOID+":"+studyEventOID+":"+formVersionOID+":DNS:"+collectDNs+":Audits:"+collectAudit);
 		LOGGER.info("Determining the generic paramters...");
 		Study study = getStudyDao().findByOcOID(studyOID);
-         if (study.getStudy()!=null){
+        int parentStudyId =0;
+        int studyId = study.getStudyId();
+		
+        if (study.getStudy()!=null){
               isActiveRoleAtSite=true;
+              parentStudyId = study.getStudy().getStudyId();
          }else{
+             parentStudyId= studyId;
              isActiveRoleAtSite=false;             
          }
 
+         
+         ArrayList <StudyUserRole> surlist =  getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, studyId, parentStudyId);
+         if (surlist==null || surlist.size()==0){
+             // Does not have permission to view study or site info / return null
+             return null;
+         }
+         
+         
+         
 		// This piece of code identifies if the study subject is assigned to study level or site level. If the study subject assigned to site  is pulled from study level this will get the site OID correctly displayed. 
 		if(!studySubjectOID.equals(INDICATE_ALL))
 		{
@@ -979,5 +996,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	public void setUserAccountDao(UserAccountDao userAccountDao) {
 		this.userAccountDao = userAccountDao;
 	}
+
+    public StudyUserRoleDao getStudyUserRoleDao() {
+        return studyUserRoleDao;
+    }
+
+    public void setStudyUserRoleDao(StudyUserRoleDao studyUserRoleDao) {
+        this.studyUserRoleDao = studyUserRoleDao;
+    }
 
 }
