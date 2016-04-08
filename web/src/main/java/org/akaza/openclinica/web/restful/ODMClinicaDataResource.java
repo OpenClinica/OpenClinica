@@ -121,6 +121,8 @@ public class ODMClinicaDataResource {
 						getClinicalDataCollectorResource()
 								.generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier,studyOID),
 										studyEventOID, formVersionOID,includeDN,includeAudit,request.getLocale(), userId));
+		if(report.getClinicalDataMap()==null)
+		    return null;
 		report.createOdmXml(true);
 		//xmlSerializer.setForceTopLevelObject(true);
 		xmlSerializer.setTypeHintsEnabled(true);

@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
@@ -85,6 +87,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private Locale locale;
 	
 	private UserAccountDao userAccountDao;
+    private StudyUserRoleDao studyUserRoleDao;
 	
 	public AuditLogEventDao getAuditEventDAO() {
 		return auditEventDAO;
@@ -342,22 +345,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if(formVersionOID!=null)formCheck = false;
 		boolean hiddenCrfCheckPassed=true;
 		List<CrfBean> hiddenCrfs= new ArrayList<CrfBean>();
-		
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			
-			List<EventDefinitionCrf> seds = se.getStudyEventDefinition().getEventDefinitionCrfs();
+			List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
 			hiddenCrfCheckPassed=true;
-			
-			if(isActiveRoleAtSite){
-				Integer parentStudyId =0;
-				if(ss.getStudy()!=null)
-				{
-		//			parentStudyId= ss.getStudy().getStudy().getStudyId();
-					parentStudyId= ss.getStudy().getStudyId();
+           int siteId=0;
+           int parentStudyId = 0;
+           Study study = ss.getStudy();
+  		if (study.getStudy()!=null && isActiveRoleAtSite){
+                //it is site subject
+                 siteId = study.getStudyId(); 
+                 parentStudyId = study.getStudy().getStudyId(); 
 				
-				}
-				
-				hiddenCrfs	 = listOfHiddenCrfs(ss.getStudy().getStudyId(),parentStudyId,seds);
+                 hiddenCrfs	 = listOfHiddenCrfs(siteId,parentStudyId,edcs,ecrf);
 				
 				if(hiddenCrfs.contains(ecrf.getCrfVersion().getCrf()))
 				{
@@ -403,31 +403,35 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	
-	private List<CrfBean> listOfHiddenCrfs(Integer siteId,Integer parentStudyId,List<EventDefinitionCrf> seds) {
-	
-		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
-		LOGGER.info("The study subject is at the site/study"+siteId);
-		for(EventDefinitionCrf eventDefCrf:seds){
-			
-			if(eventDefCrf.getHideCrf()&&(eventDefCrf.getStudy().getStudyId() == siteId || eventDefCrf.getParentId()==siteId ||parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()))
-			{
-				hiddenCrfs.add(eventDefCrf.getCrf());
-			}
-			/*else if(eventDefCrf.getHideCrf()&&parentStudyId!=0)
-			
-			{
-	
-				if(parentStudyId==eventDefCrf.getStudy().getStudyId() ||parentStudyId ==  eventDefCrf.getParentId()){
-					hiddenCrfs.add(eventDefCrf.getCrf());
-				}
-			}*/
-	
-		}
 
-		
-		return hiddenCrfs;
-	}
 
+    private List<CrfBean> listOfHiddenCrfs(Integer siteId, Integer parentStudyId, List<EventDefinitionCrf> edcs, EventCrf ecrf) {
+        boolean found = false;
+        int crfId = ecrf.getCrfVersion().getCrf().getCrfId();
+        List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+        LOGGER.info("The study subject is at the site/study " + siteId);
+        for (EventDefinitionCrf eventDefCrf : edcs) {
+
+            if (eventDefCrf.getCrf().getCrfId() == crfId && eventDefCrf.getStudy().getStudyId() == siteId) {
+                found = true;
+                if (eventDefCrf.getHideCrf()) {
+                    hiddenCrfs.add(eventDefCrf.getCrf());
+                }
+            }
+        }
+
+        if (!found) {
+            for (EventDefinitionCrf eventDefCrf : edcs) {
+                if (eventDefCrf.getCrf().getCrfId() == crfId && eventDefCrf.getStudy().getStudyId() == parentStudyId && eventDefCrf.getHideCrf()) {
+                    hiddenCrfs.add(eventDefCrf.getCrf());
+                }
+            }
+        }
+
+        return hiddenCrfs;
+    }
+	
+	
 	// This logic is taken from eventCRFBean. 
 	private String fetchEventCRFStatus(EventCrf ecrf) {
 		String stage = null;
@@ -855,14 +859,27 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		UserAccount userAccount = getUserAccountDao().findByColumnName(userId,"userId");
 		LOGGER.debug("Entering the URL with "+studyOID+":"+studySubjectOID+":"+studyEventOID+":"+formVersionOID+":DNS:"+collectDNs+":Audits:"+collectAudit);
 		LOGGER.info("Determining the generic paramters...");
+		Study study = getStudyDao().findByOcOID(studyOID);
+        int parentStudyId =0;
+        int studyId = study.getStudyId();
 		
-		if(userAccount.getActiveStudy().getStudy()!=null){
-			isActiveRoleAtSite=true;
-		}
-		else{
-			isActiveRoleAtSite=false;
-		}
-		
+        if (study.getStudy()!=null){
+              isActiveRoleAtSite=true;
+              parentStudyId = study.getStudy().getStudyId();
+         }else{
+             parentStudyId= studyId;
+             isActiveRoleAtSite=false;             
+         }
+
+         
+         ArrayList <StudyUserRole> surlist =  getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, studyId, parentStudyId);
+         if (surlist==null || surlist.size()==0){
+             // Does not have permission to view study or site info / return null
+             return null;
+         }
+         
+         
+         
 		// This piece of code identifies if the study subject is assigned to study level or site level. If the study subject assigned to site  is pulled from study level this will get the site OID correctly displayed. 
 		if(!studySubjectOID.equals(INDICATE_ALL))
 		{
@@ -980,5 +997,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.userAccountDao = userAccountDao;
 	}
 
-	
+    public StudyUserRoleDao getStudyUserRoleDao() {
+        return studyUserRoleDao;
+    }
+
+    public void setStudyUserRoleDao(StudyUserRoleDao studyUserRoleDao) {
+        this.studyUserRoleDao = studyUserRoleDao;
+    }
+
 }
