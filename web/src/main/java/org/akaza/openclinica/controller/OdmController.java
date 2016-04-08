@@ -272,7 +272,7 @@ public class OdmController {
                                 formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
                             else
                                 formUrl = createEditUrl(studyOID, crfVersion, nextEvent, ssoid);
-                            formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));
+                            formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                         }
                     }
                 }
@@ -335,7 +335,7 @@ public class OdmController {
     }
 
     private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent, List<EventCRFBean> eventCrfs,
-            CRFDAO crfDAO, String formUrl) {
+            CRFDAO crfDAO, String formUrl,boolean itemDataExists) {
         EventCRFBean selectedEventCRFBean = null;
         CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getId());
         for (EventCRFBean eventCRFBean : eventCrfs) {
@@ -344,7 +344,7 @@ public class OdmController {
                 break;
             }
         }
-        return generateFormData(crfVersion, nextEvent, selectedEventCRFBean, crfBean, formUrl);
+        return generateFormData(crfVersion, nextEvent, selectedEventCRFBean, crfBean, formUrl, itemDataExists);
 
     }
 
@@ -374,7 +374,7 @@ public class OdmController {
     }
 
     private ODMcomplexTypeDefinitionFormData generateFormData(CRFVersionBean crfVersionBean, StudyEventBean nextEvent, EventCRFBean eventCRFBean,
-            CRFBean crfBean, String formUrl) {
+            CRFBean crfBean, String formUrl,boolean itemDataExists) {
         ODMcomplexTypeDefinitionFormData formData = new ODMcomplexTypeDefinitionFormData();
         formData.setFormOID(crfVersionBean.getOid());
         formData.setFormName(crfBean.getName());
@@ -384,7 +384,12 @@ public class OdmController {
             formData.setStatus("Not Started");
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
-            formData.setStatus(eventCRFBean.getStatus().getName());
+            if (!itemDataExists){
+                formData.setStatus("Not Started");                
+            }else{
+                formData.setStatus(eventCRFBean.getStatus().getName());                
+            } 
+            
             if (eventCrf.getDateUpdated() != null) {
                 // returns time as UTC
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
