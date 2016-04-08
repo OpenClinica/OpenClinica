@@ -115,7 +115,7 @@ public class AnonymousFormControllerV2 {
                 else offline = "false";
 
                 formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean, edcBean, isOffline);
-                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl, offline, crf.getName(), crf.getDescription());
+                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl, offline, crf.getName(), crfVersionBean.getDescription());
 
                 return new ResponseEntity<AnonymousUrlResponse>(anonResponse, org.springframework.http.HttpStatus.OK);
             } else {
