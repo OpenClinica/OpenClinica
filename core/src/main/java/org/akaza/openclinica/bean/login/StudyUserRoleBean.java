@@ -64,6 +64,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     private boolean canMonitor;
 
+    private static ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+
     public StudyUserRoleBean() {
         role = Role.INVALID;
         studyId = 0;
@@ -117,7 +119,6 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     public void setRoleName(String roleName) {
         Role role = Role.getByName(roleName);
         if(role == null || role.getId()==0) {
-            ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
             if(resterm.getString("site_investigator").equals(roleName)) {
                 role = Role.INVESTIGATOR;
             } else if("Data Specialist".equals(roleName)) {
@@ -261,5 +262,62 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     public boolean isDirector() {
         return this.role == Role.STUDYDIRECTOR;
+    }
+
+    public static Role fromSerializedToNativeSiteRole(String serializedRoleName) {
+        if (serializedRoleName.equalsIgnoreCase(resterm.getString("site_investigator").trim())) {
+            return Role.INVESTIGATOR;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person").trim())) {
+            return Role.RESEARCHASSISTANT;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("site_monitor").trim())) {
+            return Role.MONITOR;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person2").trim())) {
+            return Role.RESEARCHASSISTANT2;
+        }
+        return null;
+    }
+
+    public static Role fromSerializedToNativeStudyRole(String serializedRoleName) {
+        if (serializedRoleName.equalsIgnoreCase(resterm.getString("Study_Director").trim())) {
+            return Role.STUDYDIRECTOR;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("Study_Coordinator").trim())) {
+            return Role.COORDINATOR;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("Investigator").trim())) {
+            return Role.INVESTIGATOR;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("Data_Entry_Person").trim())) {
+            return Role.RESEARCHASSISTANT;
+        } else if (serializedRoleName.equalsIgnoreCase(resterm.getString("Monitor").trim())) {
+            return Role.MONITOR;
+        }
+        return null;
+    }
+
+    public String getSerializedRoleName() {
+        if (parentStudyId != 0) {
+            // is site
+            if (role.equals(Role.INVESTIGATOR)) {
+                return resterm.getString("site_investigator").trim();
+            } else if (role.equals(Role.RESEARCHASSISTANT)) {
+                return resterm.getString("site_Data_Entry_Person").trim();
+            } else if (role.equals(Role.MONITOR)) {
+                return resterm.getString("site_monitor").trim();
+            } else if (role.equals(Role.RESEARCHASSISTANT2)) {
+                return resterm.getString("site_Data_Entry_Person2").trim();
+            }
+        } else {
+            // is study
+            if (role.equals(Role.STUDYDIRECTOR)) {
+                return resterm.getString("Study_Director").trim();
+            } else if (role.equals(Role.COORDINATOR)) {
+                return resterm.getString("Study_Coordinator").trim();
+            } else if (role.equals(Role.INVESTIGATOR)) {
+                return resterm.getString("Investigator").trim();
+            } else if (role.equals(Role.RESEARCHASSISTANT)) {
+                return resterm.getString("Data_Entry_Person").trim();
+            } else if (role.equals(Role.MONITOR)) {
+                return resterm.getString("Monitor").trim();
+            }
+        }
+        return "UNKNOWN";
     }
 }

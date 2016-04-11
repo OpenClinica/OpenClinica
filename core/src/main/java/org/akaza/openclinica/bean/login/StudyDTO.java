@@ -1,10 +1,7 @@
 package org.akaza.openclinica.bean.login;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-
-import org.akaza.openclinica.bean.core.Status;
 
 public class StudyDTO {
 	private String uniqueProtocolID;
@@ -19,7 +16,7 @@ public class StudyDTO {
 	private String studyOid;
     private ArrayList<ErrorObject> errors;
     private String message;
-    private ArrayList<UserRole> assignUserRoles;
+    private ArrayList<HashMap> assignUserRoles;
 	
 	public StudyDTO() {
 		super();
@@ -138,12 +135,12 @@ public class StudyDTO {
 	}
 
 
-	public ArrayList<UserRole> getAssignUserRoles() {
+	public ArrayList<HashMap> getAssignUserRoles() {
 		return assignUserRoles;
 	}
 
 
-	public void setAssignUserRoles(ArrayList<UserRole> assignUserRoles) {
+	public void setAssignUserRoles(ArrayList<HashMap> assignUserRoles) {
 		this.assignUserRoles = assignUserRoles;
 	}
 
