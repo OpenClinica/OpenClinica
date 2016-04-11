@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 
 /**
  * @author jxu
@@ -620,5 +621,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
         this.offline = offline;
     }
 
-	
+	public static void updateOfflineProperty(EventDefinitionCRFBean eventDefinitionCrf, StudyEventDefinitionBean eventDefinition, EventDefinitionCrfTagService eventDefinitionCrfTagService) {
+        String crfPath = eventDefinition.getOid() + "." + eventDefinitionCrf.getCrf().getOid();
+        eventDefinitionCrf.setOffline(eventDefinitionCrfTagService.getEventDefnCrfOfflineStatus(2, crfPath, true));
+    }
 }

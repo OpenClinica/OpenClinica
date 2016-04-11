@@ -431,6 +431,19 @@
       name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
         </td>
+        <c:if test="${ userRole.researchAssistant && dedc.edc.offline }">
+          <td>
+            <a href="ParticipantFormServlet?crfOID=<c:out value="${dedc.eventCRF.crfVersion.oid}"/>"
+                onMouseDown="javascript:setImage('bt_ViewParticipant', 'images/bt_ViewParticipant_d.gif');"
+                onMouseUp="javascript:setImage('bt_ViewParticipant', 'images/bt_ViewParticipant.gif');"
+                target="_blank">
+              <img name="ViewParticipant" src="images/bt_ViewParticipant.gif" border="0"
+                  alt="<fmt:message key="view_participant_form" bundle="${resword}"/>"
+                  title="<fmt:message key="view_participant_form" bundle="${resword}"/>"
+                  align="left" hspace="6">
+            </a>
+          </td>
+        </c:if>
         </tr>
     </table>
     </form>
@@ -541,7 +554,7 @@
         </c:when>
 
         <c:when test='${actionQuery == ""}'>
-        <td>    <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+        <td>    <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
               ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
@@ -635,7 +648,21 @@
             </c:if>
         </c:otherwise>
     </c:choose>
-    </tr></table>
+      <c:if test="${ userRole.researchAssistant && dec.eventDefinitionCRF.offline }">
+        <td>
+          <a href="ParticipantFormServlet?crfOID=<c:out value="${dec.eventCRF.crfVersion.oid}"/>"
+              onMouseDown="javascript:setImage('bt_ViewParticipant', 'images/bt_ViewParticipant_d.gif');"
+              onMouseUp="javascript:setImage('bt_ViewParticipant', 'images/bt_ViewParticipant.gif');"
+              target="_blank">
+            <img name="ViewParticipant" src="images/bt_ViewParticipant.gif" border="0"
+                alt="<fmt:message key="view_participant_form" bundle="${resword}"/>"
+                title="<fmt:message key="view_participant_form" bundle="${resword}"/>"
+                align="left" hspace="6">
+          </a>
+        </td>
+      </c:if>
+    </tr>
+  </table>
 </td>
 </tr>
 <c:set var="rowCount" value="${rowCount + 1}" />

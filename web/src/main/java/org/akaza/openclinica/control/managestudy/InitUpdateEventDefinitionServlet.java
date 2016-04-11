@@ -142,9 +142,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 edc.setNullFlags(processNullValues(edc));
                 CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
                 edc.setDefaultVersionName(defaultVersion.getName());
-
-                String crfPath=sed.getOid()+"."+edc.getCrf().getOid();
-                edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
+                EventDefinitionCRFBean.updateOfflineProperty(edc, sed, getEventDefinitionCrfTagService());
                 newEventDefinitionCRFs.add(edc);
             }
 

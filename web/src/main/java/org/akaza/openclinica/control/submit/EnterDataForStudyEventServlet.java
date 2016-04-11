@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
@@ -46,8 +48,10 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -78,6 +82,9 @@ public class EnterDataForStudyEventServlet extends SecureController {
     // property; this
     // value will be saved as a request attribute
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+
+    @Autowired
+    private EventDefinitionCrfTagService eventDefinitionCrfTagService;
 
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
@@ -197,6 +204,9 @@ public class EnterDataForStudyEventServlet extends SecureController {
         // only if its container eventCRf has a valid id
         populateUncompletedCRFsWithAnOwner(uncompletedEventDefinitionCRFs);
         // >>BWP
+
+        // update EventDefinitionBean properties about participate form
+        populateUncompletedCRFsWithParticipateFormInformation(seb, uncompletedEventDefinitionCRFs);
 
         // for the event definition CRFs for which event CRFs exist, get
         // DisplayEventCRFBeans, which the JSP will use to determine what
@@ -439,6 +449,18 @@ public class EnterDataForStudyEventServlet extends SecureController {
     }
 
     /**
+     * Update EventDefinitionCRFBean properties: isOffline
+     *
+     * @param uncompletedEventDefinitionCRFs 
+     */
+    private void populateUncompletedCRFsWithParticipateFormInformation(StudyEventBean event, ArrayList uncompletedEventDefinitionCRFs) {
+        for (int i = 0; i < uncompletedEventDefinitionCRFs.size(); i++) {
+            DisplayEventDefinitionCRFBean dedcrf = (DisplayEventDefinitionCRFBean) uncompletedEventDefinitionCRFs.get(i);
+            EventDefinitionCRFBean.updateOfflineProperty(dedcrf.getEdc(), event.getStudyEventDefinition(), getEventDefinitionCrfTagService());
+        }
+    }
+
+    /**
      * Each of the event CRFs with its corresponding CRFBean. Then generates a
      * list of DisplayEventCRFBeans, one for each event CRF.
      *
@@ -633,4 +655,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
         }
 
     }
+
+    private EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        if (eventDefinitionCrfTagService == null) {
+            this.eventDefinitionCrfTagService = (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+        }
+        return eventDefinitionCrfTagService;
+     }
 }

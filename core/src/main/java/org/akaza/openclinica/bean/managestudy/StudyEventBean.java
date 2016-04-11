@@ -46,6 +46,8 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     private ArrayList eventCRFs = new ArrayList();// not in DB
 
+    private ArrayList eventDefinitionCRFs = new ArrayList();// not in DB
+
     private DataEntryStage stage;
 
     private SubjectEventStatus subjectEventStatus;
@@ -292,6 +294,21 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
      */
     public void setEventCRFs(ArrayList eventCRFs) {
         this.eventCRFs = eventCRFs;
+    }
+
+    /**
+     * @return Returns the eventDefinitionCRFs.
+     */
+    public ArrayList getEventDefinitionCRFs() {
+        return eventDefinitionCRFs;
+    }
+
+    /**
+     * @param eventDefinitionCRFs
+     *            The eventDefinitionCRFs to set.
+     */
+    public void setEventDefinitionCRFs(ArrayList eventDefinitionCRFs) {
+        this.eventDefinitionCRFs = eventDefinitionCRFs;
     }
 
     /**
