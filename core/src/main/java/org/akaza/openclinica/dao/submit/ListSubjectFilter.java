@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import org.akaza.openclinica.bean.core.Status;
 
 public class ListSubjectFilter implements CriteriaCommand {
 
@@ -53,7 +54,7 @@ public class ListSubjectFilter implements CriteriaCommand {
         if (value != null) {
             if (property.equals("subject.status")) {
                 criteria = criteria + " and ";
-                criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
+                criteria = criteria + " " + columnMapping.get(property) + " = " + Status.getByName(value.toString()).getId() + " ";
             } else if (property.equals("subject.createdDate") || property.equals("subject.updatedDate")) {
                 criteria += onlyYearAndMonthAndDay(String.valueOf(value), columnMapping.get(property));
                 criteria += onlyYear(String.valueOf(value), columnMapping.get(property));

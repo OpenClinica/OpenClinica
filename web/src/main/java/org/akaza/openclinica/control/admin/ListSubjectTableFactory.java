@@ -162,7 +162,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
-            String value = Status.getByName(filter.getValue()).getId()+"";
+            String value = filter.getValue();
             listSubjectFilter.addFilter(property, value);
         }
 
