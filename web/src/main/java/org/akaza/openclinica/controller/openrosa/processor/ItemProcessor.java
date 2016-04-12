@@ -151,7 +151,7 @@ public class ItemProcessor implements Processor, Ordered {
                                         
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
-
+                                       
                                         Item item = lookupItem(itemName, crfVersion);
                                         
                                         if (item == null) {
@@ -199,6 +199,9 @@ public class ItemProcessor implements Processor, Ordered {
                                                 groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                                             }
                                             itemDataDao.saveOrUpdate(newItemData);
+                                            newItemData.setStatus(Status.UNAVAILABLE);
+                                            itemDataDao.saveOrUpdate(newItemData);
+
                                         } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                                             // Existing item. Value unchanged. Do nothing.
                                         } else {
@@ -245,7 +248,7 @@ public class ItemProcessor implements Processor, Ordered {
         itemData.setEventCrf(eventCrf);
         itemData.setValue(itemValue);
         itemData.setDateCreated(new Date());
-        itemData.setStatus(Status.UNAVAILABLE);
+        itemData.setStatus(Status.AVAILABLE);
         itemData.setOrdinal(itemOrdinal);
         itemData.setUserAccount(user);
         itemData.setDeleted(false);
