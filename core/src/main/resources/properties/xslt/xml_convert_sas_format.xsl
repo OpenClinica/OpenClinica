@@ -5,8 +5,8 @@
 	<xsl:template match="/">
 		<!-- Get the parent study oid, which is listed first. -->
 		<xsl:variable name="vStudyName" select="substring(concat('S',substring(//odm:Study[position()=1]/@OID, 3)),1,8)"/>
-		FILENAME <xsl:value-of select="$vStudyName"/> "data.xml";
-        FILENAME map "map.xml";
+		FILENAME <xsl:value-of select="$vStudyName"/> "~/SAS_DATA.xml";
+        FILENAME map "~/SAS_MAP.xml";
         LIBNAME <xsl:value-of select="$vStudyName"/> xml xmlmap=map access=readonly;
 		proc datasets library=<xsl:value-of select="$vStudyName"/>;
 		copy out=work;
@@ -28,13 +28,13 @@
             	<xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
             	<xsl:if test="string-length(@OID) &gt; 35 ">
                 	<xsl:value-of select="
-                    	concat(substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,27),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
+                    	concat('_',substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,26),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
             	</xsl:if>
             	<xsl:if test="string-length(@OID) &lt; 36 and not(contains(@OID, 'UNGROUPED'))">
-                	<xsl:value-of select="$noprefixoid"/>
+                	<xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
             	</xsl:if>
             	<xsl:if test="contains(@OID, 'UNGROUPED')">
-                	<xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '')"/>
+                	<xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '_')"/>
             	</xsl:if>
         	</xsl:variable>
 
@@ -61,7 +61,7 @@
 			<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID=$vitemOID]/odm:CodeListRef">
 				data <xsl:value-of select="$TableName"/>;
 				set <xsl:value-of select="$TableName"/>;
-				format <xsl:value-of select="../@Name"/><xsl:text> </xsl:text><xsl:if test="../@DataType = 'text'">$</xsl:if><xsl:value-of select="@CodeListOID"/>_.;
+				format <xsl:call-template name="get_item_oid"><xsl:with-param name="oid" select="../@OID"/></xsl:call-template> <xsl:text> </xsl:text> <xsl:if test="../@DataType = 'text'">$</xsl:if><xsl:value-of select="@CodeListOID"/>_.;
 				run;
 			</xsl:for-each>
 		</xsl:for-each>
@@ -71,5 +71,17 @@
 		<xsl:param name="groupname"/>
 		<xsl:param name="groupid"/>
 		<xsl:value-of select="$groupid"/>
+	</xsl:template>
+	<xsl:template name="get_item_oid">
+		<xsl:param name="oid"/>
+		<xsl:variable name="curatedItemOID" select="replace($oid, 'I_[A-Z]*_', '')"/>
+        <xsl:variable name="noprefixTokenizedItemOid" select="tokenize($curatedItemOID,'_')"/>
+        	<xsl:if test="string-length($curatedItemOID) &gt; 31 ">
+            	<xsl:value-of select="
+                        concat('_',substring(string-join(subsequence($noprefixTokenizedItemOid,1,count($noprefixTokenizedItemOid)-1),'_'),1,26),'_',$noprefixTokenizedItemOid[count($noprefixTokenizedItemOid)])"/>
+            </xsl:if>
+            <xsl:if test="string-length($curatedItemOID) &lt; 32 ">
+                    <xsl:value-of select="concat('_',$curatedItemOID)"/>
+            </xsl:if>
 	</xsl:template>
 </xsl:stylesheet>

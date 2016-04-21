@@ -54,13 +54,13 @@
             <xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
             <xsl:if test="string-length(@OID) &gt; 35 ">
                 <xsl:value-of select="
-                    concat(substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,27),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
+                    concat('_',substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,26),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
             </xsl:if>
             <xsl:if test="string-length(@OID) &lt; 36 and not(contains(@OID, 'UNGROUPED'))">
-                <xsl:value-of select="$noprefixoid"/>
+                <xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
             </xsl:if>
             <xsl:if test="contains(@OID, 'UNGROUPED')">
-                <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '')"/>
+                <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '_')"/>
             </xsl:if>
         </xsl:variable>
         <xsl:element name="TABLE">
@@ -123,7 +123,15 @@
         <xsl:variable name="typemap" select="$sas_typemap"/>
         <xsl:element name="COLUMN">
             <xsl:attribute name="Name">
-                <xsl:value-of select="replace($itemdef/@OID, 'I_[A-Z]*_', '')"/>
+                <xsl:variable name="curatedItemOID" select="replace($itemdef/@OID, 'I_[A-Z]*_', '')"/>
+                <xsl:variable name="noprefixTokenizedItemOid" select="tokenize($curatedItemOID,'_')"/>
+                <xsl:if test="string-length($curatedItemOID) &gt; 31 ">
+                    <xsl:value-of select="
+                        concat('_',substring(string-join(subsequence($noprefixTokenizedItemOid,1,count($noprefixTokenizedItemOid)-1),'_'),1,26),'_',$noprefixTokenizedItemOid[count($noprefixTokenizedItemOid)])"/>
+                </xsl:if>
+                <xsl:if test="string-length($curatedItemOID) &lt; 32 ">
+                    <xsl:value-of select="concat('_',$curatedItemOID)"/>
+                </xsl:if>
             </xsl:attribute>
             <xsl:element name="PATH">
                 <xsl:value-of select="concat('/', $study_oid, '/', $item_group_oid, '/', @ItemOID)"/>
