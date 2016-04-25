@@ -394,7 +394,7 @@ public class Validator {
 
   
     public static final ValidatorRegularExpression USERNAME =
-        new ValidatorRegularExpression("at least 5 alphanumeric or underscore characters", "[A-Za-z0-9_]{5,}");
+        new ValidatorRegularExpression("at least 2 alphanumeric or underscore characters", "[A-Za-z0-9_]{2,}");
 
     public static final int NO_BLANKS = 1;
     public static final int IS_A_NUMBER = 2;
