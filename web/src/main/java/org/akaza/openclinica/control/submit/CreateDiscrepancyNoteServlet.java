@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -27,7 +28,9 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -39,11 +42,14 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -524,14 +530,29 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             //If the data entry form has not been saved yet, collecting info from parent page.
             dnb = getNoteInfo(dnb);// populate note infos
-            if (dnb.getEventName() == null || dnb.getEventName().equals("")) {
+            
+            if (dnb.getEventName() == null || dnb.getEventName().equals("")) {                
+                if (!fp.getString("eventName").equals("")){
                 dnb.setEventName(fp.getString("eventName"));
+                }else{
+                    dnb.setEventName(getStudyEventDefinition(eventCRFId).getName());
+                }
             }
             if (dnb.getEventStart() == null) {
-                dnb.setEventStart(fp.getDate("eventDate"));
+                if (fp.getDate("eventDate")!=null){
+                    dnb.setEventStart(fp.getDate("eventDate"));                    
+                }else{
+                    dnb.setEventStart(getStudyEvent(eventCRFId).getDateStarted());
+                }
+                
             }
             if (dnb.getCrfName() == null || dnb.getCrfName().equals("")) {
-                dnb.setCrfName(fp.getString("crfName"));
+                if(!fp.getString("crfName").equals("")){
+                    dnb.setCrfName(fp.getString("crfName"));
+                }else{                    
+                   dnb.setCrfName(getCrf(eventCRFId).getName()); 
+                }
+                
             }
             //            // #4346 TBH 10/2009
             request.setAttribute(DIS_NOTE, dnb);
@@ -1052,10 +1073,31 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
  
     }
     
+    
+    private StudyEventBean getStudyEvent(int eventCRFId) {
+        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        StudyEventBean event = (StudyEventBean) sedao.findByPK(getEventCrf(eventCRFId).getStudyEventId());
+        return event;
+    }
 
-    
-    
-    ///place holder
-    
-    //this method should recalculate the ordinals
+    private StudyEventDefinitionBean getStudyEventDefinition(int eventCRFId) {
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(getStudyEvent(eventCRFId).getStudyEventDefinitionId());
+        return sed;
+    }
+
+    private CRFBean getCrf(int eventCRFId) {
+        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        CRFDAO cdao = new CRFDAO(sm.getDataSource());
+        CRFVersionBean cv = (CRFVersionBean) cvdao.findByPK(getEventCrf(eventCRFId).getCRFVersionId());
+        CRFBean c = (CRFBean) cdao.findByPK(cv.getCrfId());
+        return c;
+    }
+
+    private EventCRFBean getEventCrf(int eventCRFId) {
+        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+        EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        return ec;
+    }
+
 }
