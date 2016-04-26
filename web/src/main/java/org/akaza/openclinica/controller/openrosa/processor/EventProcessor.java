@@ -22,6 +22,8 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,7 +192,9 @@ public class EventProcessor implements Processor, Ordered {
         studyEvent.setEndTimeFlag(false);
         studyEvent.setDateCreated(currentDate);
         studyEvent.setLocation("");
-        studyEventDao.saveOrUpdate(studyEvent);
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,true);
+        StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
+        studyEventDao.saveOrUpdateTransactional(container);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(),ordinal,studySubject.getStudySubjectId());
         return studyEvent;
     }
@@ -253,7 +257,9 @@ public class EventProcessor implements Processor, Ordered {
             studyEvent.setUpdateId(user.getUserId());
             studyEvent.setDateUpdated(new Date());
             studyEvent.setSubjectEventStatusId(newStatus.getCode());
-            studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,false);
+            StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
+            studyEvent = studyEventDao.saveOrUpdateTransactional(container);
             logger.debug("*********UPDATED STUDY EVENT ");
         }
         return studyEvent;
