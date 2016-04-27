@@ -20,6 +20,8 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -157,7 +159,9 @@ public class StudyEventController {
 		// Complete study event only if there are no uncompleted, non-participant forms.
 		if (completeStudyEvent) {
 			studyEvent.setSubjectEventStatusId(4);
-			studyEventDao.saveOrUpdate(studyEvent);
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,false);
+            StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
+			studyEventDao.saveOrUpdateTransactional(container);
 		}
 		
 		
