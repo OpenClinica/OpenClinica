@@ -27,14 +27,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
-import org.openclinica.ws.beans.EventType;
-import org.openclinica.ws.beans.EventsType;
-import org.openclinica.ws.beans.GenderType;
-import org.openclinica.ws.beans.ListStudySubjectsInStudyType;
-import org.openclinica.ws.beans.StudyRefType;
-import org.openclinica.ws.beans.StudySubjectWithEventsType;
-import org.openclinica.ws.beans.StudySubjectsType;
-import org.openclinica.ws.beans.SubjectType;
+import org.openclinica.ws.beans.*;
 import org.openclinica.ws.studysubject.v1.ListAllByStudyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +167,7 @@ public class StudySubjectEndpoint {
     /**
        * Use this method to find if studysubject exists by study/site/subject lable.
      * 
-     * @param requestElement
+     * @param subject
      * @return studySubjectOID
      * @throws Exception
   */
@@ -259,26 +252,29 @@ public class StudySubjectEndpoint {
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventsType eventsType = new EventsType();
         List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
-        StudyEventDefinitionBean eb=null;
+
         for (StudyEventBean studyEventBean : events) {
         	 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
         	 studyEventBean.setStudyEventDefinition(sed);
-            
-             EventType eventType = new EventType();
-            eventType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
-            eventType.setLocation(studyEventBean.getLocation());
+
+             EventResponseType eventResponseType = new EventResponseType();
+            eventResponseType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
+            eventResponseType.setStatus(studyEventBean.getStatus().getName());
+            eventResponseType.setOccurrence(studyEventBean.getSampleOrdinal() + "");
+            eventResponseType.setSubjectEventStatus(studyEventBean.getSubjectEventStatus().getName());
+            eventResponseType.setLocation(studyEventBean.getLocation());
             if ( studyEventBean.getDateStarted() != null){
-            	eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
-            	eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
+            	eventResponseType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
+            	eventResponseType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
             }
             if ( studyEventBean.getDateEnded() != null){
-	            eventType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
-	            eventType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
+	            eventResponseType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
+	            eventResponseType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
             }
             
             
-            eventsType.getEvent().add(eventType);
-            logger.debug(eventType.getEventDefinitionOID()+" "+eventType.getStartDate());
+            eventsType.getEvent().add(eventResponseType);
+            logger.debug(eventResponseType.getEventDefinitionOID()+" "+eventResponseType.getStartDate());
             
         }
         return eventsType;
@@ -383,7 +379,7 @@ public class StudySubjectEndpoint {
     /**
      * Process createStudySubject request by creating SubjectStudyDefinitionBean from received payload.
      * 
-     * @param subjectElement
+     * @param subjectStudyElement
      * @return SubjectTransferBean
      * @throws ParseException
      */

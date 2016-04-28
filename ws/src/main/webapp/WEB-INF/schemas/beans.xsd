@@ -14,10 +14,26 @@
             <element name="endTime" type="time" minOccurs="0"/>
         </sequence>
     </complexType>
+
+    <complexType name="eventResponseType">
+        <sequence>
+            <element name="studySubjectRef" type="beans:studySubjectRefType"/>
+            <element name="studyRef" type="beans:studyRefType"/>
+            <element name="eventDefinitionOID" type="beans:customStringType"/>
+            <element name="occurrence" type="beans:customStringType"/>
+            <element name="status" type="beans:customStringType"/>
+            <element name="subjectEventStatus" type="beans:customStringType"/>
+            <element name="location" type="beans:customStringType"/>
+            <element name="startDate" type="date"/>
+            <element name="startTime" type="time"/>
+            <element name="endDate" type="date"/>
+            <element name="endTime" type="time"/>
+        </sequence>
+    </complexType>
     
     <complexType name="eventsType">
         <sequence>
-            <element name="event" type="beans:eventType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="event" type="beans:eventResponseType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
     
