@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller;
 
+import net.sf.saxon.functions.IndexOf;
+
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
@@ -55,6 +57,9 @@ import java.lang.management.OperatingSystemMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.UserPrincipal;
 import java.security.AccessController;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -390,9 +395,24 @@ public class SystemController {
         HashMap<String, Object> map = new HashMap<>();
 
         String filePath = CoreResources.getField("filePath");
+        
 
         File file = new File(filePath);
 
+        
+        String tomcatPath = filePath.substring(0, filePath.indexOf("/openclinica.data"));
+        File tomcatFile = new File(tomcatPath);
+        
+        Path path = Paths.get(tomcatPath);
+        FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+        UserPrincipal owner = ownerAttributeView.getOwner();    
+        System.out.println ("Owner name" + owner.getName());
+    
+        HashMap<String, Object> ownershipMap = new HashMap<>();
+        ownershipMap.put("Tomcat Directory", owner.getName() );
+        ownershipMap.put("Tomcat Sub Directories", displayDirectoryOwnershipList(tomcatFile));
+
+        
         HashMap<String, String> ocMap = new HashMap<>();
         float sizeInByte = getFolderSize(file);
         float freeSpace = new File("/").getFreeSpace();
@@ -404,6 +424,7 @@ public class SystemController {
         ocMap.put("Write Access", getWriteAccess(file));
         ocMap.put("Tomcat and Ownership", "Coming Soon");
 
+        map.put("Tomcat Directory Ownership" , ownershipMap);
         map.put("OpenClinica.data Facts", ocMap);
         map.put("OpenClinica.data Directory Count & File Size", displayDirectoryList(file));
         map.put("List Of Files and Directories in OpenClinica.data Directory", displayDirectoryContents(file, new ArrayList()));
@@ -450,6 +471,7 @@ public class SystemController {
          * }
          * }
          */
+       
         map.put("Role Properties", mapRole);
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -495,12 +517,39 @@ public class SystemController {
                 hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
 
                 listOfHashMaps.add(hashMap);
+                if (dirCount!=0){
                 hashMap.put("Sub Folders", displayDirectoryList(file));
+                }
             }
         }
         return listOfHashMaps;
     }
 
+    public ArrayList<HashMap<String, Object>> displayDirectoryOwnershipList(File dir) throws IOException {
+        ArrayList<HashMap<String, Object>> listOfHashMaps = new ArrayList<>();
+        HashMap<String, Object> hashMap = null;
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                hashMap = new HashMap<String, Object>();
+
+                Path path = Paths.get(file.getCanonicalPath());
+                FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+                UserPrincipal owner = ownerAttributeView.getOwner();        
+
+                hashMap.put("ownerhip", owner.getName());
+                hashMap.put("sub_folder name", file.getName());
+                listOfHashMaps.add(hashMap);
+                int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
+                if (dirCount!=0){
+                hashMap.put("Sub Folders", displayDirectoryOwnershipList(file));
+                }
+            }
+        }
+        return listOfHashMaps;
+    }
+
+    
     public int getNumberOfSubFolders(String filePath) {
         File file1 = new File(filePath);
         File[] listFiles = file1.listFiles();
