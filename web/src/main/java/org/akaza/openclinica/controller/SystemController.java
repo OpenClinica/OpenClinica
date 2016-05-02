@@ -2,11 +2,18 @@ package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.controller.healthcheck.DatabaseHealthCheck;
+import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.JobTriggerService;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -17,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +42,8 @@ import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.management.ObjectName;
 import javax.servlet.ServletContext;
 
@@ -47,9 +59,12 @@ import java.security.AccessController;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -68,6 +83,8 @@ public class SystemController {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
+    @Autowired
+    private JavaMailSenderImpl mailSender;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -109,8 +126,6 @@ public class SystemController {
             UserAccountDAO udao = new UserAccountDAO(dataSource);
             UserAccountBean uBean = (UserAccountBean) udao.findByPK(1);
 
-            
-            
             if (uBean.getFirstName().equals("Root") && uBean.getLastName().equals("User")) {
                 map.put("Root User Account First And Last Name", uBean.getFirstName() + " " + uBean.getLastName());
                 map.put("Database Connection", "PASS");
@@ -124,7 +139,6 @@ public class SystemController {
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
     }
-
 
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getConfig() throws Exception {
@@ -269,31 +283,32 @@ public class SystemController {
         }
 
         HashMap<String, String> extractDatamart = new HashMap<>();
+        HashMap<String, String> datamartRole = new HashMap<>();
         String username = CoreResources.getExtractField("db1.username");
         String password = CoreResources.getExtractField("db1.password");
         String url = CoreResources.getExtractField("db1.url");
-        
-        
-        
+
         extractDatamart.put("db1.username", username);
         extractDatamart.put("db1.url", url);
         extractDatamart.put("db1.dataBase", CoreResources.getExtractField("db1.dataBase"));
-       
+
         HashMap<String, String> extractNumber = new HashMap<>();
         extractNumber.put("extract.number", CoreResources.getExtractField("extract.number"));
 
         extractMap.put("extract.number", extractNumber);
         extractMap.put("DataMart", extractDatamart);
 
-       HashMap <String,String> datamartMap = new HashMap();
-                
-        try ( Connection db = DriverManager.getConnection(url, username, password)) {
+        HashMap<String, String> datamartMap = new HashMap();
+
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            datamartRole = getRoleProperties(conn, datamartRole, username);
             datamartMap.put("connection", "Open");
-        } catch(Exception e) {
+        } catch (Exception e) {
             datamartMap.put("connection", "Close");
         }
         map.put("Datamart Facts", datamartMap);
         map.put("extract.properties", extractMap);
+        map.put("Role Properties", datamartRole);
 
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -303,27 +318,49 @@ public class SystemController {
     public ResponseEntity<HashMap> getParticipateModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
-        
+        HashMap<String, String> mapParticipate = new HashMap<>();
+
+        ParticipantPortalRegistrar ppr = new ParticipantPortalRegistrar();
+        String result = ppr.getHostNameAvailability("123");
+        if (!result.equals(ParticipantPortalRegistrar.UNKNOWN)) {
+            mapParticipate.put("Participate", "Active");
+            mapParticipate.put("Participate Version", "Comming Soon");
+
+        } else {
+            mapParticipate.put("Participate", "In Active");
+        }
+
+        map.put("Participate Facts", mapParticipate);
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
+
     @RequestMapping(value = "/modules/randomize", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getRandomizeModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
-        
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
+
     @RequestMapping(value = "/modules/webservices", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getWebServicesModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
+
+        
+        
         
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
+
     @RequestMapping(value = "/modules/ruledesigner", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getRuleDesignerModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
+
+        
+        
         
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
@@ -332,39 +369,42 @@ public class SystemController {
     public ResponseEntity<HashMap> getLdapModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
-        
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/modules/messaging", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getMessagingModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
-        
+
+        String result = sendEmail(mailSender, "This is the Subject Of a Rest Call for Health Check", "This is the Body Of a Rest Call for Health Check");
+        map.put("Mail connection", result);
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/filesystem", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getHealth() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
         String filePath = CoreResources.getField("filePath");
-     
+
         File file = new File(filePath);
 
-        HashMap<String,String> ocMap = new HashMap<>();
+        HashMap<String, String> ocMap = new HashMap<>();
         float sizeInByte = getFolderSize(file);
         float freeSpace = new File("/").getFreeSpace();
-        
-        
-        ocMap.put("Available Disk Space in Drive"  , new File("/").getFreeSpace()+ " Byte   "+ freeSpace/1024 + " KB   "+ freeSpace/1024/1024 + " MB   "+freeSpace/1024/1024/1024 + " GB");
-        ocMap.put("Used Disk Space" ,String.valueOf(sizeInByte) + " Byte   "  + String.valueOf(sizeInByte/1024) + " KB");
-        ocMap.put("Read Access" ,getReadAccess(file));
-        ocMap.put("Write Access" ,getWriteAccess(file));        
-        ocMap.put("Tomcat and Ownership" ,"Coming Soon");
-        
-        map.put("OpenClinica.data Facts", ocMap);                
+
+        ocMap.put("Available Disk Space in Drive", new File("/").getFreeSpace() + " Byte   " + freeSpace / 1024 + " KB   " + freeSpace / 1024 / 1024 + " MB   "
+                + freeSpace / 1024 / 1024 / 1024 + " GB");
+        ocMap.put("Used Disk Space", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
+        ocMap.put("Read Access", getReadAccess(file));
+        ocMap.put("Write Access", getWriteAccess(file));
+        ocMap.put("Tomcat and Ownership", "Coming Soon");
+
+        map.put("OpenClinica.data Facts", ocMap);
         map.put("OpenClinica.data Directory Count & File Size", displayDirectoryList(file));
         map.put("List Of Files and Directories in OpenClinica.data Directory", displayDirectoryContents(file, new ArrayList()));
 
@@ -375,25 +415,42 @@ public class SystemController {
     @RequestMapping(value = "/database", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getDatabaseHealthCheck() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, String> mapRole = new HashMap<>();
 
-        HealthCheckRegistry healthChecks = new HealthCheckRegistry();
-        healthChecks.register("postgres Connection", new DatabaseHealthCheck(dataSource));
+        String username = CoreResources.getField("dbUser");
+        String password = CoreResources.getField("dbPass");
+        String url = CoreResources.getField("url");
 
-        final Map<String, HealthCheck.Result> results = healthChecks.runHealthChecks();
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            map.put("Database Connection", "Open");
+            map.put("Version", String.valueOf(conn.getMetaData().getDatabaseProductVersion()));
 
-        for (Entry<String, HealthCheck.Result> entry : results.entrySet()) {
-            if (entry.getValue().isHealthy()) {
-                map.put(entry.getKey(), " is healthy");
-            } else {
-                map.put(entry.getKey(), " is UNHEALTHY: " + entry.getValue().getMessage());
-                final Throwable e = entry.getValue().getError();
-                if (e != null) {
-                    e.printStackTrace();
-                }
-            }
+            mapRole = getRoleProperties(conn, mapRole, username);
+
+        } catch (Exception e) {
+            map.put("connection", "Close");
         }
 
+        /*
+         * HealthCheckRegistry healthChecks = new HealthCheckRegistry();
+         * healthChecks.register("postgres Connection", new DatabaseHealthCheck(dataSource));
+         * 
+         * final Map<String, HealthCheck.Result> results = healthChecks.runHealthChecks();
+         * 
+         * for (Entry<String, HealthCheck.Result> entry : results.entrySet()) {
+         * if (entry.getValue().isHealthy()) {
+         * map.put(entry.getKey(), " is healthy");
+         * } else {
+         * map.put(entry.getKey(), " is UNHEALTHY: " + entry.getValue().getMessage());
+         * final Throwable e = entry.getValue().getError();
+         * if (e != null) {
+         * e.printStackTrace();
+         * }
+         * }
+         * }
+         */
+        map.put("Role Properties", mapRole);
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
     }
@@ -428,7 +485,6 @@ public class SystemController {
                 hashMap.put("Read Access", getReadAccess(file));
                 hashMap.put("Write Access", getWriteAccess(file));
 
-
                 int fileCount = getFilesCount(file);
                 int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
                 float sizeInByte = getFolderSize(file);
@@ -436,7 +492,7 @@ public class SystemController {
                 hashMap.put("sub_folder name", file.getName());
                 hashMap.put("Number of SubFolders", String.valueOf(dirCount));
                 hashMap.put("Files Count", String.valueOf(fileCount));
-                hashMap.put("size", String.valueOf(sizeInByte) + " Byte   "  +String.valueOf(sizeInByte/1024) + " KB");
+                hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
 
                 listOfHashMaps.add(hashMap);
                 hashMap.put("Sub Folders", displayDirectoryList(file));
@@ -501,4 +557,38 @@ public class SystemController {
 
     }
 
+    public String sendEmail(JavaMailSenderImpl mailSender, String emailSubject, String message) throws OpenClinicaSystemException {
+
+        logger.info("Sending email...");
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            helper.setFrom(EmailEngine.getAdminEmail());
+            helper.setTo("oc123@openclinica.com");
+            helper.setSubject(emailSubject);
+            helper.setText(message);
+
+            mailSender.send(mimeMessage);
+            return "Success";
+        } catch (MailException me) {
+            return "Failure";
+        } catch (MessagingException me) {
+            return "Failure";
+        }
+    }
+
+    public HashMap<String, String> getRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {
+        String query = "select * from pg_roles where rolname='" + username + "'";
+        ResultSet resultSet = conn.createStatement().executeQuery(query);
+
+        while (resultSet.next()) {
+            mapRole.put("RoleName", resultSet.getString("rolname"));
+            mapRole.put("SuperUser", resultSet.getString("rolsuper").equals("t") ? "True" : "False");
+            mapRole.put("Inherit", resultSet.getString("rolinherit").equals("t") ? "True" : "False");
+            mapRole.put("CreateRole", resultSet.getString("rolcreaterole").equals("t") ? "True" : "False");
+            mapRole.put("CreateDb", resultSet.getString("rolcreatedb").equals("t") ? "True" : "False");
+            mapRole.put("Login", resultSet.getString("rolcanlogin").equals("t") ? "True" : "False");
+        }
+        return mapRole;
+    }
 }
