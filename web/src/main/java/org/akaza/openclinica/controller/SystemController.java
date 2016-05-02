@@ -422,7 +422,6 @@ public class SystemController {
         ocMap.put("Used Disk Space", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
         ocMap.put("Read Access", getReadAccess(file));
         ocMap.put("Write Access", getWriteAccess(file));
-        ocMap.put("Tomcat and Ownership", "Coming Soon");
 
         map.put("Tomcat Directory Ownership" , ownershipMap);
         map.put("OpenClinica.data Facts", ocMap);
