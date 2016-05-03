@@ -306,7 +306,7 @@ public class SystemController {
         HashMap<String, String> datamartMap = new HashMap();
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            datamartRole = getRoleProperties(conn, datamartRole, username);
+            datamartRole = getDbRoleProperties(conn, datamartRole, username);
             datamartMap.put("connection", "Open");
         } catch (Exception e) {
             datamartMap.put("connection", "Close");
@@ -345,6 +345,8 @@ public class SystemController {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
+        map.put("Randomize Module", "Comming Soon");
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
 
@@ -353,9 +355,8 @@ public class SystemController {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
-        
-        
-        
+        map.put("Web Services ", "Comming Soon");
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
 
@@ -364,9 +365,8 @@ public class SystemController {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
-        
-        
-        
+        map.put("Rule Designer ", "Comming Soon");
+
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
 
@@ -374,6 +374,7 @@ public class SystemController {
     public ResponseEntity<HashMap> getLdapModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
+        map.put("LDAP ", "Comming Soon");
 
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
     }
@@ -390,43 +391,24 @@ public class SystemController {
     }
 
     @RequestMapping(value = "/filesystem", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getHealth() throws Exception {
+    public ResponseEntity<HashMap> getFileSystem() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
         String filePath = CoreResources.getField("filePath");
-        
-
         File file = new File(filePath);
 
-        
         String tomcatPath = filePath.substring(0, filePath.indexOf("/openclinica.data"));
         File tomcatFile = new File(tomcatPath);
-        
-        Path path = Paths.get(tomcatPath);
-        FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
-        UserPrincipal owner = ownerAttributeView.getOwner();    
-        System.out.println ("Owner name" + owner.getName());
-    
-        HashMap<String, Object> ownershipMap = new HashMap<>();
-        ownershipMap.put("Tomcat Directory", owner.getName() );
-        ownershipMap.put("Tomcat Sub Directories", displayDirectoryOwnershipList(tomcatFile));
 
-        
-        HashMap<String, String> ocMap = new HashMap<>();
-        float sizeInByte = getFolderSize(file);
         float freeSpace = new File("/").getFreeSpace();
 
-        ocMap.put("Available Disk Space in Drive", new File("/").getFreeSpace() + " Byte   " + freeSpace / 1024 + " KB   " + freeSpace / 1024 / 1024 + " MB   "
-                + freeSpace / 1024 / 1024 / 1024 + " GB");
-        ocMap.put("Used Disk Space", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
-        ocMap.put("Read Access", getReadAccess(file));
-        ocMap.put("Write Access", getWriteAccess(file));
-
-        map.put("Tomcat Directory Ownership" , ownershipMap);
-        map.put("OpenClinica.data Facts", ocMap);
-        map.put("OpenClinica.data Directory Count & File Size", displayDirectoryList(file));
-        map.put("List Of Files and Directories in OpenClinica.data Directory", displayDirectoryContents(file, new ArrayList()));
+        map.put("Tomcat Directory Ownership", displayOwnerShipForTomcatDirectory(tomcatFile));
+        map.put("Available Disk Space on Drive", freeSpace + " Byte   " + freeSpace / 1024 + " KB   " + freeSpace / 1024 / 1024 + " MB   " + freeSpace / 1024
+                / 1024 / 1024 + " GB");
+        map.put("openClinica.data Directory & File Count & Size", displayOCDataDirectoryCountAndSize(file));
+        // map.put("List Of Directory and File Names in OpenClinica.data Directory", displayDirectoryContents(file, new
+        // ArrayList()));
 
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -446,7 +428,7 @@ public class SystemController {
             map.put("Database Connection", "Open");
             map.put("Version", String.valueOf(conn.getMetaData().getDatabaseProductVersion()));
 
-            mapRole = getRoleProperties(conn, mapRole, username);
+            mapRole = getDbRoleProperties(conn, mapRole, username);
 
         } catch (Exception e) {
             map.put("connection", "Close");
@@ -470,7 +452,7 @@ public class SystemController {
          * }
          * }
          */
-       
+
         map.put("Role Properties", mapRole);
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -495,7 +477,34 @@ public class SystemController {
         return list;
     }
 
-    public ArrayList<HashMap<String, Object>> displayDirectoryList(File dir) throws IOException {
+    public ArrayList<HashMap<String, Object>> displayOCDataDirectoryCountAndSize(File file) throws IOException {
+        ArrayList<HashMap<String, Object>> listOfHashMaps = new ArrayList<>();
+        HashMap<String, Object> hashMap = null;
+        if (file.isDirectory()) {
+            hashMap = new HashMap<String, Object>();
+
+            hashMap.put("Read Access", getReadAccess(file));
+            hashMap.put("Write Access", getWriteAccess(file));
+            int count = 0;
+            int fileCount = getFilesCount(file, count);
+            int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
+            long length = 0;
+            float sizeInByte = getFolderSize(file, length);
+
+            hashMap.put("Folder Name", file.getName());
+            hashMap.put("Files Count", String.valueOf(fileCount));
+            hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
+
+            listOfHashMaps.add(hashMap);
+            if (dirCount != 0) {
+                hashMap.put("Number of SubFolders", String.valueOf(dirCount));
+                hashMap.put("Sub Folders", displaySubDirectoryCountAndSize(file));
+            }
+        }
+        return listOfHashMaps;
+    }
+
+    public ArrayList<HashMap<String, Object>> displaySubDirectoryCountAndSize(File dir) throws IOException {
         ArrayList<HashMap<String, Object>> listOfHashMaps = new ArrayList<>();
         HashMap<String, Object> hashMap = null;
         File[] files = dir.listFiles();
@@ -506,25 +515,48 @@ public class SystemController {
                 hashMap.put("Read Access", getReadAccess(file));
                 hashMap.put("Write Access", getWriteAccess(file));
 
-                int fileCount = getFilesCount(file);
+                int count = 0;
+                int fileCount = getFilesCount(file, count);
                 int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
-                float sizeInByte = getFolderSize(file);
+                long length = 0;
+                float sizeInByte = getFolderSize(file, length);
 
-                hashMap.put("sub_folder name", file.getName());
-                hashMap.put("Number of SubFolders", String.valueOf(dirCount));
+                hashMap.put("Folder Name", file.getName());
                 hashMap.put("Files Count", String.valueOf(fileCount));
                 hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
 
                 listOfHashMaps.add(hashMap);
-                if (dirCount!=0){
-                hashMap.put("Sub Folders", displayDirectoryList(file));
+                if (dirCount != 0) {
+                    hashMap.put("Number of SubFolders", String.valueOf(dirCount));
+                    hashMap.put("Sub Folders", displaySubDirectoryCountAndSize(file));
                 }
             }
         }
         return listOfHashMaps;
     }
 
-    public ArrayList<HashMap<String, Object>> displayDirectoryOwnershipList(File dir) throws IOException {
+    public ArrayList<HashMap<String, Object>> displayOwnerShipForTomcatDirectory(File file) throws IOException {
+        ArrayList<HashMap<String, Object>> listOfHashMaps = new ArrayList<>();
+        HashMap<String, Object> hashMap = null;
+        if (file.isDirectory()) {
+            hashMap = new HashMap<String, Object>();
+
+            Path path = Paths.get(file.getCanonicalPath());
+            FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+            UserPrincipal owner = ownerAttributeView.getOwner();
+
+            hashMap.put("owner ship", owner.getName());
+            hashMap.put("Folder Name", file.getName());
+            listOfHashMaps.add(hashMap);
+            int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
+            if (dirCount != 0) {
+                hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
+            }
+        }
+        return listOfHashMaps;
+    }
+
+    public ArrayList<HashMap<String, Object>> displayOwnerShipForTomcatSubDirectories(File dir) throws IOException {
         ArrayList<HashMap<String, Object>> listOfHashMaps = new ArrayList<>();
         HashMap<String, Object> hashMap = null;
         File[] files = dir.listFiles();
@@ -534,21 +566,20 @@ public class SystemController {
 
                 Path path = Paths.get(file.getCanonicalPath());
                 FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
-                UserPrincipal owner = ownerAttributeView.getOwner();        
+                UserPrincipal owner = ownerAttributeView.getOwner();
 
-                hashMap.put("ownerhip", owner.getName());
-                hashMap.put("sub_folder name", file.getName());
+                hashMap.put("owner ship", owner.getName());
+                hashMap.put("Folder Name", file.getName());
                 listOfHashMaps.add(hashMap);
                 int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
-                if (dirCount!=0){
-                hashMap.put("Sub Folders", displayDirectoryOwnershipList(file));
+                if (dirCount != 0) {
+                    hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
                 }
             }
         }
         return listOfHashMaps;
     }
 
-    
     public int getNumberOfSubFolders(String filePath) {
         File file1 = new File(filePath);
         File[] listFiles = file1.listFiles();
@@ -561,27 +592,26 @@ public class SystemController {
         return dirCount;
     }
 
-    public int getFilesCount(File file) {
+    public int getFilesCount(File file, int count) {
         File[] files = file.listFiles();
-        int count = 0;
+        // int count = 0;
         for (File f : files)
-            if (f.isDirectory())
-                count += getFilesCount(f);
-            else
+            if (f.isDirectory()) {
+                count = getFilesCount(f, count);
+            } else {
                 count++;
-
+            }
         return count;
     }
 
-    private long getFolderSize(File folder) {
-        long length = 0;
+    private long getFolderSize(File folder, long length) {
         File[] files = folder.listFiles();
         int count = files.length;
         for (int i = 0; i < count; i++) {
             if (files[i].isFile()) {
                 length += files[i].length();
             } else {
-                length += getFolderSize(files[i]);
+                length = getFolderSize(files[i], length);
             }
         }
         return length;
@@ -625,7 +655,7 @@ public class SystemController {
         }
     }
 
-    public HashMap<String, String> getRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {
+    public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {
         String query = "select * from pg_roles where rolname='" + username + "'";
         ResultSet resultSet = conn.createStatement().executeQuery(query);
 
