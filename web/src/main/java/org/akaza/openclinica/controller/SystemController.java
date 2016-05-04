@@ -339,6 +339,7 @@ public class SystemController {
         session.removeAttribute("ruledesigner");
         session.removeAttribute("messaging");
         session.removeAttribute("datamart");
+        session.removeAttribute("webservice");
 
         ArrayList<StudyBean> studyList = getStudyList();
 
@@ -358,6 +359,9 @@ public class SystemController {
 
             HashMap<String, Object> mapDatamartModule = getDatamartModuleInSession(studyBean, session);
             listOfModules.add(mapDatamartModule);
+
+            HashMap<String, Object> mapWebServiceModule = getWebServiceModuleInSession(studyBean, session);
+            listOfModules.add(mapWebServiceModule);
 
             HashMap<String, Object> mapStudy = new HashMap<>();
             mapStudy.put("Modules", listOfModules);
@@ -409,13 +413,25 @@ public class SystemController {
     }
 
     @RequestMapping(value = "/modules/webservices", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getWebServicesModule(HttpServletRequest request) throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getWebServicesModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
 
-        map.put("Web Services ", "Comming Soon");
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+        HttpSession session = request.getSession();
+        session.removeAttribute("webservice");
 
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        ArrayList<StudyBean> studyList = getStudyList();
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapRuleDesignerModule = getWebServiceModuleInSession(studyBean, session);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapRuleDesignerModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/modules/ruledesigner", method = RequestMethod.GET)
@@ -864,7 +880,7 @@ public class SystemController {
             if (huc.getResponseCode() == 200) {
                 result = "ACTIVE";
             } else {
-                result = "PENDING";
+                result = "INACTIVE";
             }
 
         } catch (Exception ex) {
@@ -956,6 +972,48 @@ public class SystemController {
         return mapModule;
     }
 
+    public HashMap<String, Object> getWebServiceModule(StudyBean studyBean) {
+        String webserviceUrl = CoreResources.getField("sysURL");
+        webserviceUrl = webserviceUrl.replace("/MainMenu", "-ws");
+
+        String result = "";
+        HttpURLConnection huc = null;
+        try {
+            URL u = new URL(webserviceUrl);
+            huc = (HttpURLConnection) u.openConnection();
+            huc.setRequestMethod("HEAD");
+            huc.connect();
+            if (huc.getResponseCode() == 200) {
+                result = "ACTIVE";
+            } else {
+                result = "INACTIVE";
+            }
+
+        } catch (Exception ex) {
+            result = "INACTIVE";
+            // Handle invalid URL
+        }
+
+        HashMap<String, String> mapMetadata = new HashMap<>();
+        mapMetadata.put("WebService URL", webserviceUrl);
+        try {
+            mapMetadata.put("Http Status Code", String.valueOf(huc.getResponseCode()));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        HashMap<String, Object> mapWebService = new HashMap<>();
+        mapWebService.put("enabled", !webserviceUrl.equals("") ? "True" : "False");
+        mapWebService.put("status", result);
+        mapWebService.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Web Service", mapWebService);
+
+        return mapModule;
+    }
+
     public HashMap<String, Object> getRuleDesignerModuleInSession(StudyBean studyBean, HttpSession session) {
 
         HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ruledesigner");
@@ -982,6 +1040,16 @@ public class SystemController {
         if (mapModule == null) {
             mapModule = getDatamartModule(studyBean);
             session.setAttribute("datamart", mapModule);
+        }
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getWebServiceModuleInSession(StudyBean studyBean, HttpSession session) {
+
+        HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("webservice");
+        if (mapModule == null) {
+            mapModule = getWebServiceModule(studyBean);
+            session.setAttribute("webservice", mapModule);
         }
         return mapModule;
     }
