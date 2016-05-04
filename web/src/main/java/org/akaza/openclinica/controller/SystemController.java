@@ -4,12 +4,16 @@ import net.sf.saxon.functions.IndexOf;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.healthcheck.DatabaseHealthCheck;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.JobTriggerService;
@@ -43,17 +47,22 @@ import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
+import com.sun.jersey.api.core.HttpRequestContext;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.management.ObjectName;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,6 +101,7 @@ public class SystemController {
     private JavaMailSenderImpl mailSender;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private HttpSession session;
 
     @RequestMapping(value = "/systemstatus", method = RequestMethod.POST)
     public ResponseEntity<HashMap> getSystemStatus() throws Exception {
@@ -301,7 +311,7 @@ public class SystemController {
         extractNumber.put("extract.number", CoreResources.getExtractField("extract.number"));
 
         extractMap.put("extract.number", extractNumber);
-        extractMap.put("DataMart", extractDatamart);
+        // extractMap.put("DataMart", extractDatamart);
 
         HashMap<String, String> datamartMap = new HashMap();
 
@@ -311,47 +321,95 @@ public class SystemController {
         } catch (Exception e) {
             datamartMap.put("connection", "Close");
         }
-        map.put("Datamart Facts", datamartMap);
+        // map.put("Datamart Facts", datamartMap);
         map.put("extract.properties", extractMap);
-        map.put("Role Properties", datamartRole);
+        // map.put("Role Properties", datamartRole);
 
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
+    }
+
+    @RequestMapping(value = "/modules", method = RequestMethod.GET)
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getAllModules(HttpServletRequest request) throws Exception {
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        HashMap<String, Object> map = new HashMap<>();
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+
+        HttpSession session = request.getSession();
+        session.removeAttribute("ruledesigner");
+        session.removeAttribute("messaging");
+        session.removeAttribute("datamart");
+
+        ArrayList<StudyBean> studyList = getStudyList();
+
+        for (StudyBean studyBean : studyList) {
+            ArrayList<HashMap<String, Object>> listOfModules = new ArrayList();
+            HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
+            listOfModules.add(mapParticipantModule);
+
+            HashMap<String, Object> mapRandomizeModule = getRandomizeModule(studyBean);
+            listOfModules.add(mapRandomizeModule);
+
+            HashMap<String, Object> mapRuleDesignerModule = getRuleDesignerModuleInSession(studyBean, session);
+            listOfModules.add(mapRuleDesignerModule);
+
+            HashMap<String, Object> mapMessagingModule = getMessagingModuleInSession(studyBean, session);
+            listOfModules.add(mapMessagingModule);
+
+            HashMap<String, Object> mapDatamartModule = getDatamartModuleInSession(studyBean, session);
+            listOfModules.add(mapDatamartModule);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Modules", listOfModules);
+            mapStudy.put("Study Oid", studyBean.getOid());
+
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
     }
 
     @RequestMapping(value = "/modules/participate", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getParticipateModule() throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getParticipateModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
-        HashMap<String, String> mapParticipate = new HashMap<>();
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
 
-        ParticipantPortalRegistrar ppr = new ParticipantPortalRegistrar();
-        String result = ppr.getHostNameAvailability("123");
-        if (!result.equals(ParticipantPortalRegistrar.UNKNOWN)) {
-            mapParticipate.put("Participate", "Active");
-            mapParticipate.put("Participate Version", "Comming Soon");
+        ArrayList<StudyBean> studyList = getStudyList();
 
-        } else {
-            mapParticipate.put("Participate", "In Active");
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapParticipantModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
         }
 
-        map.put("Participate Facts", mapParticipate);
-
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
     }
 
     @RequestMapping(value = "/modules/randomize", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getRandomizeModule() throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getRandomizeModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
 
-        map.put("Randomize Module", "Comming Soon");
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
 
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        ArrayList<StudyBean> studyList = getStudyList();
+
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapParticipantModule = getRandomizeModule(studyBean);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapParticipantModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
     }
 
     @RequestMapping(value = "/modules/webservices", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getWebServicesModule() throws Exception {
+    public ResponseEntity<HashMap> getWebServicesModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
 
@@ -361,17 +419,52 @@ public class SystemController {
     }
 
     @RequestMapping(value = "/modules/ruledesigner", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getRuleDesignerModule() throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getRuleDesignerModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
 
-        map.put("Rule Designer ", "Comming Soon");
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+        HttpSession session = request.getSession();
+        session.removeAttribute("ruledesigner");
 
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        ArrayList<StudyBean> studyList = getStudyList();
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapRuleDesignerModule = getRuleDesignerModuleInSession(studyBean, session);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapRuleDesignerModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
+
+    }
+
+    @RequestMapping(value = "/modules/datamart", method = RequestMethod.GET)
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getDatamartModule(HttpServletRequest request) throws Exception {
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+
+        HttpSession session = request.getSession();
+        session.removeAttribute("datamart");
+
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+
+        ArrayList<StudyBean> studyList = getStudyList();
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapDatamartModule = getDatamartModuleInSession(studyBean, session);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapDatamartModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/modules/auth", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getLdapModule() throws Exception {
+    public ResponseEntity<HashMap> getLdapModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
         map.put("LDAP ", "Comming Soon");
@@ -380,14 +473,25 @@ public class SystemController {
     }
 
     @RequestMapping(value = "/modules/messaging", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getMessagingModule() throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getMessagingModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
 
-        String result = sendEmail(mailSender, "This is the Subject Of a Rest Call for Health Check", "This is the Body Of a Rest Call for Health Check");
-        map.put("Mail connection", result);
+        HttpSession session = request.getSession();
+        session.removeAttribute("messaging");
 
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+
+        ArrayList<StudyBean> studyList = getStudyList();
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapMessagingModule = getMessagingModuleInSession(studyBean, session);
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapMessagingModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/filesystem", method = RequestMethod.GET)
@@ -647,11 +751,11 @@ public class SystemController {
             helper.setText(message);
 
             mailSender.send(mimeMessage);
-            return "Success";
+            return "ACTIVE";
         } catch (MailException me) {
-            return "Failure";
+            return "INACTIVE";
         } catch (MessagingException me) {
-            return "Failure";
+            return "INACTIVE";
         }
     }
 
@@ -669,4 +773,217 @@ public class SystemController {
         }
         return mapRole;
     }
+
+    public ArrayList<StudyBean> getStudyList() {
+        StudyDAO sdao = new StudyDAO(dataSource);
+        ArrayList<StudyBean> sBeans = (ArrayList<StudyBean>) sdao.findAllParents();
+        return sBeans;
+    }
+
+    public StudyParameterValueBean getParticipateMod(StudyBean studyBean, String value) {
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), value);
+        return pStatus;
+    }
+
+    public void getRandomizeMod() {
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+
+    }
+
+    public HashMap<String, Object> getParticipateModule(StudyBean studyBean) {
+        StudyParameterValueBean spvBean = getParticipateMod(studyBean, "participantPortal");
+        String ocParticipateStatus = "";
+        if (spvBean.isActive()) {
+            ocParticipateStatus = spvBean.getValue().toString(); // enabled , disabled
+        }
+        String ocuiParticipateStatus = "";
+        ParticipantPortalRegistrar participantPortalRegistrar = new ParticipantPortalRegistrar();
+        if (ocParticipateStatus.equals("enabled")) {
+            try {
+                ocuiParticipateStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOid());
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        HashMap<String, String> mapMetadata = new HashMap<>();
+
+        HashMap<String, Object> mapParticipate = new HashMap<>();
+        mapParticipate.put("enabled", ocParticipateStatus.equals("enabled") ? "True" : "False");
+        mapParticipate.put("status", ocuiParticipateStatus.equals("") ? "In Active" : ocuiParticipateStatus);
+        mapParticipate.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Participate", mapParticipate);
+
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getRandomizeModule(StudyBean studyBean) {
+        StudyParameterValueBean spvBean = getParticipateMod(studyBean, "randomization");
+        String ocRandomizeStatus = "";
+        if (spvBean.isActive()) {
+            ocRandomizeStatus = spvBean.getValue().toString(); // enabled , disabled
+        }
+        SeRandomizationDTO seRandomizationDTO = null;
+        String ocuiRandomizeStatus = "";
+        if (ocRandomizeStatus.equals("enabled")) {
+            try {
+
+                RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
+                seRandomizationDTO = randomizationRegistrar.getRandomizationDTOObject(studyBean.getOid());
+                ocuiRandomizeStatus = seRandomizationDTO.getStatus();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        HashMap<String, String> mapMetadata = new HashMap<>();
+
+        HashMap<String, Object> mapRandomize = new HashMap<>();
+        mapRandomize.put("enabled", ocRandomizeStatus.equals("enabled") ? "True" : "False");
+        mapRandomize.put("status", ocuiRandomizeStatus.equals("") ? "In Active" : ocuiRandomizeStatus);
+        mapRandomize.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Randomize", mapRandomize);
+
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getRuleDesignerModule(StudyBean studyBean) {
+        String designerUrl = CoreResources.getField("designerURL");
+        String result = "";
+        HttpURLConnection huc = null;
+        try {
+            URL u = new URL(designerUrl);
+            huc = (HttpURLConnection) u.openConnection();
+            huc.setRequestMethod("HEAD");
+            huc.connect();
+            if (huc.getResponseCode() == 200) {
+                result = "ACTIVE";
+            } else {
+                result = "PENDING";
+            }
+
+        } catch (Exception ex) {
+            result = "INACTIVE";
+            // Handle invalid URL
+        }
+
+        HashMap<String, String> mapMetadata = new HashMap<>();
+        mapMetadata.put("Designer URL", designerUrl);
+        try {
+            mapMetadata.put("Http Status Code", String.valueOf(huc.getResponseCode()));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        HashMap<String, Object> mapRuleDesigner = new HashMap<>();
+        mapRuleDesigner.put("enabled", !designerUrl.equals("") ? "True" : "False");
+        mapRuleDesigner.put("status", result);
+        mapRuleDesigner.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Rule Designer", mapRuleDesigner);
+
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getMessagingModule(StudyBean studyBean) {
+
+        String result = sendEmail(mailSender, "This is the Subject Of a Rest Call for Health Check", "This is the Body Of a Rest Call for Health Check");
+        String mailProtocol = CoreResources.getField("mailProtocol");
+        String mailPort = CoreResources.getField("mailPort");
+        String mailHost = CoreResources.getField("mailHost");
+
+        HashMap<String, String> mapMetadata = new HashMap<>();
+
+        HashMap<String, Object> mapMessaging = new HashMap<>();
+        mapMessaging.put("enabled", (!mailProtocol.equals("") && !mailPort.equals("") && !mailHost.equals("")) ? "True" : "False");
+        mapMessaging.put("status", result);
+        mapMessaging.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Messaging", mapMessaging);
+
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getDatamartModule(StudyBean studyBean) {
+
+        HashMap<String, String> datamartRole = new HashMap<>();
+        String username = CoreResources.getExtractField("db1.username");
+        String password = CoreResources.getExtractField("db1.password");
+        String url = CoreResources.getExtractField("db1.url");
+
+        ArrayList<ExtractPropertyBean> extracts = CoreResources.getExtractProperties();
+        String enabled = "False";
+        for (ExtractPropertyBean extract : extracts) {
+            System.out.println(extract.getFiledescription());
+            System.out.println(extract.getFileName());
+
+            if (extract.getFiledescription().equalsIgnoreCase("Datamart")) {
+                enabled = "True";
+                break;
+            }
+        }
+
+        String result = "";
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            datamartRole = getDbRoleProperties(conn, datamartRole, username);
+            result = "ACTIVE";
+        } catch (Exception e) {
+            result = "INACTIVE";
+        }
+
+        HashMap<String, Object> mapMetadata = new HashMap<>();
+        mapMetadata.put("db1.username", username);
+        mapMetadata.put("db1.url", url);
+        mapMetadata.put("db1.dataBase", CoreResources.getExtractField("db1.dataBase"));
+        mapMetadata.put("Role Properties", datamartRole);
+
+        HashMap<String, Object> mapDatamart = new HashMap<>();
+        mapDatamart.put("enabled", enabled);
+        mapDatamart.put("status", result);
+        mapDatamart.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Datamart", mapDatamart);
+
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getRuleDesignerModuleInSession(StudyBean studyBean, HttpSession session) {
+
+        HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ruledesigner");
+        if (mapModule == null) {
+            mapModule = getRuleDesignerModule(studyBean);
+            session.setAttribute("ruledesigner", mapModule);
+        }
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getMessagingModuleInSession(StudyBean studyBean, HttpSession session) {
+
+        HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("messaging");
+        if (mapModule == null) {
+            mapModule = getMessagingModule(studyBean);
+            session.setAttribute("messaging", mapModule);
+        }
+        return mapModule;
+    }
+
+    public HashMap<String, Object> getDatamartModuleInSession(StudyBean studyBean, HttpSession session) {
+
+        HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("datamart");
+        if (mapModule == null) {
+            mapModule = getDatamartModule(studyBean);
+            session.setAttribute("datamart", mapModule);
+        }
+        return mapModule;
+    }
+
 }
