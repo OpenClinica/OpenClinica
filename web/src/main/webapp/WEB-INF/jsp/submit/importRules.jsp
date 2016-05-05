@@ -66,7 +66,7 @@
 </c:choose>
 
 <fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </h1>
 
 
@@ -102,7 +102,7 @@
 
 <span class="table_title_Admin"><fmt:message key="rule_import_getting_started" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
  
 
 <span class="table_title_Admin"><fmt:message key="rule_import_templates" bundle="${resterm}"/></span>
