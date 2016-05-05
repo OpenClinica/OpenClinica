@@ -30,9 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,9 +51,16 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.sun.jersey.api.core.HttpRequestContext;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.management.ObjectName;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -80,6 +89,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -99,6 +109,11 @@ public class SystemController {
     private BasicDataSource dataSource;
     @Autowired
     private JavaMailSenderImpl mailSender;
+
+    @Autowired
+    private ContextSource contextSource;
+
+    private SpringSecurityLdapTemplate ldapTemplate;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private HttpSession session;
@@ -128,14 +143,6 @@ public class SystemController {
         }
 
         DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-        System.out.println(metaData.getSchemas());
-        System.out.println(metaData.getUserName());
-        System.out.println(metaData.getCatalogs());
-
-        // metaData.getTablePrivileges("pg_catalog", schemaPattern, tableNamePattern)
-
-        // metaData.getTablePrivileges();
-        // metaData.getColumnPrivileges();
 
         try {
             UserAccountDAO udao = new UserAccountDAO(dataSource);
@@ -340,6 +347,7 @@ public class SystemController {
         session.removeAttribute("messaging");
         session.removeAttribute("datamart");
         session.removeAttribute("webservice");
+        session.removeAttribute("ldap");
 
         ArrayList<StudyBean> studyList = getStudyList();
 
@@ -362,6 +370,9 @@ public class SystemController {
 
             HashMap<String, Object> mapWebServiceModule = getWebServiceModuleInSession(studyBean, session);
             listOfModules.add(mapWebServiceModule);
+
+            HashMap<String, Object> mapLdapModule = getLdapModuleInSession(studyBean, session);
+            listOfModules.add(mapLdapModule);
 
             HashMap<String, Object> mapStudy = new HashMap<>();
             mapStudy.put("Modules", listOfModules);
@@ -480,12 +491,25 @@ public class SystemController {
     }
 
     @RequestMapping(value = "/modules/auth", method = RequestMethod.GET)
-    public ResponseEntity<HashMap> getLdapModule(HttpServletRequest request) throws Exception {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> getLdapModule(HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("LDAP ", "Comming Soon");
 
-        return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+        ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
+        HttpSession session = request.getSession();
+        session.removeAttribute("ldap");
+
+        ArrayList<StudyBean> studyList = getStudyList();
+        for (StudyBean studyBean : studyList) {
+            HashMap<String, Object> mapRuleDesignerModule = getLdapModuleInSession(studyBean, session);
+
+            HashMap<String, Object> mapStudy = new HashMap<>();
+            mapStudy.put("Module", mapRuleDesignerModule);
+            mapStudy.put("Study Oid", studyBean.getOid());
+            studyListMap.add(mapStudy);
+        }
+
+        return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/modules/messaging", method = RequestMethod.GET)
@@ -584,11 +608,9 @@ public class SystemController {
             for (File file : files) {
                 if (file.isDirectory()) {
                     list.add(file.getCanonicalPath());
-                    // System.out.println(file.getCanonicalPath());
                     list = displayDirectoryContents(file, list);
                 } else {
                     list.add(file.getCanonicalPath());
-                    // System.out.println(file.getCanonicalPath());
                 }
             }
         } catch (IOException e) {
@@ -938,8 +960,6 @@ public class SystemController {
         ArrayList<ExtractPropertyBean> extracts = CoreResources.getExtractProperties();
         String enabled = "False";
         for (ExtractPropertyBean extract : extracts) {
-            System.out.println(extract.getFiledescription());
-            System.out.println(extract.getFileName());
 
             if (extract.getFiledescription().equalsIgnoreCase("Datamart")) {
                 enabled = "True";
@@ -1014,6 +1034,42 @@ public class SystemController {
         return mapModule;
     }
 
+    public HashMap<String, Object> getLdapModule(StudyBean studyBean) {
+        String enabled = CoreResources.getField("ldap.enabled");
+        String ldapHost = CoreResources.getField("ldap.host");
+        String username = CoreResources.getField("ldap.userDn");
+        String password = CoreResources.getField("ldap.password");
+
+        String result = "";
+        Map<String, String> env = new HashMap<String, String>();
+
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, ldapHost);
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, "uid=" + username + ",ou=system"); // replace with user DN
+        env.put(Context.SECURITY_CREDENTIALS, password);
+
+        DirContext ctx = null;
+        try {
+            ctx = new InitialDirContext((Hashtable<?, ?>) env);
+            result = "ACTIVE";
+        } catch (Exception e) {
+            result = "INACTIVE";
+        }
+
+        HashMap<String, String> mapMetadata = new HashMap<>();
+
+        HashMap<String, Object> mapWebService = new HashMap<>();
+        mapWebService.put("enabled", enabled.equalsIgnoreCase("true") ? "True" : "False");
+        mapWebService.put("status", result);
+        mapWebService.put("metadata", mapMetadata);
+
+        HashMap<String, Object> mapModule = new HashMap<>();
+        mapModule.put("Ldap", mapWebService);
+
+        return mapModule;
+    }
+
     public HashMap<String, Object> getRuleDesignerModuleInSession(StudyBean studyBean, HttpSession session) {
 
         HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ruledesigner");
@@ -1054,4 +1110,13 @@ public class SystemController {
         return mapModule;
     }
 
+    public HashMap<String, Object> getLdapModuleInSession(StudyBean studyBean, HttpSession session) {
+
+        HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ldap");
+        if (mapModule == null) {
+            mapModule = getLdapModule(studyBean);
+            session.setAttribute("ldap", mapModule);
+        }
+        return mapModule;
+    }
 }
