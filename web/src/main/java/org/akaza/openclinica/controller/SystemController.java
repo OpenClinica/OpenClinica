@@ -17,6 +17,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.JobTriggerService;
+import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
@@ -71,6 +72,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,6 +95,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Map.Entry;
 import java.util.TimeZone;
@@ -143,7 +146,6 @@ public class SystemController {
         }
 
         DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-
         try {
             UserAccountDAO udao = new UserAccountDAO(dataSource);
             UserAccountBean uBean = (UserAccountBean) udao.findByPK(1);
@@ -830,6 +832,7 @@ public class SystemController {
     }
 
     public HashMap<String, Object> getParticipateModule(StudyBean studyBean) {
+        String portalURL = CoreResources.getField("portalURL");
         StudyParameterValueBean spvBean = getParticipateMod(studyBean, "participantPortal");
         String ocParticipateStatus = "";
         if (spvBean.isActive()) {
@@ -845,7 +848,23 @@ public class SystemController {
                 e.printStackTrace();
             }
         }
+
         HashMap<String, String> mapMetadata = new HashMap<>();
+
+        String url = "";
+        URL pManageUrl = null;
+        try {
+            pManageUrl = new URL(portalURL);
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Authorization pManageAuthorization = participantPortalRegistrar.getAuthorization(studyBean.getOid());
+        if (pManageAuthorization != null) {
+            url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+            mapMetadata.put("Participate Url", url);
+        }
 
         HashMap<String, Object> mapParticipate = new HashMap<>();
         mapParticipate.put("enabled", ocParticipateStatus.equals("enabled") ? "True" : "False");
@@ -866,18 +885,30 @@ public class SystemController {
         }
         SeRandomizationDTO seRandomizationDTO = null;
         String ocuiRandomizeStatus = "";
+        URL randomizeUrl = null;
+        HashMap<String, String> mapMetadata = new HashMap<>();
+
         if (ocRandomizeStatus.equals("enabled")) {
             try {
 
                 RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
                 seRandomizationDTO = randomizationRegistrar.getRandomizationDTOObject(studyBean.getOid());
-                ocuiRandomizeStatus = seRandomizationDTO.getStatus();
+                if (seRandomizationDTO != null && seRandomizationDTO.getStatus() != null) {
+                    ocuiRandomizeStatus = seRandomizationDTO.getStatus();
+                    if (seRandomizationDTO.getUrl() != null) {
+                        randomizeUrl = new URL(seRandomizationDTO.getUrl());
+                    }
+                    mapMetadata.put("Randomize URL", randomizeUrl == null ? "" : randomizeUrl.toString());
+                }
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-        HashMap<String, String> mapMetadata = new HashMap<>();
 
         HashMap<String, Object> mapRandomize = new HashMap<>();
         mapRandomize.put("enabled", ocRandomizeStatus.equals("enabled") ? "True" : "False");
@@ -938,6 +969,8 @@ public class SystemController {
         String mailHost = CoreResources.getField("mailHost");
 
         HashMap<String, String> mapMetadata = new HashMap<>();
+        mapMetadata.put("mail.host", mailHost);
+        mapMetadata.put("mail.protocol", mailProtocol);
 
         HashMap<String, Object> mapMessaging = new HashMap<>();
         mapMessaging.put("enabled", (!mailProtocol.equals("") && !mailPort.equals("") && !mailHost.equals("")) ? "True" : "False");
@@ -1041,23 +1074,24 @@ public class SystemController {
         String password = CoreResources.getField("ldap.password");
 
         String result = "";
-        Map<String, String> env = new HashMap<String, String>();
+        Properties env = new Properties();
 
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, ldapHost);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, "uid=" + username + ",ou=system"); // replace with user DN
+        env.put(Context.SECURITY_PRINCIPAL, username); // replace with user DN
         env.put(Context.SECURITY_CREDENTIALS, password);
 
         DirContext ctx = null;
         try {
-            ctx = new InitialDirContext((Hashtable<?, ?>) env);
+            ctx = new InitialDirContext(env);
             result = "ACTIVE";
         } catch (Exception e) {
             result = "INACTIVE";
         }
 
         HashMap<String, String> mapMetadata = new HashMap<>();
+        mapMetadata.put("ldap.host", ldapHost);
 
         HashMap<String, Object> mapWebService = new HashMap<>();
         mapWebService.put("enabled", enabled.equalsIgnoreCase("true") ? "True" : "False");
