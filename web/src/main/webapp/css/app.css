@@ -1,6 +1,7 @@
 body {
   font-family: Tahoma, Arial, Helvetica, Sans-Serif;
-  margin-left:10px;
+  margin-left: 2cm;
+  margin-right: 2cm
 }
 
 table.item-row {
@@ -368,6 +369,8 @@ input[type="text"], textarea {
 
   body {
     background-color: white;
+    margin-left: 2cm;
+    margin-right: 2cm
   }
 
   .no_print {
