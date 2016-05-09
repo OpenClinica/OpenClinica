@@ -2125,3 +2125,7 @@ margin: 2px;;
 
 #excel_file_path{ width: 307px; 
 }
+
+body.main_BG .blockUI.blockOverlay {
+    cursor: default!important; 
+}

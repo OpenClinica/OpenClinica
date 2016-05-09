@@ -27,14 +27,22 @@
         }
         createHiddenInputFieldsForLimitAndSubmit(id);
     }
+    
     function onInvokeExportAction(id) {
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListStudySubjects?'+ parameterString;
     }
 
+    function closeOnEsc(event) {
+        if (event.keyCode === 27) {
+            jQuery('#cancel').click();            
+        }
+    }
+
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
-			jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+            jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+            $(document).on('keydown', closeOnEsc);
         });
 
         jQuery('#cancel').click(function() {
