@@ -7,7 +7,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.controller.healthcheck.DatabaseHealthCheck;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -79,6 +78,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.AccessController;
 import java.sql.Connection;
@@ -278,7 +278,7 @@ public class SystemController {
 
     }
 
-    @RequestMapping(value = "/modules/extract", method = RequestMethod.GET)
+    @RequestMapping(value = "/extract", method = RequestMethod.GET)
     public ResponseEntity<HashMap> getExtractModule() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         HashMap<String, Object> map = new HashMap<>();
@@ -549,9 +549,9 @@ public class SystemController {
 
         float freeSpace = new File("/").getFreeSpace();
 
+        
         map.put("Tomcat Directory Ownership", displayOwnerShipForTomcatDirectory(tomcatFile));
-        map.put("Available Disk Space on Drive", freeSpace + " Byte   " + freeSpace / 1024 + " KB   " + freeSpace / 1024 / 1024 + " MB   " + freeSpace / 1024
-                / 1024 / 1024 + " GB");
+        map.put("Available Disk Space on Drive",  freeSpace / 1024 / 1024 + " MB " );
         map.put("openClinica.data Directory & File Count & Size", displayOCDataDirectoryCountAndSize(file));
         // map.put("List Of Directory and File Names in OpenClinica.data Directory", displayDirectoryContents(file, new
         // ArrayList()));
@@ -571,13 +571,13 @@ public class SystemController {
         String url = CoreResources.getField("url");
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            map.put("Database Connection", "Open");
+            map.put("Database Connection", "True");
             map.put("Version", String.valueOf(conn.getMetaData().getDatabaseProductVersion()));
 
             mapRole = getDbRoleProperties(conn, mapRole, username);
 
         } catch (Exception e) {
-            map.put("connection", "Close");
+            map.put("connection", "False");
         }
 
         /*
@@ -637,7 +637,7 @@ public class SystemController {
 
             hashMap.put("Folder Name", file.getName());
             hashMap.put("Files Count", String.valueOf(fileCount));
-            hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
+            hashMap.put("size", String.valueOf(sizeInByte / 1024 /1024) + " MB");
 
             listOfHashMaps.add(hashMap);
             if (dirCount != 0) {
@@ -667,7 +667,7 @@ public class SystemController {
 
                 hashMap.put("Folder Name", file.getName());
                 hashMap.put("Files Count", String.valueOf(fileCount));
-                hashMap.put("size", String.valueOf(sizeInByte) + " Byte   " + String.valueOf(sizeInByte / 1024) + " KB");
+                hashMap.put("size",  String.valueOf(sizeInByte / 1024/1024) + " MB");
 
                 listOfHashMaps.add(hashMap);
                 if (dirCount != 0) {
@@ -689,7 +689,7 @@ public class SystemController {
             FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
             UserPrincipal owner = ownerAttributeView.getOwner();
 
-            hashMap.put("owner ship", owner.getName());
+            hashMap.put("ownership", owner.getName());
             hashMap.put("Folder Name", file.getName());
             listOfHashMaps.add(hashMap);
             int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
@@ -712,12 +712,12 @@ public class SystemController {
                 FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
                 UserPrincipal owner = ownerAttributeView.getOwner();
 
-                hashMap.put("owner ship", owner.getName());
+                hashMap.put("ownership", owner.getName());
                 hashMap.put("Folder Name", file.getName());
                 listOfHashMaps.add(hashMap);
                 int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
                 if (dirCount != 0) {
-                    hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
+      //              hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
                 }
             }
         }
@@ -868,7 +868,7 @@ public class SystemController {
 
         HashMap<String, Object> mapParticipate = new HashMap<>();
         mapParticipate.put("enabled", ocParticipateStatus.equals("enabled") ? "True" : "False");
-        mapParticipate.put("status", ocuiParticipateStatus.equals("") ? "In Active" : ocuiParticipateStatus);
+        mapParticipate.put("status", ocuiParticipateStatus.equals("") ? "INACTIVE" : ocuiParticipateStatus);
         mapParticipate.put("metadata", mapMetadata);
 
         HashMap<String, Object> mapModule = new HashMap<>();
@@ -912,7 +912,7 @@ public class SystemController {
 
         HashMap<String, Object> mapRandomize = new HashMap<>();
         mapRandomize.put("enabled", ocRandomizeStatus.equals("enabled") ? "True" : "False");
-        mapRandomize.put("status", ocuiRandomizeStatus.equals("") ? "In Active" : ocuiRandomizeStatus);
+        mapRandomize.put("status", ocuiRandomizeStatus.equals("") ? "INACTIVE" : ocuiRandomizeStatus);
         mapRandomize.put("metadata", mapMetadata);
 
         HashMap<String, Object> mapModule = new HashMap<>();
