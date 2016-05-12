@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openclinica.org/ws/event/v1"
-    xmlns:events="http://openclinica.org/ws/event/v1" 
-    xmlns:beans="http://openclinica.org/ws/beans"
-    elementFormDefault="qualified">
-    
+        targetNamespace="http://openclinica.org/ws/event/v1"
+        xmlns:events="http://openclinica.org/ws/event/v1"
+        xmlns:beans="http://openclinica.org/ws/beans"
+        elementFormDefault="qualified">
+
     <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
-    
+
     <element name="scheduleRequest">
         <complexType>
             <sequence>
@@ -14,7 +14,7 @@
             </sequence>
         </complexType>
     </element>
-    
+
     <element name="scheduleResponse">
         <complexType>
             <sequence>
@@ -27,5 +27,27 @@
             </sequence>
         </complexType>
     </element>
-    
+
+    <element name="eventInformationResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="eventDefinitionOID" type="string"/>
+                <element name="studySubjectOID" type="string"/>
+                <sequence>
+                    <element name="events" type="beans:eventInformationResponseType" minOccurs="0" maxOccurs="unbounded" />
+                </sequence>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <element name="eventInformationRequest">
+        <complexType>
+            <sequence>
+                <element name="eventStatus" type="beans:eventStatusType" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
 </schema>
