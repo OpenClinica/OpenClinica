@@ -16,6 +16,7 @@ public class ListSubjectFilter implements CriteriaCommand {
 
     List<Filter> filters = new ArrayList<Filter>();
     HashMap<String, String> columnMapping = new HashMap<String, String>();
+    HashMap<String, String> monthMapping = new HashMap<String, String>();
     Integer studyEventDefinitionId;
     String defaultFormat = "yyyy-MM-dd";
     DateFormat theDefaultFormat;
@@ -34,6 +35,28 @@ public class ListSubjectFilter implements CriteriaCommand {
         columnMapping.put("subject.updater", "ua.user_name");
         columnMapping.put("subject.status", "s.status_id");
         columnMapping.put("studySubjectIdAndStudy", "");
+
+        monthMapping.put("JANUARY", "1");
+        monthMapping.put("FEBRUARY", "2");
+        monthMapping.put("MARCH", "3");
+        monthMapping.put("APRIL", "4");
+        monthMapping.put("MAY", "5");
+        monthMapping.put("JUNE", "6");
+        monthMapping.put("JULY", "7");
+        monthMapping.put("AUGUST", "8");
+        monthMapping.put("SEPTEMBER", "9");
+        monthMapping.put("OCTOBER", "10");
+        monthMapping.put("NOVEMBER", "11");
+        monthMapping.put("DECEMBER", "12");
+        monthMapping.put("JAN", "1");
+        monthMapping.put("FEB", "2");
+        monthMapping.put("MAR", "3");
+        monthMapping.put("APR", "4");
+        monthMapping.put("AUG", "8");
+        monthMapping.put("SEPT", "9");
+        monthMapping.put("OCT", "10");
+        monthMapping.put("NOV", "11");
+        monthMapping.put("DEC", "12");
     }
 
     public void addFilter(String property, Object value) {
@@ -58,6 +81,7 @@ public class ListSubjectFilter implements CriteriaCommand {
             } else if (property.equals("subject.createdDate") || property.equals("subject.updatedDate")) {
                 criteria += onlyYearAndMonthAndDay(String.valueOf(value), columnMapping.get(property));
                 criteria += onlyYear(String.valueOf(value), columnMapping.get(property));
+                criteria += onlyMonth(String.valueOf(value), columnMapping.get(property));
             } else if (property.equals("subject.owner")) {
                 criteria = criteria + " and s.owner_id = ua.user_id and ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
@@ -92,6 +116,13 @@ public class ListSubjectFilter implements CriteriaCommand {
         } catch (Exception e) {
             // Do nothing
         }
+        return criteria;
+    }
+
+    private String onlyMonth(String value, String column) {
+        String criteria = "";
+        if (monthMapping.get(value.toUpperCase()) != null)
+            criteria = " AND (   extract(month from " + column + ") = " +monthMapping.get(value.toUpperCase())+ " )";
         return criteria;
     }
 
