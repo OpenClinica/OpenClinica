@@ -85,9 +85,6 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
         super.configureTableFacade(response, tableFacade);
-        // tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.createdDate"), new DateFilterMatcher(getDateFormat()));
-        // tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.updatedDate"), new DateFilterMatcher(getDateFormat()));
-        //tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new StatusFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "subject.owner"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "subject.updater"), new GenericFilterMatecher());
