@@ -549,9 +549,8 @@ public class SystemController {
 
         float freeSpace = new File("/").getFreeSpace();
 
-        
         map.put("Tomcat Directory Ownership", displayOwnerShipForTomcatDirectory(tomcatFile));
-        map.put("Available Disk Space on Drive",  freeSpace / 1024 / 1024 + " MB " );
+        map.put("Available Disk Space on Drive", freeSpace / 1024 / 1024 + " MB ");
         map.put("openClinica.data Directory & File Count & Size", displayOCDataDirectoryCountAndSize(file));
         // map.put("List Of Directory and File Names in OpenClinica.data Directory", displayDirectoryContents(file, new
         // ArrayList()));
@@ -637,7 +636,7 @@ public class SystemController {
 
             hashMap.put("Folder Name", file.getName());
             hashMap.put("Files Count", String.valueOf(fileCount));
-            hashMap.put("size", String.valueOf(sizeInByte / 1024 /1024) + " MB");
+            hashMap.put("size", String.valueOf(sizeInByte / 1024 / 1024) + " MB");
 
             listOfHashMaps.add(hashMap);
             if (dirCount != 0) {
@@ -667,7 +666,7 @@ public class SystemController {
 
                 hashMap.put("Folder Name", file.getName());
                 hashMap.put("Files Count", String.valueOf(fileCount));
-                hashMap.put("size",  String.valueOf(sizeInByte / 1024/1024) + " MB");
+                hashMap.put("size", String.valueOf(sizeInByte / 1024 / 1024) + " MB");
 
                 listOfHashMaps.add(hashMap);
                 if (dirCount != 0) {
@@ -684,12 +683,14 @@ public class SystemController {
         HashMap<String, Object> hashMap = null;
         if (file.isDirectory()) {
             hashMap = new HashMap<String, Object>();
+            hashMap.put("Read Access", getReadAccess(file));
+            hashMap.put("Write Access", getWriteAccess(file));
 
             Path path = Paths.get(file.getCanonicalPath());
             FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
             UserPrincipal owner = ownerAttributeView.getOwner();
 
-            hashMap.put("ownership", owner.getName());
+            // hashMap.put("ownership", owner.getName());
             hashMap.put("Folder Name", file.getName());
             listOfHashMaps.add(hashMap);
             int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
@@ -707,17 +708,19 @@ public class SystemController {
         for (File file : files) {
             if (file.isDirectory()) {
                 hashMap = new HashMap<String, Object>();
+                hashMap.put("Read Access", getReadAccess(file));
+                hashMap.put("Write Access", getWriteAccess(file));
 
                 Path path = Paths.get(file.getCanonicalPath());
                 FileOwnerAttributeView ownerAttributeView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
                 UserPrincipal owner = ownerAttributeView.getOwner();
 
-                hashMap.put("ownership", owner.getName());
+                // hashMap.put("ownership", owner.getName());
                 hashMap.put("Folder Name", file.getName());
                 listOfHashMaps.add(hashMap);
                 int dirCount = getNumberOfSubFolders(file.getCanonicalPath().toString());
                 if (dirCount != 0) {
-      //              hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
+                    // hashMap.put("Sub Folders", displayOwnerShipForTomcatSubDirectories(file));
                 }
             }
         }
@@ -728,9 +731,11 @@ public class SystemController {
         File file1 = new File(filePath);
         File[] listFiles = file1.listFiles();
         int dirCount = 0;
-        for (File f : listFiles) {
-            if (f.isDirectory()) {
-                dirCount++;
+        if (listFiles != null) {
+            for (File f : listFiles) {
+                if (f.isDirectory()) {
+                    dirCount++;
+                }
             }
         }
         return dirCount;
@@ -739,23 +744,30 @@ public class SystemController {
     public int getFilesCount(File file, int count) {
         File[] files = file.listFiles();
         // int count = 0;
-        for (File f : files)
-            if (f.isDirectory()) {
-                count = getFilesCount(f, count);
-            } else {
-                count++;
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    count = getFilesCount(f, count);
+                } else {
+                    count++;
+                }
             }
+        }
         return count;
     }
 
     private long getFolderSize(File folder, long length) {
-        File[] files = folder.listFiles();
-        int count = files.length;
-        for (int i = 0; i < count; i++) {
-            if (files[i].isFile()) {
-                length += files[i].length();
-            } else {
-                length = getFolderSize(files[i], length);
+        if (folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                int count = files.length;
+                for (int i = 0; i < count; i++) {
+                    if (files[i].isFile()) {
+                        length += files[i].length();
+                    } else {
+                        length = getFolderSize(files[i], length);
+                    }
+                }
             }
         }
         return length;
