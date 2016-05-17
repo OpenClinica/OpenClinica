@@ -3,7 +3,6 @@ package org.akaza.openclinica.dao.core;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +10,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
-
-import javax.annotation.Resources;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
@@ -666,109 +665,127 @@ public class CoreResources implements ResourceLoaderAware {
 
         // ExtractPropertyBean epbean = new ExtractPropertyBean();
         int i = 1;
-        while (!getExtractField("extract." + i + ".file").equals("")) {
-            ExtractPropertyBean epbean = new ExtractPropertyBean();
-            epbean.setId(i);
-            // we will implement a find by id function in the front end
-
-            // check to make sure the file exists, if not throw an exception and system will abort to start.
-            checkForFile(getExtractFields("extract." + i + ".file"));
-            epbean.setFileName(getExtractFields("extract." + i + ".file"));
-            // file name of the xslt stylesheet
-            epbean.setFiledescription(getExtractField("extract." + i + ".fileDescription"));
-            // description of the choice of format
-            epbean.setHelpText(getExtractField("extract." + i + ".helpText"));
-            // help text, currently in the alt-text of the link
-            epbean.setLinkText(getExtractField("extract." + i + ".linkText"));
-            // link text of the choice of format
-            // epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
-            // which roles are allowed to see the choice?
-            epbean.setFileLocation(getExtractField("extract." + i + ".location"));
-            // destination of the copied files
-            // epbean.setFormat(getExtractField("xsl.format." + i));
-            // if (("").equals(epbean.getFormat())) {
-            // }
-            // formatting choice. currently permenantly set at oc1.3
-            /*
-             * String clinica = getExtractField("extract."+i+".odmType"); if(clinica!=null) {
-             * if(clinica.equalsIgnoreCase("clinical_data")) epbean.setFormat("occlinical_data"); else
-             * epbean.setFormat("oc1.3"); } else
-             */
-
-            epbean.setOdmType(getExtractField("extract." + i + ".odmType"));
-
-            epbean.setFormat("oc1.3");
-
-            // destination file name of the copied files
-            epbean.setExportFileName(getExtractFields("extract." + i + ".exportname"));
-            // post-processing event after the creation
-            String whichFunction = getExtractField("extract." + i + ".post").toLowerCase();
-            // added by JN: Zipformat comes from extract properties returns true by default
-            epbean.setZipFormat(getExtractFieldBoolean("extract." + i + ".zip"));
-            epbean.setDeleteOld(getExtractFieldBoolean("extract." + i + ".deleteOld"));
-            epbean.setSuccessMessage(getExtractField("extract." + i + ".success"));
-            epbean.setFailureMessage(getExtractField("extract." + i + ".failure"));
-            epbean.setZipName(getExtractField("extract." + i + ".zipName"));
-            if (epbean.getFileName().length != epbean.getExportFileName().length)
-                throw new OpenClinicaSystemException(
-                        "The comma seperated values of file names and export file names should correspond 1 on 1 for the property number" + i);
-
-            if ("sql".equals(whichFunction)) {
-                // set the bean within, so that we can access the file locations etc
-                SqlProcessingFunction function = new SqlProcessingFunction(epbean);
-                String whichSettings = getExtractField("xsl.post." + i + ".sql");
-                if (!"".equals(whichSettings)) {
-                    function.setDatabaseType(getExtractFieldNoRep(whichSettings + ".dataBase").toLowerCase());
-                    function.setDatabaseUrl(getExtractFieldNoRep(whichSettings + ".url"));
-                    function.setDatabaseUsername(getExtractFieldNoRep(whichSettings + ".username"));
-                    function.setDatabasePassword(getExtractFieldNoRep(whichSettings + ".password"));
-                } else {
-                    // set default db settings here
-                    function.setDatabaseType(getField("dataBase"));
-                    function.setDatabaseUrl(getField("url"));
-                    function.setDatabaseUsername(getField("username"));
-                    function.setDatabasePassword(getField("password"));
-                }
-                // also pre-set the database connection stuff
-                epbean.setPostProcessing(function);
-                // System.out.println("found db password: " + function.getDatabasePassword());
-            } else if ("pdf".equals(whichFunction)) {
-                // TODO add other functions here
-                epbean.setPostProcessing(new PdfProcessingFunction());
-            } else if ("sas".equals(whichFunction)) {
-                epbean.setPostProcessing(new SasProcessingFunction());
-            } else if (!whichFunction.isEmpty()) {
-                String postProcessorName = getExtractField(whichFunction + ".postProcessor");
-                if (postProcessorName.equals("pdf")) {
-                    epbean.setPostProcessing(new PdfProcessingFunction());
-                    epbean.setPostProcDeleteOld(getExtractFieldBoolean(whichFunction + ".deleteOld"));
-                    epbean.setPostProcZip(getExtractFieldBoolean(whichFunction + ".zip"));
-                    epbean.setPostProcLocation(getExtractField(whichFunction + ".location"));
-                    epbean.setPostProcExportName(getExtractField(whichFunction + ".exportname"));
-                }
-                // since the database is the last option TODO: think about custom post processing options
-                else {
+        int maxExtractOption = getMaxExtractCounterValue();
+        while (i <= maxExtractOption) {
+            if (!getExtractField("extract." + i + ".file").equals("")) {
+                ExtractPropertyBean epbean = new ExtractPropertyBean();
+                epbean.setId(i);
+                // we will implement a find by id function in the front end
+    
+                // check to make sure the file exists, if not throw an exception and system will abort to start.
+                checkForFile(getExtractFields("extract." + i + ".file"));
+                epbean.setFileName(getExtractFields("extract." + i + ".file"));
+                // file name of the xslt stylesheet
+                epbean.setFiledescription(getExtractField("extract." + i + ".fileDescription"));
+                // description of the choice of format
+                epbean.setHelpText(getExtractField("extract." + i + ".helpText"));
+                // help text, currently in the alt-text of the link
+                epbean.setLinkText(getExtractField("extract." + i + ".linkText"));
+                // link text of the choice of format
+                // epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
+                // which roles are allowed to see the choice?
+                epbean.setFileLocation(getExtractField("extract." + i + ".location"));
+                // destination of the copied files
+                // epbean.setFormat(getExtractField("xsl.format." + i));
+                // if (("").equals(epbean.getFormat())) {
+                // }
+                // formatting choice. currently permenantly set at oc1.3
+                /*
+                 * String clinica = getExtractField("extract."+i+".odmType"); if(clinica!=null) {
+                 * if(clinica.equalsIgnoreCase("clinical_data")) epbean.setFormat("occlinical_data"); else
+                 * epbean.setFormat("oc1.3"); } else
+                 */
+    
+                epbean.setOdmType(getExtractField("extract." + i + ".odmType"));
+    
+                epbean.setFormat("oc1.3");
+    
+                // destination file name of the copied files
+                epbean.setExportFileName(getExtractFields("extract." + i + ".exportname"));
+                // post-processing event after the creation
+                String whichFunction = getExtractField("extract." + i + ".post").toLowerCase();
+                // added by JN: Zipformat comes from extract properties returns true by default
+                epbean.setZipFormat(getExtractFieldBoolean("extract." + i + ".zip"));
+                epbean.setDeleteOld(getExtractFieldBoolean("extract." + i + ".deleteOld"));
+                epbean.setSuccessMessage(getExtractField("extract." + i + ".success"));
+                epbean.setFailureMessage(getExtractField("extract." + i + ".failure"));
+                epbean.setZipName(getExtractField("extract." + i + ".zipName"));
+                if (epbean.getFileName().length != epbean.getExportFileName().length)
+                    throw new OpenClinicaSystemException(
+                            "The comma seperated values of file names and export file names should correspond 1 on 1 for the property number" + i);
+    
+                if ("sql".equals(whichFunction)) {
+                    // set the bean within, so that we can access the file locations etc
                     SqlProcessingFunction function = new SqlProcessingFunction(epbean);
-
-                    function.setDatabaseType(getExtractFieldNoRep(whichFunction + ".dataBase").toLowerCase());
-                    function.setDatabaseUrl(getExtractFieldNoRep(whichFunction + ".url"));
-                    function.setDatabaseUsername(getExtractFieldNoRep(whichFunction + ".username"));
-                    function.setDatabasePassword(getExtractFieldNoRep(whichFunction + ".password"));
+                    String whichSettings = getExtractField("xsl.post." + i + ".sql");
+                    if (!"".equals(whichSettings)) {
+                        function.setDatabaseType(getExtractFieldNoRep(whichSettings + ".dataBase").toLowerCase());
+                        function.setDatabaseUrl(getExtractFieldNoRep(whichSettings + ".url"));
+                        function.setDatabaseUsername(getExtractFieldNoRep(whichSettings + ".username"));
+                        function.setDatabasePassword(getExtractFieldNoRep(whichSettings + ".password"));
+                    } else {
+                        // set default db settings here
+                        function.setDatabaseType(getField("dataBase"));
+                        function.setDatabaseUrl(getField("url"));
+                        function.setDatabaseUsername(getField("username"));
+                        function.setDatabasePassword(getField("password"));
+                    }
+                    // also pre-set the database connection stuff
                     epbean.setPostProcessing(function);
+                    // System.out.println("found db password: " + function.getDatabasePassword());
+                } else if ("pdf".equals(whichFunction)) {
+                    // TODO add other functions here
+                    epbean.setPostProcessing(new PdfProcessingFunction());
+                } else if ("sas".equals(whichFunction)) {
+                    epbean.setPostProcessing(new SasProcessingFunction());
+                } else if (!whichFunction.isEmpty()) {
+                    String postProcessorName = getExtractField(whichFunction + ".postProcessor");
+                    if (postProcessorName.equals("pdf")) {
+                        epbean.setPostProcessing(new PdfProcessingFunction());
+                        epbean.setPostProcDeleteOld(getExtractFieldBoolean(whichFunction + ".deleteOld"));
+                        epbean.setPostProcZip(getExtractFieldBoolean(whichFunction + ".zip"));
+                        epbean.setPostProcLocation(getExtractField(whichFunction + ".location"));
+                        epbean.setPostProcExportName(getExtractField(whichFunction + ".exportname"));
+                    }
+                    // since the database is the last option TODO: think about custom post processing options
+                    else {
+                        SqlProcessingFunction function = new SqlProcessingFunction(epbean);
+    
+                        function.setDatabaseType(getExtractFieldNoRep(whichFunction + ".dataBase").toLowerCase());
+                        function.setDatabaseUrl(getExtractFieldNoRep(whichFunction + ".url"));
+                        function.setDatabaseUsername(getExtractFieldNoRep(whichFunction + ".username"));
+                        function.setDatabasePassword(getExtractFieldNoRep(whichFunction + ".password"));
+                        epbean.setPostProcessing(function);
+                    }
+    
+                } else {
+                    // add a null here
+                    epbean.setPostProcessing(null);
                 }
-
-            } else {
-                // add a null here
-                epbean.setPostProcessing(null);
+                ret.add(epbean);
             }
-            ret.add(epbean);
             i++;
         }
-
         // tbh change to print out properties
 
         // System.out.println("found " + ret.size() + " records in extract.properties");
         return ret;
+    }
+
+    private int getMaxExtractCounterValue() {
+        Set<String> properties = EXTRACTINFO.stringPropertyNames();
+        int numExtractTypes = 0;
+        for (String property:properties) {
+            if (property.split(Pattern.quote(".")).length == 3 && property.startsWith("extract.") && property.endsWith(".file")) {
+                try {
+                    int value = Integer.parseInt(property.split(Pattern.quote("."))[1]);
+                    if (value > numExtractTypes) numExtractTypes = value;
+                } catch (Exception e) {
+                    // Wasn't a number. Do nothing.
+                }
+            }
+        }
+        return numExtractTypes;
     }
 
     private String getExtractFieldNoRep(String key) {
