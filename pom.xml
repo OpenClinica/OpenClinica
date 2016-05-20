@@ -510,18 +510,6 @@
 			</plugins>
 		</pluginManagement>
 
-  <plugins>
-    <plugin>
-      <groupId>com.heroku.sdk</groupId>
-      <artifactId>heroku-maven-plugin</artifactId>
-      <version>1.0.2</version>
-      <configuration>
-        <appName>openclinic</appName>
-      </configuration>
-    </plugin>
-  </plugins>
-
-
 
 		<resources>
 			<resource>
