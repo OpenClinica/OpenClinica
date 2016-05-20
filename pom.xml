@@ -384,6 +384,9 @@
                                 <destFileName>webapp-runner.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
+                <outputDirectory>
+                    ${project.build.directory}/dep
+                </outputDirectory>
                     </configuration>
                 </execution>
             </executions>
