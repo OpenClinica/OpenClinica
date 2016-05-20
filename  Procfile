@@ -1,1 +1,0 @@
-web: java -jar target/dependency/webapp-runner.jar  web/target/OpenClinica-web-MAINLINE-SNAPSHOT.war
