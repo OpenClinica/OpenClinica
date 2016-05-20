@@ -1,1 +1,1 @@
-web: java -cp target/classes:target/dependency/* OpenClinica
+web: java -jar target/dependency/webapp-runner.jar web/target/*.war
