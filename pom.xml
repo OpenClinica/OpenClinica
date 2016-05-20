@@ -384,9 +384,6 @@
                                 <destFileName>webapp-runner.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
-                <outputDirectory>
-                    ${project.build.directory}/dep
-                </outputDirectory>
                     </configuration>
                 </execution>
             </executions>
@@ -533,6 +530,29 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+ <plugins>
+ <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.3</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals><goal>copy</goal></goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>com.github.jsimone</groupId>
+                                <artifactId>webapp-runner</artifactId>
+                                <version>8.0.30.2</version>
+                                <destFileName>webapp-runner.jar</destFileName>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
 
 		<resources>
 			<resource>
