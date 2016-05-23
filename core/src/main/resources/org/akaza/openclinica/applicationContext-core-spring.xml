@@ -56,10 +56,10 @@
     </bean>
 
          <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
         p:placeholderPrefix="s["
         p:placeholderSuffix="]"
      >
+     <property name="ignoreUnresolvablePlaceholders" value="true"/>
      <property name="properties"><ref bean="dataInfoProperties"/></property>
 
      </bean>
