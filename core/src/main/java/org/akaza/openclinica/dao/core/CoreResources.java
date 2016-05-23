@@ -135,7 +135,7 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-      //      getPropertiesSource();
+/*          getPropertiesSource();
 
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
@@ -153,7 +153,7 @@ public class CoreResources implements ResourceLoaderAware {
             if (OC_dataExtractProperties != null)
                 extractInfo = OC_dataExtractProperties;
 
-            String dbName = dataInfo.getProperty("dbType");
+*/            String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
@@ -172,7 +172,7 @@ public class CoreResources implements ResourceLoaderAware {
                 extractProperties = findExtractProperties();
                 // JN: this is in for junits to run without extract props
                 copyImportRulesFiles();
-                copyConfig();
+       //         copyConfig();
             }
 
             // tbh, following line to be removed
