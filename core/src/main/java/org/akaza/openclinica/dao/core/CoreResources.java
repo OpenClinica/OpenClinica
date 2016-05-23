@@ -135,7 +135,7 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            getPropertiesSource();
+      //      getPropertiesSource();
 
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
@@ -277,7 +277,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
-        getPropertiesSource();
+//        getPropertiesSource();
 
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
