@@ -1,7 +1,10 @@
 package org.akaza.openclinica.ws.validator;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -18,12 +21,6 @@ import javax.sql.DataSource;
 
 public class StudyEventTransferValidator implements Validator {
 
-
-    public enum ValidationMode {
-        SCHEDULE_EVENT,         // indicates that the validation is for the scheduleEvent SOAP request
-        EVENT_INFORMATION       // the validation if for the eventInformation SOAP request
-    }
-
     DataSource dataSource;
     StudyDAO studyDAO;
     StudySubjectDAO studySubjectDAO;
@@ -32,14 +29,10 @@ public class StudyEventTransferValidator implements Validator {
     private StudyParameterValueDAO studyParameterValueDAO;
     private static String TRUE ="true";    
     private static String REQUIRED ="required";
-
-    private ValidationMode mode;
-
-    public StudyEventTransferValidator(DataSource dataSource, ValidationMode mode) {
+    public StudyEventTransferValidator(DataSource dataSource) {
 
     	
     	this.dataSource = dataSource;
-        this.mode = mode;
         helper = new BaseVSValidatorImplementation();
     }
 
@@ -139,29 +132,27 @@ public class StudyEventTransferValidator implements Validator {
             e.reject("studyEventTransferValidator.eventDefinitionOID_required");
             return;
         }
-
-        if (mode == ValidationMode.SCHEDULE_EVENT) {
-
-            if (studyEventTransferBean.getStartDateTime() == null) {
-                e.reject("studyEventTransferValidator.startDateTime_required");
-                return;
-            }
-            StudyParameterValueBean eventLocationRequiredSetting = getStudyParameterValueDAO().findByHandleAndStudy(studyEventTransferBean.getStudy().getId(), "eventLocationRequired");
-
-            //        if ("true".equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
-            if (REQUIRED.equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
-                e.reject("studyEventTransferValidator.location_required");
-                return;
-            }
-
-            if (studyEventTransferBean.getEndDateTime() != null && studyEventTransferBean.getStartDateTime() != null) {
-                if (studyEventTransferBean.getEndDateTime().compareTo(studyEventTransferBean.getStartDateTime()) == -1) {
-                    e.reject("studyEventTransferValidator.start_date_after_end_date", new Object[]{studyEventTransferBean.getStartDateTime(), studyEventTransferBean.getEndDateTime()},
-                            "Start date " + studyEventTransferBean.getStartDateTime() + "  after end date (" + studyEventTransferBean.getEndDateTime() + ").");
-
-                    return;
-                }
-            }
+        
+       
+        if (studyEventTransferBean.getStartDateTime() == null) {
+            e.reject("studyEventTransferValidator.startDateTime_required");
+            return;
+        }
+        StudyParameterValueBean eventLocationRequiredSetting = getStudyParameterValueDAO().findByHandleAndStudy(studyEventTransferBean.getStudy().getId(), "eventLocationRequired");
+        
+//        if ("true".equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
+        if (REQUIRED.equals(eventLocationRequiredSetting.getValue()) && (studyEventTransferBean.getLocation() == null || studyEventTransferBean.getLocation().length() < 1)) {
+            e.reject("studyEventTransferValidator.location_required");
+            return;
+        }
+        
+        if ( studyEventTransferBean.getEndDateTime() != null && studyEventTransferBean.getStartDateTime() != null){
+	        if (studyEventTransferBean.getEndDateTime().compareTo(studyEventTransferBean.getStartDateTime())== -1) {
+	            e.reject("studyEventTransferValidator.start_date_after_end_date", new Object[] { studyEventTransferBean.getStartDateTime(),studyEventTransferBean.getEndDateTime() },
+	                    "Start date "+studyEventTransferBean.getStartDateTime()+"  after end date ("+studyEventTransferBean.getEndDateTime()+").");
+	           
+	            return;
+	        }
         }
         int parentStudyId = study.getParentStudyId();
         StudyEventDefinitionBean studyEventDefinition =
