@@ -8,7 +8,6 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -37,7 +36,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 import javax.sql.DataSource;
@@ -65,9 +63,8 @@ public class EventEndpoint {
     /**
      * Constructor
      * 
-     * @param eventService
-     * @param dataSource
-     * @param messages
+     * @param subjectService
+     * @param cctsService
      */
     public EventEndpoint(EventServiceInterface eventService, DataSource dataSource, MessageSource messages) {
         this.eventService = eventService;
@@ -91,7 +88,7 @@ public class EventEndpoint {
 
         DataBinder dataBinder = new DataBinder((studyEventTransferBean));
         Errors errors = dataBinder.getBindingResult();
-        StudyEventTransferValidator studyEventTransferValidator = new StudyEventTransferValidator(dataSource, StudyEventTransferValidator.ValidationMode.SCHEDULE_EVENT);
+        StudyEventTransferValidator studyEventTransferValidator = new StudyEventTransferValidator(dataSource);
         studyEventTransferValidator.validate((studyEventTransferBean), errors);
 
         if (!errors.hasErrors()) {
@@ -105,88 +102,11 @@ public class EventEndpoint {
                 return new DOMSource(mapSuccessConfirmation(h));
             } catch (OpenClinicaSystemException ose) {
                 errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");
-
                 return new DOMSource(mapFailConfirmation(errors));
             }
         } else {
             return new DOMSource(mapFailConfirmation(errors));
         }
-    }
-
-    @PayloadRoot(localPart = "eventInformationRequest", namespace = NAMESPACE_URI_V1)
-    public Source eventInformation(@XPathParam("//e:eventStatus") NodeList eventInformationRequest,
-                                    @XPathParam("//e:study") String study,
-                                    @XPathParam("//e:subjectLabel") String studySubjectLabel,
-                                    @XPathParam("//e:eventDefinitionOID") String eventDefinitionOID) throws Exception {
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        Element eventInformationRequestElement = (Element) eventInformationRequest.item(0);
-
-        StudyEventTransferBean studyEventTransferBean = unMarshallToEventTransferForEventStatus(eventInformationRequestElement);
-        DataBinder dataBinder = new DataBinder(studyEventTransferBean);
-        Errors errors = dataBinder.getBindingResult();
-        StudyEventTransferValidator studyEventTransferValidator = new StudyEventTransferValidator(dataSource, StudyEventTransferValidator.ValidationMode.EVENT_INFORMATION);
-        studyEventTransferValidator.validate(studyEventTransferBean, errors);
-
-        if (!errors.hasErrors()) {
-
-            List<StudyEventBean> studyEventBeanList = getEventService().retrieveEventInformation(studyEventTransferBean.getUser(),
-                    studyEventTransferBean.getStudyUniqueId(),
-                    studyEventTransferBean.getSiteUniqueId(),
-                    studyEventTransferBean.getEventDefinitionOID(),
-                    studyEventTransferBean.getSubjectLabel());
-            return new DOMSource(mapSuccessEventInfomationResponse(studyEventBeanList, eventDefinitionOID, studySubjectLabel));
-        } else {
-            return new DOMSource(mapFailConfirmation(errors));
-        }
-    }
-
-    /**
-     * Create a successful response for the eventInformationRequest
-     * @param studyEventBeanList the list of events of the subject
-     * @return an XML element
-     * @throws Exception in case of an error
-     */
-    private Element mapSuccessEventInfomationResponse(List<StudyEventBean> studyEventBeanList, String eventDefinitionOID, String studySubjectOID) throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-
-        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "eventInformationResponse");
-        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
-        Element eventDefinitionOIDElement = document.createElementNS(NAMESPACE_URI_V1, "eventDefinitionOID");
-        Element studySubjectOIDElement = document.createElementNS(NAMESPACE_URI_V1, "studySubjectOID");
-
-        resultElement.setTextContent(messages.getMessage("eventEndpoint.success", null, "Success", locale));
-        eventDefinitionOIDElement.setTextContent(eventDefinitionOID);
-        studySubjectOIDElement.setTextContent(studySubjectOID);
-
-
-        Element eventListElement = document.createElementNS(NAMESPACE_URI_V1, "events");
-        responseElement.appendChild(eventListElement);
-
-        for (StudyEventBean studyEventBean : studyEventBeanList) {
-            eventListElement.appendChild(createStudyEventInformationElement(document, studyEventBean));
-        }
-        return responseElement;
-    }
-
-
-    private Element createStudyEventInformationElement(Document document, StudyEventBean studyEventBean) {
-        Element eventElement = document.createElementNS(NAMESPACE_URI_V1, "eventStatus");
-
-        Element element = document.createElementNS(NAMESPACE_URI_V1, "status");
-        element.setTextContent(studyEventBean.getSubjectEventStatus().getName());
-        eventElement.appendChild(element);
-
-        element = document.createElementNS(NAMESPACE_URI_V1, "repeatNumber");
-        element.setTextContent(studyEventBean.getRepeatingNum() + "");
-        eventElement.appendChild(element);
-
-        element = document.createElementNS(NAMESPACE_URI_V1, "sampleOrdinal");
-        element.setTextContent(studyEventBean.getSampleOrdinal() + "");
-        eventElement.appendChild(element);
-
-        return eventElement;
     }
 
     /**
@@ -221,7 +141,7 @@ public class EventEndpoint {
     /**
      * Process createEvent request by creating StudyEventTransferBean from received payload.
      * 
-     * @param eventElement
+     * @param subjectElement
      * @return SubjectTransferBean
      * @throws ParseException
      */
@@ -260,36 +180,11 @@ public class EventEndpoint {
                 endDate, endTime), getUserAccount());
     return studyEventTransferBean;
 }
-
-
-    private StudyEventTransferBean unMarshallToEventTransferForEventStatus(Element eventElement)
-            throws ParseException {
-
-
-
-        Element eventDefinitionOidElement = DomUtils.getChildElementByTagName(eventElement, "eventDefinitionOID");
-        Element subjectRefElement = DomUtils.getChildElementByTagName(eventElement, "subject");
-        Element labelElement = DomUtils.getChildElementByTagName(subjectRefElement, "uniqueIdentifier");
-
-        Element studyRefElement = DomUtils.getChildElementByTagName(eventElement, "studyRef");
-        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
-
-        String studySubjectId = DomUtils.getTextValue(labelElement).trim();
-        String eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement).trim();
-        String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement).trim();
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
-
-        StudyEventTransferBean studyEventTransferBean =
-                new StudyEventTransferBean(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, null, null, null, getUserAccount());
-        return studyEventTransferBean;
-    }
     
     /**
      * Create Error Response
      * 
-     * @param errors
+     * @param confirmation
      * @return
      * @throws Exception
      */
