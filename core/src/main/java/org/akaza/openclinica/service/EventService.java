@@ -18,7 +18,6 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -81,20 +80,6 @@ public class EventService implements EventServiceInterface {
         h.put("studySubjectOID", studySubject.getOid());
         return h;
 
-    }
-
-
-    public ArrayList<StudyEventBean> retrieveEventInformation(UserAccountBean user, String studyUniqueId,
-                                                 String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException {
-        StudyBean study = getStudyDao().findByUniqueIdentifier(studyUniqueId);
-        int parentStudyId = study.getId();
-        if (siteUniqueId != null) {
-            study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
-        }
-        StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
-        StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
-
-        return getStudyEventDao().findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
     }
 
     public boolean canSubjectScheduleAnEvent(StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
@@ -164,7 +149,7 @@ public class EventService implements EventServiceInterface {
     }
 
     /**
-     * @param dataSource
+     * @param datasource
      *            the datasource to set
      */
     public void setDatasource(DataSource dataSource) {
