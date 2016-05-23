@@ -56,7 +56,7 @@
     </bean>
 
          <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
         p:placeholderPrefix="s["
         p:placeholderSuffix="]"
      >
