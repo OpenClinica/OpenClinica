@@ -521,10 +521,10 @@
           <configuration>
             <artifactItems>
               <artifactItem>
-    <groupId>org.eclipse.jetty</groupId>
-    <artifactId>jetty-server</artifactId>
-    <version>9.3.3.v20150827</version>
-                        <destFileName>jetty-runner.jar</destFileName>
+    <groupId>org.mortbay.jetty</groupId>
+    <artifactId>jetty-runner</artifactId>
+    <version>8.1.14.v20131031</version>
+                            <destFileName>jetty-runner.jar</destFileName>
               </artifactItem>
             </artifactItems>
           </configuration>
