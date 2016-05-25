@@ -523,8 +523,8 @@
                             <artifactItem>
                                 <groupId>com.github.jsimone</groupId>
                                 <artifactId>webapp-runner</artifactId>
-                                <version>7.0.34.3</version>
-                                <destFileName>webapp-runner.jar</destFileName>
+                                <version>7.0.22</version>
+                             <destFileName>webapp-runner.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
                     </configuration>
