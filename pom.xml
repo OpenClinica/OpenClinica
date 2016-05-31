@@ -314,9 +314,9 @@
 		<!-- LIQUIBASE -->
 		<dependency>
 			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-plugin</artifactId>
-			<version>1.9.5.0</version>
-			<exclusions>
+			<artifactId>liquibase-maven-plugin</artifactId>
+             <version>3.0.8</version>
+    			<exclusions>
 				<exclusion>
 					<groupId>org.apache.maven</groupId>
 					<artifactId>maven-plugin-api</artifactId>
@@ -334,8 +334,8 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>1.9.5</version>
-		</dependency>
+             <version>3.5.0</version>
+       	</dependency>
 		<!-- Explicitly defining dependencies versions for Maven 3 -->
 		<dependency>
 			<groupId>antlr</groupId>
@@ -440,8 +440,8 @@
 				<plugin>
 					<groupId>org.liquibase</groupId>
 					<artifactId>liquibase-plugin</artifactId>
-					<version>1.9.1.0</version>
-					<configuration>
+                    <version>3.5.0</version>
+    					<configuration>
 						<propertyFile>${config.file}</propertyFile>
 					</configuration>
 				</plugin>

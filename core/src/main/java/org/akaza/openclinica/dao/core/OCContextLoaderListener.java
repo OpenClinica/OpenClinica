@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 import javax.servlet.ServletContextEvent;
 
-import liquibase.log.LogFactory;
+//import liquibase.log.LogFactory;
 
 import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -34,7 +34,7 @@ public class OCContextLoaderListener extends ContextLoaderListener {
         // MDC.put("WEBAPP", webAppName + " FROM " + hostName);
         // Get the liquibase logs inside the application log files using
         // SLF4JBridgeHandler
-        LogFactory.getLogger().addHandler(new SLF4JBridgeHandler());
+ //       LogFactory.getLogger().addHandler(new SLF4JBridgeHandler());
         super.contextInitialized(event);
     }
 
