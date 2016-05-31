@@ -361,6 +361,10 @@ public class AddNewSubjectServlet extends SecureController {
                 }
             }// end of the block if(!uniqueIdentifier.equals(""))
 
+            int eventId = fp.getInt(STUDY_EVENT_DEFINITION);
+            if (eventId < 1) {
+                Validator.addError(errors, STUDY_EVENT_DEFINITION, resexception.getString("input_not_acceptable_option"));
+            }
 
             String label = fp.getString(INPUT_LABEL);
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
@@ -437,10 +441,6 @@ public class AddNewSubjectServlet extends SecureController {
                 if (!existingSubShown) {
                     Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
                     if (isSubjectOverlay != null){
-                        int eventId = fp.getInt("studyEventDefinition");
-                        if (eventId < 1) {
-                             Validator.addError(errors, STUDY_EVENT_DEFINITION, resexception.getString("input_not_acceptable_option"));
-                        }
                         String location = fp.getString(LOCATION);
                         if (location == null && location.length() == 0) {
                             Validator.addError(errors, LOCATION, resexception.getString("field_not_blank"));
