@@ -7,20 +7,23 @@
  */
 package org.akaza.openclinica.ws;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -45,15 +48,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
@@ -63,6 +57,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Krikor Krumlian
@@ -257,6 +254,7 @@ public class StudySubjectEndpoint {
         	 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
         	 studyEventBean.setStudyEventDefinition(sed);
 
+
              EventResponseType eventResponseType = new EventResponseType();
             eventResponseType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
             eventResponseType.setStatus(studyEventBean.getStatus().getName());
@@ -271,7 +269,8 @@ public class StudySubjectEndpoint {
 	            eventResponseType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
 	            eventResponseType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
             }
-            
+            EventCrfInformationList eventCrfInformationList = createEventCrfInformationList(studyEventBean);
+            eventResponseType.getEventCrfInformation().add(eventCrfInformationList);
             
             eventsType.getEvent().add(eventResponseType);
             logger.debug(eventResponseType.getEventDefinitionOID()+" "+eventResponseType.getStartDate());
@@ -279,6 +278,30 @@ public class StudySubjectEndpoint {
         }
         return eventsType;
     }
+
+    private EventCrfInformationList createEventCrfInformationList(StudyEventBean studyEventBean) {
+        EventCrfInformationList eventCrfInformationList = new EventCrfInformationList ();
+
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
+        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+        CRFDAO crfdao = new CRFDAO(dataSource);
+
+        List<EventCRFBean> eventCRFBeanList = eventCRFDAO.findAllByStudyEvent(studyEventBean);
+        for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+            CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
+            CRFBean crf = crfdao.findByVersionId(crfVersionBean.getCrfId());
+            EventCrfType eventCrfType = new EventCrfType();
+            eventCrfType.setStatus(eventCRFBean.getStage().getName());
+            eventCrfType.setName(crf.getName());
+            eventCrfType.setVersion(crfVersionBean.getName());
+            eventCrfType.setOid(crfVersionBean.getOid());
+            eventCrfInformationList.getEventCrf().add(eventCrfType);
+        }
+
+        return eventCrfInformationList;
+    }
+
+
 
     /**
      * Validate the listStudySubjectsInStudy request.
