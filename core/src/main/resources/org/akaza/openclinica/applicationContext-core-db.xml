@@ -25,6 +25,8 @@
     <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase" depends-on="coreResources">
       <property name="dataSource" ref="dataSource" />
       <property name="changeLog" value="classpath:migration/master.xml" />
+      <property name="defaultSchema" value="s[schema]"/>
+      
     </bean>
 
     <!-- 
@@ -62,7 +64,7 @@
       <property name="username" value="s[username]"/>
       <property name="password" value="s[password]"/>
       <property name="bigStringTryClob" value="true"/>
-      </bean>  
+       </bean>  
      
     <!-- 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">

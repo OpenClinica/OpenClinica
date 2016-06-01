@@ -7,7 +7,6 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 
-
     <changeSet author="sdibona" id="2015-05-21-OC-5994-01">
         <comment>increasing size of column user_name in table study_user_role</comment>
         <modifyDataType tableName="study_user_role"
