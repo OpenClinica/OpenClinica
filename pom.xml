@@ -515,7 +515,7 @@
             <version>2.3</version>
             <executions>
                 <execution>
-                    <phase>package</phase>
+                    <phase>install</phase>
                     <goals><goal>copy</goal></goals>
                     <configuration>
                         <artifactItems>
