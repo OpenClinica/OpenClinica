@@ -124,12 +124,12 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -312,7 +312,7 @@
 			<version>3.8.0.GA</version>
 		</dependency>
 		<!-- LIQUIBASE -->
-			<dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-plugin</artifactId>
 			<version>1.9.5.0</version>
@@ -334,7 +334,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>3.5.0</version>
+			<version>1.9.5</version>
 		</dependency>
 		<!-- Explicitly defining dependencies versions for Maven 3 -->
 		<dependency>
@@ -363,11 +363,11 @@
 			<artifactId>commons-beanutils-core</artifactId>
 			<version>1.8.3</version>
 		</dependency>
-        	</dependencies>
+	</dependencies>
 	<build>
 		<pluginManagement>
 			<plugins>
-        				<plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.3.2</version>
@@ -437,14 +437,15 @@
 						</configuration>
 					</configuration>
 				</plugin>
-	<plugin>
+				<plugin>
 					<groupId>org.liquibase</groupId>
 					<artifactId>liquibase-plugin</artifactId>
 					<version>1.9.1.0</version>
 					<configuration>
 						<propertyFile>${config.file}</propertyFile>
 					</configuration>
-				</plugin>				<plugin>
+				</plugin>
+				<plugin>
 					<groupId>org.zeroturnaround</groupId>
 					<artifactId>jrebel-maven-plugin</artifactId>
 					<version>1.0.7</version>
@@ -508,7 +509,9 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		 <plugins>
+
+
+  <plugins>
  <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -531,7 +534,9 @@
             </executions>
         </plugin>
   </plugins>
-		
+
+
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog 
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="pgawade (generated)" id="1235684743487-0">
         <validCheckSum>6077be15943c12e7ae9a2a647dd2ff2</validCheckSum>
         <validCheckSum>30d56b8377711e93debdac333aa217d</validCheckSum>
@@ -103,13 +98,14 @@
         </createTable>
     </changeSet>
     <changeSet author="kkrumlian" id="235684743487-5-1">
-        <modifyDataType tableName="audit_log_event"
-            columnName="old_value" newDataType="VARCHAR(4000)"/>
+        <modifyColumn tableName="audit_log_event">
+            <column name="old_value" type="VARCHAR(4000)"></column>
+        </modifyColumn>
     </changeSet>
     <changeSet author="kkrumlian" id="235684743487-5-2">
-        <modifyDataType tableName="audit_log_event"
-            columnName="new_value" newDataType="VARCHAR(4000)"/>
-
+        <modifyColumn tableName="audit_log_event">
+            <column name="new_value" type="VARCHAR(4000)"></column>
+        </modifyColumn>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-6">
         <createTable tableName="audit_log_event_type">
@@ -259,9 +255,9 @@
         </createTable>
     </changeSet>
     <changeSet author="kkrumlian" id="235684743487-10-3">
-                <modifyDataType tableName="dataset"
-            columnName="sql_statement" newDataType="VARCHAR(4000)"/>
-        
+        <modifyColumn tableName="dataset">
+            <column name="sql_statement" type="VARCHAR(4000)"></column>
+        </modifyColumn>
     </changeSet> 
     <changeSet author="pgawade (generated)" id="1235684743487-11">
         <createTable tableName="dataset_crf_version_map">
@@ -554,10 +550,9 @@
         </createTable>
     </changeSet>
     <changeSet author="kkrumlian" id="235684743487-32-3">
-                  <modifyDataType tableName="filter"
-            columnName="sql_statement" newDataType="VARCHAR(4000)"/>
-        
-        
+        <modifyColumn tableName="filter">
+            <column name="sql_statement" type="VARCHAR(4000)"></column>
+        </modifyColumn>
     </changeSet> 
     <changeSet author="pgawade (generated)" id="1235684743487-33">
         <createTable tableName="filter_crf_version_map">

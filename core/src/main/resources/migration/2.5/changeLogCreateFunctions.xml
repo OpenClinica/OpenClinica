@@ -13,7 +13,6 @@
 		<!--<runningAs username="clinica" />-->
 	</preConditions>
     	<sql splitStatements="false">
-            SET search_path = ${database.defaultSchemaName};
     		CREATE OR REPLACE FUNCTION event_crf_trigger() RETURNS "trigger"
 		    AS 'DECLARE
 			pk INTEGER;
