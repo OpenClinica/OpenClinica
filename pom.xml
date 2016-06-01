@@ -334,7 +334,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>1.9.5</version>
+			<version>3.5.0</version>
 		</dependency>
 		<!-- Explicitly defining dependencies versions for Maven 3 -->
 		<dependency>
