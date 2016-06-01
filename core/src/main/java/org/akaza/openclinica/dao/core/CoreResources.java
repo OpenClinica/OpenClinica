@@ -430,8 +430,7 @@ public class CoreResources implements ResourceLoaderAware {
         String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());                
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db")+"?currentSchema="+ schema
-;
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db")+"?currentSchema="+ schema ;
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
         } else if (database.equalsIgnoreCase("oracle")) {
