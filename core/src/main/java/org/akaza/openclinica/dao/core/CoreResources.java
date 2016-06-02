@@ -424,7 +424,11 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private void setDatabaseProperties(String database) {
-
+       String herokuUrl= System.getenv("DATABASE_URL");
+      System.out.println ("Heroku PostgresUrl: " + herokuUrl);
+      
+      
+        
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
         String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());                
