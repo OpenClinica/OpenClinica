@@ -438,11 +438,13 @@ public class CoreResources implements ResourceLoaderAware {
            
          DATAINFO.setProperty("dbUser", user);
          DATAINFO.setProperty("dbPass", pass);
+         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+
          DATAINFO.setProperty("dbHost", dbhst);
          DATAINFO.setProperty("db", db);
          DATAINFO.setProperty("dbPort", dbpt);
-         
-         
+                  
        }else{
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
