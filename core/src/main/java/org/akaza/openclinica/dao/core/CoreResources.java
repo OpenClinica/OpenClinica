@@ -425,13 +425,33 @@ public class CoreResources implements ResourceLoaderAware {
 
     private void setDatabaseProperties(String database) {
        String herokuUrl= System.getenv("DATABASE_URL");
-      System.out.println ("Heroku PostgresUrl: " + herokuUrl);
-      
-      
-        
+  
+        System.out.println ("Heroku PostgresUrl: " + herokuUrl);
+       if (herokuUrl!=null){
+           String namepass[] = herokuUrl.split(":");
+                 
+           String user = namepass[1].substring(2);
+           String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
+           String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
+           String db = namepass[3].substring(5);
+           String dbpt = namepass[3].substring(0,4);
+           
+         DATAINFO.setProperty("dbUser", user);
+         DATAINFO.setProperty("dbPass", pass);
+         DATAINFO.setProperty("dbHost", dbhst);
+         DATAINFO.setProperty("db", db);
+         DATAINFO.setProperty("dbPort", dbpt);
+         
+         
+       }else{
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());                
+       }
+        
+        
+        
+        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());   
+        
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db")+"?currentSchema="+ schema ;
