@@ -16,6 +16,7 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd"
         <property name="quartzProperties">
         	<props>
         		<prop key="org.quartz.jobStore.misfireThreshold">s[org.quartz.jobStore.misfireThreshold]</prop>
+        		<prop key="org.quartz.scheduler.misfirePolicy">s[org.quartz.scheduler.misfirePolicy]</prop>
 				<prop key="org.quartz.jobStore.class">s[org.quartz.jobStore.class]</prop>
 				<prop key="org.quartz.jobStore.driverDelegateClass">s[org.quartz.jobStore.driverDelegateClass]</prop>
 				<prop key="org.quartz.jobStore.useProperties">s[org.quartz.jobStore.useProperties]</prop>

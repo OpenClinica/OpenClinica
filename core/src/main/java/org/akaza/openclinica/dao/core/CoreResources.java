@@ -307,6 +307,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
         }
 
+        DATAINFO.setProperty("org.quartz.scheduler.misfirePolicy", "doNothing");
         DATAINFO.setProperty("org.quartz.jobStore.useProperties", "false");
         DATAINFO.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
         if (DATAINFO.getProperty("org.quartz.threadPool.threadCount") == null)
