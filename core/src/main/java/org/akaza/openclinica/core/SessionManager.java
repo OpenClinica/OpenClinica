@@ -139,7 +139,9 @@ public class SessionManager {
     }
 
     public Connection getConnection() throws SQLException {
-        return ds.getConnection();
+        Connection conn =ds.getConnection();
+        CoreResources.setSchema(conn);
+        return conn;
     }
 
     public UserAccountBean getUserBean() {

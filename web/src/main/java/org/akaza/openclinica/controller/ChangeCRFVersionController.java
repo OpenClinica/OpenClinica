@@ -510,6 +510,7 @@ public class ChangeCRFVersionController {
 	        StudyEventBean st_event_bean = (StudyEventBean)sedao.findByPK(ev_bean.getStudyEventId());
 
 	        	Connection con = dataSource.getConnection();
+	            CoreResources.setSchema(con);
 	        	con.setAutoCommit(false);
 	        	event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId, getCurrentUser(request).getId(), con);
 	        	

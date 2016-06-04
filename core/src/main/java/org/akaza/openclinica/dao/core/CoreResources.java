@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -17,6 +20,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -422,6 +426,16 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
     }
+    
+    public static void setSchema(Connection conn) throws SQLException {
+        Statement statement = conn.createStatement();
+        String schema = DATAINFO.getProperty("schema");
+        try {
+            statement.execute("set search_path to '" + schema + "'");
+        } finally {
+            statement.close();
+        }
+    }    
 
     private void setDatabaseProperties(String database) {
        String herokuUrl= System.getenv("DATABASE_URL");
@@ -455,7 +469,7 @@ public class CoreResources implements ResourceLoaderAware {
         
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db")+"?currentSchema="+ schema ;
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
             System.out.println("The url is ................:"+url);
             logger.info("The url is ................:"+url);
             driver = "org.postgresql.Driver";

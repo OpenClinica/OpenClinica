@@ -10,6 +10,7 @@ package org.akaza.openclinica.dao.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.PreparedStatementFactory;
@@ -1032,6 +1033,8 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");

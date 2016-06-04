@@ -8,6 +8,7 @@
 
 package org.akaza.openclinica.bean.admin;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -213,6 +214,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
             }
@@ -263,6 +266,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         logger.debug("crf id: *******" + crfId);
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
             }
@@ -312,6 +317,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         String sql = digester.getQuery("findItemGroupNamesByCRF");
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
             }
@@ -365,6 +372,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         try {
 
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 String msg = "The connection to the database is not open.";
                 error.add(msg);
@@ -508,6 +517,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         try {
 
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 String msg = "The connection to the database is not open.";
                 error.add(msg);
@@ -616,6 +627,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         String cur_query=null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
             	 error.add("The connection to the database is not open.");
                  throw new OpenClinicaException("newCRFBean, deleteInsertToDB, connection not open", "1");
