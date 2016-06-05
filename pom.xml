@@ -367,7 +367,9 @@
     <groupId>org.apache.xmlgraphics</groupId>
     <artifactId>batik-svg-dom</artifactId>
     <version>1.8</version>
-</dependency>
+      </dependency>
+     
+     
 	</dependencies>
 	<build>
 		<pluginManagement>
