@@ -531,8 +531,8 @@
                         <artifactItems>
                             <artifactItem>
                                 <groupId>com.github.jsimone</groupId>
-                                <artifactId>webapp-runner</artifactId>
-                                <version>7.0.57.2</version>
+                                <artifactId>webapp-</artifactId>
+                                <version>7.0.59.2</version>
                                  <destFileName>webapp-runner.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
