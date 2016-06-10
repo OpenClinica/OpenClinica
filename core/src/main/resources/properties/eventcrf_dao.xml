@@ -190,7 +190,7 @@
 
     <query>
         <name>getWithFilterAndSort</name>
-        <sql>select distinct ec.* from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
+        <sql>select distinct ec.event_crf_id, ec.study_event_id, ec.crf_version_id, ec.date_interviewed, ec.interviewer_name, ec.completion_status_id, ec.status_id, ec.annotations, ec.date_completed, ec.validator_id, ec.date_validate, ec.date_validate_completed, ec.validator_annotations, ec.validate_string, ec.owner_id, se.date_start, ec.study_subject_id, ec.date_updated, ec.update_id, ec.electronic_signature_status, ec.sdv_status, ec.old_status_id, ec.sdv_update_id from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
             event_definition_crf edc, crf crf,crf_version cv
             where ec.study_event_id = se.study_event_id AND
             se.study_subject_id = ss.study_subject_id AND
