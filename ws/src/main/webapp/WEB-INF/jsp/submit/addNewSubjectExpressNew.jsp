@@ -14,7 +14,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
-<form name="subjectForm" action="AddNewSubject" method="post">
+<form name="subjectForm" action="AddNewSubject" method="post" onsubmit="return validateForm('addNewSubjectExpressNewWs');">
 <div style="width: 475px; height: 478px; overflow: scroll; background:#FFFFFF;">
 <table border="0" cellpadding="0" >
 	<tr style="height:10px;">

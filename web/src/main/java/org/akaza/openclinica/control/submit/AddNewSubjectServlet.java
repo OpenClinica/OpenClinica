@@ -287,6 +287,16 @@ public class AddNewSubjectServlet extends SecureController {
 
             HashMap errors = v.validate();
 
+            if (!checkValidLabel(fp.getString(INPUT_LABEL)))
+                Validator.addError(errors, INPUT_LABEL, resexception.getString("unacceptable_character"));
+
+            if (!checkValidLabel(fp.getString(INPUT_SECONDARY_LABEL))) {
+                Validator.addError(errors, INPUT_SECONDARY_LABEL, resexception.getString("unacceptable_character"));
+            } else {
+                if(errors.containsKey(INPUT_SECONDARY_LABEL))
+                    errors.remove(INPUT_SECONDARY_LABEL);
+            }
+
             SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
             String uniqueIdentifier = fp.getString(INPUT_UNIQUE_IDENTIFIER);// global
             // Id
@@ -850,6 +860,17 @@ public class AddNewSubjectServlet extends SecureController {
     private RuleSetDao getRuleSetDao() {
        return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
         
+    }
+
+    private boolean checkValidLabel(String label) {
+        String[] blackList = {":","=","(",")","{","}","&","<",">","\"","'"};
+        if (label.equals(""))
+            return true;
+        for (int i = 0; i < blackList.length; i++) {
+            if (label.toLowerCase().contains(blackList[i]))
+                return false;
+        }
+        return true;
     }
 
     

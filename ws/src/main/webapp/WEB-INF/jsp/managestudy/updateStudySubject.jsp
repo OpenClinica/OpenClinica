@@ -21,6 +21,8 @@
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/validate_id.js"></script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -68,7 +70,7 @@
 </c:otherwise>
 </c:choose>
 
-<form action="UpdateStudySubject" method="post">
+<form action="UpdateStudySubject" method="post" onsubmit="return validateForm('updateStudySubjectWs');">
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
 <c:choose>
@@ -87,7 +89,7 @@
 	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
 	  	</div>
 	  	<br>
-	  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
+	  	<span id="labelMessage"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></span>
 	  </td>
 	  <td>
 	  	<fmt:message key="field_required" bundle="${resword}"/>
@@ -95,6 +97,8 @@
 	  </tr>
 	  <tr valign="top">
 	  <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
+	  <br>
+	  	<span id="secondaryLabelMessage"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></span>
 	  </td>
 	  </tr>
 	  <tr valign="top">

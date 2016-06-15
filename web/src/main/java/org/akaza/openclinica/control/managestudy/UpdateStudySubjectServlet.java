@@ -230,6 +230,16 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             errors = v.validate();
 
+            if (!checkValidLabel(fp.getString("label")))
+                Validator.addError(errors, "label", resexception.getString("unacceptable_character"));
+
+            if (!checkValidLabel(fp.getString("secondaryLabel"))) {
+                Validator.addError(errors, "secondaryLabel", resexception.getString("unacceptable_character"));
+            } else {
+                if(errors.containsKey("secondaryLabel"))
+                    errors.remove("secondaryLabel");
+            }
+
             if (!StringUtil.isBlank(fp.getString("label"))) {
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 
@@ -305,6 +315,17 @@ public class UpdateStudySubjectServlet extends SecureController {
             forwardPage(Page.UPDATE_STUDY_SUBJECT_CONFIRM);
         }
 
+    }
+
+    private boolean checkValidLabel(String label) {
+        String[] blackList = {":","=","(",")","{","}","&","<",">","\"","'"};
+        if (label.equals(""))
+            return true;
+        for (int i = 0; i < blackList.length; i++) {
+            if (label.toLowerCase().contains(blackList[i]))
+                return false;
+        }
+        return true;
     }
 
 }
