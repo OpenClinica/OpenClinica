@@ -70,7 +70,7 @@
 </c:forEach>
 
 
-<form name="subjectForm" action="AddNewSubject" method="post">
+<form name="subjectForm" action="AddNewSubject" method="post" onsubmit="return validateForm('addNewSubjectExpressNewWeb');">
 <input type="hidden" name="subjectOverlay" value="true">
 
 <div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF; cursor:default">
@@ -101,7 +101,7 @@
                     <td>*</td>
                 </tr>
                 <tr>
-                    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
+                    <td id="labelMessage"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
                 </tr>
                 
             </table>

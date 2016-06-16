@@ -9,7 +9,8 @@
 
 
 <jsp:include page="../include/submit-header.jsp"/>
-
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/validate_id.js"></script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -82,7 +83,6 @@
 	
 </c:forEach>
 
-
 <h1><span class="title_manage">
 <c:out value="${study.name}" />:
     <fmt:message key="add_subject" bundle="${resword}"/>
@@ -92,7 +92,7 @@
 
 <p class="text">
 <br/><fmt:message key="field_required" bundle="${resword}"/></P>
-<form action="AddNewSubject" method="post">
+<form action="AddNewSubject" method="post" onsubmit="return validateForm('addNewSubjectWeb');">
 <jsp:include page="../include/showSubmitted.jsp" />
 
 <div style="width: 550px">
@@ -119,7 +119,7 @@
 					<td>*</td>
 				</tr>
 				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
+					<td colspan="2" id="labelMessage"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
 				</tr>
 			</table>
 		</td>
@@ -178,7 +178,7 @@
 					<td>&nbsp;</td>
 				</tr>
 				<tr>
-					<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
+					<td id="secondaryLabelMessage"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
 				</tr>
 			</table>
 		</td>
