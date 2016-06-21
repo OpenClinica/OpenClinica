@@ -209,6 +209,10 @@ public class StudySubjectEndpoint {
         response.setResult(message);
         StudySubjectsType studySubjectsType = new StudySubjectsType();
         response.setStudySubjects(studySubjectsType);
+        // 100 is a large value to avoid any map reallocation activity. The map contains the site
+        // specific StudyRefTypes to be able to output the site's identifier
+        Map<Integer, StudyRefType> studyIDRefMap = new HashMap<>(100);
+        studyIDRefMap.put(study.getId(), studyRef);
         List<StudySubjectBean> studySubjects = this.subjectService.getStudySubject(study);
         for (StudySubjectBean studySubjectBean : studySubjects) {
             StudySubjectWithEventsType studySubjectType = new StudySubjectWithEventsType();
@@ -228,7 +232,17 @@ public class StudySubjectEndpoint {
             	subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
             }
             studySubjectType.setSubject(subjectType);
-            // studySubjectType.setStudyRef(studyRef);
+            int studyIDSubject = studySubjectBean.getStudyId();
+            StudyRefType studyRefOutput = studyIDRefMap.get(studyIDSubject);
+            if (studyRefOutput == null) {
+                StudyBean siteStudy = (StudyBean) getStudyDao().findByPK(studyIDSubject);
+                studyRefOutput = new StudyRefType();
+                studyRefOutput.setIdentifier(siteStudy.getIdentifier());
+                studyIDRefMap.put(studyIDSubject, studyRefOutput);
+            }
+
+            studySubjectType.setStudyRef(studyRefOutput);
+
             logger.debug(studySubjectBean.getLabel());
             studySubjectType.setEvents(getEvents(studySubjectBean));
             studySubjectsType.getStudySubject().add(studySubjectType);
