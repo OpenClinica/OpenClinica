@@ -195,8 +195,10 @@ public class OpenRosaServices {
                         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                         form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
 
+                        //TODO:  Change test here to see if user list should be appended.  Hardcode to always add for now.
                         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getId());
-                        if (mediaList != null && mediaList.size() > 0) {
+                        //if (mediaList != null && mediaList.size() > 0) {
+                        if (true) {
                             form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid());
                         }
                         formList.add(form);
@@ -258,9 +260,9 @@ public class OpenRosaServices {
         Manifest manifest = new Manifest();
 
         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getId());
+        String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {
             for (CrfVersionMedia media : mediaList) {
-                String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
 
                 MediaFile mediaFile = new MediaFile();
                 mediaFile.setFilename(media.getName());
@@ -270,6 +272,18 @@ public class OpenRosaServices {
                 manifest.add(mediaFile);
             }
         }
+        
+        //Add user list
+        MediaFile userList = new MediaFile();
+        String userXml = "<root>" + 
+                "<item><user_name>esummer</user_name><first_name>Esther</first_name><last_name>Summerson</last_name></item>" + 
+                "<item><user_name>honoria</user_name><first_name>Honoria</first_name><last_name>Dedlock</last_name></item>" + 
+                "</root>";
+        userList.setFilename("users.xml");
+        userList.setHash((DigestUtils.md5Hex(userXml)));
+        userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
+        manifest.add(userList);
+        
         try {
             // Create the XML manifest using a Castor mapping file.
             XMLContext xmlContext = new XMLContext();
@@ -350,7 +364,7 @@ public class OpenRosaServices {
 
     }
 
-	/**
+    /**
      * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
      * @apiName getMediaFile
      * @apiPermission admin
@@ -380,6 +394,33 @@ public class OpenRosaServices {
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
         if (type != null && !type.isEmpty()) builder = builder.header("Content-Type", type);
+        return builder.build();
+    }
+
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/downloadUsers Download users
+     * @apiName getUserList
+     * @apiPermission admin
+     * @apiVersion 3.12.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Downloads list of users for use with queries.
+     */
+
+    @GET
+    @Path("/{studyOID}/downloadUsers")
+    public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+            @RequestHeader("Authorization") String authorization, @Context ServletContext context)
+            throws Exception {
+        if (!mayProceedPreview(studyOID))
+            return null;
+
+        String userXml = "<root>" +
+                "<item><user_name>jdoe</user_name><first_name>John</first_name><last_name>Doe</last_name></item>" + 
+                "<item><user_name>jsmith</user_name><first_name>John</first_name><last_name>Smith</last_name></item>" + 
+                "</root>";
+        ResponseBuilder builder = Response.ok(userXml);
+        builder = builder.header("Content-Type", "text/xml");
         return builder.build();
     }
 

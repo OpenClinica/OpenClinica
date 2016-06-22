@@ -1,61 +1,23 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.controller.healthcheck.DatabaseHealthCheck;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.JobTriggerService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.jvm.BufferPoolMetricSet;
-import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
-
-import javax.management.ObjectName;
-import javax.servlet.ServletContext;
-
-import java.io.File;
-import java.io.FilePermission;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.AccessController;
-import java.sql.DatabaseMetaData;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Map.Entry;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/healthcheck")
