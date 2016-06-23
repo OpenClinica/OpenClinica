@@ -35,12 +35,7 @@
      <!-- Our own implementation of the HandlerInterceptor interface -->
     
 
-    <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
-        <property name="alertsBoxSetup" value="OPENALERTS" />
-        <property name="enableIconsBoxSetup" value="DISABLEICONS"/>
-        <property name="infoBoxSetup" value="OPENINFO" />
-        <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
-    </bean>
+
 
     <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
           <property name="dataSource" ref="dataSource"/>

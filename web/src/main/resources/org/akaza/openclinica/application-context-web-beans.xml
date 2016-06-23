@@ -16,5 +16,15 @@
     <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
     </bean>
- 
+    <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
+        <property name="alertsBoxSetup" value="OPENALERTS" />
+        <property name="enableIconsBoxSetup" value="DISABLEICONS"/>
+        <property name="infoBoxSetup" value="OPENINFO" />
+        <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
+    </bean>
+    <bean name="sdvFactory" class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
 </beans>
