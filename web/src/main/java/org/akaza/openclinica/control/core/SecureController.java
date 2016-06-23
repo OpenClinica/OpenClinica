@@ -98,8 +98,10 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,8 +291,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
         try {
             if (jobName != null && groupName != null) {
-                int state = getScheduler(request).getTriggerState(jobName, groupName);
-                org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
+
+                Trigger.TriggerState triggerState = getScheduler(request).getTriggerState(new TriggerKey(jobName, groupName));
+                org.quartz.JobDetail details = getScheduler(request).getJobDetail(new JobKey(jobName, groupName));
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
                 // will we get the above, even if its completed running?
                 // ProcessingResultType message = null;
@@ -305,7 +308,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // ProcessingResultType message = (ProcessingResultType) details.getResult();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
-                if (state == Trigger.STATE_NONE || state== Trigger.STATE_COMPLETE) {
+                if (triggerState == Trigger.TriggerState.NONE || triggerState== Trigger.TriggerState.COMPLETE) {
                     // add the message here that your export is done
                     // TODO make absolute paths in the message, for example a link from /pages/* would break
                     // TODO i18n

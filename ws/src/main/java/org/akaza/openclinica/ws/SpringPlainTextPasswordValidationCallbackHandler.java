@@ -25,9 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.ws.soap.security.callback.AbstractCallbackHandler;
 import org.springframework.ws.soap.security.callback.CleanupCallback;
-
 import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
-
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;

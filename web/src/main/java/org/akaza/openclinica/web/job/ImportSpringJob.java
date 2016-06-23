@@ -142,9 +142,9 @@ public class ImportSpringJob extends QuartzJobBean {
         JobDataMap dataMap = context.getMergedJobDataMap();
         SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
         TriggerBean triggerBean = new TriggerBean();
-        triggerBean.setFullName(trigger.getName());
+        triggerBean.setFullName(trigger.getKey().getName());
         String contactEmail = dataMap.getString(EMAIL);
-        logger.debug("=== starting to run trigger " + trigger.getName() + " ===");
+        logger.debug("=== starting to run trigger " + trigger.getKey().getName() + " ===");
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             dataSource = (DataSource) appContext.getBean("dataSource");

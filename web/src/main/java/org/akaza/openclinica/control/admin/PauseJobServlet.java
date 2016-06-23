@@ -7,7 +7,9 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.quartz.JobKey;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 
 /**
@@ -65,23 +67,23 @@ public class PauseJobServlet extends SecureController {
         }
         String deleteMe = fp.getString("del");
         scheduler = getScheduler();
-        Trigger trigger = scheduler.getTrigger(triggerName, finalGroupName);
+        Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
         try {
              if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
-                scheduler.deleteJob(triggerName, finalGroupName);
+                scheduler.deleteJob(JobKey.jobKey(triggerName, finalGroupName));
                 // set return message here
                 logger.debug("deleted job: " + triggerName);
                 addPageMessage("The following job " + triggerName + " and its corresponding Trigger have been deleted from the system.");
             } else {
 
-                if (scheduler.getTriggerState(triggerName, finalGroupName) == Trigger.STATE_PAUSED) {
-                    scheduler.resumeTrigger(triggerName, finalGroupName);
+                if (scheduler.getTriggerState(TriggerKey.triggerKey(triggerName, finalGroupName)) == Trigger.TriggerState.PAUSED) {
+                    scheduler.resumeTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
                     // trigger.setPriority(Trigger.DEFAULT_PRIORITY);
                     logger.debug("-- resuming trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been resumed and will continue to run until paused or deleted.");
                     // set message here
                 } else {
-                    scheduler.pauseTrigger(triggerName, finalGroupName);
+                    scheduler.pauseTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
                     // trigger.setPriority(Trigger.STATE_PAUSED);
                     logger.debug("-- pausing trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been paused, and will not run again until it is restored.");
