@@ -25,6 +25,6 @@
     <bean name="sdvFactory" class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-
+    <bean name="scheduledJobTableFactory" class="org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory"/>
 
 </beans>

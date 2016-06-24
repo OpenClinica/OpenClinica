@@ -47,11 +47,6 @@
     <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
     	<property name="dataSource" ref="dataSource"/>
     </bean>
-
-
-   
-       <bean name="scheduledJobTableFactory" class="org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory">
-    </bean>
                  
 	
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
