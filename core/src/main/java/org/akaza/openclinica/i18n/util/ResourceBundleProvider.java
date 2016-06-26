@@ -31,6 +31,7 @@ public class ResourceBundleProvider {
             resBundleSet.put("org.akaza.openclinica.i18n.terms", ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms", l));
             resBundleSet.put("org.akaza.openclinica.i18n.words", ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", l));
             resBundleSet.put("org.akaza.openclinica.i18n.workflow", ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.licensing", ResourceBundle.getBundle("org.akaza.openclinica.i18n.licensing", l));
 
             resBundleSetMap.put(l, resBundleSet);
         }
@@ -106,6 +107,14 @@ public class ResourceBundleProvider {
 
     public static ResourceBundle getWorkflowBundle(Locale locale) {
         return getResBundle("org.akaza.openclinica.i18n.workflow", locale);
+    }
+
+    public static ResourceBundle getLicensingBundle() {
+        return getResBundle("org.akaza.openclinica.i18n.licensing");
+    }
+
+    public static ResourceBundle getLicensingBundle(Locale locale) {
+        return getResBundle("org.akaza.openclinica.i18n.licensing", locale);
     }
 
     /**
