@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -60,12 +61,16 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
@@ -79,6 +84,7 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -91,6 +97,12 @@ import org.w3c.dom.NodeList;
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
+    
+    @Autowired
+    UserAccountDao userAccountDao;
+    
+    @Autowired
+    StudyDao studyDao;
 
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -275,10 +287,8 @@ public class OpenRosaServices {
         
         //Add user list
         MediaFile userList = new MediaFile();
-        String userXml = "<root>" + 
-                "<item><user_name>esummer</user_name><first_name>Esther</first_name><last_name>Summerson</last_name></item>" + 
-                "<item><user_name>honoria</user_name><first_name>Honoria</first_name><last_name>Dedlock</last_name></item>" + 
-                "</root>";
+        Study study = studyDao.findByOcOID(studyOID);
+        String userXml = getUserXml(study.getStudyId());
         userList.setFilename("users.xml");
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
@@ -414,11 +424,10 @@ public class OpenRosaServices {
             throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
+        
+        Study study = studyDao.findByOcOID(studyOID);
+        String userXml = getUserXml(study.getStudyId());
 
-        String userXml = "<root>" +
-                "<item><user_name>jdoe</user_name><first_name>John</first_name><last_name>Doe</last_name></item>" + 
-                "<item><user_name>jsmith</user_name><first_name>John</first_name><last_name>Smith</last_name></item>" + 
-                "</root>";
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -663,6 +672,43 @@ public class OpenRosaServices {
         NamedNodeMap attribs = html.getAttributes();
 		return attribs;
 	}
+
+    private String getUserXml(Integer studyId) throws Exception { 
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        Document doc = docBuilder.newDocument();
+        Element root = doc.createElement("root");
+        doc.appendChild(root);
+
+        
+        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
+        for ( UserAccount userAccount:users) {
+            Element item = doc.createElement("item");
+            Element userName = doc.createElement("user_name");
+            userName.appendChild(doc.createTextNode(userAccount.getUserName()));
+            Element firstName = doc.createElement("first_name");
+            firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
+            Element lastName = doc.createElement("last_name");
+            lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
+            item.appendChild(userName);
+            item.appendChild(firstName);
+            item.appendChild(lastName);
+            root.appendChild(item);
+        }
+
+        DOMSource dom = new DOMSource(doc);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.transform(dom, result);
+        String userXml = writer.toString();
+
+        return userXml;
+
+    }
 
     private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
