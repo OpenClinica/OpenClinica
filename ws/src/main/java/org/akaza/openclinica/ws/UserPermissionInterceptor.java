@@ -55,4 +55,8 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
         return true;
     }
 
+    @Override
+    public void afterCompletion(MessageContext messageContext, Object o, Exception e) throws Exception {
+    }
+
 }

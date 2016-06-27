@@ -23,8 +23,6 @@
             classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
             classpath:org/akaza/openclinica/applicationContext-core-email.xml
             classpath:org/akaza/openclinica/applicationContext-core-db.xml
-
-
         </param-value>
     </context-param>
 
@@ -96,8 +94,6 @@
             <param-name>forceEncoding</param-name>
             <param-value>true</param-value>
         </init-param>
-
-
     </filter>
 
 
@@ -164,7 +160,7 @@
     </filter-mapping>
     <filter>
         <filter-name>hibernateFilter</filter-name>
-        <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+        <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>hibernateFilter</filter-name>
@@ -235,34 +231,28 @@
     <servlet>
         <description>The SQL init Servlet</description>
         <display-name>SQLInitServlet</display-name>
-
         <servlet-name>SQLInitServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.web.SQLInitServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
         <description>ChooseDownloadFormat</description>
-
         <servlet-name>ChooseDownloadFormat</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.ChooseDownloadFormat</servlet-class>
     </servlet>
     <servlet>
         <description>ViewLogMessage</description>
-
         <servlet-name>ViewLogMessage</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ViewLogMessageServlet</servlet-class>
     </servlet>
     <servlet>
         <description>RssReaderServlet</description>
-
         <servlet-name>RssReaderServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.RssReaderServlet</servlet-class>
     </servlet>
 
     <servlet>
         <description>AuditUserActivityServlet</description>
-
         <servlet-name>AuditUserActivityServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.AuditUserActivityServlet</servlet-class>
     </servlet>
@@ -275,28 +265,24 @@
 
     <servlet>
         <description>AuditDatabaseServlet</description>
-
         <servlet-name>AuditDatabaseServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.AuditDatabaseServlet</servlet-class>
     </servlet>
 
     <servlet>
         <description>CheckCRFLocked</description>
-
         <servlet-name>CheckCRFLocked</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.CheckCRFLocked</servlet-class>
     </servlet>
 
     <servlet>
         <description>ConfigureServlet</description>
-
         <servlet-name>ConfigureServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ConfigureServlet</servlet-class>
     </servlet>
 
     <servlet>
         <description>ConfigurePasswordRequirementsServlet</description>
-
         <servlet-name>ConfigurePasswordRequirementsServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ConfigurePasswordRequirementsServlet</servlet-class>
     </servlet>
@@ -310,19 +296,15 @@
 
     <servlet>
         <description>FormServlet</description>
-
         <display-name>FormServlet</display-name>
-
         <servlet-name>FormServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.view.form.FormServlet</servlet-class>
     </servlet>
 
     <servlet>
         <description>ListDiscNotesForCRFServlet</description>
-
         <display-name>ListDiscNotesForCRFServlet</display-name>
         <servlet-name>ListDiscNotesForCRFServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet</servlet-class>
     </servlet>
 
@@ -335,33 +317,25 @@
     <servlet>
         <description>ViewJobServlet</description>
         <display-name>ViewJobServlet</display-name>
-
         <servlet-name>ViewJobServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.control.admin.ViewJobServlet</servlet-class>
     </servlet>
     <servlet>
         <description>ViewAllJobsServlet</description>
-
         <display-name>ViewAllJobsServlet</display-name>
         <servlet-name>ViewAllJobsServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.control.admin.ViewAllJobsServlet</servlet-class>
     </servlet>
     <servlet>
         <description>ViewImportJobServlet</description>
-
         <display-name>ViewImportJobServlet</display-name>
         <servlet-name>ViewImportJobServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.control.admin.ViewImportJobServlet</servlet-class>
     </servlet>
     <servlet>
         <description>ViewSingleJobServlet</description>
-
         <display-name>ViewSingleJobServlet</display-name>
         <servlet-name>ViewSingleJobServlet</servlet-name>
-
         <servlet-class>org.akaza.openclinica.control.admin.ViewSingleJobServlet</servlet-class>
     </servlet>
     <servlet>
