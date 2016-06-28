@@ -231,6 +231,7 @@
     <servlet>
         <description>The SQL init Servlet</description>
         <display-name>SQLInitServlet</display-name>
+        <!-- we've decided not to deal this warning at this point -->
         <servlet-name>SQLInitServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.web.SQLInitServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -698,12 +699,6 @@
         <servlet-name>InitialDataEntryServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.InitialDataEntryServlet</servlet-class>
     </servlet>
-    <servlet>
-        <display-name>DataEntry</display-name>
-        <servlet-name>DataEntryServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.submit.DataEntryServlet</servlet-class>
-    </servlet>
-
     <servlet>
         <display-name>DoubleDataEntry</display-name>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
@@ -1356,18 +1351,6 @@
         <servlet-name>ParticipantFormServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ParticipantFormServlet</servlet-class>
     </servlet>
-
-
-    <servlet>
-        <display-name>OpenRosaFormDownloadServlet</display-name>
-        <servlet-name>OpenRosaFormDownloadServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.web.openrosa.OpenRosaFormDownloadServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>OpenRosaFormDownloadServlet</servlet-name>
-        <url-pattern>/openrosa/formXml</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
@@ -1756,11 +1739,6 @@
         <servlet-name>InitialDataEntryServlet</servlet-name>
         <url-pattern>/InitialDataEntry</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DataEntryServlet</servlet-name>
-        <url-pattern>/DataEntry</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <url-pattern>/DoubleDataEntry</url-pattern>
