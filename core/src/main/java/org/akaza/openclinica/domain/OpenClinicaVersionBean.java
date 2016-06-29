@@ -9,8 +9,7 @@ package org.akaza.openclinica.domain;
 
 import java.sql.Timestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -24,7 +23,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "openclinica_version")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "openclinica_version_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "openclinica_version_id_seq") })
 public class OpenClinicaVersionBean extends AbstractMutableDomainObject {
 
     private String name;

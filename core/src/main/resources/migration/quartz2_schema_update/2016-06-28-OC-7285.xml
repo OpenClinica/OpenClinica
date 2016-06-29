@@ -41,35 +41,45 @@
     <changeSet author="yshridhare" id="2016-06-28-7285-5">
         <comment>Add new 'sched_name' column to all tables</comment>
         <addColumn tableName="oc_qrtz_blob_triggers">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_calendars">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_cron_triggers">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_fired_triggers">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_job_details">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_locks">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_paused_trigger_grps">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_scheduler_state">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_simple_triggers">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
         <addColumn tableName="oc_qrtz_triggers">
-            <column name="sched_name" type="VARCHAR(120)" ></column>
+            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
         </addColumn>
+        <addNotNullConstraint tableName="oc_qrtz_blob_triggers" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_calendars" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_cron_triggers" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_fired_triggers" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_job_details" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_locks" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_paused_trigger_grps" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_scheduler_state" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_simple_triggers" columnName="sched_name"/>
+        <addNotNullConstraint tableName="oc_qrtz_triggers" columnName="sched_name"/>
     </changeSet>
     <changeSet author="yshridhare" id="2016-06-28-7285-6">
         <comment>Drop all primary and foreign key constraints, so that we can define new ones</comment>
