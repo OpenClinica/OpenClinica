@@ -111,6 +111,12 @@ public class RemoveStudySubjectServlet extends SecureController {
                 studySub.setUpdatedDate(new Date());
                 subdao.update(studySub);
 
+                // also change status on subject
+                subject.setStatus(Status.DELETED);
+                subject.setUpdater(ub);
+                subject.setUpdatedDate(new Date());
+                sdao.update(subject);
+
                 // remove all study events
                 // remove all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
