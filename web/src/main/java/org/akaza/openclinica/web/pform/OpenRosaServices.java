@@ -172,7 +172,7 @@ public class OpenRosaServices {
             @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
-
+        
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean study = sdao.findByOid(studyOID);
 
@@ -244,6 +244,8 @@ public class OpenRosaServices {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<Error>" + e.getMessage() + "</Error>";
         }
+        
+        
     }
 
     /**
@@ -737,7 +739,7 @@ public class OpenRosaServices {
 
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
