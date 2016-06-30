@@ -168,6 +168,16 @@
                 <version>9.4.1208.jre7</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-web</artifactId>
+                <version>2.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.6.4</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -425,7 +435,6 @@
             <artifactId>stormpath-sdk-httpclient</artifactId>
             <version>1.0.RC9.2</version>
         </dependency>
-
     </dependencies>
     <build>
         <pluginManagement>

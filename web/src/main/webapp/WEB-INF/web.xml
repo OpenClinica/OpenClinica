@@ -67,46 +67,6 @@
     </listener>
 
 
-    <!-- <filter> -->
-    <!-- <filter-name>restODMFilter</filter-name> -->
-    <!-- <filter-class>org.akaza.openclinica.web.filter.rest.RestODMFilter</filter-class> -->
-    <!-- <init-param> -->
-    <!--   <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> -->
-    <!--   <param-value>org.akaza.openclinica.web.filter.rest</param-value> -->
-    <!-- </init-param> -->
-    <!-- </filter> -->
-
-
-    <!-- <filter-mapping> -->
-    <!-- <filter-name>restODMFilter</filter-name> -->
-    <!-- <url-pattern>/rest/*</url-pattern> -->
-    <!-- </filter-mapping> -->
-
-
-
-
-
-   <!-- <filter>
-        <filter-name>CompressionFilter</filter-name>
-        <filter-class>org.akaza.openclinica.web.filter.CompressionFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>CompressionFilter</filter-name>
-        <url-pattern>*.js</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CompressionFilter</filter-name>
-        <url-pattern>*.css</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CompressionFilter</filter-name>
-        <url-pattern>*.html</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CompressionFilter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
-    </filter-mapping>
--->
     <filter>
         <filter-name>encodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -134,9 +94,10 @@
         <filter-name>localeFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <filter>
         <filter-name>compressFilter</filter-name>
-        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter</filter-class>
+        <filter-class>net.sf.ehcache.constructs.web.filter.GzipFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
@@ -174,6 +135,7 @@
         <filter-name>compressFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -210,7 +172,7 @@
         <filter-name>apiSecurityFilter</filter-name>
         <url-pattern>/pages/auth/api/*</url-pattern>
     </filter-mapping>
-
+-->
 
     <servlet>
         <servlet-name>pages</servlet-name>
