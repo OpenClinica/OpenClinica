@@ -15,7 +15,7 @@ public class XformUtils {
 
         // Get default translation
         for (Translation trans : translations) {
-            if (trans.getDefaultLang().equals("true()"))
+            if (trans.getDefaultLang() != null && trans.getDefaultLang().equals("true()"))
                 translation = trans;
         }
         if (translation == null)
