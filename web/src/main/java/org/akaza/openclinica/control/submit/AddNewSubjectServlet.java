@@ -361,8 +361,21 @@ public class AddNewSubjectServlet extends SecureController {
                 }
             }// end of the block if(!uniqueIdentifier.equals(""))
 
+            // escapehtml for label and secondaryLabel
+            String label = encodeForHtml(fp.getString(INPUT_LABEL));
+            String secondaryLabel = encodeForHtml(fp.getString(INPUT_SECONDARY_LABEL));
+            if (!errors.containsKey(INPUT_LABEL))
+                if (label.length() > 30)
+                    Validator.addError(errors, INPUT_LABEL, resexception.getString("character_limits_exceeded_after_escaping"));
 
-            String label = fp.getString(INPUT_LABEL);
+            if (!StringUtil.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
+                if (!errors.containsKey(INPUT_SECONDARY_LABEL)) {
+                    if (secondaryLabel.length() > 30) {
+                        Validator.addError(errors, INPUT_SECONDARY_LABEL, resexception.getString("character_limits_exceeded_after_escaping"));
+                    }
+                }
+            }
+
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
             // value of "AUTO_LABEL",
             // then Study Subject ID should be created when db row is inserted.
@@ -420,7 +433,7 @@ public class AddNewSubjectServlet extends SecureController {
                 fp.addPresetValue(INPUT_YOB, fp.getString(INPUT_YOB));
                 fp.addPresetValue(INPUT_GENDER, fp.getString(INPUT_GENDER));
                 fp.addPresetValue(INPUT_UNIQUE_IDENTIFIER, uniqueIdentifier);
-                fp.addPresetValue(INPUT_LABEL, label);
+                fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
                 fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                 fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
                 fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
@@ -492,7 +505,7 @@ public class AddNewSubjectServlet extends SecureController {
                     // YW <<
                     // Shaoyu Su: delay setting INPUT_LABEL field
                     if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-                        fp.addPresetValue(INPUT_LABEL, label);
+                        fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
                     }
                     fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                     fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
@@ -701,8 +714,8 @@ public class AddNewSubjectServlet extends SecureController {
                 // enroll the subject in the active study
                 studySubject.setSubjectId(subject.getId());
                 studySubject.setStudyId(currentStudy.getId());
-                studySubject.setLabel(fp.getString(INPUT_LABEL));
-                studySubject.setSecondaryLabel(fp.getString(INPUT_SECONDARY_LABEL));
+                studySubject.setLabel(label);
+                studySubject.setSecondaryLabel(secondaryLabel);
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setEnrollmentDate(fp.getDate(INPUT_ENROLLMENT_DATE));
                 if (fp.getBoolean("addWithEvent")) {
@@ -712,13 +725,13 @@ public class AddNewSubjectServlet extends SecureController {
                 studySubject.setOwner(ub);
 
                 // Shaoyu Su: prevent same label ("Study Subject ID")
-                if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+                if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                     synchronized (simpleLockObj) {
                         int nextLabel = ssd.findTheGreatestLabel() + 1;
                         studySubject.setLabel(nextLabel + "");
                         studySubject = ssd.createWithoutGroup(studySubject);
                         if (showExistingRecord && !existingSubShown) {
-                            fp.addPresetValue(INPUT_LABEL, label);
+                            fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
                         }
                     }
                 } else {
