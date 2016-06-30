@@ -599,6 +599,7 @@
                                         </includes>
                                         <excludes>
                                             <exclude>*.war</exclude>
+                                            <exclude>dependency/*.jar</exclude>
                                         </excludes>
                                     </fileset>
                                 </filesets>
