@@ -88,11 +88,11 @@
 
     <dependencyManagement>
         <dependencies>
-<dependency>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-clean-plugin</artifactId>
-    <version>2.5</version>
-</dependency>
+            <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.5</version>
+            </dependency>
             <dependency>
                 <groupId>org.jmesa</groupId>
                 <artifactId>jmesa</artifactId>
@@ -583,13 +583,6 @@
                         <schemaDirectory>src/main/webapp/WEB-INF/schemas</schemaDirectory>
                     </configuration>
                 </plugin>
-                
-                
-                
-                
-                
-                
-                
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>2.5</version>
@@ -613,22 +606,6 @@
                         </execution>
                     </executions>
                 </plugin>
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-               
-                
             </plugins>
         </pluginManagement>
 
