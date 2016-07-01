@@ -36,12 +36,7 @@ public class ReportController {
 	RuleSetService ruleSetService;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    
-    
-	
-	
-	
-	
+
 	/**
 	 * @api {post} /pages/healthcheck/runonschedule Evaluate runOnSchedule behavior
 	 * @apiName ruleTrigger
@@ -154,7 +149,5 @@ public class ReportController {
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
 	}
-
-
 
 }

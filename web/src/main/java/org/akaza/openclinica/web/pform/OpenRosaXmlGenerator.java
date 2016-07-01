@@ -119,7 +119,9 @@ public class OpenRosaXmlGenerator {
             String xformMinusInstance = buildStringXForm(html);
             String preInstance = xformMinusInstance.substring(0, xformMinusInstance.indexOf("<instance>"));
             String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
-            String postInstance = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
+            String nodeset = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
+            // add nodeset for instanceId
+            String postInstance = "<bind calculate=\"concat('uuid:', uuid())\" nodeset=\"/" + crfVersion.getOid() + "/meta/instanceID\" readonly=\"true()\" type=\"string\"/>" + nodeset;
             logger.debug(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
@@ -501,6 +503,14 @@ public class OpenRosaXmlGenerator {
             } // end of item
 
         } // end of group
+
+        // add meta
+        Element meta = doc.createElement("meta");
+        // add instanceId
+        Element instanceId = doc.createElement("instanceID");
+        meta.appendChild(instanceId);
+        crfElement.appendChild(meta);
+
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
