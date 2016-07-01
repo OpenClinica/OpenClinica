@@ -605,6 +605,7 @@
                                 <fileset>
                                     <directory>target</directory>
                                     <excludes>
+                                    	<exclude>dependency/webapp-runner.jar</exclude>
                                         <exclude>*.war</exclude>
                                     </excludes>
                                 </fileset>
