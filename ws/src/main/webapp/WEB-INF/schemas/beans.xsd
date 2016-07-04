@@ -14,15 +14,45 @@
             <element name="endTime" type="time" minOccurs="0"/>
         </sequence>
     </complexType>
-    
-    <complexType name="eventsType">
+
+    <complexType name="eventResponseType">
         <sequence>
-            <element name="event" type="beans:eventType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="studySubjectRef" type="beans:studySubjectRefType"/>
+            <element name="studyRef" type="beans:studyRefType"/>
+            <element name="eventDefinitionOID" type="beans:customStringType"/>
+            <element name="occurrence" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="status" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="subjectEventStatus" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="location" type="beans:customStringType"/>
+            <element name="startDate" type="date"/>
+            <element name="startTime" type="time"/>
+            <element name="endDate" type="date"/>
+            <element name="endTime" type="time"/>
+            <element name="eventCrfInformation" type="beans:eventCrfInformationList" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+    </complexType>
+
+    <complexType name="eventCrfInformationList">
+        <sequence>
+            <element name="eventCrf" type="beans:eventCrfType" minOccurs="0" maxOccurs="unbounded" />
         </sequence>
     </complexType>
     
-    
+    <complexType name="eventsType">
+        <sequence>
+            <element name="event" type="beans:eventResponseType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
 
+    <complexType name="eventCrfType">
+        <!-- The element 'name' corresponds to the column name in the table 'crf'. -->
+        <sequence>
+            <element name="name" type="beans:customStringType" />
+            <element name="oid" type="beans:customStringType" />
+            <element name="status" type="beans:customStringType"/>
+            <element name="version" type="beans:customStringType"/>
+        </sequence>
+    </complexType>
 
     <complexType name="studySubjectType">
         <sequence>
