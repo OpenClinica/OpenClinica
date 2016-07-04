@@ -237,7 +237,10 @@ public class StudySubjectEndpoint {
             if (studyRefOutput == null) {
                 StudyBean siteStudy = (StudyBean) getStudyDao().findByPK(studyIDSubject);
                 studyRefOutput = new StudyRefType();
-                studyRefOutput.setIdentifier(siteStudy.getIdentifier());
+                studyRefOutput.setIdentifier(study.getIdentifier());
+                SiteRefType siteRefType = new SiteRefType();
+                siteRefType.setIdentifier(siteStudy.getIdentifier());
+                studyRefOutput.setSiteRef(siteRefType);
                 studyIDRefMap.put(studyIDSubject, studyRefOutput);
             }
 
