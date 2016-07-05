@@ -11,7 +11,6 @@
     <modules>
         <module>core</module>
         <module>web</module>
-        <module>ws</module>
     </modules>
 
     <properties>
@@ -442,7 +441,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>3.5.1</version>
                     <configuration>
                         <source>8</source>
                         <target>8</target>
@@ -452,7 +451,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>3.0.1</version>
                     <configuration>
                         <delimiters>
                             <delimiter>${*}</delimiter>
@@ -462,7 +461,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.10</version>
+                    <version>2.19.1</version>
                     <configuration>
                         <skipTests>${skipTests}</skipTests>
                     </configuration>
@@ -470,12 +469,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2.2</version>
+                    <version>2.6</version>
                     <configuration>
                         <outputDirectory>${openclinica.distros.dir}</outputDirectory>
                         <descriptors>
@@ -488,7 +487,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
-                    <version>2.8</version>
+                    <version>2.10</version>
                     <configuration>
                         <addVersionToProjectName>true</addVersionToProjectName>
                     </configuration>
@@ -496,7 +495,7 @@
                 <plugin>
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
-                    <version>1.1.4</version>
+                    <version>1.5.0</version>
                     <configuration>
                         <!-- Container configuration -->
                         <container>
@@ -520,7 +519,7 @@
                 <plugin>
                     <groupId>org.zeroturnaround</groupId>
                     <artifactId>jrebel-maven-plugin</artifactId>
-                    <version>1.0.7</version>
+                    <version>1.1.6</version>
                     <executions>
                         <execution>
                             <id>generate-rebel-xml</id>
@@ -535,7 +534,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.3</version>
+                    <version>1.4</version>
                     <executions>
                         <execution>
                             <id>buildnumber</id>
@@ -566,7 +565,7 @@
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
                     <artifactId>maven-jaxb2-plugin</artifactId>
-                    <version>0.7.5</version>
+                    <version>0.13.1</version>
                     <executions>
                         <execution>
                             <phase>generate-sources</phase>
@@ -593,7 +592,7 @@
                                 <excludeDefaultDirectories>true</excludeDefaultDirectories>
                                 <filesets>
                                     <fileset>
-                                        <directory>${basedir}/target</directory>
+                                        <directory>target</directory>
                                         <includes>
                                             <include>**/*.jar</include>
                                         </includes>
