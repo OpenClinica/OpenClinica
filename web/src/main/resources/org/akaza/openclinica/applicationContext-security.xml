@@ -9,69 +9,30 @@
                            http://www.springframework.org/schema/security/spring-security-4.1.xsd
                            http://www.springframework.org/schema/security/oauth2
                            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+    <import resource="spring/appServlet/servlet-context.xml" />
 
+    <bean id="stormpathClient" class="com.stormpath.spring.security.client.ClientFactory" >
+        <!-- # Replace this value with the file location from #2 above -->
+        <property name="apiKeyFileLocation" value="/home/yogi/.stormpath/apiKey.properties" />
+        <!-- If you've configured a Spring CacheManager (recommended to reduce network calls) -->
+        <!--<property name="cacheManager" ref="cacheManager" />-->
+    </bean>
 
-    <security:http entry-point-ref="authenticationProcessingFilterEntryPoint" use-expressions="true">
+    <!-- Configure Spring Security with the Stormpath `AuthenticationProvider` -->
+    <bean id="authenticationProvider" class="com.stormpath.spring.security.provider.StormpathAuthenticationProvider">
+        <property name="client" ref="stormpathClient" />
+        <property name="applicationRestUrl" value="https://api.stormpath.com/v1/applications/5CfeVqkohRjuM2XhNjSMuH"/>
+    </bean>
 
-        <security:anonymous />
-        <security:intercept-url pattern="/pages/login/login" access="permitAll"/>
-        <security:intercept-url pattern="/SystemStatus" access="permitAll"/>
-        <security:intercept-url pattern="/RssReader" access="permitAll"/>
-        <security:intercept-url pattern="/RequestPassword" access="permitAll"/>
-        <security:intercept-url pattern="/RequestAccount" access="permitAll"/>
-        <security:intercept-url pattern="/includes/**" access="permitAll"/>
-        <security:intercept-url pattern="/images/**" access="permitAll"/>
-        <security:intercept-url pattern="/help/**" access="permitAll"/>
-        <security:intercept-url pattern="/ws/**" access="permitAll"/>
-        <security:intercept-url pattern="/Contact" access="permitAll"/>
-        <security:intercept-url pattern="/rest2/openrosa/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/odmk/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/openrosa/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/accounts/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/itemdata/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/auth/api/v1/studies/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/odmss/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/healthcheck/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/api/v1/anonymousform/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/api/v2/anonymousform/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/api/v1/editform/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" access="permitAll"/>
-        <security:intercept-url pattern="/pages/auth/api/**" access="permitAll"/>
-        <!--
-        <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
-          default-target-url='/MainMenu' always-use-default-target='true' />
-         -->
-        <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
-        <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
-        <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
-        <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
-        <security:session-management session-authentication-strategy-ref="sas"/>
-        <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
-        <security:access-denied-handler error-page="/accounts/denied.htm"/>
+    <security:http auto-config="true" use-expressions="true">
+        <security:intercept-url pattern="/**" access="hasRole('https://api.stormpath.com/v1/groups/56Kw4ncN5ufT69zoObJ3EX')"/>
         <security:csrf disabled="true"/>
+        <security:logout logout-url="/logout" logout-success-url="/logoutSuccess.jsp"/>
     </security:http>
 
-    <bean id="authenticationProcessingFilterEntryPoint"
-          class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-        <constructor-arg value="/pages/login/login"/>
-        <property name="forceHttps" value="false"/>
-    </bean>
-
-    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="authenticationFailureHandler" ref="failureHandler" />
-        <property name="authenticationSuccessHandler" ref="successHandler" />
-        <!--
-        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
-        <property name="defaultTargetUrl" value="/MainMenu"/>
-         -->
-        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
-        <property name="configurationDao" ref="configurationDao"/>
-        <property name="dataSource" ref="dataSource"/>
-        <property name="allowSessionCreation" value="true" />
-        <property name="sessionAuthenticationStrategy" ref="sas"/>
-        <property name="crfLocker" ref="crfLocker"/>
-    </bean>
+    <security:authentication-manager>
+        <security:authentication-provider ref='authenticationProvider'/>
+    </security:authentication-manager>
 
     <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
         <property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->

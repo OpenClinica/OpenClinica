@@ -31,6 +31,7 @@
         <spring.version>4.3.0.RELEASE</spring.version>
         <spring-security.version>4.1.0.RELEASE</spring-security.version>
         <db.test>localhost</db.test>
+        <stormpath.version>1.0.RC9.2</stormpath.version>
     </properties>
     <profiles>
         <profile>
@@ -663,7 +664,12 @@
             <dependency>
             	<groupId>com.stormpath.sdk</groupId>
             	<artifactId>stormpath-sdk-httpclient</artifactId>
-            	<version>1.0.RC9.2</version>
+            	<version>${stormpath.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.stormpath.spring</groupId>
+                <artifactId>stormpath-default-spring-boot-starter</artifactId>
+                <version>${stormpath.version}</version>
             </dependency>
         </dependencies>
 
