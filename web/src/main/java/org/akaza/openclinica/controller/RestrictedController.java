@@ -24,9 +24,9 @@ public class RestrictedController {
         Account account = AccountResolver.INSTANCE.getAccount(request);
 
         if (account == null) {
-            return "redirect:/login";
+            return "redirect:/pages/login";
         }
         logger.info("****in SSO restricted controller");
-        return "restricted/secret";
+        return "redirect:/MainMenu";
     }
 }
