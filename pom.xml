@@ -400,11 +400,6 @@
                 <version>2.3</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.castor</groupId>
-                <artifactId>castor</artifactId>
-                <version>1.2</version>
-            </dependency>
-            <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>

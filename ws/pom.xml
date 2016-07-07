@@ -224,10 +224,6 @@
             <groupId>oracle.ojdbc14</groupId>
             <artifactId>ojdbc14</artifactId>
         </dependency>
-        <dependency>
-			<groupId>org.codehaus.castor</groupId>
-			<artifactId>castor</artifactId>
-		</dependency>
 	</dependencies>
     <build>
         <plugins>
