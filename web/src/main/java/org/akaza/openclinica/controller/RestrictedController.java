@@ -28,7 +28,7 @@ public class RestrictedController {
             return "redirect:/pages/login";
         }
         */
-        logger.info("****After in SSO restricted controller");
+        logger.info("^^^^^After in SSO restricted controller");
         return "redirect:/MainMenu";
     }
 }
