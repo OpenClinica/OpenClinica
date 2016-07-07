@@ -22,11 +22,11 @@ public class RestrictedController {
         System.out.println("****in SSO restricted controller");
 
         Account account = AccountResolver.INSTANCE.getAccount(request);
-
+        System.out.println("****Account=" + account);
         if (account == null) {
             return "redirect:/pages/login";
         }
-        logger.info("****in SSO restricted controller");
+        logger.info("****After in SSO restricted controller");
         return "redirect:/MainMenu";
     }
 }
