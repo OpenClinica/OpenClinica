@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 @Controller
 @EnableStormpath
@@ -24,8 +25,17 @@ public class RestrictedController {
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++Request attr names:");
-        while (request.getAttributeNames().hasMoreElements())
-            System.out.println(request.getAttributeNames().nextElement());
+        Enumeration params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = (String)params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
+        Enumeration attrs = request.getAttributeNames();
+        while(attrs.hasMoreElements()){
+            String paramName = (String)attrs.nextElement();
+            System.out.println("Attribute Name - "+paramName+", Value - "+request.getAttribute(paramName));
+        }
 
         System.out.println("****in SSO restricted controller:" + app);
         System.out.println("Previous app from the request:" + getApplication(request));
