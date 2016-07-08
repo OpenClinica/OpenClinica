@@ -6,6 +6,7 @@ import com.stormpath.sdk.client.Client;
 import com.stormpath.spring.config.EnableStormpath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @EnableStormpath //enables the @Autowired beans below
+@ComponentScan("org.akaza.openclinica")
 @PropertySource("classpath:application.properties")
 public class SSOAppConfig {
 
