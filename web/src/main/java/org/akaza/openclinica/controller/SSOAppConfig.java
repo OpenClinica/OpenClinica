@@ -15,7 +15,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @EnableStormpath //enables the @Autowired beans below
-@ComponentScan("org.akaza.openclinica")
+@ComponentScan(basePackages = { "com.akaza.openclinica.*" })
 @PropertySource("classpath:application.properties")
 public class SSOAppConfig {
 
