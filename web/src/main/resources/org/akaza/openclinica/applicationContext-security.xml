@@ -78,8 +78,6 @@
         <property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
     </bean>
 
-    <bean id="app" class="com.stormpath.sdk.impl.application.DefaultApplication"/>
-
     <bean id="failureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler" >
         <property name="defaultFailureUrl" value="/pages/login/login?action=errorLogin" />
         <property name="exceptionMappings">
