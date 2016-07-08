@@ -23,7 +23,7 @@ public class RestrictedController {
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
-        System.out.println("++++++++Request attr names:");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++Request attr names:");
         while (request.getAttributeNames().hasMoreElements())
             System.out.println(request.getAttributeNames().nextElement());
 
