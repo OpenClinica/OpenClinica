@@ -23,8 +23,9 @@ public class RestrictedController {
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
+        System.out.println("++++++++Request:" + request);
         System.out.println("****in SSO restricted controller:" + app);
-
+        System.out.println("Previous app from the request:" + getApplication(request));
         Account account = AccountResolver.INSTANCE.getAccount(request);
         System.out.println("****Account=" + account);
         /*
@@ -34,5 +35,8 @@ public class RestrictedController {
         */
         logger.info("After in SSO restricted controller");
         return "redirect:/MainMenu";
+    }
+    protected Application getApplication(HttpServletRequest request) {
+        return (Application)request.getAttribute(Application.class.getName());
     }
 }
