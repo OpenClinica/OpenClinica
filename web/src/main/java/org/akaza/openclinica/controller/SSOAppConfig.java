@@ -23,7 +23,7 @@ public class SSOAppConfig {
     @Autowired
     public Client client; //can be used to interact with all things in your Stormpath tenant
     @Bean
-    public Application getApp() {
+    public Application getStormpathApplication() {
         return stormpathApplication;
     }
 
