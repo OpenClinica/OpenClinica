@@ -18,13 +18,7 @@ import org.springframework.context.annotation.PropertySource;
 public class SSOAppConfig {
 
     @Autowired
-    public Application stormpathApplication; //the REST resource in Stormpath that represents this app
-
-    @Autowired
     public Client client; //can be used to interact with all things in your Stormpath tenant
-    @Bean
-    public Application getStormpathApplication() {
-        return stormpathApplication;
-    }
+
 
 }
