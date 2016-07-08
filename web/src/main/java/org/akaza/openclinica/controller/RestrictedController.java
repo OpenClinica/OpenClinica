@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +54,11 @@ public class RestrictedController {
         System.out.println("Previous app from the request:" + getApplication(request));
         //Account account = AccountResolver.INSTANCE.getAccount(request);
         System.out.println("****Account=" + account);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(account.getUsername(), null,
+                AuthorityUtils.createAuthorityList("ROLE_USER"));
+        System.out.println("**************Auth=" + authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         /*
         if (account == null) {
             return "redirect:/pages/login";
