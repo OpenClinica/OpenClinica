@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.application.Application;
+import com.stormpath.sdk.idsite.AccountResult;
 import com.stormpath.sdk.servlet.account.AccountResolver;
 import com.stormpath.spring.config.EnableStormpath;
 import org.slf4j.Logger;
@@ -41,10 +42,13 @@ public class RestrictedController {
             String paramName = (String)attrs.nextElement();
             System.out.println("Attribute Name - "+paramName+", Value - "+request.getAttribute(paramName));
         }
+        AccountResult accountResult = app.newIdSiteCallbackHandler(request).getAccountResult();
+
+        Account account = accountResult.getAccount();
 
         System.out.println("****in SSO restricted controller:" + app);
         System.out.println("Previous app from the request:" + getApplication(request));
-        Account account = AccountResolver.INSTANCE.getAccount(request);
+
         System.out.println("****Account=" + account);
         /*
         if (account == null) {
