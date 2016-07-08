@@ -16,13 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class RestrictedController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    @Autowired
+    Application app;
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
-        System.out.println("****in SSO restricted controller");
+        System.out.println("****in SSO restricted controller:" + app);
 
         Account account = AccountResolver.INSTANCE.getAccount(request);
-        //System.out.println("****Account=" + account);
+        System.out.println("****Account=" + account);
         /*
         if (account == null) {
             return "redirect:/pages/login";
