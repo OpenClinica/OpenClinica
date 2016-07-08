@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.servlet.account.AccountResolver;
+import com.stormpath.spring.config.EnableStormpath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
+@EnableStormpath
 public class RestrictedController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
