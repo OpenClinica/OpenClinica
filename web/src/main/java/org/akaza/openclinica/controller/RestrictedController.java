@@ -42,13 +42,13 @@ public class RestrictedController {
             String paramName = (String)attrs.nextElement();
             System.out.println("Attribute Name - "+paramName+", Value - "+request.getAttribute(paramName));
         }
-        AccountResult accountResult = app.newIdSiteCallbackHandler(request).getAccountResult();
+        //AccountResult accountResult = app.newIdSiteCallbackHandler(request).getAccountResult();
 
-        Account account = accountResult.getAccount();
+        //Account account = accountResult.getAccount();
 
         System.out.println("****in SSO restricted controller:" + app);
         System.out.println("Previous app from the request:" + getApplication(request));
-
+        Account account = AccountResolver.INSTANCE.getAccount(request);
         System.out.println("****Account=" + account);
         /*
         if (account == null) {
