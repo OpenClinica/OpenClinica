@@ -19,8 +19,6 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:application.properties")
 public class SSOAppConfig {
 
-    @Autowired
-    public Client client; //can be used to interact with all things in your Stormpath tenant
 
 
 }
