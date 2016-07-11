@@ -671,6 +671,11 @@
                 <artifactId>stormpath-default-spring-boot-starter</artifactId>
                 <version>${stormpath.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
+                <version>2.1.0.1</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
