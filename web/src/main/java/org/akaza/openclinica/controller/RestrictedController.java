@@ -31,8 +31,6 @@ public class RestrictedController {
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SSOAppConfig.class);
-        context.registerShutdownHook();
 
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++Request attr names:");
         Enumeration params = request.getParameterNames();
@@ -50,20 +48,20 @@ public class RestrictedController {
 
         Account account = accountResult.getAccount();
 
+        if (account == null) {
+            return "redirect:/pages/login";
+        }
+
+
         System.out.println("****in SSO restricted controller:" + app);
         System.out.println("Previous app from the request:" + getApplication(request));
-        //Account account = AccountResolver.INSTANCE.getAccount(request);
         System.out.println("****Account=" + account);
         Authentication authentication = new UsernamePasswordAuthenticationToken(account.getUsername(), null,
                 AuthorityUtils.createAuthorityList("ROLE_USER"));
         System.out.println("**************Auth=" + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        /*
-        if (account == null) {
-            return "redirect:/pages/login";
-        }
-        */
+
         logger.info("After in SSO restricted controller");
         return "redirect:/MainMenu";
     }
