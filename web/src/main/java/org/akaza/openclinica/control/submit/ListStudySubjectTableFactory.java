@@ -35,6 +35,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -231,11 +232,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for (StudySubjectBean studySubjectBean : items) {
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
-            theItem.put("studySubject.label", studySubjectBean.getLabel());
+            theItem.put("studySubject.label", StringEscapeUtils.unescapeHtml(studySubjectBean.getLabel()));
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", ((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
-            theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
+            theItem.put("studySubject.secondaryLabel", StringEscapeUtils.unescapeHtml(studySubjectBean.getSecondaryLabel()));
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
             theItem.put("subject", subjectBean);

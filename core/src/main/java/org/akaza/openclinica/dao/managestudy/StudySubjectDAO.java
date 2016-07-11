@@ -35,6 +35,8 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 
+import org.owasp.esapi.ESAPI;
+
 /**
  * @author jxu
  * 
@@ -382,7 +384,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
+        variables.put(new Integer(1), ESAPI.encoder().encodeForHTML(label));
         variables.put(new Integer(2), new Integer(studyId));
         variables.put(new Integer(3), new Integer(studySubjectId));
 
@@ -402,7 +404,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
+        variables.put(new Integer(1), ESAPI.encoder().encodeForHTML(label));
         variables.put(new Integer(2), new Integer(studyId));
         variables.put(new Integer(3), new Integer(studySubjectId));
 
@@ -440,7 +442,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
+        variables.put(new Integer(1), ESAPI.encoder().encodeForHTML(label));
         variables.put(new Integer(2), new Integer(study.getId()));
         variables.put(new Integer(3), new Integer(study.getId()));
 
@@ -469,7 +471,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
+        variables.put(new Integer(1), ESAPI.encoder().encodeForHTML(label));
         variables.put(new Integer(2), new Integer(studyId));
         variables.put(new Integer(3), new Integer(studyId));
         variables.put(new Integer(4), new Integer(id));
