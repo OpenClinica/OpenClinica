@@ -99,6 +99,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.quartz.JobKey;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
@@ -110,6 +111,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.owasp.esapi.ESAPI;
 
 /**
  * This class enhances the Controller in several ways.
@@ -668,7 +670,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected void forwardPage(Page jspPage, boolean checkTrail) {
     	Page page1 = Page.valueOf(jspPage.name());
     	String temp;
-    	
+
     	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
@@ -706,7 +708,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }
-           
+
              temp = page1.getFileName();
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(temp).forward(request, response);
@@ -782,7 +784,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             request.setAttribute(POP_UP_URL, url);
             request.setAttribute("hasPopUp", 1);
             logger.info("just set pop up url: " + url);
-           
+
         }
     }
 
@@ -1170,6 +1172,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
+    protected String encodeForHtml(String input) {
+        return ESAPI.encoder().encodeForHTML(input);
+    }
+
+    protected String decodeForHtml(String input) {
+        return StringEscapeUtils.unescapeHtml(input);
+    }
 
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
@@ -1195,7 +1204,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return crfLocker;
     }
 
-    
-    
-    
+
+
+
 }
