@@ -2747,6 +2747,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // << tbh 08/2009
             if (formItemGroup.getOrdinal() > dbGroups.size() - 1) {
                 formItemGroup.setEditFlag("add");
+                // set ItemDataBean id to 0 for new unsaved item
+                for (DisplayItemBean disIB : formItemGroup.getItems()) {
+                    disIB.getData().setId(0);
+                }
             } else {
                 for (int i = 0; i < dbGroups.size(); i++) {
                     DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
