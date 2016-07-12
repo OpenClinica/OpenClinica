@@ -23,6 +23,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
+            <version>4.1.1.RELEASE</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -243,6 +244,10 @@
         <dependency>
             <groupId>org.owasp.esapi</groupId>
             <artifactId>esapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-web</artifactId>
         </dependency>
     </dependencies>
     <!-- @pgawade 16-NOV-2010 unit tests through maven -->
