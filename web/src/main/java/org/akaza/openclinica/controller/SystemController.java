@@ -219,6 +219,7 @@ public class SystemController {
         quartzSchedulerConfiguration.put("org.quartz.threadPool.threadPriority", CoreResources.getField("org.quartz.threadPool.threadPriority"));
 
         HashMap<String, String> facilityInformation = new HashMap<>();
+        facilityInformation.put("FacName", CoreResources.getField("FacName"));
         facilityInformation.put("FacCity", CoreResources.getField("FacCity"));
         facilityInformation.put("FacState", CoreResources.getField("FacState"));
         facilityInformation.put("FacZIP", CoreResources.getField("FacZIP"));
