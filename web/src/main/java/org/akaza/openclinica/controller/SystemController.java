@@ -573,7 +573,7 @@ public class SystemController {
             map.put("Database Connection", "True");
             map.put("Version", String.valueOf(conn.getMetaData().getDatabaseProductVersion()));
 
-            mapRole = getDbRoleProperties(conn, mapRole, username);
+            mapRole = getDbRoleProperties(conn, mapRole, username, true);
 
         } catch (Exception e) {
             map.put("connection", "False");
@@ -809,6 +809,13 @@ public class SystemController {
         } catch (MessagingException me) {
             return "INACTIVE";
         }
+    }
+
+    public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username, Boolean withoutRoleName) throws SQLException {
+        mapRole = getDbRoleProperties(conn, mapRole, username);
+        if (withoutRoleName)
+            mapRole.remove("RoleName");
+        return mapRole;
     }
 
     public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {
