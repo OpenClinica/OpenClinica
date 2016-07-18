@@ -1,10 +1,9 @@
 package org.akaza.openclinica.web.pform;
 
-import java.util.HashMap;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 import javax.servlet.ServletContext;
-
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import java.util.HashMap;
 
 public class PFormCache {
     

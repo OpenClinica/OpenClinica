@@ -1,13 +1,13 @@
 package org.akaza.openclinica.control.submit;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.pform.EnketoAPI;
 import org.akaza.openclinica.web.pform.EnketoCredentials;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ParticipantFormServlet extends SecureController {
 

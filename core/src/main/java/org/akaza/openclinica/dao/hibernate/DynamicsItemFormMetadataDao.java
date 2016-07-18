@@ -1,8 +1,5 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -12,6 +9,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

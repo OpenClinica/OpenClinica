@@ -1,9 +1,8 @@
 package org.akaza.openclinica.domain.technicaladmin;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 @Embeddable
 public class DatabaseChangeLogBeanPk implements Serializable {

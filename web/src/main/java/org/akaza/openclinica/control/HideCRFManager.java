@@ -1,10 +1,8 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

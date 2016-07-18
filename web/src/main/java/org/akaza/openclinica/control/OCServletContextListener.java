@@ -1,16 +1,15 @@
 package org.akaza.openclinica.control;
 
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO;
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.akaza.openclinica.domain.OpenClinicaVersionBean;
 import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.util.Map;
 
 /**
  * ServletContextListener used as a controller for throwing an error when

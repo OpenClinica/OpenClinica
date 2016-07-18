@@ -1,9 +1,9 @@
 package org.akaza.openclinica.service.extract;
 
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+
 import java.util.LinkedHashMap;
 import java.util.Locale;
-
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 
 public interface GenerateClinicalDataService {
 

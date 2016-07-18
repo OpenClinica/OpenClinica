@@ -12,11 +12,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.admin.DeleteStudyUserRoleServlet;
-import org.akaza.openclinica.control.admin.DeleteUserServlet;
-import org.akaza.openclinica.control.admin.EditStudyUserRoleServlet;
-import org.akaza.openclinica.control.admin.EditUserAccountServlet;
-import org.akaza.openclinica.control.admin.ViewUserAccountServlet;
+import org.akaza.openclinica.control.admin.*;
 
 import java.util.ArrayList;
 

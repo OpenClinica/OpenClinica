@@ -1,15 +1,15 @@
 package org.akaza.openclinica.control.submit;
 
-import java.util.Locale;
-
+import junit.framework.TestCase;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import static org.mockito.Mockito.*;
+import java.util.Locale;
 
-import junit.framework.TestCase;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SubmitDataServletTest extends TestCase {
 

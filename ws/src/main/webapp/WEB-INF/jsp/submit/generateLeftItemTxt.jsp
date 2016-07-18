@@ -1,8 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="org.akaza.openclinica.logic.score.*, java.util.HashMap, java.util.ArrayList, org.akaza.openclinica.bean.submit.ResponseOptionBean, org.akaza.openclinica.bean.submit.ItemBean" %>
-
 <c:set var="inputType" value="${param.inputType}" />
 <c:set var="itemId" value="${param.itemId}" />
 <c:set var="function" value="${param.function}"/>

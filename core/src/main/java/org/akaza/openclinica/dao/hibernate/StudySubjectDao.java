@@ -1,13 +1,13 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudySubjectOidGenerator;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 

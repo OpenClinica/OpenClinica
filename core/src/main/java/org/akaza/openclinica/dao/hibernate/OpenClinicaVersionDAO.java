@@ -3,10 +3,10 @@
  */
 package org.akaza.openclinica.dao.hibernate;
 
-import java.sql.Timestamp;
-
 import org.akaza.openclinica.domain.OpenClinicaVersionBean;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
 
 /**
  * @author pgawade

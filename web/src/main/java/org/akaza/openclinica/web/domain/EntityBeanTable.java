@@ -6,13 +6,7 @@ package org.akaza.openclinica.web.domain;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Link;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class for displaying a table of EntityBean objects on the screen.

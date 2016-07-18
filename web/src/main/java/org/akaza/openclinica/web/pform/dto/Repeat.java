@@ -1,10 +1,6 @@
 package org.akaza.openclinica.web.pform.dto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.akaza.openclinica.bean.submit.SectionBean;
 
 public class Repeat {
 

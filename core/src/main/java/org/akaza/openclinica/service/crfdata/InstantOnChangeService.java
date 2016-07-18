@@ -18,13 +18,8 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.sql.DataSource;
+import java.util.*;
 
 /**
  * For instant-calculation func:onchange

@@ -1,15 +1,12 @@
 package org.akaza.openclinica.web.job;
 
 import org.quartz.JobDataMap;
-import org.quartz.ScheduleBuilder;
 import org.quartz.SimpleTrigger;
-import org.quartz.spi.MutableTrigger;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
 
 import java.util.Date;
+
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 public class XalanTriggerService {
     public XalanTriggerService() {

@@ -1,6 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.io.*" %>
+<%@ page import="java.io.BufferedInputStream" %>
+<%@ page import="java.io.BufferedOutputStream" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.io.InputStream" %>
 <jsp:useBean scope='session' id='pageMessage' class='java.lang.String'/>
 <jsp:useBean scope='request' id='downloadStatus' class='java.lang.String'/>
 

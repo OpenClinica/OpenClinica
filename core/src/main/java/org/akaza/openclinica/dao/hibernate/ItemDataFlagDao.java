@@ -1,11 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.akaza.openclinica.domain.datamap.EventCrfFlag;
 import org.akaza.openclinica.domain.datamap.ItemDataFlag;
-import org.akaza.openclinica.domain.datamap.ItemData;
+
+import java.util.List;
 
 public class ItemDataFlagDao extends AbstractDomainDao<ItemDataFlag> {
 

@@ -1,31 +1,12 @@
 package org.akaza.openclinica.service.crfdata;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import org.akaza.openclinica.dao.hibernate.ResponseSetDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
 import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformUtils;
-import org.akaza.openclinica.domain.xform.dto.Group;
-import org.akaza.openclinica.domain.xform.dto.Html;
-import org.akaza.openclinica.domain.xform.dto.Input;
-import org.akaza.openclinica.domain.xform.dto.Item;
-import org.akaza.openclinica.domain.xform.dto.ItemSet;
-import org.akaza.openclinica.domain.xform.dto.Label;
-import org.akaza.openclinica.domain.xform.dto.Select;
-import org.akaza.openclinica.domain.xform.dto.Select1;
-import org.akaza.openclinica.domain.xform.dto.Upload;
-import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.domain.xform.dto.*;
 import org.akaza.openclinica.validator.xform.ResponseSetValidator;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +18,15 @@ import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Service
 public class ResponseSetService {

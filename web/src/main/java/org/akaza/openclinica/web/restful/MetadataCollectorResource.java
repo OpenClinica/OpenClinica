@@ -1,29 +1,23 @@
 package org.akaza.openclinica.web.restful;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
-import javax.sql.DataSource;
-
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
-
-import org.akaza.openclinica.bean.extract.odm.ClinicalDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
-import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * R

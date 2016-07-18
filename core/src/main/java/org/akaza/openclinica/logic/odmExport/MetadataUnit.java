@@ -12,13 +12,7 @@ package org.akaza.openclinica.logic.odmExport;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
-import org.akaza.openclinica.bean.odmbeans.GlobalVariablesBean;
-import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
-import org.akaza.openclinica.bean.odmbeans.MetaDataVersionIncludeBean;
-import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
-import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
+import org.akaza.openclinica.bean.odmbeans.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
@@ -26,14 +20,9 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
 import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * A class for ODM metadata of one study.

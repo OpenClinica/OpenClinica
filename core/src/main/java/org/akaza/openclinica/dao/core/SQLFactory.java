@@ -7,7 +7,12 @@
  */
 package org.akaza.openclinica.dao.core;
 
-import java.io.File;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import org.akaza.openclinica.dao.cache.EhCacheWrapper;
+import org.springframework.core.io.ResourceLoader;
+import org.xml.sax.SAXException;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -15,14 +20,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
-
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.hibernate.EhCacheProvider;
-
-import org.akaza.openclinica.dao.cache.EhCacheWrapper;
-import org.springframework.core.io.ResourceLoader;
-import org.xml.sax.SAXException;
 
 /**
  * Provides a singleton SQLFactory instance

@@ -7,19 +7,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Connection;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -39,6 +26,11 @@ import org.akaza.openclinica.patterns.ocobserver.Observer;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.rule.StudyEventBeanListener;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * @author jxu

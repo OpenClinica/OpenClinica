@@ -1,13 +1,8 @@
 package org.akaza.openclinica.web.pform.widget;
 
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
-import org.akaza.openclinica.web.pform.dto.Hint;
-import org.akaza.openclinica.web.pform.dto.Input;
-import org.akaza.openclinica.web.pform.dto.Label;
 import org.akaza.openclinica.web.pform.dto.UserControl;
 
 public class GroupWidget extends BaseWidget {

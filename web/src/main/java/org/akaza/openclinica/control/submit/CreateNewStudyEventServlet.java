@@ -33,17 +33,9 @@ import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
-
 import javax.sql.DataSource;
+import java.net.URLEncoder;
+import java.util.*;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 

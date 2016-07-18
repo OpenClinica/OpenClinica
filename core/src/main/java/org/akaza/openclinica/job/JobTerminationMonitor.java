@@ -7,10 +7,10 @@
  */
 package org.akaza.openclinica.job;
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 /**
  * This class is used to introduce checkpoints in the extract job execution in which a job cancellation request

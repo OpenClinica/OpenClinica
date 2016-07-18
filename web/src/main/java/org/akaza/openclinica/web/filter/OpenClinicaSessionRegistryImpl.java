@@ -1,10 +1,5 @@
 package org.akaza.openclinica.web.filter;
 
-import java.util.Date;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
@@ -16,6 +11,10 @@ import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
+
+import javax.sql.DataSource;
+import java.util.Date;
+import java.util.Locale;
 
 public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
 

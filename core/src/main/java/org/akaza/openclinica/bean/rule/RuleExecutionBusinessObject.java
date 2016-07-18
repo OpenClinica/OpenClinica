@@ -1,8 +1,5 @@
 package org.akaza.openclinica.bean.rule;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -14,6 +11,9 @@ import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /*
  * @author Krikor Krumlian

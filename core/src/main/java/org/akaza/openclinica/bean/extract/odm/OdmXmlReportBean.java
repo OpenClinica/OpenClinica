@@ -7,14 +7,14 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.util.TreeSet;
-
 import org.akaza.openclinica.bean.extract.ODMSASFormatNameValidator;
 import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.TreeSet;
 
 /**
  * Create ODM XML document.

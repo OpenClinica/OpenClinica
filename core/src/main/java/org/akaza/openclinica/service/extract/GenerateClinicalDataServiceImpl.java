@@ -1,60 +1,18 @@
 package org.akaza.openclinica.service.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
-import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
-import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
-import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
-import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.bean.odmbeans.*;
+import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DnEventCrfMap;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-import org.akaza.openclinica.domain.datamap.DnStudyEventMap;
-import org.akaza.openclinica.domain.datamap.DnStudySubjectMap;
-import org.akaza.openclinica.domain.datamap.DnSubjectMap;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
-import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
-import org.akaza.openclinica.domain.datamap.VersioningMap;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Generate CDISC-ODM clinical data without data set.

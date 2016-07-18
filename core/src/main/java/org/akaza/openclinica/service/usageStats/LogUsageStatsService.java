@@ -3,15 +3,14 @@
  */
 package org.akaza.openclinica.service.usageStats;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author pgawade

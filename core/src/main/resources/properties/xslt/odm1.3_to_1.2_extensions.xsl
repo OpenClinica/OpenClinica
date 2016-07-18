@@ -1,12 +1,11 @@
 <xsl:stylesheet
-   version="2.0"
-   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-   xmlns:olddef="http://www.cdisc.org/ns/odm/v1.3"
-   xmlns="http://www.cdisc.org/ns/odm/v1.2"
-   xmlns:oldOC="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
-   xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v1.2"
-    xmlns:OpenClinicaRules="http://www.openclinica.org/ns/rules/v3.1" 
-   exclude-result-prefixes="olddef oldOC">
+        version="2.0"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:olddef="http://www.cdisc.org/ns/odm/v1.3"
+        xmlns="http://www.cdisc.org/ns/odm/v1.2"
+        xmlns:oldOC="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+        xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v1.2"
+        exclude-result-prefixes="olddef oldOC">
 
 
 <!-- ****************************************************************************************************** -->

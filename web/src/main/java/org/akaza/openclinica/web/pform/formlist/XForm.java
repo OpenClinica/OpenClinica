@@ -1,10 +1,9 @@
 package org.akaza.openclinica.web.pform.formlist;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+
+import java.security.NoSuchAlgorithmException;
 
 public class XForm {
     private String formID = null;

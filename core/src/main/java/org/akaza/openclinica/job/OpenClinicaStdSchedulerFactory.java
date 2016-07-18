@@ -1,11 +1,11 @@
 package org.akaza.openclinica.job;
 
-import java.util.Properties;
-
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.ThreadPool;
+
+import java.util.Properties;
 
 /**
  * Custom {@link SchedulerFactory} adapted to configure a {@link ThreadPool} with zero threads.

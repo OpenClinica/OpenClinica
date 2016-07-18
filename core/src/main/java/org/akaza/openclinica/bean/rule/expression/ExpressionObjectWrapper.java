@@ -3,9 +3,8 @@ package org.akaza.openclinica.bean.rule.expression;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.RuleSetBean;
 
-import java.util.HashMap;
-
 import javax.sql.DataSource;
+import java.util.HashMap;
 
 public class ExpressionObjectWrapper {
 

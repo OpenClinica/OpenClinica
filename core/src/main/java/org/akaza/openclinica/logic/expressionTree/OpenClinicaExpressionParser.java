@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.logic.expressionTree;
 
-import java.util.HashMap;
-
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 /**
  * @author Krikor Krumlian

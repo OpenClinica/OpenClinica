@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller.helper;
 
-import org.springframework.web.bind.ServletRequestDataBinder;
-
 import java.util.Date;
 
 /**

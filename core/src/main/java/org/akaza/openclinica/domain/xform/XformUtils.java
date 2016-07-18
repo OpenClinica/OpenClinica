@@ -1,11 +1,11 @@
 package org.akaza.openclinica.domain.xform;
 
-import java.util.List;
-
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.domain.xform.dto.Text;
 import org.akaza.openclinica.domain.xform.dto.Translation;
 import org.akaza.openclinica.domain.xform.dto.Value;
+
+import java.util.List;
 
 public class XformUtils {
 

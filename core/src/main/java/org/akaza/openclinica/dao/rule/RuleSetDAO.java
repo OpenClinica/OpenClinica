@@ -28,13 +28,12 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 
+import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import javax.sql.DataSource;
 
 /**
  * <p>

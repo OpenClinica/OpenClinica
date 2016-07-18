@@ -1,9 +1,5 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.jmesa.view.html.HtmlBuilder;
-
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.fetcher.FeedFetcher;
@@ -12,19 +8,20 @@ import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 import com.sun.syndication.io.FeedException;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.jmesa.view.html.HtmlBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class RssReaderServlet extends HttpServlet {
 

@@ -18,18 +18,15 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import javax.xml.bind.DatatypeConverter;
 
 public class UploadFileServlet extends SecureController {
     Locale locale;

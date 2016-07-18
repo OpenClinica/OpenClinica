@@ -1,17 +1,6 @@
 package org.akaza.openclinica.web.pform.widget;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.domain.datamap.Section;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.web.pform.OpenRosaXmlGenerator;
+import org.akaza.openclinica.bean.submit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

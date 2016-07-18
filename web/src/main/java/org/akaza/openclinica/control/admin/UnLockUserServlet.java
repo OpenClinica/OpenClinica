@@ -7,8 +7,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -21,6 +19,8 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+
+import java.util.Locale;
 
 // allows both deletion and restoration of a study user role
 

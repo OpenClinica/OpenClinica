@@ -5,12 +5,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * A class that handles persistent values that must appear in forms when they

@@ -9,10 +9,6 @@ package org.akaza.openclinica.core;
 
 import org.akaza.openclinica.dao.core.CoreResources;
 
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -21,6 +17,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  *

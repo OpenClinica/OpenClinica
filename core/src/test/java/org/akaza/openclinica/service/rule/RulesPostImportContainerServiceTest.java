@@ -1,20 +1,15 @@
 package org.akaza.openclinica.service.rule;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import junit.framework.TestCase;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.ArrayList;
-
-import junit.framework.TestCase;
 
 public class RulesPostImportContainerServiceTest extends TestCase {
 

@@ -10,7 +10,6 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.view.Page;
 
 /**
  * Processes request to change ordinals of study event definitions in a study

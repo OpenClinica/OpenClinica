@@ -1,14 +1,14 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import static java.util.Arrays.asList;
+import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Arrays.asList;
 
 public class PasswordRequirementsDao {
 	public static final String

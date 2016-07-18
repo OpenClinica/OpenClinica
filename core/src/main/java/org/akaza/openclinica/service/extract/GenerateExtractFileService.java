@@ -1,33 +1,6 @@
 package org.akaza.openclinica.service.extract;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
-import org.akaza.openclinica.bean.extract.ExportFormatBean;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.extract.SPSSReportBean;
-import org.akaza.openclinica.bean.extract.SPSSVariableNameValidator;
-import org.akaza.openclinica.bean.extract.TabReportBean;
+import org.akaza.openclinica.bean.extract.*;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -40,6 +13,12 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.io.*;
+import java.util.*;
+import java.util.zip.ZipOutputStream;
 
 public class GenerateExtractFileService {
 

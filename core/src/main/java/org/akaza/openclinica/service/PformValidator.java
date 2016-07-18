@@ -1,11 +1,5 @@
 package org.akaza.openclinica.service;
 
-import java.text.MessageFormat;
-
-import javax.validation.Validation;
-
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

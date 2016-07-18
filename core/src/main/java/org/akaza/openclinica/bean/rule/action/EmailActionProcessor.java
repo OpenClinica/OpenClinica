@@ -7,10 +7,9 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-
 import javax.mail.MessagingException;
 import javax.sql.DataSource;
+import java.util.HashMap;
 
 public class EmailActionProcessor implements ActionProcessor {
 

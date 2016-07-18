@@ -1,7 +1,6 @@
 package org.akaza.openclinica.web.bean;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;

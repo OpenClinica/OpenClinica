@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- Copyright (C) 2010, Akaza Research, LLC. -->
 <xsl:stylesheet version="2.0"
-	xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:def="http://www.cdisc.org/ns/def/v1.0"
-	xmlns:xlink="http://www.w3c.org/1999/xlink" xmlns:exsl="http://exslt.org/common"
-	extension-element-prefixes="exsl"
-	xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
-	xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+                xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
+                extension-element-prefixes="exsl"
+                xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+>
 
 
 	<xsl:output method="text" indent="yes" encoding="utf-8"

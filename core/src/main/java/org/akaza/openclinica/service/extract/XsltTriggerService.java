@@ -1,15 +1,13 @@
 package org.akaza.openclinica.service.extract;
 
-import java.math.BigInteger;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
-import static org.quartz.TriggerBuilder.newTrigger;
+import java.math.BigInteger;
+import java.util.Date;
 
 public class XsltTriggerService {
     public XsltTriggerService() {

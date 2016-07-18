@@ -1,22 +1,16 @@
 package org.akaza.openclinica.web.filter;
 
-import java.io.IOException;
-import java.util.Locale;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
-
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Filter for applying the OpenClinica's Locale

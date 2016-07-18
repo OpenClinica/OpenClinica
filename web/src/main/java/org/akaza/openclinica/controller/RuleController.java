@@ -1,15 +1,5 @@
 package org.akaza.openclinica.controller;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -22,18 +12,9 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.RunOnSchedule;
+import org.akaza.openclinica.domain.rule.*;
 import org.akaza.openclinica.domain.rule.action.*;
-import org.akaza.openclinica.domain.rule.expression.Context;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
-import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
-import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
+import org.akaza.openclinica.domain.rule.expression.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
@@ -58,13 +39,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/rule")

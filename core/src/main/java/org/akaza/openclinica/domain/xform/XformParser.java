@@ -1,21 +1,18 @@
 package org.akaza.openclinica.domain.xform;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.xform.dto.Html;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class XformParser {
     private XMLContext xmlContext = null;

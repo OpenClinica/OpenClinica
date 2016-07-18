@@ -1,13 +1,7 @@
 package org.akaza.openclinica.service.pmanage;
 
-import java.util.Date;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -20,6 +14,10 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.client.RestTemplate;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.util.Date;
 
 public class RandomizationRegistrar {
 

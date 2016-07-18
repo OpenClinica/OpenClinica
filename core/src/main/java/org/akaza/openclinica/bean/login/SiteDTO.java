@@ -1,8 +1,6 @@
 package org.akaza.openclinica.bean.login;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class SiteDTO {
 	private String uniqueSiteProtocolID;

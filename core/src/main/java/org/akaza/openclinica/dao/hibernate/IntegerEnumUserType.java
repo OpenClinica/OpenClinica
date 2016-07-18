@@ -1,13 +1,12 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.bean.rule.expression.Context;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.internal.util.ReflectHelper;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;

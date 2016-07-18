@@ -1,21 +1,11 @@
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.dao.submit.*;
 
 import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Utility class with method for retrieving the metadata for a CRFVersion.

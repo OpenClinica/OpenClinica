@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller;
 
-import org.springframework.stereotype.Component;
-
 /**
 *  This class represents the state of a sidebar in decorator.jsp. For example,
  * if the Alerts/Messages should be initially displayed as open, then the alertsBoxSetup

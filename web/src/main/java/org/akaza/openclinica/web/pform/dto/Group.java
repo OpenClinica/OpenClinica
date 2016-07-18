@@ -1,6 +1,5 @@
 package org.akaza.openclinica.web.pform.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Group {

@@ -1,15 +1,5 @@
 package org.akaza.openclinica.service.user;
 
-import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-
 import org.akaza.openclinica.domain.user.LdapUser;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +10,15 @@ import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import java.text.MessageFormat;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides access to user information retrieved from LDAP/Active Directory.

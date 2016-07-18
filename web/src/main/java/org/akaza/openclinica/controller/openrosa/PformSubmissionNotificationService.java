@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import java.util.HashMap;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.service.pmanage.Study;
@@ -12,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
 
 @Service
 public class PformSubmissionNotificationService {

@@ -1,10 +1,6 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.jdom.Element;
 

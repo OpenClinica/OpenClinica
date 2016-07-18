@@ -11,11 +11,10 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.extract.QueryBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-
-import javax.sql.DataSource;
 
 /**
  * @author thickerson

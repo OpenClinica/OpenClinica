@@ -7,20 +7,6 @@
  */
 package org.akaza.openclinica.service.extract;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExportFormatBean;
@@ -37,13 +23,16 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
-import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
-import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
-import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
-import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
-import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
+import org.akaza.openclinica.logic.odmExport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

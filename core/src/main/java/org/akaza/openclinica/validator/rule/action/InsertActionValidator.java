@@ -25,11 +25,10 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 public class InsertActionValidator implements Validator {
 

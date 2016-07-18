@@ -17,11 +17,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
+import javax.servlet.ServletOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-
-import javax.servlet.ServletOutputStream;
 
 /**
  * @author jxu

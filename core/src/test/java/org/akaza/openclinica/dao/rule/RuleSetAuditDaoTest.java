@@ -1,17 +1,12 @@
 package org.akaza.openclinica.dao.rule;
 
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
@@ -64,34 +59,43 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
 
         assertNotNull("ruleSetAudits is null", ruleSetAudits);
         assertEquals("The size of the ruleSetAudits is not 2", new Integer(2), Integer.valueOf(ruleSetAudits.size()));
-
     }
 
     public void testFindById() {
-       // RuleSetAuditDao ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
+        // RuleSetAuditDao ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
 
-        RuleSetAuditBean ruleSetAuditBean = ruleSetAuditDao.findById(-1);
+        RuleSetAuditBean ruleSetAuditBean = null;
+        try {
+            ruleSetAuditBean = ruleSetAuditDao.findById(-1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         assertNotNull("ruleSetRuleAuditBean is null", ruleSetAuditBean);
-        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be 3", new Integer(-1), Integer.valueOf(ruleSetAuditBean.getRuleSetBean().getId()));
-
+        assertEquals("The ruleSetRuleAuditBean.getRuleSetRule.getId should be -1", new Integer(-1), Integer.valueOf(ruleSetAuditBean.getRuleSetBean().getId()));
     }
 
     public void testSaveOrUpdate() {
-   //     RuleSetAuditDao ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
+        //     RuleSetAuditDao ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
        // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleSetBean ruleSetBean = ruleSetDao.findById(-1);
 
         RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();
         ruleSetAuditBean.setRuleSetBean(ruleSetBean);
+        try {
         ruleSetAuditBean = ruleSetAuditDao.saveOrUpdate(ruleSetAuditBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         assertNotNull("Persistant id is null", ruleSetAuditBean.getId());
     }
+
     public void tearDown(){
         try {
-            ruleSetAuditDao.getSessionFactory().getCurrentSession().close();
-            ruleSetAuditDao.getSessionFactory().getCurrentSession().close();
+            // if there are any uncommitted transactions, commit them now
+            if (ruleSetAuditDao.getCurrentSession().getTransaction().isActive())
+                ruleSetAuditDao.getCurrentSession().getTransaction().commit();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

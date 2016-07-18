@@ -2,11 +2,9 @@ package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 
 import javax.sql.DataSource;

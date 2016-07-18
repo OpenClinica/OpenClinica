@@ -1,5 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.io.*" %>
+<%@ page import="java.io.BufferedInputStream" %>
+<%@ page import="java.io.BufferedOutputStream" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.io.InputStream" %>
 
 <%
   String path = (String)request.getAttribute("generate");

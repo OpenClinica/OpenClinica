@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openclinica.org/ws/studySubject/v1"
-    xmlns:studySubjects="http://openclinica.org/ws/studySubject/v1" 
-    xmlns:beans="http://openclinica.org/ws/beans"
-    elementFormDefault="qualified">
+        targetNamespace="http://openclinica.org/ws/studySubject/v1"
+        xmlns:beans="http://openclinica.org/ws/beans"
+        elementFormDefault="qualified">
     
     <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
 

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<xsd:schema targetNamespace="http://www.w3.org/1999/xlink" 
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-            xmlns:xlink="http://www.w3.org/1999/xlink" 
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema targetNamespace="http://www.w3.org/1999/xlink"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified" attributeFormDefault="qualified">
 
    <xsd:element name="root">

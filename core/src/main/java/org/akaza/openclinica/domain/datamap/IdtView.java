@@ -1,23 +1,13 @@
 package org.akaza.openclinica.domain.datamap;
 
-import java.beans.Transient;
+import org.akaza.openclinica.domain.DataMapDomainObject;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.akaza.openclinica.domain.DataMapDomainObject;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Table(name = "view_item_data_toolkit_filtered")

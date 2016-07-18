@@ -1,11 +1,11 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
+
+import java.util.ArrayList;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 

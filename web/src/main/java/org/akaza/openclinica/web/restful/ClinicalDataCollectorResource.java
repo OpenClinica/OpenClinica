@@ -1,10 +1,10 @@
 package org.akaza.openclinica.web.restful;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.service.extract.GenerateClinicalDataService;
+
+import java.util.LinkedHashMap;
+import java.util.Locale;
 
 /**
  * 

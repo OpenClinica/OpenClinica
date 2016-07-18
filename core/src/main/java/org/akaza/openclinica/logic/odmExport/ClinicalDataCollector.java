@@ -9,16 +9,15 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.job.JobTerminationMonitor;
+
+import javax.sql.DataSource;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Populate ODM ClinicalData Element for a ODM XML file. It supports:

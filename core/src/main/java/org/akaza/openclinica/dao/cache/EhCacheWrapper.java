@@ -1,12 +1,11 @@
 package org.akaza.openclinica.dao.cache;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EhCacheWrapper<K, V> implements CacheWrapper<K, V> 
 {

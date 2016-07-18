@@ -1,12 +1,12 @@
 package org.akaza.openclinica.web.filter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Adds the <code>ROLE_USER</code> to all LDAP users which succeed on authenticating.

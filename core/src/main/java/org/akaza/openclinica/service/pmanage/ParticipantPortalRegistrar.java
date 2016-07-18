@@ -1,10 +1,5 @@
 package org.akaza.openclinica.service.pmanage;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -12,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpSession;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ParticipantPortalRegistrar {
 

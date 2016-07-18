@@ -12,11 +12,10 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.sql.DataSource;
 
 public class SubjectTransferValidator implements Validator {
 

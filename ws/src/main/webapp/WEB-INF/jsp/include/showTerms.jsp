@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
 <%
 Integer value = (Integer) request.getParameter("value");  // hmm... that won't work...
 List terms = (List) request.getParameter("terms");

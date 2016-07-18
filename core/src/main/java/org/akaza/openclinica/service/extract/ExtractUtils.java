@@ -1,11 +1,10 @@
 package org.akaza.openclinica.service.extract;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
 
 public class ExtractUtils {
 

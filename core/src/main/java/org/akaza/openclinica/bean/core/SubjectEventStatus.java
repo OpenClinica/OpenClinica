@@ -7,15 +7,9 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import java.util.*;
 
 /**
  * @author Jun Xu

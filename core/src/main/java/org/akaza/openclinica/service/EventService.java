@@ -18,10 +18,9 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.util.Date;
 import java.util.HashMap;
-
-import javax.sql.DataSource;
 
 public class EventService implements EventServiceInterface {
 

@@ -22,11 +22,7 @@ import org.akaza.openclinica.web.domain.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records

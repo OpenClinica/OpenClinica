@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author jxu

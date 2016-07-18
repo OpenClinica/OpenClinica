@@ -5,9 +5,8 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 
-import java.util.HashMap;
-
 import javax.sql.DataSource;
+import java.util.HashMap;
 
 public class ExpressionObjectWrapper {
 

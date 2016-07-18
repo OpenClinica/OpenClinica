@@ -1,9 +1,5 @@
 package org.akaza.openclinica.web.pform;
 
-import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -14,6 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 
 public class EnketoAPI {
 

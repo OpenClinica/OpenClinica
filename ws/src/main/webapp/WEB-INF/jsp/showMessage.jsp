@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.ArrayList" %>
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 
 <%

@@ -1,11 +1,11 @@
 package org.akaza.openclinica.gwt.client;
 
-import java.util.HashMap;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.*;
+
+import java.util.HashMap;
 
 /**
  * A component class for the top-level navigation menu.

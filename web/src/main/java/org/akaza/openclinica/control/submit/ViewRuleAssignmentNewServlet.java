@@ -32,12 +32,11 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
