@@ -68,7 +68,8 @@
      <!-- Configuration for distributed sessions using spring-session -->
      <context:annotation-config/>
      <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"/>
-     <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"/>
+     <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+         p:host-name="ec2-23-23-126-210.compute-1.amazonaws.com" p:port="28089" p:password="pcb578ini8t7248epm59tm4ftgr"/>
      <bean id="springSessionDefaultRedisSerializer" class="org.akaza.openclinica.core.OpenClinicaRedisSerializer"/>
 
 </beans>
