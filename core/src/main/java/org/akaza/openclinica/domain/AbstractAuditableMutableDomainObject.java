@@ -9,13 +9,10 @@ import javax.persistence.Transient;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.hibernate.annotations.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @MappedSuperclass
 public abstract class AbstractAuditableMutableDomainObject extends AbstractMutableDomainObject implements MutableDomainObject, AuditableMutableDomainObject, Serializable {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     protected Date createdDate;
     protected Date updatedDate;
     protected UserAccountBean owner;

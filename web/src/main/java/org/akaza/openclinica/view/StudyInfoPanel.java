@@ -39,8 +39,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * To create a flexible panel of information that will change while the user
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
  */
 public class StudyInfoPanel implements Serializable {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private TreeMap data = new TreeMap();
 
