@@ -65,6 +65,10 @@
 
      <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
      
-     
-     
+     <!-- Configuration for distributed sessions using spring-session -->
+     <context:annotation-config/>
+     <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"/>
+     <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"/>
+     <bean id="springSessionDefaultRedisSerializer" class="org.akaza.openclinica.core.OpenClinicaRedisSerializer"/>
+
 </beans>

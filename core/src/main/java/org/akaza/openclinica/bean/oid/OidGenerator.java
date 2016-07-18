@@ -7,11 +7,12 @@
  */
 package org.akaza.openclinica.bean.oid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * OID Generator solves the problems described below. We have Domain Objects
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
  * @see Strategy Pattern, Template Pattern
  */
 
-public abstract class OidGenerator {
+public abstract class OidGenerator implements Serializable {
 
     @Override
     public int hashCode() {

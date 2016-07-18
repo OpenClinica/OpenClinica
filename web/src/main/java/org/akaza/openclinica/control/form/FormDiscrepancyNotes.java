@@ -7,17 +7,18 @@
  */
 package org.akaza.openclinica.control.form;
 
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 
 /**
  * @author jxu
  *
  * 
  */
-public class FormDiscrepancyNotes {
+public class FormDiscrepancyNotes implements Serializable{
     private HashMap fieldNotes;
     private HashMap numExistingFieldNotes;
     private HashMap idNotes;

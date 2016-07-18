@@ -7,11 +7,11 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * @author ssachs
@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 public class Term extends EntityBean {
 
     Locale locale;
-    ResourceBundle resterm;
+    //ResourceBundle resterm;
     protected String description;
 
     public Term() {
@@ -46,7 +46,7 @@ public class Term extends EntityBean {
      */
     public String getDescription() {
         if (!this.description.equals("")) {
-            resterm = ResourceBundleProvider.getTermsBundle();
+            ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
             return resterm.getString(this.description).trim();
         } else
             return null;
@@ -98,7 +98,7 @@ public class Term extends EntityBean {
     @Override
     public String getName() {
         // *
-        resterm = ResourceBundleProvider.getTermsBundle();
+        ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
         String name = resterm.getString(this.name);
         if(name != null) {
            return name.trim();
