@@ -10,7 +10,7 @@
                         http://www.springframework.org/schema/util
                         http://www.springframework.org/schema/util/spring-util-4.3.xsd">
 
-     <util:properties id="testInfo" location="classpath:test.properties"/>
+     <util:properties id="testInfo" location="classpath:datainfo.properties"/>
 
       <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
 
