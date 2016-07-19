@@ -27,19 +27,6 @@ public class RestrictedController {
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
-
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++Request attr names:");
-        Enumeration params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = (String)params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
-        Enumeration attrs = request.getAttributeNames();
-        while(attrs.hasMoreElements()){
-            String paramName = (String)attrs.nextElement();
-            System.out.println("Attribute Name - "+paramName+", Value - "+request.getAttribute(paramName));
-        }
         AccountResult accountResult = app.newIdSiteCallbackHandler(request).getAccountResult();
 
         Account account = accountResult.getAccount();
@@ -49,12 +36,8 @@ public class RestrictedController {
         }
 
 
-        System.out.println("****in SSO restricted controller:" + app);
-        System.out.println("Previous app from the request:" + getApplication(request));
-        System.out.println("****Account=" + account);
         Authentication authentication = new UsernamePasswordAuthenticationToken(account.getUsername(), null,
                 AuthorityUtils.createAuthorityList("ROLE_USER"));
-        System.out.println("**************Auth=" + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
