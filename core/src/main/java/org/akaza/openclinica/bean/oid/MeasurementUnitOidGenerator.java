@@ -29,7 +29,6 @@ public class MeasurementUnitOidGenerator extends OidGenerator {
         if (oid.equals("MU_")) {
             oid = randomizeOid("MU_");
         }
-        logger.info("OID : " + oid);
         return oid;
     }
 

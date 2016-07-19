@@ -11,8 +11,7 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sf.ehcache.config.PersistenceConfiguration.Strategy;
 
 /**
  * OID Generator solves the problems described below. We have Domain Objects
@@ -33,7 +32,6 @@ public abstract class OidGenerator implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((logger == null) ? 0 : logger.hashCode());
         result = prime * result + oidLength;
         return result;
     }
@@ -47,18 +45,12 @@ public abstract class OidGenerator implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         OidGenerator other = (OidGenerator) obj;
-        if (logger == null) {
-            if (other.logger != null)
-                return false;
-        } else if (!logger.equals(other.logger))
-            return false;
         if (oidLength != other.oidLength)
             return false;
         return true;
     }
 
     private final int oidLength = 40;
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public final String generateOid(String... keys) throws Exception {
         verifyArgumentLength(keys);
