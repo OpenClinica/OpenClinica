@@ -170,8 +170,8 @@ public class ItemProcessor implements Processor, Ordered {
                                         }
                                         if (responseTypeId == 4) {
                                            for (HashMap  uploadFilePath : listOfUploadFilePaths){
-                                               if ((boolean) uploadFilePath.containsKey(itemName+"."+itemValue)  && itemValue!=""){
-                                                   itemValue = (String) uploadFilePath.get(itemName+"."+itemValue);
+                                               if ((boolean) uploadFilePath.containsKey(itemValue)  && itemValue!=""){
+                                                   itemValue = (String) uploadFilePath.get(itemValue);
                                                    break;
                                                }
                                                
