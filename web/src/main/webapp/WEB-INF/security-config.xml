@@ -8,8 +8,7 @@
 
                            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.1.xsd">
 
-	<security:http auto-config="true" use-expressions="true"
-		access-denied-page="/accounts/denied.htm">
+	<security:http auto-config="true" use-expressions="true">
 		<security:form-login login-page="/login/login"
 			authentication-failure-url="/WEB-INF/jsp/login/login.jsp?action=errorLogin" />
 		<security:intercept-url pattern="/accounts/edit*"
@@ -18,7 +17,7 @@
 			access="ROLE_ADMIN,ROLE_MEMBER" />
 		<security:intercept-url pattern="/**"
 			access="ROLE_USER" />
-
+		<security:access-denied-handler error-page="/aacounts/denied.htm"></security:access-denied-handler>
 	</security:http>
 
 	<security:authentication-provider>

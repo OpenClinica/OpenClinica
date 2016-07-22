@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.util.Enumeration;
 
 @Controller
@@ -24,6 +25,8 @@ public class RestrictedController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     Application app;
+    @Autowired
+    DataSource dataSource;
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
@@ -47,4 +50,11 @@ public class RestrictedController {
     protected Application getApplication(HttpServletRequest request) {
         return (Application)request.getAttribute(Application.class.getName());
     }
+
+    //TODO
+    /*
+    - Get the dataSource as done above
+    - Create new UserAccountDAO(dataSource)
+    -
+     */
 }
