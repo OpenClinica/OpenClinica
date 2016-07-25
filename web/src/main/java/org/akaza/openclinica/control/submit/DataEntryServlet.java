@@ -97,6 +97,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
@@ -4170,9 +4171,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList<ItemFormMetadataBean> shownRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndShownByCrfVersionId(ecb.getCRFVersionId());
         ArrayList<ItemFormMetadataBean> hiddenRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndHiddenByCrfVersionId(ecb
                 .getCRFVersionId());
-
+        ItemGroupMetadataDAO<String, ArrayList> igdao = new ItemGroupMetadataDAO<String, ArrayList>(dataSource);
+        
         ArrayList<ItemDataBean> itemdatas = null;
         for (ItemFormMetadataBean shownItemMeta : shownRequiredAllItemsInCrfVersion) {
+            ItemGroupMetadataBean igBean=  (ItemGroupMetadataBean) igdao.findByItemAndCrfVersion(shownItemMeta.getItemId(), ecb.getCRFVersionId());
+  // verifies if the group that the item belongs to is not hidden.
+            if (igBean!=null && igBean.isShowGroup()){  
             itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), shownItemMeta.getItemId());
             if (itemdatas == null || itemdatas.size()==0)
                 return false;
@@ -4182,7 +4187,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     return false;
                 }
             }
-        }
+          }
+        
 
         ArrayList<DynamicsItemFormMetadataBean> dynamicsItemFormMetadataBeans = null;
         for (ItemFormMetadataBean hiddenItemMeta : hiddenRequiredAllItemsInCrfVersion) {
@@ -4197,9 +4203,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         return false;
                 }
             }
-        }        
-        
-        
+        }         
+    }
         
       // had to change the query below to allow for hidden items here, tbh 04/2010
         ArrayList allFilled = iddao.findAllBlankRequiredByEventCRFId(ecb.getId(), ecb.getCRFVersionId());
