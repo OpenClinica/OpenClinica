@@ -9,12 +9,11 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
-import java.util.Date;
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Call Super Class SecurityContextLogoutHandler that Performs a logout by modifying the {@link org.springframework.security.context.SecurityContextHolder}.

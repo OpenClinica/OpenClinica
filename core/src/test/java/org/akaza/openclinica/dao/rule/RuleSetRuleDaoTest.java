@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.rule;
 
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
@@ -9,9 +8,6 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
@@ -89,10 +85,9 @@ public class RuleSetRuleDaoTest extends HibernateOcDbTestCase {
     }
     public void tearDown(){
         try {
-           ruleSetDao.getSessionFactory().getCurrentSession().close();
-            ruleDao.getSessionFactory().getCurrentSession().close();
-        //   ruleDao.getSessionFactory().getCurrentSession().flush();
-            ruleSetRuleDao.getSessionFactory().getCurrentSession().close();
+            // if there are any uncommitted transactions, commit them now
+            if (ruleSetRuleDao.getCurrentSession().getTransaction().isActive())
+                ruleSetRuleDao.getCurrentSession().getTransaction().commit();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

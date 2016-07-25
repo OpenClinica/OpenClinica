@@ -1,7 +1,6 @@
 package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.JobTriggerService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.dbcp.BasicDataSource;

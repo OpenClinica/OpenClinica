@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -60,12 +61,16 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
@@ -79,6 +84,7 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -91,6 +97,12 @@ import org.w3c.dom.NodeList;
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
+    
+    @Autowired
+    UserAccountDao userAccountDao;
+    
+    @Autowired
+    StudyDao studyDao;
 
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -160,7 +172,7 @@ public class OpenRosaServices {
             @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
-
+        
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean study = sdao.findByOid(studyOID);
 
@@ -195,8 +207,10 @@ public class OpenRosaServices {
                         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                         form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
 
+                        //TODO:  Change test here to see if user list should be appended.  Hardcode to always add for now.
                         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getId());
-                        if (mediaList != null && mediaList.size() > 0) {
+                        //if (mediaList != null && mediaList.size() > 0) {
+                        if (true) {
                             form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid());
                         }
                         formList.add(form);
@@ -230,6 +244,8 @@ public class OpenRosaServices {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<Error>" + e.getMessage() + "</Error>";
         }
+        
+        
     }
 
     /**
@@ -258,9 +274,9 @@ public class OpenRosaServices {
         Manifest manifest = new Manifest();
 
         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getId());
+        String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {
             for (CrfVersionMedia media : mediaList) {
-                String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
 
                 MediaFile mediaFile = new MediaFile();
                 mediaFile.setFilename(media.getName());
@@ -270,6 +286,16 @@ public class OpenRosaServices {
                 manifest.add(mediaFile);
             }
         }
+        
+        //Add user list
+        MediaFile userList = new MediaFile();
+        Study study = studyDao.findByOcOID(studyOID);
+        String userXml = getUserXml(study.getStudyId());
+        userList.setFilename("users.xml");
+        userList.setHash((DigestUtils.md5Hex(userXml)));
+        userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
+        manifest.add(userList);
+        
         try {
             // Create the XML manifest using a Castor mapping file.
             XMLContext xmlContext = new XMLContext();
@@ -350,7 +376,7 @@ public class OpenRosaServices {
 
     }
 
-	/**
+    /**
      * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
      * @apiName getMediaFile
      * @apiPermission admin
@@ -380,6 +406,32 @@ public class OpenRosaServices {
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
         if (type != null && !type.isEmpty()) builder = builder.header("Content-Type", type);
+        return builder.build();
+    }
+
+    /**
+     * @api {get} /rest2/openrosa/:studyOID/downloadUsers Download users
+     * @apiName getUserList
+     * @apiPermission admin
+     * @apiVersion 3.12.0
+     * @apiParam {String} studyOID Study Oid.
+     * @apiGroup Form
+     * @apiDescription Downloads list of users for use with queries.
+     */
+
+    @GET
+    @Path("/{studyOID}/downloadUsers")
+    public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+            @RequestHeader("Authorization") String authorization, @Context ServletContext context)
+            throws Exception {
+        if (!mayProceedPreview(studyOID))
+            return null;
+        
+        Study study = studyDao.findByOcOID(studyOID);
+        String userXml = getUserXml(study.getStudyId());
+
+        ResponseBuilder builder = Response.ok(userXml);
+        builder = builder.header("Content-Type", "text/xml");
         return builder.build();
     }
 
@@ -623,6 +675,43 @@ public class OpenRosaServices {
 		return attribs;
 	}
 
+    private String getUserXml(Integer studyId) throws Exception { 
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+        Document doc = docBuilder.newDocument();
+        Element root = doc.createElement("root");
+        doc.appendChild(root);
+
+        
+        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
+        for ( UserAccount userAccount:users) {
+            Element item = doc.createElement("item");
+            Element userName = doc.createElement("user_name");
+            userName.appendChild(doc.createTextNode(userAccount.getUserName()));
+            Element firstName = doc.createElement("first_name");
+            firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
+            Element lastName = doc.createElement("last_name");
+            lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
+            item.appendChild(userName);
+            item.appendChild(firstName);
+            item.appendChild(lastName);
+            root.appendChild(item);
+        }
+
+        DOMSource dom = new DOMSource(doc);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.transform(dom, result);
+        String userXml = writer.toString();
+
+        return userXml;
+
+    }
+
     private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
@@ -650,7 +739,7 @@ public class OpenRosaServices {
 
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled

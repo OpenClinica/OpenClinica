@@ -91,6 +91,7 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
 
         RuleSetServiceInterface instance = (RuleSetServiceInterface) getContext().getBean("ruleSetService");
         List<RuleSetBean> ruleSets = instance.getRuleSetsByCrfStudyAndStudyEventDefinition(study, studyEventDefinition, crfVersion);
+
         return ruleSets;
 
     }

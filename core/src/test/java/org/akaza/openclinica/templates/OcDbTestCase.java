@@ -9,11 +9,9 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
+import javax.sql.DataSource;
 import java.util.Locale;
 import java.util.Properties;
-
-import javax.sql.DataSource;
 
 public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
 
@@ -105,7 +103,7 @@ public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
     }
 
     private String getPropertiesFilePath() {
-        return "/test.properties";
+        return "/datainfo.properties";
     }
 
     /**

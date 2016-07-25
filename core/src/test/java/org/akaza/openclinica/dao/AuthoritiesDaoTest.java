@@ -4,12 +4,6 @@ import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import java.sql.SQLException;
-import java.util.List;
 
 public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
     private static AuthoritiesDao authoritiesDao;
@@ -55,7 +49,11 @@ public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
         authorities.setUsername("root");
         authorities.setAuthority("ROLE_USER");
         authorities.setId(-1);
-        authorities = authoritiesDao.saveOrUpdate(authorities);
+        try {
+            authorities = authoritiesDao.saveOrUpdate(authorities);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         assertNotNull("Persistant id is null", authorities.getId());
     }
@@ -70,25 +68,31 @@ public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
         assertNotNull("RuleSet is null", authorities);
         assertEquals("The id of the retrieved Domain Object should be -1", new Integer(-1), authorities.getId());
    }
+
     public void testFindByUsername() {
 
         
         AuthoritiesBean authorities = null;
-        authorities = authoritiesDao.findByUsername("root");
-        
-      
+        try {
+            authorities = authoritiesDao.findByUsername("root");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         // Test Authorities
         assertNotNull("RuleSet is null", authorities);
         assertEquals("The id of the retrieved Domain Object should be -1", new Integer(-1), authorities.getId());
     }
     
-    
+
     
     
     public void tearDown(){
         try {
-           
-            authoritiesDao.getSessionFactory().getCurrentSession().close();
+
+            if (authoritiesDao.getCurrentSession().getTransaction().isActive())
+                authoritiesDao.getCurrentSession().getTransaction().commit();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

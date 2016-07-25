@@ -2,15 +2,10 @@ package org.akaza.openclinica.dao.rule;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
-import org.hibernate.HibernateException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class RuleDaoTest extends HibernateOcDbTestCase {
     private static RuleDao ruleDao;
@@ -125,13 +120,13 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
         return expression;
     }
     public void tearDown(){
-        try {
+        /*try {
             ruleDao.getSessionFactory().getCurrentSession().close();
           
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        }*/
         super.tearDown();
     }
 }

@@ -2,8 +2,6 @@ package org.akaza.openclinica.dao.rule;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
@@ -15,9 +13,6 @@ import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
@@ -116,6 +111,7 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         assertEquals("The List size of ruleset objects should be 2 ", persistentRuleSets.size(), 2);
 
     }*/
+
     public void testSaveOrUpdate() {
         // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
       //   RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
@@ -163,7 +159,8 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
 
     private RuleSetBean createStubRuleSetBean(RuleBean ruleBean) {
         RuleSetBean ruleSet = new RuleSetBean();
-        ruleSet.setTarget(createExpression(Context.OC_RULES_V1, "SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_N"));
+        ruleSet.setOriginalTarget(createExpression(Context.OC_RULES_V1, "SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_N"));
+        ruleSet.setStudyId(1);
         RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, ruleBean);
         ruleSet.addRuleSetRule(ruleSetRule);
         return ruleSet;
@@ -207,9 +204,9 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
     public void tearDown(){
         try {
         //    ruleSetDao.getSessionFactory().getCurrentSession().flush();
-            ruleSetDao.getSessionFactory().getCurrentSession().close();
+        //    ruleSetDao.getSessionFactory().getCurrentSession().close();
         //    ruleDao.getSessionFactory().getCurrentSession().flush();
-            ruleDao.getSessionFactory().getCurrentSession().close();
+        //    ruleDao.getSessionFactory().getCurrentSession().close();
         } catch (HibernateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

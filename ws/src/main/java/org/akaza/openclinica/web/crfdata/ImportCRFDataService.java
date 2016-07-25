@@ -1,69 +1,30 @@
 package org.akaza.openclinica.web.crfdata;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
-import org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
+import java.util.*;
 
 public class ImportCRFDataService {
 
