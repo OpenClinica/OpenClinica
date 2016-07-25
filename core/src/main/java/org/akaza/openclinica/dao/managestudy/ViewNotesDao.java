@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
-
-import java.util.List;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

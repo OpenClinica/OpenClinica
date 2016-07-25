@@ -15,8 +15,13 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
 import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * <P>

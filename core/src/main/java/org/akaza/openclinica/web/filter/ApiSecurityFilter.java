@@ -3,6 +3,7 @@ package org.akaza.openclinica.web.filter;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 

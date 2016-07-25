@@ -16,8 +16,9 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
+
+import javax.sql.DataSource;
 
 public class StudyConfigService {
 

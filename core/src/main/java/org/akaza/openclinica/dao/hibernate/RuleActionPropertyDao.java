@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.rule.action.PropertyBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
 
 public class RuleActionPropertyDao extends AbstractDomainDao<PropertyBean> {
 

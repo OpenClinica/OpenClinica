@@ -1,5 +1,8 @@
 package org.akaza.openclinica.validator.xform;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.akaza.openclinica.dao.hibernate.ResponseSetDao;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
@@ -7,9 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ResponseSetValidator implements Validator {
 

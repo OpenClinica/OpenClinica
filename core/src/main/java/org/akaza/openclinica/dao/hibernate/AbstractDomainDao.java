@@ -1,16 +1,13 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
@@ -28,10 +25,9 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     public T findById(Integer id) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.id = :id";
-        Query q = getCurrentSession().createQuery(query);
-        q.setParameter("id", id, IntegerType.INSTANCE);
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("id", id);
         return (T) q.uniqueResult();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -39,7 +35,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     public ArrayList<T> findAll() {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do";
-        Query q = getCurrentSession().createQuery(query);
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
         return (ArrayList<T>) q.list();
     }
     
@@ -47,8 +43,8 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 	public T findByOcOID(String OCOID){
     	 getSessionFactory().getStatistics().logSummary();
          String query = "from " + getDomainClassName() + " do  where do.oc_oid = :oc_oid";
-         Query q = getCurrentSession().createQuery(query);
-         q.setParameter("oc_oid", OCOID, StringType.INSTANCE);
+         org.hibernate.Query q = getCurrentSession().createQuery(query);
+         q.setString("oc_oid", OCOID);
          return (T) q.uniqueResult();
     }
 
@@ -71,7 +67,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     @Transactional
     public T findByColumnName(Object id,String key) {
     String query = "from " + getDomainClassName() + " do where do."+key +"= ?";
-    Query q = getCurrentSession().createQuery(query);
+    org.hibernate.Query q = getCurrentSession().createQuery(query);
     q.setParameter(0, id);
     return (T) q.uniqueResult();
     } 

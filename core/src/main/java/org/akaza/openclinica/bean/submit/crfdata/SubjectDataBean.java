@@ -1,9 +1,9 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
-
-import java.util.ArrayList;
 
 public class SubjectDataBean {
     private ArrayList<StudyEventDataBean> studyEventData;

@@ -7,7 +7,21 @@
  */
 package org.akaza.openclinica.dao.login;
 
-import org.akaza.openclinica.bean.core.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Privilege;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -17,10 +31,6 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.util.*;
 
 /**
  * <P>

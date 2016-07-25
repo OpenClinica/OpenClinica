@@ -19,8 +19,13 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import javax.sql.DataSource;
-import java.util.*;
 
 public class RuleSetAuditDAO extends EntityDAO {
 

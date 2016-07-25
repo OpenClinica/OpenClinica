@@ -8,7 +8,11 @@
 package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

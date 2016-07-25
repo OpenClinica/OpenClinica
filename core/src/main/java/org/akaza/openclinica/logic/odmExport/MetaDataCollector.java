@@ -9,16 +9,17 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
-
-import javax.sql.DataSource;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 /**
  * Populate metadata for a ODM XML file. It supports:

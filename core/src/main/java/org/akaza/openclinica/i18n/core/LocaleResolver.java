@@ -3,11 +3,12 @@ package org.akaza.openclinica.i18n.core;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Customize Locale.

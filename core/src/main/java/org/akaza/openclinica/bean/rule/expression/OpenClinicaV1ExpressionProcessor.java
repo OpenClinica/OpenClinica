@@ -14,10 +14,11 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian

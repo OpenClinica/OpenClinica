@@ -15,8 +15,9 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 /**
  * Gather information about an odm study.

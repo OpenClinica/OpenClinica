@@ -8,10 +8,9 @@
 <!-- OpenClinica Enterprise Subscription agreement  -->
 <!-- for terms and conditions.  This program is protected -->
 <!--  by copyright law and international treaties   -->
-<xsl:stylesheet version="2.0" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
-                xmlns:fun="http://www.openclinica.org/ns/functions_library"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xsl:stylesheet version="2.0" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:def="http://www.cdisc.org/ns/def/v1.0" xmlns:xlink="http://www.w3c.org/1999/xlink" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
+xmlns:fun="http://www.openclinica.org/ns/functions_library"
+xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xsl:output method="text" version="4.0" encoding="utf-8" indent="no"/>
 	<xsl:variable name="language">
 		<xsl:text>en</xsl:text>
@@ -2841,8 +2840,8 @@
 			</xsl:choose>
 	</xsl:function>
 	-->
-    <xsl:function name="fun:escape-for-regex" as="xs:string"
-    >
+	<xsl:function name="fun:escape-for-regex" as="xs:string" 
+              xmlns:functx="http://www.functx.com" >
 	  <xsl:param name="arg" as="xs:string?"/> 
  
 	  <xsl:sequence select=" 

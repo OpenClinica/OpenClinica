@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
 /**
  * @author ssachs

@@ -16,9 +16,10 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.util.Date;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 public class SubjectService implements SubjectServiceInterface {
 

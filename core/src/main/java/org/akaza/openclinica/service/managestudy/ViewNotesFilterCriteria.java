@@ -7,16 +7,21 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
 import org.jmesa.limit.Limit;
 import org.jmesa.limit.RowSelect;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

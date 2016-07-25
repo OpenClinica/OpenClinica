@@ -1,9 +1,9 @@
 package org.akaza.openclinica.bean.extract;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-
 import java.io.OutputStream;
 import java.util.List;
+
+import org.akaza.openclinica.bean.core.EntityBean;
 
 /**
  * User: bruceperry

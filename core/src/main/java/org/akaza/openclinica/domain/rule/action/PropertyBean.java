@@ -5,7 +5,12 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "rule_action_property")

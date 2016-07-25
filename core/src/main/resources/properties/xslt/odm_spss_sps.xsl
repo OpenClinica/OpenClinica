@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
-                xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
-                xmlns:exsl="http://exslt.org/common"
-                extension-element-prefixes="exsl"
-                xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
-                xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ">
+	xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:def="http://www.cdisc.org/ns/def/v1.0"
+	xmlns:xlink="http://www.w3c.org/1999/xlink" xmlns:exsl="http://exslt.org/common"
+	extension-element-prefixes="exsl"
+	xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
+	xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ">
 	<xsl:output method="text" version="4.0" encoding="utf-8"
 		indent="no" />
 	<xsl:variable name="delimiter" select="'&#x09;'" />

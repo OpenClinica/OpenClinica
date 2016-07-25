@@ -21,8 +21,14 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import javax.sql.DataSource;
-import java.util.*;
 
 public class RuleSetBulkRuleRunner extends RuleRunner {
 

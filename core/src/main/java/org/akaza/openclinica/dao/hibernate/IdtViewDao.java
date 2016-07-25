@@ -1,9 +1,10 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.IdtView;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.IdtView;
+import org.akaza.openclinica.domain.datamap.ItemData;
 
 public class IdtViewDao extends AbstractDomainDao<IdtView> {
 

@@ -2,15 +2,26 @@ package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
 
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 8, 2007

@@ -7,6 +7,17 @@
  */
 package org.akaza.openclinica.dao;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -14,15 +25,6 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

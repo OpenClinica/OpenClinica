@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.ResponseSet;
-
 import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.ResponseSet;
 
 public class ResponseSetDao extends AbstractDomainDao<ResponseSet> {
 

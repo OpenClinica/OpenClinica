@@ -1,10 +1,12 @@
 package org.akaza.openclinica.dao;
 
-import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+
+
+import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 /**
  * 
  * @author jnyayapathi

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ResponseType;
 
 public class ResponseTypeDao extends AbstractDomainDao<ResponseType> {

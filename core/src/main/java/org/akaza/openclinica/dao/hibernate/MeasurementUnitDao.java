@@ -8,10 +8,10 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.admin.MeasurementUnit;
-
 import java.util.ArrayList;
 import java.util.TreeSet;
+
+import org.akaza.openclinica.domain.admin.MeasurementUnit;
 
 public class MeasurementUnitDao extends AbstractDomainDao<MeasurementUnit> {
     @Override

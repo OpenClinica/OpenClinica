@@ -1,13 +1,15 @@
 package org.akaza.openclinica.dao.core;
 
-import org.slf4j.MDC;
-import org.springframework.web.context.ContextLoaderListener;
-
-import javax.servlet.ServletContextEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.servlet.ServletContextEvent;
+
 //import liquibase.log.LogFactory;
+
+import org.slf4j.MDC;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.web.context.ContextLoaderListener;
 
 public class OCContextLoaderListener extends ContextLoaderListener {
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass().getName());

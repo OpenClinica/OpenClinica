@@ -3,7 +3,8 @@ package org.akaza.openclinica.job;
 /**
  * Created by yogi on 6/20/16.
  */
-
+import org.quartz.Job;
+import org.quartz.SchedulerException;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;

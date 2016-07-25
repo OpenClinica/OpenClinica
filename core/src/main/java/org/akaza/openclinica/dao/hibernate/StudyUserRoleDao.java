@@ -1,9 +1,9 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.user.UserAccount;
-
-import java.util.ArrayList;
 
 public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole> {
 

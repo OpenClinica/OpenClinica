@@ -1,13 +1,13 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.CompositeIdDomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 
 public abstract class CompositeIdAbstractDomainDao<T extends CompositeIdDomainObject> {

@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
-import org.akaza.openclinica.core.util.Pair;
-import org.jmesa.limit.Sort;
-import org.jmesa.limit.SortSet;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.akaza.openclinica.core.util.Pair;
+import org.jmesa.limit.Sort;
+import org.jmesa.limit.SortSet;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

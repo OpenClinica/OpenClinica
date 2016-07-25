@@ -1,21 +1,25 @@
 package org.akaza.openclinica.service.rule;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
+import org.akaza.openclinica.patterns.ocobserver.OnStudyEventJDBCBeanChanged;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.context.ApplicationListener;
 
 public class StudyEventBeanListener implements Observer,ApplicationContextAware {
 

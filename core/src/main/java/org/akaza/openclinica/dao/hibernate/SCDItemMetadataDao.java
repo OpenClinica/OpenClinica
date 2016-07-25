@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 
 import java.util.ArrayList;

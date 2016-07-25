@@ -7,15 +7,25 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import org.akaza.openclinica.bean.odmbeans.*;
-import org.akaza.openclinica.bean.submit.crfdata.*;
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+
+import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  * Create ODM XML ClinicalData Element for a study.

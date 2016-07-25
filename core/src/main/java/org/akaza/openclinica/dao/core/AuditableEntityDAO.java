@@ -11,11 +11,12 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.sql.DataSource;
 
 /**
  * <P>

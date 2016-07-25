@@ -1,8 +1,8 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-
 import java.util.LinkedList;
+
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 
 /**
  * This class represents a Discrepancy Note thread or sequence of notes that are

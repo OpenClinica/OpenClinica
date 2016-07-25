@@ -1,8 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
-
 import java.util.ArrayList;
+import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 
 public class CrfVersionMediaDao extends AbstractDomainDao<CrfVersionMedia> {
 

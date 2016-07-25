@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-
 import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 
 public class DnItemDataMapDao extends AbstractDomainDao<DnItemDataMap> {
 

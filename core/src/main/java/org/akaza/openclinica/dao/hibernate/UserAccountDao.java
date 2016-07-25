@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.user.UserAccount;
-
 import java.util.List;
+
+import org.akaza.openclinica.domain.user.UserAccount;
 
 public class UserAccountDao extends AbstractDomainDao<UserAccount> {
 	

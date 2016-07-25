@@ -25,12 +25,12 @@ package org.akaza.openclinica.logic.score;
  * @author ywang (Jan. 2008)
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScoreValidator {
     private Locale locale;

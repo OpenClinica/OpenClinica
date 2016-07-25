@@ -7,6 +7,19 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -14,14 +27,15 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
-import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.owasp.esapi.ESAPI;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Types;
-import java.util.*;
+import org.owasp.esapi.ESAPI;
 
 /**
  * @author jxu

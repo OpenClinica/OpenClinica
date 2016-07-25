@@ -2,17 +2,45 @@ package org.akaza.openclinica.domain.user;
 // default package
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.Section;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.StudyGroupClass;
+import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
+import org.akaza.openclinica.domain.datamap.Subject;
+import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
 
 
 /**

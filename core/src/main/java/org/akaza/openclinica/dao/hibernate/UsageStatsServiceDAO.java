@@ -3,14 +3,18 @@
  */
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.usageStats.LogUsageStatsBean;
-import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.akaza.openclinica.domain.usageStats.LogUsageStatsBean;
+import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author pgawade

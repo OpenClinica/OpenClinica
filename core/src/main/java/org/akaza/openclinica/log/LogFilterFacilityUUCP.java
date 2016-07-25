@@ -7,9 +7,10 @@
  */
 package org.akaza.openclinica.log;
 
+import org.slf4j.MDC;
+
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
-import org.slf4j.MDC;
 
 /**
  * @author pgawade

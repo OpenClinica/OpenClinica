@@ -1,5 +1,6 @@
 package org.akaza.openclinica.patterns.ocobserver;
 
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.springframework.context.ApplicationEvent;
 /**
  * The StudyEvent is propagated here on change/update to studyeventdao..

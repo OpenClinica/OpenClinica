@@ -7,10 +7,10 @@
  */
 package org.akaza.openclinica.service;
 
+import java.io.Serializable;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
-
-import java.io.Serializable;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

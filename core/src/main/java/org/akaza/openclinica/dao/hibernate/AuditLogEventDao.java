@@ -1,6 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.hibernate.Filter;
+import org.hibernate.internal.FilterImpl;
 
 public class AuditLogEventDao extends AbstractDomainDao<AuditLogEvent> {
 

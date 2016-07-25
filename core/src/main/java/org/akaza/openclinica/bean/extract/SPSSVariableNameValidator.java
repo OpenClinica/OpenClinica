@@ -9,6 +9,9 @@
 
 package org.akaza.openclinica.bean.extract;
 
+import java.util.TreeSet;
+
+
 /**
  * Validate if a SPSS variable name is valid.
  * <p>

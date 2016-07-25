@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.domain.usageStats;
 
+import java.sql.Timestamp;
+
+import javax.persistence.*;
+
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.sql.Timestamp;
 
 /**
  * <p>

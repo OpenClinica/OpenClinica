@@ -1,11 +1,12 @@
 package org.akaza.openclinica.domain.enumsupport;
 
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
+import org.hibernate.internal.util.ReflectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

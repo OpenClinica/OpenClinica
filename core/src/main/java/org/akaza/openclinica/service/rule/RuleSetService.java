@@ -7,15 +7,41 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -27,12 +53,29 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
-import org.akaza.openclinica.domain.rule.*;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
+import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
+import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
+import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.logic.rulerunner.*;
+import org.akaza.openclinica.logic.rulerunner.BeanPropertyRuleRunner;
+import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
+import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.logic.rulerunner.MessageContainer;
+import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
@@ -42,12 +85,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * @author krikor

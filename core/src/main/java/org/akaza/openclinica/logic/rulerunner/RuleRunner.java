@@ -4,7 +4,11 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -13,7 +17,11 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.rule.RuleSetRuleDAO;
 import org.akaza.openclinica.dao.rule.action.RuleActionDAO;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -24,12 +32,16 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 public class RuleRunner {
 

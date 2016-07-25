@@ -10,13 +10,13 @@
 package org.akaza.openclinica.logic.odmExport;
 
 
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
-
-import javax.sql.DataSource;
 
 /**
  * A class for ODM AdminData of one study.

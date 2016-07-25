@@ -7,26 +7,52 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.bean.rule.action.EmailActionBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.rule.*;
+import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.RunOnSchedule;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
-import org.akaza.openclinica.domain.rule.action.*;
-import org.akaza.openclinica.domain.rule.expression.*;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
+import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.expression.Context;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
+import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
+import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.validator.rule.action.EventActionValidator;
 import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
 import org.akaza.openclinica.validator.rule.action.RandomizeActionValidator;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -34,9 +60,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
-import javax.sql.DataSource;
 import java.text.MessageFormat;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian

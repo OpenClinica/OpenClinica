@@ -3,7 +3,6 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
-
 import java.util.ArrayList;
 
 /**

@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.core;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.SaltSource;
@@ -14,9 +17,6 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 
 /**
  *

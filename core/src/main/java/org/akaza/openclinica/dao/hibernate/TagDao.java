@@ -1,5 +1,10 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag;
 import org.akaza.openclinica.domain.datamap.Tag;
 
 public class TagDao extends AbstractDomainDao<Tag> {

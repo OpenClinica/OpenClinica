@@ -1,10 +1,11 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-
-import java.util.ArrayList;
 
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;

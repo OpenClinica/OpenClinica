@@ -7,14 +7,14 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.ViewNotesDao;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 
 /**

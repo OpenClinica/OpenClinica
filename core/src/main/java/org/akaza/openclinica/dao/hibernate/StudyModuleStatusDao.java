@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
+import org.akaza.openclinica.domain.rule.RuleBean;
 
 /**
  * @author: Shamim

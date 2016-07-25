@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.EventCrf;
-
 import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.EventCrf;
 
 public class EventCrfDao extends AbstractDomainDao<EventCrf> {
 

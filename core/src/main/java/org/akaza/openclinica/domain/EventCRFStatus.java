@@ -1,11 +1,11 @@
 package org.akaza.openclinica.domain;
 
-import org.akaza.openclinica.domain.enumsupport.CodedEnum;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import org.akaza.openclinica.domain.enumsupport.CodedEnum;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 public enum EventCRFStatus  implements CodedEnum  {
 

@@ -1,5 +1,11 @@
 package org.akaza.openclinica.service;
 
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
@@ -11,12 +17,24 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
-import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
+import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -24,16 +42,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import javax.sql.DataSource;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RandomizeService extends RandomizationRegistrar {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

@@ -7,15 +7,71 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ResponseType;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.*;
+import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
+import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
+import org.akaza.openclinica.bean.odmbeans.CodeListBean;
+import org.akaza.openclinica.bean.odmbeans.CodeListItemBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
+import org.akaza.openclinica.bean.odmbeans.EventDefinitionDetailsBean;
+import org.akaza.openclinica.bean.odmbeans.FormDefBean;
+import org.akaza.openclinica.bean.odmbeans.FormDetailsBean;
+import org.akaza.openclinica.bean.odmbeans.ItemDefBean;
+import org.akaza.openclinica.bean.odmbeans.ItemDetailsBean;
+import org.akaza.openclinica.bean.odmbeans.ItemGroupDefBean;
+import org.akaza.openclinica.bean.odmbeans.ItemGroupDetailsBean;
+import org.akaza.openclinica.bean.odmbeans.ItemGroupRepeatBean;
+import org.akaza.openclinica.bean.odmbeans.ItemPresentInFormBean;
+import org.akaza.openclinica.bean.odmbeans.ItemResponseBean;
+import org.akaza.openclinica.bean.odmbeans.MeasurementUnitBean;
+import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
+import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
+import org.akaza.openclinica.bean.odmbeans.MetaDataVersionRefBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListItemBean;
+import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.odmbeans.PresentInEventDefinitionBean;
+import org.akaza.openclinica.bean.odmbeans.PresentInFormBean;
+import org.akaza.openclinica.bean.odmbeans.SectionDetails;
+import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
+import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
+import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
+import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
+import org.akaza.openclinica.bean.odmbeans.SymbolBean;
+import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
+import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -31,10 +87,6 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
-
-import javax.sql.DataSource;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Fetch odm data from database and load odm related classes.

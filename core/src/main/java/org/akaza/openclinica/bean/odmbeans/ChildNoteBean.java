@@ -11,6 +11,8 @@ package org.akaza.openclinica.bean.odmbeans;
 
 import java.util.Date;
 
+import org.akaza.openclinica.domain.user.UserAccount;
+
 /**
  *
  * @author ywang (March, 2010)

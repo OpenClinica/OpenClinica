@@ -1,5 +1,7 @@
 package org.akaza.openclinica.domain.rule;
 
+import java.security.Timestamp;
+
 public class RunOnSchedule {
 
 	private String runTime;

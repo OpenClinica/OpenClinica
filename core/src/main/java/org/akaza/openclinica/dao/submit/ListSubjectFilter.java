@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import org.akaza.openclinica.bean.core.Status;
 
 public class ListSubjectFilter implements CriteriaCommand {
 

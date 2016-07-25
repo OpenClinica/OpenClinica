@@ -15,14 +15,15 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.sql.DataSource;
 
 public class EmailActionProcessor implements ActionProcessor {
 

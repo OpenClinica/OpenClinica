@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.dao.admin;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
@@ -15,9 +24,6 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * the data access object for instruments in the database.

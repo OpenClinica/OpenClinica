@@ -1,10 +1,11 @@
 package org.akaza.openclinica.bean.extract;
 
-import org.akaza.openclinica.bean.service.ProcessingFunction;
+import java.io.Serializable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
+import org.akaza.openclinica.bean.service.ProcessingFunction;
 /**
  * Extract Property Bean, by Tom Hickerson 09/2010
  * Placeholder for items from the extract.properties file, filled in 

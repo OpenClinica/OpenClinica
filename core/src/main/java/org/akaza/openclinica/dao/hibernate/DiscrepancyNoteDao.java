@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-
 import java.util.List;
+
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 
 public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
 

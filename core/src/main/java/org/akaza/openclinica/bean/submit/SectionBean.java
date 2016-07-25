@@ -7,9 +7,9 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 /**
  * <P>

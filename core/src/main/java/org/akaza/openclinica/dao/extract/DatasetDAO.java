@@ -19,9 +19,15 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 
-import javax.sql.DataSource;
 import java.sql.Types;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.sql.DataSource;
 
 /**
  * The data access object for datasets; also generates datasets based on their

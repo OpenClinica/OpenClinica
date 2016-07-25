@@ -9,12 +9,29 @@
  */
 package org.akaza.openclinica.bean.extract;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -30,12 +47,6 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 public class ExtractBean {
 

@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.transaction.annotation.Transactional;

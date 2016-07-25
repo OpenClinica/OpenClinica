@@ -7,13 +7,30 @@
  */
 package org.akaza.openclinica.service.managestudy;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -24,9 +41,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-
-import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)

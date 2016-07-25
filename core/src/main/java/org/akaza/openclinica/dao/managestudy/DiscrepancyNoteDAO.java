@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -16,15 +26,15 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-
-import javax.sql.DataSource;
-import java.sql.Types;
-import java.util.*;
 
 /**
  * @author jxu
