@@ -433,6 +433,13 @@
         </sql>
     </query>
 
+    <query>
+        <name>findByCrfVersion</name>
+        <sql>select ec.* from event_crf  ec, crf_version cv
+            where ec.crf_version_id=cv.crf_version_id
+            and cv.crf_version_id=?
+        </sql>
+    </query>
 
     <query>
         <name>markCompleteIDE</name>

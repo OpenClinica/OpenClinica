@@ -439,6 +439,15 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
 
     }
 
+    public ArrayList<EventCRFBean> findByCrfVersion(CRFVersionBean crfVersion) {
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(crfVersion.getId()));
+
+        ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByCrfVersion", variables);
+        return eventCrfs;
+
+    }
+
     public void delete(int eventCRFId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(eventCRFId));
