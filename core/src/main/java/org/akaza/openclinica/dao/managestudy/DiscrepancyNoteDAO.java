@@ -247,7 +247,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), currentStudy.getId());
-        variables.put(Integer.valueOf(2), currentStudy.getId());
+        variables.put(Integer.valueOf(2), currentStudy.getParentStudyId());
         String sql = digester.getQuery("getCountWithFilter");
         sql += filter.execute("");
 

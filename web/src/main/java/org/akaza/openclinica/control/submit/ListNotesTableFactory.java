@@ -180,7 +180,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
             // Set any value greater than the maximum page size here, as it will be overriden once read from DB
-            tableFacade.setTotalRows(100);
+            tableFacade.setTotalRows(Integer.MAX_VALUE);
         }
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
