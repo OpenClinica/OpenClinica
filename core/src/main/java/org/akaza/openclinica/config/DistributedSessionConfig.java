@@ -24,10 +24,7 @@ public class DistributedSessionConfig {
         String password = null;
         
         try {
-            System.out.println("STEVE test fetching environment variables: " + environment.getProperty("HOME"));
-            System.out.println("STEVE REDIS URL: " + environment.getProperty("REDIS_URL"));
             // Redis URL should be of the format redis://h:<PASSWORD>@<HOSTNAME>:<PORT>
-            // Ex: redis://h:pcb578ini8t7248epm59tm4ftgr@ec2-23-23-126-210.compute-1.amazonaws.com:28089
             String redisUrl = environment.getProperty("REDIS_URL");
 
             port = redisUrl.substring(redisUrl.lastIndexOf(":") + 1, redisUrl.length());
@@ -45,11 +42,6 @@ public class DistributedSessionConfig {
         jedisConnFactory.setPassword(password);
         return jedisConnFactory;
     }
-
-    //@Bean
-    //public RedisHttpSessionConfiguration redisHttpSessionConfiguration() {
-    //    return new RedisHttpSessionConfiguration();
-    //}
 
     @Bean
     public OpenClinicaRedisSerializer springSessionDefaultRedisSerializer() {

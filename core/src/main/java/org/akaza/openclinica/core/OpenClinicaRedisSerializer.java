@@ -14,7 +14,6 @@ public class OpenClinicaRedisSerializer extends JdkSerializationRedisSerializer 
     @Override
     public Object deserialize(byte[] bytes) {
         Object obj = super.deserialize(bytes);
-        if (obj != null && obj.getClass().getName().startsWith("org.akaza.openclinica")) System.out.println("Deserializing " + obj.getClass().getName());
 
         if (obj instanceof UserAccountBean) {
             List<StudyUserRoleBean> roles = ((UserAccountBean) obj).getRoles();
@@ -75,7 +74,6 @@ public class OpenClinicaRedisSerializer extends JdkSerializationRedisSerializer 
 
     @Override
     public byte[] serialize(Object object) {
-        //if (object != null && object.getClass().getName().startsWith("org.akaza.openclinica")) System.out.println("Serializing " + object.getClass().getName());
         return super.serialize(object);
     }
 
