@@ -28,9 +28,6 @@ public class ItemOidGenerator extends OidGenerator {
         String crfName = keys[0];
         String itemLabel = keys[1];
 
-        logger.debug(crfName);
-        logger.debug(itemLabel);
-
         crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 5);
         itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), 27);
 
@@ -40,7 +37,6 @@ public class ItemOidGenerator extends OidGenerator {
         if (oid.equals("I_") || oid.equals("I__")) {
             oid = randomizeOid("I_");
         }
-        logger.debug("OID : " + oid);
         return oid;
     }
 }

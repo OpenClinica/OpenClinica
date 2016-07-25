@@ -25,47 +25,38 @@
             classpath:org/akaza/openclinica/applicationContext-core-db.xml
         </param-value>
     </context-param>
-
     <context-param>
         <param-name>jmesaMessagesLocation</param-name>
         <param-value>org/akaza/openclinica/jmesaResourceBundle</param-value>
     </context-param>
-
     <context-param>
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>
 
     <listener>
-        <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
         <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
-
-    <!--     <listener>
-          <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
-    </listener>  -->
-
     <listener>
-
-
-        <listener-class>
-            org.springframework.security.web.session.HttpSessionEventPublisher
-        </listener-class>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
     </listener>
     <listener>
         <listener-class>org.akaza.openclinica.control.OCServletContextListener</listener-class>
     </listener>
     <listener>
-
-        <listener-class>
-
-            org.springframework.web.context.request.RequestContextListener
-
-        </listener-class>
-
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
 
+    <filter>
+        <filter-name>springSessionRepositoryFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSessionRepositoryFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
 
     <filter>
         <filter-name>encodingFilter</filter-name>
@@ -79,8 +70,6 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
-
-
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -144,6 +133,7 @@
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <filter>
         <filter-name>hibernateFilter</filter-name>
         <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
@@ -152,6 +142,7 @@
         <filter-name>hibernateFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <filter>
         <filter-name>logFilter</filter-name>
         <filter-class>org.akaza.openclinica.control.core.OCServletFilter</filter-class>
@@ -160,6 +151,7 @@
         <filter-name>logFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <filter>
         <filter-name>apiSecurityFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

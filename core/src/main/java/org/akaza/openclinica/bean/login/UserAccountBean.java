@@ -89,7 +89,7 @@ public class UserAccountBean extends AuditableEntityBean {
     //
 
     // elements are StudyUserRoleBeans
-    private ArrayList roles = new ArrayList();
+    private ArrayList<StudyUserRoleBean> roles = new ArrayList<StudyUserRoleBean>();
 
     // key is Integer whose intValue is a studyId, value is StudyUserRoleBean
     // for that study
@@ -451,7 +451,7 @@ public class UserAccountBean extends AuditableEntityBean {
     /**
      * @return Returns the roles.
      */
-    public ArrayList getRoles() {
+    public ArrayList<StudyUserRoleBean> getRoles() {
         return roles;
     }
 
@@ -459,8 +459,8 @@ public class UserAccountBean extends AuditableEntityBean {
      * @param roles
      *            The roles to set.
      */
-    public void setRoles(ArrayList roles) {
-        this.roles = new ArrayList();
+    public void setRoles(ArrayList<StudyUserRoleBean> roles) {
+        this.roles = new ArrayList<StudyUserRoleBean>();
         rolesByStudy.clear();
 
         for (int i = 0; i < roles.size(); i++) {
