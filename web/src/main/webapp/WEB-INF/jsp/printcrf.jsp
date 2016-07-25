@@ -170,7 +170,7 @@ var app_error_print_CRF_Message_at_Loading='<oc:jsEscape key="error_print_CRF_Me
   <script src="${pageContext.request.contextPath}/js/load_scripts.js"></script>
  </head>
 
- <body style="margin-left: 2cm; margin-right: 2cm">
+ <body>
      <div id="loading_msg"> ${app_print_CRF_Message_at_Loading}</div>
     <img id="loading" src="${pageContext.request.contextPath}/images/loading_wh.gif" class="spinner"/>
  </body>
