@@ -37,6 +37,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.job.ExportLogger;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -211,7 +212,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                     ab.setOrdinal(idBean.getOrdinal());
                 }
             }
-
+            ExportLogger.exportExcelExportAuditLog(study, ub, studySubject);
         }    	
     	    	
     	try {
@@ -661,8 +662,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 		 }
 		}
 		
-		
-		
 		workbook.write();
 		workbook.close();
 		session.setAttribute("subject", null);
@@ -720,5 +719,4 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
     	    sheet.setColumnView(x, cell);
     	}
     }
-
 }

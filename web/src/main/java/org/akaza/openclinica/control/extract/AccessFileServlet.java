@@ -17,6 +17,7 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.job.ExportLogger;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -61,6 +62,7 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
         }
+        ExportLogger.logAccessExportFile(ub, asdfBean );
 
         // asdfBean.setWebPath(WEB_DIR+
         // asdfBean.getDatasetId()+

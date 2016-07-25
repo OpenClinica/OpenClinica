@@ -49,6 +49,7 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
@@ -81,13 +82,12 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String XML_FILE_PATH = "xmlFilePath";
     public static final String POST_FILE_PATH = "postFilePath";
     public static final String POST_FILE_NAME = "postFileName";
-    public static final String EXTRACT_PROPERTY = "extractProperty";
+
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
     public static final String ZIPPED = "zipped";
     public static final String DELETE_OLD = "deleteOld";
-    public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
-    public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
+
     public static final String XSLT_PATH="XSLT_PATH";
     public static final String EP_BEAN = "epBean";
 
@@ -99,6 +99,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
+    private ItemDAO itemDao;
 
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
@@ -454,7 +455,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
             }
             // email the message to the user
-            emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
+            emailBuffer.append("<p>" + CoreResources.getField("job.notification.email.footer") + "</p>");
             try {
 
                 // @pgawade 19-April-2011 Log the event into audit_event table
@@ -484,8 +485,8 @@ public class XsltTransformJob extends QuartzJobBean {
                 successMsg =" ";
             }
 
-
-           postSuccessMessage(successMsg, context);
+            ExportLogger.logExport(currentStudy, userBean, datasetBean, itemDao, epBean.getFiledescription(), alertEmail);
+            postSuccessMessage(successMsg, context);
         } catch (JobInterruptedException e) {
             logger.info("Job was cancelled by the user");
             exceptions = true;
@@ -577,6 +578,7 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetDao = ctx.getBean(DatasetDAO.class);
             userAccountDao = ctx.getBean(UserAccountDAO.class);
             studyDao = new StudyDAO(dataSource);
+            itemDao = new ItemDAO(dataSource);
             archivedDatasetFileDao = ctx.getBean(ArchivedDatasetFileDAO.class);
             generateFileService = ctx.getBean(GenerateExtractFileService.class);
             odmFileCreation = ctx.getBean(OdmFileCreation.class);
