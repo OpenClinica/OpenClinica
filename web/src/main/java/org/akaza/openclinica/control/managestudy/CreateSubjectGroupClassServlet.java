@@ -23,8 +23,8 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.io.IOException;
 
 /**
  * @author jxu

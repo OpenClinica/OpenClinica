@@ -1,5 +1,10 @@
 package org.akaza.openclinica.view.display;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -16,9 +21,6 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.view.form.ViewPersistanceHandler;
 
 import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class handles the responsibility for generating a List of

@@ -23,9 +23,10 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.sql.DataSource;
 
 /**
  * To view the table of content of an event CRF

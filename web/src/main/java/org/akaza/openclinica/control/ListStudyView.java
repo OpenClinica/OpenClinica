@@ -1,14 +1,17 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jmesa.view.component.Column;
-import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.HtmlSnippets;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.jmesa.view.component.Column;
+import org.jmesa.view.editor.CellEditor;
+import org.jmesa.view.editor.GroupCellEditor;
+import org.jmesa.view.html.HtmlBuilder;
+import org.jmesa.view.html.HtmlSnippets;
 
 public class ListStudyView  extends DefaultView{
 	

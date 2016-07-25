@@ -1,5 +1,11 @@
 package org.akaza.openclinica.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.ServletContext;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -29,11 +35,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import javax.servlet.ServletContext;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
 
 @Controller
 @RequestMapping(value = "/api/v2/anonymousform")

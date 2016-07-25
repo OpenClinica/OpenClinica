@@ -1,18 +1,43 @@
 package org.akaza.openclinica.control.extract;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.Pair;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -23,12 +48,6 @@ import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static java.util.Collections.emptySet;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.

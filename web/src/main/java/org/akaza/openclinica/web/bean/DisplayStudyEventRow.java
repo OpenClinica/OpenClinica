@@ -7,10 +7,10 @@
  */
 package org.akaza.openclinica.web.bean;
 
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 
 /**
  * @author jxu

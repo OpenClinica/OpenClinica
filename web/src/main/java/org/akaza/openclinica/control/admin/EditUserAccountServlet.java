@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -21,10 +26,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 /**
  * @author ssachs

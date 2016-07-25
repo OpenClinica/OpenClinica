@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.*" %>
 <%
 ArrayList entities = request.getParameter("entities");
 Iterator it = entities.iterator();

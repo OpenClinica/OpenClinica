@@ -6,7 +6,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,12 +37,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
-import javax.servlet.http.HttpSession;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * Create a discrepancy note

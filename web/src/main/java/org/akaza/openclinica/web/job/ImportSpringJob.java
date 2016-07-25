@@ -1,5 +1,25 @@
 package org.akaza.openclinica.web.job;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -10,7 +30,11 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
@@ -36,7 +60,11 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -46,12 +74,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.sql.DataSource;
-import java.io.*;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.

@@ -1,5 +1,9 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
@@ -8,10 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
 
 @Component
 public class OpenRosaSubmissionService {

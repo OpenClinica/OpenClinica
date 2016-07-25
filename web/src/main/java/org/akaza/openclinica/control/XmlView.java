@@ -1,13 +1,13 @@
 package org.akaza.openclinica.control;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.jmesa.core.CoreContext;
 import org.jmesa.util.ItemUtils;
 import org.jmesa.view.AbstractExportView;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.component.Table;
-
-import java.util.Collection;
-import java.util.List;
 
 public class XmlView extends AbstractExportView {
 

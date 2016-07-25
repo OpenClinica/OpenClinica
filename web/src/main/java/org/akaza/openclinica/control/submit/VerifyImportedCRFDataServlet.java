@@ -7,15 +7,30 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -34,9 +49,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.ImportSpringJob;
-
-import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.

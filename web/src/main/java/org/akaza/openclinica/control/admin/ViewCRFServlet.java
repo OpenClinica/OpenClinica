@@ -6,6 +6,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -40,8 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 /**
  * @author jxu

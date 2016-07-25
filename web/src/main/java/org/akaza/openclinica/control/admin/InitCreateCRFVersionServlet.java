@@ -7,8 +7,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;

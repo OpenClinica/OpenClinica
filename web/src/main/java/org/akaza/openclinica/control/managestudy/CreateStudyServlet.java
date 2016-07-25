@@ -28,7 +28,12 @@ import org.akaza.openclinica.web.SQLInitServlet;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 
 /**
  * Processes request to create a new study

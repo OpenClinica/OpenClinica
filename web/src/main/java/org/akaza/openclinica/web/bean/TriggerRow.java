@@ -1,8 +1,9 @@
 package org.akaza.openclinica.web.bean;
 
-import org.akaza.openclinica.bean.admin.TriggerBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.admin.TriggerBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 
 /**
  * 

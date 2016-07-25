@@ -1,21 +1,27 @@
 package org.akaza.openclinica.web.job;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
-
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;

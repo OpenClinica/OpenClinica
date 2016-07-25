@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.pform.widget;
 
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
 import org.akaza.openclinica.web.pform.dto.UserControl;
 

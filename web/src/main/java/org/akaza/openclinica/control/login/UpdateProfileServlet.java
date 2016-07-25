@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -22,8 +30,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.*;
 /**
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu

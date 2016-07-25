@@ -2,8 +2,8 @@ package org.akaza.openclinica.web.table.sdv;
 
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.

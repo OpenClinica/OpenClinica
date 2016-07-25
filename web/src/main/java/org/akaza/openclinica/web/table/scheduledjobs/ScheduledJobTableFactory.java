@@ -17,12 +17,13 @@ import org.jmesa.view.html.HtmlSnippets;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 /**
  * View builder for the list of scheduled jobs with an ability to cancel the job
  * @author jnyayapathi

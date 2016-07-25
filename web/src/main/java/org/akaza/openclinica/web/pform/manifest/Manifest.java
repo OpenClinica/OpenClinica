@@ -1,6 +1,7 @@
 package org.akaza.openclinica.web.pform.manifest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Manifest {
     private ArrayList<MediaFile> mediaFile = null;

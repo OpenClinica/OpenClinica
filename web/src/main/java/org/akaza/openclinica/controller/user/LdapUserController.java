@@ -1,5 +1,11 @@
 package org.akaza.openclinica.controller.user;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.user.LdapUserService;
@@ -8,11 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *

@@ -15,6 +15,14 @@ package org.akaza.openclinica.web.filter;
  * limitations under the License.
  */
 
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -34,13 +42,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.util.Assert;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Processes an authentication form submission. Called {@code AuthenticationProcessingFilter} prior to Spring Security

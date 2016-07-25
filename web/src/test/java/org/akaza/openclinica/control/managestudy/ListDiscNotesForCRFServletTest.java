@@ -1,15 +1,15 @@
 package org.akaza.openclinica.control.managestudy;
 
-import junit.framework.TestCase;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.util.Locale;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import junit.framework.TestCase;
 
 public class ListDiscNotesForCRFServletTest extends TestCase {
 

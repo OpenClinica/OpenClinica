@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.form;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -16,10 +25,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 // import javax.servlet.*;
 // import java.io.*;

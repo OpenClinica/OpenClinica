@@ -2,13 +2,28 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**

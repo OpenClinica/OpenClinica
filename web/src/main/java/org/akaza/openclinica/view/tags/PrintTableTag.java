@@ -5,16 +5,17 @@ import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.view.form.PrintHorizontalFormBuilder;
 
-import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.JspFragment;
-import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.jsp.JspContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.JspFragment;
+import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 /**
  * A tag class that is designed to generate a printable group table. The String

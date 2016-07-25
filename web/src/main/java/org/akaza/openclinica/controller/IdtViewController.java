@@ -1,12 +1,44 @@
 package org.akaza.openclinica.controller;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.UserDTO;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfFlagDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfFlagWorkflowDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.IdtViewDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataFlagDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataFlagWorkflowDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventCrfFlag;
+import org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag;
+import org.akaza.openclinica.domain.datamap.IdtView;
+import org.akaza.openclinica.domain.datamap.ItemDataFlag;
+import org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow;
+import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.fop.area.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +46,24 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+
+import java.awt.print.Pageable;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @Controller
 @RequestMapping(value = "auth/api/itemdata")

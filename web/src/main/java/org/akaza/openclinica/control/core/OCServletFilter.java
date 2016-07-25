@@ -3,14 +3,19 @@
  */
 package org.akaza.openclinica.control.core;
 
+import java.io.IOException;
+import java.security.Principal;
+
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.log.LoggingConstants;
 import org.slf4j.MDC;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.security.Principal;
 
 /**
  * @author pgawade

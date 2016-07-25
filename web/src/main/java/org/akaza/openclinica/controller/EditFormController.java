@@ -1,14 +1,50 @@
 package org.akaza.openclinica.controller;
 
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.ServletContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.ItemDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
+import org.akaza.openclinica.dao.hibernate.SectionDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.ResponseType;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.EnketoAPI;
@@ -28,20 +64,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.servlet.ServletContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 @Controller
 @RequestMapping(value = "/api/v1/editform")

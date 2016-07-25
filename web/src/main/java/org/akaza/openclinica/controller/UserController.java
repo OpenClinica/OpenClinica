@@ -1,15 +1,17 @@
 package org.akaza.openclinica.controller;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * A simple example of an annotated Spring Controller. Notice that it is a POJO; it

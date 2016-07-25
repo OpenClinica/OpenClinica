@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -19,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-
-import java.util.Date;
 
 @Component
 public class UserProcessor implements Processor, Ordered {

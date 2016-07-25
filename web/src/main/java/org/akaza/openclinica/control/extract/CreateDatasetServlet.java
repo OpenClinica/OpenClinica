@@ -7,8 +7,23 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DatasetItemStatus;
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.TermType;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.FilterBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -34,9 +49,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.FilterRow;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Creates a dataset by building a query based on study events, CRFs and items

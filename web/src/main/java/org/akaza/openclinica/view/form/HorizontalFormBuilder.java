@@ -8,8 +8,6 @@ import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
-import javax.xml.transform.Result;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -17,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.xml.transform.Result;
 
 /**
  * This class generates a horizontal HTML table with multiple columns and

@@ -26,10 +26,16 @@ import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletOutputStream;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.ServletOutputStream;
 
 public class DownloadRuleSetXmlServlet extends SecureController {
 

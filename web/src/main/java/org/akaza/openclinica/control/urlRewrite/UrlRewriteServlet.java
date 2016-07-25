@@ -3,6 +3,13 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -12,6 +19,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -27,11 +35,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 
 /**
  * @author pgawade Servlet to call appropriate application pages corresponding to

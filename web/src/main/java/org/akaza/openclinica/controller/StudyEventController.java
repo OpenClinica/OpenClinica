@@ -1,8 +1,25 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.dao.hibernate.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -19,11 +36,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studyevent")

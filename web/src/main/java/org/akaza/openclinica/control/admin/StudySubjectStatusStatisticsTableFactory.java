@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
+import org.akaza.openclinica.control.StatisticsView;
 import org.akaza.openclinica.control.StudySubjectStatusView;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -17,8 +18,14 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
 
 public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFactory {
 

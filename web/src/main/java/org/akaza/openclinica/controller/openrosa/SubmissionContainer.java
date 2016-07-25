@@ -1,13 +1,17 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.springframework.validation.Errors;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.user.UserAccount;
+import org.springframework.validation.Errors;
 
 public class SubmissionContainer {
     private String requestBody = null;

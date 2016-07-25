@@ -1,17 +1,50 @@
 package org.akaza.openclinica.web.pform;
 
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.managestudy.CRFVersionMetadataUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.web.pform.dto.*;
+import org.akaza.openclinica.web.pform.dto.Bind;
+import org.akaza.openclinica.web.pform.dto.Body;
+import org.akaza.openclinica.web.pform.dto.Group;
+import org.akaza.openclinica.web.pform.dto.Html;
+import org.akaza.openclinica.web.pform.dto.Label;
+import org.akaza.openclinica.web.pform.dto.Model;
+import org.akaza.openclinica.web.pform.dto.Repeat;
+import org.akaza.openclinica.web.pform.dto.UserControl;
 import org.akaza.openclinica.web.pform.widget.Widget;
 import org.akaza.openclinica.web.pform.widget.WidgetFactory;
 import org.apache.commons.io.IOUtils;
@@ -24,21 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author joekeremian

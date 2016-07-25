@@ -9,6 +9,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -19,8 +26,17 @@ import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
@@ -28,8 +44,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import java.util.*;
 
 /**
  *

@@ -1,11 +1,46 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.akaza.openclinica.controller.openrosa.ItemItemDataContainer;
 import org.akaza.openclinica.controller.openrosa.PformValidator;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
+import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteTypeDao;
+import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
+import org.akaza.openclinica.dao.hibernate.ItemDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.DnItemDataMap;
+import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.ResolutionStatus;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -20,11 +55,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-import java.util.*;
 
 @Component
 public class ItemProcessor implements Processor, Ordered {

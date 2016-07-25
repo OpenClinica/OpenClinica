@@ -7,32 +7,43 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.submit.*;
-import org.akaza.openclinica.control.form.*;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.form.DiscrepancyValidator;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.form.RuleValidator;
+import org.akaza.openclinica.control.form.ScoreItemValidator;
+import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author ssachs

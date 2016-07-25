@@ -1,9 +1,20 @@
 package org.akaza.openclinica.web.pform.widget;
 
-import org.akaza.openclinica.bean.submit.*;
-import org.akaza.openclinica.web.pform.dto.*;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.web.pform.dto.Bind;
+import org.akaza.openclinica.web.pform.dto.Hint;
+import org.akaza.openclinica.web.pform.dto.Item;
+import org.akaza.openclinica.web.pform.dto.Label;
+import org.akaza.openclinica.web.pform.dto.Select1;
+import org.akaza.openclinica.web.pform.dto.UserControl;
 
 public class Select1Widget extends BaseWidget {
 

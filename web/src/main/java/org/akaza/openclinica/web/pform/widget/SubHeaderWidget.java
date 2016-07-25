@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.web.pform.dto.Bind;
+import org.akaza.openclinica.web.pform.dto.Hint;
 import org.akaza.openclinica.web.pform.dto.Input;
 import org.akaza.openclinica.web.pform.dto.Label;
 import org.akaza.openclinica.web.pform.dto.UserControl;

@@ -3,20 +3,46 @@ package org.akaza.openclinica.view.form;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * This class builds DisplayFormGroupBeans and DisplayItemBeans in preparation

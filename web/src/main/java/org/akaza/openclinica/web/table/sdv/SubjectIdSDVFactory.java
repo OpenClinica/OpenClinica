@@ -2,7 +2,11 @@ package org.akaza.openclinica.web.table.sdv;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -11,13 +15,21 @@ import org.akaza.openclinica.controller.helper.table.SubjectAggregateContainer;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.*;
+import org.jmesa.limit.Filter;
+import org.jmesa.limit.FilterSet;
+import org.jmesa.limit.Limit;
+import org.jmesa.limit.Sort;
+import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.html.AbstractHtmlView;
 import org.jmesa.view.html.HtmlBuilder;
@@ -26,10 +38,17 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.util.*;
 
 /**
  * A Jmesa table that represents study subjects in each row.

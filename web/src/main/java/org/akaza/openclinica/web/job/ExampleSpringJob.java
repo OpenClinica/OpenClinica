@@ -1,5 +1,15 @@
 package org.akaza.openclinica.web.job;
 
+import java.io.File;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
@@ -18,21 +28,16 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
+import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class ExampleSpringJob extends QuartzJobBean {
 
