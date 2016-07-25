@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 
-<%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
+<%@ page import="org.akaza.openclinica.i18n.util.*" %>
 <%@ page import="java.util.ResourceBundle" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
