@@ -76,7 +76,6 @@ public class MainMenuServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 1");
     	FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);
@@ -88,7 +87,6 @@ public class MainMenuServlet extends SecureController {
             forwardPage(Page.MENU, false);
             return;
         }
-        System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 2");
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         ArrayList studies = null;
@@ -107,7 +105,6 @@ public class MainMenuServlet extends SecureController {
         ub1.setOwner(ub1);
         ub1.setUpdater(ub1);
         udao.update(ub1);
-        System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 3");
 
         // Use study Id in JSPs
         request.setAttribute("studyId", currentStudy.getId());
@@ -118,7 +115,6 @@ public class MainMenuServlet extends SecureController {
             // "Forge" a password change date for LDAP user
             lastPwdChangeDate = new Date();
         }
-    System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 4");
 System.out.println("is ub a ldapuser??"+ub.isLdapUser());
 
 
@@ -132,7 +128,6 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
 	            long difference = Math.abs(cal.getTime().getTime() - lastPwdChangeDate.getTime());
 	            long days = difference / (1000 * 60 * 60 * 24);
 	            session.setAttribute("passwordExpired", "no");
-	            System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 5");
 	
 	            if (!ub.isLdapUser() && pwdExpireDay > 0 && days >= pwdExpireDay) {// password expired, need to be changed
 			System.out.println("here");
@@ -155,7 +150,6 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
 	            } 
             }
 //            else {
-            System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 6");
 
                 if (ub.getNumVisitsToMainMenu() <= 1) {
                     if (ub.getLastVisitDate() != null) {
@@ -171,7 +165,6 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                         addPageMessage(respage.getString("current_study_frozen"));
                     }
                 }
-                System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 7");
 
                 ////Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
                 //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
@@ -194,7 +187,6 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                     fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
                 }
                 setPresetValues(fp.getPresetValues());
-                System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 8");
 
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
                     setupListStudySubjectTable();
@@ -217,17 +209,14 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
 
                 forwardPage(Page.MENU);
 //            }
-                System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 9");
 
         } else {// a new user's first log in
-            System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 10");
             studies = (ArrayList) sdao.findAllByUser(ub.getName());
             request.setAttribute("studies", studies);
             session.setAttribute("userBean1", ub);
 //            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
 //                + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
             
-            System.out.println("DISTRIBUTED SESSION - EXCECUTING MAIN MENU SERVLET 11");
             if (pwdChangeRequired == 1) {
             } else {
                 forwardPage(Page.MENU);
