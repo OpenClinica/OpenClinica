@@ -32,6 +32,8 @@
 		select="//odm:SubjectData/@OpenClinica:UniqueIdentifier" />
 	<xsl:variable name="dobExist"
 		select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
+        <xsl:variable name="yearOfBirthExist"
+		select="//odm:SubjectData/@OpenClinica:YearOfBirth" />
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status" />
 	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
 	
@@ -2076,6 +2078,13 @@
 			<xsl:text> ADATE10</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+                
+                <xsl:if test="$yearOfBirthExist">
+			<xsl:text>YearofBirth</xsl:text>
+			<!-- @jrousseau 21-Mar-2014 OC-4783 - Check if the year of birth is imported correctly by SPSS with type F4 -->			
+			<xsl:text> F4</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 <!--****************************************************************************************************** -->
 	<!-- Starting Columns and its labels -->
@@ -2123,6 +2132,12 @@
 		<xsl:if test="$dobExist">
 			<xsl:text>DateofBirth</xsl:text>
 			<xsl:text> "Date of Birth"</xsl:text><xsl:text> /</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+                
+                <xsl:if test="$yearOfBirthExist">
+			<xsl:text>YearofBirth</xsl:text>
+			<xsl:text> "Year of Birth"</xsl:text><xsl:text> /</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
