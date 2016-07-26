@@ -10,8 +10,11 @@ import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @EnableRedisHttpSession
-@Profile("heroku")
+@Profile(DistributedSessionConfig.DISTRIBUTED_SESSION_SPRING_PROFILE)
 public class DistributedSessionConfig {
+    
+    public static final String DISTRIBUTED_SESSION_SPRING_PROFILE = "distributedSession";
+    public static final String REDIS_URL = "REDIS_URL";
 
     @Autowired
     private Environment environment;
@@ -25,7 +28,7 @@ public class DistributedSessionConfig {
         
         try {
             // Redis URL should be of the format redis://h:<PASSWORD>@<HOSTNAME>:<PORT>
-            String redisUrl = environment.getProperty("REDIS_URL");
+            String redisUrl = environment.getProperty(REDIS_URL);
 
             port = redisUrl.substring(redisUrl.lastIndexOf(":") + 1, redisUrl.length());
             host = redisUrl.substring(redisUrl.lastIndexOf("@") + 1, redisUrl.lastIndexOf(":"));
