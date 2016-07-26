@@ -12,15 +12,11 @@ public class DistributedSessionFilterInitializer extends AbstractHttpSessionAppl
     public static final String SPRING_PROFILES_PROPERTY_NAME = "spring.profiles.active";
 
     public void onStartup(ServletContext servletContext) throws ServletException {
-        System.out.println("Executing DistributedSessionFilterInitializer");
         String profiles = System.getProperty(SPRING_PROFILES_PROPERTY_NAME);
         if (!StringUtils.isEmpty(profiles)) {
-            String[] profileArray = profiles.split(",");
-            if (ArrayUtils.contains(profileArray, DistributedSessionConfig.DISTRIBUTED_SESSION_SPRING_PROFILE)) {
-                System.out.println("Found heroku profile.  Creating Filter.");
+            if (ArrayUtils.contains(profiles.split(","), DistributedSessionConfig.DISTRIBUTED_SESSION_SPRING_PROFILE))
                 super.onStartup(servletContext);
-            } else System.out.println("Did not find heroku profile.  Skipping filter.");
-        } else System.out.println("No spring profiles specified.  Skipping filter.");
+        }
     }
 }
 
