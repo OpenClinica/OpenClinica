@@ -449,29 +449,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>auto-clean</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>target</directory>
-                                    <includes>
-                                        <include>**/*.jar</include>
-                                    </includes>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
         <pluginManagement>
             <plugins>
@@ -509,6 +487,58 @@
             </plugins>
         </pluginManagement>
     </build>
+<profiles>
+    <profile>
+        <id>heroku</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+            <property>
+                <name>environment</name>
+                <value>heroku</value>
+            </property>
+        </activation>
+        <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>auto-clean</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                                <configuration>
+                                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                                    <filesets>
+                                        <fileset>
+                                            <directory>target</directory>
+                                            <includes>
+                                                <include>**/*.jar</include>
+                                            </includes>
+                                        </fileset>
+                                    </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </pluginManagement>
+
+        </build>
+    </profile>
+
+    <profile>
+        <id>local</id>
+        <activation>
+            <property>
+                <name>environment</name>
+                <value>local</value>
+            </property>
+        </activation>
+    </profile>
+</profiles>
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>

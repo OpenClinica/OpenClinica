@@ -9,14 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,13 +30,22 @@ import java.util.Enumeration;
 @EnableStormpath
 public class RestrictedController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    @Autowired
-    Application app;
+
     @Autowired
     DataSource dataSource;
+    @Autowired
+    private ApplicationContext applicationContext;
+
 
     @RequestMapping("/restricted/secret")
     public String secret(HttpServletRequest request, Model model) {
+
+        String stormpathApp = applicationContext.getEnvironment().getProperty("stormpath.application.href");
+        if (StringUtils.isEmpty(stormpathApp)) {
+            logger.error("Environment variable STORMPATH_APPLICATION_HREF is not set");
+            return "redirect:/pages/login";
+        }
+        Application app = applicationContext.getBean(Application.class);
         AccountResult accountResult = app.newIdSiteCallbackHandler(request).getAccountResult();
 
         Account account = accountResult.getAccount();
