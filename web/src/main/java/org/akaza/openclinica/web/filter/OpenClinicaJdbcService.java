@@ -48,7 +48,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             returnUsername = username;
         }
 
-        return new User(returnUsername, userFromUserQuery.getPassword(), userFromUserQuery.isEnabled(), true, true, userFromUserQuery.isAccountNonLocked(),
+        return new User(returnUsername, userFromUserQuery.getPassword(), userFromUserQuery.isEnabled(), true, true, true,
                 combinedAuthorities);
     }
 
