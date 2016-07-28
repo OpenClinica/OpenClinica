@@ -41,6 +41,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
      *            the combined array of authorities from all the authority loading queries.
      * @return the final UserDetails which should be used in the system.
      */
+    @Override
     protected UserDetails createUserDetails(String username, UserDetails userFromUserQuery, List<GrantedAuthority> combinedAuthorities) {
         String returnUsername = userFromUserQuery.getUsername();
 
