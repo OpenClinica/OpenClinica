@@ -10,6 +10,7 @@
 
     <modules>
         <module>core</module>
+        <module>stormpath</module>
         <module>web</module>
         <module>ws</module>
     </modules>
@@ -31,7 +32,6 @@
         <spring.version>4.3.1.RELEASE</spring.version>
         <spring-security.version>4.1.1.RELEASE</spring-security.version>
         <db.test>localhost</db.test>
-        <stormpath.version>1.0.RC9.2</stormpath.version>
     </properties>
     <profiles>
         <profile>
@@ -649,21 +649,6 @@
                 <version>1.8</version>
             </dependency>
             <dependency>
-                <groupId>com.stormpath.spring.security</groupId>
-                <artifactId>stormpath-spring-security-core</artifactId>
-                <version>0.3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.stormpath.sdk</groupId>
-                <artifactId>stormpath-sdk-httpclient</artifactId>
-                <version>${stormpath.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.stormpath.spring</groupId>
-                <artifactId>stormpath-default-spring-boot-starter</artifactId>
-                <version>${stormpath.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.owasp.esapi</groupId>
                 <artifactId>esapi</artifactId>
                 <version>2.1.0.1</version>
@@ -671,7 +656,7 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version></version>
+                <version>${spring-security.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

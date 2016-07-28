@@ -322,15 +322,6 @@
             <artifactId>spring-aspects</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.stormpath.spring.security</groupId>
-            <artifactId>stormpath-spring-security-core</artifactId>
-        </dependency>
-        <!-- http://mvnrepository.com/artifact/com.stormpath.sdk/stormpath-sdk-httpclient -->
-        <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-httpclient</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-plugin</artifactId>
             <exclusions>
