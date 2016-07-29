@@ -452,45 +452,6 @@ public class CRFVersionMigrationBatchController  {
         return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
     }
 
-    @Override
-    public void run() {
-
-        for (EventCRFBean crfMigrationReport : crfMigrationReportList) {
-            executeMigrationAction(crfMigrationReport, targetCrfVersionBean, request);
-
-            StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(crfMigrationReport.getStudySubjectId());
-            StudyBean sBean = (StudyBean) sdao().findByPK(ssBean.getStudyId());
-            StudyEventBean seBean = (StudyEventBean) sedao().findByPK(crfMigrationReport.getStudyEventId());
-            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
-            reportLog.getReportLogList().add(
-                    cBean.getName() + "," + sourceCrfVersionBean.getName() + "," + targetCrfVersionBean.getName() + "," + ssBean.getLabel() + ","
-                            + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
-        }
-
-        String fileName = new SimpleDateFormat("_yyyy-MM-dd-hhmmssSaa'.txt'").format(new Date());
-        fileName = "logFile" + fileName;
-        File file = createLogFile(fileName);
-        PrintWriter writer = null;
-        try {
-            writer = openFile(file);
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        writer.print(toStringTextFormat(reportLog));
-        closeFile(writer);
-        String reportUrl = getReportUrl(fileName);
-        System.out.println(reportUrl);
-        String fullName = getCurrentUser(request).getFirstName() + " " + getCurrentUser(request).getLastName();
-        String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_for") + " "
-                + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
-                + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl;
-        System.out.println(body);
-        // openClinicaMailSender.sendEmail(getCurrentUser(request).getEmail(), EmailEngine.getAdminEmail(),
-        // resterms.getString("Batch_Migration_Complete"),
-        // body, true);
-
-    }
 
     private StudyBean getParentStudy(StudyBean study) {
         if (study.getParentStudyId() == 0) {
