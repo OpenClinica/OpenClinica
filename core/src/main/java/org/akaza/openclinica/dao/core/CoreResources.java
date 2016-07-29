@@ -439,7 +439,6 @@ public class CoreResources implements ResourceLoaderAware {
 
     private void setDatabaseProperties(String database) {
        String herokuUrl= System.getenv("DATABASE_URL");
-       System.out.println ("Heroku PostgresUrl: " + herokuUrl);
        if (herokuUrl!=null){
            String namepass[] = herokuUrl.split(":");
                  
@@ -470,8 +469,6 @@ public class CoreResources implements ResourceLoaderAware {
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
-            System.out.println("The url is ................:"+url);
-            logger.info("The url is ................:"+url);
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
         } else if (database.equalsIgnoreCase("oracle")) {

@@ -23,7 +23,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
-import org.openclinica.ws.beans.*;
 import org.openclinica.ws.studysubject.v1.ListAllByStudyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,20 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import org.openclinica.ws.beans.EventType;
+import org.openclinica.ws.beans.EventsType;
+import org.openclinica.ws.beans.GenderType;
+import org.openclinica.ws.beans.ListStudySubjectsInStudyType;
+import org.openclinica.ws.beans.StudyRefType;
+import org.openclinica.ws.beans.StudySubjectWithEventsType;
+import org.openclinica.ws.beans.StudySubjectsType;
+import org.openclinica.ws.beans.SubjectType;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Krikor Krumlian

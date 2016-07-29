@@ -12,36 +12,6 @@ import java.util.List;
 public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
     private static RuleSetAuditDao ruleSetAuditDao;
     private static RuleSetDao ruleSetDao;
-   
-  /*  static
-    {
-        
-        loadProperties();
-        dbName = properties.getProperty("dbName");
-        dbUrl = properties.getProperty("url");
-        dbUserName = properties.getProperty("username");
-        dbPassword = properties.getProperty("password");
-        dbDriverClassName = properties.getProperty("driver");
-        locale = properties.getProperty("locale");
-        initializeLocale();
-        initializeQueriesInXml();
-       
-     
-        
-        context =
-            new ClassPathXmlApplicationContext(
-                    new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-                       " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
-      transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
-      transactionManager.getTransaction(new DefaultTransactionDefinition());
-        
-
-    }*/
     
     
     public RuleSetAuditDaoTest() {
@@ -76,8 +46,6 @@ public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
     }
 
     public void testSaveOrUpdate() {
-        //     RuleSetAuditDao ruleSetAuditDao = (RuleSetAuditDao) getContext().getBean("ruleSetAuditDao");
-       // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleSetBean ruleSetBean = ruleSetDao.findById(-1);
 
         RuleSetAuditBean ruleSetAuditBean = new RuleSetAuditBean();

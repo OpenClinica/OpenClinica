@@ -30,35 +30,6 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         ruleDao = (RuleDao) getContext().getBean("ruleDao");
     }
-   /* static
-    {
-        
-        loadProperties();
-        dbName = properties.getProperty("dbName");
-        dbUrl = properties.getProperty("url");
-        dbUserName = properties.getProperty("username");
-        dbPassword = properties.getProperty("password");
-        dbDriverClassName = properties.getProperty("driver");
-        locale = properties.getProperty("locale");
-        initializeLocale();
-        initializeQueriesInXml();
-       
-     
-        
-        context =
-            new ClassPathXmlApplicationContext(
-                    new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-                       " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
-      transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
-      transactionManager.getTransaction(new DefaultTransactionDefinition());
-        
-
-    }*/
 
 
     public void testFindById() {
@@ -84,33 +55,6 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         assertEquals("The size of the RuleSetRules is not 2", new Integer(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
     }
 
-    //JN:The following commented out tests are failing, suspicion is and arnd studyid and the way it is set, TODO:revisit
-/*    public void testFindAllByStudy() {
-
-   //     RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-        List<RuleSetBean> ruleSets = null;
-        StudyBean study = new StudyBean();
-        study.setId(1);
-        ruleSets = ruleSetDao.findAllByStudy(study);
-        assertEquals("The RuleSets List size should be 2", 2, ruleSets.size());
-    }
-
-    public void testFindByCrfVersionOrCrfAndStudyAndStudyEventDefinition() {
-        CRFBean crfBean = new CRFBean();
-        crfBean.setId(2);
-        CRFVersionBean crfVersionBean = new CRFVersionBean();
-        crfVersionBean.setId(2);
-        StudyBean studyBean = new StudyBean();
-        studyBean.setId(1);
-        StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-        sed.setId(2);
-
-        RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-        List<RuleSetBean> persistentRuleSets = ruleSetDao.findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(crfVersionBean, crfBean, studyBean, sed);
-        assertNotNull("The returned ruleSet was null", persistentRuleSets);
-        assertEquals("The List size of ruleset objects should be 2 ", persistentRuleSets.size(), 2);
-
-    }*/
 
     public void testSaveOrUpdate() {
         // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
@@ -120,19 +64,6 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
          ruleSetBean = ruleSetDao.saveOrUpdate(ruleSetBean);
               assertNotNull("Persistant id is null", ruleSetBean.getId());
      }
-    // @pgawade 09-NOV-2010 Commented out the test "testFindByCrf" temporarily
-    // public void testFindByCrf() {
-    // CRFBean crfBean = new CRFBean();
-    // crfBean.setId(2);
-    // StudyBean studyBean = new StudyBean();
-    // studyBean.setId(1);
-    // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
-    // List<RuleSetBean> persistentRuleSets = ruleSetDao.findByCrf(crfBean,
-    // studyBean);
-    // assertNotNull("The returned ruleSet was null", persistentRuleSets);
-    // assertEquals("The List size of ruleset objects should be 2 ",
-    // persistentRuleSets.size(), 2);
-    // }
 
     public void testFindByCrfEmptyResultSet() {
         CRFBean crfBean = new CRFBean();
@@ -186,14 +117,6 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         return ruleSetRule;
     }
 
-    /*
-     * private RuleBean createRuleBean() { RuleBean ruleBean = new RuleBean();
-     * ruleBean.setName("TEST"); ruleBean.setOid("BOY");
-     * ruleBean.setDescription("Yellow");
-     * ruleBean.setExpression(createExpression(Context.OC_RULES_V1,
-     * "SE_ED1NONRE.F_AGEN.IG_AGEN_UNGROUPED[1].I_AGEN_PERIODSTART eq \"07/01/2008\" and I_CONC_CON_MED_NAME eq \"Tylenol\""
-     * )); return ruleBean; }
-     */
 
     private ExpressionBean createExpression(Context context, String value) {
         ExpressionBean expression = new ExpressionBean();
@@ -202,15 +125,6 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         return expression;
     }
     public void tearDown(){
-        try {
-        //    ruleSetDao.getSessionFactory().getCurrentSession().flush();
-        //    ruleSetDao.getSessionFactory().getCurrentSession().close();
-        //    ruleDao.getSessionFactory().getCurrentSession().flush();
-        //    ruleDao.getSessionFactory().getCurrentSession().close();
-        } catch (HibernateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         super.tearDown();
     }
 

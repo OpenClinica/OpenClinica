@@ -358,7 +358,10 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         if (con != null){isTrasactional = true;}
         PreparedStatement ps = null;
         try {
-            if ( !isTrasactional){ con = ds.getConnection();  CoreResources.setSchema(con);}
+            if ( !isTrasactional){
+                con = ds.getConnection();
+                CoreResources.setSchema(con);
+            }
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
