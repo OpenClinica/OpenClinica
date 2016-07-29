@@ -19,7 +19,7 @@ public class XsltStatefulJob extends XsltTransformJob implements StatefulJob, In
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        jobTerminationMonitor = JobTerminationMonitor.createInstance(context.getJobDetail().getFullName());
+        jobTerminationMonitor = JobTerminationMonitor.createInstance(context.getJobDetail().getDescription());
         super.executeInternal(context);
     }
 

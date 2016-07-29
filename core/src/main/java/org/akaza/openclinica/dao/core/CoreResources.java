@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -17,6 +20,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -135,7 +139,7 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            getPropertiesSource();
+/*          getPropertiesSource();
 
             String filePath = "$catalina.home/$WEBAPP.lower.config";
 
@@ -153,7 +157,7 @@ public class CoreResources implements ResourceLoaderAware {
             if (OC_dataExtractProperties != null)
                 extractInfo = OC_dataExtractProperties;
 
-            String dbName = dataInfo.getProperty("dbType");
+*/            String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
@@ -172,7 +176,7 @@ public class CoreResources implements ResourceLoaderAware {
                 extractProperties = findExtractProperties();
                 // JN: this is in for junits to run without extract props
                 copyImportRulesFiles();
-                copyConfig();
+       //         copyConfig();
             }
 
             // tbh, following line to be removed
@@ -277,7 +281,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
-        getPropertiesSource();
+//        getPropertiesSource();
 
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
@@ -291,7 +295,9 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("filePath", filePath);
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
-        // sysURL.base
+        
+        
+       // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
 
@@ -420,14 +426,49 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
     }
+    
+    public static void setSchema(Connection conn) throws SQLException {
+        Statement statement = conn.createStatement();
+        String schema = DATAINFO.getProperty("schema");
+        try {
+            statement.execute("set search_path to '" + schema + "'");
+        } finally {
+            statement.close();
+        }
+    }    
 
     private void setDatabaseProperties(String database) {
+       String herokuUrl= System.getenv("DATABASE_URL");
+       if (herokuUrl!=null){
+           String namepass[] = herokuUrl.split(":");
+                 
+           String user = namepass[1].substring(2);
+           String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
+           String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
+           String db = namepass[3].substring(5);
+           String dbpt = namepass[3].substring(0,4);
+           
+         DATAINFO.setProperty("dbUser", user);
+         DATAINFO.setProperty("dbPass", pass);
+         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
 
+         DATAINFO.setProperty("dbHost", dbhst);
+         DATAINFO.setProperty("db", db);
+         DATAINFO.setProperty("dbPort", dbpt);
+                  
+       }else{
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+       }
+        
+        
+        
+        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());   
+        
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
         } else if (database.equalsIgnoreCase("oracle")) {
@@ -443,6 +484,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
+        DATAINFO.setProperty("schema", schema);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
         DATAINFO.setProperty("driver", driver);
 

@@ -15,7 +15,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -43,7 +43,7 @@ public class RandomizationRegistrar {
     public SeRandomizationDTO getRandomizationDTOObject(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String randomizationUrl = CoreResources.getField("moduleManager") + "/app/rest/oc/se_randomizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
@@ -119,7 +119,7 @@ public class RandomizationRegistrar {
             seRandomizationDTO.setStudyName(studyName);
             seRandomizationDTO.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
 
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 

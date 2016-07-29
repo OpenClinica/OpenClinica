@@ -38,17 +38,6 @@ import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.jvm.BufferPoolMetricSet;
-import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.sun.jersey.api.core.HttpRequestContext;
 
 import javax.annotation.PostConstruct;
@@ -219,7 +208,6 @@ public class SystemController {
         quartzSchedulerConfiguration.put("org.quartz.threadPool.threadPriority", CoreResources.getField("org.quartz.threadPool.threadPriority"));
 
         HashMap<String, String> facilityInformation = new HashMap<>();
-        facilityInformation.put("FacName", CoreResources.getField("FacName"));
         facilityInformation.put("FacCity", CoreResources.getField("FacCity"));
         facilityInformation.put("FacState", CoreResources.getField("FacState"));
         facilityInformation.put("FacZIP", CoreResources.getField("FacZIP"));
@@ -574,7 +562,7 @@ public class SystemController {
             map.put("Database Connection", "True");
             map.put("Version", String.valueOf(conn.getMetaData().getDatabaseProductVersion()));
 
-            mapRole = getDbRoleProperties(conn, mapRole, username, true);
+            mapRole = getDbRoleProperties(conn, mapRole, username);
 
         } catch (Exception e) {
             map.put("connection", "False");
@@ -810,13 +798,6 @@ public class SystemController {
         } catch (MessagingException me) {
             return "INACTIVE";
         }
-    }
-
-    public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username, Boolean withoutRoleName) throws SQLException {
-        mapRole = getDbRoleProperties(conn, mapRole, username);
-        if (withoutRoleName)
-            mapRole.remove("RoleName");
-        return mapRole;
     }
 
     public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {

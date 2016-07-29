@@ -7,6 +7,20 @@
  */
 package org.akaza.openclinica.view;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -25,21 +39,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * To create a flexible panel of information that will change while the user
@@ -48,10 +47,8 @@ import javax.servlet.http.HttpSession;
  * @author thickerson
  *
  */
-public class StudyInfoPanel {
+public class StudyInfoPanel implements Serializable {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    ResourceBundle resword;
 
     private TreeMap data = new TreeMap();
 
@@ -186,7 +183,7 @@ public class StudyInfoPanel {
     public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
         Locale locale = LocaleResolver.getLocale(request);
-        resword = ResourceBundleProvider.getWordsBundle();
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
         local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
         // logger.info("found date format string: " +
         // ResourceBundleProvider.getFormatBundle
@@ -619,6 +616,7 @@ public class StudyInfoPanel {
      */
     public ArrayList generateTreeFromBeans(ArrayList rows, ArrayList displayData, StudySubjectBean studySubject, EventCRFBean ecb) {
         Iterator itRows = rows.iterator();
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
 
         displayData.add(new StudyInfoPanelLine(resword.getString("study_events"), "(" + rows.size() + ")", true, false, false));
 

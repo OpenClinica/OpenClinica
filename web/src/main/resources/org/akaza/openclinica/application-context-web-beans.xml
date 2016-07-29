@@ -6,11 +6,7 @@
         xmlns:aop="http://www.springframework.org/schema/aop"
 
         xsi:schemaLocation="http://www.springframework.org/schema/beans
-                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                            http://www.springframework.org/schema/tx
-                            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-                            http://www.springframework.org/schema/aop
-                            http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+                            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
 
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource 
@@ -20,5 +16,15 @@
     <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
     </bean>
- 
+    <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
+        <property name="alertsBoxSetup" value="OPENALERTS" />
+        <property name="enableIconsBoxSetup" value="DISABLEICONS"/>
+        <property name="infoBoxSetup" value="OPENINFO" />
+        <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
+    </bean>
+    <bean name="sdvFactory" class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean name="scheduledJobTableFactory" class="org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory"/>
+
 </beans>

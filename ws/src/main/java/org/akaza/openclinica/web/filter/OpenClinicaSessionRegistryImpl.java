@@ -10,10 +10,9 @@ import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;
 
+import javax.sql.DataSource;
 import java.util.Date;
 import java.util.Locale;
-
-import javax.sql.DataSource;
 
 public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
 

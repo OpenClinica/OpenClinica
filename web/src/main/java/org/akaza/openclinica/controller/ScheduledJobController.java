@@ -1,11 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,20 +14,21 @@ import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.jmesa.facade.TableFacade;
-import org.quartz.JobExecutionContext;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 /**
  *
  * @author jnyayapathi
@@ -89,21 +86,25 @@ public class ScheduledJobController {
         List<String> currentJobList = new ArrayList<String>();
         while(itCurrentJobs.hasNext()){
             JobExecutionContext temp = itCurrentJobs.next();
-            currentJobList.add(temp.getTrigger().getJobName()+temp.getTrigger().getGroup());
+            currentJobList.add(temp.getTrigger().getJobKey().getName()+temp.getTrigger().getKey().getGroup());
         }
 
-        String[] triggerGroups =  scheduler.getTriggerGroupNames();
+        List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
+        String[] triggerGroups = triggerGroupNames.stream().toArray(String[]::new);
+
         List<SimpleTrigger> simpleTriggers = new ArrayList<SimpleTrigger>();
         int index1 =0;
         for (String triggerGroup : triggerGroups) {
             logger.debug("Group: " + triggerGroup + " contains the following triggers");
-              triggerNames = scheduler.getTriggerNames(triggerGroup) ;
+            Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
+
+            triggerNames = triggerKeys.stream().toArray(String[]::new);
             
             for (String triggerName : triggerNames) {
-             int state = scheduler.getTriggerState(triggerName, triggerGroup);
+               Trigger.TriggerState state = scheduler.getTriggerState(TriggerKey.triggerKey(triggerName, triggerGroup));
                logger.debug("- " + triggerName);
-               if (state != Trigger.STATE_PAUSED) {
-               simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroup));
+               if (state != Trigger.TriggerState.PAUSED) {
+               simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(TriggerKey.triggerKey(triggerName, triggerGroup)));
                  index1++;
                }
             }
@@ -114,7 +115,7 @@ public class ScheduledJobController {
         int index = 0;
 
         for (SimpleTrigger st : simpleTriggers) {
-            boolean isExecuting = currentJobList.contains(st.getJobName() + st.getGroup());
+            boolean isExecuting = currentJobList.contains(st.getJobKey().getName() + st.getJobKey().getGroup());
 
             ScheduledJobs jobs = new ScheduledJobs();
 
@@ -135,10 +136,10 @@ public class ScheduledJobController {
                     String contextPath = request.getContextPath();
                     StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='").
                             append(contextPath).append("/pages/cancelScheduledJob").append("';").
-                            append("this.form.theJobName.value='").append(st.getJobName()).append("';").
-                            append("this.form.theJobGroupName.value='").append(st.getJobGroup()).append("';").
-                            append("this.form.theTriggerName.value='").append(st.getName()).append("';").
-                            append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';").
+                            append("this.form.theJobName.value='").append(st.getJobKey().getName() ).append("';").
+                            append("this.form.theJobGroupName.value='").append(st.getJobKey().getGroup()).append("';").
+                            append("this.form.theTriggerName.value='").append(st.getJobKey().getName()).append("';").
+                            append("this.form.theTriggerGroupName.value='").append(st.getJobKey().getGroup()).append("';").
                             append("this.form.submit();");
 
                     actions.append("<td><input type=\"submit\" class=\"button\" value=\"Cancel Job\" ").
@@ -182,10 +183,10 @@ public class ScheduledJobController {
             @RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException
         {
 
-        scheduler.getJobDetail(theJobName, theJobGroupName);
+        scheduler.getJobDetail(JobKey.jobKey(theJobName, theJobGroupName));
         logger.debug("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
 
-        SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroupName);
+        SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(TriggerKey.triggerKey(triggerName, triggerGroupName));
         if(oldTrigger!=null)
         {
         Date startTime = new Date(oldTrigger.getStartTime().getTime()+oldTrigger.getRepeatInterval());
@@ -194,55 +195,53 @@ public class ScheduledJobController {
             interruptQuartzJob(scheduler, theJobName, theJobGroupName);
         }
 
-        scheduler.pauseJob(theJobName, theJobGroupName);
+        scheduler.pauseJob(JobKey.jobKey(theJobName, theJobGroupName));
+        SimpleTrigger newTrigger = (SimpleTrigger) newTrigger()
+                .forJob(theJobName, theJobGroupName)
+                .startAt(startTime)
+                .withSchedule(simpleSchedule().withRepeatCount(oldTrigger.getRepeatCount()).withIntervalInSeconds(new Long(oldTrigger.getRepeatInterval()).intValue())
+                        .withMisfireHandlingInstructionNextWithRemainingCount());
 
-        SimpleTrigger newTrigger = new SimpleTrigger(triggerName,triggerGroupName);
-        newTrigger.setJobName(theJobName);
-        newTrigger.setJobGroup(theJobGroupName);
-        newTrigger.setJobDataMap(oldTrigger.getJobDataMap());
-        newTrigger.setVolatility(false);
-        newTrigger.setRepeatCount(oldTrigger.getRepeatCount());
-        newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
-        newTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT);
-        newTrigger.setStartTime(startTime);
-        newTrigger.setRepeatInterval(oldTrigger.getRepeatInterval());
 
-        scheduler.unscheduleJob(triggerName,triggerGroupName);// these are the jobs which are from extract data and are not not required to be rescheduled.
+        newTrigger.getTriggerBuilder().usingJobData(oldTrigger.getJobDataMap());
+
+
+        scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName,triggerGroupName));// these are the jobs which are from extract data and are not not required to be rescheduled.
 
         ArrayList<String> pageMessages = new ArrayList<String>();
 
         if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
         {
-            scheduler.rescheduleJob(triggerName, triggerGroupName, newTrigger);
+            scheduler.rescheduleJob(TriggerKey.triggerKey(triggerName,triggerGroupName), newTrigger);
 
             pageMessages.add("The Job  "+theJobName+" has been cancelled");
         }
         else if(triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME))
         {
 
-            JobDetailBean jobDetailBean = new JobDetailBean();
-            jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
-            jobDetailBean.setName(newTrigger.getName());
-            jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-            jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
-            jobDetailBean.setDurability(true); // need durability?
-            jobDetailBean.setVolatility(false);
+            JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
+            JobDetailFactoryBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
+            JobDetailFactoryBean.setName(newTrigger.getKey().getName());
+            JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+            JobDetailFactoryBean.setJobDataMap(newTrigger.getJobDataMap());
+            JobDetailFactoryBean.setDurability(true); // need durability?
 
-           scheduler.deleteJob(theJobName, theJobGroupName);
-           scheduler.scheduleJob(jobDetailBean, newTrigger);
+
+           scheduler.deleteJob(JobKey.jobKey(theJobName, theJobGroupName));
+           scheduler.scheduleJob(JobDetailFactoryBean.getObject(), newTrigger);
            pageMessages.add("The Job "+theJobName+"  has been rescheduled");
         }
 
         request.setAttribute("pageMessages", pageMessages);
 
-        logger.debug("jobDetails>"+ scheduler.getJobDetail(theJobName, theJobGroupName));
+        logger.debug("jobDetails>"+ scheduler.getJobDetail(JobKey.jobKey(theJobName, theJobGroupName)));
         }
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
     }
 
     private void interruptQuartzJob(Scheduler scheduler, String jobName, String jobGroup) throws SchedulerException {
-        scheduler.interrupt(jobName, jobGroup);
+        scheduler.interrupt(JobKey.jobKey(jobName, jobGroup));
     }
 
     private String longFormatString() {

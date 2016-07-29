@@ -18,7 +18,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "study_module_status")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_module_status_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_module_status_id_seq") })
 public class StudyModuleStatus extends AbstractAuditableMutableDomainObject {
     public static final int NOT_STARTED = 1;
     public static final int IN_PROGRESS = 2;

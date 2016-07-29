@@ -2,11 +2,7 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,9 +26,12 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
-
+import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import static org.quartz.TriggerBuilder.*;
+import static org.quartz.SimpleScheduleBuilder.*;
 /**
  *
  * @author thickerson
@@ -137,7 +136,9 @@ public class CreateJobExportServlet extends SecureController {
             forwardPage(Page.CREATE_JOB_EXPORT);
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
-            HashMap errors = validateForm(fp, request, scheduler.getTriggerNames("DEFAULT"), "");
+            Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT"));
+            String[] triggerNames = triggerKeys.stream().toArray(String[]::new);
+            HashMap errors = validateForm(fp, request, triggerNames, "");
 
             if (!errors.isEmpty()) {
                 // set errors to request
@@ -226,14 +227,12 @@ public class CreateJobExportServlet extends SecureController {
                         epBean, userBean, LocaleResolver.getLocale(request).getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
 
                 //Updating the original trigger with user given inputs
-                trigger.setRepeatCount(64000);
-                trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
-                trigger.setDescription(jobDesc);
-                // set just the start date
-
-                trigger.setStartTime(startDateTime);
-                trigger.setName(jobName);// + datasetId);
-                trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+                trigger.getTriggerBuilder().withSchedule(simpleSchedule().withRepeatCount(64000)
+                        .withIntervalInSeconds(new Integer(period).intValue())
+                        .withMisfireHandlingInstructionNextWithExistingCount())
+                        .startAt(startDateTime)
+                        .forJob(jobName)
+                        .withDescription(jobDesc);
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
@@ -241,17 +240,17 @@ public class CreateJobExportServlet extends SecureController {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
 				trigger.getJobDataMap().put("job_type", "exportJob");
 
-                JobDetailBean jobDetailBean = new JobDetailBean();
-                jobDetailBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
-                jobDetailBean.setName(trigger.getName());
-                jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-                jobDetailBean.setJobDataMap(trigger.getJobDataMap());
-                jobDetailBean.setDurability(true); // need durability?
-                jobDetailBean.setVolatility(false);
+                JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
+                JobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
+                JobDetailFactoryBean.setName(trigger.getKey().getName());
+                JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+                JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
+                JobDetailFactoryBean.setDurability(true); // need durability?
+
 
                 // set to the scheduler
                 try {
-                    Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
+                    Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), trigger);
                     logger.info("== found job date: " + dateStart.toString());
                     // set a success message here
                 } catch (SchedulerException se) {

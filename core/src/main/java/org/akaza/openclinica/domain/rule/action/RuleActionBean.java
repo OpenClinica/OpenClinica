@@ -38,7 +38,7 @@ import org.hibernate.annotations.Type;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "action_type", discriminatorType = DiscriminatorType.INTEGER)
 @Table(name = "rule_action")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_action_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class RuleActionBean extends AbstractAuditableMutableDomainObject implements Comparable<ActionType> {

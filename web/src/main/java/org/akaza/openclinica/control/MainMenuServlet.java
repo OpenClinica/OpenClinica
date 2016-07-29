@@ -76,7 +76,6 @@ public class MainMenuServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-
     	FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);
