@@ -1064,7 +1064,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(temp != null && temp.length() > 0 ? " PageNumber=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
             temp = inform.getDefaultValue();
             xml.append(temp != null && temp.length() > 0 ? " DefaultValue=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
-            xml.append(" PHI=\"" + inform.getPhi() + "\" ShowItem=\"" + inform.getShowItem()+ "\" OrderInForm= \""+inform.getOrderInForm()+ "\">");
+            xml.append(" PHI=\"" + inform.getPhi() + "\" ShowItem=\"" + inform.getShowItem()+ "\" OrderInForm= \""+inform.getOrderInForm()+ "\" Required=\"" + inform.getRequired() + "\">");
             
             xml.append(nls);
             temp = inform.getLeftItemText();

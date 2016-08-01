@@ -26,6 +26,7 @@ public class ItemPresentInFormBean {
     private String itemHeader;
     private String itemSubHeader;
     private String sectionLabel;
+    private String required;
     private ItemResponseBean itemResponse;
     private SimpleConditionalDisplayBean simpleConditionalDisplay;
     
@@ -44,7 +45,15 @@ public class ItemPresentInFormBean {
         itemResponse = new ItemResponseBean();
         simpleConditionalDisplay = new SimpleConditionalDisplayBean();
     }
-    
+
+    public String getRequired() {
+        return required;
+    }
+
+    public void setRequired(String required) {
+        this.required = required;
+    }
+
     public String getFormOid() {
         return formOid;
     }

@@ -558,6 +558,7 @@
 		<xs:attribute name="PHI" type="odm:text" use="required"/>
 		<xs:attribute name="ShowItem" type="odm:text" />
 		<xs:attribute name="OrderInForm" type="odm:integer" />
+		<xs:attribute name="Required" type="odm:text" use="optional"/>
 	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="SimpleConditionalDisplayAttributeDefinition"/>

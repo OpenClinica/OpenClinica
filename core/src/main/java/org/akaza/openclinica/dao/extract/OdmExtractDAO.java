@@ -236,6 +236,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;    this.setTypeExpected(i, TypeNames.STRING);// page_number_label
         ++i;    this.setTypeExpected(i, TypeNames.STRING);// response_layout
         ++i;    this.setTypeExpected(i, TypeNames.STRING);// default_value
+        ++i;    this.setTypeExpected(i, TypeNames.BOOL);// required
         ++i;    this.setTypeExpected(i, TypeNames.BOOL);// phi_status
         ++i;    this.setTypeExpected(i, TypeNames.BOOL);// show_item
         ++i;    this.setTypeExpected(i, TypeNames.INT);// response_type_id
@@ -800,6 +801,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 Integer rsTypeId = (Integer) row.get("response_type_id");
                 String dfValue = (String) row.get("default_value");
                 Boolean phi = (Boolean) row.get("phi_status");
+                Boolean required = (Boolean) row.get("required");
                 Boolean showItem = (Boolean) row.get("show_item");
                 Integer orderInForm = (Integer)row.get("item_order");
                 if((cvId+"-"+igId).equals(prevCvIg)) {
@@ -837,6 +839,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 itInForm.setParentItemOid(parentItemOIDs.get(itPId));
                 itInForm.setSectionLabel(sectionLabels.get(itSecId));
                 itInForm.setPhi(phi==false?"No":"Yes");
+                itInForm.setRequired(required == false ? "No" : "Yes");
                 itInForm.setOrderInForm(orderInForm);
                 itInForm.setShowItem(showItem==true?"Yes":"No");
                 ItemResponseBean itemResponse = new ItemResponseBean();
@@ -1598,6 +1601,7 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer rsTypeId = (Integer) row.get("response_type_id");
             String dfValue = (String) row.get("default_value");
             Boolean phi = (Boolean) row.get("phi_status");
+            Boolean required = (Boolean) row.get("required");
             Boolean showItem = (Boolean) row.get("show_item");
             Integer orderInForm = (Integer)row.get("item_order");
             if((cvId+"-"+igId).equals(prevCvIg)) {
@@ -1632,6 +1636,7 @@ public class OdmExtractDAO extends DatasetDAO {
             itInForm.setParentItemOid(parentItemOIDs.get(itPId));
             itInForm.setSectionLabel(sectionLabels.get(itSecId));
             itInForm.setPhi(phi==false?"No":"Yes");
+            itInForm.setRequired(required == false ? "No" : "Yes");
             itInForm.setOrderInForm(orderInForm);
             itInForm.setShowItem(showItem==true?"Yes":"No");
             ItemResponseBean itemResponse = new ItemResponseBean();
@@ -3254,11 +3259,11 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
         return "select cv.crf_id, cv.crf_version_id,"
             + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
             + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
-            + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, item.phi_status, ifm.show_item, "
+            + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, ifm.required, item.phi_status, ifm.show_item, "
             + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group,orderInForm.item_order,igm.item_group_header from crf_version cv, (select crf_version_id, item_id, response_set_id,"
             + " header as item_header, subheader, section_id, left_item_text, right_item_text,"
             + " parent_id, column_number, page_number_label, response_layout,"
-            + " default_value, show_item from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
+            + " default_value, required, show_item from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
             + " (select crf_version_id, item_group_id, item_id, header as item_group_header,"
             + " repeat_number, repeat_max, show_group from item_group_metadata where crf_version_id in ("
             + crfVersionIds + "))igm," + " item_group ig, "
