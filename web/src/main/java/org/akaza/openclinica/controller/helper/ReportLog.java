@@ -9,6 +9,8 @@ import org.apache.commons.lang.StringUtils;
 public class ReportLog {
 
     private int subjectCount;
+    private int eventCrfCount;
+    private String reportSummary;
     private ArrayList<String> migrationCanNotPerformList;
     private ArrayList<String> errorList;
     private ArrayList<String> reportLogList;
@@ -50,6 +52,22 @@ public class ReportLog {
 
     public void setReportLogList(ArrayList<String> reportLogList) {
         this.reportLogList = reportLogList;
+    }
+
+    public int getEventCrfCount() {
+        return eventCrfCount;
+    }
+
+    public void setEventCrfCount(int eventCrfCount) {
+        this.eventCrfCount = eventCrfCount;
+    }
+
+    public String getReportSummary() {
+        return reportSummary;
+    }
+
+    public void setReportSummary(String reportSummary) {
+        this.reportSummary = reportSummary;
     }
 
 

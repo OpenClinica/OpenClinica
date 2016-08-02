@@ -319,6 +319,10 @@ public enum Page {
     VIEW_CRF ("/WEB-INF/jsp/admin/viewCRF.jsp", "View a CRF"),
 
     /**
+     * Page for creating crf.
+     */
+    BATCH_CRF_MIGRATION ("/WEB-INF/jsp/admin/batchCRFMigration.jsp", "batch CRF Migration"),
+    /**
      * Page for viewing audit user activity.
      */
     AUDIT_USER_ACTIVITY ("/WEB-INF/jsp/admin/auditUserActivity.jsp", "Audit User Activity"),
