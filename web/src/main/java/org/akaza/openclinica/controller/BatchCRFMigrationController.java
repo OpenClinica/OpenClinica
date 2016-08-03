@@ -103,7 +103,7 @@ import com.sun.jersey.api.core.HttpRequestContext;
  * Verification. This is an autowired, multiaction Controller.
  */
 @Controller
-public class BatchCRFMigrationController implements Runnable{
+public class BatchCRFMigrationController implements Runnable {
 
     @Autowired
     private DataSource dataSource;
@@ -125,24 +125,30 @@ public class BatchCRFMigrationController implements Runnable{
     CRFVersionBean targetCrfVersionBean;
     ReportLog reportLog;
     StudyBean stBean;
-    CRFBean cBean; 
+    CRFBean cBean;
+    UserAccountBean userAccountBean;
     HttpServletRequest request;
+    String urlBase;
+
     public BatchCRFMigrationController() {
         super();
     }
-    
-  
-      public  BatchCRFMigrationController(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
- ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request) {
-      this.crfMigrationReportList =crfMigrationReportList;
-      this.sourceCrfVersionBean=sourceCrfVersionBean;
-      this.targetCrfVersionBean=targetCrfVersionBean;
-      this.reportLog=reportLog;
-      this.stBean=stBean;
-      this.cBean=cBean;
-      this.request=request;              
-      }
 
+    public BatchCRFMigrationController(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
+            CRFVersionBean targetCrfVersionBean, ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request, DataSource dataSource,
+            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase) {
+        this.crfMigrationReportList = crfMigrationReportList;
+        this.sourceCrfVersionBean = sourceCrfVersionBean;
+        this.targetCrfVersionBean = targetCrfVersionBean;
+        this.reportLog = reportLog;
+        this.stBean = stBean;
+        this.cBean = cBean;
+        this.request = request;
+        this.dataSource = dataSource;
+        this.userAccountBean = userAccountBean;
+        this.resterms = resterms;
+        this.urlBase = urlBase;
+    }
 
     @RequestMapping(value = "/batchmigration/{filename}/downloadLogFile")
     public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws Exception {
@@ -229,20 +235,20 @@ public class BatchCRFMigrationController implements Runnable{
         ReportLog reportLog = (ReportLog) map.get("reportLog");
         StudyBean stBean = (StudyBean) map.get("stBean");
         CRFBean cBean = (CRFBean) map.get("cBean");
-
-/*        // run migration process using Thread        
-        BatchCRFMigrationController bcmController = new
-                BatchCRFMigrationController(crfMigrationReportList,sourceCrfVersionBean, targetCrfVersionBean,
-                        reportLog,stBean,cBean,request);
+        UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
+        ResourceBundle resterms = (ResourceBundle) map.get("resterms");
+        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+        // run migration process using Thread
+        BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
+                reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase);
         Thread thread = new Thread(bcmController);
         thread.start();
-*/  
-        runMigration(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean, reportLog, stBean, cBean, request);
+
     }
 
     @RequestMapping(value = "/api/v1/batchmigration/process", method = RequestMethod.POST)
     public @ResponseBody String runBatchProcess(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+
         HashMap<String, Object> hashMap = getUIComponents(request);
         String crfId = request.getParameter("crfId");
 
@@ -254,19 +260,18 @@ public class BatchCRFMigrationController implements Runnable{
         ReportLog reportLog = (ReportLog) map.get("reportLog");
         StudyBean stBean = (StudyBean) map.get("stBean");
         CRFBean cBean = (CRFBean) map.get("cBean");
+        UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
+        ResourceBundle resterms = (ResourceBundle) map.get("resterms");
+        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
 
-              String pageMessages = null;
+        String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
-/*            // run migration process using Thread        
-            BatchCRFMigrationController bcmController = new
-                    BatchCRFMigrationController(crfMigrationReportList,sourceCrfVersionBean, targetCrfVersionBean,
-                            reportLog,stBean,cBean,request);
+            // run migration process using Thread
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
+                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase);
             Thread thread = new Thread(bcmController);
             thread.start();
-*/                  runMigration(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean, reportLog, stBean, cBean, request);
-          
-            
-            
+
             pageMessages = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
             return (String) redirect(request, response, "/ListCRF?module=manage" + "&isFromCRFVersionBatchChange=" + pageMessages);
         } else {
@@ -347,7 +352,8 @@ public class BatchCRFMigrationController implements Runnable{
         return reportLog;
     }
 
-    public void executeMigrationAction(EventCRFBean eventCRFBEan, CRFVersionBean targetCrfVersionBean, HttpServletRequest request) {
+    public void executeMigrationAction(EventCRFBean eventCRFBEan, CRFVersionBean targetCrfVersionBean, HttpServletRequest request, DataSource dataSource,
+            UserAccountBean userAccountBean) {
         try {
             EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
             StudyEventDAO sedao = new StudyEventDAO(dataSource);
@@ -357,7 +363,7 @@ public class BatchCRFMigrationController implements Runnable{
 
             Connection con = dataSource.getConnection();
             con.setAutoCommit(false);
-            event_crf_dao.updateCRFVersionID(eventCRFBEan.getId(), targetCrfVersionBean.getId(), getCurrentUser(request).getId(), null);
+            event_crf_dao.updateCRFVersionID(eventCRFBEan.getId(), targetCrfVersionBean.getId(), userAccountBean.getId(), null);
 
             String status_before_update = null;
             SubjectEventStatus eventStatus = null;
@@ -372,10 +378,10 @@ public class BatchCRFMigrationController implements Runnable{
                     subjectStatus = Status.get(subject_status);
                     studySubBean.setStatus(subjectStatus);
                 }
-                studySubBean.setUpdater(getCurrentUser(request));
+                studySubBean.setUpdater(userAccountBean);
                 ssdao().update(studySubBean, null);
             }
-            st_event_bean.setUpdater(getCurrentUser(request));
+            st_event_bean.setUpdater(userAccountBean);
             st_event_bean.setUpdatedDate(new Date());
 
             status_before_update = auditDao().findLastStatus("study_event", st_event_bean.getId(), "8");
@@ -401,7 +407,7 @@ public class BatchCRFMigrationController implements Runnable{
 
         Locale locale = request.getLocale();
         resterms = ResourceBundleProvider.getTermsBundle(locale);
-
+        UserAccountBean userAccountBean = getCurrentUser(request);
         ReportLog reportLog = new ReportLog();
 
         String studyOid = (String) hashMap.get("studyOid");
@@ -419,7 +425,7 @@ public class BatchCRFMigrationController implements Runnable{
             hashObject.put("reportLog", reportLog);
             return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
-        StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(getCurrentUser(request).getName(), stBean.getId());
+        StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(), stBean.getId());
         Role r = suRole.getRole();
         if (suRole == null || !(r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR))) {
             reportLog.getErrorList().add(resterms.getString("You_do_not_have_permission_to_perform_CRF_version_migration_in_this_study"));
@@ -508,6 +514,8 @@ public class BatchCRFMigrationController implements Runnable{
         hashObject.put("crfMigrationReportList", crfMigrationReportList);
         hashObject.put("sourceCrfVersionBean", sourceCrfVersionBean);
         hashObject.put("targetCrfVersionBean", targetCrfVersionBean);
+        hashObject.put("userAccountBean", userAccountBean);
+        hashObject.put("resterms", resterms);
 
         return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.OK);
     }
@@ -587,8 +595,7 @@ public class BatchCRFMigrationController implements Runnable{
         writer.close();
     }
 
-    private String getReportUrl(String filename) {
-        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+    private String getReportUrl(String filename, String urlBase) {
         String reportUrl = urlBase + "/pages/batchmigration/" + filename + "/downloadLogFile";
         return reportUrl;
     }
@@ -620,7 +627,7 @@ public class BatchCRFMigrationController implements Runnable{
         return hashMap;
     }
 
-    public String toStringTextFormat(ReportLog reportLog) {
+    public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms) {
 
         StringBuffer text1 = new StringBuffer();
         for (String migrationPerform : reportLog.getMigrationCanNotPerformList()) {
@@ -708,14 +715,15 @@ public class BatchCRFMigrationController implements Runnable{
 
     }
 
-   public void runMigration(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
-            ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request) {
-/*                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-*/                    
+    // public void runMigration(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
+    // CRFVersionBean targetCrfVersionBean,
+    // ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request) {
+    @Override
+    public void run() {
+        // TODO Auto-generated method stub
+
         for (EventCRFBean crfMigrationReport : crfMigrationReportList) {
-            executeMigrationAction(crfMigrationReport, targetCrfVersionBean, request);
+            executeMigrationAction(crfMigrationReport, targetCrfVersionBean, request, dataSource, userAccountBean);
 
             StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(crfMigrationReport.getStudySubjectId());
             StudyBean sBean = (StudyBean) sdao().findByPK(ssBean.getStudyId());
@@ -736,26 +744,19 @@ public class BatchCRFMigrationController implements Runnable{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        writer.print(toStringTextFormat(reportLog));
+        writer.print(toStringTextFormat(reportLog, resterms));
         closeFile(writer);
-        String reportUrl = getReportUrl(fileName);
+        String reportUrl = getReportUrl(fileName, urlBase);
         System.out.println(reportUrl);
-        String fullName = getCurrentUser(request).getFirstName() + " " + getCurrentUser(request).getLastName();
+        String fullName = userAccountBean.getFirstName() + " " + userAccountBean.getLastName();
         String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_for") + " "
                 + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl;
         System.out.println(body);
-        openClinicaMailSender.sendEmail(getCurrentUser(request).getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete"), body,
-                true);
+        // openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
+        // resterms.getString("Batch_Migration_Complete"), body,
+        // true);
 
     }
-
-
-@Override
-public void run() {
-    // TODO Auto-generated method stub
-    
-}
-
 
 }
