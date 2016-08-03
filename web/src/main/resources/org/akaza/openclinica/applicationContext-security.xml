@@ -38,6 +38,7 @@
         <security:intercept-url pattern="/pages/api/v1/editform/**" access="permitAll"/>
         <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" access="permitAll"/>
         <security:intercept-url pattern="/pages/auth/api/**" access="permitAll"/>
+        <security:intercept-url pattern="/pages/auth/api/v1/system/**" filters="none"/>
         <!--
         <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
           default-target-url='/MainMenu' always-use-default-target='true' />
