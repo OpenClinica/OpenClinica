@@ -17,8 +17,6 @@ ws/*.iml
 core/.DS_Store
 web/.DS_Store
 ws/.DS_Store
-conf/
-build.sh
 
 # git
 *.orig
