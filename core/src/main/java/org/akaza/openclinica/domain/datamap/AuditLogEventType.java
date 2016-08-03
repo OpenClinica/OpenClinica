@@ -23,7 +23,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "audit_log_event_type")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "audit_log_event_type_audit_log_event_type_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "audit_log_event_type_audit_log_event_type_id_seq") })
 
 public class AuditLogEventType extends DataMapDomainObject implements Serializable {
 

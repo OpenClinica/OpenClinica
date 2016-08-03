@@ -253,10 +253,10 @@ public class XformMetaDataService {
             // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
             for (UserControl widget : widgets) {
 
-                // Skip read-only items here
+                // Skip reserved name and read-only items here
+                XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (readonly == null || !readonly.trim().equals("true()")) {
-                    XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
+                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") && (readonly == null || !readonly.trim().equals("true()"))) {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
@@ -328,7 +328,8 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        itemFormMetadata.setRequired(false);
+        if (getItemFormMetadataRequired(html,xformItem)) itemFormMetadata.setRequired(true);
+        else itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
@@ -422,9 +423,25 @@ public class XformMetaDataService {
                     return itemDataTypeDao.findByItemDataTypeCode("REAL");
                 else if (dataType.equals("select") || dataType.equals("select1"))
                     return itemDataTypeDao.findByItemDataTypeCode("ST");
+                else if (dataType.equals("binary"))
+                    return itemDataTypeDao.findByItemDataTypeCode("FILE");
+                else if (dataType.equals("date"))
+                    return itemDataTypeDao.findByItemDataTypeCode("DATE");
             }
         }
         return null;
+    }
+
+    private boolean getItemFormMetadataRequired(Html html, XformItem xformItem) {
+        boolean required = false;
+
+        for (Bind bind : html.getHead().getModel().getBind()) {
+            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
+                if (bind.getRequired().equals("true()")) required = true;
+                else if (bind.getRequired().equals("false()")) required = false;
+            }
+        }
+        return required;
     }
 
     private ResponseType getResponseType(Html html, XformItem xformItem) {
@@ -440,10 +457,14 @@ public class XformMetaDataService {
                     return responseTypeDao.findByResponseTypeName("text");
                 else if (responseType.equals("decimal"))
                     return responseTypeDao.findByResponseTypeName("text");
+                else if (responseType.equals("date"))
+                    return responseTypeDao.findByResponseTypeName("text");
                 else if (responseType.equals("select"))
                     return responseTypeDao.findByResponseTypeName("checkbox");
                 else if (responseType.equals("select1"))
                     return responseTypeDao.findByResponseTypeName("radio");
+                else if (responseType.equals("binary"))
+                    return responseTypeDao.findByResponseTypeName("file");
                 else
                     return null;
             }

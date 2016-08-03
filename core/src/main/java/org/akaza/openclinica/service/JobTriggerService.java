@@ -58,6 +58,8 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.rule.RuleSetService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -81,6 +83,7 @@ public class JobTriggerService {
 	RuleSetService ruleSetService;
 	ItemDataDAO iddao;
 	ItemBean iBean;
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -96,7 +99,7 @@ public class JobTriggerService {
 	 @Scheduled(cron = "0 0 0/1 * * ?")
 	// trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
-		System.out.println("The time is now " + currentDateFormat.format(new Date()));
+		logger.debug("The time is : " + new Date());
 		triggerJob();
 	}
 

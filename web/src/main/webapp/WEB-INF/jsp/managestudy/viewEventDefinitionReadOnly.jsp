@@ -83,7 +83,7 @@
   <fmt:message key="CRFs" bundle="${resword}"/>
 </div>
 <%--<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>--%>
-<div style="width: 700px">
+<div style="width: 900px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 
@@ -103,6 +103,7 @@
      <td valign="top" class="table_header_row"><fmt:message key="participant_form" bundle="${resword}"/></td>     
      <td valign="top" class="table_header_row"><fmt:message key="allow_anonymous_submission" bundle="${resword}"/></td>  
      <td valign="top" class="table_header_row"><fmt:message key="submission_url" bundle="${resword}"/></td>  
+     <td valign="top" class="table_header_row"><fmt:message key="offline" bundle="${resword}"/></td>  
     </c:when>  
    </c:choose>
 
@@ -193,6 +194,18 @@
               </c:when>
             </c:choose>
           </td>
+               <td class="table_cell">
+        <c:choose>
+          <c:when test="${crf.participantForm == true && crf.allowAnonymousSubmission == true}">
+            <c:choose>
+              <c:when test="${crf.offline == true}"> 
+                <fmt:message key="yes" bundle="${resword}"/> 
+              </c:when>
+              <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+            </c:choose>
+          </c:when>
+        </c:choose>
+      </td>          
         </c:when>
       </c:choose>
 

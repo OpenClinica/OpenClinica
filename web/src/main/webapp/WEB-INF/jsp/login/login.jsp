@@ -25,6 +25,7 @@
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/ua-parser.min.js'/>"></script>
 </head>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -57,27 +58,23 @@
   	<%}%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
-        <script type="text/javascript">
-                if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
-                    var ffversion=new Number(RegExp.$1)
-                    if (!(ffversion>=3)){
-                        document.write("<tr> <td align='center' ><h4>"+
+
+    <script type="text/javascript">
+        var parser = new UAParser();
+        var showMessage = false;
+
+        if (parser.getBrowser().name == 'IE' && parseInt(parser.getBrowser().major) < 11){
+            showMessage = true;
+        }else if (parser.getBrowser().name != 'Firefox' && parser.getBrowser().name !='Chrome' && parser.getBrowser().name != 'IE'){
+            showMessage = true;
+        }
+
+        if (showMessage){
+            document.write("<tr> <td align='center' ><h4>"+
                         " <fmt:message key="choose_browser" bundle="${restext}"/>"+
                         "</h4></td> </tr>");
-                    }
-                } else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
-                     var ieversion=new Number(RegExp.$1)
-                     if (!(ieversion>=8)){
-                     document.write("<tr> <td align='center' > <h4>"+
-                         "<fmt:message key="choose_browser" bundle="${restext}"/> "+
-                         "</h4></td> </tr>");
-                     }
-                }else{
-                    document.write("<tr> <td align='center' ><h4>"+
-                    " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                    "</h4></td> </tr>");
-                }
-             </script>
+        }
+    </script>
             </table>
 
     <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">

@@ -31,6 +31,11 @@ public class ResponseSetValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         ResponseSet responseSet = (ResponseSet) target;
+        if (responseSet.getResponseSetId() == 0 ){
+            errors.rejectValue("label", "found_unsupported_usercontrol", item.getName());    
+            return;
+        }
+        
         List<String> newTexts = Arrays.asList(responseSet.getOptionsText().split("(?<!\\\\),"));
         List<String> newValues = Arrays.asList(responseSet.getOptionsValues().split("(?<!\\\\),"));
 

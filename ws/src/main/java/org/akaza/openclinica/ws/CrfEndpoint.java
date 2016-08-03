@@ -22,16 +22,15 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBElement;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
-
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBElement;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * @author Krikor Krumlian

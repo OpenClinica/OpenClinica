@@ -50,6 +50,7 @@ import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -67,6 +68,8 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -78,6 +81,9 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -92,8 +98,11 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.JobKey;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +111,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.owasp.esapi.ESAPI;
 
 /**
  * This class enhances the Controller in several ways.
@@ -158,7 +168,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected StudyBean currentStudy;
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
-
+    protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
 
     private StdScheduler scheduler;
@@ -283,8 +293,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
         try {
             if (jobName != null && groupName != null) {
-                int state = getScheduler(request).getTriggerState(jobName, groupName);
-                org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
+
+                Trigger.TriggerState triggerState = getScheduler(request).getTriggerState(new TriggerKey(jobName, groupName));
+                org.quartz.JobDetail details = getScheduler(request).getJobDetail(new JobKey(jobName, groupName));
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
                 // will we get the above, even if its completed running?
                 // ProcessingResultType message = null;
@@ -299,7 +310,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // ProcessingResultType message = (ProcessingResultType) details.getResult();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
-                if (state == Trigger.STATE_NONE || state== Trigger.STATE_COMPLETE) {
+                if (triggerState == Trigger.TriggerState.NONE || triggerState== Trigger.TriggerState.COMPLETE) {
                     // add the message here that your export is done
                     // TODO make absolute paths in the message, for example a link from /pages/* would break
                     // TODO i18n
@@ -659,7 +670,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected void forwardPage(Page jspPage, boolean checkTrail) {
     	Page page1 = Page.valueOf(jspPage.name());
     	String temp;
-    	
+
     	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
@@ -697,7 +708,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }
-           
+
              temp = page1.getFileName();
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(temp).forward(request, response);
@@ -773,7 +784,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             request.setAttribute(POP_UP_URL, url);
             request.setAttribute("hasPopUp", 1);
             logger.info("just set pop up url: " + url);
-           
+
         }
     }
 
@@ -1161,6 +1172,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
+    protected String encodeForHtml(String input) {
+        return ESAPI.encoder().encodeForHTML(input);
+    }
+
+    protected String decodeForHtml(String input) {
+        return StringEscapeUtils.unescapeHtml(input);
+    }
 
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
@@ -1185,4 +1203,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
+
+
+
+
 }

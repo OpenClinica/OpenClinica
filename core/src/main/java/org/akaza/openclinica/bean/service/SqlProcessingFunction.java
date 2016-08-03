@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.core.util.ScriptRunner;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 /**
  * Class to implement the datamart in SQL. by Tom Hickerson, 09/2010
@@ -56,8 +57,10 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
             props.setProperty("password", databasePassword);
             // props.setProperty("ssl","true");
             conn = DriverManager.getConnection(databaseUrl, props);
+            CoreResources.setSchema(conn);
 
-            conn.setAutoCommit(true);
+
+            conn.setAutoCommit(false);
             File sqlFile = new File(getTransformFileName());
             // String[] statements = getFileContents(sqlFile);
 
@@ -95,7 +98,7 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
                     stmt.close();
                 if (conn != null) {
                     conn.commit();
-                    conn.setAutoCommit(false);
+                    conn.setAutoCommit(true);
 
                     conn.close();
                 }

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">         
+<databaseChangeLog
+
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
 <!-- Postgres database specific functions -->
     <changeSet author="pgawade (generated)" id="1235684743487-358">
     	<preConditions onFail="MARK_RAN">
@@ -7,6 +13,8 @@
 		<!--<runningAs username="clinica" />-->
 	</preConditions>
     	<sql splitStatements="false">
+    	            SET search_path = ${database.defaultSchemaName};
+    	
     		CREATE OR REPLACE FUNCTION event_crf_trigger() RETURNS "trigger"
 		    AS 'DECLARE
 			pk INTEGER;
@@ -431,7 +439,7 @@
     
     <changeSet author="pgawade (generated)" id="1235684743487-365">
     	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
+	 	<dbms type="postgresql"/>
 		<!--<runningAs username="clinica" />-->
 	</preConditions>     	 
     	 <sql splitStatements="false">
@@ -2438,7 +2446,7 @@
 				audit_log_event_audit_id_seq.nextval,
 				event_type_id,
 				sysdate,
-				NEWREC.sdv_update_id,
+				NEWREC.update_id,
 				'event_crf',
 				NEWREC.event_crf_id,
 				entity_name_value,

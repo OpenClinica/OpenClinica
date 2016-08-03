@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -39,7 +38,6 @@ import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
@@ -463,7 +461,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 } else {
                     value = NO;
                 }
-            } else {
+            } else if(theItem !=null) {
                 ArrayList<ItemFormMetadataBean> itemFormMetadatas = getItemFormMetadataDAO().findAllByItemIdAndHasValidations(theItem.getId());
                 if (itemFormMetadatas.size() > 0) {
                     value =
@@ -472,6 +470,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     value = NO;
                 }
 
+            }else{
+                value =null;
             }
 
             return value;

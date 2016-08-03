@@ -88,7 +88,7 @@
 
 <form action="DefineStudyEvent" method="post">
     <input type="hidden" name="actionName" value="confirm">
-    <div style="width: 8    00px">
+    <div style="width: 900px">
         <!-- These DIVs define shaded box borders -->
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -148,7 +148,17 @@
                            <tr valign="top">
   <c:choose>
     <c:when test="${participateFormStatus == 'enabled'}">
-      <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')"></td>
+    
+       <c:choose>
+       <c:when test="${definition.repeating == true }">
+            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'participantForm')"></td>                                      
+       </c:when>
+         <c:otherwise>
+            <td class="table_cell" colspan="1"><fmt:message key="participant_form" bundle="${resword}"/>:<input type="checkbox" name="participantForm<c:out value="${count}"/>" value="yes" ></td>
+         </c:otherwise>
+       </c:choose>
+    
+    
       <td class="table_cell" colspan="1">
         <span id="enabledIfParticipantForm<c:out value="${count}"/>" style="display : none">
           <fmt:message key="allow_anonymous_submission" bundle="${resword}"/>:<input type="checkbox" name="allowAnonymousSubmission<c:out value="${count}"/>" value="yes" onclick="showMe(<c:out value="${count}"/>,'allowAnonymousSubmission')">
@@ -157,6 +167,14 @@
       <td class="table_cell" colspan="2">
         <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>" style="display : none">
           <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value="">
+                <c:choose>
+                  <c:when test="${definition.repeating == true }">
+                          <br />
+                    <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" >                    
+                  </c:when>
+                </c:choose>
+          
         </span>
       </td>
    </c:when>  

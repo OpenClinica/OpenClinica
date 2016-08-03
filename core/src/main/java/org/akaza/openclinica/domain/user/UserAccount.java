@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,7 +17,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Version;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
@@ -48,7 +48,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "user_account", schema = "public")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "user_account_user_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "user_account_user_id_seq") })
 
 public class UserAccount extends DataMapDomainObject {
 
@@ -79,6 +79,11 @@ public class UserAccount extends DataMapDomainObject {
 	private boolean accountNonLocked;
 	private int lockCounter;
 	private boolean runWebservices;
+	private String accessCode;
+	private String timeZone;
+	private boolean enableApiKey;
+	private String apiKey;
+	
 	private List userRoleAccesses ;
 	private List<Item> items;
 	private List<Section> sections ;
@@ -117,73 +122,9 @@ public class UserAccount extends DataMapDomainObject {
 		this.runWebservices = runWebservices;
 	}
 
-//	public UserAccount(int userId, UserAccount userAccount, UserType userType,
-//			Status status, String userName, String passwd, String firstName,
-//			String lastName, String email, Integer activeStudy,
-//			String institutionalAffiliation, Date dateCreated,
-//			Date dateUpdated, Date dateLastvisit, Date passwdTimestamp,
-//			String passwdChallengeQuestion, String passwdChallengeAnswer,
-//			String phone, Integer updateId, boolean enabled,
-//			boolean accountNonLocked, int lockCounter, boolean runWebservices,
-//			Set userRoleAccesses, Set items, Set sections, Set itemGroups,
-//			Set crfs, Set userAccounts, Set discrepancyNotesForAssignedUserId,
-//			Set studySubjects, Set eventDefinitionCrfs, Set studyGroupClasses,
-//			Set studyEventDefinitions, Set subjects, Set subjectGroupMaps,
-//			Set auditUserLogins, Set discrepancyNotesForOwnerId,
-//			Set studyUserRoles, Set decisionConditions, Set itemDatas,
-//			Set filters, List<Study> studies, Set datasets, Set eventCrfs,
-//			Set studyEvents, Set crfVersions) {
-//		this.userId = userId;
-//		this.userAccount = userAccount;
-//		this.userType = userType;
-//		this.status = status;
-//		this.userName = userName;
-//		this.passwd = passwd;
-//		this.firstName = firstName;
-//		this.lastName = lastName;
-//		this.email = email;
-//		this.activeStudy = activeStudy;
-//		this.institutionalAffiliation = institutionalAffiliation;
-//		this.dateCreated = dateCreated;
-//		this.dateUpdated = dateUpdated;
-//		this.dateLastvisit = dateLastvisit;
-//		this.passwdTimestamp = passwdTimestamp;
-//		this.passwdChallengeQuestion = passwdChallengeQuestion;
-//		this.passwdChallengeAnswer = passwdChallengeAnswer;
-//		this.phone = phone;
-//		this.updateId = updateId;
-//		this.enabled = enabled;
-//		this.accountNonLocked = accountNonLocked;
-//		this.lockCounter = lockCounter;
-//		this.runWebservices = runWebservices;
-//		this.userRoleAccesses = userRoleAccesses;
-//		this.items = items;
-//		this.sections = sections;
-//		this.itemGroups = itemGroups;
-//		this.crfs = crfs;
-//		this.userAccounts = userAccounts;
-//		this.discrepancyNotesForAssignedUserId = discrepancyNotesForAssignedUserId;
-//		this.studySubjects = studySubjects;
-//		this.eventDefinitionCrfs = eventDefinitionCrfs;
-//		this.studyGroupClasses = studyGroupClasses;
-//		this.studyEventDefinitions = studyEventDefinitions;
-//		this.subjects = subjects;
-//		this.subjectGroupMaps = subjectGroupMaps;
-//		this.auditUserLogins = auditUserLogins;
-//		this.discrepancyNotesForOwnerId = discrepancyNotesForOwnerId;
-//		this.studyUserRoles = studyUserRoles;
-//		this.decisionConditions = decisionConditions;
-//		this.itemDatas = itemDatas;
-//		this.filters = filters;
-//		this.studies = studies;
-//		this.datasets = datasets;
-//		this.eventCrfs = eventCrfs;
-//		this.studyEvents = studyEvents;
-//		this.crfVersions = crfVersions;
-//	}
-//
 	@Id
 	@Column(name = "user_id", unique = true, nullable = false)
+    @GeneratedValue(generator = "id-generator")
 	public int getUserId() {
 		return this.userId;
 	}
@@ -399,6 +340,8 @@ public class UserAccount extends DataMapDomainObject {
 		this.runWebservices = runWebservices;
 	}
 
+	
+	
 	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List getUserRoleAccesses() {
 		return this.userRoleAccesses;
@@ -408,7 +351,43 @@ public class UserAccount extends DataMapDomainObject {
 		this.userRoleAccesses = userRoleAccesses;
 	}*/
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
+    @Column(name = "access_code", length = 64)
+	public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
+    }
+
+    @Column(name = "time_zone", length = 255)
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    @Column(name = "enable_api_key")
+    public boolean isEnableApiKey() {
+        return enableApiKey;
+    }
+
+    public void setEnableApiKey(boolean enableApiKey) {
+        this.enableApiKey = enableApiKey;
+    }
+
+    @Column(name = "api_key", length = 255)
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccount")
 	public List<Item> getItems() {
 		return this.items;
 	}

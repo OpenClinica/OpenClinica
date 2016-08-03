@@ -10,7 +10,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class ParticipantPortalRegistrar {
@@ -25,7 +25,7 @@ public class ParticipantPortalRegistrar {
     public Authorization getAuthorization(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 
@@ -56,7 +56,7 @@ public class ParticipantPortalRegistrar {
     private String loadRegistrationStatus(String studyOid) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
         try {
@@ -72,7 +72,7 @@ public class ParticipantPortalRegistrar {
 
     public String getHostNameAvailability(String hostName) {
         String pManageUrl = CoreResources.getField("portalURL") + "/app/permit/studys/name?hostName=" + hostName;
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
         String response = null;
@@ -123,7 +123,7 @@ public class ParticipantPortalRegistrar {
     	String host = hostname.substring(0,hostname.indexOf("/#/login"));
        	String pManageUrl =host + "/app/rest/oc/email";
 
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 
@@ -148,7 +148,7 @@ public class ParticipantPortalRegistrar {
         authStudy.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
         authRequest.setStudy(authStudy);
 
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 
@@ -169,7 +169,7 @@ public class ParticipantPortalRegistrar {
         String pManageUrl = CoreResources.getField("portalURL");
         String pManageUrlFull = pManageUrl + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
 
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
         try {

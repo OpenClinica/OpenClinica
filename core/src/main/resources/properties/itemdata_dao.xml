@@ -143,15 +143,18 @@
 	</query>
 	<query>
 		<name>findAllBlankRequiredByEventCRFId</name>
-		<sql>
-		   select id.* from item_data id, item i, item_form_metadata ifm
+		<sql>		  
+		   select id.* from item_data id, item i, item_form_metadata ifm , item_group_metadata igm
 		   where id.event_crf_id=?
 		   and id.item_id = i.item_id
 		   and i.item_id = ifm.item_id
+		   and i.item_id = igm.item_id		   
+           and ifm.crf_version_id= igm.crf_version_id
 		   and ifm.crf_version_id=?
 		   and ifm.required=true
-		   and ifm.show_item=true
-		   and (id.value='')
+		   and ifm.show_item=true 
+		   and igm.show_group=true
+		   and (id.value='')		   		   
 		</sql>
 	</query>
 	<query>
@@ -159,7 +162,7 @@
 		<sql>
 		   select distinct id.* from item_data id, item_form_metadata ifm
 		   where id.event_crf_id=?
-		   and id.item_id = ifm.item_id
+		   and id.item_id = ifm.item_id 
 		   and ifm.required=true
 		</sql>
 	</query>

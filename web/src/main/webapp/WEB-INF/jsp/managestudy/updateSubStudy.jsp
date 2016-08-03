@@ -695,6 +695,17 @@ function updateThis(multiSelEle, count) {
                 <input type="text"  name="submissionUrl<c:out value="${num}"/>" value="${edc.submissionUrl}"/>
           <c:set var="summary" value="submissionUrl${num}"/>
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
+                          <br />
+                <c:choose>
+                  <c:when test="${edc.allowAnonymousSubmission == true && def.repeating == true  && edc.offline == true}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" disabled checked>
+                  </c:when>
+                  <c:when test="${edc.allowAnonymousSubmission == true && def.repeating == true  && edc.offline == false}">
+                <fmt:message key="offline" bundle="${resword}"/>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           
+                    <input type="checkbox" name="offline<c:out value="${count}"/>" value="yes" disabled>
+                  </c:when>
+                </c:choose>
           
         </td>
      </c:when>  

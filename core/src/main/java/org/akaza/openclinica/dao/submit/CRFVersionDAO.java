@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -389,7 +388,6 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         sqls.add(sql);
         sql = digester.getQuery("deleteItemMapByVersion") + versionId;
         sqls.add(sql);
-
         sql = digester.getQuery("deleteItemGroupMetaByVersion") + versionId;
         sqls.add(sql);
 
@@ -401,7 +399,8 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
 
         sql = digester.getQuery("deleteResponseSetByVersion") + versionId;
         sqls.add(sql);
-
+        sql = digester.getQuery("deleteCrfVersionMediaByVersion") + versionId;
+        sqls.add(sql);
         sql = digester.getQuery("delete") + versionId;
         sqls.add(sql);
         return sqls;

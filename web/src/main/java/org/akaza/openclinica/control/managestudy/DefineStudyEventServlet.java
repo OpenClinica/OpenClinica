@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -27,6 +28,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
@@ -52,6 +54,7 @@ import java.util.Map;
  * Defines a new study event
  */
 public class DefineStudyEventServlet extends SecureController {
+    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     /**
      * Checks whether the user has the correct privilege
@@ -303,6 +306,7 @@ public class DefineStudyEventServlet extends SecureController {
             String participantForm = fp.getString("participantForm" + i);
             String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
             String submissionUrl = fp.getString("submissionUrl" + i);
+            String offline = fp.getString("offline" + i);
             
 
             // issue 312 BWP<<
@@ -334,6 +338,11 @@ public class DefineStudyEventServlet extends SecureController {
                 edcBean.setAllowAnonymousSubmission(true);
             } else {
                 edcBean.setAllowAnonymousSubmission(false);
+            }
+            if (!StringUtils.isBlank(offline) && "yes".equalsIgnoreCase(offline.trim())) {
+                edcBean.setOffline(true);
+            } else {
+                edcBean.setOffline(false);
             }
             if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);
@@ -580,6 +589,8 @@ public class DefineStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sed1 = (StudyEventDefinitionBean) edao.create(sed);
 
         EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         ArrayList eventDefinitionCRFs = new ArrayList();
         if (session.getAttribute("edCRFs") != null) {
             eventDefinitionCRFs = (ArrayList) session.getAttribute("edCRFs");
@@ -591,6 +602,11 @@ public class DefineStudyEventServlet extends SecureController {
             edc.setStatus(Status.AVAILABLE);
             edc.setStudyEventDefinitionId(sed1.getId());
             edc.setOrdinal(i + 1);
+            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(sed.getId());
+            CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());                
+            String crfPath=sedBean.getOid()+"."+cBean.getOid();
+            getEventDefinitionCrfTagService().saveEventDefnCrfOfflineTag(2, crfPath, edc ,sedBean);
+          
             cdao.create(edc);
         }
 
@@ -638,5 +654,11 @@ public class DefineStudyEventServlet extends SecureController {
         }
 
     }
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService=
+         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+         return eventDefinitionCrfTagService;
+     }
 
 }

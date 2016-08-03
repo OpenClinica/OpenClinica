@@ -48,7 +48,7 @@ import org.akaza.openclinica.web.job.XalanTriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 /**
  * Take a dataset and show it in different formats,<BR/> Detect whether or not
@@ -237,16 +237,16 @@ public class ExportDatasetServlet extends SecureController {
                             generalFileDir + "output.sql", db.getId());
                     scheduler = getScheduler();
 
-                    JobDetailBean jobDetailBean = new JobDetailBean();
-                    jobDetailBean.setGroup(xts.TRIGGER_GROUP_NAME);
-                    jobDetailBean.setName(simpleTrigger.getName());
-                    jobDetailBean.setJobClass(org.akaza.openclinica.web.job.XalanStatefulJob.class);
-                    jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
-                    jobDetailBean.setDurability(true); // need durability?
-                    jobDetailBean.setVolatility(false);
+                    JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
+                    JobDetailFactoryBean.setGroup(xts.TRIGGER_GROUP_NAME);
+                    JobDetailFactoryBean.setName(simpleTrigger.getKey().getName());
+                    JobDetailFactoryBean.setJobClass(org.akaza.openclinica.web.job.XalanStatefulJob.class);
+                    JobDetailFactoryBean.setJobDataMap(simpleTrigger.getJobDataMap());
+                    JobDetailFactoryBean.setDurability(true); // need durability?
+
 
                     try {
-                        Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
+                        Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), simpleTrigger);
                         logger.info("== found job date: " + dateStart.toString());
                     } catch (SchedulerException se) {
                         se.printStackTrace();

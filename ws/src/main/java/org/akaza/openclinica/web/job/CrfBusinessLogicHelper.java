@@ -21,10 +21,9 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
-
-import javax.sql.DataSource;
 
 /*
  * Helper methods will be placed in this class - DRY

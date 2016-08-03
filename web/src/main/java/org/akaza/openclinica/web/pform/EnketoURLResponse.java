@@ -1,9 +1,14 @@
 package org.akaza.openclinica.web.pform;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EnketoURLResponse {
     private String url = null;
     private String preview_url = null;
     private String edit_url = null;
+    private String offline_url = null;
+    private String iframe_url = null;
     private String code = null;
 
     public String getUrl() {
@@ -38,4 +43,19 @@ public class EnketoURLResponse {
         this.edit_url = edit_url;
     }
 
+    public String getOffline_url() {
+        return offline_url;
+    }
+
+    public void setOffline_url(String offline_url) {
+        this.offline_url = offline_url;
+    }
+
+    public String getIframe_url() {
+        return iframe_url;
+    }
+
+    public void setIframe_url(String iframe_url) {
+        this.iframe_url = iframe_url;
+    }
 }

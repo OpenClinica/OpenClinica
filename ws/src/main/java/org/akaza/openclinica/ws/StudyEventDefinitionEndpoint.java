@@ -31,14 +31,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.util.List;
-import java.util.Locale;
-
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import java.util.List;
+import java.util.Locale;
 
 @Endpoint
 public class StudyEventDefinitionEndpoint {
@@ -202,6 +201,18 @@ public class StudyEventDefinitionEndpoint {
 
                 element = document.createElementNS(NAMESPACE_URI_V1, "participantForm");
                 element.setTextContent(String.valueOf(eventCrf.isParticipantForm()));
+                eventDefinitionCrfElement.appendChild(element);
+
+                element = document.createElementNS(NAMESPACE_URI_V1, "allowAnonymousSubmission");
+                element.setTextContent(String.valueOf(eventCrf.isAllowAnonymousSubmission()));
+                eventDefinitionCrfElement.appendChild(element);
+
+                element = document.createElementNS(NAMESPACE_URI_V1, "submissionUrl");
+                element.setTextContent(String.valueOf(eventCrf.getSubmissionUrl()));
+                eventDefinitionCrfElement.appendChild(element);
+
+                element = document.createElementNS(NAMESPACE_URI_V1, "offline");
+                element.setTextContent(String.valueOf(eventCrf.isOffline()));
                 eventDefinitionCrfElement.appendChild(element);
 
                 element = document.createElementNS(NAMESPACE_URI_V1, "sourceDataVerificaiton");

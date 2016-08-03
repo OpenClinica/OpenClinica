@@ -29,7 +29,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "subject")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "subject_subject_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "subject_subject_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Subject  extends DataMapDomainObject {
 
@@ -162,8 +162,8 @@ public class Subject  extends DataMapDomainObject {
 		this.uniqueIdentifier = uniqueIdentifier;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "date_created", length = 8)
 	public Date getDateCreated() {
 		return this.dateCreated;
 	}
@@ -172,8 +172,8 @@ public class Subject  extends DataMapDomainObject {
 		this.dateCreated = dateCreated;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_updated", length = 4)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "date_updated", length = 8)
 	public Date getDateUpdated() {
 		return this.dateUpdated;
 	}

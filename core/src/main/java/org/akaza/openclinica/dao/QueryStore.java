@@ -9,13 +9,16 @@ package org.akaza.openclinica.dao;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.ResourceLoaderAware;
@@ -77,7 +80,10 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
 
     protected String resolveDbFolder() {
         try {
-            String url = dataSource.getConnection().getMetaData().getURL();
+            Connection conn = dataSource.getConnection();
+            CoreResources.setSchema(conn);
+
+            String url = conn.getMetaData().getURL();
             if (url.startsWith("jdbc:postgresql")) {
                 return "postgres";
             }

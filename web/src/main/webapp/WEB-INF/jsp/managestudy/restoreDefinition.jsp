@@ -141,6 +141,16 @@
       <c:out value="${participantUrl}${crf.submissionUrl}"/></c:when>   
       <c:otherwise><c:out value="${crf.submissionUrl}"/> </c:otherwise>   
      </c:choose>
+   </td>
+     
+     
+         <td class="table_cell"><fmt:message key="offline" bundle="${resword}"/>:
+     <c:choose>
+      <c:when test="${crf.offline == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
+      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
+     </c:choose>
+   </td>
+     
    </c:when>  
  </c:choose>
 

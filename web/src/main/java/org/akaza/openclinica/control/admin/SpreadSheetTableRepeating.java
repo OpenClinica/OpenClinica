@@ -30,6 +30,7 @@ import org.akaza.openclinica.control.form.spreadsheet.SheetValidationType;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -1564,9 +1565,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
                                             + crfId
-                                            + " LIMIT 1),'"
+                                            + " LIMIT 1),E'"
                                             + igMeta.getHeader()
-                                            + "', '"
+                                            + "', E'"
                                             + igMeta.getSubheader()
                                             + "', '"
                                             +
@@ -2226,6 +2227,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         int nextCRFId;
                         try {
                             con = ds.getConnection();
+                            CoreResources.setSchema(con);
+
                             /*
                              * We are selecting the crf id which will be used to
                              * save the new CRF. Selecting the crf id in advance

@@ -567,9 +567,10 @@ public class UpdateStudyEventServlet extends SecureController {
             }
         } else {
             logger.debug("no action, go to update page");
-
             DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
             StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+            studySubjectBean.setLabel(decodeForHtml(studySubjectBean.getLabel()));
+            studySubjectBean.setSecondaryLabel(decodeForHtml(studySubjectBean.getSecondaryLabel()));
             int studyId = studySubjectBean.getStudyId();
             boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
             boolean isParentStudy = studyBean.getParentStudyId() < 1;

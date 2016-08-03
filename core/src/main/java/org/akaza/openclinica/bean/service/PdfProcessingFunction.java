@@ -53,7 +53,9 @@ public class PdfProcessingFunction extends ProcessingFunction  {
      * @see org.akaza.openclinica.bean.service.ProcessingInterface#run()
      */
     public ProcessingResultType run() {
-         FopFactory fopFactory = FopFactory.newInstance(); 
+        // FopFactory fopFactory = FopFactory.newInstance(); 
+        FopFactory fopFactory = FopFactory.newInstance();        
+     //   FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
         OutputStream out = null;   
         File outputFile =null;
         String zipName = "_";

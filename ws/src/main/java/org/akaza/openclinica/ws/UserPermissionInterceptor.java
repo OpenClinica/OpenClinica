@@ -10,9 +10,8 @@ import org.springframework.ws.server.EndpointInterceptor;
 import org.springframework.ws.soap.SoapBody;
 import org.springframework.ws.soap.SoapMessage;
 
-import java.util.Locale;
-
 import javax.sql.DataSource;
+import java.util.Locale;
 
 public class UserPermissionInterceptor implements EndpointInterceptor {
 
@@ -53,6 +52,10 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
     public boolean handleFault(MessageContext messageContext, Object endpoint) throws Exception {
         // TODO Auto-generated method stub
         return true;
+    }
+
+    @Override
+    public void afterCompletion(MessageContext messageContext, Object o, Exception e) throws Exception {
     }
 
 }

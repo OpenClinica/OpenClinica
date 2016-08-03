@@ -45,14 +45,13 @@ public class JobTriggerListener extends TriggerListenerSupport {
         logTriggerInfo(trigger, "Trigger {} misfired");
     }
 
-    @Override
-    public void triggerComplete(Trigger trigger, JobExecutionContext context, int triggerInstructionCode) {
+    public void triggerComplete(Trigger trigger, JobExecutionContext context, Trigger.CompletedExecutionInstruction triggerInstructionCode) {
         super.triggerComplete(trigger, context, triggerInstructionCode);
         logTriggerInfo(trigger, "Trigger {} complete");
     }
 
     private void logTriggerInfo(Trigger trigger, String message) {
-        LOG.debug(message, trigger.getName());
+        LOG.debug(message, trigger.getDescription());
     }
 
 

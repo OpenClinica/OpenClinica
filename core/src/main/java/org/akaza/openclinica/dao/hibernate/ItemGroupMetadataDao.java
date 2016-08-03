@@ -20,4 +20,11 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
         return (ArrayList<ItemGroupMetadata>) q.list();
     }
 
+    public ItemGroupMetadata findByItemCrfVersion(int item_id, int crf_version_id) {
+        String query = "from " + getDomainClassName() + " do where do.item.itemId = :itemid and do.crfVersion.crfVersionId = :crfversionid";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("itemid", item_id);
+        q.setInteger("crfversionid", crf_version_id);
+        return (ItemGroupMetadata) q.uniqueResult();
+    }
 }

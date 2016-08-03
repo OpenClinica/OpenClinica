@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,7 +32,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "study_subject", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_subject_study_subject_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_subject_study_subject_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudySubject  extends DataMapDomainObject {
 
@@ -170,8 +169,8 @@ public class StudySubject  extends DataMapDomainObject {
 		this.enrollmentDate = enrollmentDate;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "date_created", length = 8)
 	public Date getDateCreated() {
 		return this.dateCreated;
 	}
@@ -180,7 +179,7 @@ public class StudySubject  extends DataMapDomainObject {
 		this.dateCreated = dateCreated;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "date_updated", length = 4)
 	public Date getDateUpdated() {
 		return this.dateUpdated;

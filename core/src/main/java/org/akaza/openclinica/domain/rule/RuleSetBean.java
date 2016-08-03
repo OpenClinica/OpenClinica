@@ -41,7 +41,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "rule_set")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 

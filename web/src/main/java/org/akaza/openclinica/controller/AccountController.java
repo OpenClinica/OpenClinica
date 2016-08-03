@@ -10,11 +10,16 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.OpenclinicaVersion;
+import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -35,6 +40,7 @@ import javax.servlet.ServletContext;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,7 +72,9 @@ public class AccountController {
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
+    private AuditUserLoginDao auditUserLoginDao;
 
+	
 	/**
 	 * @api {post} /pages/accounts/login Retrieve a user account
 	 * @apiName getAccountByUserName
@@ -1029,6 +1037,47 @@ public class AccountController {
 		}
 	}
 
+	   @RequestMapping(value = "/auditcrc", method = RequestMethod.POST)
+	    public ResponseEntity<HashMap> auditcrc(@RequestBody HashMap<String, String> requestMap) throws Exception {
+           HashMap map = new HashMap();
+           
+           String crcUserName = requestMap.get("crcUserName");
+           String studyOid = requestMap.get("studyOid");
+           String studySubjectId = requestMap.get("studySubjectId");
+           
+           StudyBean parentStudy = getParentStudy(studyOid);
+           StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
+
+           // build UserName
+           HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
+           String pUserName = mapValues.get("pUserName"); // Participant User Name
+           AuditUserLoginBean auditUserLogin =new AuditUserLoginBean();
+           UserAccountBean userAccount =getUserAccount(crcUserName); 
+                      
+           auditUserLogin.setUserName(userAccount.getName());
+           auditUserLogin.setLoginStatus(LoginStatus.ACCESS_CODE_VIEWED);
+           auditUserLogin.setLoginAttemptDate(new Date());
+           auditUserLogin.setUserAccountId(userAccount != null ? userAccount.getId() : null);
+           auditUserLogin.setDetails(pUserName);
+           
+           
+           
+           getAuditUserLoginDao().save(auditUserLogin);
+           
+           
+
+	       
+	       return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
+	    }
+
+	    public AuditUserLoginDao getAuditUserLoginDao() {
+	        auditUserLoginDao =
+	            this.auditUserLoginDao != null ? auditUserLoginDao : (AuditUserLoginDao) SpringServletAccess.getApplicationContext(context).getBean(
+	                    "auditUserLoginDao");
+	        return auditUserLoginDao;
+	    }
+
+	
     public Boolean isApiKeyExist(String uuid) {
         UserAccountDAO udao = new UserAccountDAO(dataSource);
         UserAccountBean uBean = (UserAccountBean) udao.findByApiKey(uuid);

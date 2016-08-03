@@ -36,7 +36,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     public static String CRF_VERSION_ID = "crfVersionId";
 
-    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.5.xls";
+    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.9.xls";
 
     /**
      *

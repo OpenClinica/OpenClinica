@@ -24,6 +24,7 @@ import org.akaza.openclinica.domain.xform.dto.ItemSet;
 import org.akaza.openclinica.domain.xform.dto.Label;
 import org.akaza.openclinica.domain.xform.dto.Select;
 import org.akaza.openclinica.domain.xform.dto.Select1;
+import org.akaza.openclinica.domain.xform.dto.Upload;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
 import org.akaza.openclinica.validator.xform.ResponseSetValidator;
 import org.apache.commons.lang.StringUtils;
@@ -56,12 +57,16 @@ public class ResponseSetService {
             // Create the response set
             ResponseSet responseSet = new ResponseSet();
             responseSet.setLabel(xformItem.getItemName());
-            responseSet.setOptionsText(getOptionsText(html, submittedXformText, xformItem, responseType));
+            String optionText =getOptionsText(html, submittedXformText, xformItem, responseType);
+            
+            if (optionText !=null){
+            responseSet.setOptionsText(optionText);
             responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
             responseSet.setResponseType(responseType);
             responseSet.setVersionId(version.getCrfVersionId());
             responseSetDao.saveOrUpdate(responseSet);
             responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+            }
             // Run validation against it
             ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);
             DataBinder dataBinder = new DataBinder(responseSet);
@@ -90,14 +95,16 @@ public class ResponseSetService {
                     List<Item> items = null;
                     ItemSet itemSet = null;
 
-                    if (control instanceof Input)
+                    if (control instanceof Input){
                         return responseType.getName();
-                    else if (control instanceof Select) {
+                    }else if (control instanceof Select) {
                         items = ((Select) control).getItem();
                         itemSet = ((Select) control).getItemSet();
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
+                          return responseType.getName();  
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;
@@ -180,14 +187,16 @@ public class ResponseSetService {
                     List<Item> items = null;
                     ItemSet itemSet = null;
 
-                    if (control instanceof Input)
+                    if (control instanceof Input){
                         return responseType.getName();
-                    else if (control instanceof Select) {
+                    } else if (control instanceof Select) {
                         items = ((Select) control).getItem();
                         itemSet = ((Select) control).getItemSet();
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
+                            return responseType.getName();
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;

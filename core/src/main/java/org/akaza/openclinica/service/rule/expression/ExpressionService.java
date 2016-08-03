@@ -626,7 +626,8 @@ public class ExpressionService {
     public boolean ruleExpressionChecker(String expression) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
-        
+        isExpressionValid(expression);
+
         if (checkIfExpressionIsForScheduling(expression)) {
             if (checkSyntax(expression)) return true;
             else return false;
@@ -1268,11 +1269,11 @@ public class ExpressionService {
             // ItemBean item =
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
-            ItemBean item = (ItemBean) getItemDao().findByOid(oid).get(0);
-            if (item != null) {
+            ArrayList <ItemBean> items = (ArrayList<ItemBean>) getItemDao().findByOid(oid);
+            if (items==null || items.size() !=0){
                 return "OK";
+                        }
             }
-        }
 
         return oid;
     }

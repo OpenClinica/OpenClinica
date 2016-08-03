@@ -73,7 +73,7 @@
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
-<div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF;">
+<div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF; cursor:default">
 <table border="0" cellpadding="0" >
     <tr style="height:10px;">
         <td width="35%"><h3><fmt:message key="add_new_subject" bundle="${resword}"/></h3></td>

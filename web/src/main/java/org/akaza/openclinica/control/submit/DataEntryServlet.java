@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.commons.beanutils.BeanUtils;
-
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -84,6 +83,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -97,8 +97,10 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -445,7 +447,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
             //Removing the user and EventCRF from the locked CRF List
-            if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId()) 
+            if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId())
                 getCrfLocker().unlock(ecb.getId());
 
             if (newUploadedFiles.size() > 0) {
@@ -530,9 +532,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
         Phase phase2 = Phase.INITIAL_DATA_ENTRY;
-        if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+       if (getServletPage(request).startsWith(Page.DOUBLE_DATA_ENTRY_SERVLET.getFileName())) {
             phase2 = Phase.DOUBLE_DATA_ENTRY;
-        } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
+        } else if (getServletPage(request).startsWith(Page.ADMIN_EDIT_SERVLET.getFileName())) {
             phase2 = Phase.ADMIN_EDITING;
         }
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
@@ -957,12 +959,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwb = allItems.get(i);
                 if (diwb.isInGroup()) {
+                    // for the items in groups
+                    DisplayItemGroupBean digb = diwb.getItemGroup();
+                    
                     List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
                     for (int j = 0; j < dbGroups.size(); j++) {
                         DisplayItemGroupBean displayGroup = dbGroups.get(j);
                         List<DisplayItemBean> items = displayGroup.getItems();
                         if ("remove".equalsIgnoreCase(displayGroup.getEditFlag())) {
                             for (DisplayItemBean displayItem : items) {
+                                if(displayItem.getMetadata().isShowItem() && digb.getGroupMetaBean().isShowGroup()){
                                 int itemId = displayItem.getItem().getId();
                                 int ordinal = displayItem.getData().getOrdinal();
                                 if (itemOrdinals.containsKey(itemId)) {
@@ -988,6 +994,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 changedItemsMap.put(formName, displayGroup);
                                 LOGGER.debug("adding to changed items map: " + formName);
                             }
+                           }
                         }
                     }
 
@@ -1286,11 +1293,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         ItemDataBean idb = displayItem.getData();
                         ItemBean item_bean = displayItem.getItem();
                         ItemFormMetadataBean ifmb = displayItem.getMetadata();
-                        
-                        	
+
+
                         LOGGER.debug("-- found group label " + ifmb.getGroupLabel());
                         if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase(""))
-                        
+
                         {
                             // << tbh 11/2009 sometimes the group label is blank instead of ungrouped???
                             Iterator iter = changedItemsMap.entrySet().iterator();
@@ -1563,7 +1570,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             boolean undelete = false;
                             for (DisplayItemBean displayItem : items) {
                                 String currItemVal = displayItem.getData().getValue();
-                                if (currItemVal != null && !currItemVal.equals("")){ 
+                                if (currItemVal != null && !currItemVal.equals("")){
                                     undelete = true;
                                     break;
                                 }
@@ -1577,17 +1584,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                 //                    displayItem.getData().setValue("");
                  //               }
-                               
+
                                 //15350, this particular logic, takes into consideration that a DN is created properly as long as the item data record exists and it fails to get created when it doesnt.
                                 //so, we are expanding the logic from writeToDb method to avoid creating duplicate records.
                                 writeDN = writeDN(displayItem);
                                 //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
                                 nextOrdinal =      displayItem.getData().getOrdinal();
-                                
+
                                 temp = writeToDB(displayItem, iddao, nextOrdinal, request);
                                 LOGGER.debug("just executed writeToDB - 1");
                                 LOGGER.debug("next ordinal: " + nextOrdinal);
-                                
+
                                 // Undelete item if any item in the repeating group has data.
                                 if (undelete && displayItem.getDbData() != null && displayItem.getDbData().isDeleted()) {
                                     iddao.undelete(displayItem.getDbData().getId(),ub.getId());
@@ -2072,14 +2079,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean writeDN(DisplayItemBean displayItem)
     {
     	boolean writeDN=true;
-    	
+
     	if (StringUtils.isBlank(displayItem.getEditFlag())){
  	   if (!displayItem.getData().isActive()) {
  		   writeDN = true;
  	   }
  	   else
  		   writeDN=false;
- 	   
+
  }
  else{
  	 if ("add".equalsIgnoreCase(displayItem.getEditFlag())){
@@ -3847,7 +3854,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 int itemId = dib.getItem().getId();
                 int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
                 int numNotes1 = dndao.findNumOfActiveExistingNotesForItemData(itemDataId);
-               
+
                 String inputFieldName = "input" + itemId;
 
                 discNotes.setNumExistingFieldNotes(inputFieldName, numNotes1);
@@ -4079,6 +4086,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
             newStatus = Status.UNAVAILABLE;
             ecb.setDateValidateCompleted(new Date());
+            ecb.setUpdaterId(ub.getId());
+            ecb.setUpdater(ub);
             ide = false;
         }
 
@@ -4157,19 +4166,47 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ItemDAO idao = new ItemDAO(getDataSource());
         ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(getDataSource());
-        int allRequiredNum = idao.findAllRequiredByCRFVersionId(ecb.getCRFVersionId());
-        int allRequiredFilledOut = iddao.findAllRequiredByEventCRFId(ecb);
-        int allRequiredButHidden = itemFormMetadataDao.findCountAllHiddenByCRFVersionId(ecb.getCRFVersionId());
-        int allHiddenButShown = itemFormMetadataDao.findCountAllHiddenButShownByEventCRFId(ecb.getId());
-        // add all hidden items minus all hidden but now shown items to the allRequiredFilledOut variable
+   
+       // Below code will iterate all shown and hidden required fields/items in a crf version and verify if the data field is filled up with value or if not , then it is a hidden field with no show rule triggered for the item.        
+        ArrayList<ItemFormMetadataBean> shownRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndShownByCrfVersionId(ecb.getCRFVersionId());
+        ArrayList<ItemFormMetadataBean> hiddenRequiredAllItemsInCrfVersion = itemFormMetadataDao.findAllItemsRequiredAndHiddenByCrfVersionId(ecb
+                .getCRFVersionId());
+        ItemGroupMetadataDAO<String, ArrayList> igdao = new ItemGroupMetadataDAO<String, ArrayList>(dataSource);
+        
+        ArrayList<ItemDataBean> itemdatas = null;
+        for (ItemFormMetadataBean shownItemMeta : shownRequiredAllItemsInCrfVersion) {
+            ItemGroupMetadataBean igBean=  (ItemGroupMetadataBean) igdao.findByItemAndCrfVersion(shownItemMeta.getItemId(), ecb.getCRFVersionId());
+  // verifies if the group that the item belongs to is not hidden.
+            if (igBean!=null && igBean.isShowGroup()){  
+            itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), shownItemMeta.getItemId());
+            if (itemdatas == null || itemdatas.size()==0)
+                return false;
+            for (ItemDataBean itemdata : itemdatas) {
+                System.out.println(itemdata.getItemId() +"  :  "+   itemdata.getValue());
+                if ((itemdata.getValue()==null || itemdata.getValue().equals("") || itemdata.getValue().trim().length()==0) && dndao.findNumExistingNotesForItem(itemdata.getId())<1 ) {
+                    return false;
+                }
+            }
+          }
+        
 
-        if (allRequiredNum > allRequiredFilledOut + allRequiredButHidden - allHiddenButShown) {
-            LOGGER.debug("using crf version number: " + ecb.getCRFVersionId());
-            LOGGER.debug("allRequiredNum > allRequiredFilledOut:" + allRequiredNum + " " + allRequiredFilledOut + " plus " + allRequiredButHidden + " minus "
-                + allHiddenButShown);
-            return false;
-        }
-        // had to change the query below to allow for hidden items here, tbh 04/2010
+        ArrayList<DynamicsItemFormMetadataBean> dynamicsItemFormMetadataBeans = null;
+        for (ItemFormMetadataBean hiddenItemMeta : hiddenRequiredAllItemsInCrfVersion) {
+            itemdatas = iddao.findAllByEventCRFIdAndItemId(ecb.getId(), hiddenItemMeta.getItemId());
+            dynamicsItemFormMetadataBeans = getItemMetadataService().getDynamicsItemFormMetadataDao().findByItemAndEventCrfShown(ecb,
+                    hiddenItemMeta.getItemId());
+            if (itemdatas.size() == 0 && dynamicsItemFormMetadataBeans.size() > 0) {
+                return false;
+            }
+            for (ItemDataBean itemdata : itemdatas) {
+                if ((itemdata.getValue()==null || itemdata.getValue().equals("") || itemdata.getValue().trim().length()==0) && dndao.findNumExistingNotesForItem(itemdata.getId())<1 && dynamicsItemFormMetadataBeans.size() > 0) {
+                        return false;
+                }
+            }
+        }         
+    }
+        
+      // had to change the query below to allow for hidden items here, tbh 04/2010
         ArrayList allFilled = iddao.findAllBlankRequiredByEventCRFId(ecb.getId(), ecb.getCRFVersionId());
         int numNotes = 0;
         if (!allFilled.isEmpty()) {
@@ -4987,7 +5024,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
            ItemDataBean existingItemData =  oldItemdata.get(tempKey);
         	String oldValue =existingItemData.getValue();
         	int oldOrdinal = existingItemData.getOrdinal();
-        	
+
             if (oldValue != null) {
                 if (value == null)
                 { if(ordinal==oldOrdinal)
@@ -5446,7 +5483,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
         int manualRows = 0;
         HashMap<String, Boolean> noteSubmitted = (HashMap<String, Boolean>) request.getSession().getAttribute(DataEntryServlet.NOTE_SUBMITTED);
         FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) request.getSession().getAttribute(CreateDiscrepancyNoteServlet.FLAG_DISCREPANCY_RFC);
-       
+
         ArrayList<DiscrepancyNoteBean> fieldNote = null;
         String intendedKey = null;
         String replacementKey = null;

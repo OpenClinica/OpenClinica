@@ -1,8 +1,5 @@
 package org.akaza.openclinica.domain.datamap;
 
-// default package
-// Generated Aug 8, 2013 11:32:37 AM by Hibernate Tools 3.4.0.CR1
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -25,59 +22,74 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnItemDataMap extends DataMapDomainObject {
 
-	private DnItemDataMapId dnItemDataMapId;
-	private ItemData itemData;
-	private DiscrepancyNote discrepancyNote;
+    private DnItemDataMapId dnItemDataMapId;
+    private ItemData itemData;
+    private DiscrepancyNote discrepancyNote;
+    private StudySubject studySubject;
+    private boolean activated;
 
-	public DnItemDataMap() {
-	}
+    public DnItemDataMap() {
+    }
 
-	public DnItemDataMap(DnItemDataMapId id) {
-		this.dnItemDataMapId = id;
-	}
+    public DnItemDataMap(ItemData itemData,
+            DiscrepancyNote discrepancyNote,
+            StudySubject studySubject) {
+        this.itemData = itemData;
+        this.discrepancyNote = discrepancyNote;
+        this.studySubject = studySubject;
+        this.activated = true;
+    }
 
-	public DnItemDataMap(DnItemDataMapId id, ItemData itemData,
-			DiscrepancyNote discrepancyNote) {
-		this.dnItemDataMapId = id;
-		this.itemData = itemData;
-		this.discrepancyNote = discrepancyNote;
-	}
+    @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name = "itemDataId", column = @Column(name = "item_data_id")),
+        @AttributeOverride(name = "discrepancyNoteId", column = @Column(name = "discrepancy_note_id")),
+        @AttributeOverride(name = "columnName", column = @Column(name = "column_name")),
+        @AttributeOverride(name = "studySubjectId", column = @Column(name = "study_subject_id")) })
+    public DnItemDataMapId getDnItemDataMapId() {
+        return dnItemDataMapId;
+    }
 
-	@EmbeddedId
-	@AttributeOverrides({
-			@AttributeOverride(name = "itemDataId", column = @Column(name = "item_data_id")),
-			@AttributeOverride(name = "discrepancyNoteId", column = @Column(name = "discrepancy_note_id")),
-			@AttributeOverride(name = "columnName", column = @Column(name = "column_name")),
-			@AttributeOverride(name = "studySubjectId", column = @Column(name = "study_subject_id")) })
-	public DnItemDataMapId getDnItemDataMapId() {
-		return this.dnItemDataMapId;
-	}
+    public void setDnItemDataMapId(DnItemDataMapId dnItemDataMapId) {
+        this.dnItemDataMapId = dnItemDataMapId;
+    }
 
-	public void setDnItemDataMapId(DnItemDataMapId id) {
-		this.dnItemDataMapId = id;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_data_id", insertable = false, updatable = false)
+    public ItemData getItemData() {
+        return this.itemData;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "item_data_id", insertable = false, updatable = false)
-	public ItemData getItemData() {
-		return this.itemData;
-	}
+    public void setItemData(ItemData itemData) {
+        this.itemData = itemData;
+    }
 
-	public void setItemData(ItemData itemData) {
-		this.itemData = itemData;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discrepancy_note_id", insertable = false, updatable = false)
+    public DiscrepancyNote getDiscrepancyNote() {
+        return this.discrepancyNote;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "discrepancy_note_id", insertable = false, updatable = false)
-	
-	public DiscrepancyNote getDiscrepancyNote() {
-		return this.discrepancyNote;
-	}
+    public void setDiscrepancyNote(DiscrepancyNote discrepancyNote) {
+        this.discrepancyNote = discrepancyNote;
+    }
 
-	public void setDiscrepancyNote(DiscrepancyNote discrepancyNote) {
-		this.discrepancyNote = discrepancyNote;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_subject_id", insertable = false, updatable = false)
+     public StudySubject getStudySubject() {
+        return studySubject;
+    }
 
-	
+    public void setStudySubject(StudySubject studySubject) {
+        this.studySubject = studySubject;
+    }
 
+    @Column(name = "activated")
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
 }

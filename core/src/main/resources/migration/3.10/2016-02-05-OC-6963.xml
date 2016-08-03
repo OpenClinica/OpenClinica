@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+
+
+
+
+
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-01">
+		<comment>Create Table tag </comment>
+		<sql splitStatements="false">
+			CREATE TABLE tag
+			(
+			id serial NOT NULL,
+			tag_name
+			character varying(255),
+			workflow character varying(255),
+			owner_id
+			integer,
+			update_id integer,
+			date_created timestamp with time zone,
+			date_updated timestamp with time zone,
+			CONSTRAINT pk_tag PRIMARY KEY
+			(id)
+			)
+
+		</sql>
+	</changeSet>
+
+
+
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-02">
+		<comment>Create Table event_definition_crf_item_tag </comment>
+		<sql splitStatements="false">
+			CREATE TABLE event_definition_crf_item_tag
+			(
+			id serial NOT NULL,
+			path character varying(255),
+			tag_id integer,
+			active
+			boolean,
+			owner_id integer,
+			update_id integer,
+			date_created timestamp
+			with time zone,
+			date_updated timestamp with time zone,
+			CONSTRAINT
+			pk_event_definition_crf_item_tag PRIMARY KEY (id)
+			)
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-03">
+		<comment>Create Table event_definition_crf_tag </comment>
+		<sql splitStatements="false">
+			CREATE TABLE event_definition_crf_tag
+			(
+			id
+			serial NOT NULL,
+			path character varying(255),
+			tag_id integer,
+			active
+			boolean,
+			owner_id integer,
+			update_id integer,
+			date_created timestamp
+			with time zone,
+			date_updated timestamp with time zone,
+			CONSTRAINT
+			pk_event_definition_crf_tag PRIMARY KEY (id)
+			)
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-04">
+		<comment>Create Table item_data_flag </comment>
+		<sql splitStatements="false">
+
+			CREATE TABLE item_data_flag
+			(
+			id serial NOT
+			NULL,
+			path character varying(255),
+			tag_id integer,
+			flag_workflow_id
+			integer,
+			owner_id integer,
+			update_id integer,
+			date_created timestamp
+			with time zone,
+			date_updated timestamp with time zone,
+			CONSTRAINT
+			pk_item_data_flag PRIMARY KEY (id)
+			)
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-05">
+		<comment>Create Table item_data_flag_workflow </comment>
+		<sql splitStatements="false">
+			CREATE TABLE item_data_flag_workflow
+			(
+			id
+			serial NOT NULL,
+			workflow_id character varying(255),
+			workflow_status
+			character varying(255),
+			owner_id integer,
+			update_id integer,
+			date_created timestamp with time zone,
+			date_updated timestamp with
+			time zone,
+			CONSTRAINT pk_item_data_flag_workflow PRIMARY KEY (id)
+			)
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-06">
+		<comment>Create Table event_crf_flag </comment>
+		<sql splitStatements="false">
+			CREATE TABLE event_crf_flag
+			(
+			id serial NOT
+			NULL,
+			path character varying(255),
+			tag_id integer,
+			flag_workflow_id
+			integer,
+			owner_id integer,
+			update_id integer,
+			date_created timestamp
+			with time zone,
+			date_updated timestamp with time zone,
+			CONSTRAINT
+			pk_event_crf_flag PRIMARY KEY (id)
+			)
+
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-07">
+		<comment>Create Table event_crf_flag_workflow </comment>
+		<sql splitStatements="false">
+			CREATE TABLE event_crf_flag_workflow
+			(
+			id
+			serial NOT NULL,
+			workflow_id character varying(255),
+			workflow_status
+			character varying(255),
+			owner_id integer,
+			update_id integer,
+			date_created timestamp with time zone,
+			date_updated timestamp with
+			time zone,
+			CONSTRAINT pk_event_crf_flag_workflow PRIMARY KEY (id)
+			)
+
+		</sql>
+	</changeSet>
+
+
+
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-08">
+		<comment>Create View for Item Data Toolkit </comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE VIEW view_item_data_toolkit
+			AS
+			SELECT DISTINCT id.item_data_id,
+			CASE
+			WHEN s.parent_study_id IS NULL
+			THEN 0
+			ELSE s.parent_study_id
+			END AS parent_study_id, s.study_id,
+			ss.label AS study_subject_id,
+			ss.oc_oid AS ss_oid, sed.name AS
+			study_event_defn, sed.oc_oid AS
+			sed_oid, se.sample_ordinal AS
+			event_ordinal, c.name AS crf_name,
+			c.oc_oid AS crf_oid, ig.name AS
+			group_name, ig.oc_oid AS group_oid,
+			id.ordinal AS group_ordinal,
+			i.oc_oid AS item_oid,
+			ifm.left_item_text, id.value, ec.event_crf_id,
+			ec.status_id AS
+			event_crf_status_id
+			FROM item_data id
+			JOIN item i ON
+			id.item_id = i.item_id
+			JOIN item_form_metadata ifm ON ifm.item_id =
+			i.item_id
+			JOIN event_crf ec ON id.event_crf_id = ec.event_crf_id
+			JOIN
+			study_subject ss ON ss.study_subject_id = ec.study_subject_id
+			JOIN
+			study s ON s.study_id = ss.study_id
+			JOIN crf_version cv ON
+			ec.crf_version_id = cv.crf_version_id
+			JOIN crf c ON c.crf_id =
+			cv.crf_id
+			JOIN item_group_metadata igm ON igm.item_id = id.item_id
+			JOIN item_group ig ON ig.item_group_id = igm.item_group_id
+			JOIN
+			study_event se ON se.study_event_id = ec.study_event_id
+			JOIN
+			study_event_definition sed ON sed.study_event_definition_id =
+			se.study_event_definition_id
+			ORDER BY id.item_data_id;
+
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="jkeremian" id="2016-02-05-OC-6963-09">
+		<comment>Create View for Item Data Toolkit Filtered </comment>
+		<sql splitStatements="false">
+			CREATE OR REPLACE VIEW view_item_data_toolkit_filtered AS
+			SELECT
+			DISTINCT view.item_data_id, view.parent_study_id, view.study_id,
+			view.study_subject_id, view.ss_oid, view.study_event_defn,
+			view.sed_oid, view.event_ordinal, view.crf_name, view.crf_oid,
+			view.group_name, view.group_oid, view.group_ordinal, view.item_oid,
+			view.left_item_text, view.value, view.event_crf_id,
+			view.event_crf_status_id, edci_tag.path, edc_tag.tag_id,
+			idfw.workflow_status AS item_data_workflow_status
+			FROM
+			view_item_data_toolkit view
+			JOIN event_definition_crf_tag edc_tag ON
+			edc_tag.path::text =
+			((view.sed_oid::text || '.'::text) ||
+			view.crf_oid::text)
+			LEFT JOIN event_definition_crf_item_tag edci_tag
+			ON edci_tag.path::text =
+			((((((view.sed_oid::text || '.'::text) ||
+			view.crf_oid::text) ||
+			'.'::text) || view.group_oid::text) ||
+			'.'::text) ||
+			view.item_oid::text) AND edci_tag.active = true AND
+			edci_tag.tag_id =
+			edc_tag.tag_id
+			LEFT JOIN item_data_flag id_flag ON
+			id_flag.path::text =
+			((((((((((((view.ss_oid::text || '.'::text) ||
+			view.sed_oid::text) ||
+			'.'::text) || view.event_ordinal::text) ||
+			'.'::text) ||
+			view.crf_oid::text) || '.'::text) ||
+			view.group_oid::text) ||
+			'.'::text) || view.group_ordinal::text) ||
+			'.'::text) ||
+			view.item_oid::text)
+			LEFT JOIN event_crf_flag ec_flag ON
+			ec_flag.path::text =
+			((((((view.ss_oid::text || '.'::text) ||
+			view.sed_oid::text) ||
+			'.'::text) || view.event_ordinal::text) ||
+			'.'::text) ||
+			view.crf_oid::text) AND ec_flag.tag_id = edc_tag.tag_id
+			LEFT JOIN item_data_flag_workflow idfw ON idfw.id =
+			id_flag.flag_workflow_id
+			LEFT JOIN event_crf_flag_workflow ecfw ON
+			ecfw.id =
+			ec_flag.flag_workflow_id
+			ORDER BY view.event_crf_id;
+
+				</sql>
+			</changeSet>
+
+
+
+
+</databaseChangeLog>

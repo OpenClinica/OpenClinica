@@ -52,7 +52,7 @@ public class UserController {
 
         //TODO: Get user from Hibernate DAO class
         //userList.add(userDao.loadUser(userId).getName())
-        map.addObject(userList);
+        map.addAllAttributes(userList);
         return map;
     }
 

@@ -10,6 +10,7 @@ package org.akaza.openclinica.dao.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.PreparedStatementFactory;
@@ -370,6 +371,48 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         return answer;
     }
 
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndShownByCrfVersionId(int crfVersionId)  {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+
+        this.setTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+
+        String sql = digester.getQuery("findAllItemsRequiredAndShownByCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndHiddenByCrfVersionId(int crfVersionId)  {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+
+        this.setTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+
+        String sql = digester.getQuery("findAllItemsRequiredAndHiddenByCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    
     public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -990,6 +1033,8 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");

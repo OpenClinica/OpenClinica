@@ -28,6 +28,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -40,11 +41,10 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -301,7 +301,7 @@ import javax.servlet.http.HttpServletRequest;
  *      String fieldValue = request.getParameter(fieldName);
  *
  *      if (fieldValue == null) {
- *          return false;
+ *  return false;
  *      }
  *
  *      try {

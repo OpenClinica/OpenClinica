@@ -26,7 +26,9 @@ public class ChangeDefinitionOrdinalServlet extends ChangeOrdinalServlet {
         int previous = fp.getInt("previous");
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         increase(current, previous, seddao);
-        forwardPage(Page.LIST_DEFINITION_SERVLET);
+        String url=response.encodeRedirectURL("ListEventDefinition");
+        response.sendRedirect(url);
+//        forwardPage(Page.LIST_DEFINITION_SERVLET);
 
     }
 
