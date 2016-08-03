@@ -753,9 +753,9 @@ public class BatchCRFMigrationController implements Runnable {
                 + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl;
         System.out.println(body);
-        // openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
-        // resterms.getString("Batch_Migration_Complete"), body,
-        // true);
+         openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
+         resterms.getString("Batch_Migration_Complete"), body,
+         true);
 
     }
 
