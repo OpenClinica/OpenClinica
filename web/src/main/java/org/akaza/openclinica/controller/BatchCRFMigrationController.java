@@ -136,7 +136,7 @@ public class BatchCRFMigrationController implements Runnable {
 
     public BatchCRFMigrationController(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
             CRFVersionBean targetCrfVersionBean, ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request, DataSource dataSource,
-            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase) {
+            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase ,OpenClinicaMailSender openClinicaMailSender) {
         this.crfMigrationReportList = crfMigrationReportList;
         this.sourceCrfVersionBean = sourceCrfVersionBean;
         this.targetCrfVersionBean = targetCrfVersionBean;
@@ -148,6 +148,7 @@ public class BatchCRFMigrationController implements Runnable {
         this.userAccountBean = userAccountBean;
         this.resterms = resterms;
         this.urlBase = urlBase;
+        this.openClinicaMailSender=openClinicaMailSender;
     }
 
     @RequestMapping(value = "/batchmigration/{filename}/downloadLogFile")
@@ -237,10 +238,10 @@ public class BatchCRFMigrationController implements Runnable {
         CRFBean cBean = (CRFBean) map.get("cBean");
         UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
         ResourceBundle resterms = (ResourceBundle) map.get("resterms");
-        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];        
         // run migration process using Thread
         BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase);
+                reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase,openClinicaMailSender);
         Thread thread = new Thread(bcmController);
         thread.start();
 
@@ -268,7 +269,7 @@ public class BatchCRFMigrationController implements Runnable {
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
             // run migration process using Thread
             BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase);
+                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase,openClinicaMailSender);
             Thread thread = new Thread(bcmController);
             thread.start();
 
