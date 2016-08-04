@@ -211,6 +211,12 @@
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
                     </a>
 
+                    <a onclick="checkCRFLockedInitialEnketo('<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${dedc.enketoURL}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
+                      onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+                      onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="Launch Enketo!!" title="Launch Enketo!!" align="right" hspace="6">
+                    </a>
+
                  </c:if>
                  </td>
 				</c:when>

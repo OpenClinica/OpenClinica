@@ -64,6 +64,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.akaza.openclinica.web.pform.EnketoAPI;
+import org.akaza.openclinica.web.pform.EnketoCredentials;
+import org.akaza.openclinica.web.pform.PFormCache;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -309,18 +312,33 @@ public class ViewStudySubjectServlet extends SecureController {
                     }
             }
 
+            
 
             // BWP 3212; remove event CRFs that are supposed to be "hidden" >>
             if (currentStudy.getParentStudyId() > 0) {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
-
                 for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
-
                     hideCRFManager.removeHiddenEventCRF(displayStudyEventBean);
+                }
+            }
+            
+            EnketoCredentials credentials = EnketoCredentials.getInstance(currentStudy.getOid());
+            EnketoAPI enketo = new EnketoAPI(credentials);
+            for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
+                ArrayList<DisplayEventDefinitionCRFBean> displayEventDefCRFs = displayStudyEventBean.getUncompletedCRFs();
+                for (DisplayEventDefinitionCRFBean dedc:displayEventDefCRFs) {
+                    
+                    PFormCache cache = PFormCache.getInstance(context);
+                    
+                    String enketoURL = cache.getPFormURL(currentStudy.getOid(), dedc.getEventCRF().getCrfVersion().getOid());
+                    String contextHash = cache.putSubjectContext(studySub.getOid(), String.valueOf(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId()),
+                            String.valueOf(displayStudyEventBean.getStudyEvent().getSampleOrdinal()), dedc.getEventCRF().getCrfVersion().getOid());
+                    String url = enketoURL + "?" + "ecid=" + contextHash;
+                    dedc.setEnketoURL(url);
 
                 }
-
             }
+
             // >>
             EntityBeanTable table = fp.getEntityBeanTable();
             table.setSortingIfNotExplicitlySet(1, false);// sort by start
@@ -548,11 +566,6 @@ public class ViewStudySubjectServlet extends SecureController {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
 
-            // System.out.println("created dedc with edcrf
-            // "+edcrf.getCrfName()+" default version "+
-            // edcrf.getDefaultVersionName()+", id
-            // "+edcrf.getDefaultVersionId());
-
             dedc.setEdc(edcrf);
             // below added tbh, 112007 to fix bug 1943
             if (status.equals(SubjectEventStatus.LOCKED)) {
@@ -562,26 +575,11 @@ public class ViewStudySubjectServlet extends SecureController {
             EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
             if (b == null || !b.booleanValue()) {
 
-                // System.out.println("entered boolean loop with ev
-                // "+ev.getId()+" crf version id "+
-                // ev.getCRFVersionId());
-
                 dedc.setEventCRF(ev);
                 answer.add(dedc);
 
-                // System.out.println("just added dedc to answer");
-                // removed, tbh, since this is proving nothing, 11-2007
-
-                /*
-                 * if (dedc.getEdc().getDefaultVersionId() !=
-                 * dedc.getEventCRF().getId()) { System.out.println("ID
-                 * MISMATCH: edc name "+dedc.getEdc().getName()+ ", default
-                 * version id "+dedc.getEdc().getDefaultVersionId()+ " event crf
-                 * id "+dedc.getEventCRF().getId()); }
-                 */
             }
         }
-        // System.out.println("size of answer" + answer.size());
         return answer;
     }
 
