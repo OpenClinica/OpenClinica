@@ -611,6 +611,11 @@
         <servlet-class>org.akaza.openclinica.control.extract.ExportDatasetServlet</servlet-class>
     </servlet>
     <servlet>
+        <display-name>BatchCRFMigration</display-name>
+        <servlet-name>BatchCRFMigrationServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.admin.BatchCRFMigrationServlet</servlet-class>
+    </servlet>
+    <servlet>
         <display-name>ViewCRF</display-name>
         <servlet-name>ViewCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ViewCRFServlet</servlet-class>
@@ -1772,6 +1777,10 @@
     <servlet-mapping>
         <servlet-name>ViewCRFServlet</servlet-name>
         <url-pattern>/ViewCRF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BatchCRFMigrationServlet</servlet-name>
+        <url-pattern>/BatchCRFMigration</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>InitUpdateCRFServlet</servlet-name>
