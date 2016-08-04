@@ -136,7 +136,7 @@ public class BatchCRFMigrationController implements Runnable {
 
     public BatchCRFMigrationController(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
             CRFVersionBean targetCrfVersionBean, ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request, DataSource dataSource,
-            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase ,OpenClinicaMailSender openClinicaMailSender) {
+            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase, OpenClinicaMailSender openClinicaMailSender) {
         this.crfMigrationReportList = crfMigrationReportList;
         this.sourceCrfVersionBean = sourceCrfVersionBean;
         this.targetCrfVersionBean = targetCrfVersionBean;
@@ -148,7 +148,7 @@ public class BatchCRFMigrationController implements Runnable {
         this.userAccountBean = userAccountBean;
         this.resterms = resterms;
         this.urlBase = urlBase;
-        this.openClinicaMailSender=openClinicaMailSender;
+        this.openClinicaMailSender = openClinicaMailSender;
     }
 
     @RequestMapping(value = "/batchmigration/{filename}/downloadLogFile")
@@ -172,17 +172,16 @@ public class BatchCRFMigrationController implements Runnable {
 
     /**
      * @api {post} /pages/auth/api/v1/batchmigration/process CRF Version Migration Execution
-     * @apiName runAuthBatch
-     * @apiPermission admin
+     * @apiName runAuthBatchProcess
+     * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
      * @apiParam {String} studyOid is the Target Study Oid.
      * @apiParam {String} sourceCrfVersion CRF Version Oid From.
      * @apiParam {String} targetCrfVersion CRF Version Oid To.
      * @apiParam {String} studyEventDefnlist List Of Event Definitions , when left blank, implies all events within
-     *           target
-     *           study .
+     *           target study.
      * @apiParam {String} sitelist List Of Sites , when left blank, implies all sites including target study
-     * @apiGroup Subject
+     * @apiGroup Form
      * @apiDescription This api will execute crf version migration and return an email with link of a file that include
      *                 details of the transaction.
      * @apiParamExample {json} Request-Example:
@@ -197,36 +196,30 @@ public class BatchCRFMigrationController implements Runnable {
      * @apiErrorExample {json} Error-Response:
      *                  HTTP/1.1 406 NOT ACCEPTABLE
      *                  {
-     *                  "errorList": ["The OID of the Target Study that you provided is invalid."],
+     *                  "errorList": ["Current CRF version and New CRF version can not be same."],
+     *                  "reportSummary": null,
+     *                  "subjectCount": 0,
+     *                  "eventCrfCount": 0,
      *                  "migrationCanNotPerformList": [],
-     *                  "reportLogList": [],
-     *                  "subjectCount": 0
+     *                  "reportLogList": []
      *                  }
      * 
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
      *                    "errorList": [],
-     *                    "migrationCanNotPerformList":
-     *                    ["CRF Version Migration cannot be performed for Site C Follow Up Visit"],
-     *                    "reportLogList": ["Groups_Adverse_Events,v2.2,v2.2.1,Sub B 101,Site B,Follow Up Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub D 101,Baseline Study 101,Follow Up Visit DDE,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub E 101,Baseline Study 101,Follow Up Visit DDE,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub A 101,Site C,Observational Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub B 101,Site B,Observational Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub A 101,Site C,Observational Visit,2",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub A 101,Site C,Observational Visit,3",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub A 201,Site B,Observational Visit,2",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,Sub A 201,Site B,Observational Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,STEST01,Baseline Study 101,Follow Up Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,STEST02,Baseline Study 101,Follow Up Visit,1",
-     *                    "Groups_Adverse_Events,v2.2,v2.2.1,DYN101,Site A,Follow Up Visit,1"],
-     *                    "subjectCount": 8
+     *                    "reportSummary":
+     *                    "Batch CRF version migration is running. You will receive an email once the process is complete"
+     *                    ,
+     *                    "subjectCount": 8,
+     *                    "eventCrfCount": 12,
+     *                    "migrationCanNotPerformList": [],
+     *                    "reportLogList": []
      *                    }
      */
 
     @RequestMapping(value = "/auth/api/v1/batchmigration/process", method = RequestMethod.POST)
-    public void runAuthBatchProcess(@RequestBody HashMap<String, Object> hashMap, HttpServletRequest request) throws Exception {
+    public ResponseEntity<ReportLog> runAuthBatchProcess(@RequestBody HashMap<String, Object> hashMap, HttpServletRequest request) throws Exception {
 
         ResponseEntity<HashMap<String, Object>> res = runBatchCrfVersionMigrationSummaryReport(hashMap, request);
         HashMap<String, Object> map = res.getBody();
@@ -237,14 +230,31 @@ public class BatchCRFMigrationController implements Runnable {
         StudyBean stBean = (StudyBean) map.get("stBean");
         CRFBean cBean = (CRFBean) map.get("cBean");
         UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
-        ResourceBundle resterms = (ResourceBundle) map.get("resterms");
-        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];        
-        // run migration process using Thread
-        BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase,openClinicaMailSender);
-        Thread thread = new Thread(bcmController);
-        thread.start();
+        // ResourceBundle resterms = (ResourceBundle) map.get("resterms");
+        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+        Locale locale = request.getLocale();
+        resterms = ResourceBundleProvider.getTermsBundle(locale);
 
+        // run migration execution process using Thread
+        String str = "";
+        if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
+
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
+                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase, openClinicaMailSender);
+            Thread thread = new Thread(bcmController);
+            thread.start();
+            str = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
+            reportLog.setReportSummary(str);
+            return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
+        } else {
+            if (reportLog.getErrorList().size() > 0) {
+                return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            } else {
+                str = resterms.getString("Migration_did_not_run_due_to_no_affected_subject");
+                reportLog.setReportSummary(str);
+                return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
+            }
+        }
     }
 
     @RequestMapping(value = "/api/v1/batchmigration/process", method = RequestMethod.POST)
@@ -262,14 +272,16 @@ public class BatchCRFMigrationController implements Runnable {
         StudyBean stBean = (StudyBean) map.get("stBean");
         CRFBean cBean = (CRFBean) map.get("cBean");
         UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
-        ResourceBundle resterms = (ResourceBundle) map.get("resterms");
+        // ResourceBundle resterms = (ResourceBundle) map.get("resterms");
         String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+        Locale locale = request.getLocale();
+        resterms = ResourceBundleProvider.getTermsBundle(locale);
 
         String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
             // run migration process using Thread
             BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase,openClinicaMailSender);
+                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase, openClinicaMailSender);
             Thread thread = new Thread(bcmController);
             thread.start();
 
@@ -284,16 +296,15 @@ public class BatchCRFMigrationController implements Runnable {
     /**
      * @api {post} /pages/auth/api/v1/batchmigration/summaryreport CRF Version Migration Summary Report
      * @apiName runAuthSummaryReport
-     * @apiPermission admin
+     * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
      * @apiParam {String} studyOid is the Target Study Oid.
      * @apiParam {String} sourceCrfVersion CRF Version Oid From.
      * @apiParam {String} targetCrfVersion CRF Version Oid To.
      * @apiParam {String} studyEventDefnlist List Of Event Definitions , when left blank, implies all events within
-     *           target
-     *           study .
+     *           target study.
      * @apiParam {String} sitelist List Of Sites , when left blank, implies all sites including target study
-     * @apiGroup Subject
+     * @apiGroup Form
      * @apiDescription This api is a summary report for crf version migration and returns json object of report log.
      * @apiParamExample {json} Request-Example:
      *                  {
@@ -308,19 +319,22 @@ public class BatchCRFMigrationController implements Runnable {
      *                  HTTP/1.1 406 NOT ACCEPTABLE
      *                  {
      *                  "errorList": ["The OID of the Target Study that you provided is invalid."],
+     *                  "reportSummary": null,
+     *                  "subjectCount": 0,
+     *                  "eventCrfCount": 0,
      *                  "migrationCanNotPerformList": [],
-     *                  "reportLogList": [],
-     *                  "subjectCount": 0
+     *                  "reportLogList": []
      *                  }
      * 
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
      *                    "errorList": [],
-     *                    "migrationCanNotPerformList":
-     *                    ["CRF Version Migration cannot be performed for Site A Observational Visit"],
-     *                    "reportLogList": [],
-     *                    "subjectCount": 8
+     *                    "reportSummary": null,
+     *                    "subjectCount": 8,
+     *                    "eventCrfCount": 12,
+     *                    "migrationCanNotPerformList": [],
+     *                    "reportLogList": []
      *                    }
      */
     @RequestMapping(value = "/auth/api/v1/batchmigration/summaryreport", method = RequestMethod.POST)
@@ -349,7 +363,7 @@ public class BatchCRFMigrationController implements Runnable {
         // CRFVersionBean targetCrfVersionBean = (CRFVersionBean) map.get("targetCrfVersionBean");
         ReportLog reportLog = (ReportLog) map.get("reportLog");
 
-        reportLog.setReportSummary(toStringHtmlFormat(reportLog));
+        reportLog.setReportSummary(toStringHtmlFormat(reportLog, resterms));
         return reportLog;
     }
 
@@ -434,7 +448,11 @@ public class BatchCRFMigrationController implements Runnable {
             return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         if (sourceCrfVersionBean == null || targetCrfVersionBean == null) {
-            reportLog.getErrorList().add(resterms.getString("Current_CRF_version_and_New_CRF_version_should_be_selected"));
+            if (sourceCrfVersion.equals("-1") || targetCrfVersion.equals("-1")) {
+                reportLog.getErrorList().add(resterms.getString("Current_CRF_version_and_New_CRF_version_should_be_selected"));
+            } else {
+                reportLog.getErrorList().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
+            }
             hashObject.put("reportLog", reportLog);
             return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
@@ -643,10 +661,10 @@ public class BatchCRFMigrationController implements Runnable {
         for (String log : reportLog.getReportLogList()) {
             text3.append(log.toString()).append('\n');
         }
-        String str = resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_to_be_affected_by_migration") + ": "
+        String str = resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
                 + reportLog.getSubjectCount() + "\n";
 
-        str = str + resterms.getString("Number_of_Event_CRF_to_be_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n";
+        str = str + resterms.getString("Number_of_Event_CRF_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n";
 
         str = str + text1.toString() + "\n";
 
@@ -659,7 +677,7 @@ public class BatchCRFMigrationController implements Runnable {
         return str;
     }
 
-    public String toStringHtmlFormat(ReportLog reportLog) {
+    public String toStringHtmlFormat(ReportLog reportLog, ResourceBundle resterms) {
 
         StringBuffer text1 = new StringBuffer();
         for (String migrationPerform : reportLog.getMigrationCanNotPerformList()) {
@@ -754,9 +772,7 @@ public class BatchCRFMigrationController implements Runnable {
                 + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl;
         System.out.println(body);
-         openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
-         resterms.getString("Batch_Migration_Complete"), body,
-         true);
+        openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete"), body, true);
 
     }
 
