@@ -91,7 +91,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 @Controller
-@RequestMapping(value = "/system")
+@RequestMapping(value = "/auth/api/v1/system")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class SystemController {
 
