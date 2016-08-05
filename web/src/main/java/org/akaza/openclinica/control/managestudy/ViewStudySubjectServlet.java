@@ -168,6 +168,7 @@ public class ViewStudySubjectServlet extends SecureController {
     public void processRequest() throws Exception {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
+        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
@@ -329,8 +330,14 @@ public class ViewStudySubjectServlet extends SecureController {
                 for (DisplayEventDefinitionCRFBean dedc:displayEventDefCRFs) {
                     
                     PFormCache cache = PFormCache.getInstance(context);
-                    
-                    String enketoURL = cache.getPFormURL(currentStudy.getOid(), dedc.getEventCRF().getCrfVersion().getOid());
+                    String crfVersionOid = null;
+                    if (dedc.getEventCRF().isActive()) crfVersionOid = dedc.getEventCRF().getCrfVersion().getOid();
+                    else { 
+                        int crfVersionId = dedc.getEdc().getDefaultVersionId();
+                        CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+                        crfVersionOid = version.getOid();
+                    }
+                    String enketoURL = cache.getPFormURL(currentStudy.getOid(), crfVersionOid);
                     String contextHash = cache.putSubjectContext(studySub.getOid(), String.valueOf(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId()),
                             String.valueOf(displayStudyEventBean.getStudyEvent().getSampleOrdinal()), dedc.getEventCRF().getCrfVersion().getOid());
                     String url = enketoURL + "?" + "ecid=" + contextHash;

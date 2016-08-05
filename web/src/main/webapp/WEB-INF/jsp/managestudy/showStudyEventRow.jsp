@@ -204,19 +204,29 @@
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 				 <td>
                 <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
-
+                    <script LANGUAGE="JavaScript">
+                    var eventcrf = "${dedc.eventCRF}";
+                    console.log(eventcrf);
+                    console.log("${dedc.eventCRF}");
+                    console.log("${dedc.eventCRF.id}");
+                    console.log("${dedc.eventCRF.status.name}")
+                    </script>
+                    <c:choose>
+                    <c:when test="${dedc.eventCRF.status.id != 0}">
                     <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
                     </a>
-
+                    </c:when>
+                    <c:otherwise>
                     <a onclick="checkCRFLockedInitialEnketo('<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${dedc.enketoURL}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="Launch Enketo!!" title="Launch Enketo!!" align="right" hspace="6">
+                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="Launch Enketo!!" title="Launch Enketo!!" align="right" hspace="6" style="cursor: pointer;">
                     </a>
-
+                    </c:otherwise>
+                    </c:choose>
                  </c:if>
                  </td>
 				</c:when>

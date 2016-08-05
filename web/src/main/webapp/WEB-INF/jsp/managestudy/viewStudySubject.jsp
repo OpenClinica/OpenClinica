@@ -63,7 +63,6 @@
         });
     }
     function checkCRFLockedInitialEnketo(ecId, enketoURL, formName){
-        if(ecId==0) {formName.submit(); return;}
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
                 var fullEnketoURL = enketoURL + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host);
