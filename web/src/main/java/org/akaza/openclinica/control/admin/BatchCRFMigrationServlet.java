@@ -6,44 +6,21 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
-import org.jmesa.facade.TableFacade;
-import org.jmesa.view.component.Column;
-import org.jmesa.view.component.Row;
-import org.jmesa.view.component.Table;
-import org.jmesa.view.editor.BasicCellEditor;
-import org.jmesa.view.editor.CellEditor;
-import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.component.HtmlColumn;
-import org.jmesa.view.html.component.HtmlRow;
-import org.jmesa.view.html.component.HtmlTable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author jxu
@@ -51,13 +28,11 @@ import java.util.List;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
+@SuppressWarnings("serial")
 public class BatchCRFMigrationServlet extends SecureController {
 
     private static String CRF_ID = "crfId";
     private static String CRF = "crf";
-    private RuleSetServiceInterface ruleSetService;
-    private StudyDAO sdao=null;
-    
     /**
      *
      */
@@ -75,6 +50,7 @@ public class BatchCRFMigrationServlet extends SecureController {
 
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void processRequest() throws Exception {
 
@@ -108,14 +84,17 @@ public class BatchCRFMigrationServlet extends SecureController {
             crf.setVersions(crfVersionList);
             ArrayList<StudyBean> listOfSites = (ArrayList<StudyBean>) sdao().findAllByParent(currentStudy.getId());
             siteList = new ArrayList<StudyBean>();
-            siteList.add(currentStudy);
+            StudyBean studyBean = new StudyBean();
+            studyBean.setOid(currentStudy.getOid()); 
+            studyBean.setName(resterm.getString("Study_Level_Subjects_Only"));
+            siteList.add(studyBean);
             for (StudyBean s : listOfSites) {
                 if (s.getStatus().isAvailable()) {
                     siteList.add(s);
                 }
             }
      
-            ArrayList<StudyEventDefinitionBean> listOfDefn = (ArrayList<StudyEventDefinitionBean>) seddao().findAllByStudy(currentStudy);
+            ArrayList<StudyEventDefinitionBean> listOfDefn = seddao().findAllByStudy(currentStudy);
             eventList = new ArrayList<StudyEventDefinitionBean>();
             for (StudyEventDefinitionBean d : listOfDefn) {
                 if (d.getStatus().isAvailable()) {
@@ -130,8 +109,6 @@ public class BatchCRFMigrationServlet extends SecureController {
     }
 
             
-            
-            
             request.setAttribute("study", currentStudy);
             request.setAttribute("siteList", siteList);
             request.setAttribute("eventList", eventList);
@@ -142,10 +119,12 @@ public class BatchCRFMigrationServlet extends SecureController {
     }
 
 
+    @SuppressWarnings("rawtypes")
     private StudyDAO sdao() {
         return new StudyDAO(sm.getDataSource());
     }
 
+    @SuppressWarnings("rawtypes")
     private StudyEventDefinitionDAO seddao() {
         return new StudyEventDefinitionDAO(sm.getDataSource());
     }

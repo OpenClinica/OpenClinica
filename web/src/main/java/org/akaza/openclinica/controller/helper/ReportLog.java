@@ -10,16 +10,16 @@ public class ReportLog {
 
     private int subjectCount;
     private int eventCrfCount;
-    private String reportSummary;
-    private ArrayList<String> migrationCanNotPerformList;
-    private ArrayList<String> errorList;
-    private ArrayList<String> reportLogList;
+    private String reportPreview;
+    private ArrayList<String> canNotMigrate;
+    private ArrayList<String> errors;
+    private ArrayList<String> logs;
 
     public ReportLog() {
         super();
-        migrationCanNotPerformList = new ArrayList<String>();
-        errorList = new ArrayList<String>();
-        reportLogList = new ArrayList<String>();
+        canNotMigrate = new ArrayList<String>();
+        errors = new ArrayList<String>();
+        logs = new ArrayList<String>();
     }
 
     public int getSubjectCount() {
@@ -30,28 +30,28 @@ public class ReportLog {
         this.subjectCount = subjectCount;
     }
 
-    public ArrayList<String> getMigrationCanNotPerformList() {
-        return migrationCanNotPerformList;
+    public String getReportPreview() {
+        return reportPreview;
     }
 
-    public void setMigrationCanNotPerformList(ArrayList<String> migrationCanNotPerformList) {
-        this.migrationCanNotPerformList = migrationCanNotPerformList;
+    public void setReportPreview(String reportPreview) {
+        this.reportPreview = reportPreview;
     }
 
-    public ArrayList<String> getErrorList() {
-        return errorList;
+    public ArrayList<String> getCanNotMigrate() {
+        return canNotMigrate;
     }
 
-    public void setErrorList(ArrayList<String> errorList) {
-        this.errorList = errorList;
+    public void setCanNotMigrate(ArrayList<String> canNotMigrate) {
+        this.canNotMigrate = canNotMigrate;
     }
 
-    public ArrayList<String> getReportLogList() {
-        return reportLogList;
+    public ArrayList<String> getErrors() {
+        return errors;
     }
 
-    public void setReportLogList(ArrayList<String> reportLogList) {
-        this.reportLogList = reportLogList;
+    public void setErrors(ArrayList<String> errors) {
+        this.errors = errors;
     }
 
     public int getEventCrfCount() {
@@ -62,13 +62,12 @@ public class ReportLog {
         this.eventCrfCount = eventCrfCount;
     }
 
-    public String getReportSummary() {
-        return reportSummary;
+    public ArrayList<String> getLogs() {
+        return logs;
     }
 
-    public void setReportSummary(String reportSummary) {
-        this.reportSummary = reportSummary;
+    public void setLogs(ArrayList<String> logs) {
+        this.logs = logs;
     }
-
 
 }

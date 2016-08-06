@@ -605,7 +605,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     
     
-    public ArrayList findAllCrfMigrationDoesNotPerform(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+    public List findAllCrfMigrationDoesNotPerform(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
         HashMap variables = new HashMap();
         String eventStr =StringUtils.join(studyEventDefnlist, ",");
         String siteStr =StringUtils.join(sitelist, ",");

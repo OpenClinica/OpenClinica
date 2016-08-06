@@ -1,62 +1,9 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.dao.admin.AuditDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.HttpSessionRequiredException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
-import org.akaza.openclinica.view.StudyInfoPanel;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -65,23 +12,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -89,19 +26,41 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.login.UserDTO;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.controller.helper.HelperObject;
 import org.akaza.openclinica.controller.helper.ReportLog;
-import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.controller.helper.TransferObject;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.dao.admin.AuditDAO;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.io.IOUtils;
-import org.cdisc.ns.odm.v130_api.ODM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sun.jersey.api.core.HttpRequestContext;
-
-/**
- * Implement the functionality for displaying a table of Event CRFs for Source Data
- * Verification. This is an autowired, multiaction Controller.
- */
 @Controller
 public class BatchCRFMigrationController implements Runnable {
 
@@ -112,15 +71,12 @@ public class BatchCRFMigrationController implements Runnable {
     CoreResources coreResources;
 
     @Autowired
-    JavaMailSenderImpl mailSender;
-
-    @Autowired
     OpenClinicaMailSender openClinicaMailSender;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     ResourceBundle resterms;
-    ArrayList<EventCRFBean> crfMigrationReportList;
+    List<EventCRFBean> crfMigrationReportList;
     CRFVersionBean sourceCrfVersionBean;
     CRFVersionBean targetCrfVersionBean;
     ReportLog reportLog;
@@ -134,154 +90,138 @@ public class BatchCRFMigrationController implements Runnable {
         super();
     }
 
-    public BatchCRFMigrationController(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
-            CRFVersionBean targetCrfVersionBean, ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request, DataSource dataSource,
-            UserAccountBean userAccountBean, ResourceBundle resterms, String urlBase, OpenClinicaMailSender openClinicaMailSender) {
-        this.crfMigrationReportList = crfMigrationReportList;
-        this.sourceCrfVersionBean = sourceCrfVersionBean;
-        this.targetCrfVersionBean = targetCrfVersionBean;
-        this.reportLog = reportLog;
-        this.stBean = stBean;
-        this.cBean = cBean;
-        this.request = request;
-        this.dataSource = dataSource;
-        this.userAccountBean = userAccountBean;
-        this.resterms = resterms;
-        this.urlBase = urlBase;
-        this.openClinicaMailSender = openClinicaMailSender;
+    public BatchCRFMigrationController(HelperObject helperObject) {
+        this.crfMigrationReportList = helperObject.getCrfMigrationReportList();
+        this.sourceCrfVersionBean = helperObject.getSourceCrfVersionBean();
+        this.targetCrfVersionBean = helperObject.getTargetCrfVersionBean();
+        this.reportLog = helperObject.getReportLog();
+        this.stBean = helperObject.getStBean();
+        this.cBean = helperObject.getcBean();
+        this.request = helperObject.getRequest();
+        this.dataSource = helperObject.getDataSource();
+        this.userAccountBean = helperObject.getUserAccountBean();
+        this.resterms = helperObject.getResterms();
+        this.urlBase = helperObject.getUrlBase();
+        this.openClinicaMailSender = helperObject.getOpenClinicaMailSender();
     }
 
-    @RequestMapping(value = "/batchmigration/{filename}/downloadLogFile")
-    public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = "/forms/migrate/{filename}/downloadLogFile")
+    public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws IOException {
+        InputStream inputStream = null;
         try {
             String logFileName = getFilePath() + File.separator + fileName;
-
             File fileToDownload = new File(logFileName);
-            InputStream inputStream = new FileInputStream(fileToDownload);
+            inputStream = new FileInputStream(fileToDownload);
             response.setContentType("application/force-download");
             response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
-            inputStream.close();
         } catch (Exception e) {
             logger.debug("Request could not be completed at this moment. Please try again.");
-            e.printStackTrace();
+            logger.debug(e.getStackTrace().toString());
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // do something clever with the exception
+                }
+            }
         }
 
     }
 
     /**
-     * @api {post} /pages/auth/api/v1/batchmigration/process CRF Version Migration Execution
-     * @apiName runAuthBatchProcess
+     * @api {post} /pages/auth/api/v1/forms/migrate/run/ Batch CRF Version Migration Run
+     * @apiName runAuthMigration
      * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
-     * @apiParam {String} studyOid is the Target Study Oid.
-     * @apiParam {String} sourceCrfVersion CRF Version Oid From.
-     * @apiParam {String} targetCrfVersion CRF Version Oid To.
-     * @apiParam {String} studyEventDefnlist List Of Event Definitions , when left blank, implies all events within
+     * @apiParam {String} studyOID is the Target Study OID.
+     * @apiParam {String} sourceFormVersion Form Version OID From.
+     * @apiParam {String} targetFormVersion Form Version OID To.
+     * @apiParam {String} studyEventDefs List Of Event Definitions , when left blank, implies all events within
      *           target study.
-     * @apiParam {String} sitelist List Of Sites , when left blank, implies all sites including target study
+     * @apiParam {String} sites List Of Sites , when left blank, implies all sites including target study
      * @apiGroup Form
      * @apiDescription This api will execute crf version migration and return an email with link of a file that include
      *                 details of the transaction.
      * @apiParamExample {json} Request-Example:
      *                  {
-     *                  "studyOid" : "S_BL101" ,
-     *                  "sourceCrfVersion" : "F_GROUPS_ADVER_V221" ,
-     *                  "targetCrfVersion" : "F_GROUPS_ADVER_V22" ,
-     *                  "studyEventDefnlist" : [] ,
-     *                  "sitelist" : []
+     *                  "studyOID" : "S_BL101" ,
+     *                  "sourceFormVersion" : "F_GROUPS_ADVER_V221" ,
+     *                  "targetFormVersion" : "F_GROUPS_ADVER_V22" ,
+     *                  "studyEventDefs" : [] ,
+     *                  "sites" : []
      *                  }
      * 
      * @apiErrorExample {json} Error-Response:
      *                  HTTP/1.1 406 NOT ACCEPTABLE
      *                  {
-     *                  "errorList": ["Current CRF version and New CRF version can not be same."],
-     *                  "reportSummary": null,
+     *                  "errors": ["Current CRF version and New CRF version can not be same."],
+     *                  "reportPreview": null,
      *                  "subjectCount": 0,
      *                  "eventCrfCount": 0,
-     *                  "migrationCanNotPerformList": [],
-     *                  "reportLogList": []
+     *                  "canNotMigrate": [],
+     *                  "logs": []
      *                  }
      * 
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
-     *                    "errorList": [],
-     *                    "reportSummary":
+     *                    "errors": [],
+     *                    "reportPreview":
      *                    "Batch CRF version migration is running. You will receive an email once the process is complete"
      *                    ,
      *                    "subjectCount": 8,
      *                    "eventCrfCount": 12,
-     *                    "migrationCanNotPerformList": [],
-     *                    "reportLogList": []
+     *                    "canNotMigrate": [],
+     *                    "logs": []
      *                    }
      */
 
-    @RequestMapping(value = "/auth/api/v1/batchmigration/process", method = RequestMethod.POST)
-    public ResponseEntity<ReportLog> runAuthBatchProcess(@RequestBody HashMap<String, Object> hashMap, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/auth/api/v1/forms/migrate/run", method = RequestMethod.POST)
+    public ResponseEntity<ReportLog> runAuthMigration(@RequestBody TransferObject transferObject, HttpServletRequest request) throws Exception {
 
-        ResponseEntity<HashMap<String, Object>> res = runBatchCrfVersionMigrationSummaryReport(hashMap, request);
-        HashMap<String, Object> map = res.getBody();
-        ArrayList<EventCRFBean> crfMigrationReportList = (ArrayList<EventCRFBean>) map.get("crfMigrationReportList");
-        CRFVersionBean sourceCrfVersionBean = (CRFVersionBean) map.get("sourceCrfVersionBean");
-        CRFVersionBean targetCrfVersionBean = (CRFVersionBean) map.get("targetCrfVersionBean");
-        ReportLog reportLog = (ReportLog) map.get("reportLog");
-        StudyBean stBean = (StudyBean) map.get("stBean");
-        CRFBean cBean = (CRFBean) map.get("cBean");
-        UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
-        // ResourceBundle resterms = (ResourceBundle) map.get("resterms");
-        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-        Locale locale = request.getLocale();
-        resterms = ResourceBundleProvider.getTermsBundle(locale);
+        ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
+        HelperObject helperObject = res.getBody();
+        helperObject.setUrlBase(coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0]);
+        helperObject.setOpenClinicaMailSender(openClinicaMailSender);
+        helperObject.setDataSource(dataSource);
+        ReportLog reportLog = helperObject.getReportLog();
 
-        // run migration execution process using Thread
         String str = "";
-        if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
-
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase, openClinicaMailSender);
+        if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
             Thread thread = new Thread(bcmController);
             thread.start();
             str = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
-            reportLog.setReportSummary(str);
+            reportLog.setReportPreview(str);
             return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
+        } else if (reportLog.getErrors().size() > 0) {
+            return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         } else {
-            if (reportLog.getErrorList().size() > 0) {
-                return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-            } else {
-                str = resterms.getString("Migration_did_not_run_due_to_no_affected_subject");
-                reportLog.setReportSummary(str);
-                return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
-            }
+            str = resterms.getString("Migration_did_not_run_due_to_no_affected_subject");
+            reportLog.setReportPreview(str);
+            return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "/api/v1/batchmigration/process", method = RequestMethod.POST)
-    public @ResponseBody String runBatchProcess(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = "/api/v1/forms/migrate/run", method = RequestMethod.POST)
+    public @ResponseBody String runMigration(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        HashMap<String, Object> hashMap = getUIComponents(request);
+        TransferObject transferObject = getUIComponents(request);
         String crfId = request.getParameter("crfId");
 
-        ResponseEntity<HashMap<String, Object>> res = runBatchCrfVersionMigrationSummaryReport(hashMap, request);
-        HashMap<String, Object> map = res.getBody();
-        ArrayList<EventCRFBean> crfMigrationReportList = (ArrayList<EventCRFBean>) map.get("crfMigrationReportList");
-        CRFVersionBean sourceCrfVersionBean = (CRFVersionBean) map.get("sourceCrfVersionBean");
-        CRFVersionBean targetCrfVersionBean = (CRFVersionBean) map.get("targetCrfVersionBean");
-        ReportLog reportLog = (ReportLog) map.get("reportLog");
-        StudyBean stBean = (StudyBean) map.get("stBean");
-        CRFBean cBean = (CRFBean) map.get("cBean");
-        UserAccountBean userAccountBean = (UserAccountBean) map.get("userAccountBean");
-        // ResourceBundle resterms = (ResourceBundle) map.get("resterms");
-        String urlBase = coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-        Locale locale = request.getLocale();
-        resterms = ResourceBundleProvider.getTermsBundle(locale);
+        ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
+        HelperObject helperObject = res.getBody();
+        helperObject.setUrlBase(coreResources.getDataInfo().getProperty("sysURL").split("/MainMenu")[0]);
+        helperObject.setOpenClinicaMailSender(openClinicaMailSender);
+        helperObject.setDataSource(dataSource);
+        ReportLog reportLog = helperObject.getReportLog();
 
         String pageMessages = null;
-        if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrorList().size() == 0) {
-            // run migration process using Thread
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(crfMigrationReportList, sourceCrfVersionBean, targetCrfVersionBean,
-                    reportLog, stBean, cBean, request, dataSource, userAccountBean, resterms, urlBase, openClinicaMailSender);
+        if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
             Thread thread = new Thread(bcmController);
             thread.start();
 
@@ -294,79 +234,69 @@ public class BatchCRFMigrationController implements Runnable {
     }
 
     /**
-     * @api {post} /pages/auth/api/v1/batchmigration/summaryreport CRF Version Migration Summary Report
-     * @apiName runAuthSummaryReport
+     * @api {post} /pages/auth/api/v1/forms/migrate/preview Batch CRF Version Migration Preview
+     * @apiName runAuthPreview
      * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
-     * @apiParam {String} studyOid is the Target Study Oid.
-     * @apiParam {String} sourceCrfVersion CRF Version Oid From.
-     * @apiParam {String} targetCrfVersion CRF Version Oid To.
-     * @apiParam {String} studyEventDefnlist List Of Event Definitions , when left blank, implies all events within
+     * @apiParam {String} studyOID is the Target Study OID.
+     * @apiParam {String} sourceFormVersion Form Version OID From.
+     * @apiParam {String} targetFormVersion Form Version OID To.
+     * @apiParam {String} studyEventDefs List Of Event Definitions , when left blank, implies all events within
      *           target study.
-     * @apiParam {String} sitelist List Of Sites , when left blank, implies all sites including target study
+     * @apiParam {String} sites List Of Sites , when left blank, implies all sites including target study
      * @apiGroup Form
      * @apiDescription This api is a summary report for crf version migration and returns json object of report log.
      * @apiParamExample {json} Request-Example:
      *                  {
-     *                  "studyOid" : "S_BL101" ,
-     *                  "sourceCrfVersion" : "F_GROUPS_ADVER_V221" ,
-     *                  "targetCrfVersion" : "F_GROUPS_ADVER_V22" ,
-     *                  "studyEventDefnlist" : [] ,
-     *                  "sitelist" : []
+     *                  "studyOID" : "S_BL101" ,
+     *                  "sourceFormVersion" : "F_GROUPS_ADVER_V221" ,
+     *                  "targetFormVersion" : "F_GROUPS_ADVER_V22" ,
+     *                  "studyEventDefs" : [] ,
+     *                  "sites" : []
      *                  }
      * 
      * @apiErrorExample {json} Error-Response:
      *                  HTTP/1.1 406 NOT ACCEPTABLE
      *                  {
-     *                  "errorList": ["The OID of the Target Study that you provided is invalid."],
-     *                  "reportSummary": null,
+     *                  "errors": ["The OID of the Target Study that you provided is invalid."],
+     *                  "reportPreview": null,
      *                  "subjectCount": 0,
      *                  "eventCrfCount": 0,
-     *                  "migrationCanNotPerformList": [],
-     *                  "reportLogList": []
+     *                  "canNotMigrate": [],
+     *                  "logs": []
      *                  }
      * 
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
-     *                    "errorList": [],
-     *                    "reportSummary": null,
+     *                    "errors": [],
+     *                    "reportPreview": null,
      *                    "subjectCount": 8,
      *                    "eventCrfCount": 12,
-     *                    "migrationCanNotPerformList": [],
-     *                    "reportLogList": []
+     *                    "canNotMigrate": [],
+     *                    "logs": []
      *                    }
      */
-    @RequestMapping(value = "/auth/api/v1/batchmigration/summaryreport", method = RequestMethod.POST)
-    public ResponseEntity<ReportLog> runAuthSummaryReport(@RequestBody HashMap<String, Object> hashMap, HttpServletRequest request) throws Exception {
-        boolean dryrun = true;
+    @RequestMapping(value = "/auth/api/v1/forms/migrate/preview", method = RequestMethod.POST)
+    public ResponseEntity<ReportLog> runAuthPreview(@RequestBody TransferObject transferObject, HttpServletRequest request) throws Exception {
 
-        ResponseEntity<HashMap<String, Object>> res = runBatchCrfVersionMigrationSummaryReport(hashMap, request);
-        HashMap<String, Object> map = res.getBody();
-        // ArrayList<EventCRFBean> crfMigrationReportList= (ArrayList<EventCRFBean>) map.get("crfMigrationReportList");
-        // CRFVersionBean sourceCrfVersionBean = (CRFVersionBean) map.get("sourceCrfVersionBean");
-        // CRFVersionBean targetCrfVersionBean = (CRFVersionBean) map.get("targetCrfVersionBean");
-        ReportLog reportLog = (ReportLog) map.get("reportLog");
+        ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
+        HelperObject helperObject = res.getBody();
 
-        return new ResponseEntity<ReportLog>(reportLog, org.springframework.http.HttpStatus.OK);
-
+        return new ResponseEntity<ReportLog>(helperObject.getReportLog(), org.springframework.http.HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/v1/batchmigration/summaryreport", method = RequestMethod.POST)
-    public @ResponseBody ReportLog runSummaryReport(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        HashMap<String, Object> hashMap = getUIComponents(request);
+    @RequestMapping(value = "/api/v1/forms/migrate/preview", method = RequestMethod.POST)
+    public @ResponseBody ReportLog runPreview(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        TransferObject transferObject = getUIComponents(request);
 
-        ResponseEntity<HashMap<String, Object>> res = runBatchCrfVersionMigrationSummaryReport(hashMap, request);
-        HashMap<String, Object> map = res.getBody();
-        // ArrayList<EventCRFBean> crfMigrationReportList= (ArrayList<EventCRFBean>) map.get("crfMigrationReportList");
-        // CRFVersionBean sourceCrfVersionBean = (CRFVersionBean) map.get("sourceCrfVersionBean");
-        // CRFVersionBean targetCrfVersionBean = (CRFVersionBean) map.get("targetCrfVersionBean");
-        ReportLog reportLog = (ReportLog) map.get("reportLog");
-
-        reportLog.setReportSummary(toStringHtmlFormat(reportLog, resterms));
-        return reportLog;
+        ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
+        HelperObject helperObject = res.getBody();
+        helperObject.getReportLog().setReportPreview(toStringHtmlFormat(helperObject.getReportLog(), resterms));
+        return helperObject.getReportLog();
     }
 
+    @SuppressWarnings("rawtypes")
     public void executeMigrationAction(EventCRFBean eventCRFBEan, CRFVersionBean targetCrfVersionBean, HttpServletRequest request, DataSource dataSource,
             UserAccountBean userAccountBean) {
         try {
@@ -411,61 +341,63 @@ public class BatchCRFMigrationController implements Runnable {
             con.setAutoCommit(true);
             con.close();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.debug(e.getMessage());
+        } finally {
+
         }
+
     }
 
-    public ResponseEntity<HashMap<String, Object>> runBatchCrfVersionMigrationSummaryReport(HashMap<String, Object> hashMap, HttpServletRequest request)
-            throws Exception {
-        // ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        HashMap<String, Object> hashObject = new HashMap<String, Object>();
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<HelperObject> runPreviewTest(TransferObject transferObject, HttpServletRequest request) throws Exception {
+        HelperObject helperObject = new HelperObject();
 
         Locale locale = request.getLocale();
         resterms = ResourceBundleProvider.getTermsBundle(locale);
         UserAccountBean userAccountBean = getCurrentUser(request);
         ReportLog reportLog = new ReportLog();
 
-        String studyOid = (String) hashMap.get("studyOid");
-        String sourceCrfVersion = (String) hashMap.get("sourceCrfVersion");
-        String targetCrfVersion = (String) hashMap.get("targetCrfVersion");
-        ArrayList<String> studyEventDefnlist = (ArrayList<String>) hashMap.get("studyEventDefnlist");
-        ArrayList<String> sitelist = (ArrayList<String>) hashMap.get("sitelist");
+        String studyOid = transferObject.getStudyOID();
+        String sourceCrfVersion = transferObject.getSourceFormVersion();
+        String targetCrfVersion = transferObject.getTargetFormVersion();
+        ArrayList<String> studyEventDefnlist = transferObject.getStudyEventDefs();
+        ArrayList<String> sitelist = transferObject.getSites();
 
         CRFVersionBean sourceCrfVersionBean = cvdao().findByOid(sourceCrfVersion);
         CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
 
         StudyBean stBean = sdao().findByOid(studyOid);
         if (stBean == null || stBean.getStatus().isUnavailable() || stBean.getParentStudyId() != 0) {
-            reportLog.getErrorList().add(resterms.getString("The_OID_of_the_Target_Study_that_you_provided_is_invalid"));
-            hashObject.put("reportLog", reportLog);
-            return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            reportLog.getErrors().add(resterms.getString("The_OID_of_the_Target_Study_that_you_provided_is_invalid"));
+            helperObject.setReportLog(reportLog);
+            return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(), stBean.getId());
         Role r = suRole.getRole();
         if (suRole == null || !(r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR))) {
-            reportLog.getErrorList().add(resterms.getString("You_do_not_have_permission_to_perform_CRF_version_migration_in_this_study"));
-            hashObject.put("reportLog", reportLog);
-            return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            reportLog.getErrors().add(resterms.getString("You_do_not_have_permission_to_perform_CRF_version_migration_in_this_study"));
+            helperObject.setReportLog(reportLog);
+            return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         if (sourceCrfVersionBean == null || targetCrfVersionBean == null) {
             if (sourceCrfVersion.equals("-1") || targetCrfVersion.equals("-1")) {
-                reportLog.getErrorList().add(resterms.getString("Current_CRF_version_and_New_CRF_version_should_be_selected"));
+                reportLog.getErrors().add(resterms.getString("Current_CRF_version_and_New_CRF_version_should_be_selected"));
             } else {
-                reportLog.getErrorList().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
+                reportLog.getErrors().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
             }
-            hashObject.put("reportLog", reportLog);
-            return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            helperObject.setReportLog(reportLog);
+            return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         if (sourceCrfVersionBean.getId() == targetCrfVersionBean.getId()) {
-            reportLog.getErrorList().add(resterms.getString("Current_CRF_version_and_New_CRF_version_can_not_be_same"));
-            hashObject.put("reportLog", reportLog);
-            return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            reportLog.getErrors().add(resterms.getString("Current_CRF_version_and_New_CRF_version_can_not_be_same"));
+            helperObject.setReportLog(reportLog);
+            return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         if (sourceCrfVersionBean.getCrfId() != targetCrfVersionBean.getCrfId() || sourceCrfVersionBean.getStatus().isUnavailable()
                 || targetCrfVersionBean.getStatus().isUnavailable()) {
-            reportLog.getErrorList().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
-            hashObject.put("reportLog", reportLog);
-            return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            reportLog.getErrors().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
+            helperObject.setReportLog(reportLog);
+            return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
 
         CRFBean cBean = (CRFBean) cdao().findByPK(sourceCrfVersionBean.getCrfId());
@@ -480,17 +412,17 @@ public class BatchCRFMigrationController implements Runnable {
             }
         } else {
             for (String site : sitelist) {
-                StudyBean siteBean = (StudyBean) sdao().findByOid(site);
+                StudyBean siteBean = sdao().findByOid(site);
                 if (siteBean == null || siteBean.getStatus().isUnavailable() || getParentStudy(siteBean).getId() != stBean.getId()) {
-                    reportLog.getErrorList().add(resterms.getString("The_OID_of_the_Site_that_you_provided_is_invalid"));
-                    hashObject.put("reportLog", reportLog);
-                    return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                    reportLog.getErrors().add(resterms.getString("The_OID_of_the_Site_that_you_provided_is_invalid"));
+                    helperObject.setReportLog(reportLog);
+                    return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
                 }
             }
         }
 
         if (studyEventDefnlist.size() == 0) {
-            ArrayList<StudyEventDefinitionBean> listOfDefn = (ArrayList<StudyEventDefinitionBean>) seddao().findAllByStudy(stBean);
+            ArrayList<StudyEventDefinitionBean> listOfDefn = seddao().findAllByStudy(stBean);
             for (StudyEventDefinitionBean d : listOfDefn) {
                 if (d.getStatus().isAvailable()) {
                     studyEventDefnlist.add(d.getOid());
@@ -498,45 +430,45 @@ public class BatchCRFMigrationController implements Runnable {
             }
         } else {
             for (String studyEventDefn : studyEventDefnlist) {
-                StudyEventDefinitionBean sedefnBean = (StudyEventDefinitionBean) seddao().findByOid(studyEventDefn);
+                StudyEventDefinitionBean sedefnBean = seddao().findByOid(studyEventDefn);
                 if (sedefnBean == null || sedefnBean.getStatus().isUnavailable() || sedefnBean.getStudyId() != stBean.getId()) {
-                    reportLog.getErrorList().add(resterms.getString("The_OID_of_the_Event_that_you_provided_is_invalid"));
-                    hashObject.put("reportLog", reportLog);
-                    return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                    reportLog.getErrors().add(resterms.getString("The_OID_of_the_Event_that_you_provided_is_invalid"));
+                    helperObject.setReportLog(reportLog);
+                    return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
                 }
             }
         }
 
-        // ---------
         int eventCrfCount = ssdao().getTotalEventCrfCountForCrfMigration(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist, sitelist);
         reportLog.setEventCrfCount(eventCrfCount);
 
         int subjectCount = ssdao().getTotalCountStudySubjectForCrfMigration(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist, sitelist);
         reportLog.setSubjectCount(subjectCount);
 
-        ArrayList<EventDefinitionCRFBean> crfMigrationDoesNotPerformList = edcdao().findAllCrfMigrationDoesNotPerform(sourceCrfVersionBean,
-                targetCrfVersionBean, studyEventDefnlist, sitelist);
+        List<EventDefinitionCRFBean> crfMigrationDoesNotPerformList = edcdao().findAllCrfMigrationDoesNotPerform(sourceCrfVersionBean, targetCrfVersionBean,
+                studyEventDefnlist, sitelist);
         for (EventDefinitionCRFBean crfMigrationDoesNotPerform : crfMigrationDoesNotPerformList) {
             StudyEventDefinitionBean seddBean = (StudyEventDefinitionBean) seddao().findByPK(crfMigrationDoesNotPerform.getStudyEventDefinitionId());
             StudyBean sssBean = (StudyBean) sdao().findByPK(crfMigrationDoesNotPerform.getStudyId());
-            reportLog.getMigrationCanNotPerformList().add(
+            reportLog.getCanNotMigrate().add(
                     resterms.getString("CRF_Version_Migration_cannot_be_performed_for") + " " + sssBean.getName() + " " + seddBean.getName() + ". "
                             + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
         }
 
-        ArrayList<EventCRFBean> crfMigrationReportList = ecdao().findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
+        List<EventCRFBean> crfMigrationReportList = ecdao().findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
                 sitelist);
 
-        hashObject.put("reportLog", reportLog);
-        hashObject.put("stBean", stBean);
-        hashObject.put("cBean", cBean);
-        hashObject.put("crfMigrationReportList", crfMigrationReportList);
-        hashObject.put("sourceCrfVersionBean", sourceCrfVersionBean);
-        hashObject.put("targetCrfVersionBean", targetCrfVersionBean);
-        hashObject.put("userAccountBean", userAccountBean);
-        hashObject.put("resterms", resterms);
+        helperObject.setReportLog(reportLog);
+        helperObject.setStBean(stBean);
+        helperObject.setcBean(cBean);
+        helperObject.setCrfMigrationReportList(crfMigrationReportList);
+        helperObject.setSourceCrfVersionBean(sourceCrfVersionBean);
+        helperObject.setTargetCrfVersionBean(targetCrfVersionBean);
+        helperObject.setUserAccountBean(userAccountBean);
+        helperObject.setResterms(resterms);
 
-        return new ResponseEntity<HashMap<String, Object>>(hashObject, org.springframework.http.HttpStatus.OK);
+        return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.OK);
+
     }
 
     private StudyBean getParentStudy(StudyBean study) {
@@ -548,10 +480,12 @@ public class BatchCRFMigrationController implements Runnable {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private StudyDAO sdao() {
         return new StudyDAO(dataSource);
     }
 
+    @SuppressWarnings("rawtypes")
     private EventCRFDAO ecdao() {
         return new EventCRFDAO(dataSource);
     }
@@ -560,10 +494,12 @@ public class BatchCRFMigrationController implements Runnable {
         return new StudyEventDAO(dataSource);
     }
 
+    @SuppressWarnings("rawtypes")
     private StudyEventDefinitionDAO seddao() {
         return new StudyEventDefinitionDAO(dataSource);
     }
 
+    @SuppressWarnings("rawtypes")
     private StudySubjectDAO ssdao() {
         return new StudySubjectDAO(dataSource);
     }
@@ -576,10 +512,12 @@ public class BatchCRFMigrationController implements Runnable {
         return new UserAccountDAO(dataSource);
     }
 
+    @SuppressWarnings("rawtypes")
     private CRFDAO cdao() {
         return new CRFDAO(dataSource);
     }
 
+    @SuppressWarnings("rawtypes")
     private CRFVersionDAO cvdao() {
         return new CRFVersionDAO(dataSource);
     }
@@ -615,16 +553,14 @@ public class BatchCRFMigrationController implements Runnable {
     }
 
     private String getReportUrl(String filename, String urlBase) {
-        String reportUrl = urlBase + "/pages/batchmigration/" + filename + "/downloadLogFile";
+        String reportUrl = urlBase + "/pages/forms/migrate/" + filename + "/downloadLogFile";
         return reportUrl;
     }
 
-    public HashMap<String, Object> getUIComponents(HttpServletRequest request) {
-        String selectedSourceVersion = request.getParameter("selectedSourceVersion");
-        String selectedTargetVersion = request.getParameter("selectedTargetVersion");
+    public TransferObject getUIComponents(HttpServletRequest request) {
+
         String selectedSites = request.getParameter("selectedSites");
         String selectedEvents = request.getParameter("selectedEvents");
-        String studyOid = request.getParameter("studyOid");
 
         List<String> selectedSiteList = Arrays.asList(selectedSites.split(","));
         List<String> selectedEventList = Arrays.asList(selectedEvents.split(","));
@@ -636,29 +572,29 @@ public class BatchCRFMigrationController implements Runnable {
         if (selectedEventArrayList.contains("-1"))
             selectedEventArrayList.clear();
 
-        HashMap<String, Object> hashMap = new HashMap();
-        hashMap.put("studyOid", studyOid);
-        hashMap.put("sourceCrfVersion", selectedSourceVersion);
-        hashMap.put("targetCrfVersion", selectedTargetVersion);
-        hashMap.put("sitelist", selectedSiteArrayList);
-        hashMap.put("studyEventDefnlist", selectedEventArrayList);
+        TransferObject transferObject = new TransferObject();
+        transferObject.setSites(selectedSiteArrayList);
+        transferObject.setStudyEventDefs(selectedEventArrayList);
+        transferObject.setSourceFormVersion(request.getParameter("selectedSourceVersion"));
+        transferObject.setTargetFormVersion(request.getParameter("selectedTargetVersion"));
+        transferObject.setStudyOID(request.getParameter("studyOid"));
 
-        return hashMap;
+        return transferObject;
     }
 
     public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms) {
 
         StringBuffer text1 = new StringBuffer();
-        for (String migrationPerform : reportLog.getMigrationCanNotPerformList()) {
+        for (String migrationPerform : reportLog.getCanNotMigrate()) {
             text1.append(migrationPerform.toString()).append('\n');
         }
         StringBuffer text2 = new StringBuffer();
-        for (String error : reportLog.getErrorList()) {
+        for (String error : reportLog.getErrors()) {
             text2.append(error.toString()).append('\n');
         }
 
         StringBuffer text3 = new StringBuffer();
-        for (String log : reportLog.getReportLogList()) {
+        for (String log : reportLog.getLogs()) {
             text3.append(log.toString()).append('\n');
         }
         String str = resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
@@ -668,7 +604,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         str = str + text1.toString() + "\n";
 
-        if (reportLog.getErrorList().size() != 0) {
+        if (reportLog.getErrors().size() != 0) {
             str = str + resterms.getString("Errors") + ":\n" + text2.toString() + "\n";
         }
 
@@ -680,36 +616,34 @@ public class BatchCRFMigrationController implements Runnable {
     public String toStringHtmlFormat(ReportLog reportLog, ResourceBundle resterms) {
 
         StringBuffer text1 = new StringBuffer();
-        for (String migrationPerform : reportLog.getMigrationCanNotPerformList()) {
+        for (String migrationPerform : reportLog.getCanNotMigrate()) {
             text1.append(migrationPerform.toString()).append("<br>");
         }
         StringBuffer text2 = new StringBuffer();
-        for (String error : reportLog.getErrorList()) {
+        for (String error : reportLog.getErrors()) {
             text2.append(error.toString()).append("<br>");
         }
 
         StringBuffer text3 = new StringBuffer();
-        for (String log : reportLog.getReportLogList()) {
+        for (String log : reportLog.getLogs()) {
             text3.append(log.toString()).append("<br>");
         }
         StringBuilder sb = new StringBuilder();
-        // sb.append("<font color=\"color1\">");
-        // sb.append(c);
-        // sb.append("</font>");
-        // String str = "<br>";
 
         sb.append("<br>");
-        sb.append("<font size=\"3\" color=\"#D4A718\"><b>");
-        sb.append(resterms.getString("Migration_Summary") + ":");
-        sb.append("</b></font>");
-        sb.append("<br>");
+        if (reportLog.getErrors().size() == 0) {
+            sb.append("<font size=\"3\" color=\"#D4A718\"><b>");
+            sb.append(resterms.getString("Migration_Summary") + ":");
+            sb.append("</b></font>");
+            sb.append("<br>");
 
-        sb.append(resterms.getString("Number_of_Subjects_to_be_affected_by_migration") + ": " + reportLog.getSubjectCount() + "<br>");
-        sb.append(resterms.getString("Number_of_Event_CRF_to_be_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "<br>");
-        sb.append("<br>");
-        sb.append(text1.toString() + "<br>");
+            sb.append(resterms.getString("Number_of_Subjects_to_be_affected_by_migration") + ": " + reportLog.getSubjectCount() + "<br>");
+            sb.append(resterms.getString("Number_of_Event_CRF_to_be_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "<br>");
+            sb.append("<br>");
+            sb.append(text1.toString() + "<br>");
+        }
 
-        if (reportLog.getErrorList().size() != 0) {
+        if (reportLog.getErrors().size() != 0) {
             sb.append("<font size=\"3\" color=\"#D4A718\" ><b>");
             sb.append(resterms.getString("Errors") + ":");
             sb.append("</b></font>");
@@ -728,18 +662,17 @@ public class BatchCRFMigrationController implements Runnable {
         try {
             response.sendRedirect(request.getContextPath() + location);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug(e.getStackTrace().toString());
+        } finally {
+
         }
+
         return null;
 
     }
 
-    // public void runMigration(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean,
-    // CRFVersionBean targetCrfVersionBean,
-    // ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request) {
     @Override
     public void run() {
-        // TODO Auto-generated method stub
 
         for (EventCRFBean crfMigrationReport : crfMigrationReportList) {
             executeMigrationAction(crfMigrationReport, targetCrfVersionBean, request, dataSource, userAccountBean);
@@ -748,7 +681,7 @@ public class BatchCRFMigrationController implements Runnable {
             StudyBean sBean = (StudyBean) sdao().findByPK(ssBean.getStudyId());
             StudyEventBean seBean = (StudyEventBean) sedao().findByPK(crfMigrationReport.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
-            reportLog.getReportLogList().add(
+            reportLog.getLogs().add(
                     cBean.getName() + "," + sourceCrfVersionBean.getName() + "," + targetCrfVersionBean.getName() + "," + ssBean.getLabel() + ","
                             + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
         }
@@ -760,19 +693,21 @@ public class BatchCRFMigrationController implements Runnable {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        } finally {
         }
         writer.print(toStringTextFormat(reportLog, resterms));
         closeFile(writer);
         String reportUrl = getReportUrl(fileName, urlBase);
-        System.out.println(reportUrl);
         String fullName = userAccountBean.getFirstName() + " " + userAccountBean.getLastName();
         String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_for") + " "
                 + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
-                + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl;
+                + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl + "<br><br>"
+                + "Thank you, Your OpenClinica System";
         System.out.println(body);
-        openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete"), body, true);
+        // openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
+        // resterms.getString("Batch_Migration_Complete_For") + " "
+        // + stBean.getName(), body, true);
 
     }
 

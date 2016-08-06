@@ -6,8 +6,10 @@
 	var="resformat" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow"
+	var="resworkflow" />
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages"
+	var="resmessages" />
 
 <c:set var="dteFormat">
 	<fmt:message key="date_format_string" bundle="${resformat}" />
@@ -33,7 +35,8 @@
 			src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 		<b><fmt:message key="instructions" bundle="${resword}" /></b>
 		<div class="sidebar_tab_content">
-			<fmt:message key="choose_crf_migration_batch_instruction_key" bundle="${resword}" />
+			<fmt:message key="choose_crf_migration_batch_instruction_key"
+				bundle="${resword}" />
 		</div></td>
 </tr>
 
@@ -59,7 +62,8 @@
 
 <h1>
 	<span class="title_manage"> <fmt:message
-			key="batch_crf_version_migration" bundle="${resworkflow}" />
+			key="batch_crf_version_migration_for" bundle="${resworkflow}" />
+		&nbsp;<c:out value="${crf.name}" />
 	</span>
 </h1>
 
@@ -69,13 +73,14 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+</script>
 
 <script type="text/javascript">
 	function madeAjaxCall() {
 		$
 				.ajax({
 					type : "post",
-					url : "${pageContext.request.contextPath}/pages/api/v1/batchmigration/summaryreport",
+					url : "${pageContext.request.contextPath}/pages/api/v1/forms/migrate/preview",
 					cache : false,
 					data : 'selectedSourceVersion='
 							+ $("#selectedSourceVersion").val()
@@ -86,36 +91,65 @@
 							+ "&studyOid=" + $("#studyOid").val(),
 					dataType : 'json',
 					success : function(obj) {
-			            $('.button_xlong').css('display','block');
 						$('#result').empty();
-						$('#result').append(obj.reportSummary);
-						if(obj.subjectCount==0){
-							$('.button_xlong').css('display','none');
-						}else{
-				            $('.button_xlong').css('display','block');
-						}												
+						$('#result').append(obj.reportPreview);
+						if (obj.subjectCount == 0) {
+							$('.button_xlong').css('display', 'none');
+						} else {
+							$('.button_xlong').css('display', 'block');
+						}
 					},
 					error : function(e) {
 						alert('Error: ' + e);
 					}
 				});
 	}
+
+	$(function() {
+
+		$('#selectedSourceVersion').change(function() {
+			$('.button_xlong').css('display', 'none');
+			$('#result').empty();			
+		});
+	});
+
+	$(function() {
+		$('#selectedTargetVersion').change(function() {
+			$('.button_xlong').css('display', 'none');
+			$('#result').empty();
+		});
+	});
+
+	$(function() {
+		$('#selectedSites').change(function() {
+			$('.button_xlong').css('display', 'none');
+			$('#result').empty();
+		});
+	});
+
+	$(function() {
+		$('#selectedEvents').change(function() {
+			$('.button_xlong').css('display', 'none');
+			$('#result').empty();
+		});
+	});
 </script>
 
-<form name="employeeForm" action="${pageContext.request.contextPath}/pages/api/v1/batchmigration/process"
-  method="post">
+
+
+<form
+	action="${pageContext.request.contextPath}/pages/api/v1/forms/migrate/run"
+	method="post">
 	<input type="hidden" name="studyOid" id="studyOid" value="${study.oid}">
 	<input type="hidden" name="crfId" id="crfId" value="${crf.id}">
 
 
 	<table cellpadding="2" cellspacing="2" border="0" class="dataTable">
-		<tr>
-			<td><fmt:message key="crf_name" bundle="${resword}" /></td>
-			<td><c:out value="${crf.name}" /></td>
-		</tr>
+
 		<tr></tr>
 		<tr>
-			<td><fmt:message key="current_crf_version" bundle="${resword}" /></td>
+			<td><fmt:message key="current_version_of" bundle="${resword}" />
+				&nbsp;<c:out value="${crf.name}" />&#58;</td>
 			<td><select name="selectedSourceVersion"
 				id="selectedSourceVersion">
 					<option value="-1">-Select-</option>
@@ -127,7 +161,8 @@
 			</select></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="new_crf_version" bundle="${resword}" /></td>
+			<td><fmt:message key="new_version_of" bundle="${resword}" />
+				&nbsp;<c:out value="${crf.name}" />&#58;</td>
 			<td><select name="selectedTargetVersion"
 				id="selectedTargetVersion">
 					<option value="-1">-Select-</option>
@@ -140,7 +175,7 @@
 		</tr>
 		<tr></tr>
 		<tr>
-			<td><fmt:message key="list_of_sites" bundle="${resword}" /></td>
+			<td><fmt:message key="list_of_sites" bundle="${resword}" />&#58;</td>
 			<td><select name="selectedSites" id="selectedSites"
 				multiple="multiple">
 					<option value="<c:out value="-1" />" selected="selected">&nbsp;
@@ -155,7 +190,7 @@
 		</tr>
 		<tr>
 			<td><fmt:message key="list_of_event_definitions"
-					bundle="${resword}" /></td>
+					bundle="${resword}" />&#58;</td>
 			<td><select name="selectedEvents" id="selectedEvents"
 				multiple="multiple">
 					<option value="<c:out value="-1" />" selected="selected">&nbsp;
@@ -170,22 +205,19 @@
 		</tr>
 		<tr>
 			<td><input type="button" onclick="madeAjaxCall();"
-				value="<fmt:message key="preview_summary" bundle="${resword}"/>"
+				value="<fmt:message key="preview" bundle="${resword}"/>"
 				class="button_long"></td>
-			<td>    <input type="button"
-				onclick="confirmCancel('ListCRF?module=manage');" name="cancel"
-				value="   <fmt:message key="cancel" bundle="${resword}"/>   "
-				class="button_medium" /></td>
-				
-				<td><input type="submit" name ="submit" style="display:none"
-				value="<fmt:message key="run_migration" bundle="${resword}"/>"
+
+
+			<td><input type="submit" name="submit" style="display: none"
+				value="<fmt:message key="migrate" bundle="${resword}"/>"
 				class="button_xlong"></td>
-				
- </tr> 
 
-        </table>
+		</tr>
 
- </form>
- <div id="result"></div>
-<jsp:include page="../include/footer.jsp"/>
+	</table>
+
+</form>
+<div id="result"></div>
+<jsp:include page="../include/footer.jsp" />
 
