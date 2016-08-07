@@ -36,6 +36,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.controller.helper.HelperObject;
 import org.akaza.openclinica.controller.helper.ReportLog;
 import org.akaza.openclinica.controller.helper.TransferObject;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -749,9 +750,8 @@ public class BatchCRFMigrationController implements Runnable {
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl + "<br><br>"
                 + "Thank you, Your OpenClinica System";
         System.out.println(body);
-        // openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
-        // resterms.getString("Batch_Migration_Complete_For") + " "
-        // + stBean.getName(), body, true);
+        openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete_For") + " "
+                + stBean.getName(), body, true);
 
     }
 
