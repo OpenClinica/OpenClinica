@@ -1,6 +1,5 @@
 package org.akaza.openclinica.controller.helper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -13,9 +12,14 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.hibernate.SessionFactory;
 
 public class HelperObject {
-    List<EventCRFBean> crfMigrationReportList;
+    List<EventCRFBean> eventCrfListToMigrate;
     CRFVersionBean sourceCrfVersionBean;
     CRFVersionBean targetCrfVersionBean;
     ReportLog reportLog;
@@ -27,35 +31,15 @@ public class HelperObject {
     ResourceBundle resterms;
     String urlBase;
     OpenClinicaMailSender openClinicaMailSender;
+    EventCrfDao eventCrfDao;
+    StudyEventDao studyEventDao;
+    StudySubjectDao studySubjectDao;
+    CrfVersionDao crfVersionDao;
+    SessionFactory sessionFactory;
 
-    public HelperObject(ArrayList<EventCRFBean> crfMigrationReportList, CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
-            ReportLog reportLog, StudyBean stBean, CRFBean cBean, HttpServletRequest request, DataSource dataSource, UserAccountBean userAccountBean,
-            ResourceBundle resterms, String urlBase, OpenClinicaMailSender openClinicaMailSender) {
-        super();
-        this.crfMigrationReportList = crfMigrationReportList;
-        this.sourceCrfVersionBean = sourceCrfVersionBean;
-        this.targetCrfVersionBean = targetCrfVersionBean;
-        this.reportLog = reportLog;
-        this.stBean = stBean;
-        this.cBean = cBean;
-        this.request = request;
-        this.dataSource = dataSource;
-        this.userAccountBean = userAccountBean;
-        this.resterms = resterms;
-        this.urlBase = urlBase;
-        this.openClinicaMailSender = openClinicaMailSender;
-    }
 
     public HelperObject() {
         // TODO Auto-generated constructor stub
-    }
-
-    public List<EventCRFBean> getCrfMigrationReportList() {
-        return crfMigrationReportList;
-    }
-
-    public void setCrfMigrationReportList(List<EventCRFBean> crfMigrationReportList2) {
-        this.crfMigrationReportList = crfMigrationReportList2;
     }
 
     public CRFVersionBean getSourceCrfVersionBean() {
@@ -144,6 +128,54 @@ public class HelperObject {
 
     public void setOpenClinicaMailSender(OpenClinicaMailSender openClinicaMailSender) {
         this.openClinicaMailSender = openClinicaMailSender;
+    }
+
+    public List<EventCRFBean> getEventCrfListToMigrate() {
+        return eventCrfListToMigrate;
+    }
+
+    public void setEventCrfListToMigrate(List<EventCRFBean> eventCrfListToMigrate) {
+        this.eventCrfListToMigrate = eventCrfListToMigrate;
+    }
+
+    public EventCrfDao getEventCrfDao() {
+        return eventCrfDao;
+    }
+
+    public void setEventCrfDao(EventCrfDao eventCrfDao) {
+        this.eventCrfDao = eventCrfDao;
+    }
+
+    public StudyEventDao getStudyEventDao() {
+        return studyEventDao;
+    }
+
+    public void setStudyEventDao(StudyEventDao studyEventDao) {
+        this.studyEventDao = studyEventDao;
+    }
+
+    public StudySubjectDao getStudySubjectDao() {
+        return studySubjectDao;
+    }
+
+    public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
+        this.studySubjectDao = studySubjectDao;
+    }
+
+    public CrfVersionDao getCrfVersionDao() {
+        return crfVersionDao;
+    }
+
+    public void setCrfVersionDao(CrfVersionDao crfVersionDao) {
+        this.crfVersionDao = crfVersionDao;
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
 }
