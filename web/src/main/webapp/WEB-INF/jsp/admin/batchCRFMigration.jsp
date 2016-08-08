@@ -62,8 +62,7 @@
 
 <h1>
 	<span class="title_manage"> <fmt:message
-			key="batch_crf_version_migration_for" bundle="${resworkflow}" />
-		&nbsp;<c:out value="${crf.name}" />
+			key="batch_crf_version_migration_for" bundle="${resworkflow}"/>&nbsp;<c:out value="${crf.name}"/>
 	</span>
 </h1>
 
@@ -148,21 +147,19 @@
 
 		<tr></tr>
 		<tr>
-			<td><fmt:message key="current_version_of" bundle="${resword}" />
-				&nbsp;<c:out value="${crf.name}" />&#58;</td>
+			<td><fmt:message key="current_version_of" bundle="${resword}"/>&nbsp;<c:out value="${crf.name}"/>&#58;</td>
 			<td><select name="selectedSourceVersion"
 				id="selectedSourceVersion">
 					<option value="-1">-Select-</option>
 					<c:forEach var="version" items="${crf.versions}">
-						<option value="<c:out value="${version.oid}" />">&nbsp;
+						<option value="<c:out value="${version.oid}"/>">&nbsp;
 							<c:out value="${version.name}" />&nbsp;
 						</option>
 					</c:forEach>
 			</select></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="new_version_of" bundle="${resword}" />
-				&nbsp;<c:out value="${crf.name}" />&#58;</td>
+			<td><fmt:message key="new_version_of" bundle="${resword}"/>&nbsp;<c:out value="${crf.name}"/>&#58;</td>
 			<td><select name="selectedTargetVersion"
 				id="selectedTargetVersion">
 					<option value="-1">-Select-</option>
@@ -175,30 +172,30 @@
 		</tr>
 		<tr></tr>
 		<tr>
-			<td><fmt:message key="list_of_sites" bundle="${resword}" />&#58;</td>
+			<td><fmt:message key="list_of_sites" bundle="${resword}"/>&#58;</td>
 			<td><select name="selectedSites" id="selectedSites"
 				multiple="multiple">
 					<option value="<c:out value="-1" />" selected="selected">&nbsp;
 						<c:out value="-All-" />&nbsp;
 					</option>
 					<c:forEach var="site" items="${siteList}">
-						<option value="<c:out value="${site.oid}" />">&nbsp;
-							<c:out value="${site.name}" />&nbsp;
+						<option value="<c:out value="${site.oid}"/>">&nbsp;
+							<c:out value="${site.name}"/>&nbsp;
 						</option>
 					</c:forEach>
 			</select></td>
 		</tr>
 		<tr>
 			<td><fmt:message key="list_of_event_definitions"
-					bundle="${resword}" />&#58;</td>
+					bundle="${resword}"/>&#58;</td>
 			<td><select name="selectedEvents" id="selectedEvents"
 				multiple="multiple">
 					<option value="<c:out value="-1" />" selected="selected">&nbsp;
 						<c:out value="-All-" />&nbsp;
 					</option>
 					<c:forEach var="event" items="${eventList}">
-						<option value="<c:out value="${event.oid}" />">&nbsp;
-							<c:out value="${event.name}" />&nbsp;
+						<option value="<c:out value="${event.oid}"/>">&nbsp;
+							<c:out value="${event.name}"/>&nbsp;
 						</option>
 					</c:forEach>
 			</select></td>

@@ -604,7 +604,7 @@ public class BatchCRFMigrationController implements Runnable {
         return transferObject;
     }
 
-    public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms) {
+    public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms, StudyBean stBean, CRFBean cBean) {
 
         StringBuffer text1 = new StringBuffer();
         for (String migrationPerform : reportLog.getCanNotMigrate()) {
@@ -619,7 +619,11 @@ public class BatchCRFMigrationController implements Runnable {
         for (String log : reportLog.getLogs()) {
             text3.append(log.toString()).append('\n');
         }
-        String str = resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
+        String str = "";
+        str = str + resterms.getString("Study") + ": " + stBean.getName() + "\n";
+        str = str + resterms.getString("CRF") + ": " + cBean.getName() + "\n\n";
+
+        str = str + resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
                 + reportLog.getSubjectCount() + "\n";
 
         str = str + resterms.getString("Number_of_Event_CRF_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n";
@@ -657,6 +661,7 @@ public class BatchCRFMigrationController implements Runnable {
             sb.append("<font size=\"3\" color=\"#D4A718\"><b>");
             sb.append(resterms.getString("Migration_Summary") + ":");
             sb.append("</b></font>");
+            sb.append("<br>");
             sb.append("<br>");
 
             sb.append(resterms.getString("Number_of_Subjects_to_be_affected_by_migration") + ": " + reportLog.getSubjectCount() + "<br>");
@@ -729,18 +734,17 @@ public class BatchCRFMigrationController implements Runnable {
             e.printStackTrace();
         } finally {
         }
-        writer.print(toStringTextFormat(reportLog, resterms));
+        writer.print(toStringTextFormat(reportLog, resterms, stBean, cBean));
         closeFile(writer);
         String reportUrl = getReportUrl(fileName, urlBase);
         String fullName = userAccountBean.getFirstName() + " " + userAccountBean.getLastName();
-        String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_for") + " "
-                + stBean.getName() + " " + resterms.getString("has_completed_running") + "<br><br>"
+        String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_has_finished_running")
+                + "<br>" + resterms.getString("Study") + ": " + stBean.getName() + "<br>" + resterms.getString("CRF") + ": " + cBean.getName() + "<br><br>"
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl + "<br><br>"
                 + "Thank you, Your OpenClinica System";
         System.out.println(body);
         openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete_For") + " "
                 + stBean.getName(), body, true);
-
     }
 
     public void fillHelperObject(HelperObject helperObject) {
