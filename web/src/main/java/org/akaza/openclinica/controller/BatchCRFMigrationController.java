@@ -67,7 +67,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,8 +97,6 @@ public class BatchCRFMigrationController implements Runnable {
 
     @Autowired
     private SessionFactory sessionFactory;
-
-    private HibernateTemplate hibernateTemplate;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
