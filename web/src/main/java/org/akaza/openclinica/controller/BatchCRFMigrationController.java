@@ -154,7 +154,7 @@ public class BatchCRFMigrationController implements Runnable {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    // do something clever with the exception
+                    logger.debug(e.getStackTrace().toString());
                 }
             }
         }
@@ -215,9 +215,8 @@ public class BatchCRFMigrationController implements Runnable {
 
         ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
         HelperObject helperObject = res.getBody();
-        helperObject.setUrlBase(CoreResources.getField("sysURL").split("/MainMenu")[0]);
-        helperObject.setOpenClinicaMailSender(openClinicaMailSender);
-        helperObject.setDataSource(dataSource);
+        helperObject.setRequest(request);
+        fillHelperObject(helperObject);
         ReportLog reportLog = helperObject.getReportLog();
 
         String str = "";
@@ -240,15 +239,13 @@ public class BatchCRFMigrationController implements Runnable {
     @Produces(MediaType.APPLICATION_JSON)
     @RequestMapping(value = "/api/v1/forms/migrate/run", method = RequestMethod.POST)
     public @ResponseBody String runMigration(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
         TransferObject transferObject = getUIComponents(request);
         String crfId = request.getParameter("crfId");
 
         ResponseEntity<HelperObject> res = runPreviewTest(transferObject, request);
         HelperObject helperObject = res.getBody();
-        helperObject.setUrlBase(CoreResources.getField("sysURL").split("/MainMenu")[0]);
-        helperObject.setOpenClinicaMailSender(openClinicaMailSender);
-        helperObject.setDataSource(dataSource);
+        fillHelperObject(helperObject);
+        helperObject.setRequest(request);
         ReportLog reportLog = helperObject.getReportLog();
 
         String pageMessages = null;
@@ -491,12 +488,6 @@ public class BatchCRFMigrationController implements Runnable {
         helperObject.setSourceCrfVersionBean(sourceCrfVersionBean);
         helperObject.setTargetCrfVersionBean(targetCrfVersionBean);
         helperObject.setUserAccountBean(userAccountBean);
-        helperObject.setResterms(resterms);
-        helperObject.setEventCrfDao(eventCrfDao);
-        helperObject.setStudyEventDao(studyEventDao);
-        helperObject.setStudySubjectDao(studySubjectDao);
-        helperObject.setCrfVersionDao(crfVersionDao);
-        helperObject.setSessionFactory(sessionFactory);
 
         return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.OK);
 
@@ -752,4 +743,15 @@ public class BatchCRFMigrationController implements Runnable {
 
     }
 
+    public void fillHelperObject(HelperObject helperObject) {
+       helperObject.setUrlBase(CoreResources.getField("sysURL").split("/MainMenu")[0]);
+       helperObject.setOpenClinicaMailSender(openClinicaMailSender);
+       helperObject.setDataSource(dataSource);
+       helperObject.setResterms(resterms);
+       helperObject.setEventCrfDao(eventCrfDao);
+       helperObject.setStudyEventDao(studyEventDao);
+       helperObject.setStudySubjectDao(studySubjectDao);
+       helperObject.setCrfVersionDao(crfVersionDao);
+       helperObject.setSessionFactory(sessionFactory);
+   }
 }
