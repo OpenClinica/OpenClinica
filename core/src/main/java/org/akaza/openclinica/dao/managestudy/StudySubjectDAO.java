@@ -24,6 +24,8 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
@@ -34,7 +36,7 @@ import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-
+import org.apache.commons.lang.StringUtils;
 import org.owasp.esapi.ESAPI;
 
 /**
@@ -738,7 +740,63 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             return null;
         }
     }
+    
+    
+  
+    public Integer getTotalCountStudySubjectForCrfMigration(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+        StudySubjectBean studySubjectBean = new StudySubjectBean();
+        setTypesExpected();
 
+        HashMap variables = new HashMap();
+        String eventStr =StringUtils.join(studyEventDefnlist, ",");
+        String siteStr =StringUtils.join(sitelist, ",");
+        variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
+        variables.put(2, eventStr);
+        variables.put(3, siteStr);
+        variables.put(4, String.valueOf(sourceCrfVersionBean.getId()));
+        variables.put(5, String.valueOf(targetCrfVersionBean.getId()));
+
+        String sql = digester.getQuery("getTotalCountStudySubjectForCrfMigration");
+
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+    
+
+    public Integer getTotalEventCrfCountForCrfMigration(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+        StudySubjectBean studySubjectBean = new StudySubjectBean();
+        setTypesExpected();
+
+        HashMap variables = new HashMap();
+        String eventStr =StringUtils.join(studyEventDefnlist, ",");
+        String siteStr =StringUtils.join(sitelist, ",");
+        variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
+        variables.put(2, eventStr);
+        variables.put(3, siteStr);
+        variables.put(4, String.valueOf(sourceCrfVersionBean.getId()));
+        variables.put(5, String.valueOf(targetCrfVersionBean.getId()));
+
+        String sql = digester.getQuery("getTotalEventCrfCountForCrfMigration");
+
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+
+    
     public Integer getCountofStudySubjectsAtStudy(StudyBean currentStudy) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();

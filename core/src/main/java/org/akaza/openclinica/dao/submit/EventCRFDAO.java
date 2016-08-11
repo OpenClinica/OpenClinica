@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -41,6 +42,8 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.validator.util.SetAccessibility;
 
 /**
  * <P>
@@ -325,6 +328,20 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findAllByStudySubject", variables);
     }
 
+    public List<EventCRFBean> findAllCRFMigrationReportList(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+        HashMap<Integer, Object> variables = new HashMap();
+        String eventStr =StringUtils.join(studyEventDefnlist, ",");
+        String siteStr =StringUtils.join(sitelist, ",");
+        variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
+        variables.put(2, eventStr);
+        variables.put(3, siteStr);
+        variables.put(4, String.valueOf(sourceCrfVersionBean.getId()));
+        variables.put(5, String.valueOf(targetCrfVersionBean.getId()));
+
+        return executeFindAllQuery("findAllCRFMigrationReportList", variables);
+    }
+    
+    
     public ArrayList findAllByStudyEventAndCrfOrCrfVersionOid(StudyEventBean studyEvent, String crfVersionOrCrfOID) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEvent.getId()));

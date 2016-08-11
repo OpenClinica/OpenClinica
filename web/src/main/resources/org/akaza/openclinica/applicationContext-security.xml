@@ -40,7 +40,8 @@
     <security:intercept-url pattern="/pages/api/v2/anonymousform/**" filters="none"/>
     <security:intercept-url pattern="/pages/api/v1/editform/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/v1/batchmigration/**" filters="none"/>
+    <security:intercept-url pattern="/pages/auth/api/v1/forms/migrate/**" filters="none"/>
+    <security:intercept-url pattern="/pages/api/v1/forms/migrate/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/system/**" filters="none"/>
     <!--
