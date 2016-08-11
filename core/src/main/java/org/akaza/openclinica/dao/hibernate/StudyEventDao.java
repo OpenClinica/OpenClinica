@@ -16,8 +16,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	private ApplicationEventPublisher eventPublisher;
 	private StudyEventChangeDetails changeDetails;
 
-	@Override
-    public Class<StudyEvent> domainClass(){
+	public Class<StudyEvent> domainClass(){
 		return StudyEvent.class;
 	}
 	public StudyEvent fetchByStudyEventDefOID(String oid,Integer studySubjectId){
@@ -73,32 +72,32 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         q.setInteger("studySubjectId", studySubjectId);
         q.setString("oid", oid);
 
-        eventList = q.list();
+        eventList = (List<StudyEvent>) q.list();
         return eventList;
 
 	}
 
 	@Transactional(propagation = Propagation.NEVER)
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
-        StudyEvent event = saveOrUpdateEvent(container.getEvent());
+        StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
 
    public StudyEvent saveOrUpdateTransactional(StudyEventContainer container) {
-        StudyEvent event = saveOrUpdateEvent(container.getEvent());
+        StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
 
-    public StudyEvent saveOrUpdateEvent(StudyEvent domainObject) {
-        super.saveOrUpdate(domainObject);
-        getCurrentSession().flush();
+     @Override
+	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
+	 super.saveOrUpdate(domainObject);
+	        getCurrentSession().flush();
 	        return domainObject;
 	    }
 
-
-    @Override
+	@Override
 	public void setApplicationEventPublisher(
 			ApplicationEventPublisher applicationEventPublisher) {
  this.eventPublisher = applicationEventPublisher;
