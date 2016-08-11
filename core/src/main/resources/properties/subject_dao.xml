@@ -30,14 +30,14 @@
 	</query>
 	<query>
         <name>getCountWithFilter</name>
-        <sql>select count (DISTINCT s.subject_id) from subject s,study_subject ss,study,user_account ua  where 
+        <sql>select count (DISTINCT s.subject_id) from subject s,study_subject ss,study where
                 s.subject_id = ss.subject_id  and 
                 study.study_id = ss.study_id
         </sql>
     </query>
     <query>
         <name>getWithFilterAndSort</name>
-        <sql> select DISTINCT s.* from subject s,study_subject ss,study,user_account ua where 
+        <sql> select DISTINCT s.* from subject s,study_subject ss,study where
                 s.subject_id = ss.subject_id  and 
                 study.study_id = ss.study_id
         </sql>
