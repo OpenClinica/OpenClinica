@@ -16,6 +16,7 @@ import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 public class HelperObject {
@@ -36,7 +37,7 @@ public class HelperObject {
     StudySubjectDao studySubjectDao;
     CrfVersionDao crfVersionDao;
     SessionFactory sessionFactory;
-
+    Session session;
 
     public HelperObject() {
         // TODO Auto-generated constructor stub
@@ -177,5 +178,14 @@ public class HelperObject {
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
 
 }

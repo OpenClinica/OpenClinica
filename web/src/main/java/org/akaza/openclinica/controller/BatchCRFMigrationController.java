@@ -98,6 +98,8 @@ public class BatchCRFMigrationController implements Runnable {
     @Autowired
     private SessionFactory sessionFactory;
 
+    private HelperObject helperObject;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     ResourceBundle resterms;
@@ -116,27 +118,11 @@ public class BatchCRFMigrationController implements Runnable {
     }
 
     public BatchCRFMigrationController(HelperObject helperObject) {
-        this.eventCrfListToMigrate = helperObject.getEventCrfListToMigrate();
-        this.sourceCrfVersionBean = helperObject.getSourceCrfVersionBean();
-        this.targetCrfVersionBean = helperObject.getTargetCrfVersionBean();
-        this.reportLog = helperObject.getReportLog();
-        this.stBean = helperObject.getStBean();
-        this.cBean = helperObject.getcBean();
-        this.request = helperObject.getRequest();
-        this.dataSource = helperObject.getDataSource();
-        this.userAccountBean = helperObject.getUserAccountBean();
-        this.resterms = helperObject.getResterms();
-        this.urlBase = helperObject.getUrlBase();
-        this.openClinicaMailSender = helperObject.getOpenClinicaMailSender();
-        this.eventCrfDao = helperObject.getEventCrfDao();
-        this.studyEventDao = helperObject.getStudyEventDao();
-        this.studySubjectDao = helperObject.getStudySubjectDao();
-        this.crfVersionDao = helperObject.getCrfVersionDao();
-        this.sessionFactory = helperObject.getSessionFactory();
+        this.helperObject = helperObject;
     }
 
     @RequestMapping(value = "/forms/migrate/{filename}/downloadLogFile")
-    public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws IOException {
+    public void getLogFile(@PathVariable("filename") String fileName, HttpServletResponse response) throws Exception {
         InputStream inputStream = null;
         try {
             String logFileName = getFilePath() + File.separator + fileName;
@@ -149,12 +135,14 @@ public class BatchCRFMigrationController implements Runnable {
         } catch (Exception e) {
             logger.debug("Request could not be completed at this moment. Please try again.");
             logger.debug(e.getStackTrace().toString());
+            throw e;
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
                     logger.debug(e.getStackTrace().toString());
+                    throw e;
                 }
             }
         }
@@ -327,39 +315,40 @@ public class BatchCRFMigrationController implements Runnable {
         return helperObject.getReportLog();
     }
 
-    @SuppressWarnings({ "static-access" })
-    public void executeMigrationAction(EventCRFBean eventCRFBean, CRFVersionBean targetCrfVersionBean, HttpServletRequest request, DataSource dataSource,
-            UserAccountBean userAccountBean, EventCrfDao eventCrfDao, StudyEventDao studyEventDao, StudySubjectDao studySubjectDao, CrfVersionDao crfVersionDao) {
 
-        EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
-        StudyEvent studyEvent = studyEventDao.findById(eventCRFBean.getStudyEventId());
-        CrfVersion crfVersion = crfVersionDao.findById(targetCrfVersionBean.getId());
+    public void executeMigrationAction(HelperObject helperObject, EventCRFBean eventCRFBean) {
+        Session session = helperObject.getSession();
+
+        EventCrf eventCrf = helperObject.getEventCrfDao().findById(eventCRFBean.getId());
+        StudyEvent studyEvent = helperObject.getStudyEventDao().findById(eventCRFBean.getStudyEventId());
+        CrfVersion crfVersion = helperObject.getCrfVersionDao().findById(helperObject.getTargetCrfVersionBean().getId());
+        StudySubject studySubject = helperObject.getStudySubjectDao().findById(eventCRFBean.getStudySubjectId());
 
         eventCrf.setSdvStatus(false);
         eventCrf.setDateUpdated(new Date());
-        eventCrf.setSdvUpdateId(userAccountBean.getId());
-        eventCrf.setUpdateId(userAccountBean.getId());
+        eventCrf.setSdvUpdateId(helperObject.getUserAccountBean().getId());
+        eventCrf.setUpdateId(helperObject.getUserAccountBean().getId());
         eventCrf.setCrfVersion(crfVersion);
-        eventCrfDao.saveOrUpdate(eventCrf);
+        session.saveOrUpdate(eventCrf);
 
         String status_before_update = null;
         SubjectEventStatus eventStatus = null;
 
         // event signed, check if subject is signed as well
-        StudySubject studySubject = studySubjectDao.findById(eventCRFBean.getStudySubjectId());
 
-        if (studySubject.getStatus().SIGNED != null) {
+        if (studySubject.getStatus() == Status.SIGNED) {
             status_before_update = auditDao().findLastStatus("study_subject", studySubject.getStudySubjectId(), "8");
             if (status_before_update != null && status_before_update.length() == 1) {
                 int subject_status = Integer.parseInt(status_before_update);
                 Status status = Status.getByCode(subject_status);
                 studySubject.setStatus(status);
             }
-            studySubject.setUpdateId(userAccountBean.getId());
-            studySubjectDao.saveOrUpdate(studySubject);
+            studySubject.setUpdateId(helperObject.getUserAccountBean().getId());
+            session.saveOrUpdate(studySubject);
+
         }
 
-        studyEvent.setUpdateId(userAccountBean.getId());
+        studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
 
         status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), "8");
@@ -368,7 +357,8 @@ public class BatchCRFMigrationController implements Runnable {
             eventStatus = SubjectEventStatus.get(status);
             studyEvent.setSubjectEventStatusId(eventStatus.getId());
         }
-        studyEventDao.saveOrUpdate(studyEvent);
+
+        session.saveOrUpdate(studyEvent);
     }
 
     @SuppressWarnings("unchecked")
@@ -619,24 +609,21 @@ public class BatchCRFMigrationController implements Runnable {
         for (String log : reportLog.getLogs()) {
             text3.append(log.toString()).append('\n');
         }
-        String str = "";
-        str = str + resterms.getString("Study") + ": " + stBean.getName() + "\n";
-        str = str + resterms.getString("CRF") + ": " + cBean.getName() + "\n\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(resterms.getString("Study") + ": " + stBean.getName() + "\n");
+        sb.append(resterms.getString("CRF") + ": " + cBean.getName() + "\n\n");
+        sb.append(resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
+                + reportLog.getSubjectCount() + "\n");
+        sb.append(resterms.getString("Number_of_Event_CRF_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n");
+        sb.append(text1.toString() + "\n");
 
-        str = str + resterms.getString("Migration_Summary") + ":\n" + resterms.getString("Number_of_Subjects_affected_by_migration") + ": "
-                + reportLog.getSubjectCount() + "\n";
-
-        str = str + resterms.getString("Number_of_Event_CRF_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n";
-
-        str = str + text1.toString() + "\n";
 
         if (reportLog.getErrors().size() != 0) {
-            str = str + resterms.getString("Errors") + ":\n" + text2.toString() + "\n";
+            sb.append(resterms.getString("Errors") + ":\n" + text2.toString() + "\n");
         }
-
-        str = str + resterms.getString("Report_Log") + ":\n"
-                + resterms.getString("CRF_Name__Origin_Version__Target_Version__Subject_ID__Site__Event__Event_Ordinal") + "\n" + text3.toString();
-        return str;
+        sb.append(resterms.getString("Report_Log") + ":\n"
+                + resterms.getString("CRF_Name__Origin_Version__Target_Version__Subject_ID__Site__Event__Event_Ordinal") + "\n" + text3.toString());
+        return sb.toString();
     }
 
     public String toStringHtmlFormat(ReportLog reportLog, ResourceBundle resterms) {
@@ -700,13 +687,23 @@ public class BatchCRFMigrationController implements Runnable {
 
     @Override
     public void run() {
+        dataSource = helperObject.getDataSource();
+        cBean = helperObject.getcBean();
+        reportLog = helperObject.getReportLog();
+        stBean = helperObject.getStBean();
+        resterms = helperObject.getResterms();
+        userAccountBean = helperObject.getUserAccountBean();
+        openClinicaMailSender = helperObject.getOpenClinicaMailSender();
+        sessionFactory = helperObject.getSessionFactory();
+
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
+        helperObject.setSession(session);
         int i = 0;
-        for (EventCRFBean eventCrfToMigrate : eventCrfListToMigrate) {
+        for (EventCRFBean eventCrfToMigrate : helperObject.getEventCrfListToMigrate()) {
             i++;
-            executeMigrationAction(eventCrfToMigrate, targetCrfVersionBean, request, dataSource, userAccountBean, eventCrfDao, studyEventDao, studySubjectDao,
-                    crfVersionDao);
+            executeMigrationAction(helperObject, eventCrfToMigrate);
+
             if (i % 50 == 0) {
                 session.flush();
                 session.clear();
@@ -717,12 +714,12 @@ public class BatchCRFMigrationController implements Runnable {
             StudyEventBean seBean = (StudyEventBean) sedao().findByPK(eventCrfToMigrate.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
             reportLog.getLogs().add(
-                    cBean.getName() + "," + sourceCrfVersionBean.getName() + "," + targetCrfVersionBean.getName() + "," + ssBean.getLabel() + ","
+                    cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","
+                            + ssBean.getLabel() + ","
                             + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
         }
         tx.commit();
         session.close();
-
 
         String fileName = new SimpleDateFormat("_yyyy-MM-dd-hhmmssSaa'.txt'").format(new Date());
         fileName = "logFile" + fileName;
@@ -733,18 +730,20 @@ public class BatchCRFMigrationController implements Runnable {
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         } finally {
+            writer.print(toStringTextFormat(reportLog, resterms, stBean, cBean));
+            closeFile(writer);
         }
-        writer.print(toStringTextFormat(reportLog, resterms, stBean, cBean));
-        closeFile(writer);
-        String reportUrl = getReportUrl(fileName, urlBase);
+        String reportUrl = getReportUrl(fileName, helperObject.getUrlBase());
         String fullName = userAccountBean.getFirstName() + " " + userAccountBean.getLastName();
-        String body = resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_has_finished_running")
-                + "<br>" + resterms.getString("Study") + ": " + stBean.getName() + "<br>" + resterms.getString("CRF") + ": " + cBean.getName() + "<br><br>"
+        StringBuilder body = new StringBuilder();
+        body.append(resterms.getString("Dear") + " " + fullName + ",<br><br>" + resterms.getString("Batch_CRF_version_migration_has_finished_running") + "<br>"
+                + resterms.getString("Study") + ": " + stBean.getName() + "<br>" + resterms.getString("CRF") + ": " + cBean.getName() + "<br><br>"
                 + resterms.getString("A_summary_report_of_the_migration_is_available_here") + ":<br>" + reportUrl + "<br><br>"
-                + "Thank you, Your OpenClinica System";
-        System.out.println(body);
+                + resterms.getString("Thank_you_Your_OpenClinica_System"));
+
+        logger.info(body.toString());
         openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete_For") + " "
-                + stBean.getName(), body, true);
+                + stBean.getName(), body.toString(), true);
     }
 
     public void fillHelperObject(HelperObject helperObject) {
