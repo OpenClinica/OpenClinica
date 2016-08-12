@@ -451,21 +451,22 @@ public class ImportCRFDataService {
                                         blankCheck.put(newKey, itemDataBean);
                                         logger.info("adding " + newKey + " to blank checks");
                                         if (!metadataBeans.isEmpty()) {
-                                            ItemFormMetadataBean metadataBean = metadataBeans.get(0);
-                                            // also
-                                            // possible
-                                            // nullpointer
-                                            displayItemBean.setData(itemDataBean);
-                                            displayItemBean.setMetadata(metadataBean);
-                                            // set event def crf?
-                                            displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
-                                            String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
-                                            // if you do indeed leave off this in the XML it will pass but return 'null'
-                                            // tbh
-                                            attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
-                                                    studySubjectBean.getOid());
-                                            displayItemBeans.add(displayItemBean);
-
+                                            ItemFormMetadataBean metadataBean = findMetaDataBean(metadataBeans, crfVersion.getId());
+                                            if (metadataBean != null) {
+                                                // also
+                                                // possible
+                                                // nullpointer
+                                                displayItemBean.setData(itemDataBean);
+                                                displayItemBean.setMetadata(metadataBean);
+                                                // set event def crf?
+                                                displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+                                                String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+                                                // if you do indeed leave off this in the XML it will pass but return 'null'
+                                                // tbh
+                                                attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
+                                                        studySubjectBean.getOid());
+                                                displayItemBeans.add(displayItemBean);
+                                            }
                                         } else {
                                             MessageFormat mf = new MessageFormat("");
                                             mf.applyPattern(respage.getString("no_metadata_could_be_found"));
@@ -1183,4 +1184,12 @@ public class ImportCRFDataService {
         return itemDataDao;
     }
 
+    private ItemFormMetadataBean findMetaDataBean(List<ItemFormMetadataBean> itemFormMetadataBeanList, Integer crfVersionId) {
+        for (ItemFormMetadataBean itemFormMetadataBean : itemFormMetadataBeanList) {
+            if (itemFormMetadataBean.getCrfVersionId() == crfVersionId.intValue()) {
+                return itemFormMetadataBean;
+            }
+        }
+        return null;
+    }
 }
