@@ -1,6 +1,5 @@
 package org.akaza.openclinica.config;
 
-import org.akaza.openclinica.core.OpenClinicaRedisSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;

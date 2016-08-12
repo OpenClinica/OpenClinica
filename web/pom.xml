@@ -179,11 +179,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>httpunit</groupId>
-            <artifactId>httpunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
             <scope>compile</scope>
@@ -412,11 +407,32 @@
             <artifactId>dbunit</artifactId>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>org.owasp.esapi</groupId>
             <artifactId>esapi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.sdk</groupId>
+            <artifactId>stormpath-sdk-api</artifactId>
+            <version>1.0.RC9.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+          <version>4.5.2</version>
+         </dependency>
     </dependencies>
 
     <build>
@@ -488,7 +504,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.akaza.openclinica</groupId>
-                <artifactId>stormpath</artifactId>
+                <artifactId>Stormpath</artifactId>
                 <version>MAINLINE-SNAPSHOT</version>
             </dependency>
         </dependencies>

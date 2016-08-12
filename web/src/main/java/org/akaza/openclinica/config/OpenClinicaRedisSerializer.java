@@ -1,4 +1,4 @@
-package org.akaza.openclinica.core;
+package org.akaza.openclinica.config;
 
 import java.util.List;
 
