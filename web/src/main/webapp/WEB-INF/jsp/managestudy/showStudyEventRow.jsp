@@ -136,7 +136,7 @@
                   <c:when test="${dedc.edc.defaultVersionId==version.id}">
                   <option value="<c:out value="${version.id}"/>" selected>
 					<c:out value="${version.name}"/>
-					   <c:set var="crfVersionOID" value="${version.oid}"/>
+                       <c:set var="crfVersionOID" value="${version.oid}"/>
 				  </option>
                   </c:when>
                   <c:otherwise>
@@ -149,6 +149,7 @@
 
                  </c:forEach>
                  </select>
+                 
 
                  <SCRIPT LANGUAGE="JavaScript">
                  function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
@@ -204,26 +205,20 @@
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 				 <td>
                 <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
-                    <script LANGUAGE="JavaScript">
-                    var eventcrf = "${dedc.eventCRF}";
-                    console.log(eventcrf);
-                    console.log("${dedc.eventCRF}");
-                    console.log("${dedc.eventCRF.id}");
-                    console.log("${dedc.eventCRF.status.name}")
-                    </script>
+
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
-                    <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
+                    <a href="EnketoFormServlet?crfVersionId=<c:out value="${dedc.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
                     </a>
                     </c:when>
                     <c:otherwise>
-                    <a onclick="checkCRFLockedInitialEnketo('<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${dedc.enketoURL}"/>', document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>);"
+                    <a href="EnketoFormServlet?crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="Launch Enketo!!" title="Launch Enketo!!" align="right" hspace="6" style="cursor: pointer;">
+                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
                     </a>
                     </c:otherwise>
                     </c:choose>
@@ -318,10 +313,9 @@
 	     <td>
 			<c:if test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
 			    <c:if test="${dec.continueInitialDataEntryPermitted}">
-		           <a href="#"
+		           <a href="EnketoFormServlet?crfVersionId=<c:out value="${dec.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'InitialDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
+				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
 				    </a>
     		    </c:if>

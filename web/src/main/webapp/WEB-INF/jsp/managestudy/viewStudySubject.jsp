@@ -28,18 +28,6 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
 <script type="text/javascript" language="javascript">
-
-    $(document).ready(function(){
-        var $iframe = $('<iframe />').appendTo('body');
-        $iframe.attr('id', 'enketo').css("position","fixed")
-        $iframe.css("z-index:1011");
-        $iframe.css("top","0")
-        $iframe.css("left","0")
-        $iframe.css("width","100vw")
-        $iframe.css("height","100vh")
-        $iframe.hide()
-    });
-
     function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
 
     function checkCRFLocked(ecId, url){
@@ -61,30 +49,6 @@
                 alert(data);
             }
         });
-    }
-    function checkCRFLockedInitialEnketo(ecId, enketoURL, formName){
-        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
-            if(data == 'true'){
-                var fullEnketoURL = enketoURL + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host);
-                jQuery("#enketo").siblings().hide();
-                jQuery("#enketo").attr('src', fullEnketoURL);
-                jQuery("#enketo").show();
-                jQuery(document.body).css('overflow','hidden');
-            }else{
-                alert(data);
-            }
-        });
-    }
-    
-    window.addEventListener("message", receiveMessage, false);
-    
-    function receiveMessage(event)
-    {
-        var postMessage = JSON.parse(event.data);
-        if(postMessage.enketoEvent === 'submissionsuccess') {
-            jQuery("#enketo").hide();
-            window.location.reload(false);
-        }
     }
 </script>
 

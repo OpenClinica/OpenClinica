@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 public class PFormCache {
@@ -90,6 +93,11 @@ public class PFormCache {
         return subjectContextCache.get(key);
     }
 
+    public String putSubjectContext(PFormCacheSubjectContextEntry entry) {
+        return putSubjectContext(entry.getStudySubjectOid(),entry.getStudyEventDefinitionId().toString(),
+                entry.getOrdinal().toString(),entry.getCrfVersionOid());
+    }
+    
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, 
             String studyEventOrdinal, String crfVersionOID)
     {

@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -59,13 +60,13 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
+import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.pform.EnketoAPI;
-import org.akaza.openclinica.web.pform.EnketoCredentials;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -197,6 +198,7 @@ public class ViewStudySubjectServlet extends SecureController {
             studySub.setSecondaryLabel(decodeForHtml(studySub.getSecondaryLabel()));
 
             request.setAttribute("studySub", studySub);
+            request.setAttribute("originatingPage", URLEncoder.encode("ViewStudySubject?id=" + studySub.getId(), "UTF-8"));
 
             int studyId = studySub.getStudyId();
             int subjectId = studySub.getSubjectId();
@@ -337,6 +339,8 @@ public class ViewStudySubjectServlet extends SecureController {
                         CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
                         crfVersionOid = version.getOid();
                     }
+                    
+                    request.setAttribute("crfVersionOid", crfVersionOid);
                     String enketoURL = cache.getPFormURL(currentStudy.getOid(), crfVersionOid);
                     String contextHash = cache.putSubjectContext(studySub.getOid(), String.valueOf(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId()),
                             String.valueOf(displayStudyEventBean.getStudyEvent().getSampleOrdinal()), dedc.getEventCRF().getCrfVersion().getOid());
