@@ -123,7 +123,7 @@ public class EnketoUrlService {
         // Load context
 
         // Lookup relevant data
-        StudyEventDefinition eventDef = studyEventDefinitionDao.findById(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
+        StudyEventDefinition eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(subjectContext.getStudyEventDefinitionId());
         CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
         StudySubject subject = studySubjectDao.findByOcOID(subjectContext.getStudySubjectOid());
         StudyEvent event = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(eventDef.getOc_oid(), Integer.valueOf(subjectContext.getOrdinal()),

@@ -36,6 +36,9 @@ public class EditFormController {
     @Autowired
     ServletContext context;
 
+    @Autowired
+    EnketoUrlService urlService;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -82,7 +85,6 @@ public class EditFormController {
         subjectContext.setCrfVersionOid(subjectContextMap.get("crfVersionOID"));
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(Integer.valueOf(subjectContextMap.get("studyEventOrdinal")));
-        EnketoUrlService urlService = new EnketoUrlService();
 
         editURL = urlService.getEditUrl(formContext, subjectContext, studyOID);
         logger.debug("Generating Enketo edit url for form: " + editURL);
