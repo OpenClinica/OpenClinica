@@ -15,6 +15,7 @@ import org.akaza.openclinica.service.EventServiceInterface;
 
 import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
 import org.akaza.openclinica.ws.validator.StudyEventTransferValidator;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -216,8 +217,14 @@ public class EventEndpoint {
     private Date getDate(String dateAsString, String hourMinuteAsString) throws ParseException {
         Date d = null;
         if (dateAsString != null && dateAsString.length() != 0) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            dateAsString += hourMinuteAsString == null ? " 00:00" : " " + hourMinuteAsString;
+            if (StringUtils.isNotEmpty(hourMinuteAsString)) {
+                if (hourMinuteAsString.indexOf(":") == hourMinuteAsString.lastIndexOf(":")) {
+                    // add seconds if missing
+                    hourMinuteAsString += ":00";
+                }
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            dateAsString += hourMinuteAsString == null ? " 00:00:00" : " " + hourMinuteAsString;
             d = sdf.parse(dateAsString);
             if (!sdf.format(d).equals(dateAsString)) {
                 throw new OpenClinicaSystemException("Date not parseable");
