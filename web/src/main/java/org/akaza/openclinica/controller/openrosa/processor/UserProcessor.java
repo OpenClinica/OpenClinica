@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 
 @Component
@@ -51,9 +52,18 @@ public class UserProcessor implements Processor, Ordered {
         String contextStudySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String studySubjectOid = container.getSubject().getOcOid();
         String parentStudyOid = getParentStudy(container.getStudy().getOc_oid()).getOc_oid();
-
+        String userAccountId = container.getSubjectContext().get("userAccountID");
+        // Check if UserAccount is specified in subject context
+        if (!StringUtils.isEmpty(userAccountId)) {
+            UserAccount existingAccount = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
+            if (existingAccount == null) {
+                logger.info("Could not find existing user account from provided context.  Aborting submission.");
+                errors.reject("Could not find existing user account from provided context.  Aborting submission.");
+                throw new Exception("Could not find existing user account from provided context.  Aborting submission.");
+            }
+            container.setUser(existingAccount);
         // if study subject oid is not null, just look up user account
-        if (contextStudySubjectOid != null) {
+        } else if (contextStudySubjectOid != null) {
             String userName = parentStudyOid + "." + contextStudySubjectOid;
             UserAccount existingAccount = userAccountDao.findByUserName(userName);
             if (existingAccount == null) {
@@ -66,7 +76,7 @@ public class UserProcessor implements Processor, Ordered {
             String userName = parentStudyOid + "." + studySubjectOid;
             UserAccount existingAccount = userAccountDao.findByUserName(userName);
             if (existingAccount != null) {
-                container.setUser(existingAccount);;
+                container.setUser(existingAccount);
             } else {
                 //Create user account
                 UserAccount rootUser = userAccountDao.findByUserId(1);

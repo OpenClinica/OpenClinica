@@ -44,6 +44,7 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setStudyEventDefinitionId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId());
         subjectContext.setOrdinal(studyEvent.getSampleOrdinal());
         subjectContext.setCrfVersionOid(crfVersion.getOcOid());
+        subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
         
 

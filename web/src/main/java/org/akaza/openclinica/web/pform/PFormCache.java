@@ -95,17 +95,23 @@ public class PFormCache {
 
     public String putSubjectContext(PFormCacheSubjectContextEntry entry) {
         return putSubjectContext(entry.getStudySubjectOid(),entry.getStudyEventDefinitionId().toString(),
-                entry.getOrdinal().toString(),entry.getCrfVersionOid());
+                entry.getOrdinal().toString(),entry.getCrfVersionOid(), entry.getUserAccountId().toString());
     }
     
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, 
-            String studyEventOrdinal, String crfVersionOID)
+            String studyEventOrdinal, String crfVersionOID) {
+        return putSubjectContext(studySubjectOID,studyEventDefinitionID,studyEventOrdinal,crfVersionOID,null);
+    }
+    
+    public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, 
+            String studyEventOrdinal, String crfVersionOID, String userAccountID)
     {
         HashMap<String,String> contextMap = new HashMap<String,String>();
         contextMap.put("studySubjectOID",studySubjectOID);
         contextMap.put("studyEventDefinitionID",studyEventDefinitionID);
         contextMap.put("studyEventOrdinal", studyEventOrdinal);
         contextMap.put("crfVersionOID", crfVersionOID);
+        contextMap.put("userAccountID", userAccountID);
         
         String hashString = studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + crfVersionOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);

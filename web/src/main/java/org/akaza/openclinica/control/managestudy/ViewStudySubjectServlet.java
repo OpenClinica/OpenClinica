@@ -62,6 +62,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -342,8 +343,13 @@ public class ViewStudySubjectServlet extends SecureController {
                     
                     request.setAttribute("crfVersionOid", crfVersionOid);
                     String enketoURL = cache.getPFormURL(currentStudy.getOid(), crfVersionOid);
-                    String contextHash = cache.putSubjectContext(studySub.getOid(), String.valueOf(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId()),
-                            String.valueOf(displayStudyEventBean.getStudyEvent().getSampleOrdinal()), dedc.getEventCRF().getCrfVersion().getOid());
+                    PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
+                    subjectContext.setStudySubjectOid(studySub.getOid());
+                    subjectContext.setStudyEventDefinitionId(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId());
+                    subjectContext.setOrdinal(displayStudyEventBean.getStudyEvent().getSampleOrdinal());
+                    subjectContext.setCrfVersionOid(dedc.getEventCRF().getCrfVersion().getOid());
+                    subjectContext.setUserAccountId(ub.getId());
+                    String contextHash = cache.putSubjectContext(subjectContext);
                     String url = enketoURL + "?" + "ecid=" + contextHash;
                     dedc.setEnketoURL(url);
 
