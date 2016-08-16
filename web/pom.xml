@@ -560,7 +560,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.akaza.openclinica</groupId>
-                <artifactId>stormpath</artifactId>
+                <artifactId>Stormpath</artifactId>
                 <version>MAINLINE-SNAPSHOT</version>
             </dependency>
         </dependencies>
