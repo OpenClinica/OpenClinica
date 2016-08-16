@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,6 +121,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
         int eventId = fp.getInt(INPUT_EVENT_ID, true);
         request.setAttribute("eventId", eventId + "");
+        request.setAttribute("originatingPage", URLEncoder.encode("EnterDataForStudyEvent?eventId=" + eventId, "UTF-8"));
 
         // so we can display the event for which we're entering data
         StudyEventBean seb = getStudyEvent(eventId);
