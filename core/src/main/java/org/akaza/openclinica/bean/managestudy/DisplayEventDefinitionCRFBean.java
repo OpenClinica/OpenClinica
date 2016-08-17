@@ -17,7 +17,6 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 public class DisplayEventDefinitionCRFBean extends AuditableEntityBean {
     private EventDefinitionCRFBean edc;
     private EventCRFBean eventCRF;
-    private String enketoURL;
     private boolean completedEventCRFs;
 
     /**
@@ -65,13 +64,4 @@ public class DisplayEventDefinitionCRFBean extends AuditableEntityBean {
         this.eventCRF = eventCRF;
     }
 
-    public String getEnketoURL() {
-        return enketoURL;
-    }
-
-    public void setEnketoURL(String enketoURL) {
-        this.enketoURL = enketoURL;
-    }
-    
-    
 }

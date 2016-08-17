@@ -60,15 +60,11 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
-import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
-import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
-import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.pform.PFormCache;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -323,36 +319,6 @@ public class ViewStudySubjectServlet extends SecureController {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
                 for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
                     hideCRFManager.removeHiddenEventCRF(displayStudyEventBean);
-                }
-            }
-            
-            EnketoCredentials credentials = EnketoCredentials.getInstance(currentStudy.getOid());
-            EnketoAPI enketo = new EnketoAPI(credentials);
-            for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
-                ArrayList<DisplayEventDefinitionCRFBean> displayEventDefCRFs = displayStudyEventBean.getUncompletedCRFs();
-                for (DisplayEventDefinitionCRFBean dedc:displayEventDefCRFs) {
-                    
-                    PFormCache cache = PFormCache.getInstance(context);
-                    String crfVersionOid = null;
-                    if (dedc.getEventCRF().isActive()) crfVersionOid = dedc.getEventCRF().getCrfVersion().getOid();
-                    else { 
-                        int crfVersionId = dedc.getEdc().getDefaultVersionId();
-                        CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-                        crfVersionOid = version.getOid();
-                    }
-                    
-                    request.setAttribute("crfVersionOid", crfVersionOid);
-                    String enketoURL = cache.getPFormURL(currentStudy.getOid(), crfVersionOid);
-                    PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
-                    subjectContext.setStudySubjectOid(studySub.getOid());
-                    subjectContext.setStudyEventDefinitionId(displayStudyEventBean.getStudyEvent().getStudyEventDefinitionId());
-                    subjectContext.setOrdinal(displayStudyEventBean.getStudyEvent().getSampleOrdinal());
-                    subjectContext.setCrfVersionOid(dedc.getEventCRF().getCrfVersion().getOid());
-                    subjectContext.setUserAccountId(ub.getId());
-                    String contextHash = cache.putSubjectContext(subjectContext);
-                    String url = enketoURL + "?" + "ecid=" + contextHash;
-                    dedc.setEnketoURL(url);
-
                 }
             }
 
