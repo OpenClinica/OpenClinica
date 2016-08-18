@@ -89,7 +89,24 @@
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
-</div>
+
+<table width="75%">
+    <tr>
+        <td>
+            <h2>Nombre: <c:out value="${studySubjectAdmData.name}"/></h2>
+        </td>
+        <td>
+            <h2>Apellidos: <c:out value="${studySubjectAdmData.familyName}"/></h2>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <h2>Dirección: <c:out value="${studySubjectAdmData.address}"/></h2>
+        </td>
+    </tr>
+</table>
+
+
 
 <form name="crfForm" method="POST" action="InitialDataEntry" onLoad = document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'" >
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />

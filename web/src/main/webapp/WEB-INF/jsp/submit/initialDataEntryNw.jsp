@@ -112,6 +112,21 @@
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 <%--the tabId default value is set in DataEntryServlet.getInputBeans()--%>
 
+<table width="75%">
+    <tr>
+        <td>
+            <h2>Nombre: <c:out value="${studySubjectAdmData.name}"/></h2>
+        </td>
+        <td>
+            <h2>Apellidos: <c:out value="${studySubjectAdmData.familyName}"/></h2>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <h2>Dirección: <c:out value="${studySubjectAdmData.address}"/></h2>
+        </td>
+    </tr>
+</table>
 
 
 <!--InitialDataEntry  inputs-->
