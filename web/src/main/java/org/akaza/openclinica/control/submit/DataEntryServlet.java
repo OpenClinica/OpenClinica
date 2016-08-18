@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import core.bean.SubjectAdmData;
 import org.apache.commons.beanutils.BeanUtils;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -613,6 +614,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
         //ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
         request.setAttribute("studySubject", ssb);
         request.setAttribute("subject", subject);
+        SubjectAdmData subjectAdmData =
+            new SubjectAdmData(
+                "NombrePaciente",
+                "ApellidosPaciente",
+                "cip",
+                new Date(),
+                "Dirección");
+        request.setAttribute(
+            "studySubjectAdmData",
+            subjectAdmData);
         //request.setAttribute("beans", beans);
         request.setAttribute("eventCRF", ecb);
         request.setAttribute("age", age);
