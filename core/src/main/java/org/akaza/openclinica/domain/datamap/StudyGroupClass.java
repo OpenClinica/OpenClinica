@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "study_group_class")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_group_class_study_group_class_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_group_class_study_group_class_id_seq") })
 
 public class StudyGroupClass  extends DataMapDomainObject {
 

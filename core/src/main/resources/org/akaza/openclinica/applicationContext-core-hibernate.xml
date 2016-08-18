@@ -3,19 +3,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:tx="http://www.springframework.org/schema/tx"
-        xmlns:aop="http://www.springframework.org/schema/aop"
 	    xsi:schemaLocation="http://www.springframework.org/schema/beans
-                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                             http://www.springframework.org/schema/tx
-                            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-                            http://www.springframework.org/schema/aop
-                            http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+                            http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
                             >
 
 
 
     <!-- A Hibernate SessionFactory for mapping Domain Objects from object to relation tables -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingLocations">
             <list>
@@ -135,21 +132,28 @@
                 <prop key="hibernate.format_sql">true</prop>
                 <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
                 <prop key="hibernate.generate_statistics">true</prop>
-                <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
+                <prop key="hibernate.default_schema">s[schema]</prop>
                 <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
                 <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
             </props>
         </property>
-        <property name="namingStrategy">
-            <bean class="org.hibernate.cfg.ImprovedNamingStrategy"/>
+        <!-- convet aaBb to aa_bb -->
+        <property name="PhysicalNamingStrategy">
+            <bean class="org.akaza.openclinica.dao.hibernate.ImprovedNamingStrategy" />
         </property>
+        <!-- convet aa_bb to aaBb -->
+        <property name="implicitNamingStrategy">
+            <bean class="org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl" />
+        </property>
+
     </bean>
 
   <!-- A transaction manager for working with Hibernate SessionFactories -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
   
@@ -158,7 +162,7 @@
   </bean>
   
 
-  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
     <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
 

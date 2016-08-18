@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.HttpSessionRequiredException;
@@ -72,7 +73,7 @@ public class ChangeCRFVersionController {
     //Autowire the class that handles the sidebar structure with a configured
     //bean named "sidebarInit"
     @Autowired
-    @Qualifier("sidebarInit")
+	@Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
     
     ResourceBundle  resword,resformat, respage;
@@ -510,6 +511,7 @@ public class ChangeCRFVersionController {
 	        StudyEventBean st_event_bean = (StudyEventBean)sedao.findByPK(ev_bean.getStudyEventId());
 
 	        	Connection con = dataSource.getConnection();
+	            CoreResources.setSchema(con);
 	        	con.setAutoCommit(false);
 	        	event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId, getCurrentUser(request).getId(), con);
 	        	

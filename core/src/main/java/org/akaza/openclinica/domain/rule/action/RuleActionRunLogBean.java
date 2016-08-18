@@ -24,7 +24,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "rule_action_run_log")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_run_log_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_action_run_log_id_seq") })
 public class RuleActionRunLogBean extends AbstractMutableDomainObject {
 
     ActionType actionType;

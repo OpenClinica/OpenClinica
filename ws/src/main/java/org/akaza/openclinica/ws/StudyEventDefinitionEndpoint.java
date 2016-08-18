@@ -31,14 +31,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.util.List;
-import java.util.Locale;
-
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import java.util.List;
+import java.util.Locale;
 
 @Endpoint
 public class StudyEventDefinitionEndpoint {

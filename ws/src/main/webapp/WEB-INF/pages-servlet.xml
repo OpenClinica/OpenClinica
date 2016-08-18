@@ -5,9 +5,9 @@
         xmlns:p="http://www.springframework.org/schema/p"
         xmlns:context="http://www.springframework.org/schema/context"
         xsi:schemaLocation="http://www.springframework.org/schema/beans
-                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                         http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+           http://www.springframework.org/schema/context/spring-context-4.3.xsd"
         >
 
     <!-- Resolves logical view names to JSP views -->
@@ -35,12 +35,7 @@
      <!-- Our own implementation of the HandlerInterceptor interface -->
     
 
-    <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
-        <property name="alertsBoxSetup" value="OPENALERTS" />
-        <property name="enableIconsBoxSetup" value="DISABLEICONS"/>
-        <property name="infoBoxSetup" value="OPENINFO" />
-        <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
-    </bean>
+
 
     <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
           <property name="dataSource" ref="dataSource"/>

@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.bean.service;
 
+import java.io.Serializable;
+
 /**
  * This is a help class for each study, it saves all the parameter
  * configurations
@@ -14,7 +16,7 @@ package org.akaza.openclinica.bean.service;
  * @author jxu
  *
  */
-public class StudyParameterConfig {
+public class StudyParameterConfig implements Serializable{
     private String collectDob;
 
     private String discrepancyManagement;

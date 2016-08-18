@@ -33,7 +33,6 @@ public class GenericOidGenerator extends OidGenerator {
         if (oid.equals("_")) {
             oid = randomizeOid("");
         }
-        logger.debug("OID : " + oid);
         return oid;
     }
 }

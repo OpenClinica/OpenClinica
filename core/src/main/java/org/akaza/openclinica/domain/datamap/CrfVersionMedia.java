@@ -21,7 +21,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "crf_version_media", schema = "public")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "crf_version_media_crf_version_media_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "crf_version_media_crf_version_media_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CrfVersionMedia extends DataMapDomainObject {
 

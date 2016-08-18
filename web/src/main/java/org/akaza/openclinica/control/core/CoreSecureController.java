@@ -57,8 +57,10 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,13 +227,13 @@ public abstract class CoreSecureController extends HttpServlet {
         try {
             if (jobName != null && groupName != null) {
                 LOGGER.debug("trying to retrieve status on " + jobName + " " + groupName);
-                int state = getScheduler(request).getTriggerState(jobName, groupName);
-                LOGGER.debug("found state: " + state);
-                org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
+                Trigger.TriggerState triggerState = getScheduler(request).getTriggerState(new TriggerKey(jobName, groupName));
+                LOGGER.debug("found state: " + triggerState);
+                org.quartz.JobDetail details = getScheduler(request).getJobDetail(new JobKey(jobName, groupName));
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
-                if (state == Trigger.STATE_NONE) {
+                if (triggerState == Trigger.TriggerState.NONE) {
                     // add the message here that your export is done
                     // TODO make absolute paths in the message, for example a
                     // link from /pages/* would break

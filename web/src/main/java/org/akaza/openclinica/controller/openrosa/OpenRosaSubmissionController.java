@@ -102,20 +102,20 @@ public class OpenRosaSubmissionController {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);
+                List<FileItem> items = upload.parseRequest(request);              
                 for (FileItem item : items) {
                     if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
                         if (!new File(dir).exists()) new File(dir).mkdirs();
 
                         File file = processUploadedFile(item, dir);
-                        map.put(item.getFieldName()+"."+item.getName(), file.getPath());
-                        listOfUploadFilePaths.add(map);
+                        map.put(item.getFieldName(), file.getPath());
 
                     } else if (item.getFieldName().equals("xml_submission_file")) {
                         requestBody = item.getString("UTF-8");
                     }
                 }
-            } else  {
+                listOfUploadFilePaths.add(map);
+            } else  {                
                 requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
             }
 

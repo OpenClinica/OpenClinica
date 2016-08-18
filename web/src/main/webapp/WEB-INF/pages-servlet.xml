@@ -8,17 +8,16 @@
         xmlns:oxm="http://www.springframework.org/schema/oxm"
         xmlns:util="http://www.springframework.org/schema/util"
         xsi:schemaLocation="
-            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
-            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
-            http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+            http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-4.3.xsd">
 
-    <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
+    <!--<bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
     </bean> 
-    
-    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+   -->
+   <!-- <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     <property name="mappings">
       <props>
         <prop key="/oauth/confirm_access">accessConfirmationController</prop>
@@ -26,7 +25,7 @@
     </property>
     <property name="alwaysUseFullPath" value="true"/>
   </bean>
-
+-->
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
     <bean name="/login/login" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
@@ -47,21 +46,13 @@
     <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
     	<property name="dataSource" ref="dataSource"/>
     </bean>
-
-    <bean name="sdvFactory" class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
-    	<property name="dataSource" ref="dataSource"/>
-    </bean>
-   
-   
-       <bean name="scheduledJobTableFactory" class="org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory">
-    </bean>
                  
 	
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
         <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
     </bean>
     
-    <oxm:jaxb2-marshaller id="jaxbMarshaller" contextPath="org.cdisc.ns.odm.v130:org.cdisc.ns.odm.v130_api:org.openclinica.ns.odm_ext_v130.v31_api:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>
+    <oxm:jaxb2-marshaller id="jaxbMarshaller" context-path="org.cdisc.ns.odm.v130:org.cdisc.ns.odm.v130_api:org.openclinica.ns.odm_ext_v130.v31_api:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>
     
     <bean id="marshallingHttpMessageConverter"  class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <property name="marshaller" ref="jaxbMarshaller" />
@@ -71,7 +62,7 @@
     
     <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
  
-    <bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+    <bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="supportedMediaTypes" value="application/json"/>
     </bean>
  

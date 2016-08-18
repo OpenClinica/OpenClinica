@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,7 +98,7 @@ public class ExtractController {
         String exportFileName;
         int fileSize = files.length;
         int  cnt = 0;
-        JobDetailBean jobDetailBean = new JobDetailBean();
+        JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
         SimpleTrigger simpleTrigger = null;
         //TODO: if files and export names size is not same... throw an error
         dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
@@ -161,16 +161,15 @@ public class ExtractController {
         // System.out.println("just set locale: " + LocaleResolver.getLocale(request).getLanguage());
 
         cnt++;
-        jobDetailBean = new JobDetailBean();
-        jobDetailBean.setGroup(this.TRIGGER_GROUP_NAME);
-        jobDetailBean.setName(simpleTrigger.getName()+System.currentTimeMillis());
-        jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-        jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
-        jobDetailBean.setDurability(true); // need durability? YES - we will want to see if it's finished
-        jobDetailBean.setVolatility(false);
+        JobDetailFactoryBean = new JobDetailFactoryBean();
+        JobDetailFactoryBean.setGroup(this.TRIGGER_GROUP_NAME);
+        JobDetailFactoryBean.setName(simpleTrigger.getKey().getName()+System.currentTimeMillis());
+        JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+        JobDetailFactoryBean.setJobDataMap(simpleTrigger.getJobDataMap());
+        JobDetailFactoryBean.setDurability(true); // need durability? YES - we will want to see if it's finished
 
         try {
-            Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
+            Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), simpleTrigger);
             logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
@@ -179,8 +178,8 @@ public class ExtractController {
 
         request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
-        if(jobDetailBean!=null)
-        request.getSession().setAttribute("jobName", jobDetailBean.getName());
+        if(JobDetailFactoryBean!=null)
+        request.getSession().setAttribute("jobName", JobDetailFactoryBean.getObject().getKey().getName());
         if(simpleTrigger!= null)
         request.getSession().setAttribute("groupName", this.TRIGGER_GROUP_NAME);
 

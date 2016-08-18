@@ -21,7 +21,7 @@ import org.hibernate.annotations.Parameter;
 */
 @Entity
 @Table(name = "user_type")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "user_type_user_type_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "user_type_user_type_id_seq") })
 
 public class UserType  extends DataMapDomainObject implements java.io.Serializable {
 

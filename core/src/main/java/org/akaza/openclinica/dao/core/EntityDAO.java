@@ -158,6 +158,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         logger.debug("query???"+query);
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
@@ -201,6 +202,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
@@ -289,6 +292,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
@@ -353,7 +358,10 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         if (con != null){isTrasactional = true;}
         PreparedStatement ps = null;
         try {
-            if ( !isTrasactional){ con = ds.getConnection();}
+            if ( !isTrasactional){
+                con = ds.getConnection();
+                CoreResources.setSchema(con);
+            }
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -393,7 +401,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         PreparedStatement ps = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         try {
-        	 if ( !isTrasactional){ con = ds.getConnection();}
+        	 if ( !isTrasactional){ con = ds.getConnection();             CoreResources.setSchema(con);}
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -435,7 +443,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
        	 PreparedStatement ps = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
         try {
-        	if ( !isTrasactional){ con = ds.getConnection();}
+        	if ( !isTrasactional){ con = ds.getConnection();             CoreResources.setSchema(con);}
            if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -480,6 +488,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -981,6 +991,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -1237,6 +1249,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -1297,6 +1311,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -2554,6 +2570,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: setHashMapInKeysHelper.select!");
@@ -2672,6 +2690,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: selectStudySubjectIDs!");
@@ -2834,6 +2854,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Statement ps = null;
         try {
             con = ds.getConnection();
+            CoreResources.setSchema(con);
+
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: getStudySubjectIDs!");

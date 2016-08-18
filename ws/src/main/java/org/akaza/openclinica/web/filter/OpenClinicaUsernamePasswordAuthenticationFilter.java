@@ -33,13 +33,12 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.util.Assert;
 
-import java.util.Date;
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Processes an authentication form submission. Called {@code AuthenticationProcessingFilter} prior to Spring Security

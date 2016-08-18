@@ -22,7 +22,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "response_set")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "response_set_response_set_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "response_set_response_set_id_seq") })
 
 public class ResponseSet  extends DataMapDomainObject {
 

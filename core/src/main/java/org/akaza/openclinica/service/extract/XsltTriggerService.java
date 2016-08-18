@@ -7,6 +7,9 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
+import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
+
+import static org.quartz.TriggerBuilder.newTrigger;
 
 public class XsltTriggerService {
     public XsltTriggerService() {
@@ -49,12 +52,13 @@ public class XsltTriggerService {
         if(triggerGroupName!=null)
             TRIGGER_GROUP_NAME = triggerGroupName;
 
-        SimpleTrigger trigger = new SimpleTrigger(jobName, triggerGroupName);
+        SimpleTriggerFactoryBean triggerFactoryBean = new SimpleTriggerFactoryBean();
+        triggerFactoryBean.setBeanName("trigger1");
+        triggerFactoryBean.setGroup("group1");
+        triggerFactoryBean.setStartTime(startDateTime);
+        triggerFactoryBean.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+        SimpleTrigger trigger = triggerFactoryBean.getObject();
 
-        trigger.setStartTime(startDateTime);
-        trigger.setName(jobName);// + datasetId);
-        trigger.setGroup(triggerGroupName);// + datasetId);
-        trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
         // set job data map
         JobDataMap jobDataMap = new JobDataMap();
 
@@ -84,8 +88,7 @@ public class XsltTriggerService {
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         jobDataMap.put(EP_BEAN, epBean);
 
-        trigger.setJobDataMap(jobDataMap);
-        trigger.setVolatility(false);
+        trigger.getTriggerBuilder().usingJobData(jobDataMap);
 
         return trigger;
     }

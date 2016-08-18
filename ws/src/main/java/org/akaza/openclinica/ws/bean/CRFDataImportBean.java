@@ -1,9 +1,5 @@
 package org.akaza.openclinica.ws.bean;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-
-
 //htaycher: deprecated
 public class CRFDataImportBean {
 

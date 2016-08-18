@@ -16,6 +16,7 @@ package org.akaza.openclinica.ws;
  * limitations under the License.
  */
 
+import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,12 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.ws.soap.security.callback.AbstractCallbackHandler;
 import org.springframework.ws.soap.security.callback.CleanupCallback;
 
-import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
-
-import java.io.IOException;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import java.io.IOException;
 
 /**
  * Callback handler that validates a certificate uses an Spring Security <code>AuthenticationManager</code>. Logic based

@@ -4,22 +4,19 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import java.io.File;
+import javax.sql.DataSource;
 import java.util.Locale;
 import java.util.Properties;
-
-import javax.sql.DataSource;
 
 public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
@@ -87,7 +84,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
        // setUpContext();
         // TODO Auto-generated method stub
         super.setUp();
-        
+
     }
 
     private void setUpContext() {
@@ -109,8 +106,15 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
     }
 
     @Override
+    protected void setUpDatabaseConfig(DatabaseConfig config) {
+        config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, "true");
+    }
+
+
+    @Override
     protected IDataSet getDataSet() throws Exception {
-        return new FlatXmlDataSet(HibernateOcDbTestCase.class.getResourceAsStream(getTestDataFilePath()));
+        FlatXmlDataSetBuilder setBuilder = new FlatXmlDataSetBuilder();
+        return setBuilder.build(HibernateOcDbTestCase.class.getResourceAsStream(getTestDataFilePath()));
     }
 
     @Override
@@ -169,7 +173,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
     
     private static String getPropertiesFilePath() {
-        return "/test.properties";
+        return "/datainfo.properties";
     }
 
     /**
@@ -197,8 +201,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
   public void tearDown(){
     
       try {
-      
-        transactionManager.commit( transactionManager.getTransaction(new DefaultTransactionDefinition()));
+          transactionManager.commit( transactionManager.getTransaction(new DefaultTransactionDefinition()));
         super.tearDown();
       //  transactionManager = null;
        if(ds!=null)
@@ -208,6 +211,5 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         // TODO Auto-generated catch block
         e.printStackTrace();
     }
-
   }
 }

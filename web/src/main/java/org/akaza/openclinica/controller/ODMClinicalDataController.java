@@ -23,6 +23,7 @@ public class ODMClinicalDataController {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Autowired
+	@Qualifier("odmClinicalDataRestResource")
 	ODMClinicaDataResource odmClinicaDataResource;
 
 	@RequestMapping(value = "/json/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET)

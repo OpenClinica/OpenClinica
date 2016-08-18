@@ -9,8 +9,7 @@ package org.akaza.openclinica.domain.usageStats;
 
 import java.sql.Timestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
@@ -25,13 +24,12 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "usage_statistics_data")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "usage_statistics_data_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "usage_statistics_data_id_seq") })
 public class LogUsageStatsBean extends AbstractMutableDomainObject {
 
     private String param_key;
     private String param_value;
     private Timestamp update_timestamp;
-
 
     /**
      * @return the param_key
