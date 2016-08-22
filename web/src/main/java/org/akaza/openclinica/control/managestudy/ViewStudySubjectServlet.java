@@ -189,8 +189,6 @@ public class ViewStudySubjectServlet extends SecureController {
                 request.setAttribute("from", "");
             }
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
-            studySub.setLabel(decodeForHtml(studySub.getLabel()));
-            studySub.setSecondaryLabel(decodeForHtml(studySub.getSecondaryLabel()));
 
             request.setAttribute("studySub", studySub);
 

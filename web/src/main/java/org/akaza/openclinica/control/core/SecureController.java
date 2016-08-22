@@ -98,7 +98,6 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
@@ -109,7 +108,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.owasp.esapi.ESAPI;
 
 /**
  * This class enhances the Controller in several ways.
@@ -1169,13 +1167,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
-    protected String encodeForHtml(String input) {
-        return ESAPI.encoder().encodeForHTML(input);
-    }
-
-    protected String decodeForHtml(String input) {
-        return StringEscapeUtils.unescapeHtml(input);
-    }
 
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
