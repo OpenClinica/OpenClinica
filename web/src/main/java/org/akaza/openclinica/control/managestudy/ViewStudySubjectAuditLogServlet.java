@@ -111,8 +111,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
             StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
-            studySubject.setLabel(decodeForHtml(studySubject.getLabel()));
-            studySubject.setSecondaryLabel(decodeForHtml(studySubject.getSecondaryLabel()));
             StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
             //Check if this StudySubject would be accessed from the Current Study
             if(studySubject.getStudyId() != currentStudy.getId()){
@@ -162,11 +160,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 if (auditBean.getAuditEventTypeId() == 3) {
                     auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
                     auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
-                }
-
-                if (auditBean.getAuditEventTypeId() == 4) {
-                    auditBean.setOldValue(decodeForHtml(auditBean.getOldValue()));
-                    auditBean.setNewValue(decodeForHtml(auditBean.getNewValue()));
                 }
             }
             studySubjectAudits.addAll(studySubjectAuditEvents);
