@@ -51,12 +51,12 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.akaza.openclinica.service.rule.RuleSetService;
 
 // import javax.servlet.http.*;
 
@@ -363,9 +363,19 @@ public class AddNewSubjectServlet extends SecureController {
 
 
             String label = fp.getString(INPUT_LABEL);
+            String secondaryLable = fp.getString(INPUT_SECONDARY_LABEL);
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
             // value of "AUTO_LABEL",
             // then Study Subject ID should be created when db row is inserted.
+            if (label.contains("<") || label.contains(">")) {
+                Validator.addError(errors, INPUT_LABEL, resexception
+                        .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
+            }
+            if (secondaryLable.contains("<") || secondaryLable.contains(">")) {
+                Validator.addError(errors, INPUT_SECONDARY_LABEL,
+                        resexception.getString("secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
+            }
+
             if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
