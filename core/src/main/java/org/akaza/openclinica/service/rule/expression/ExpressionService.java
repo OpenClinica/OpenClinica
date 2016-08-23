@@ -764,16 +764,6 @@ public class ExpressionService {
         }
     }
 
-    private String deContextualizeExpressionOrig(int j, String ruleExpression, String ruleSetTargetExpression) {
-        String ruleSetExpression = ruleSetTargetExpression;
-        String[] splitRuleSetExpression = ruleSetExpression.split(ESCAPED_SEPERATOR);
-        String buildExpression = "";
-
-        for (int i = 0; i < j; i++) {
-            buildExpression = buildExpression + splitRuleSetExpression[i] + SEPERATOR;
-        }
-        return buildExpression + ruleExpression;
-    }
 
     @SuppressWarnings("unchecked")
     private String deContextualizeExpression(int j, String ruleExpression, String ruleSetTargetExpression) {
@@ -1259,9 +1249,7 @@ public class ExpressionService {
             ArrayList<ItemGroupBean> igBean = (ArrayList<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(
                     item.getId());
 
-            if (itemGroup == null)
-                // if (itemGroup == null || itemGroup.getId() !=
-                // igBean.get(0).getId())
+            if (itemGroup == null || itemGroup.getId() != igBean.get(0).getId())
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
         }
