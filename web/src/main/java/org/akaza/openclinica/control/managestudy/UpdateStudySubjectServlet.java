@@ -221,6 +221,8 @@ public class UpdateStudySubjectServlet extends SecureController {
             //currentRole.getRoleName().equals(Role.STUDYDIRECTOR) || currentRole.getRoleName().equals(Role.COORDINATOR)) {
 
             v.addValidation("label", Validator.NO_BLANKS);
+            v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            v.addValidation("secondaryLabel", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
 
             String eDateString = fp.getString("enrollmentDate");
             if (!StringUtil.isBlank(eDateString)) {
