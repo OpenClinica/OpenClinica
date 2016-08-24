@@ -175,9 +175,8 @@ public class ExpressionService {
 
     public String ifValueIsDate(ItemBean itemBean, String value) {
         String theFinalValue = value;
-
         if (value != null && itemBean.getDataType() == ItemDataType.DATE) {
-            value = Utils.convertedItemDateValue(value, ResourceBundleProvider.getFormatBundle().getString("date_format_string"), "MM/dd/yyyy");
+            value = Utils.convertedItemDateValue(value, ResourceBundleProvider.getFormatBundle(ResourceBundleProvider.getLocale()).getString("date_format_string"), "MM/dd/yyyy", ResourceBundleProvider.getLocale());
             theFinalValue = ExpressionTreeHelper.isValidDateMMddyyyy(value);
         }
         return theFinalValue;
@@ -231,39 +230,39 @@ public class ExpressionService {
 
     }
 
-
+    
     public String getSSZoneId(){
      Integer subjectId = expressionWrapper.getStudySubjectId();
      System.out.println("  subjectId  " + subjectId + "  : ");
-     if(subjectId ==null) return null;
+     if(subjectId ==null) return null;     
      StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
        return ssBean.getTime_zone().trim();
      }
-
+    
     public HashMap<String,String> getSSDate(String ssZoneId , String serverZoneId){
     	HashMap<String,String> map = new HashMap<String, String>();
-        if (ssZoneId == null || ssZoneId.equals(""))
+        if (ssZoneId == null || ssZoneId.equals("")) 	
         	ssZoneId = TimeZone.getDefault().getID();
-
+  
         DateTimeZone ssZone = DateTimeZone.forID(ssZoneId);
         DateMidnight dm = new DateMidnight(ssZone);
         DateTimeFormatter fmt = ISODateTimeFormat.date();
         map.put("ssDate", fmt.print(dm));
-
+        
         map.put("serverZoneId", serverZoneId);
         DateTimeZone serverZone = DateTimeZone.forID(serverZoneId);
         DateMidnight serverDate = new DateMidnight(serverZone);
         map.put("serverDate", fmt.print(serverDate));
         return map;
     }
-
-
+    
+        
  public HashMap <String,String> getValueFromDbb(String expression) throws OpenClinicaSystemException {
      HashMap<String , String > map = new HashMap<>();
         if (isExpressionPartial(expression)) {
             throw new OpenClinicaSystemException("getValueFromDb:We cannot get the Value of a PARTIAL expression : " + expression);
         }
-
+        
         try {
             // Get the studyEventId from RuleSet Target so we can know which
             // StudySubject we are dealing with.
@@ -284,9 +283,9 @@ public class ExpressionService {
             StudyEventBean studyEventofThisExpression =
                 getStudyEventDao().findAllByStudyEventDefinitionAndCrfOidsAndOrdinal(studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal,
                         studySubjectId);
-
+  
             if(studyEvent.getId()==studyEventofThisExpression.getId())
-                map.put("match", "true");
+                map.put("match", "true"); 
 
             logger.debug("studyEvent : {} , itemOid {} , itemGroupOid {}", new Object[] { studyEventofThisExpression.getId(),
                 getItemOidFromExpression(expression), getItemGroupOidFromExpression(expression) });
@@ -304,9 +303,9 @@ public class ExpressionService {
             ItemBean itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
             String value = itemData.get(index).getValue();
             value = ifValueIsDate(itemBean, value);
-            map.put("value", value);
-
-
+            map.put("value", value); 
+           
+                 
             return map;
         } catch (Exception e) {
             return map;
@@ -340,8 +339,8 @@ public class ExpressionService {
         }
         return result;
     }
-
-
+    
+    
     public String getValueFromForm(String expression, Map<String, ItemBean> itemBeans) {
         if (itemBeans == null)
             logger.debug("The Map that stores ItemBeans is null. Item Date value cannot be processed.");
@@ -365,7 +364,7 @@ public class ExpressionService {
     public String evaluateExpression(String expression) throws OpenClinicaSystemException {
         String value = null;
         Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
-
+        
         if(items != null) {
             Iterator<ItemBean> iter = items.values().iterator();
             while(iter.hasNext()) {
@@ -375,7 +374,7 @@ public class ExpressionService {
         }
         if (expressionWrapper.getRuleSet() != null) {
         	if(checkIfExpressionIsForScheduling(expression)){
-             StudyEvent studyEvent;
+             StudyEvent studyEvent;        		
 
 				if (expression.endsWith(this.STARTDATE)) {
 					String oid = expression.substring(0,expression.indexOf(this.STARTDATE));
@@ -395,12 +394,12 @@ public class ExpressionService {
 						return "";
 				}
         	}
-
-
+        	
+        	
             if (isExpressionPartial(expression)) {
                 String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
                 List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
-
+               
                 fullExpression =
                     fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
                 if (checkSyntax(fullExpression)) {
@@ -444,8 +443,8 @@ public class ExpressionService {
                      valueFromDb = map.get("value");
                      matchEvents = map.get("match");
 
-                // if se_id are a match go in , otherwise nothing
-                     if (matchEvents!=null && matchEvents.equals("true")){
+                // if se_id are a match go in , otherwise nothing     
+                     if (matchEvents!=null && matchEvents.equals("true")){                     
                      if (items == null) {
                          valueFromForm = getValueFromForm(expression);
                      } else {
@@ -458,13 +457,13 @@ public class ExpressionService {
                          logger.info("The value is " + value + "  for expression" + expression);
                          throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
                      }
-
+                     
                  }
              }
         }
             return value;
         }
-
+             
     private String getValueFromDbOrForm(String fullExpression, Map<Integer, ItemBean> itemBeansI){
         List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
         fullExpression =
@@ -489,16 +488,16 @@ public class ExpressionService {
         }
         return  valueFromForm == null ? valueFromDb : valueFromForm;
     }
-
-
-
+    
+    
+    
     public boolean checkIfExpressionIsForScheduling(String expression){
     	if(expression.toUpperCase().startsWith("SE_")&&(expression.toUpperCase().endsWith(this.STARTDATE)|| expression.toUpperCase().endsWith(this.STATUS))){
     		return true;
     	}
     	return false;
     }
-
+    
     public StudyEvent getStudyEventFromOID(String oid)
     {
     	Integer subjectId = expressionWrapper.getStudySubjectId();
@@ -508,24 +507,14 @@ public class ExpressionService {
         		int leftBracketIndex = oid.indexOf("[");
         		int rightBracketIndex = oid.indexOf("]");
         		int ordinal =  Integer.valueOf(oid.substring(leftBracketIndex + 1,rightBracketIndex));
-        		studyEvent= getStudyEventFromDb(oid.substring(0,leftBracketIndex), ordinal, subjectId);
-        	}
-        	else studyEvent= getStudyEventFromDb(oid, 1, subjectId);
+        		studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid.substring(0,leftBracketIndex), ordinal, subjectId);
+        	}	
+        	else studyEvent= expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid, 1, subjectId);
         return studyEvent;
     }
-
-    private StudyEvent getStudyEventFromDb(String oid, Integer ordinal, Integer studySubjectId){
-        StudyEvent studyEvent = null;
-        try{
-            studyEvent = expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinalTransactional(oid,ordinal,studySubjectId);
-        }catch(org.springframework.transaction.IllegalTransactionStateException itse){
-            studyEvent = expressionWrapper.getStudyEventDaoHib().fetchByStudyEventDefOIDAndOrdinal(oid,ordinal,studySubjectId);
-        }
-        return studyEvent;
-    }
-
+    
     private List<ItemDataBean> getItemDatas(String expression) {
-
+    	
         String studyEventId = getStudyEventDefinitionOidOrdinalFromExpression(expression);
         List<ItemDataBean> itemData =
             getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), getItemOidFromExpression(expression),
@@ -642,7 +631,7 @@ public class ExpressionService {
             if (checkSyntax(expression)) return true;
             else return false;
         }
-
+        
         if (expressionWrapper.getRuleSet() != null) {
             if (isExpressionPartial(expressionWrapper.getRuleSet().getTarget().getValue())) {
                 return true;
@@ -679,7 +668,7 @@ public class ExpressionService {
         } else {
             if (checkSyntax(expression) && getItemBeanFromExpression(expression) != null) {
                 result = true;
-            }
+            }  
         }
         return result;
     }
@@ -696,7 +685,7 @@ public class ExpressionService {
         }
         else */if (splitExpression.length == 4)
             return false;
-        else
+        else 
             return true;
     }
 
@@ -803,7 +792,7 @@ public class ExpressionService {
     /**
      * Use this method to create 1ItemOID or ItemOID Used in Data Entry Rule
      * Execution
-     *
+     * 
      * @param expression
      * @return GroupOrdinal + ItemOID
      */
@@ -940,13 +929,13 @@ public class ExpressionService {
     }
 
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpression(String expression) {
-
-
+    	
+    	
     	if (expression.split(ESCAPED_SEPERATOR).length == 4){
     		return getStudyEventDefinitionFromExpression(expression, expressionWrapper.getStudyBean()) ;
     	}
     	else if (expression.split(ESCAPED_SEPERATOR).length == 2 && (expression.endsWith(STARTDATE)|| expression.endsWith(STATUS))){
-
+    	
     	return	getStudyEventDefinitionFromExpressionForEvents(expression, expressionWrapper.getStudyBean());
     	}
     	else
@@ -975,7 +964,7 @@ public class ExpressionService {
         }
 
 	}
-
+    
 
 	public String getStudyEventDefinitionOidFromExpressionForEvents(
 			String expression) {
@@ -1002,7 +991,7 @@ public class ExpressionService {
         }
     }
 
-
+    
     public StudyEventDefinitionBean getStudyEventDefinitionFromExpressionForEventScheduling(String expression) {
         return expression.split(ESCAPED_SEPERATOR).length == 2 ? getStudyEventDefinitionFromExpressionForEventScheduling(expression, false) : null;
     }
@@ -1013,8 +1002,8 @@ public class ExpressionService {
     	if (onlyOID) studyEventDefinitionKey = expression.replaceAll(BRACKETS_AND_CONTENTS, "");
     	else studyEventDefinitionKey = getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
 
-
-
+    	
+    
         logger.debug("Expression : {} , Study Event Definition OID {} , Study Bean {} ", new Object[] { expression, studyEventDefinitionKey,study!=null? study.getId():null });
         if (studyEventDefinitions.get(studyEventDefinitionKey) != null) {
             return studyEventDefinitions.get(studyEventDefinitionKey);
@@ -1031,8 +1020,8 @@ public class ExpressionService {
         }
     }
 
-
-
+    
+    
     public ItemGroupBean getItemGroupExpression(String expression) {
         if (expression.split(ESCAPED_SEPERATOR).length < 2) {
             return null;
@@ -1128,7 +1117,7 @@ public class ExpressionService {
      * component. Will throw OpenClinicaSystemException with correct
      * explanation. This might allow immediate communication of message to user
      * .
-     *
+     * 
      * @param expression
      */
     @Deprecated
@@ -1162,7 +1151,7 @@ public class ExpressionService {
      * component. Will throw OpenClinicaSystemException with correct
      * explanation. This might allow immediate communication of message to user
      * .
-     *
+     * 
      * @param expression
      */
     public void isExpressionValid(String expression) {
@@ -1172,8 +1161,8 @@ public class ExpressionService {
         ItemGroupBean itemGroup = null;
         CRFBean crf = null;
         boolean isEventStartDateAndStatusParamExist = (expression.endsWith(STARTDATE) ||expression.endsWith(STATUS));
-
-
+            
+        
         if (length > 0 && !isEventStartDateAndStatusParamExist) {
             item = getItemFromExpression(expression);
             if (item == null)
@@ -1185,7 +1174,7 @@ public class ExpressionService {
             String itemGroupOid = getItemGroupOidFromExpression(expression);
             itemGroup = getItemGroupDao().findByOid(itemGroupOid);
            ArrayList <ItemGroupBean> igBean = (ArrayList<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(item.getId());
-
+            
             if(itemGroup == null || itemGroup.getId() != igBean.get(0).getId())
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
@@ -1226,7 +1215,7 @@ public class ExpressionService {
        	 throw new OpenClinicaSystemException("OCRERR_0034", new String[] { expression });
         }
 
-
+    
     }
 
     public EventDefinitionCRFBean getEventDefinitionCRF(String expression) {
@@ -1279,11 +1268,11 @@ public class ExpressionService {
             // ItemBean item =
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
-            ArrayList <ItemBean> items = (ArrayList<ItemBean>) getItemDao().findByOid(oid);
-            if (items==null || items.size() !=0){
+            ItemBean item = (ItemBean) getItemDao().findByOid(oid).get(0);
+            if (item != null) {
                 return "OK";
-                        }
             }
+        }
 
         return oid;
     }
