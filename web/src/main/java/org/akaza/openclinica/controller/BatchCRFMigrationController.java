@@ -374,7 +374,9 @@ public class BatchCRFMigrationController implements Runnable {
         String sourceCrfVersion = transferObject.getSourceFormVersion();
         String targetCrfVersion = transferObject.getTargetFormVersion();
         ArrayList<String> studyEventDefnlist = transferObject.getStudyEventDefs();
+        ArrayList<String> studyEventDefnlistFiltered = new ArrayList<String>();
         ArrayList<String> sitelist = transferObject.getSites();
+        ArrayList<String> sitelistFiltered = new ArrayList<String>();
 
         CRFVersionBean sourceCrfVersionBean = cvdao().findByOid(sourceCrfVersion);
         CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
@@ -425,13 +427,16 @@ public class BatchCRFMigrationController implements Runnable {
             }
         } else {
             for (String site : sitelist) {
-                StudyBean siteBean = sdao().findByOid(site);
-                if (siteBean == null || siteBean.getStatus().isUnavailable() || getParentStudy(siteBean).getId() != stBean.getId()) {
+                StudyBean siteBean = sdao().findByOid(site.trim());
+                if (siteBean == null || getParentStudy(siteBean).getId() != stBean.getId()) {
                     reportLog.getErrors().add(resterms.getString("The_OID_of_the_Site_that_you_provided_is_invalid"));
                     helperObject.setReportLog(reportLog);
                     return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                } else if (siteBean.getStatus().isAvailable()) {
+                    sitelistFiltered.add(site);
                 }
             }
+            sitelist = sitelistFiltered;
         }
 
         if (studyEventDefnlist.size() == 0) {
@@ -444,12 +449,16 @@ public class BatchCRFMigrationController implements Runnable {
         } else {
             for (String studyEventDefn : studyEventDefnlist) {
                 StudyEventDefinitionBean sedefnBean = seddao().findByOid(studyEventDefn);
-                if (sedefnBean == null || sedefnBean.getStatus().isUnavailable() || sedefnBean.getStudyId() != stBean.getId()) {
+                if (sedefnBean == null || sedefnBean.getStudyId() != stBean.getId()) {
                     reportLog.getErrors().add(resterms.getString("The_OID_of_the_Event_that_you_provided_is_invalid"));
                     helperObject.setReportLog(reportLog);
                     return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                } else if (sedefnBean.getStatus().isAvailable()) {
+                    studyEventDefnlistFiltered.add(studyEventDefn);
                 }
             }
+            studyEventDefnlist = studyEventDefnlistFiltered;
+
         }
 
         int eventCrfCount = ssdao().getTotalEventCrfCountForCrfMigration(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist, sitelist);
