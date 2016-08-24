@@ -1,20 +1,20 @@
 package org.akaza.openclinica.web.filter;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.StringTokenizer;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.StringTokenizer;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Created by krikorkrumlian on 8/7/15.
@@ -49,7 +49,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(_username);
-                            if(ub.getId() != 0){
+                            if (!_username.equals("") && ub.getId() != 0) {
                                 request.getSession().setAttribute("userBean",ub);
                             }else{
                                 unauthorized(response, "Bad credentials");
