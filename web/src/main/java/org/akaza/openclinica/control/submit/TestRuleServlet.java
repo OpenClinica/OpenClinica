@@ -274,7 +274,7 @@ public class TestRuleServlet extends SecureController {
                 }
                 if ((item!=null &&item.getItemDataTypeId() == 9)||(item==null&&entry.getKey().contains(ExpressionService.STARTDATE))) {//so enter this in case if the rules are event action based or if item has date type
                     try {
-                        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+                        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),this.locale);
                         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
                         if(!entry.getValue().isEmpty()) {
                             java.util.Date date = sdf2.parse(entry.getValue());
@@ -314,11 +314,11 @@ public class TestRuleServlet extends SecureController {
             	  else if(entry.getKey().endsWith(ExpressionService.STARTDATE)){
             		  try {
                           v.addValidation(entry.getKey(), Validator.IS_A_DATE);
-                          SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+                          SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"),this.locale);
                           SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
                           if(!entry.getValue().isEmpty()) {
-                              java.util.Date date = sdf2.parse(entry.getValue());
-                              entry.setValue(sdf.format(date));
+                              java.util.Date date = sdf.parse(entry.getValue());
+                              entry.setValue(sdf2.format(date));
                           }
                       } catch (Exception e) {
                           logger.error(e.toString());
@@ -348,14 +348,15 @@ public class TestRuleServlet extends SecureController {
 
                 if (item.getItemDataTypeId() == 9) {
                     try {
-                        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
-                        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                    	SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), this.locale);
+                    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
                         if(!entry.getValue().isEmpty()) {
                             java.util.Date date = sdf.parse(entry.getValue());
                             entry.setValue(sdf2.format(date));
                         }
                     } catch (Exception e) {
                         // TODO: handle exception
+                    	logger.error(e.toString());
                     }
                 }
             }
