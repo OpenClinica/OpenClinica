@@ -8,9 +8,6 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,17 +22,16 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.apache.commons.lang.StringUtils;
 /**
  * @author jxu
  *
@@ -193,6 +189,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
      * getEntityFromHashMap, the method that gets the object from the database
      * query.
      */
+    @Override
     public Object getEntityFromHashMap(HashMap hm) {
         StudySubjectBean eb = new StudySubjectBean();
         super.setEntityAuditInformation(eb, hm);
@@ -226,6 +223,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         return executeFindAllQuery("getGroupByStudySubject", variables);
     }
 
+    @Override
     public Collection findAll() {
         this.setTypesExpected();
         String sql = digester.getQuery("findAll");
@@ -315,6 +313,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         return greatestLabel;
     }
 
+    @Override
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
@@ -418,6 +417,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         return eb;
     }
 
+    @Override
     public EntityBean findByPK(int ID) {
         StudySubjectBean eb = new StudySubjectBean();
         this.setTypesExpected();
@@ -490,6 +490,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
     /**
      * @deprecated Creates a new studysubject
      */
+    @Override
     @Deprecated
     public EntityBean create(EntityBean eb) {
         StudySubjectBean sb = (StudySubjectBean) eb;
@@ -1079,6 +1080,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
     /**
      * Updates a StudySubject
      */
+    @Override
     public EntityBean update(EntityBean eb) {
    	 Connection con = null;
    	 return update( eb, con);
@@ -1137,12 +1139,14 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         return sb;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
         ArrayList al = new ArrayList();
 
