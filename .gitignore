@@ -7,7 +7,6 @@ release.properties
 .classpath
 .project
 .settings/
-.idea/
 web/src/main/resources/datainfo.properties
 .DS_Store
 core/.DS_Store
@@ -15,11 +14,8 @@ web/.DS_Store
 ws/.DS_Store
 
 # intellij idea
+.idea/
 *.iml
-core/*.iml
-web/*.iml
-ws/*.iml
-stormpath/*.iml
 
 # git
 *.orig
