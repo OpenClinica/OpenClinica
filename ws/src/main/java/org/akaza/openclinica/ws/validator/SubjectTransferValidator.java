@@ -1,9 +1,13 @@
 package org.akaza.openclinica.ws.validator;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
@@ -17,12 +21,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.sql.DataSource;
 
 public class SubjectTransferValidator implements Validator {
 
@@ -39,6 +37,7 @@ public class SubjectTransferValidator implements Validator {
         helper = new BaseVSValidatorImplementation();
     }
 
+    @Override
     public boolean supports(Class clazz) {
         return SubjectTransferBean.class.equals(clazz);
     }
@@ -125,6 +124,7 @@ public class SubjectTransferValidator implements Validator {
         	
     	
     }
+    @Override
     public void validate(Object obj, Errors e) {
         SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
 
@@ -201,11 +201,17 @@ public class SubjectTransferValidator implements Validator {
         int handleStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
         StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
         String personId = subjectTransferBean.getPersonId();
+
         //personId 3 cases: 
 //        	a. requiered: personId != null && personId.length() > 255
 //        	b. optional: can be provided but can be missed
 //        	c. not-used: personId==null
         
+        if (personId.contains("<") || personId.contains(">")) {
+            e.reject("subjectTransferValidator.person_id_can_not_contain_html_lessthan_or_greaterthan_elements");
+            return;
+        }
+
         if ("required".equals(studyParameter.getValue()) && (personId == null || personId.length() < 1)) {
             e.reject("subjectTransferValidator.personId_required", new Object[] { study.getName() }, "personId is required for the study: " + study.getName());
             return;
@@ -233,6 +239,7 @@ public class SubjectTransferValidator implements Validator {
 		   	 }
          
          }
+
         
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
         String idSetting = subjectIdGenerationParameter.getValue();
@@ -257,6 +264,12 @@ public class SubjectTransferValidator implements Validator {
             	            return;
             	 }
             }
+
+            if (studySubjectId.contains("<") || studySubjectId.contains(">")) {
+                e.reject("subjectTransferValidator.study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements");
+                return;
+            }
+
         }
 
         String secondaryId = subjectTransferBean.getSecondaryId();
@@ -265,6 +278,11 @@ public class SubjectTransferValidator implements Validator {
                 + " cannot be longer than 30 characters.");
             return;
         }
+        if (secondaryId.contains("<") || secondaryId.contains(">")) {
+            e.reject("subjectTransferValidator.secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements");
+            return;
+        }
+
         String gender = String.valueOf(subjectTransferBean.getGender());
         studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "genderRequired");
         if ("true".equals(studyParameter.getValue()) ) {

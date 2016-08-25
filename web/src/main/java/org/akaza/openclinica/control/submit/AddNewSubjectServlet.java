@@ -363,6 +363,7 @@ public class AddNewSubjectServlet extends SecureController {
 
 
             String label = fp.getString(INPUT_LABEL);
+            String personId = fp.getString(INPUT_UNIQUE_IDENTIFIER);
             String secondaryLable = fp.getString(INPUT_SECONDARY_LABEL);
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
             // value of "AUTO_LABEL",
@@ -374,6 +375,11 @@ public class AddNewSubjectServlet extends SecureController {
             if (secondaryLable.contains("<") || secondaryLable.contains(">")) {
                 Validator.addError(errors, INPUT_SECONDARY_LABEL,
                         resexception.getString("secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
+            }
+
+            if (personId.contains("<") || personId.contains(">")) {
+                Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER,
+                        resexception.getString("person_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
             }
 
             if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
