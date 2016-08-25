@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -24,11 +29,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 /**
  * @author jxu
  *
@@ -42,6 +42,7 @@ public class UpdateSubjectServlet extends SecureController {
 	// Changes
     SimpleDateFormat yformat = new SimpleDateFormat("yyyy");
 	
+    public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
     public static final String DATE_DOB = "localBirthDate";
     public static final String DATE_DOB_TO_SAVE = "localBirthDateToSave";
 
@@ -186,6 +187,10 @@ public class UpdateSubjectServlet extends SecureController {
         	v.alwaysExecuteLastValidation("uniqueIdentifier");
      	}
         
+        String personId = fp.getString(INPUT_UNIQUE_IDENTIFIER);
+        if (personId.contains("<") || personId.contains(">")) {
+            v.addValidation("uniqueIdentifier", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+        }
 
         
         if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1")){
