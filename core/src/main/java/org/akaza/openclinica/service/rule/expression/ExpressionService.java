@@ -776,7 +776,12 @@ public class ExpressionService {
         String repeatOrdinal = "";
         if (j == 3) {
             item = getItemFromExpression(ruleExpression);
-            groupOidWithoutOrdinal = splitRuleSetExpression[2].substring(0, splitRuleSetExpression[2].indexOf("["));
+			int indexOfOpenBrack = splitRuleSetExpression[2].indexOf("[");
+			if (indexOfOpenBrack != -1) {
+			groupOidWithoutOrdinal = splitRuleSetExpression[2].substring(0, indexOfOpenBrack);
+			} else {
+				groupOidWithoutOrdinal = splitRuleSetExpression[2];
+			}
             ArrayList<ItemGroupBean> igBean = (ArrayList<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(
                     item.getId());
             groupOidFromItem = igBean.get(0).getOid();
