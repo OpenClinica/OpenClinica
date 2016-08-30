@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.pform;
+package org.akaza.openclinica.service.crfdata.xform;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 

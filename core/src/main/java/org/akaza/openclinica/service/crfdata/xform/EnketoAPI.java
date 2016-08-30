@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.pform;
+package org.akaza.openclinica.service.crfdata.xform;
 
 import java.net.URL;
 import java.util.Calendar;
