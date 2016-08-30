@@ -174,7 +174,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 }
 
                 request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
-                request.setAttribute(EnketoFormServlet.ORIGINATING_PAGE, "ViewNotes?module=submit");
             } else {
                 request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
                 request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));

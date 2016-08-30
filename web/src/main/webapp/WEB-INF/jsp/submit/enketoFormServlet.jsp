@@ -30,7 +30,9 @@
         if(postMessage.enketoEvent === 'submissionsuccess') {
           iframe = document.getElementById("enketo");
           jQuery("#enketo").hide();
-          window.location.replace("${originatingPage}");
+
+          if ("${originatingPage}") window.location.replace("${originatingPage}");
+          else window.close();
         }
       }
     </script
