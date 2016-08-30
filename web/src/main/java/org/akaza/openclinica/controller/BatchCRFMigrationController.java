@@ -382,7 +382,7 @@ public class BatchCRFMigrationController implements Runnable {
         CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
 
         StudyBean stBean = sdao().findByOid(studyOid);
-        if (stBean == null || stBean.getStatus().isUnavailable() || stBean.getParentStudyId() != 0) {
+		if (stBean == null || !stBean.getStatus().isAvailable() || stBean.getParentStudyId() != 0) {
             reportLog.getErrors().add(resterms.getString("The_OID_of_the_Target_Study_that_you_provided_is_invalid"));
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -408,8 +408,7 @@ public class BatchCRFMigrationController implements Runnable {
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
-        if (sourceCrfVersionBean.getCrfId() != targetCrfVersionBean.getCrfId() || sourceCrfVersionBean.getStatus().isUnavailable()
-                || targetCrfVersionBean.getStatus().isUnavailable()) {
+		if (sourceCrfVersionBean.getCrfId() != targetCrfVersionBean.getCrfId() || !sourceCrfVersionBean.getStatus().isAvailable() || !targetCrfVersionBean.getStatus().isAvailable()) {
             reportLog.getErrors().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
