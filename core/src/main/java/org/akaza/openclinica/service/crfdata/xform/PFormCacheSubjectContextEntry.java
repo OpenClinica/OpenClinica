@@ -6,6 +6,7 @@ public class PFormCacheSubjectContextEntry {
     private Integer studyEventDefinitionId = null;
     private Integer ordinal = null;
     private String crfVersionOid = null;
+    private Integer userAccountId = null;
 
     public String getStudySubjectOid() {
         return studySubjectOid;
@@ -31,6 +32,10 @@ public class PFormCacheSubjectContextEntry {
     public void setCrfVersionOid(String crfVersionOid) {
         this.crfVersionOid = crfVersionOid;
     }
-    
-    
+    public Integer getUserAccountId() {
+        return userAccountId;
+    }
+    public void setUserAccountId(Integer userAccountId) {
+        this.userAccountId = userAccountId;
+    }
 }
