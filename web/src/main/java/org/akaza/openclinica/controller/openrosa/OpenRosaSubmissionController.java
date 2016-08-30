@@ -30,13 +30,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -146,8 +146,7 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // Log submission with Participate
-            if (isParticipantSubmission(subjectContext))
-            notifier.notify(studyOID, subjectContext);
+            if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
@@ -160,7 +159,7 @@ public class OpenRosaSubmissionController {
     private boolean isParticipantSubmission(HashMap<String, String> subjectContext) {
         boolean isParticipant = true;
         String userAccountId = subjectContext.get("userAccountID");
-        if (!StringUtils.isEmpty(userAccountId)) {
+        if (StringUtils.isNotEmpty(userAccountId)) {
             UserAccount user = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
             // All Participants have a '.' in the user name.  Non-participant user creation does not allow a '.' in the user name.
             if (user != null && !user.getUserName().contains(".")) return false;

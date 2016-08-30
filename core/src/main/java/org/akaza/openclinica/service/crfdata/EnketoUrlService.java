@@ -107,7 +107,7 @@ public class EnketoUrlService {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-    public String getUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid) throws Exception {
+    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid) throws Exception {
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
         return enketo.getFormURL(subjectContext.getCrfVersionOid()) + "?ecid=" + subjectContextKey;

@@ -218,9 +218,6 @@ public class ViewStudySubjectServlet extends SecureController {
                     }
                 }
             }
-
-
-
             // If the study subject derives from a site, and is being viewed
             // from a parent study,
             // then the study IDs will be different. However, since each note is
@@ -242,15 +239,11 @@ public class ViewStudySubjectServlet extends SecureController {
                 if (!isParentStudy) {
                     StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
                     allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
-
                     allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
-
                 } else {
                     allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(currentStudy, study, subjectId);
-
                     allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(currentStudy, study, studySubId));
                 }
-
             }
 
             if (!allNotesforSubject.isEmpty()) {
@@ -291,7 +284,6 @@ public class ViewStudySubjectServlet extends SecureController {
             }
 
             ArrayList children = (ArrayList) sdao.findAllChildrenByPK(subjectId);
-
             request.setAttribute("children", children);
 
             // find study events
@@ -302,19 +294,12 @@ public class ViewStudySubjectServlet extends SecureController {
                     WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
             List<DisplayStudyEventBean> displayEvents =
                     studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
-            //ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
-            //A. Hamid.
-            // Mantis Issue 5048: Preventing Investigators from Unlocking Events
             for(int i = 0; i < displayEvents.size(); i++){
                 DisplayStudyEventBean decb = displayEvents.get(i);
                     if(!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()){
                          decb.getStudyEvent().setEditable(false);
                     }
             }
-
-            
-
-            // BWP 3212; remove event CRFs that are supposed to be "hidden" >>
             if (currentStudy.getParentStudyId() > 0) {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
                 for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
@@ -322,7 +307,6 @@ public class ViewStudySubjectServlet extends SecureController {
                 }
             }
 
-            // >>
             EntityBeanTable table = fp.getEntityBeanTable();
             table.setSortingIfNotExplicitlySet(1, false);// sort by start
             // date, desc
@@ -334,14 +318,12 @@ public class ViewStudySubjectServlet extends SecureController {
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(4);
             table.hideColumnLink(5);
-            // YW 11-08-2007 <<
             if (!"removed".equalsIgnoreCase(studySub.getStatus().getName()) && !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
                 if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.MONITOR)) {
                     table.addLink(resword.getString("add_new_event"), "CreateNewStudyEvent?"
                         + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
                 }
             }
-            // YW >>
             HashMap args = new HashMap();
             args.put("id", new Integer(studySubId).toString());
             table.setQuery("ViewStudySubject", args);
@@ -349,9 +331,6 @@ public class ViewStudySubjectServlet extends SecureController {
             table.computeDisplay();
 
             request.setAttribute("table", table);
-            // request.setAttribute("displayEvents", displayEvents);
-
-            // find group info
             SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
             ArrayList groupMaps = (ArrayList) sgmdao.findAllByStudySubject(studySubId);
             request.setAttribute("groups", groupMaps);
@@ -382,21 +361,14 @@ public class ViewStudySubjectServlet extends SecureController {
                         sea.setNewSubjectEventStatus(newStatus);
                     }
                 } catch (NumberFormatException e) {
-
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
-                    // logger.warning("^^^ caught NFE");
                 }
                 UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
                 sea.setUpdater(updater);
                 eventLogs.add(sea);
-
             }
-            // logger.warning("^^^ finished iteration");
             request.setAttribute("eventLogs", eventLogs);
-
             forwardPage(Page.VIEW_STUDY_SUBJECT);
-
         }
     }
 
