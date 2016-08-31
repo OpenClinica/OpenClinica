@@ -177,7 +177,7 @@ public class ExpressionService {
         String theFinalValue = value;
 
         if (value != null && itemBean.getDataType() == ItemDataType.DATE) {
-            value = Utils.convertedItemDateValue(value, ResourceBundleProvider.getFormatBundle().getString("date_format_string"), "MM/dd/yyyy");
+            value = Utils.convertedItemDateValue(value, ResourceBundleProvider.getFormatBundle(ResourceBundleProvider.getLocale()).getString("date_format_string"), "MM/dd/yyyy", ResourceBundleProvider.getLocale());
             theFinalValue = ExpressionTreeHelper.isValidDateMMddyyyy(value);
         }
         return theFinalValue;
