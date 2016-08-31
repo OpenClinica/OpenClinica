@@ -457,6 +457,7 @@ public class Validator {
     public static final int SUBMISSION_URL_NOT_UNIQUE = 45;
     
     public static final int NO_LEADING_OR_TRAILING_SPACES = 46;
+    public static final int DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS = 47;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -849,6 +850,9 @@ public class Validator {
             case SUBMISSION_URL_NOT_UNIQUE:
                 errorMessage = resexception.getString("field_submission_url_not_unique");
                 break;
+            case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
+                errorMessage = resexception.getString("id_can_not_contain_html_lessthan_or_greaterthan_elements");
+                break;
             }
         }
         // logger.info("<<<error added: "+errorMessage+" to "+fieldName);
@@ -1142,6 +1146,10 @@ public class Validator {
             break;
         case SUBMISSION_URL_NOT_UNIQUE:
             if (isSubmissionUrlUnique(fieldName)) {
+                addError(fieldName, v);
+            }
+        case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
+            if (doesContainHtmlElements(fieldName)) {
                 addError(fieldName, v);
             }
 break;
@@ -1769,6 +1777,16 @@ break;
         return false;
     }
     
+    protected boolean doesContainHtmlElements(String fieldName) {
+        String fieldValue = getFieldValue(fieldName);
+        if (fieldValue == null)
+            return false;
+        if (fieldValue.contains("<") || fieldValue.contains(">")) {
+            return true;
+        }
+        return false;
+    }
+
     protected boolean isSubmissionUrlUnique(String fieldName) {
             return true;
     }

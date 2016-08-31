@@ -121,12 +121,6 @@ public class CreateNewStudyEventServlet extends SecureController {
             // YW >>
             request.setAttribute(INPUT_REQUEST_STUDY_SUBJECT, "no");
         }
-        
-        //need to unescape label and secondary label
-        if (ssb != null) {
-            ssb.setLabel(decodeForHtml(ssb.getLabel()));
-            ssb.setSecondaryLabel(decodeForHtml(ssb.getSecondaryLabel()));
-        }
 
         // running this crashes the server, or so we think...instead, let's grab a count
         // or remove it altogether tbh 10/2009

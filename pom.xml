@@ -272,7 +272,7 @@
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth</artifactId>
-			<version>1.0.0.M3</version>
+			<version>1.0.0.M2</version>
 		</dependency>
 		<!-- HIBERNATE -->
 		<dependency>
@@ -364,25 +364,21 @@
 			<version>1.8.3</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.owasp.esapi</groupId>
-		    <artifactId>esapi</artifactId>
-		    <version>2.1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-core</artifactId>
-			<version>3.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-healthchecks</artifactId>
-			<version>3.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-jvm</artifactId>
-			<version>3.1.2</version>
-		</dependency>
+	<groupId>io.dropwizard.metrics</groupId>
+	<artifactId>metrics-core</artifactId>
+	<version>3.1.2</version>
+</dependency>
+<dependency>
+	<groupId>io.dropwizard.metrics</groupId>
+	<artifactId>metrics-healthchecks</artifactId>
+	<version>3.1.0</version>
+</dependency>
+<dependency>
+	<groupId>io.dropwizard.metrics</groupId>
+	<artifactId>metrics-jvm</artifactId>
+	<version>3.1.2</version>
+</dependency>
+
 	</dependencies>
 	<build>
 		<pluginManagement>

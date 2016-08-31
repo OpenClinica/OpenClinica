@@ -51,12 +51,12 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.akaza.openclinica.service.rule.RuleSetService;
 
 // import javax.servlet.http.*;
 
@@ -361,24 +361,21 @@ public class AddNewSubjectServlet extends SecureController {
                 }
             }// end of the block if(!uniqueIdentifier.equals(""))
 
-            // escapehtml for label and secondaryLabel
-            String label = encodeForHtml(fp.getString(INPUT_LABEL));
-            String secondaryLabel = encodeForHtml(fp.getString(INPUT_SECONDARY_LABEL));
-            if (!errors.containsKey(INPUT_LABEL))
-                if (label.length() > 30)
-                    Validator.addError(errors, INPUT_LABEL, resexception.getString("character_limits_exceeded_after_escaping"));
 
-            if (!StringUtil.isBlank(fp.getString(INPUT_SECONDARY_LABEL))) {
-                if (!errors.containsKey(INPUT_SECONDARY_LABEL)) {
-                    if (secondaryLabel.length() > 30) {
-                        Validator.addError(errors, INPUT_SECONDARY_LABEL, resexception.getString("character_limits_exceeded_after_escaping"));
-                    }
-                }
-            }
-
+            String label = fp.getString(INPUT_LABEL);
+            String secondaryLable = fp.getString(INPUT_SECONDARY_LABEL);
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
             // value of "AUTO_LABEL",
             // then Study Subject ID should be created when db row is inserted.
+            if (label.contains("<") || label.contains(">")) {
+                Validator.addError(errors, INPUT_LABEL, resexception
+                        .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
+            }
+            if (secondaryLable.contains("<") || secondaryLable.contains(">")) {
+                Validator.addError(errors, INPUT_SECONDARY_LABEL,
+                        resexception.getString("secondary_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
+            }
+
             if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
@@ -433,7 +430,7 @@ public class AddNewSubjectServlet extends SecureController {
                 fp.addPresetValue(INPUT_YOB, fp.getString(INPUT_YOB));
                 fp.addPresetValue(INPUT_GENDER, fp.getString(INPUT_GENDER));
                 fp.addPresetValue(INPUT_UNIQUE_IDENTIFIER, uniqueIdentifier);
-                fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
+                fp.addPresetValue(INPUT_LABEL, label);
                 fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                 fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
                 fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
@@ -505,7 +502,7 @@ public class AddNewSubjectServlet extends SecureController {
                     // YW <<
                     // Shaoyu Su: delay setting INPUT_LABEL field
                     if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-                        fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
+                        fp.addPresetValue(INPUT_LABEL, label);
                     }
                     fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                     fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
@@ -714,8 +711,8 @@ public class AddNewSubjectServlet extends SecureController {
                 // enroll the subject in the active study
                 studySubject.setSubjectId(subject.getId());
                 studySubject.setStudyId(currentStudy.getId());
-                studySubject.setLabel(label);
-                studySubject.setSecondaryLabel(secondaryLabel);
+                studySubject.setLabel(fp.getString(INPUT_LABEL));
+                studySubject.setSecondaryLabel(fp.getString(INPUT_SECONDARY_LABEL));
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setEnrollmentDate(fp.getDate(INPUT_ENROLLMENT_DATE));
                 if (fp.getBoolean("addWithEvent")) {
@@ -725,13 +722,13 @@ public class AddNewSubjectServlet extends SecureController {
                 studySubject.setOwner(ub);
 
                 // Shaoyu Su: prevent same label ("Study Subject ID")
-                if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+                if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                     synchronized (simpleLockObj) {
                         int nextLabel = ssd.findTheGreatestLabel() + 1;
                         studySubject.setLabel(nextLabel + "");
                         studySubject = ssd.createWithoutGroup(studySubject);
                         if (showExistingRecord && !existingSubShown) {
-                            fp.addPresetValue(INPUT_LABEL, fp.getString(INPUT_LABEL));
+                            fp.addPresetValue(INPUT_LABEL, label);
                         }
                     }
                 } else {
