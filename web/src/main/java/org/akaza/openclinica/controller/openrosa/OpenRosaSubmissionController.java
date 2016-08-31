@@ -18,8 +18,10 @@ import org.akaza.openclinica.control.submit.UploadFileServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -28,6 +30,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,9 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private StudyParameterValueDao studyParameterValueDao;
+
+    @Autowired
+    private UserAccountDao userAccountDao;
 
     @Autowired
     PformSubmissionNotificationService notifier;
@@ -140,7 +146,7 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // Log submission with Participate
-            notifier.notify(studyOID, subjectContext);
+            if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
@@ -148,6 +154,17 @@ public class OpenRosaSubmissionController {
             logger.info("Submission contained errors. Sending error response");
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
+    }
+
+    private boolean isParticipantSubmission(HashMap<String, String> subjectContext) {
+        boolean isParticipant = true;
+        String userAccountId = subjectContext.get("userAccountID");
+        if (StringUtils.isNotEmpty(userAccountId)) {
+            UserAccount user = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
+            // All Participants have a '.' in the user name.  Non-participant user creation does not allow a '.' in the user name.
+            if (user != null && !user.getUserName().contains(".")) return false;
+        }
+        return isParticipant;
     }
 
     private Study getParentStudy(String studyOid) {

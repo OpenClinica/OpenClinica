@@ -450,6 +450,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+                    if (dnb.getEntityType().equals("itemData")) builder.append(" target=\"_blank\" ");
                     builder.close();
                     builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
                             .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();

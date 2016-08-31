@@ -168,15 +168,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 
                 String formUrl = null;
                 if (ecb.getId() > 0) {
-                    //Get Edit Url
                     formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid());
                 } else {
-                    //Get Normal Url
-                    formUrl = enketoUrlService.getUrl(contextHash, subjectContext, currentStudy.getOid());
+                    formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid());
                 }
 
                 request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
-                request.setAttribute(EnketoFormServlet.ORIGINATING_PAGE, "ViewNotes?module=submit");
             } else {
                 request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
                 request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
