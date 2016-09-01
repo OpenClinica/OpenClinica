@@ -10,7 +10,6 @@
 
     <modules>
         <module>core</module>
-        <module>stormpath</module>
         <module>web</module>
         <module>ws</module>
     </modules>
