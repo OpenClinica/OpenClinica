@@ -423,16 +423,32 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-api</artifactId>
-            <version>1.0.RC9.2</version>
-        </dependency>
+
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
           <version>4.5.2</version>
          </dependency>
+        <dependency>
+            <groupId>com.stormpath.sdk</groupId>
+            <artifactId>stormpath-sdk-api</artifactId>
+            <version>${stormpath.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.spring.security</groupId>
+            <artifactId>stormpath-spring-security-core</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.sdk</groupId>
+            <artifactId>stormpath-sdk-httpclient</artifactId>
+            <version>${stormpath.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.spring</groupId>
+            <artifactId>stormpath-default-spring-boot-starter</artifactId>
+            <version>${stormpath.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -501,13 +517,6 @@
                 <value>heroku</value>
             </property>
         </activation>
-        <dependencies>
-            <dependency>
-                <groupId>org.akaza.openclinica</groupId>
-                <artifactId>Stormpath</artifactId>
-                <version>MAINLINE-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
         <build>
             <pluginManagement>
                 <plugins>
@@ -549,26 +558,11 @@
             </property>
         </activation>
     </profile>
-    <profile>
-        <id>localStormpath</id>
-        <activation>
-            <property>
-                <name>environment</name>
-                <value>localStormpath</value>
-            </property>
-        </activation>
-        <dependencies>
-            <dependency>
-                <groupId>org.akaza.openclinica</groupId>
-                <artifactId>stormpath</artifactId>
-                <version>MAINLINE-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-    </profile>
 </profiles>
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>
+        <stormpath.version>1.0.RC9.2</stormpath.version>
     </properties>
 
 </project>

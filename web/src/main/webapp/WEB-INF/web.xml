@@ -153,7 +153,6 @@
         <filter-name>apiSecurityFilter</filter-name>
         <url-pattern>/pages/auth/api/*</url-pattern>
     </filter-mapping>
-
     <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
