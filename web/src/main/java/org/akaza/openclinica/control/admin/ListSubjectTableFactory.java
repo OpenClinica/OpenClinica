@@ -105,8 +105,9 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 
 		if (!limit.isComplete()) {
 			Integer totalRows = getSubjectDao().getCountWithFilter(listSubjectFilter, getCurrentStudy());
-			if (totalRows == null)
+			if (totalRows == null) {
 				totalRows = 0;
+			}
 			tableFacade.setTotalRows(totalRows.intValue());
 		}
 
