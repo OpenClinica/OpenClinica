@@ -302,8 +302,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -423,16 +423,32 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
         <dependency>
             <groupId>com.stormpath.sdk</groupId>
             <artifactId>stormpath-sdk-api</artifactId>
-            <version>1.0.RC9.2</version>
+            <version>${stormpath.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-          <version>4.5.2</version>
-         </dependency>
+            <groupId>com.stormpath.spring.security</groupId>
+            <artifactId>stormpath-spring-security-core</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.sdk</groupId>
+            <artifactId>stormpath-sdk-httpclient</artifactId>
+            <version>${stormpath.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.spring</groupId>
+            <artifactId>stormpath-default-spring-boot-starter</artifactId>
+            <version>${stormpath.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -491,84 +507,62 @@
             </plugins>
         </pluginManagement>
     </build>
-<profiles>
-    <profile>
-        <id>heroku</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-                <name>environment</name>
-                <value>heroku</value>
-            </property>
-        </activation>
-        <dependencies>
-            <dependency>
-                <groupId>org.akaza.openclinica</groupId>
-                <artifactId>Stormpath</artifactId>
-                <version>MAINLINE-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-        <build>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>auto-clean</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>clean</goal>
-                                </goals>
-                                <configuration>
-                                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                                    <filesets>
-                                        <fileset>
-                                            <directory>target</directory>
-                                            <includes>
-                                                <include>**/*.jar</include>
-                                            </includes>
-                                        </fileset>
-                                    </filesets>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </pluginManagement>
+    <profiles>
+        <profile>
+            <id>heroku</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>heroku</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-clean-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>auto-clean</id>
+                                    <phase>install</phase>
+                                    <goals>
+                                        <goal>clean</goal>
+                                    </goals>
+                                    <configuration>
+                                        <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                                        <filesets>
+                                            <fileset>
+                                                <directory>target</directory>
+                                                <includes>
+                                                    <include>**/*.jar</include>
+                                                </includes>
+                                            </fileset>
+                                        </filesets>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
 
-        </build>
-    </profile>
+            </build>
+        </profile>
 
-    <profile>
-        <id>local</id>
-        <activation>
-            <property>
-                <name>environment</name>
-                <value>local</value>
-            </property>
-        </activation>
-    </profile>
-    <profile>
-        <id>localStormpath</id>
-        <activation>
-            <property>
-                <name>environment</name>
-                <value>localStormpath</value>
-            </property>
-        </activation>
-        <dependencies>
-            <dependency>
-                <groupId>org.akaza.openclinica</groupId>
-                <artifactId>Stormpath</artifactId>
-                <version>MAINLINE-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-    </profile>
-</profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>local</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>
+        <stormpath.version>1.0.RC9.2</stormpath.version>
     </properties>
 
 </project>

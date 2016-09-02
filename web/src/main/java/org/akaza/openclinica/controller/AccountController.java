@@ -37,6 +37,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -107,6 +109,12 @@ public class AccountController {
 	 *                    "apiKey": "6e8b69f6fb774e899f9a6c349c5adace"
 	 *                    }
 	 */
+
+
+	@RequestMapping(value = "/importOdm", method = RequestMethod.POST)
+	public void importOdm(@RequestBody HashMap<String, String> map, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		System.out.println("I'm in ImportOdm method");
+	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> getAccountByUserName(@RequestBody HashMap<String, String> requestMap) throws Exception {
