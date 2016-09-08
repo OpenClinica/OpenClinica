@@ -153,7 +153,6 @@
         <filter-name>apiSecurityFilter</filter-name>
         <url-pattern>/pages/auth/api/*</url-pattern>
     </filter-mapping>
-
     <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -1317,6 +1316,11 @@
         <servlet-name>ParticipantFormServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ParticipantFormServlet</servlet-class>
     </servlet>
+    <servlet>
+        <display-name>EnketoFormServlet</display-name>
+        <servlet-name>EnketoFormServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.submit.EnketoFormServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
@@ -2180,6 +2184,10 @@
     <servlet-mapping>
         <servlet-name>ParticipantFormServlet</servlet-name>
         <url-pattern>/ParticipantFormServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EnketoFormServlet</servlet-name>
+        <url-pattern>/EnketoFormServlet</url-pattern>
     </servlet-mapping>
 
 

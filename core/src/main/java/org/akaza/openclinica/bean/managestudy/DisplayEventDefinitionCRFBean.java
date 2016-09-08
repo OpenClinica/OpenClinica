@@ -63,4 +63,5 @@ public class DisplayEventDefinitionCRFBean extends AuditableEntityBean {
     public void setEventCRF(EventCRFBean eventCRF) {
         this.eventCRF = eventCRF;
     }
+
 }

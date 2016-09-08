@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.pform.EnketoAPI;
-import org.akaza.openclinica.web.pform.EnketoCredentials;
 
 public class ParticipantFormServlet extends SecureController {
 
