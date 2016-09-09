@@ -814,7 +814,7 @@ public class SystemController {
 	}
 
 	/**
-	 * @api {get} /pages/auth/api/v1/system/modules/filesystem Retrieve FileSystem Info
+	 * @api {get} /pages/auth/api/v1/system/filesystem Retrieve FileSystem Info
 	 * @apiName getFileSystem
 	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 3.8.0
