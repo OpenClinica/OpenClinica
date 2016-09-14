@@ -18,7 +18,6 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -78,7 +77,6 @@ public class OdmImportController {
     @Autowired
     EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public @ResponseBody void importOdm(@RequestBody org.cdisc.ns.odm.v130_sb.ODM odm, HttpServletResponse response, HttpServletRequest request)
             throws Exception {
@@ -112,7 +110,6 @@ public class OdmImportController {
 
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
-        List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = odmMetadataVersions.get(0).getStudyEventDef();
         for (ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef : odmStudyEventDefs) {
 
@@ -156,6 +153,7 @@ public class OdmImportController {
                 }
             }
         }
+        List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
             for (ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef : odmStudyEventDefs) {
                 if (odmStudyEventDef.getOID().equals(odmStudyEventRef.getStudyEventOID())) {
@@ -345,7 +343,6 @@ public class OdmImportController {
         } else {
             eventDefinitionCrf.setAllowAnonymousSubmission(false);
         }
-
         if (conf.getParticipantForm().equalsIgnoreCase("Yes")) {
             eventDefinitionCrf.setParicipantForm(true);
         } else {
@@ -366,7 +363,6 @@ public class OdmImportController {
         } else {
             eventDefinitionCrfTag.setActive(false);
         }
-
         eventDefinitionCrfTag.setTagId(tagId);
         eventDefinitionCrfTag.setPath(crfPath);
         eventDefinitionCrfTag.setDateCreated(new Date());
@@ -382,10 +378,6 @@ public class OdmImportController {
         eventDefinitionCrfTag.setDateUpdated(new Date());
 
         return eventDefinitionCrfTag;
-    }
-
-    private EventDefinitionCRFDAO getEventDefinitionCRFDao() {
-        return (new EventDefinitionCRFDAO(dataSource));
     }
 
 }
