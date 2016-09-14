@@ -111,10 +111,6 @@ public class AccountController {
 	 */
 
 
-	@RequestMapping(value = "/importOdm", method = RequestMethod.POST)
-	public void importOdm(@RequestBody HashMap<String, String> map, HttpServletResponse response, HttpServletRequest request) throws Exception {
-		System.out.println("I'm in ImportOdm method");
-	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> getAccountByUserName(@RequestBody HashMap<String, String> requestMap) throws Exception {

@@ -50,6 +50,7 @@ public class CrfVersion extends DataMapDomainObject {
     private String ocOid;
     private String xform;
     private String xformName;
+    private String url;
     private Set filterCrfVersionMaps = new HashSet(0);
     private List<VersioningMap> versioningMaps;
     private List<EventCrf> eventCrfs;
@@ -277,6 +278,15 @@ public class CrfVersion extends DataMapDomainObject {
 
     public void setItemGroupMetadatas(Set<ItemGroupMetadata> itemGroupMetadatas) {
         this.itemGroupMetadatas = itemGroupMetadatas;
+    }
+
+    @Column(name = "url")
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

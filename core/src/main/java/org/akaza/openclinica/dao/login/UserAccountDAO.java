@@ -99,10 +99,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(21, TypeNames.BOOL);
         this.setTypeExpected(22, TypeNames.INT);
         this.setTypeExpected(23, TypeNames.BOOL);
-        this.setTypeExpected(24, TypeNames.STRING);    // access_doe
-        this.setTypeExpected(25, TypeNames.STRING);    // timezone
-        this.setTypeExpected(26, TypeNames.BOOL);      // enable_api_key 
-        this.setTypeExpected(27, TypeNames.STRING);    // api_key
+        this.setTypeExpected(24, TypeNames.STRING); // access_doe
+        this.setTypeExpected(25, TypeNames.STRING); // timezone
+        this.setTypeExpected(26, TypeNames.BOOL); // enable_api_key
+        this.setTypeExpected(27, TypeNames.STRING); // api_key
     }
 
     public void setPrivilegeTypesExpected() {
@@ -130,9 +130,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
     }
 
     private void setPasswordTypesExpected() {
-    	// assume getting list of old passwords
-    	this.unsetTypeExpected();
-    	this.setTypeExpected(1, TypeNames.STRING);
+        // assume getting list of old passwords
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);
     }
 
     @Override
@@ -142,7 +142,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         HashMap nullVars = new HashMap();
 
         /*
-         * update user_account set date_lastvisit=?, passwd_timestamp=?, passwd_challenge_question=?, passwd_challenge_answer=?, phone=? where user_name=?
+         * update user_account set date_lastvisit=?, passwd_timestamp=?, passwd_challenge_question=?,
+         * passwd_challenge_answer=?, phone=? where user_name=?
          */
 
         variables.put(new Integer(1), uab.getName());
@@ -193,7 +194,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(19), uab.getAccessCode());
         }
-        
+
         if (uab.getTime_zone() == null || uab.getTime_zone().equals("")) {
             nullVars.put(new Integer(20), new Integer(TypeNames.STRING));
             variables.put(new Integer(20), null);
@@ -201,16 +202,15 @@ public class UserAccountDAO extends AuditableEntityDAO {
             variables.put(new Integer(20), uab.getTime_zone());
         }
         variables.put(new Integer(21), uab.isEnableApiKey());
-        
+
         if (uab.getApiKey() == null || uab.getApiKey().equals("")) {
             nullVars.put(new Integer(22), new Integer(TypeNames.STRING));
-            variables.put(new Integer(22), null);        
-        }else{
-        variables.put(new Integer(22), uab.getApiKey());
+            variables.put(new Integer(22), null);
+        } else {
+            variables.put(new Integer(22), uab.getApiKey());
         }
-        
-        variables.put(new Integer(23), new Integer(uab.getId()));
 
+        variables.put(new Integer(23), new Integer(uab.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
@@ -316,7 +316,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(17), uab.isEnableApiKey());
         variables.put(new Integer(18), uab.getApiKey());
 
-        
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
         success = success && isQuerySuccessful();
@@ -344,7 +343,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     public StudyUserRoleBean createStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
         Locale currentLocale = ResourceBundleProvider.getLocale();
-        ResourceBundleProvider.updateLocale(Locale.US); 
+        ResourceBundleProvider.updateLocale(Locale.US);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), studyRole.getRoleName());
         variables.put(new Integer(2), new Integer(studyRole.getStudyId()));
@@ -355,6 +354,22 @@ public class UserAccountDAO extends AuditableEntityDAO {
         ResourceBundleProvider.updateLocale(currentLocale);
         return studyRole;
     }
+
+    public StudyUserRoleBean findByUserNameAndStudy(String username, int studyId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), username);
+        variables.put(new Integer(2), studyId);
+        ArrayList alist = this.select(digester.getQuery("findByUserNameAndStudy"), variables);
+        StudyUserRoleBean surBean = null;
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            surBean = (StudyUserRoleBean) this.getRoleFromHashMap((HashMap) it.next());
+        }
+
+        return surBean;
+
+    }
+
     public UserAccountBean findStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
         this.setTypesExpected();
         this.setTypeExpected(1, TypeNames.STRING);
@@ -367,8 +382,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(8, TypeNames.STRING);
         HashMap variables = new HashMap();
 
-        variables.put(new Integer(1),  studyRole.getRoleName());
-        variables.put(new Integer(2),  new Integer(studyRole.getStudyId()));
+        variables.put(new Integer(1), studyRole.getRoleName());
+        variables.put(new Integer(2), new Integer(studyRole.getStudyId()));
         variables.put(new Integer(3), new Integer(studyRole.getStatus().getId()));
         variables.put(new Integer(4), user.getName());
 
@@ -376,7 +391,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         UserAccountBean eb = new UserAccountBean();
         Iterator it = alist.iterator();
         if (it.hasNext()) {
-        eb.setName((String) ((HashMap) it.next()).get("user_name"));
+            eb.setName((String) ((HashMap) it.next()).get("user_name"));
         }
         return eb;
     }
@@ -440,7 +455,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         String time_zone = (String) hm.get("time_zone");
         Boolean enableApiKey = (Boolean) hm.get("enable_api_key");
         String apiKey = (String) hm.get("api_key");
-        
 
         // begin to set objects in the bean
         eb.setId(userId.intValue());
@@ -461,7 +475,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setTime_zone(time_zone);
         eb.setEnableApiKey(enableApiKey);
         eb.setApiKey(apiKey);
-        
+
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -485,9 +499,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
 
         // pull out the roles and privs here, tbh
-        if (!userName.contains(".")){
-        ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
-        eb.setRoles(userRoleBeans);
+        if (!userName.contains(".")) {
+            ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
+            eb.setRoles(userRoleBeans);
         }
         // the role-privilege mapping is now statically fixed in Role,
         // so we don't need the block below
@@ -534,6 +548,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     /*
      * next on our list, how can we affect the query??? SELECT FROM USER_ACCOUNT ORDER BY ? DESC?
+     * 
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAll(java.lang.String, boolean, java.lang.String)
      */
     @Override
@@ -590,7 +605,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
-
     public EntityBean findByAccessCode(String name) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
@@ -621,25 +635,21 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
-    
     public Collection findAllParticipantsByStudyOid(String studyOid) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), studyOid+".%");
+        variables.put(new Integer(1), studyOid + ".%");
         ArrayList alist = this.select(digester.getQuery("findAllParticipantsByStudyOid"), variables);
 
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            UserAccountBean eb = (UserAccountBean)this.getEntityFromHashMap((HashMap) it.next(),false);
+            UserAccountBean eb = (UserAccountBean) this.getEntityFromHashMap((HashMap) it.next(), false);
             al.add(eb);
         }
         return al;
     }
 
-    
-
-    
     /**
      * Finds all the studies with roles for a user
      *
@@ -1086,7 +1096,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(2), studyId);
 
         ArrayList alist = new ArrayList();
-        if(childStudyId == 0){
+        if (childStudyId == 0) {
             alist = this.select(digester.getQuery("findRoleCountByUserNameAndStudyId"), variables);
         } else {
             variables.put(new Integer(3), childStudyId);
@@ -1094,7 +1104,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         }
         return alist.size();
     }
-
 
     public void setSysAdminRole(UserAccountBean uab, boolean creating) {
         HashMap variables = new HashMap();

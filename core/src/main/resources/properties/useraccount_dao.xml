@@ -102,6 +102,13 @@
 		<name>findRole</name>
 		<sql>select * from user_role where role_name=?</sql>
 	</query>
+	
+	<query>
+		<name>findByUserNameAndStudy</name>
+		<sql>select * from study_user_role where user_name=? and study_id=?</sql>
+	</query>
+	
+	
 	<query>
 		<name>findPrivilegesByRole</name>
 		<sql>select p.priv_id, p.priv_name, p.priv_desc, prm.priv_value from privilege p,
