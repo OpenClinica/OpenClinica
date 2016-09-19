@@ -1,5 +1,15 @@
 package org.akaza.openclinica.web.crfdata;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -32,16 +42,6 @@ import org.akaza.openclinica.web.job.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
 
 /**
  * 
@@ -291,9 +291,9 @@ public class DataImportService {
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
                                 && eventCrfBean.getStatus().isAvailable()) {
-                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean);
+                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);
                         } else {
-                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
+                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean, true);
                         }
                         eventCrfInts.add(new Integer(eventCrfBean.getId()));
                     }

@@ -1,5 +1,9 @@
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.List;
+
+import javax.sql.DataSource;
+
 //import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -11,7 +15,10 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.*;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBeanObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -21,10 +28,6 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import javax.sql.DataSource;
-
-import java.util.List;
 
 /**
  * 
@@ -87,7 +90,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        for (RuleActionBean ruleActionBean: actionListBasedOnRuleExecutionResult){
 	                            // ActionProcessor ap =ActionProcessorFacade.getActionProcessor(ruleActionBean.getActionType(), ds, null, null,ruleSet, null, ruleActionBean.getRuleSetRule());
 	                        	if (ruleActionBean instanceof EventActionBean){
-	                        		beanPropertyService.runAction(ruleActionBean,eow,userId);
+	                        		beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
                                     notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule); 
                                     notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studySubjectBeanId,eventOrdinal);

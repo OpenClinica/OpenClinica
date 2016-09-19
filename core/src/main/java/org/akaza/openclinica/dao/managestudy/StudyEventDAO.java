@@ -530,12 +530,23 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      * Updates a Study event
      */
     public EntityBean update(EntityBean eb) {
+        return update(eb,false);
+    }
+    
+    /**
+     * Updates a Study event
+     */
+    public EntityBean update(EntityBean eb, boolean isTransaction) {
     	 Connection con = null;
-    	 return update( eb, con);
+    	 return update( eb, con, isTransaction);
+    }
+    
+    public EntityBean update(EntityBean eb, Connection con) {
+        return update(eb,con,false);
     }
     /* this function allows to run transactional updates for an action*/
     
-    public EntityBean update(EntityBean eb, Connection con) {
+    public EntityBean update(EntityBean eb, Connection con, boolean isTransaction) {
         StudyEventBean sb = (StudyEventBean) eb;
         StudyEventBean oldStudyEventBean = (StudyEventBean)findByPK(sb.getId());
         HashMap nullVars = new HashMap();
@@ -589,6 +600,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         	changeDetails.setStartDateChanged(true);
         if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId()) 
         	changeDetails.setStatusChanged(true);
+        changeDetails.setRunningInTransaction(isTransaction);
         StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
        notifyObservers(container);
         
