@@ -355,21 +355,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return studyRole;
     }
 
-    public StudyUserRoleBean findByUserNameAndStudy(String username, int studyId) {
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), username);
-        variables.put(new Integer(2), studyId);
-        ArrayList alist = this.select(digester.getQuery("findByUserNameAndStudy"), variables);
-        StudyUserRoleBean surBean = null;
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            surBean = (StudyUserRoleBean) this.getRoleFromHashMap((HashMap) it.next());
-        }
-
-        return surBean;
-
-    }
-
     public UserAccountBean findStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
         this.setTypesExpected();
         this.setTypeExpected(1, TypeNames.STRING);
