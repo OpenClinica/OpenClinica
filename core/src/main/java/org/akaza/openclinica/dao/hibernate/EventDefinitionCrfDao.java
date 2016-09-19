@@ -3,6 +3,7 @@ package org.akaza.openclinica.dao.hibernate;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.hibernate.Query;
 
 public class EventDefinitionCrfDao extends AbstractDomainDao<EventDefinitionCrf> {
 
@@ -47,7 +48,7 @@ public class EventDefinitionCrfDao extends AbstractDomainDao<EventDefinitionCrf>
     public EventDefinitionCrf findByStudyEventDefinitionIdAndCRFIdAndStudyId(Integer studyEventDefinitionId, Integer crfId, Integer studyId) {
         String query = "from " + getDomainClassName() + " do where do.studyEventDefinition.studyEventDefinitionId = :studyeventdefid "
                 + " and do.study.studyId = :studyid and do.crf.crfId = :crfid";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyeventdefid", studyEventDefinitionId);
         q.setInteger("studyid", studyId);
         q.setInteger("crfid", crfId);
