@@ -19,9 +19,16 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	public Class<StudyEvent> domainClass(){
 		return StudyEvent.class;
 	}
-	public StudyEvent fetchByStudyEventDefOID(String oid,Integer studySubjectId){
-		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
-		 org.hibernate.Query q = getCurrentSession().createQuery(query);
+    public StudyEvent findByStudyEventId(int study_event_id) {
+        String query = "from " + getDomainClassName() + " study_event  where study_event.studyEventId = :studyeventid ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventid", study_event_id);
+        return (StudyEvent) q.uniqueResult();
+    }
+    
+    public StudyEvent fetchByStudyEventDefOID(String oid,Integer studySubjectId){
+        String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+         org.hibernate.Query q = getCurrentSession().createQuery(query);
          q.setInteger("studySubjectId", studySubjectId);
          q.setString("oid", oid);
          
@@ -29,8 +36,8 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         // this.eventPublisher.publishEvent(new OnStudyEventUpdated(se));
          return se;
        
-		
-	}
+        
+    }
 	public StudyEvent fetchByStudyEventDefOIDAndOrdinal(String oid,Integer ordinal,Integer studySubjectId){
 		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
 		 org.hibernate.Query q = getCurrentSession().createQuery(query);
