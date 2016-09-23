@@ -27,6 +27,7 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
@@ -49,19 +50,19 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	{
         for (RuleSetBean ruleSet : ruleSets) 
         {
-            for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
-               ruleSet.setTarget(expressionBean);
+            List<ExpressionBean> expressions = ruleSet.getExpressions();
+            for (ExpressionBean expressionBean : expressions) {
+                ruleSet.setTarget(expressionBean);
                 
-        	        StudyEventBean studyEvent =
-                    (StudyEventBean) getStudyEventDao(ds).findByPK(
-                            Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
-        
-        	        int eventOrdinal = studyEvent.getSampleOrdinal();
-        		    int studySubjectBeanId = studyEvent.getStudySubjectId();
-         
-   //     	if (checkTargetMatch(ruleSet,changeDetails))
-   //   	{
-                for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) 
+                StudyEventBean studyEvent =
+                (StudyEventBean) getStudyEventDao(ds).findByPK(
+                        Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
+
+                int eventOrdinal = studyEvent.getSampleOrdinal();
+                int studySubjectBeanId = studyEvent.getStudySubjectId();
+
+                List<RuleSetRuleBean> ruleSetRules = ruleSet.getRuleSetRules();
+                for (RuleSetRuleBean ruleSetRule : ruleSetRules) 
                 {
                     Object result = null;
                     
@@ -83,7 +84,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        eow.setStudyBean(currentStudy);
 	                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 	                       // sw.stop();
-		                    System.out.println( "Result : " + result);
+                            logger.debug( "Rule Expression Evaluation Result: " + result);
 	                        // Actions
 	                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 	
@@ -98,7 +99,8 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
 	                   // 	osa.printStackTrace();
-	                        System.out.println("Something happeneing : " + osa.getMessage());
+                            logger.error("Rule Runner received exception: " + osa.getMessage());
+                            logger.error(ExceptionUtils.getStackTrace(osa));
 	                        // TODO: report something useful
 	                    }
 	                }
