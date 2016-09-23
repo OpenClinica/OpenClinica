@@ -6,12 +6,12 @@ import javax.sql.DataSource;
 
 //import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -54,12 +54,11 @@ public class BeanPropertyRuleRunner extends RuleRunner{
             for (ExpressionBean expressionBean : expressions) {
                 ruleSet.setTarget(expressionBean);
                 
-                StudyEventBean studyEvent =
-                (StudyEventBean) getStudyEventDao(ds).findByPK(
+                StudyEvent studyEvent = studyEventDaoHib.findByStudyEventId(
                         Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
 
                 int eventOrdinal = studyEvent.getSampleOrdinal();
-                int studySubjectBeanId = studyEvent.getStudySubjectId();
+                int studySubjectBeanId = studyEvent.getStudySubject().getStudySubjectId();
 
                 List<RuleSetRuleBean> ruleSetRules = ruleSet.getRuleSetRules();
                 for (RuleSetRuleBean ruleSetRule : ruleSetRules) 
