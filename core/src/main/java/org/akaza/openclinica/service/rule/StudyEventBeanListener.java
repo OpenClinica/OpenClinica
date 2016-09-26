@@ -1,10 +1,5 @@
 package org.akaza.openclinica.service.rule;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +14,7 @@ import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -98,40 +93,13 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	         List<RuleSetBean> ruleSetCopies = new ArrayList<RuleSetBean>();
 	    
 	    for (RuleSetBean ruleSetDB:ruleSetsDB) { 
-	        RuleSetBean ruleSetCopy = deepCopyRuleSet(ruleSetDB);
+	        RuleSetBean ruleSetCopy = (RuleSetBean) SerializationUtils.clone(ruleSetDB);
 	        ruleSetCopies.add(ruleSetCopy);
 	    }
 	    return ruleSetCopies;
 
 		
 	}
-	private RuleSetBean deepCopyRuleSet(RuleSetBean ruleSetDB) {
-	    RuleSetBean ruleSetCopy = null;
-	    ObjectOutputStream objOutputStream = null;
-	    ObjectInputStream objInputStream = null;
-	    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	    try {
-	        objOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-	        objOutputStream.writeObject(ruleSetDB);
-	        objOutputStream.flush();
-	        ByteArrayInputStream bin = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-	        objInputStream = new ObjectInputStream(bin);
-	        ruleSetCopy = (RuleSetBean) objInputStream.readObject();
-	    } catch (Exception e){ 
-	        LOGGER.error(e.getMessage());
-	        LOGGER.error(ExceptionUtils.getStackTrace(e));
-	    } finally {
-	        try {
-	            objOutputStream.close();
-	            objInputStream.close();
-	        } catch (IOException ioe) {
-	            LOGGER.error(ioe.getMessage());
-	            LOGGER.error(ExceptionUtils.getStackTrace(ioe));
-	        }
-	    }
-	    return ruleSetCopy;
-	}
-
     public DataSource getDataSource() {
 		return dataSource;
 	}
