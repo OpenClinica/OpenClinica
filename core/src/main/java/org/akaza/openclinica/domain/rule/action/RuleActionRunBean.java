@@ -7,15 +7,16 @@
  */
 package org.akaza.openclinica.domain.rule.action;
 
-import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 /**
  * @author Krikor Krumlian
@@ -24,7 +25,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "rule_action_run")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_run_id_seq") })
-public class RuleActionRunBean extends AbstractMutableDomainObject {
+public class RuleActionRunBean extends AbstractMutableDomainObject implements Serializable{
 
     Boolean administrativeDataEntry;
     Boolean initialDataEntry;

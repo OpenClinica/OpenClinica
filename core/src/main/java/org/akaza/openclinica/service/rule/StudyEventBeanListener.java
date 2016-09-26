@@ -9,20 +9,21 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
-import org.akaza.openclinica.patterns.ocobserver.OnStudyEventJDBCBeanChanged;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventBeanContainer;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.lang.SerializationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
 
 public class StudyEventBeanListener implements Observer,ApplicationContextAware {
 
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
 	private StudyEventDAO studyEventDao;
 	private DataSource dataSource;
 
@@ -87,10 +88,19 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 		
 	}
 	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {
-		return getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
+	    List<RuleSetBean> ruleSetsDB = getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
+
+	         List<RuleSetBean> ruleSetCopies = new ArrayList<RuleSetBean>();
+	    
+	    for (RuleSetBean ruleSetDB:ruleSetsDB) { 
+	        RuleSetBean ruleSetCopy = (RuleSetBean) SerializationUtils.clone(ruleSetDB);
+	        ruleSetCopies.add(ruleSetCopy);
+	    }
+	    return ruleSetCopies;
+
 		
 	}
-	public DataSource getDataSource() {
+    public DataSource getDataSource() {
 		return dataSource;
 	}
 	public void setDataSource(DataSource dataSource) {

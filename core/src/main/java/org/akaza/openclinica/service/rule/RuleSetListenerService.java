@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.akaza.openclinica.logic.score.function.GetExternalValue;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
-import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -41,7 +37,6 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 		
 		Integer studyEventDefId = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId();
 		Integer studyEventOrdinal = studyEvent.getSampleOrdinal();
-	//	Integer studySubjectId = event.getContainer().getEvent().getStudySubject().getStudySubjectId();
 		Integer userId = studyEvent.getUpdateId();
 		
 		if(userId==null && studyEvent.getUserAccount()!=null ) userId=  studyEvent.getUserAccount().getUserId();
@@ -52,23 +47,17 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 		ArrayList<RuleSetBean> ruleSets = (ArrayList<RuleSetBean>) createRuleSet(studyEventDefId);
 		for (RuleSetBean ruleSet : ruleSets){
 			ArrayList<RuleSetBean> ruleSetBeans = new ArrayList();		
-			ExpressionBean eBean = new ExpressionBean();
-			eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
-			ruleSet.setTarget(eBean);
-			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEventBean));
+	            ExpressionBean eBean = new ExpressionBean();
+    			eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
+    			ruleSet.setTarget(eBean);
+    			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEventBean));
 			ruleSetBeans.add(ruleSet);
-			
 			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId,event.getContainer().getChangeDetails() , studyEventOrdinal);
         	}	
 		   
-  //  	  }			
 		}
 
 }
-
-
-
-
 
 public RuleSetService getRuleSetService() {
 	return ruleSetService;
@@ -90,6 +79,15 @@ public void setRuleSetDao(RuleSetDao ruleSetDao) {
 }
 
 private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {	
-	return getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
+    List<RuleSetBean> ruleSetsDB = new ArrayList<RuleSetBean>();
+    List<RuleSetBean> ruleSetCopies = new ArrayList<RuleSetBean>();
+	ruleSetsDB = getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);
+	
+	for (RuleSetBean ruleSetDB:ruleSetsDB) { 
+	    RuleSetBean ruleSetCopy = (RuleSetBean) SerializationUtils.clone(ruleSetDB);
+	    ruleSetCopies.add(ruleSetCopy);
+	}
+	return ruleSetCopies;
 }
+
 }

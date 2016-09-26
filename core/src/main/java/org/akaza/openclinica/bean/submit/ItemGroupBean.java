@@ -1,14 +1,16 @@
 package org.akaza.openclinica.bean.submit;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 7, 2007
  */
-public class ItemGroupBean extends AuditableEntityBean {
+public class ItemGroupBean extends AuditableEntityBean implements Serializable{
 
     private Integer crfId = 0;
     private ItemGroupMetadataBean meta = new ItemGroupMetadataBean();
