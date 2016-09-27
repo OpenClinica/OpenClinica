@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
@@ -124,10 +123,12 @@ public class XformMetaDataService {
         return errors;
     }
 
-    @Transactional
+    // @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
             String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
+
+        CrfVersion crfVersion;
 
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
@@ -136,6 +137,12 @@ public class XformMetaDataService {
             crf.setUpdateId(ub.getId());
             crf.setDateUpdated(new Date());
             crfDao.saveOrUpdate(crf);
+
+            crfVersion = crfVersionDao.findByOcOID(version.getOid());
+            // crfVersion.setXform(submittedXformText);
+            crfVersion.setXformName(container.getInstanceName());
+            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+
         } else {
             crf = new CrfBean();
             crf.setName(submittedCrfName);
@@ -148,22 +155,21 @@ public class XformMetaDataService {
             crf.setDateUpdated(new Date());
             Integer crfId = (Integer) crfDao.save(crf);
             crf.setCrfId(crfId);
+
+            // Create new CRF Version
+            crfVersion = new CrfVersion();
+            crfVersion.setName(submittedCrfVersionName);
+            crfVersion.setDescription(submittedCrfVersionDescription);
+            crfVersion.setCrf(crf);
+            crfVersion.setUserAccount(userDao.findById(ub.getId()));
+            crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            crfVersion.setRevisionNotes(submittedRevisionNotes);
+            crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
+            crfVersion.setXform(submittedXformText);
+            crfVersion.setXformName(container.getInstanceName());
+            Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
+            crfVersion.setCrfVersionId(crfVersionId);
         }
-
-        // Create new CRF Version
-        CrfVersion crfVersion = new CrfVersion();
-        crfVersion.setName(submittedCrfVersionName);
-        crfVersion.setDescription(submittedCrfVersionDescription);
-        crfVersion.setCrf(crf);
-        crfVersion.setUserAccount(userDao.findById(ub.getId()));
-        crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        crfVersion.setRevisionNotes(submittedRevisionNotes);
-        crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
-        crfVersion.setXform(submittedXformText);
-        crfVersion.setXformName(container.getInstanceName());
-        Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
-        crfVersion.setCrfVersionId(crfVersionId);
-
         // Create Section
         Section section = new Section();
         section.setCrfVersion(crfVersion);
@@ -256,7 +262,8 @@ public class XformMetaDataService {
                 // Skip reserved name and read-only items here
                 XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") && (readonly == null || !readonly.trim().equals("true()"))) {
+                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
+                        && (readonly == null || !readonly.trim().equals("true()"))) {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
@@ -328,8 +335,10 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        if (getItemFormMetadataRequired(html,xformItem)) itemFormMetadata.setRequired(true);
-        else itemFormMetadata.setRequired(false);
+        if (getItemFormMetadataRequired(html, xformItem))
+            itemFormMetadata.setRequired(true);
+        else
+            itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
@@ -437,8 +446,10 @@ public class XformMetaDataService {
 
         for (Bind bind : html.getHead().getModel().getBind()) {
             if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
-                if (bind.getRequired().equals("true()")) required = true;
-                else if (bind.getRequired().equals("false()")) required = false;
+                if (bind.getRequired().equals("true()"))
+                    required = true;
+                else if (bind.getRequired().equals("false()"))
+                    required = false;
             }
         }
         return required;

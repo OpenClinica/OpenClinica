@@ -102,6 +102,9 @@
         <property name="coreResources" ref="coreResources"/>
     </bean>
 
+    <bean id="xformService" class="org.akaza.openclinica.service.crfdata.XformMetaDataService"/>
+    
+
     <bean name="apiSecurityFilter" class="org.akaza.openclinica.web.filter.ApiSecurityFilter"/>
 
 </beans>
