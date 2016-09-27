@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.dao.core;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -16,13 +15,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.hibernate.EhCacheProvider;
-
 import org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import org.springframework.core.io.ResourceLoader;
 import org.xml.sax.SAXException;
+
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
 
 /**
  * Provides a singleton SQLFactory instance
@@ -75,12 +73,6 @@ public class SQLFactory {
     public final String DAO_SUBJECTTRANSFER = "subjecttransfer";
     // YW, 05-2008, for odm extract
     public final String DAO_ODM_EXTRACT = "odm_extract";
-
-    
-    // EhCacheManagerFactoryBean cacheManagerBean = new EhCacheManagerFactoryBean();
-    //  cacheManagerBean.setConfigLocation= (new org.springframework.core.io.FileSystemResource("classpath:org/akaza/openclinica/ehcache.xml") );
-    // cacheManagerBean.setConfigLocation(new FileSystemReour(""));
-     
 
     private SQLFactory(){
     	//to thwart any instantiation of this class
@@ -156,7 +148,7 @@ public class SQLFactory {
       
         try {
             if(resourceLoader!=null && cacheManager!=null)
-            cacheManager = cacheManager.create(resourceLoader.getResource("classpath:org/akaza/openclinica/ehcache.xml").getInputStream());
+            cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/ehcache.xml").getInputStream());
         } catch (CacheException e) {
           
             e.printStackTrace();
