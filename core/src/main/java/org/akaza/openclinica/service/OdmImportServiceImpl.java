@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,9 +40,11 @@ import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Html;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Crf;
 import org.akaza.openclinica.service.dto.Version;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormDef;
@@ -84,7 +87,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     @Autowired
     private XformMetaDataService xformService;
 
-    // ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+    ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
@@ -99,6 +102,9 @@ public class OdmImportServiceImpl implements OdmImportService {
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = saveOrUpdateStudy(odm, userAccount, odmStudy);
+
+        ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
+        String str = portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
 
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
@@ -351,6 +357,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                     if (version.getOcoid().equals(crfVersion.getOcOid())) {
                         crfVersion.setDescription(version.getDescription());
                         crfVersion.setName(version.getName());
+                        // crfVersion.setXform(version.get);
                     }
                 }
             }
@@ -634,7 +641,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (version.getCrfId() == 0 && (submittedCrfName == null || submittedCrfName.equals(""))) {
             DataBinder crfDataBinder = new DataBinder(new CrfBean());
             Errors crfErrors = crfDataBinder.getBindingResult();
-            // crfErrors.rejectValue("name", "crf_val_crf_name_blank", resword.getString("CRF_name"));
+            crfErrors.rejectValue("name", "crf_val_crf_name_blank", resword.getString("CRF_name"));
             errors.addAllErrors(crfErrors);
         }
 
@@ -643,24 +650,22 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         // Verify CRF Version Name is populated
         if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
-            // crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
+            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
         }
 
         // Verify CRF Version Description is populated
         if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
-            // crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank",
-            // resword.getString("crf_version_description"));
+            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", resword.getString("crf_version_description"));
         }
 
         // Verify CRF Version Revision Notes is populated
         if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-            // crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank",
-            // resword.getString("revision_notes"));
+            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
         }
 
         // Verify Xform text is populated
         if (submittedXformText == null || submittedXformText.equals("")) {
-            // crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
+            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
         }
         errors.addAllErrors(crfVersionErrors);
     }

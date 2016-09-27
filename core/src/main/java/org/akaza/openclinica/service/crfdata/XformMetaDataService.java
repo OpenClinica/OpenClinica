@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
@@ -123,7 +124,7 @@ public class XformMetaDataService {
         return errors;
     }
 
-    // @Transactional
+    @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
             String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
@@ -171,19 +172,21 @@ public class XformMetaDataService {
             crfVersion.setCrfVersionId(crfVersionId);
         }
         // Create Section
-        Section section = new Section();
-        section.setCrfVersion(crfVersion);
-        section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        section.setLabel("");
-        section.setTitle("");
-        section.setSubtitle("");
-        section.setPageNumberLabel("");
-        section.setOrdinal(1);
-        section.setUserAccount(userDao.findById(ub.getId())); // not null
-        section.setBorders(0);
-        sectionDao.saveOrUpdate(section);
-        section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
-
+        Section section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+        if (section == null) {
+            section = new Section();
+            section.setCrfVersion(crfVersion);
+            section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            section.setLabel("");
+            section.setTitle("");
+            section.setSubtitle("");
+            section.setPageNumberLabel("");
+            section.setOrdinal(1);
+            section.setUserAccount(userDao.findById(ub.getId())); // not null
+            section.setBorders(0);
+            sectionDao.saveOrUpdate(section);
+            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+        }
         createGroups(container, html, submittedXformText, crf, crfVersion, section, ub, errors);
 
         saveMedia(formItems, crf, crfVersion);
@@ -268,9 +271,17 @@ public class XformMetaDataService {
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
-                        createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
+                        // add if statement
+                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        if (ifmd == null) {
+                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
+                        }
                         createVersioningMap(version, item);
-                        createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                        //
+                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        if (igmd == null) {
+                            igmd = createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                        }
                         itemOrdinal++;
                     }
                 }
@@ -279,7 +290,7 @@ public class XformMetaDataService {
 
     }
 
-    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
+    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);
         itemGroupMetadata.setHeader("");
@@ -300,7 +311,8 @@ public class XformMetaDataService {
         itemGroupMetadata.setItem(item);
         itemGroupMetadata.setOrdinal(itemOrdinal);
         itemGroupMetadata.setShowGroup(true);
-        itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
+        itemGroupMetadata = itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
+        return itemGroupMetadata;
     }
 
     private void createVersioningMap(CrfVersion version, Item item) {
@@ -316,7 +328,7 @@ public class XformMetaDataService {
         versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private void createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
+    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
             Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
         itemFormMetadata.setCrfVersionId(version.getCrfVersionId());
@@ -343,7 +355,8 @@ public class XformMetaDataService {
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
         itemFormMetadata.setShowItem(true);
-        itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
+        itemFormMetadata = itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
+        return itemFormMetadata;
     }
 
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
