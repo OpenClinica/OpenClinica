@@ -52,20 +52,20 @@ public class ResponseSetService {
     public ResponseSet getResponseSet(Html html, String submittedXformText, XformItem xformItem, CrfVersion version, ResponseType responseType,
             org.akaza.openclinica.domain.datamap.Item item, Errors errors) throws Exception {
 
-        ResponseSet existingSet = responseSetDao.findByLabelVersion(responseType.getName(), version.getCrfVersionId());
+        ResponseSet existingSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
         if (existingSet == null) {
             // Create the response set
             ResponseSet responseSet = new ResponseSet();
             responseSet.setLabel(xformItem.getItemName());
-            String optionText =getOptionsText(html, submittedXformText, xformItem, responseType);
-            
-            if (optionText !=null){
-            responseSet.setOptionsText(optionText);
-            responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
-            responseSet.setResponseType(responseType);
-            responseSet.setVersionId(version.getCrfVersionId());
-            responseSetDao.saveOrUpdate(responseSet);
-            responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+            String optionText = getOptionsText(html, submittedXformText, xformItem, responseType);
+
+            if (optionText != null) {
+                responseSet.setOptionsText(optionText);
+                responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
+                responseSet.setResponseType(responseType);
+                responseSet.setVersionId(version.getCrfVersionId());
+                responseSetDao.saveOrUpdate(responseSet);
+                responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
             }
             // Run validation against it
             ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);
@@ -95,16 +95,16 @@ public class ResponseSetService {
                     List<Item> items = null;
                     ItemSet itemSet = null;
 
-                    if (control instanceof Input){
+                    if (control instanceof Input) {
                         return responseType.getName();
-                    }else if (control instanceof Select) {
+                    } else if (control instanceof Select) {
                         items = ((Select) control).getItem();
                         itemSet = ((Select) control).getItemSet();
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
-                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
-                          return responseType.getName();  
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
+                        return responseType.getName();
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;
@@ -187,7 +187,7 @@ public class ResponseSetService {
                     List<Item> items = null;
                     ItemSet itemSet = null;
 
-                    if (control instanceof Input){
+                    if (control instanceof Input) {
                         return responseType.getName();
                     } else if (control instanceof Select) {
                         items = ((Select) control).getItem();
@@ -195,8 +195,8 @@ public class ResponseSetService {
                     } else if (control instanceof Select1) {
                         items = ((Select1) control).getItem();
                         itemSet = ((Select1) control).getItemSet();
-                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")){
-                            return responseType.getName();
+                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
+                        return responseType.getName();
                     } else {
                         logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
                         return null;

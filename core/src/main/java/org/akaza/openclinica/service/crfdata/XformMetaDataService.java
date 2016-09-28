@@ -129,6 +129,8 @@ public class XformMetaDataService {
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
             String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
 
+        CrfVersion crfVersion;
+
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
         if (version.getCrfId() > 0) {
@@ -136,6 +138,12 @@ public class XformMetaDataService {
             crf.setUpdateId(ub.getId());
             crf.setDateUpdated(new Date());
             crfDao.saveOrUpdate(crf);
+
+            crfVersion = crfVersionDao.findByOcOID(version.getOid());
+            // crfVersion.setXform(submittedXformText);
+            crfVersion.setXformName(container.getInstanceName());
+            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+
         } else {
             crf = new CrfBean();
             crf.setName(submittedCrfName);
@@ -148,36 +156,37 @@ public class XformMetaDataService {
             crf.setDateUpdated(new Date());
             Integer crfId = (Integer) crfDao.save(crf);
             crf.setCrfId(crfId);
+
+            // Create new CRF Version
+            crfVersion = new CrfVersion();
+            crfVersion.setName(submittedCrfVersionName);
+            crfVersion.setDescription(submittedCrfVersionDescription);
+            crfVersion.setCrf(crf);
+            crfVersion.setUserAccount(userDao.findById(ub.getId()));
+            crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            crfVersion.setRevisionNotes(submittedRevisionNotes);
+            crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
+            crfVersion.setXform(submittedXformText);
+            crfVersion.setXformName(container.getInstanceName());
+            Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
+            crfVersion.setCrfVersionId(crfVersionId);
         }
-
-        // Create new CRF Version
-        CrfVersion crfVersion = new CrfVersion();
-        crfVersion.setName(submittedCrfVersionName);
-        crfVersion.setDescription(submittedCrfVersionDescription);
-        crfVersion.setCrf(crf);
-        crfVersion.setUserAccount(userDao.findById(ub.getId()));
-        crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        crfVersion.setRevisionNotes(submittedRevisionNotes);
-        crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
-        crfVersion.setXform(submittedXformText);
-        crfVersion.setXformName(container.getInstanceName());
-        Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
-        crfVersion.setCrfVersionId(crfVersionId);
-
         // Create Section
-        Section section = new Section();
-        section.setCrfVersion(crfVersion);
-        section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        section.setLabel("");
-        section.setTitle("");
-        section.setSubtitle("");
-        section.setPageNumberLabel("");
-        section.setOrdinal(1);
-        section.setUserAccount(userDao.findById(ub.getId())); // not null
-        section.setBorders(0);
-        sectionDao.saveOrUpdate(section);
-        section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
-
+        Section section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+        if (section == null) {
+            section = new Section();
+            section.setCrfVersion(crfVersion);
+            section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            section.setLabel("");
+            section.setTitle("");
+            section.setSubtitle("");
+            section.setPageNumberLabel("");
+            section.setOrdinal(1);
+            section.setUserAccount(userDao.findById(ub.getId())); // not null
+            section.setBorders(0);
+            sectionDao.saveOrUpdate(section);
+            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+        }
         createGroups(container, html, submittedXformText, crf, crfVersion, section, ub, errors);
 
         saveMedia(formItems, crf, crfVersion);
@@ -256,14 +265,23 @@ public class XformMetaDataService {
                 // Skip reserved name and read-only items here
                 XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") && (readonly == null || !readonly.trim().equals("true()"))) {
+                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
+                        && (readonly == null || !readonly.trim().equals("true()"))) {
                     Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
-                        createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
+                        // add if statement
+                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        if (ifmd == null) {
+                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
+                        }
                         createVersioningMap(version, item);
-                        createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                        //
+                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        if (igmd == null) {
+                            igmd = createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                        }
                         itemOrdinal++;
                     }
                 }
@@ -272,7 +290,7 @@ public class XformMetaDataService {
 
     }
 
-    private void createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
+    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);
         itemGroupMetadata.setHeader("");
@@ -293,7 +311,8 @@ public class XformMetaDataService {
         itemGroupMetadata.setItem(item);
         itemGroupMetadata.setOrdinal(itemOrdinal);
         itemGroupMetadata.setShowGroup(true);
-        itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
+        itemGroupMetadata = itemGroupMetadataDao.saveOrUpdate(itemGroupMetadata);
+        return itemGroupMetadata;
     }
 
     private void createVersioningMap(CrfVersion version, Item item) {
@@ -309,7 +328,7 @@ public class XformMetaDataService {
         versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private void createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
+    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
             Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
         itemFormMetadata.setCrfVersionId(version.getCrfVersionId());
@@ -328,13 +347,16 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        if (getItemFormMetadataRequired(html,xformItem)) itemFormMetadata.setRequired(true);
-        else itemFormMetadata.setRequired(false);
+        if (getItemFormMetadataRequired(html, xformItem))
+            itemFormMetadata.setRequired(true);
+        else
+            itemFormMetadata.setRequired(false);
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
         itemFormMetadata.setShowItem(true);
-        itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
+        itemFormMetadata = itemFormMetadataDao.saveOrUpdate(itemFormMetadata);
+        return itemFormMetadata;
     }
 
     private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
@@ -437,8 +459,10 @@ public class XformMetaDataService {
 
         for (Bind bind : html.getHead().getModel().getBind()) {
             if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
-                if (bind.getRequired().equals("true()")) required = true;
-                else if (bind.getRequired().equals("false()")) required = false;
+                if (bind.getRequired().equals("true()"))
+                    required = true;
+                else if (bind.getRequired().equals("false()"))
+                    required = false;
             }
         }
         return required;
