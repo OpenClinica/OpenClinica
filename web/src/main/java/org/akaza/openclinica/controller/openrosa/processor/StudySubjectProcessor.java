@@ -22,16 +22,19 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+
 
 @Component
-public class StudySubjectProcessor implements Processor, Ordered {
+@Order(value=3)
+public class StudySubjectProcessor implements Processor {
 
     @Autowired
     StudySubjectDao studySubjectDao;
@@ -45,7 +48,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     
     @Override
-    public void process(SubmissionContainer container) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing study subject processor.");
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
@@ -96,6 +99,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
             container.setSubject(studySubject);
         }
+        return ProcessorEnum.PROCEED;
     }
 
     private boolean subjectExistsInParentSiblingStudy(String embeddedStudySubjectId, Study study) {
@@ -111,11 +115,6 @@ public class StudySubjectProcessor implements Processor, Ordered {
             }
         }
         return subjectExists;
-    }
-
-    @Override
-    public int getOrder() {
-        return 1;
     }
     
     private Subject createSubject(Date currentDate) {

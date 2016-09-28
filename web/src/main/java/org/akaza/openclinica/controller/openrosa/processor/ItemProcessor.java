@@ -46,7 +46,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
@@ -55,9 +55,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
-public class ItemProcessor implements Processor, Ordered {
+@Order(value=6)
+public class ItemProcessor implements Processor {
 
     @Autowired
     ItemDataDao itemDataDao;
@@ -91,11 +93,7 @@ public class ItemProcessor implements Processor, Ordered {
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public int getOrder() {
-        return 4;
-    }
-
-    public void process(SubmissionContainer container) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Item Processor.");
         ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
 
@@ -223,6 +221,7 @@ public class ItemProcessor implements Processor, Ordered {
                     }
                 }
             }
+            return ProcessorEnum.PROCEED;
         }
     
     private Item lookupItem(String itemName, CrfVersion crfVersion) {

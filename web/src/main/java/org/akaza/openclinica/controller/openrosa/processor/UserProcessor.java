@@ -18,13 +18,15 @@ import org.akaza.openclinica.domain.user.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
-public class UserProcessor implements Processor, Ordered {
+@Order(value=4)
+public class UserProcessor implements Processor {
 
     @Autowired
     UserAccountDao userAccountDao;
@@ -45,7 +47,7 @@ public class UserProcessor implements Processor, Ordered {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Override
-    public void process(SubmissionContainer container) throws Exception{
+    public ProcessorEnum process(SubmissionContainer container) throws Exception{
         logger.info("Executing User Processor.");
         Errors errors = container.getErrors();
 
@@ -119,13 +121,9 @@ public class UserProcessor implements Processor, Ordered {
                 // This table should also foreign key to user_account but doesn't.
             }
         }
+        return ProcessorEnum.PROCEED;
     }
 
-
-    @Override
-    public int getOrder() {
-        return 2;
-    }
     private Study getParentStudy(String studyOid) {
         Study study = studyDao.findByOcOID(studyOid);
         Study parentStudy = study.getStudy();
