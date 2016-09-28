@@ -27,12 +27,15 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+
 
 @Component
-public class EventProcessor implements Processor, Ordered {
+@Order(value=5)
+public class EventProcessor implements Processor {
 
     @Autowired
     StudyEventDao studyEventDao;
@@ -60,7 +63,7 @@ public class EventProcessor implements Processor, Ordered {
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public void process(SubmissionContainer container) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Event Processor.");
         Errors errors = container.getErrors();
         StudySubject studySubject = container.getSubject();
@@ -82,12 +85,10 @@ public class EventProcessor implements Processor, Ordered {
         else study = container.getStudy();
         container.setEventCrf(updateEventCrf(container.getEventCrf(), study, studySubject, container.getUser(), isAnonymous));
         container.setStudyEvent(updateStudyEvent(container.getStudyEvent(), studyEventDefinition, study, studySubject, container.getUser(), isAnonymous));
+        return ProcessorEnum.PROCEED;
+
     }
 
-    @Override
-    public int getOrder() {
-        return 3;
-    }
     
     private void processParticipant(SubmissionContainer container, Errors errors, StudySubject studySubject, StudyEventDefinition studyEventDefinition) throws Exception {
         Integer ordinal = Integer.valueOf(container.getSubjectContext().get("studyEventOrdinal"));

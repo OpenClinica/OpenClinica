@@ -47,6 +47,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -170,6 +172,11 @@ public class OpenRosaServices {
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        // print logback's internal status
+        StatusPrinter.print(lc);
+        logger.error("*********************************Test log");
         if (!mayProceedPreview(studyOID))
             return null;
         
@@ -455,6 +462,31 @@ public class OpenRosaServices {
         Response.ResponseBuilder builder = Response.noContent();
 
         ResponseEntity<String> responseEntity = openRosaSubmissionController.doSubmission(request, response, studyOID, context);
+        if (responseEntity == null) {
+            LOGGER.debug("Null response from OpenRosaSubmissionController.");
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.CREATED)) {
+            LOGGER.debug("Successful OpenRosa submission");
+            builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
+            return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
+            LOGGER.debug("Failed OpenRosa submission");
+            return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
+        } else {
+            LOGGER.debug("Failed OpenRosa submission with unhandled error");
+            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @POST
+    @Path("/{studyOID}/fieldsubmission")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+            @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
+
+        Response.ResponseBuilder builder = Response.noContent();
+
+        ResponseEntity<String> responseEntity = openRosaSubmissionController.doFieldSubmission(request, response, studyOID, context);
         if (responseEntity == null) {
             LOGGER.debug("Null response from OpenRosaSubmissionController.");
             return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();

@@ -21,16 +21,15 @@
     	iframe = document.getElementById("enketo");
         iframe.setAttribute('src', fullEnketoURL);
     });
-    
-      window.addEventListener("message", receiveMessage, false);
 
+      window.addEventListener("message", receiveMessage, false);
       function receiveMessage(event)
       {
         var postMessage = JSON.parse(event.data);
-        if(postMessage.enketoEvent === 'submissionsuccess') {
+        if((postMessage.enketoEvent === 'submissionsuccess') ||
+                (postMessage.enketoEvent === 'close')) {
           iframe = document.getElementById("enketo");
           jQuery("#enketo").hide();
-
           if ("${originatingPage}") window.location.replace("${originatingPage}");
           else window.close();
         }
