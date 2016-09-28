@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,13 +39,13 @@ import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Html;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Crf;
 import org.akaza.openclinica.service.dto.Version;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.cdisc.ns.odm.v130_sb.EventType;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormDef;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormRef;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionGlobalVariables;
@@ -87,7 +86,6 @@ public class OdmImportServiceImpl implements OdmImportService {
     @Autowired
     private XformMetaDataService xformService;
 
-    ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
@@ -279,6 +277,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         study.setSummary("This is the summary");
         study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         study.setUserAccount(userAccount);
+        study.setDateCreated(new Date());
         return study;
     }
 
@@ -309,6 +308,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             studyEventDefinition.setRepeating(false);
         }
+        studyEventDefinition.setType(EventType.SCHEDULED.value());
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
         studyEventDefinition.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
@@ -641,7 +641,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (version.getCrfId() == 0 && (submittedCrfName == null || submittedCrfName.equals(""))) {
             DataBinder crfDataBinder = new DataBinder(new CrfBean());
             Errors crfErrors = crfDataBinder.getBindingResult();
-            crfErrors.rejectValue("name", "crf_val_crf_name_blank", resword.getString("CRF_name"));
+            crfErrors.rejectValue("name", "crf_val_crf_name_blank", "CRF Name");
             errors.addAllErrors(crfErrors);
         }
 
@@ -650,22 +650,22 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         // Verify CRF Version Name is populated
         if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
-            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
+            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", "Version Name");
         }
 
         // Verify CRF Version Description is populated
         if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
-            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", resword.getString("crf_version_description"));
+            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", "Version Description");
         }
 
         // Verify CRF Version Revision Notes is populated
         if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
+            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", "Revision Notes");
         }
 
         // Verify Xform text is populated
         if (submittedXformText == null || submittedXformText.equals("")) {
-            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
+            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", "Xform");
         }
         errors.addAllErrors(crfVersionErrors);
     }
