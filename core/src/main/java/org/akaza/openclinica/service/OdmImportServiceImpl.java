@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -24,6 +25,7 @@ import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
@@ -101,6 +103,10 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
         String str = portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        pStatus.setValue("enabled");
+        spvdao.update(pStatus);
 
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
