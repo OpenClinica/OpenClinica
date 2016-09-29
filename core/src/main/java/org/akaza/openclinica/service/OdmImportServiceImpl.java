@@ -312,7 +312,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             studyEventDefinition.setRepeating(false);
         }
-        studyEventDefinition.setType(EventType.SCHEDULED.value());
+        studyEventDefinition.setType(EventType.SCHEDULED.value().toLowerCase());
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
         studyEventDefinition.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
@@ -363,6 +363,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                         crfVersion.setName(version.getName());
                         if (version.getFileLinks() != null) {
                             for (String fileLink : version.getFileLinks()) {
+                                ////////////////////
                                 if (fileLink.endsWith(".xml")) {
                                     crfVersion.setXform(getXFormFromFormManager(fileLink));
                                     break;
