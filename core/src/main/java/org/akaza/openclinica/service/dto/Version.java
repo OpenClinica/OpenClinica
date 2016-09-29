@@ -2,6 +2,7 @@
 package org.akaza.openclinica.service.dto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -25,6 +26,9 @@ public class Version {
     private String ocoid;
     @JsonProperty("previewURL")
     private String previewURL;
+    @JsonProperty("fileLinks")
+    private List<String> fileLinks;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -156,6 +160,16 @@ public class Version {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public List<String> getFileLinks() {
+        return fileLinks;
+    }
+
+    @JsonAnySetter
+    public void setFileLinks(List<String> fileLinks) {
+        this.fileLinks = fileLinks;
     }
 
 }
