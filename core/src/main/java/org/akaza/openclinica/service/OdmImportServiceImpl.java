@@ -59,7 +59,6 @@ import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayo
 import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
@@ -80,10 +79,9 @@ public class OdmImportServiceImpl implements OdmImportService {
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private DataSource dataSource;
-    @Autowired
+
     private XformParser xformParser;
 
-    @Autowired
     private XformMetaDataService xformService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
