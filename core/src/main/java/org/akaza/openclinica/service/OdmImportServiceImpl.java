@@ -59,7 +59,6 @@ import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayo
 import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
@@ -80,10 +79,9 @@ public class OdmImportServiceImpl implements OdmImportService {
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private DataSource dataSource;
-    @Autowired
+
     private XformParser xformParser;
 
-    @Autowired
     private XformMetaDataService xformService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -357,7 +355,14 @@ public class OdmImportServiceImpl implements OdmImportService {
                     if (version.getOcoid().equals(crfVersion.getOcOid())) {
                         crfVersion.setDescription(version.getDescription());
                         crfVersion.setName(version.getName());
-                        // crfVersion.setXform(version.get);
+                        if (version.getFileLinks() != null) {
+                            for (String fileLink : version.getFileLinks()) {
+                                if (fileLink.endsWith(".xml")) {
+                                    crfVersion.setXform(getXFormFromFormManager(fileLink));
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -509,8 +514,10 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     public Crf[] getCrfsFromFormManager(Study study) {
-        String protocolId = study.getName().toLowerCase();
-        String url = "http://159.203.83.212:8080/api/protocol/" + protocolId + "/forms";
+        String protocolId = study.getUniqueIdentifier();
+        // String url = "http://159.203.83.212:8080/api/protocol/" + protocolId + "/forms";
+        String url = "http://fm.openclinica.info:8080/api/protocol/" + protocolId + "/forms";
+
         RestTemplate restTemplate = new RestTemplate();
         Crf[] crfs = null;
         try {
@@ -519,6 +526,17 @@ public class OdmImportServiceImpl implements OdmImportService {
             System.out.println(e.getMessage());
         }
         return crfs;
+    }
+
+    public String getXFormFromFormManager(String fileLink) {
+        String xform = "";
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            xform = restTemplate.getForObject(fileLink, String.class);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return xform;
     }
 
     @SuppressWarnings("rawtypes")
