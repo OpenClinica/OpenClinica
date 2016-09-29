@@ -289,12 +289,16 @@ public class OpenRosaSubmissionController {
 
         if (ssBean == null) {
             logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE"))
+            //TODO:  Disabled pManage status check for OC16 conference.  Re-enable after.
+            //if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE"))
+            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available"))
                 accessPermission = true;
         } else {
             logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
                     + "  studySubjectStatus: " + ssBean.getStatus().getName());
-            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")
+            //TODO:  Disabled pManage status check for OC16 conference.  Re-enable after.
+            //if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")
+            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available")
                     && ssBean.getStatus() == Status.AVAILABLE)
                 accessPermission = true;
         }
