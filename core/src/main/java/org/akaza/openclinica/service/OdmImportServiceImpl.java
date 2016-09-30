@@ -103,10 +103,29 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
         String str = portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
+
+        
+        
+        
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        pStatus.setValue("enabled");
-        spvdao.update(pStatus);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        // Update OC Study configuration
+        spv.setStudyId(study.getId());
+        spv.setParameter("participantPortal");
+        spv.setValue("enabled");
+        if (spv.getId() > 0)
+            spvdao.update(spv);
+        else
+            spvdao.create(spv);
+        
+        
+        
+        
+        
+        
+        //StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        //pStatus.setValue("enabled");
+        //spvdao.update(pStatus);
 
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;

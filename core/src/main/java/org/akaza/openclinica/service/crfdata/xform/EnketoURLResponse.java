@@ -11,6 +11,8 @@ public class EnketoURLResponse {
     private String iframe_url = null;
     private String code = null;
 
+    private String single_fieldsubmission_iframe_url = null;
+
     public String getUrl() {
         return url;
     }
@@ -58,4 +60,12 @@ public class EnketoURLResponse {
     public void setIframe_url(String iframe_url) {
         this.iframe_url = iframe_url;
     }
+    public String getSingle_fieldsubmission_iframe_url() {
+        return single_fieldsubmission_iframe_url;
+    }
+
+    public void setSingle_fieldsubmission_iframe_url(String single_fieldsubmission_iframe_url) {
+        this.single_fieldsubmission_iframe_url = single_fieldsubmission_iframe_url;
+    }
+
 }

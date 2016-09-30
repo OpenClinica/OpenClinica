@@ -12,6 +12,8 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.springframework.validation.Errors;
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+
 
 public class SubmissionContainer {
     private String requestBody = null;
@@ -25,6 +27,7 @@ public class SubmissionContainer {
     private Errors errors = null;
     private Locale locale = null;
     private ArrayList<HashMap> listOfUploadFilePaths;
+    private ProcessorEnum processorEnum;
 
     public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList<HashMap> listOfUploadFilePaths) {
         this.study = study;
@@ -33,6 +36,14 @@ public class SubmissionContainer {
         this.errors = errors;
         this.locale = locale;
         this.listOfUploadFilePaths=listOfUploadFilePaths;
+    }
+
+    public ProcessorEnum getProcessorEnum() {
+        return processorEnum;
+    }
+
+    public void setProcessorEnum(ProcessorEnum processorEnum) {
+        this.processorEnum = processorEnum;
     }
 
     public String getRequestBody() {

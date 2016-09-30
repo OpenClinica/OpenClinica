@@ -54,6 +54,7 @@ public class EnketoFormServlet extends SecureController {
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid());
         }
         request.setAttribute(FORM_URL, formUrl);
+        //request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
 
         forwardPage(Page.ENKETO_FORM_SERVLET);
