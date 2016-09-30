@@ -110,7 +110,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         // Update OC Study configuration
-        spv.setStudyId(study.getId());
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("participantPortal");
         spv.setValue("enabled");
         if (spv.getId() > 0)
