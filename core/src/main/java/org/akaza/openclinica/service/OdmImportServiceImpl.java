@@ -61,7 +61,6 @@ import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayo
 import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
@@ -93,7 +92,6 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.dataSource = dataSource;
     }
 
-    @Transactional
     public void importOdmToOC(org.cdisc.ns.odm.v130_sb.ODM odm) {
 
         UserAccount userAccount = getCurrentUser();
@@ -104,28 +102,20 @@ public class OdmImportServiceImpl implements OdmImportService {
         ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
         String str = portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
 
-        
-        
-        
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         // Update OC Study configuration
-        spv.setStudyId(study.getId());
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("participantPortal");
         spv.setValue("enabled");
         if (spv.getId() > 0)
             spvdao.update(spv);
         else
             spvdao.create(spv);
-        
-        
-        
-        
-        
-        
-        //StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        //pStatus.setValue("enabled");
-        //spvdao.update(pStatus);
+
+        // StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        // pStatus.setValue("enabled");
+        // spvdao.update(pStatus);
 
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
@@ -378,13 +368,14 @@ public class OdmImportServiceImpl implements OdmImportService {
             if (fmCrf.getOcoid().equals(crf.getOcOid())) {
                 for (Version version : fmCrf.getVersions()) {
                     if (version.getOcoid().equals(crfVersion.getOcOid())) {
-                        crfVersion.setDescription(version.getDescription());
+                        crfVersion.setDescription("Description");
+                        crfVersion.setRevisionNotes("Revision");
                         crfVersion.setName(version.getName());
                         if (version.getFileLinks() != null) {
                             for (String fileLink : version.getFileLinks()) {
-                                ////////////////////
                                 if (fileLink.endsWith(".xml")) {
                                     crfVersion.setXform(getXFormFromFormManager(fileLink));
+                                    crfVersion.setXformName("default");
                                     break;
                                 }
                             }
@@ -539,6 +530,22 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.eventDefinitionCrfTagDao = eventDefinitionCrfTagDao;
     }
 
+    public XformParser getXformParser() {
+        return xformParser;
+    }
+
+    public void setXformParser(XformParser xformParser) {
+        this.xformParser = xformParser;
+    }
+
+    public XformMetaDataService getXformService() {
+        return xformService;
+    }
+
+    public void setXformService(XformMetaDataService xformService) {
+        this.xformService = xformService;
+    }
+
     public Crf[] getCrfsFromFormManager(Study study) {
         String protocolId = study.getUniqueIdentifier();
         // String url = "http://159.203.83.212:8080/api/protocol/" + protocolId + "/forms";
@@ -594,6 +601,8 @@ public class OdmImportServiceImpl implements OdmImportService {
             StudyBean currentStudy = (StudyBean) sdao.findByPK(study.getStudyId());
             UserAccountDAO udao = new UserAccountDAO(dataSource);
             UserAccountBean ub = (UserAccountBean) udao.findByPK(userAccount.getUserId());
+            ub.setActiveStudyId(currentStudy.getId());
+            udao.update(ub);
             // Save meta-data in database
 
             try {
