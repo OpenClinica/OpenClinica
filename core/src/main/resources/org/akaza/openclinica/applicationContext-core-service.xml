@@ -146,6 +146,7 @@
         <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>        
         <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>        
         <property name="studyDao" ref="studyDaoDomain"/>
+        <property name="xformParser" ref="xformParser"/>
     </bean>
 
 
