@@ -129,8 +129,6 @@ public class XformMetaDataService {
             String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
             String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
 
-        CrfVersion crfVersion;
-
         // Retrieve CrfBean. Create one if it doesn't exist yet.
         CrfBean crf = null;
         if (version.getCrfId() > 0) {
@@ -138,11 +136,6 @@ public class XformMetaDataService {
             crf.setUpdateId(ub.getId());
             crf.setDateUpdated(new Date());
             crfDao.saveOrUpdate(crf);
-
-            crfVersion = crfVersionDao.findByOcOID(version.getOid());
-            // crfVersion.setXform(submittedXformText);
-            crfVersion.setXformName(container.getInstanceName());
-            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
 
         } else {
             crf = new CrfBean();
@@ -156,6 +149,15 @@ public class XformMetaDataService {
             crf.setDateUpdated(new Date());
             Integer crfId = (Integer) crfDao.save(crf);
             crf.setCrfId(crfId);
+        }
+        CrfVersion crfVersion = null;
+        if (version.getOid() != null) {
+            crfVersion = crfVersionDao.findByOcOID(version.getOid());
+            // crfVersion.setXform(submittedXformText);
+            crfVersion.setXformName(container.getInstanceName());
+            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+
+        } else {
 
             // Create new CRF Version
             crfVersion = new CrfVersion();
