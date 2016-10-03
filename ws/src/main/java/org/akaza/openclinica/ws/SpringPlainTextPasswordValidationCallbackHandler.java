@@ -97,8 +97,17 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
         public boolean validate(PasswordValidationCallback.Request request) throws PasswordValidationCallback.PasswordValidationException {
             PasswordValidationCallback.PlainTextPasswordRequest plainTextRequest = (PasswordValidationCallback.PlainTextPasswordRequest) request;
             try {
+                String password =
+                    plainTextRequest.getPassword();
+                if (password != null) {
+                    password =
+                        password.toLowerCase();
+                }
                 Authentication authResult =
-                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(plainTextRequest.getUsername(), plainTextRequest.getPassword()));
+                    authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                            plainTextRequest.getUsername(),
+                            password));
                 if (logger.isDebugEnabled()) {
                     logger.debug("Authentication success: " + authResult.toString());
                 }

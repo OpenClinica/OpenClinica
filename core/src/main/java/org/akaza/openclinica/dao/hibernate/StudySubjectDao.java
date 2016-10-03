@@ -3,6 +3,8 @@ package org.akaza.openclinica.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Query;
+
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudySubjectOidGenerator;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -61,6 +63,25 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (ArrayList<StudyEvent>) q.list();
 
     }
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<StudySubject> getBySubjectUID(
+		String subjectUID) {
+
+		String hql =
+			" from StudySubject ss "
+				+ "where ss.subject.uniqueIdentifier= :subjectUID";
+		Query query =
+			getCurrentSession().
+			createQuery(
+				hql);
+		query.setString(
+			"subjectUID",
+			subjectUID);
+
+		return (List<StudySubject>) query.list();
+    }
+
     public String getValidOid(StudySubject studySubject, ArrayList<String> oidList) {
     OidGenerator oidGenerator = new StudySubjectOidGenerator();
         String oid = getOid(studySubject);
