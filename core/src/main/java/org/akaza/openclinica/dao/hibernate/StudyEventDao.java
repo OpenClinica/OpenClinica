@@ -1,11 +1,13 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.Date;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.hibernate.Query;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Propagation;
@@ -76,6 +78,29 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return eventList;
 
 	}
+
+	public List<StudyEvent> fetchListOpenEventsByStudySubjectAndDate(
+		int studySubjectId,
+		Date dateStart){
+
+		String hql = 
+			"from StudyEvent se "
+				+ "where se.studySubject.studySubjectId = :studySubjectId "
+				+ "and se.dateStart <= :dateStart";
+		Query query =
+			getCurrentSession().
+			createQuery(
+				hql);
+		query.setInteger(
+			"studySubjectId",
+			studySubjectId);
+		query.setDate(
+			"dateStart",
+			dateStart);
+
+        	return (List<StudyEvent>) query.list();
+	}
+
 
 	@Transactional(propagation = Propagation.NEVER)
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
