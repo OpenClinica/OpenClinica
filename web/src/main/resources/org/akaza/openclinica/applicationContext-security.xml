@@ -40,6 +40,10 @@
     <security:intercept-url pattern="/pages/api/v2/anonymousform/**" filters="none"/>
     <security:intercept-url pattern="/pages/api/v1/editform/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" filters="none"/>
+
+    <security:intercept-url pattern="/pages/personSubject/**" filters="none"/>
+    <security:intercept-url pattern="/pages/studyEvent/**" filters="none"/>
+
     <security:intercept-url pattern="/pages/auth/api/**" filters="none"/>
     <!--
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
@@ -168,6 +172,14 @@
 
 <bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
 </bean>
+
+    <bean id="personSubjectResource" class="org.akaza.openclinica.web.restful_ssib.PersonSubjectResource">
+        <property name="studySubjectDao" ref="studySubjectDaoDomain"/>
+    </bean>
+
+    <bean id="studySubjectEventResource" class="org.akaza.openclinica.web.restful_ssib.StudySubjectEventResource">
+        <property name="studyEventDao" ref="studyEventDaoDomain"/>
+    </bean>
 
 
 </beans>
