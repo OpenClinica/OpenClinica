@@ -7,30 +7,6 @@
  */
 package org.akaza.openclinica.ws;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.EventServiceInterface;
-
-import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
-import org.akaza.openclinica.ws.validator.StudyEventTransferValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.xml.DomUtils;
-import org.springframework.validation.DataBinder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
-import org.springframework.ws.server.endpoint.annotation.Endpoint;
-import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
-import org.springframework.ws.server.endpoint.annotation.XPathParam;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,6 +18,33 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.EventServiceInterface;
+import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
+import org.akaza.openclinica.ws.validator.StudyEventTransferValidator;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.xml.DomUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.XPathParam;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Krikor Krumlian
@@ -58,6 +61,8 @@ public class EventEndpoint {
     private final MessageSource messages;
     private final DataSource dataSource;
     Locale locale;
+
+    private TransactionTemplate transactionTemplate;
 
     /**
      * Constructor
@@ -77,10 +82,25 @@ public class EventEndpoint {
      * 
      */
     @PayloadRoot(localPart = "scheduleRequest", namespace = NAMESPACE_URI_V1)
-    public Source createSubject(@XPathParam("//e:event") NodeList event, @XPathParam("//e:study") String study,
-            @XPathParam("//e:eventDefinitionOID") String eventDefinitionOID, @XPathParam("//e:location") String location,
-            @XPathParam("//e:startDate") String startDate, @XPathParam("//e:startTime") String startTime, @XPathParam("//e:endDate") String endDate,
-            @XPathParam("//e:endTime") String endTime) throws Exception {
+    public Source scheduleEvent(@XPathParam("//e:event") final NodeList event) throws Exception {
+        
+        return getTransactionTemplate().execute(new TransactionCallback<Source>() {
+            public Source doInTransaction(TransactionStatus status) {
+                Source result = null;
+                try {
+                    result = scheduleEventInTransaction(event);
+                    assert (result != null);
+                } catch (Throwable t) {
+                    logger.error(t.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(t));
+                    throw new RuntimeException("Error processing schedule event request", t);
+                }
+                return result;
+            }
+        });
+    }
+
+    protected Source scheduleEventInTransaction(NodeList event) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element eventElement = (Element) event.item(0);
         StudyEventTransferBean studyEventTransferBean = unMarshallToEventTransfer(eventElement);
@@ -102,8 +122,13 @@ public class EventEndpoint {
             } catch (OpenClinicaSystemException ose) {
                 errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");
                 return new DOMSource(mapFailConfirmation(errors));
+            } catch (Exception e) { 
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+                throw e;
             }
         } else {
+           
             return new DOMSource(mapFailConfirmation(errors));
         }
     }
@@ -262,6 +287,14 @@ public class EventEndpoint {
 
     public EventServiceInterface getEventService() {
         return eventService;
+    }
+
+    public TransactionTemplate getTransactionTemplate() {
+        return transactionTemplate;
+    }
+
+    public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+        this.transactionTemplate = transactionTemplate;
     }
 
 }
