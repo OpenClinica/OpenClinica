@@ -190,6 +190,7 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>
         <property name="dateFormat" value="yyyy-MM-dd"/>
+        <property name="transactionTemplate" ref="sharedTransactionTemplate"/>
     </bean>
 
     <bean id="crfEndpoint" class="org.akaza.openclinica.ws.CrfEndpoint">

@@ -480,6 +480,12 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      * Creates a new studysubject
      */
     public EntityBean create(EntityBean eb) {
+        return create(eb,false);
+    }
+    /**
+     * Creates a new studysubject
+     */
+    public EntityBean create(EntityBean eb, boolean isTransaction) {
         StudyEventBean sb = (StudyEventBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
@@ -521,6 +527,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         }
         
         StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,true);
+        changeDetails.setRunningInTransaction(isTransaction);
         StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
         notifyObservers(container);
         return sb;

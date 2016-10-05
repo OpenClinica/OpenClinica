@@ -1,5 +1,10 @@
 package org.akaza.openclinica.service;
 
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -17,11 +22,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.sql.DataSource;
 
 public class EventService implements EventServiceInterface {
 
@@ -67,7 +67,7 @@ public class EventService implements EventServiceInterface {
             studyEvent.setStatus(Status.AVAILABLE);
             studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
             studyEvent.setSampleOrdinal(getStudyEventDao().getMaxSampleOrdinal(studyEventDefinition, studySubject) + 1);
-            studyEvent = (StudyEventBean) getStudyEventDao().create(studyEvent);
+            studyEvent = (StudyEventBean) getStudyEventDao().create(studyEvent, true);
             studyEventOrdinal = studyEvent.getSampleOrdinal();
 
         } else {
