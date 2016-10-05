@@ -82,28 +82,25 @@ public class EventEndpoint {
      * 
      */
     @PayloadRoot(localPart = "scheduleRequest", namespace = NAMESPACE_URI_V1)
-    public Source scheduleEvent(@XPathParam("//e:event") final NodeList event, @XPathParam("//e:study") final String study,
-            @XPathParam("//e:eventDefinitionOID") final String eventDefinitionOID, @XPathParam("//e:location") final String location,
-            @XPathParam("//e:startDate") final String startDate, @XPathParam("//e:startTime") final String startTime, @XPathParam("//e:endDate") final String endDate,
-            @XPathParam("//e:endTime") final String endTime) throws Exception {
+    public Source scheduleEvent(@XPathParam("//e:event") final NodeList event) throws Exception {
         
         return getTransactionTemplate().execute(new TransactionCallback<Source>() {
             public Source doInTransaction(TransactionStatus status) {
+                Source result = null;
                 try {
-                    return scheduleEventInTransaction(event,study,eventDefinitionOID,location,startDate,startTime,endDate,endTime);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error processing schedule event request", e);
+                    result = scheduleEventInTransaction(event);
+                    assert (result != null);
+                } catch (Throwable t) {
+                    logger.error(t.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(t));
+                    throw new RuntimeException("Error processing schedule event request", t);
                 }
+                return result;
             }
         });
     }
 
-        
-        
-
-    protected Source scheduleEventInTransaction(NodeList event, String study, String eventDefinitionOID,
-            String location, String startDate, String startTime, String endDate, String endTime) throws Exception {
-        // TODO Auto-generated method stub
+    protected Source scheduleEventInTransaction(NodeList event) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element eventElement = (Element) event.item(0);
         StudyEventTransferBean studyEventTransferBean = unMarshallToEventTransfer(eventElement);
@@ -131,6 +128,7 @@ public class EventEndpoint {
                 throw e;
             }
         } else {
+           
             return new DOMSource(mapFailConfirmation(errors));
         }
     }
