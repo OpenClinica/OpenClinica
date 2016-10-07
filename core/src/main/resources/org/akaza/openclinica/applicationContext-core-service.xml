@@ -137,7 +137,6 @@
     </bean>
 
     <bean id="odmImportServiceImpl" class="org.akaza.openclinica.service.OdmImportServiceImpl" autowire="byName">
-        <constructor-arg ref="dataSource"/>
         <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
@@ -146,6 +145,7 @@
         <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>        
         <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>        
         <property name="studyDao" ref="studyDaoDomain"/>
+        <property name="studyParameterValueDao" ref="studyParameterValueDao"/>
         <property name="xformParser" ref="xformParser"/>
     </bean>
 

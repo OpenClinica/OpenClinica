@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
+
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 
 public class CrfVersionMediaDao extends AbstractDomainDao<CrfVersionMedia> {
@@ -17,4 +18,13 @@ public class CrfVersionMediaDao extends AbstractDomainDao<CrfVersionMedia> {
         q.setInteger("crfversionid", crf_version_id);
         return (ArrayList<CrfVersionMedia>) q.list();
     }
+
+    public CrfVersionMedia findByCrfVersionIdAndFileName(int crf_version_id, String fileName) {
+        String query = "from " + getDomainClassName() + " do  where do.crfVersion.crfVersionId = :crfversionid and do.name = :fileName";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("crfversionid", crf_version_id);
+        q.setString("fileName", fileName);
+        return (CrfVersionMedia) q.uniqueResult();
+    }
+
 }

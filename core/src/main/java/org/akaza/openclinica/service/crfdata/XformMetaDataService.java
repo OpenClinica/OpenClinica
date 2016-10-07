@@ -218,11 +218,14 @@ public class XformMetaDataService {
                         fileName = fileName.substring(startIndex + 1, fileName.length());
                     }
 
-                    CrfVersionMedia media = new CrfVersionMedia();
-                    media.setCrfVersion(version);
-                    media.setName(fileName);
-                    media.setPath(dir);
-                    crfVersionMediaDao.saveOrUpdate(media);
+                    CrfVersionMedia media = crfVersionMediaDao.findByCrfVersionIdAndFileName(version.getCrfVersionId(), fileName);
+                    if (media == null) {
+                        media = new CrfVersionMedia();
+                        media.setCrfVersion(version);
+                        media.setName(fileName);
+                        media.setPath(dir);
+                        crfVersionMediaDao.saveOrUpdate(media);
+                    }
 
                 }
             }
