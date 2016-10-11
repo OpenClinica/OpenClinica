@@ -13,14 +13,17 @@ public class PopulateEDCTagParameter {
     private String crfPath;
     private EventDefinitionCrfTag eventDefinitionCrfTag;
 
-    public PopulateEDCTagParameter(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount, OCodmComplexTypeDefinitionConfigurationParameters conf,
-            int tagId, String crfPath, EventDefinitionCrfTag eventDefinitionCrfTag) {
-        this.eventDefinitionCrf = eventDefinitionCrf;
-        this.userAccount = userAccount;
-        this.conf = conf;
-        this.tagId = tagId;
-        this.crfPath = crfPath;
-        this.eventDefinitionCrfTag = eventDefinitionCrfTag;
+    public PopulateEDCTagParameter(PopulateEDCTagParameter paramObj) {
+        this.eventDefinitionCrf = paramObj.eventDefinitionCrf;
+        this.userAccount = paramObj.userAccount;
+        this.conf = paramObj.conf;
+        this.tagId = paramObj.tagId;
+        this.crfPath = paramObj.crfPath;
+        this.eventDefinitionCrfTag = paramObj.eventDefinitionCrfTag;
+    }
+
+    public PopulateEDCTagParameter() {
+        // TODO Auto-generated constructor stub
     }
 
     public EventDefinitionCrf getEventDefinitionCrf() {

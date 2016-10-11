@@ -14,14 +14,17 @@ public class PopulateCrfVersionParameter {
     private String url;
     private Crf[] fmCrfs;
 
-    public PopulateCrfVersionParameter(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfVersion crfVersion, CrfBean crf, String url,
-            Crf[] fmCrfs) {
-        this.odmFormDef = odmFormDef;
-        this.userAccount = userAccount;
-        this.crfVersion = crfVersion;
-        this.crf = crf;
-        this.url = url;
-        this.fmCrfs = fmCrfs;
+    public PopulateCrfVersionParameter(PopulateCrfVersionParameter paramObj) {
+        this.odmFormDef = paramObj.odmFormDef;
+        this.userAccount = paramObj.userAccount;
+        this.crfVersion = paramObj.crfVersion;
+        this.crf = paramObj.crf;
+        this.url = paramObj.url;
+        this.fmCrfs = paramObj.fmCrfs;
+    }
+
+    public PopulateCrfVersionParameter() {
+        // TODO Auto-generated constructor stub
     }
 
     public ODMcomplexTypeDefinitionFormDef getOdmFormDef() {

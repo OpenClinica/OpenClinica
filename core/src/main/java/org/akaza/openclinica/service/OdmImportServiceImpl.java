@@ -176,10 +176,23 @@ public class OdmImportServiceImpl implements OdmImportService {
                             defaultVersionOid = formLayoutRefs.get(0).getOID();
                         }
                         crfVersion = getCrfVersionDao().findByOcOID(defaultVersionOid);
-                        eventDefinitionCrf = saveOrUpdateEventDefnCrf(new SaveOrUpdateEventDefnCrfParameter(userAccount, study, studyEventDefinition, crf,
-                                crfVersion, eventDefinitionCrf, conf, odmFormRef));
-                        saveOrUpdateEventDefnCrfTag(new SaveOrUpdateEventDefnCrfTagParameter(
-                                new SaveOrUpdateEventDefnCrfTagParameterParameter(userAccount, studyEventDefinition, crf, eventDefinitionCrf, conf)));
+                        PopulateEventDefinitionCrfParameter paramObj = new PopulateEventDefinitionCrfParameter();
+                        paramObj.setUserAccount(userAccount);
+                        paramObj.setConf(conf);
+                        paramObj.setCrf(crf);
+                        paramObj.setEventDefinitionCrf(eventDefinitionCrf);
+                        paramObj.setOdmFormRef(odmFormRef);
+                        paramObj.setStudy(study);
+                        paramObj.setCrfVersion(crfVersion);
+                        paramObj.setStudyEventDefinition(studyEventDefinition);
+
+                        PopulateEDCTagParameter populateEDCTagParameter = new PopulateEDCTagParameter();
+                        populateEDCTagParameter.setConf(conf);
+                        populateEDCTagParameter.setEventDefinitionCrf(eventDefinitionCrf);
+                        populateEDCTagParameter.setUserAccount(userAccount);
+
+                        eventDefinitionCrf = saveOrUpdateEventDefnCrf(new PopulateEventDefinitionCrfParameter(paramObj));
+                        saveOrUpdateEDCTag(new PopulateEDCTagParameter(populateEDCTagParameter), studyEventDefinition, crf);
                         jsonEventDefCrfList.add(eventDefinitionCrf);
                     }
 
@@ -199,32 +212,30 @@ public class OdmImportServiceImpl implements OdmImportService {
 
     }
 
-    private void saveOrUpdateEventDefnCrfTag(SaveOrUpdateEventDefnCrfTagParameter paramObj) {
+    private void saveOrUpdateEDCTag(PopulateEDCTagParameter paramObj, StudyEventDefinition studyEventDefinition, CrfBean crf) {
         EventDefinitionCrfTag eventDefinitionCrfTag;
         int tagId = 2; // Offline
-        String crfPath = paramObj.getStudyEventDefinition().getOc_oid() + "." + paramObj.getCrf().getOcOid();
+        String crfPath = studyEventDefinition.getOc_oid() + "." + crf.getOcOid();
         eventDefinitionCrfTag = getEventDefinitionCrfTagDao().findByCrfPathAndTagId(tagId, crfPath);
+        paramObj.setTagId(tagId);
+        paramObj.setCrfPath(crfPath);
         if (eventDefinitionCrfTag == null) {
             eventDefinitionCrfTag = new EventDefinitionCrfTag();
-            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(populateEDCTag(new PopulateEDCTagParameter(paramObj.getEventDefinitionCrf(),
-                    paramObj.getUserAccount(), paramObj.getConf(), tagId, crfPath, eventDefinitionCrfTag)));
+            paramObj.setEventDefinitionCrfTag(eventDefinitionCrfTag);
+            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(populateEDCTag(new PopulateEDCTagParameter(paramObj)));
         } else {
-            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(updateEDCTag(new UpdateEDCTagParameter(paramObj.getEventDefinitionCrf(),
-                    paramObj.getUserAccount(), paramObj.getConf(), tagId, crfPath, eventDefinitionCrfTag)));
+            paramObj.setEventDefinitionCrfTag(eventDefinitionCrfTag);
+            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(updateEDCTag(new PopulateEDCTagParameter(paramObj)));
         }
     }
 
-    private EventDefinitionCrf saveOrUpdateEventDefnCrf(SaveOrUpdateEventDefnCrfParameter paramObj) {
+    private EventDefinitionCrf saveOrUpdateEventDefnCrf(PopulateEventDefinitionCrfParameter paramObj) {
         EventDefinitionCrf eventDefinitionCrf = paramObj.getEventDefinitionCrf();
         if (eventDefinitionCrf == null) {
             eventDefinitionCrf = new EventDefinitionCrf();
-            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(
-                    populateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(eventDefinitionCrf, paramObj.getUserAccount(), paramObj.getCrf(),
-                            paramObj.getCrfVersion(), paramObj.getConf(), paramObj.getStudy(), paramObj.getStudyEventDefinition(), paramObj.getOdmFormRef())));
+            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(populateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(paramObj)));
         } else {
-            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(
-                    updateEventDefinitionCrf(new UpdateEventDefinitionCrfParameter(eventDefinitionCrf, paramObj.getUserAccount(), paramObj.getCrf(),
-                            paramObj.getCrfVersion(), paramObj.getConf(), paramObj.getStudy(), paramObj.getStudyEventDefinition(), paramObj.getOdmFormRef())));
+            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(updateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(paramObj)));
         }
         return eventDefinitionCrf;
     }
@@ -247,7 +258,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                 try {
                     parseCrfVersion(crf, version, study, userAccount);
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -258,17 +268,23 @@ public class OdmImportServiceImpl implements OdmImportService {
         CrfVersion crfVersion = null;
         List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
-
             crfVersion = getCrfVersionDao().findByOcOID(formLayoutDef.getOID());
             String url = formLayoutDef.getURL();
+
+            PopulateCrfVersionParameter populateCrfVersionParameter = new PopulateCrfVersionParameter();
+            populateCrfVersionParameter.setCrf(crf);
+            populateCrfVersionParameter.setFmCrfs(fmCrfs);
+            populateCrfVersionParameter.setOdmFormDef(odmFormDef);
+            populateCrfVersionParameter.setUserAccount(userAccount);
+            populateCrfVersionParameter.setCrfVersion(crfVersion);
+            populateCrfVersionParameter.setUrl(url);
+
             if (crfVersion == null) {
                 crfVersion = new CrfVersion();
                 crfVersion.setOcOid(formLayoutDef.getOID());
-                crfVersion = getCrfVersionDao()
-                        .saveOrUpdate(populateCrfVersion(new PopulateCrfVersionParameter(odmFormDef, userAccount, crfVersion, crf, url, fmCrfs)));
+                crfVersion = getCrfVersionDao().saveOrUpdate(populateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             } else {
-                crfVersion = getCrfVersionDao()
-                        .saveOrUpdate(updateCrfVersion(new UpdateCrfVersionParameter(odmFormDef, userAccount, crfVersion, crf, url, fmCrfs)));
+                crfVersion = getCrfVersionDao().saveOrUpdate(updateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             }
         }
         return crfVersion;
@@ -427,10 +443,9 @@ public class OdmImportServiceImpl implements OdmImportService {
         return paramObj.getCrfVersion();
     }
 
-    private CrfVersion updateCrfVersion(UpdateCrfVersionParameter paramObj) {
+    private CrfVersion updateCrfVersion(PopulateCrfVersionParameter paramObj) {
         CrfVersion crfVersion = paramObj.getCrfVersion();
-        crfVersion = populateCrfVersion(new PopulateCrfVersionParameter(paramObj.getOdmFormDef(), paramObj.getUserAccount(), crfVersion, paramObj.getCrf(),
-                paramObj.getUrl(), paramObj.getFmCrfs()));
+        crfVersion = populateCrfVersion(new PopulateCrfVersionParameter(paramObj));
         crfVersion.setUpdateId(paramObj.getUserAccount().getUserId());
         crfVersion.setDateUpdated(new Date());
         return crfVersion;
@@ -457,11 +472,9 @@ public class OdmImportServiceImpl implements OdmImportService {
         return paramObj.getEventDefinitionCrf();
     }
 
-    private EventDefinitionCrf updateEventDefinitionCrf(UpdateEventDefinitionCrfParameter paramObj) {
+    private EventDefinitionCrf updateEventDefinitionCrf(PopulateEventDefinitionCrfParameter paramObj) {
         EventDefinitionCrf eventDefinitionCrf = paramObj.getEventDefinitionCrf();
-        eventDefinitionCrf = populateEventDefinitionCrf(
-                new PopulateEventDefinitionCrfParameter(eventDefinitionCrf, paramObj.getUserAccount(), paramObj.getCrf(), paramObj.getCrfVersion(),
-                        paramObj.getConf(), paramObj.getStudy(), paramObj.getStudyEventDefinition(), paramObj.getOdmFormRef()));
+        eventDefinitionCrf = populateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(paramObj));
         eventDefinitionCrf.setUpdateId(paramObj.getUserAccount().getUserId());
         eventDefinitionCrf.setDateUpdated(new Date());
 
@@ -500,10 +513,9 @@ public class OdmImportServiceImpl implements OdmImportService {
         return paramObj.getEventDefinitionCrfTag();
     }
 
-    private EventDefinitionCrfTag updateEDCTag(UpdateEDCTagParameter paramObj) {
+    private EventDefinitionCrfTag updateEDCTag(PopulateEDCTagParameter paramObj) {
         EventDefinitionCrfTag eventDefinitionCrfTag = paramObj.getEventDefinitionCrfTag();
-        eventDefinitionCrfTag = populateEDCTag(new PopulateEDCTagParameter(paramObj.getEventDefinitionCrf(), paramObj.getUserAccount(), paramObj.getConf(),
-                paramObj.getTagId(), paramObj.getCrfPath(), eventDefinitionCrfTag));
+        eventDefinitionCrfTag = populateEDCTag(new PopulateEDCTagParameter(paramObj));
         eventDefinitionCrfTag.setUpdateId(paramObj.getUserAccount().getUserId());
         eventDefinitionCrfTag.setDateUpdated(new Date());
         return eventDefinitionCrfTag;
@@ -634,13 +646,11 @@ public class OdmImportServiceImpl implements OdmImportService {
                 IOUtils.write(response.getBody(), output);
                 fileItem = new DiskFileItem("media_file", response.getHeaders().get("Content-Type").get(0), false, fileName, 100000000, file);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
                 try {
                     output.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -688,9 +698,16 @@ public class OdmImportServiceImpl implements OdmImportService {
         CRFVersionBean crfVersion = new CRFVersionBean();
         crfVersion.setOid(version.getOcOid());
         crfVersion.setCrfId(version.getCrf().getCrfId());
+        ValidateFormFieldsParameter validateFormFieldsParameter = new ValidateFormFieldsParameter();
+        validateFormFieldsParameter.setErrors(errors);
+        validateFormFieldsParameter.setSubmittedCrfName(submittedCrfName);
+        validateFormFieldsParameter.setSubmittedCrfVersionDescription(submittedCrfVersionDescription);
+        validateFormFieldsParameter.setSubmittedCrfVersionName(submittedCrfVersionName);
+        validateFormFieldsParameter.setSubmittedRevisionNotes(submittedRevisionNotes);
+        validateFormFieldsParameter.setSubmittedXformText(submittedXformText);
+        validateFormFieldsParameter.setVersion(crfVersion);
 
-        validateFormFields(new ValidateFormFieldsParameter(errors, crfVersion, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription,
-                submittedRevisionNotes, submittedXformText));
+        validateFormFields(validateFormFieldsParameter);
 
         if (!errors.hasErrors()) {
             // Parse instance and xform
@@ -711,7 +728,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                 xformService.createCRFMetaData(crfVersion, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
                         submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

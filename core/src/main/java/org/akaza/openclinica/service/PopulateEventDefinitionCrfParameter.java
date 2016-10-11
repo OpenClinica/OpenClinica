@@ -19,17 +19,19 @@ public class PopulateEventDefinitionCrfParameter {
     private StudyEventDefinition studyEventDefinition;
     private ODMcomplexTypeDefinitionFormRef odmFormRef;
 
-    public PopulateEventDefinitionCrfParameter(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount, CrfBean crf, CrfVersion crfVersion,
-            OCodmComplexTypeDefinitionConfigurationParameters conf, Study study, StudyEventDefinition studyEventDefinition,
-            ODMcomplexTypeDefinitionFormRef odmFormRef) {
-        this.eventDefinitionCrf = eventDefinitionCrf;
-        this.userAccount = userAccount;
-        this.crf = crf;
-        this.crfVersion = crfVersion;
-        this.conf = conf;
-        this.study = study;
-        this.studyEventDefinition = studyEventDefinition;
-        this.odmFormRef = odmFormRef;
+    public PopulateEventDefinitionCrfParameter(PopulateEventDefinitionCrfParameter paramObj) {
+        this.eventDefinitionCrf = paramObj.eventDefinitionCrf;
+        this.userAccount = paramObj.userAccount;
+        this.crf = paramObj.crf;
+        this.crfVersion = paramObj.crfVersion;
+        this.conf = paramObj.conf;
+        this.study = paramObj.study;
+        this.studyEventDefinition = paramObj.studyEventDefinition;
+        this.odmFormRef = paramObj.odmFormRef;
+    }
+
+    public PopulateEventDefinitionCrfParameter() {
+        // TODO Auto-generated constructor stub
     }
 
     public EventDefinitionCrf getEventDefinitionCrf() {

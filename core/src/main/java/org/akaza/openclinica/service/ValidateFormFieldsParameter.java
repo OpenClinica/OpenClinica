@@ -12,15 +12,18 @@ public class ValidateFormFieldsParameter {
     private String submittedRevisionNotes;
     private String submittedXformText;
 
-    public ValidateFormFieldsParameter(Errors errors, CRFVersionBean version, String submittedCrfName, String submittedCrfVersionName,
-            String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
-        this.errors = errors;
-        this.version = version;
-        this.submittedCrfName = submittedCrfName;
-        this.submittedCrfVersionName = submittedCrfVersionName;
-        this.submittedCrfVersionDescription = submittedCrfVersionDescription;
-        this.submittedRevisionNotes = submittedRevisionNotes;
-        this.submittedXformText = submittedXformText;
+    public ValidateFormFieldsParameter(ValidateFormFieldsParameter validateFormFieldsParameter) {
+        this.errors = validateFormFieldsParameter.errors;
+        this.version = validateFormFieldsParameter.version;
+        this.submittedCrfName = validateFormFieldsParameter.submittedCrfName;
+        this.submittedCrfVersionName = validateFormFieldsParameter.submittedCrfVersionName;
+        this.submittedCrfVersionDescription = validateFormFieldsParameter.submittedCrfVersionDescription;
+        this.submittedRevisionNotes = validateFormFieldsParameter.submittedRevisionNotes;
+        this.submittedXformText = validateFormFieldsParameter.submittedXformText;
+    }
+
+    public ValidateFormFieldsParameter() {
+        // TODO Auto-generated constructor stub
     }
 
     public Errors getErrors() {
