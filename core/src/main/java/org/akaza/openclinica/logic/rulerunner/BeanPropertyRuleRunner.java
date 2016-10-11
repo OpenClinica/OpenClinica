@@ -1,6 +1,5 @@
 package org.akaza.openclinica.logic.rulerunner;
 
-//import com.ecyrd.speed4j.StopWatch;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;

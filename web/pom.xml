@@ -67,10 +67,6 @@
             <artifactId>spring-webmvc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
@@ -96,7 +92,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -320,7 +315,7 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -376,29 +371,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-plugin</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
             <scope>test</scope>
@@ -443,6 +415,10 @@
             <groupId>com.stormpath.spring</groupId>
             <artifactId>stormpath-default-spring-boot-starter</artifactId>
             <version>${stormpath.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.akaza.openclinica.odm</groupId>
+            <artifactId>openclinica-odm</artifactId>
         </dependency>
     </dependencies>
 
@@ -502,62 +478,62 @@
             </plugins>
         </pluginManagement>
     </build>
-<profiles>
-    <profile>
-        <id>heroku</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-            <property>
-                <name>environment</name>
-                <value>heroku</value>
-            </property>
-        </activation>
-        <build>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>auto-clean</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>clean</goal>
-                                </goals>
-                                <configuration>
-                                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                                    <filesets>
-                                        <fileset>
-                                            <directory>target</directory>
-                                            <includes>
-                                                <include>**/*.jar</include>
-                                            </includes>
-                                        </fileset>
-                                    </filesets>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </pluginManagement>
+    <profiles>
+        <profile>
+            <id>heroku</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>heroku</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-clean-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>auto-clean</id>
+                                    <phase>install</phase>
+                                    <goals>
+                                        <goal>clean</goal>
+                                    </goals>
+                                    <configuration>
+                                        <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                                        <filesets>
+                                            <fileset>
+                                                <directory>target</directory>
+                                                <includes>
+                                                    <include>**/*.jar</include>
+                                                </includes>
+                                            </fileset>
+                                        </filesets>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
 
             </build>
         </profile>
 
-    <profile>
-        <id>local</id>
-        <activation>
-            <property>
-                <name>environment</name>
-                <value>local</value>
-            </property>
-        </activation>
-    </profile>
-</profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>local</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>
-        <stormpath.version>1.0.RC9.2</stormpath.version>
+        <stormpath.version>1.0.4</stormpath.version>
     </properties>
 
 </project>
