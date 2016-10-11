@@ -137,7 +137,7 @@ public class OpenRosaSubmissionController {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
 
-            if (!errors.hasErrors()) {
+            if (errors.hasErrors()) {
                 // Send a failure response
                 logger.info("Submission caused internal error.  Sending error response.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
@@ -152,6 +152,97 @@ public class OpenRosaSubmissionController {
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
         } else {
             logger.info("Submission contained errors. Sending error response");
+            return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    /**
+     * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
+     * @apiName doSubmission
+     * @apiPermission admin
+     * @apiVersion 3.8.0
+     * @apiParam {String} studyOid Study Oid.
+     * @apiParam {String} ecid Key that will be used to look up subject context information while processing submission.
+     * @apiGroup Form
+     * @apiDescription Submits the data from a completed form.
+     */
+
+    @RequestMapping(value = "/{studyOID}/fieldsubmission", method = RequestMethod.POST)
+    public ResponseEntity<String> doFieldSubmission(HttpServletRequest request, HttpServletResponse response,
+            @PathVariable("studyOID") String studyOID, @RequestParam(FORM_CONTEXT) String ecid) {
+
+        logger.info("Processing xform field submission.");
+        HashMap<String, String> subjectContext = null;
+        Locale locale = LocaleResolver.getLocale(request);
+
+        DataBinder dataBinder = new DataBinder(null);
+        Errors errors = dataBinder.getBindingResult();
+        Study study = studyDao.findByOcOID(studyOID);
+        String requestBody=null;
+        String instanceId = null;
+        HashMap<String,String> map = new HashMap();
+        ArrayList <HashMap> listOfUploadFilePaths = new ArrayList();
+
+        try {
+            // Verify Study is allowed to submit
+            if (!mayProceed(studyOID)) {
+                logger.info("Field Submissions to the study not allowed.  Aborting field submission.");
+                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            }
+            if (ServletFileUpload.isMultipartContent(request)) {
+                String dir = getAttachedFilePath(studyOID);
+                FileProperties fileProperties= new FileProperties();
+                DiskFileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                upload.setFileSizeMax(fileProperties.getFileSizeMax());
+                List<FileItem> items = upload.parseRequest(request);
+                for (FileItem item : items) {
+                    if (item.getFieldName().equals("instance_id")) {
+                        instanceId = item.getString();
+                    } else if (item.getFieldName().equals("xml_submission_fragment_file")) {
+                        requestBody = item.getString("UTF-8");
+                    } else if (item.getContentType() != null) {
+                        if (!new File(dir).exists()) new File(dir).mkdirs();
+
+                        File file = processUploadedFile(item, dir);
+                        map.put(item.getFieldName(), file.getPath());
+
+                    }
+                }
+                listOfUploadFilePaths.add(map);
+            }
+            if (instanceId == null)  {
+                logger.info("Field Submissions to the study not allowed without a valid instanceId.  Aborting field submission.");
+                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            }
+
+            // Load user context from ecid
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+
+            // Execute save as Hibernate transaction to avoid partial imports
+            openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale , listOfUploadFilePaths);
+
+        } catch (Exception e) {
+            logger.error("Exception while processing xform submission.");
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+
+            if (!errors.hasErrors()) {
+                // Send a failure response
+                logger.info("Submission caused internal error.  Sending error response.");
+                return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        if (!errors.hasErrors()) {
+            // Log submission with Participate
+            if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
+            logger.info("Completed xform field submission. Sending successful response");
+            String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
+            return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
+        } else {
+            logger.info("Field Submission contained errors. Sending error response");
             return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
     }
@@ -198,12 +289,16 @@ public class OpenRosaSubmissionController {
 
         if (ssBean == null) {
             logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE"))
+            //TODO:  Disabled pManage status check for OC16 conference.  Re-enable after.
+            //if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE"))
+            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available"))
                 accessPermission = true;
         } else {
             logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
                     + "  studySubjectStatus: " + ssBean.getStatus().getName());
-            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")
+            //TODO:  Disabled pManage status check for OC16 conference.  Re-enable after.
+            //if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")
+            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available")
                     && ssBean.getStatus() == Status.AVAILABLE)
                 accessPermission = true;
         }
