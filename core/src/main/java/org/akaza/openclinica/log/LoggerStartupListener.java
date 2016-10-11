@@ -56,12 +56,6 @@ public class LoggerStartupListener extends ContextAwareBase implements
 		context.putProperty("log.dir", getField("log.dir"));
 		context.putProperty("logLocation", getField("logLocation"));
 		context.putProperty("logLevel", getField("logLevel"));
-		context.putProperty("syslog.host", getField("syslog.host"));
-		context.putProperty("syslog.port", getField("syslog.port"));
-		context.putProperty("collectStats", getField("collectStats"));
-		context.putProperty("usage.stats.host", getField("usage.stats.host"));
-		context.putProperty("usage.stats.port", getField("usage.stats.port"));
-		context.putProperty("OpenClinica.version",getField("OpenClinica.version"));
 
 		started = true;
 	}
