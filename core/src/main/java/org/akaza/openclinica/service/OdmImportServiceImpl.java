@@ -649,7 +649,9 @@ public class OdmImportServiceImpl implements OdmImportService {
                 e.printStackTrace();
             } finally {
                 try {
-                    output.close();
+                    if (output != null) {
+                        output.close();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
