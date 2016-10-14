@@ -169,6 +169,8 @@ public class ExtractController {
         JobDetailFactoryBean.setDurability(true); // need durability? YES - we will want to see if it's finished
 
         try {
+
+            JobDetailFactoryBean.afterPropertiesSet();
             Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), simpleTrigger);
             logger.debug("== found job date: " + dateStart.toString());
 

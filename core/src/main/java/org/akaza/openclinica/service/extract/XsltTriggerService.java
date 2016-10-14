@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -57,7 +58,9 @@ public class XsltTriggerService {
         triggerFactoryBean.setGroup("group1");
         triggerFactoryBean.setStartTime(startDateTime);
         triggerFactoryBean.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-        SimpleTrigger trigger = triggerFactoryBean.getObject();
+        triggerFactoryBean.setRepeatInterval(1);
+        triggerFactoryBean.setRepeatCount(1);
+
 
         // set job data map
         JobDataMap jobDataMap = new JobDataMap();
@@ -87,6 +90,11 @@ public class XsltTriggerService {
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         jobDataMap.put(EP_BEAN, epBean);
+
+        triggerFactoryBean.setJobDataAsMap(jobDataMap);
+        triggerFactoryBean.afterPropertiesSet();
+
+        SimpleTrigger trigger = triggerFactoryBean.getObject();
 
         trigger.getTriggerBuilder().usingJobData(jobDataMap);
 
