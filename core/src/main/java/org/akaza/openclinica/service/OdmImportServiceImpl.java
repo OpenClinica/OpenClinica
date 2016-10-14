@@ -233,6 +233,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         EventDefinitionCrf eventDefinitionCrf = paramObj.getEventDefinitionCrf();
         if (eventDefinitionCrf == null) {
             eventDefinitionCrf = new EventDefinitionCrf();
+            paramObj.setEventDefinitionCrf(eventDefinitionCrf);
             eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(populateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(paramObj)));
         } else {
             eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(updateEventDefinitionCrf(new PopulateEventDefinitionCrfParameter(paramObj)));
@@ -276,14 +277,15 @@ public class OdmImportServiceImpl implements OdmImportService {
             populateCrfVersionParameter.setFmCrfs(fmCrfs);
             populateCrfVersionParameter.setOdmFormDef(odmFormDef);
             populateCrfVersionParameter.setUserAccount(userAccount);
-            populateCrfVersionParameter.setCrfVersion(crfVersion);
             populateCrfVersionParameter.setUrl(url);
 
             if (crfVersion == null) {
                 crfVersion = new CrfVersion();
                 crfVersion.setOcOid(formLayoutDef.getOID());
+                populateCrfVersionParameter.setCrfVersion(crfVersion);
                 crfVersion = getCrfVersionDao().saveOrUpdate(populateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             } else {
+                populateCrfVersionParameter.setCrfVersion(crfVersion);
                 crfVersion = getCrfVersionDao().saveOrUpdate(updateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             }
         }
