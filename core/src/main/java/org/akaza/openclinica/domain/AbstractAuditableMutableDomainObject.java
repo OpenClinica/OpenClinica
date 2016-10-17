@@ -1,18 +1,19 @@
 package org.akaza.openclinica.domain;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.hibernate.annotations.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.hibernate.annotations.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @MappedSuperclass
-public abstract class AbstractAuditableMutableDomainObject extends AbstractMutableDomainObject implements MutableDomainObject, AuditableMutableDomainObject {
+public abstract class AbstractAuditableMutableDomainObject extends AbstractMutableDomainObject implements MutableDomainObject, AuditableMutableDomainObject, Serializable {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     protected Date createdDate;
