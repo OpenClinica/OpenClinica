@@ -5,6 +5,6 @@ import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain;
 
 public interface Processor {
 
-    public SubmissionProcessorChain.ProcessorEnum process(SubmissionContainer container) throws Exception;
+    public SubmissionProcessorChain.ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception;
 
 }

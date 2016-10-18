@@ -1,46 +1,11 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.akaza.openclinica.controller.openrosa.ItemItemDataContainer;
 import org.akaza.openclinica.controller.openrosa.PformValidator;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
-import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteTypeDao;
-import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.ResolutionStatus;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -50,52 +15,64 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.*;
+
 import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
 @Component
 @Order(value=6)
 public class ItemProcessor implements Processor {
 
     @Autowired
-    ItemDataDao itemDataDao;
+    private ItemDataDao itemDataDao;
     
     @Autowired
-    ItemDao itemDao;
+    private ItemDao itemDao;
     
     @Autowired
-    ItemGroupDao itemGroupDao;
+    private ItemGroupDao itemGroupDao;
     
     @Autowired
-    ItemGroupMetadataDao itemGroupMetadataDao;
+    private ItemGroupMetadataDao itemGroupMetadataDao;
     
     @Autowired
-    ItemFormMetadataDao itemFormMetadataDao;
+    private ItemFormMetadataDao itemFormMetadataDao;
     
     @Autowired
-    CrfVersionDao crfVersionDao;
+    private CrfVersionDao crfVersionDao;
     
     @Autowired
-    DiscrepancyNoteDao discrepancyNoteDao;
+    private DiscrepancyNoteDao discrepancyNoteDao;
     
     @Autowired
-    ResolutionStatusDao resolutionStatusDao;
+    private ResolutionStatusDao resolutionStatusDao;
     
     @Autowired
-    DiscrepancyNoteTypeDao discrepancyNoteTypeDao;
+    private DiscrepancyNoteTypeDao discrepancyNoteTypeDao;
     
     @Autowired
-    DnItemDataMapDao dnItemDataMapDao;
+    private DnItemDataMapDao dnItemDataMapDao;
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public ProcessorEnum process(SubmissionContainer container) throws Exception {
+    private CrfVersion crfVersion;
+    private EventCrf eventCrf;
+    private ArrayList<ItemData> itemDataList;
+    private SubmissionContainer container;
+    private boolean fieldSubmissionFlag;
+
+    public ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
         logger.info("Executing Item Processor.");
-        ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
+        this.container = container;
+        this.fieldSubmissionFlag = fieldSubmissionFlag;
+        ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -117,9 +94,9 @@ public class ItemProcessor implements Processor {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
 
-                        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
-                        EventCrf eventCrf = container.getEventCrf();
-                        ArrayList<ItemData> itemDataList = new ArrayList<ItemData>();
+                        crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+                        eventCrf = container.getEventCrf();
+                        itemDataList = new ArrayList<ItemData>();
 
                         HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
                         NodeList groupNodeList = crfNode.getChildNodes();
@@ -134,96 +111,200 @@ public class ItemProcessor implements Processor {
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
                                     continue;
                                 }
-                                
-                                if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getItemGroupId())) groupOrdinalMapping.put(itemGroup.getItemGroupId(),new TreeSet<Integer>());
-
-                                NodeList itemNodeList = groupNode.getChildNodes();
-                                // Item loop
-                                for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
-                                    Node itemNode = itemNodeList.item(m);
-                                    if (itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
-                                            && !itemNode.getNodeName().endsWith(".SUBHEADER")
-                                            && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL")
-                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")
-                                            && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID_CONFIRM") ) {
-                                        
-                                        itemName = itemNode.getNodeName().trim();
-                                        itemValue = itemNode.getTextContent();
-                                       
-                                        Item item = lookupItem(itemName, crfVersion);
-                                        
-                                        if (item == null) {
-                                            logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
-                                            continue;
-                                        }
-
-                                        ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                                        ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                                        Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
-
-                                        // Convert space separated Enketo multiselect values to comma separated OC multiselect values
-                                        Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
-                                        if (responseTypeId == 3 || responseTypeId == 7) {
-                                            itemValue = itemValue.replaceAll(" ", ",");
-                                        }
-                                        if (responseTypeId == 4) {
-                                           for (HashMap  uploadFilePath : listOfUploadFilePaths){
-                                               if ((boolean) uploadFilePath.containsKey(itemValue)  && itemValue!=""){
-                                                   itemValue = (String) uploadFilePath.get(itemValue);
-                                                   break;
-                                               }
-                                               
-                                           }
-                                        }
-
-                                        // Build set of submitted row numbers to be used to find deleted DB rows later
-                                        Set<Integer> ordinals = groupOrdinalMapping.get(itemGroup.getItemGroupId());
-                                        ordinals.add(itemOrdinal);
-                                        groupOrdinalMapping.put(itemGroup.getItemGroupId(),ordinals);
-
-                                        ItemData newItemData = createItemData(item, itemValue, itemOrdinal, eventCrf, container.getStudy(), container.getSubject(), container.getUser());
-                                        Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
-                                        if (itemErrors.hasErrors()) {
-                                            container.getErrors().addAllErrors(itemErrors);
-                                            throw new Exception("Item validation error.  Rolling back submission changes.");
-                                        } else {
-                                            itemDataList.add(newItemData);
-                                        }
-                                        ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
-                                        if (existingItemData == null) {
-                                            // No existing value, create new item.
-                                            if (newItemData.getOrdinal() < 0) {
-                                                newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
-                                                groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
-                                            }
-                                            itemDataDao.saveOrUpdate(newItemData);
-                                            newItemData.setStatus(Status.UNAVAILABLE);
-                                            itemDataDao.saveOrUpdate(newItemData);
-
-                                        } else if (existingItemData.getValue().equals(newItemData.getValue())) {
-                                            // Existing item. Value unchanged. Do nothing.
-                                        } else {
-                                            // Existing item. Value changed. Update existing value.
-                                            existingItemData.setValue(newItemData.getValue());
-                                            existingItemData.setUpdateId(container.getUser().getUserId());
-                                            existingItemData.setDateUpdated(new Date());
-                                            itemDataDao.saveOrUpdate(existingItemData);
-                                        }
-                                    }
+                                if (fieldSubmissionFlag) {
+                                    processFieldSubmissionGroupItems(listOfUploadFilePaths, groupOrdinalMapping, groupNode, itemGroup);
+                                } else {
+                                    processGroupItems(listOfUploadFilePaths, groupOrdinalMapping, groupNode, itemGroup);
                                 }
                             }
                         }
                         //}
 
                             // Delete rows that have been removed
-                            removeDeletedRows(groupOrdinalMapping,eventCrf,crfVersion,container.getStudy(),container.getSubject(), container.getLocale(), container.getUser());
+                            removeDeletedRows(groupOrdinalMapping);
                         }
                     }
                 }
             }
             return ProcessorEnum.PROCEED;
         }
-    
+
+    private void processGroupItems(ArrayList<HashMap> listOfUploadFilePaths, HashMap<Integer, Set<Integer>> groupOrdinalMapping, Node groupNode, ItemGroup itemGroup) throws Exception {
+        String itemName;
+        String itemValue;
+
+        if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getItemGroupId())) {
+            groupOrdinalMapping.put(itemGroup.getItemGroupId(), new TreeSet<Integer>());
+        }
+        NodeList itemNodeList = groupNode.getChildNodes();
+        // Item loop
+        for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
+            Node itemNode = itemNodeList.item(m);
+            if (ShouldProcessItemNode(itemNode)) {
+
+                itemName = itemNode.getNodeName().trim();
+                itemValue = itemNode.getTextContent();
+
+                Item item = lookupItem(itemName, crfVersion);
+
+                if (item == null) {
+                    logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
+                    continue;
+                }
+
+                ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
+
+                // Convert space separated Enketo multiselect values to comma separated OC multiselect values
+                Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+                if (responseTypeId == 3 || responseTypeId == 7) {
+                    itemValue = itemValue.replaceAll(" ", ",");
+                }
+                if (responseTypeId == 4) {
+                   for (HashMap  uploadFilePath : listOfUploadFilePaths){
+                       if ((boolean) uploadFilePath.containsKey(itemValue)  && itemValue!=""){
+                           itemValue = (String) uploadFilePath.get(itemValue);
+                           break;
+                       }
+
+                   }
+                }
+
+                // Build set of submitted row numbers to be used to find deleted DB rows later
+                Set<Integer> ordinals = groupOrdinalMapping.get(itemGroup.getItemGroupId());
+                ordinals.add(itemOrdinal);
+                groupOrdinalMapping.put(itemGroup.getItemGroupId(),ordinals);
+
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, eventCrf, container.getStudy(), container.getSubject(), container.getUser());
+                Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
+                if (itemErrors.hasErrors()) {
+                    container.getErrors().addAllErrors(itemErrors);
+                    throw new Exception("Item validation error.  Rolling back submission changes.");
+                } else {
+                    itemDataList.add(newItemData);
+                }
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
+                if (existingItemData == null) {
+                    // No existing value, create new item.
+                    if (newItemData.getOrdinal() < 0) {
+                        newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
+                        groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
+                    }
+                    itemDataDao.saveOrUpdate(newItemData);
+                    newItemData.setStatus(Status.UNAVAILABLE);
+                    itemDataDao.saveOrUpdate(newItemData);
+
+                } else if (existingItemData.getValue().equals(newItemData.getValue())) {
+                    // Existing item. Value unchanged. Do nothing.
+                } else {
+                    // Existing item. Value changed. Update existing value.
+                    existingItemData.setValue(newItemData.getValue());
+                    existingItemData.setUpdateId(container.getUser().getUserId());
+                    existingItemData.setDateUpdated(new Date());
+                    itemDataDao.saveOrUpdate(existingItemData);
+                }
+            }
+        }
+    }
+
+    private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, HashMap<Integer, Set<Integer>> groupOrdinalMapping, Node groupNode, ItemGroup itemGroup) throws Exception {
+        String itemName;
+        String itemValue;
+        Integer itemOrdinal = null;
+        // does groupNode have any enketo attributes
+        final NamedNodeMap attributes = groupNode.getAttributes();
+        boolean enketoOrdinalFound = false;
+        for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
+            System.out.println(attributes.item(attrIndex).getNodeName());
+            System.out.println(attributes.item(attrIndex).getNodeValue());
+            if (attributes.item(attrIndex).getNodeName().equals(ENKETO_ORDINAL)) {
+                System.out.println("found enketo attribute");
+                enketoOrdinalFound = true;
+                itemOrdinal = new Integer(attributes.item(attrIndex).getNodeValue());
+            }
+        }
+
+        if (!enketoOrdinalFound) {
+            // set the ordinal as 1
+            itemOrdinal = 1;
+        }
+        if (itemGroup != null && !groupOrdinalMapping.containsKey(itemGroup.getItemGroupId())) {
+            groupOrdinalMapping.put(itemGroup.getItemGroupId(),new TreeSet<Integer>());
+        }
+
+        NodeList itemNodeList = groupNode.getChildNodes();
+        // Item loop
+        for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
+            Node itemNode = itemNodeList.item(m);
+            if (ShouldProcessItemNode(itemNode)) {
+
+                itemName = itemNode.getNodeName().trim();
+                itemValue = itemNode.getTextContent();
+
+                Item item = lookupItem(itemName, crfVersion);
+
+                if (item == null) {
+                    logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
+                    continue;
+                }
+
+                ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+
+                // Convert space separated Enketo multiselect values to comma separated OC multiselect values
+                Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+                if (responseTypeId == 3 || responseTypeId == 7) {
+                    itemValue = itemValue.replaceAll(" ", ",");
+                }
+                if (responseTypeId == 4) {
+                    for (HashMap  uploadFilePath : listOfUploadFilePaths){
+                        if ((boolean) uploadFilePath.containsKey(itemValue)  && itemValue!=""){
+                            itemValue = (String) uploadFilePath.get(itemValue);
+                            break;
+                        }
+
+                    }
+                }
+
+                // Build set of submitted row numbers to be used to find deleted DB rows later
+                Set<Integer> ordinals = groupOrdinalMapping.get(itemGroup.getItemGroupId());
+                ordinals.add(itemOrdinal);
+                groupOrdinalMapping.put(itemGroup.getItemGroupId(),ordinals);
+
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, eventCrf, container.getStudy(), container.getSubject(), container.getUser());
+                Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
+                if (itemErrors.hasErrors()) {
+                    container.getErrors().addAllErrors(itemErrors);
+                    throw new Exception("Item validation error.  Rolling back submission changes.");
+                } else {
+                    itemDataList.add(newItemData);
+                }
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
+                if (existingItemData == null) {
+                    itemDataDao.saveOrUpdate(newItemData);
+                    newItemData.setStatus(Status.UNAVAILABLE);
+                    itemDataDao.saveOrUpdate(newItemData);
+
+                } else if (existingItemData.getValue().equals(newItemData.getValue())) {
+                    // Existing item. Value unchanged. Do nothing.
+                } else {
+                    // Existing item. Value changed. Update existing value.
+                    existingItemData.setValue(newItemData.getValue());
+                    existingItemData.setUpdateId(container.getUser().getUserId());
+                    existingItemData.setDateUpdated(new Date());
+                    itemDataDao.saveOrUpdate(existingItemData);
+                }
+            }
+        }
+    }
+
+    private boolean ShouldProcessItemNode(Node itemNode) {
+        return itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER") && !itemNode.getNodeName().endsWith(".SUBHEADER") && !itemNode.getNodeName()
+                .equals("OC.REPEAT_ORDINAL") && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID") && !itemNode.getNodeName()
+                .equals("OC.STUDY_SUBJECT_ID_CONFIRM");
+    }
+
     private Item lookupItem(String itemName, CrfVersion crfVersion) {
         if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) { 
             return itemDao.findByOcOID(itemName);
@@ -287,7 +368,7 @@ public class ItemProcessor implements Processor {
         return ordinal;
     }
 
-    private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping, EventCrf eventCrf, CrfVersion crfVersion, Study study, StudySubject studySubject, Locale locale, UserAccount user) {
+    private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping) {
         Iterator<Integer> keys = groupOrdinalMapping.keySet().iterator();
         while (keys.hasNext()) {
             Integer itemGroupId = keys.next();
@@ -297,22 +378,22 @@ public class ItemProcessor implements Processor {
                     itemData.setDeleted(true);
                     itemData.setValue("");
                     itemData.setOldStatus(itemData.getStatus());
-                    itemData.setUserAccount(user);
+                    itemData.setUserAccount(container.getUser());
                     itemData.setStatus(Status.AVAILABLE);
-                    itemData.setUpdateId(user.getUserId());
+                    itemData.setUpdateId(container.getUser().getUserId());
                     itemData = itemDataDao.saveOrUpdate(itemData);
 
                     //Close discrepancy notes
-                    closeItemDiscrepancyNotes(itemData, study, studySubject, locale, user);
+                    closeItemDiscrepancyNotes(itemData);
                 }
             }
         }
     }
     
-    private void closeItemDiscrepancyNotes(ItemData itemData, Study study, StudySubject studySubject, Locale locale, UserAccount user) {
+    private void closeItemDiscrepancyNotes(ItemData itemData) {
 
-        ResourceBundleProvider.updateLocale(locale);
-        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(locale);
+        ResourceBundleProvider.updateLocale(container.getLocale());
+        ResourceBundle resword = ResourceBundleProvider.getWordsBundle(container.getLocale());
 
         // Notes & Discrepancies must be set to "closed" when event CRF is deleted
         // parentDiscrepancyNoteList is the list of the parent DNs records only
@@ -324,14 +405,14 @@ public class ItemProcessor implements Processor {
                 // create new DN record , new DN Map record , also update the parent record
                 DiscrepancyNote dn = new DiscrepancyNote();
                 ResolutionStatus resStatus = resolutionStatusDao.findByResolutionStatusId(4);
-                dn.setStudy(study);
+                dn.setStudy(container.getStudy());
                 dn.setEntityType("itemData");
                 dn.setDescription(description);
                 dn.setDetailedNotes(detailedNotes);
                 dn.setDiscrepancyNoteType(parentDiscrepancyNote.getDiscrepancyNoteType()); // set to parent DN Type Id
                 dn.setResolutionStatus(resStatus); // set to closed
-                dn.setUserAccount(user);
-                dn.setUserAccountByOwnerId(user);
+                dn.setUserAccount(container.getUser());
+                dn.setUserAccountByOwnerId(container.getUser());
                 dn.setParentDiscrepancyNote(parentDiscrepancyNote);
                 dn.setDateCreated(new Date());
                 dn = discrepancyNoteDao.saveOrUpdate(dn);
@@ -340,20 +421,20 @@ public class ItemProcessor implements Processor {
                 DnItemDataMapId dnItemDataMapId = new DnItemDataMapId();
                 dnItemDataMapId.setDiscrepancyNoteId(dn.getDiscrepancyNoteId());
                 dnItemDataMapId.setItemDataId(itemData.getItemDataId());
-                dnItemDataMapId.setStudySubjectId(studySubject.getStudySubjectId());
+                dnItemDataMapId.setStudySubjectId(container.getSubject().getStudySubjectId());
                 dnItemDataMapId.setColumnName("value");
 
                 DnItemDataMap mapping = new DnItemDataMap();
                 mapping.setDnItemDataMapId(dnItemDataMapId);
                 mapping.setItemData(itemData);
-                mapping.setStudySubject(studySubject);
+                mapping.setStudySubject(container.getSubject());
                 mapping.setActivated(false);
                 mapping.setDiscrepancyNote(dn);
                 dnItemDataMapDao.saveOrUpdate(mapping);
 
                 DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
                 itemParentNote.setResolutionStatus(resStatus);
-                itemParentNote.setUserAccount(user);
+                itemParentNote.setUserAccount(container.getUser());
                 discrepancyNoteDao.saveOrUpdate(itemParentNote);
             }
         }

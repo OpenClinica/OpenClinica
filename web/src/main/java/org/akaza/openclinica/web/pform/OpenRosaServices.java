@@ -1,52 +1,5 @@
 package org.akaza.openclinica.web.pform;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -60,11 +13,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
-import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
-import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -90,21 +39,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
     
-    @Autowired
-    UserAccountDao userAccountDao;
+    @Autowired UserAccountDao userAccountDao;
     
-    @Autowired
-    StudyDao studyDao;
+    @Autowired StudyDao studyDao;
 
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -176,7 +146,6 @@ public class OpenRosaServices {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         // print logback's internal status
         StatusPrinter.print(lc);
-        logger.error("*********************************Test log");
         if (!mayProceedPreview(studyOID))
             return null;
         
@@ -203,7 +172,9 @@ public class OpenRosaServices {
                         // trick Enketo into always downloading
                         // TODO: them.
                         if (version.getXformName() != null){
-                            form.setHash(DigestUtils.md5Hex(version.getXform()));
+                            Calendar cal = Calendar.getInstance();
+                            //form.setHash(DigestUtils.md5Hex(version.getXform()));
+                            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
                         }else {
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(new Date());
@@ -370,8 +341,6 @@ public class OpenRosaServices {
                 xform = generator.buildForm(formId);
             }
         } catch (Exception e) {
-        	System.out.println(e.getMessage());
-        	System.out.println(ExceptionUtils.getStackTrace(e));
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<error>" + e.getMessage() + "</error>";
@@ -459,22 +428,22 @@ public class OpenRosaServices {
     public Response doSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
             @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
 
-        Response.ResponseBuilder builder = Response.noContent();
+        ResponseBuilder builder = Response.noContent();
 
         ResponseEntity<String> responseEntity = openRosaSubmissionController.doSubmission(request, response, studyOID, context);
         if (responseEntity == null) {
             LOGGER.debug("Null response from OpenRosaSubmissionController.");
-            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.CREATED)) {
             LOGGER.debug("Successful OpenRosa submission");
             builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
-            return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
+            return builder.status(Response.Status.CREATED).build();
         } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
             LOGGER.debug("Failed OpenRosa submission");
-            return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
+            return builder.status(Response.Status.NOT_ACCEPTABLE).build();
         } else {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
-            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -484,22 +453,22 @@ public class OpenRosaServices {
     public Response doFieldSubmission(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
             @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
 
-        Response.ResponseBuilder builder = Response.noContent();
+        ResponseBuilder builder = Response.noContent();
 
         ResponseEntity<String> responseEntity = openRosaSubmissionController.doFieldSubmission(request, response, studyOID, context);
         if (responseEntity == null) {
             LOGGER.debug("Null response from OpenRosaSubmissionController.");
-            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.CREATED)) {
             LOGGER.debug("Successful OpenRosa submission");
             builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
-            return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
+            return builder.status(Response.Status.CREATED).build();
         } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
             LOGGER.debug("Failed OpenRosa submission");
-            return builder.status(javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE).build();
+            return builder.status(Response.Status.NOT_ACCEPTABLE).build();
         } else {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
-            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -518,7 +487,7 @@ public class OpenRosaServices {
     @Produces(MediaType.APPLICATION_XML)
     public Response doSubmissionHead(@PathParam("studyOID") String studyOID) {
 
-        Response.ResponseBuilder builder = Response.noContent();
+        ResponseBuilder builder = Response.noContent();
         String maxSubmissionSize = CoreResources.getField("pformMaxSubmissionSize");
         int maxSubmissionSizeInt = -1;
 
@@ -527,8 +496,8 @@ public class OpenRosaServices {
         } catch (Exception e) {
             logger.error("Unable to parse pformMaxSubmissionSize as an integer.");
         }
-        
-        
+
+
         // Build response headers
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         Date currentDate = new Date();
@@ -540,10 +509,10 @@ public class OpenRosaServices {
 
         if (maxSubmissionSizeInt < 1) {
             logger.error("pformMaxSubmissionSize does not contain an integer value greater than 0.");
-            return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } else {
             builder = builder.header("X-OpenRosa-Accept-Content-Length", maxSubmissionSizeInt);
-            return builder.status(javax.ws.rs.core.Response.Status.ACCEPTED).build();
+            return builder.status(Response.Status.ACCEPTED).build();
         }
     }
 
@@ -682,7 +651,7 @@ public class OpenRosaServices {
         transformer.transform(source, result);
         String modifiedXform = writer.toString();
         modifiedXform = applyXformAttributes(modifiedXform, attribs);
-        System.out.println("Finalized xform source: " + modifiedXform);
+        logger.debug("Finalized xform source: " + modifiedXform);
     	return modifiedXform;
 	}
 

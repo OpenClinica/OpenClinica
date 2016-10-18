@@ -14,7 +14,7 @@ public class InstanceIdProcessor implements Processor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public ProcessorEnum process(SubmissionContainer container) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
         logger.info("Executing InstanceId Processor.");
         if (container.getProcessorEnum() != ProcessorEnum.INSTANCE_ID_PROCESSOR)
             return ProcessorEnum.PROCEED;

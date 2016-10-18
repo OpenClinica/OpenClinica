@@ -15,7 +15,6 @@ import java.util.Locale;
 
 import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
-
 @Component
 public class OpenRosaSubmissionService {
 
@@ -48,14 +47,14 @@ public class OpenRosaSubmissionService {
 
         SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);
         container.setProcessorEnum(ProcessorEnum.SUBMISSION_PROCESSOR);
-        submissionProcessorChain.processSubmission(container);
+        submissionProcessorChain.processSubmission(container, false);
 
     }
 
     private void processFieldPayload(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList <HashMap> listOfUploadFilePaths) throws Exception{
         SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);
         container.setProcessorEnum(checkInitialInstanceIdSubmission(requestBody));
-        submissionProcessorChain.processSubmission(container);
+        submissionProcessorChain.processSubmission(container, true);
 
     }
 
