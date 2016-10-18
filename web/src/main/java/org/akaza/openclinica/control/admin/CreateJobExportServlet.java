@@ -219,7 +219,7 @@ public class CreateJobExportServlet extends SecureController {
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 SimpleTrigger trigger = null;
 
-                trigger = xsltService.generateXsltTrigger(xsltPath,
+                trigger = xsltService.generateXsltTrigger(scheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
                         exportFileName,
