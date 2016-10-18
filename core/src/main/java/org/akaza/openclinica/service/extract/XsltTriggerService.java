@@ -1,17 +1,20 @@
 package org.akaza.openclinica.service.extract;
 
-import java.math.BigInteger;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.quartz.JobDataMap;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.quartz.TriggerBuilder.newTrigger;
+import java.math.BigInteger;
 
 public class XsltTriggerService {
+
     public XsltTriggerService() {
 
     }
@@ -45,50 +48,24 @@ public class XsltTriggerService {
     public static final String POST_PROC_EXPORT_NAME="postProcExportName";
     public static final String COUNT="count";
 
-    public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath,
+
+    public SimpleTrigger generateXsltTrigger(Scheduler scheduler, String xslFile, String xmlFile, String endFilePath,
             String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName) {
-        Date startDateTime = new Date(System.currentTimeMillis());
+        //Date startDateTime = new Date(System.currentTimeMillis());
         String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
         if(triggerGroupName!=null)
             TRIGGER_GROUP_NAME = triggerGroupName;
 
-        SimpleTriggerFactoryBean triggerFactoryBean = new SimpleTriggerFactoryBean();
-        triggerFactoryBean.setBeanName("trigger1");
-        triggerFactoryBean.setGroup("group1");
-        triggerFactoryBean.setStartTime(startDateTime);
-        triggerFactoryBean.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+        //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
+        ApplicationContext context = null;
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(
+                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath);
         SimpleTrigger trigger = triggerFactoryBean.getObject();
-
-        // set job data map
-        JobDataMap jobDataMap = new JobDataMap();
-
-        jobDataMap.put(XSL_FILE_PATH, xslFile);
-        jobDataMap.put(XML_FILE_PATH, endFilePath);
-        jobDataMap.put(POST_FILE_PATH, endFilePath);
-        jobDataMap.put(POST_FILE_NAME, endFile);
-
-        jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
-        jobDataMap.put(USER_ID, userAccountBean.getId());
-        jobDataMap.put(STUDY_ID, userAccountBean.getActiveStudyId());
-        jobDataMap.put(LOCALE, locale);
-        jobDataMap.put(DATASET_ID, datasetId);
-        jobDataMap.put(EMAIL, userAccountBean.getEmail());
-        jobDataMap.put(ZIPPED,epBean.getZipFormat());
-        jobDataMap.put(DELETE_OLD,epBean.getDeleteOld());
-        jobDataMap.put(SUCCESS_MESSAGE,epBean.getSuccessMessage());
-        jobDataMap.put(FAILURE_MESSAGE,epBean.getFailureMessage());
-
-        jobDataMap.put(POST_PROC_DELETE_OLD, epBean.getPostProcDeleteOld());
-        jobDataMap.put(POST_PROC_ZIP, epBean.getPostProcZip());
-        jobDataMap.put(POST_PROC_LOCATION, epBean.getPostProcLocation());
-        jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
-        jobDataMap.put(COUNT,cnt);
-        jobDataMap.put(XSLT_PATH,xsltPath);
-        // jobDataMap.put(DIRECTORY, directory);
-        // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
-        jobDataMap.put(EP_BEAN, epBean);
-
-        trigger.getTriggerBuilder().usingJobData(jobDataMap);
 
         return trigger;
     }
