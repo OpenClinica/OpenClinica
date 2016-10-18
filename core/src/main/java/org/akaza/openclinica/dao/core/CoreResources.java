@@ -69,7 +69,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     /**
      * TODO: Delete me!
-     * 
+     *
      * @param dataInfoProps
      * @throws IOException
      */
@@ -161,7 +161,7 @@ public class CoreResources implements ResourceLoaderAware {
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
-                                               // instance
+            // instance
 
             EXTRACTINFO = extractInfo;
 
@@ -176,7 +176,7 @@ public class CoreResources implements ResourceLoaderAware {
                 extractProperties = findExtractProperties();
                 // JN: this is in for junits to run without extract props
                 copyImportRulesFiles();
-       //         copyConfig();
+                //         copyConfig();
             }
 
             // tbh, following line to be removed
@@ -281,7 +281,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
-//        getPropertiesSource();
+        //        getPropertiesSource();
 
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
@@ -295,9 +295,9 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("filePath", filePath);
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
-        
-        
-       // sysURL.base
+
+
+        // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
 
@@ -426,7 +426,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
     }
-    
+
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
         String schema = DATAINFO.getProperty("schema");
@@ -435,37 +435,37 @@ public class CoreResources implements ResourceLoaderAware {
         } finally {
             statement.close();
         }
-    }    
+    }
 
     private void setDatabaseProperties(String database) {
-       String herokuUrl= System.getenv("DATABASE_URL");
-       if (herokuUrl!=null){
-           String namepass[] = herokuUrl.split(":");
-                 
-           String user = namepass[1].substring(2);
-           String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
-           String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
-           String db = namepass[3].substring(5);
-           String dbpt = namepass[3].substring(0,4);
-           
-         DATAINFO.setProperty("dbUser", user);
-         DATAINFO.setProperty("dbPass", pass);
-         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+        String herokuUrl= System.getenv("DATABASE_URL");
+        if (herokuUrl!=null){
+            String namepass[] = herokuUrl.split(":");
 
-         DATAINFO.setProperty("dbHost", dbhst);
-         DATAINFO.setProperty("db", db);
-         DATAINFO.setProperty("dbPort", dbpt);
-                  
-       }else{
-        DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-        DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-       }
-        
-        
-        
-        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());   
-        
+            String user = namepass[1].substring(2);
+            String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
+            String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
+            String db = namepass[3].substring(5);
+            String dbpt = namepass[3].substring(0,4);
+
+            DATAINFO.setProperty("dbUser", user);
+            DATAINFO.setProperty("dbPass", pass);
+            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+
+            DATAINFO.setProperty("dbHost", dbhst);
+            DATAINFO.setProperty("db", db);
+            DATAINFO.setProperty("dbPort", dbpt);
+
+        }else{
+            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+        }
+
+
+
+        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());
+
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
@@ -476,12 +476,7 @@ public class CoreResources implements ResourceLoaderAware {
             driver = "oracle.jdbc.driver.OracleDriver";
             hibernateDialect = "org.hibernate.dialect.OracleDialect";
         }
-        // If logLevel is 'TRACE' or 'DEBUG', enagle log4jdbc
-        String logLevel = DATAINFO.getProperty("logLevel");
-        if (logLevel != null && (logLevel.equalsIgnoreCase("TRACE") || logLevel.equalsIgnoreCase("DEBUG"))) {
-            driver = "net.sf.log4jdbc.DriverSpy";
-            url = StringUtils.replace(url, "jdbc:", "jdbc:log4jdbc:");
-        }
+
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
         DATAINFO.setProperty("schema", schema);
@@ -713,7 +708,7 @@ public class CoreResources implements ResourceLoaderAware {
                 ExtractPropertyBean epbean = new ExtractPropertyBean();
                 epbean.setId(i);
                 // we will implement a find by id function in the front end
-    
+
                 // check to make sure the file exists, if not throw an exception and system will abort to start.
                 checkForFile(getExtractFields("extract." + i + ".file"));
                 epbean.setFileName(getExtractFields("extract." + i + ".file"));
@@ -737,11 +732,11 @@ public class CoreResources implements ResourceLoaderAware {
                  * if(clinica.equalsIgnoreCase("clinical_data")) epbean.setFormat("occlinical_data"); else
                  * epbean.setFormat("oc1.3"); } else
                  */
-    
+
                 epbean.setOdmType(getExtractField("extract." + i + ".odmType"));
-    
+
                 epbean.setFormat("oc1.3");
-    
+
                 // destination file name of the copied files
                 epbean.setExportFileName(getExtractFields("extract." + i + ".exportname"));
                 // post-processing event after the creation
@@ -755,7 +750,7 @@ public class CoreResources implements ResourceLoaderAware {
                 if (epbean.getFileName().length != epbean.getExportFileName().length)
                     throw new OpenClinicaSystemException(
                             "The comma seperated values of file names and export file names should correspond 1 on 1 for the property number" + i);
-    
+
                 if ("sql".equals(whichFunction)) {
                     // set the bean within, so that we can access the file locations etc
                     SqlProcessingFunction function = new SqlProcessingFunction(epbean);
@@ -792,14 +787,14 @@ public class CoreResources implements ResourceLoaderAware {
                     // since the database is the last option TODO: think about custom post processing options
                     else {
                         SqlProcessingFunction function = new SqlProcessingFunction(epbean);
-    
+
                         function.setDatabaseType(getExtractFieldNoRep(whichFunction + ".dataBase").toLowerCase());
                         function.setDatabaseUrl(getExtractFieldNoRep(whichFunction + ".url"));
                         function.setDatabaseUsername(getExtractFieldNoRep(whichFunction + ".username"));
                         function.setDatabasePassword(getExtractFieldNoRep(whichFunction + ".password"));
                         epbean.setPostProcessing(function);
                     }
-    
+
                 } else {
                     // add a null here
                     epbean.setPostProcessing(null);
