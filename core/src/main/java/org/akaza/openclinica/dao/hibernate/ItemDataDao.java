@@ -3,12 +3,25 @@ package org.akaza.openclinica.dao.hibernate;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.hibernate.query.Query;
 
 public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
     Class<ItemData> domainClass() {
         return ItemData.class;
     }
+
+
+
+    private static String findByEventCrfGroupOrdinalQuery = "select id from ItemData id, Item i, ItemGroupMetadata igm, CrfVersion crf, EventCrf ec " +
+            "where id.item.itemId = i.itemId " +
+            "and igm.item.itemId = id.item.itemId " +
+            "and id.eventCrf.eventCrfId = ec.eventCrfId " +
+            "and ec.crfVersion.crfVersionId = crf.crfVersionId " +
+            "and igm.crfVersion.crfVersionId = crf.crfVersionId " +
+            "and crf.crf.crfId = :crfId " +
+            "and igm.itemGroup.itemGroupId = :itemGroupId " +
+            "and id.ordinal = :ordinal ";
 
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
@@ -33,7 +46,15 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (List<ItemData>) q.list();
       
     }
-    
+
+    public ItemData findByEventCrfGroupOrdinal(Integer crfId, Integer itemGroupId, Integer ordinal) {
+        Query q = getCurrentSession().createQuery(findByEventCrfGroupOrdinalQuery);
+        q.setParameter("crfId", crfId);
+        q.setParameter("itemGroupId", itemGroupId);
+        q.setParameter("ordinal", ordinal);
+        return (ItemData) q.uniqueResult();
+    }
+
     public List<ItemData> findByEventCrfId(Integer eventCrfId) {
         String query = "from " + getDomainClassName() + " item_data where item_data.eventCrf.eventCrfId = :eventcrfid";
         org.hibernate.Query q = getCurrentSession().createQuery(query);

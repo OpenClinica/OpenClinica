@@ -24,14 +24,36 @@ public class SubmissionContainer {
     private Locale locale = null;
     private ArrayList<HashMap> listOfUploadFilePaths;
     private ProcessorEnum processorEnum;
+    private boolean fieldSubmissionFlag;
+    public enum FieldRequestTypeEnum {EDIT_FIELD, DELETE_FIELD, NEW_FIELD, FORM_FIELD};
 
-    public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList<HashMap> listOfUploadFilePaths) {
+    public FieldRequestTypeEnum getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(FieldRequestTypeEnum requestType) {
+        this.requestType = requestType;
+    }
+
+    private FieldRequestTypeEnum requestType;
+
+    public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors,
+            Locale locale,ArrayList<HashMap> listOfUploadFilePaths, FieldRequestTypeEnum requestType) {
         this.study = study;
         this.requestBody = requestBody;
         this.subjectContext = subjectContext;
         this.errors = errors;
         this.locale = locale;
         this.listOfUploadFilePaths=listOfUploadFilePaths;
+        this.requestType = requestType;
+    }
+
+    public boolean isFieldSubmissionFlag() {
+        return fieldSubmissionFlag;
+    }
+
+    public void setFieldSubmissionFlag(boolean fieldSubmissionFlag) {
+        this.fieldSubmissionFlag = fieldSubmissionFlag;
     }
 
     public ProcessorEnum getProcessorEnum() {

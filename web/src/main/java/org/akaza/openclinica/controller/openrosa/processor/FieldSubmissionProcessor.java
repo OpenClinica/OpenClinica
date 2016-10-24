@@ -14,7 +14,7 @@ public class FieldSubmissionProcessor implements Processor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Field Submission Processor.");
         if (container.getProcessorEnum() != ProcessorEnum.FIELD_SUBMISSION_RPOCESSOR)
             return ProcessorEnum.PROCEED;

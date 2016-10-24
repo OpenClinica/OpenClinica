@@ -41,7 +41,7 @@ public class EventProcessor implements Processor {
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Event Processor.");
         Errors errors = container.getErrors();
         StudySubject studySubject = container.getSubject();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.Item;
+import org.hibernate.query.Query;
 
 public class ItemDao extends AbstractDomainDao<Item> {
 
@@ -27,6 +28,7 @@ public class ItemDao extends AbstractDomainDao<Item> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
         return ((Item) q.uniqueResult());
     }
+
 
     public int getItemDataTypeId(Item item) {
         String query = "select item_data_type_id from item where item_id = " + item.getItemId();

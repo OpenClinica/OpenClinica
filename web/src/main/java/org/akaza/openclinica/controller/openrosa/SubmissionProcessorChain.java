@@ -13,9 +13,9 @@ public class SubmissionProcessorChain {
     @Autowired
     List<Processor> processors;
 
-    public void processSubmission(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
+    public void processSubmission(SubmissionContainer container) throws Exception {
         for (Processor processor:processors) {
-            if (processor.process(container, fieldSubmissionFlag) != ProcessorEnum.PROCEED) {
+            if (processor.process(container) != ProcessorEnum.PROCEED) {
                 break;
             }
         }

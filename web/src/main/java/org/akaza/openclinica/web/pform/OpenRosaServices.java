@@ -28,6 +28,7 @@ import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.manifest.Manifest;
 import org.akaza.openclinica.web.pform.manifest.MediaFile;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
@@ -39,11 +40,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 import org.w3c.dom.*;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -173,8 +177,9 @@ public class OpenRosaServices {
                         // TODO: them.
                         if (version.getXformName() != null){
                             Calendar cal = Calendar.getInstance();
-                            //form.setHash(DigestUtils.md5Hex(version.getXform()));
-                            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                            // TODO Uncomment this before checking in
+                            form.setHash(DigestUtils.md5Hex(version.getXform()));
+                            //form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
                         }else {
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(new Date());
@@ -336,7 +341,6 @@ public class OpenRosaServices {
             if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")){
                 xform = updateRepeatGroupsWithOrdinal(crfVersion.getXform());
             } else {
-
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
             }
@@ -456,6 +460,32 @@ public class OpenRosaServices {
         ResponseBuilder builder = Response.noContent();
 
         ResponseEntity<String> responseEntity = openRosaSubmissionController.doFieldSubmission(request, response, studyOID, context);
+        if (responseEntity == null) {
+            LOGGER.debug("Null response from OpenRosaSubmissionController.");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.CREATED)) {
+            LOGGER.debug("Successful OpenRosa submission");
+            builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
+            return builder.status(Response.Status.CREATED).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
+            LOGGER.debug("Failed OpenRosa submission");
+            return builder.status(Response.Status.NOT_ACCEPTABLE).build();
+        } else {
+            LOGGER.debug("Failed OpenRosa submission with unhandled error");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{studyOID}/fieldsubmission")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldDeletion(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+            @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
+
+        ResponseBuilder builder = Response.noContent();
+
+        ResponseEntity<String> responseEntity = openRosaSubmissionController.doFieldDeletion(request, response, studyOID, context);
         if (responseEntity == null) {
             LOGGER.debug("Null response from OpenRosaSubmissionController.");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();

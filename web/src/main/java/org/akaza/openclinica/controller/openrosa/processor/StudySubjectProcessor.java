@@ -43,7 +43,7 @@ public class StudySubjectProcessor implements Processor {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     
     @Override
-    public ProcessorEnum process(SubmissionContainer container, boolean fieldSubmissionFlag) throws Exception {
+    public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing study subject processor.");
         
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
