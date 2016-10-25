@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -213,7 +214,11 @@ public class ViewNotesServlet extends SecureController {
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
         request.setAttribute("mapKeys", ResolutionStatus.getMembers());
-        request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames());
+        if(this.request.getLocale().equals(new Locale("es"))){
+        	request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNamesEs());
+        }else{
+        	request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames());	
+        }
         request.setAttribute("typeKeys", totalMap);
         request.setAttribute("grandTotal", grandTotal);
 
