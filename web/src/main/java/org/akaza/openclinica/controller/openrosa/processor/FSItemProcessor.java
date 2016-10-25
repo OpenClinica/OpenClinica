@@ -118,7 +118,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
 
         if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
-                ItemData existingItemData = lookupFieldItemData(crfVersion, itemGroup, itemOrdinal);
+                ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal);
 
                 existingItemData.setDeleted(true);
                 existingItemData.setValue("");
@@ -208,8 +208,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
     }
 
-    private ItemData lookupFieldItemData(CrfVersion crfVersion, ItemGroup itemGroup, Integer ordinal) {
-        return itemDataDao.findByEventCrfGroupOrdinal(crfVersion.getCrf().getCrfId(), itemGroup.getItemGroupId(), ordinal);
+    private ItemData lookupFieldItemData(ItemGroup itemGroup, Integer ordinal) {
+        return itemDataDao.findByEventCrfGroupOrdinal(eventCrf, itemGroup.getItemGroupId(), ordinal);
     }
 
 }
