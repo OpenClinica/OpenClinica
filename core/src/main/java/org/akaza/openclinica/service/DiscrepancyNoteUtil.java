@@ -57,6 +57,13 @@ public class DiscrepancyNoteUtil {
     public static String[] getTypeNames() {
         return TYPE_NAMES;
     }
+    
+    //esES
+    public static final String[] TYPE_NAMES_ES = {"Consulta", "Comprobacion de Validacion Fallida", "Razon de cambio", "Anotacion"};
+
+    public static String[] getTypeNamesEs() {
+        return TYPE_NAMES_ES;
+    }
 
 
     /**
