@@ -1,8 +1,32 @@
 Assignment 2: Requirements elicitation
 
 Requirements: Introduction, Purpose/Scope, and Description
-Grade: 3pts
-Note: This is a generic introduction to requirements as well as requirements elicitation in the project (how is this done? How does the team decides on whether to implement a new features, etc. )
+Requerimentos: Introdução, Âmbito e Descrição
+
+A ferramenta deve suportar a criação de estudos médicos.
+
+Create eCRFs "electronic case report form (eCRF)."
+The industry defines an eCRF as a collection of a few data elements, corresponding to a
+computer screen of data. It amounts to what might have been collected on a single piece of paper. This definition of eCRF is inherently
+singular, unitary and backward-compatible with a common mental construct of a paper form.
+For the FDA, an eCRF is inherently about multiple forms, collections of forms, and forward-looking. At the agency, an eCRF is now a
+compilation of lots of data, possibly all of the data about one patient.
+"The eCRF is a vehicle used to assemble all the data from different electronic- and paper-based systems and makes it possible to capture
+and organize these diverse data in a manner that satisfies the study protocol and that enables the data to be systematically reviewed and
+analyzed."
+As conceived by the FDA, an eCRF is an uber-record containing both electronic and paper information. This is a legitimate perspective.
+Regulators could not allow important data to escape their review simply because it was collected in one medium but not another.
+
+Design rules/edit checks
+Schedule patient visits
+Capture eCRF data from study sites via the web
+Monitor and manage clinical data
+Audit trails and electronic signatures
+Role-based access controls
+Import/Export Data
+Extract data for analysis and reporting
+Note: This is a generic introduction to requirements as well as requirements elicitation in the project (how is this done? How does the
+team decides on whether to implement a new features, etc. )
 Specific Requirements and Features (Functional and Non-Functional requirements)
 Grade: 5pts
 Use Cases (including diagrams)
