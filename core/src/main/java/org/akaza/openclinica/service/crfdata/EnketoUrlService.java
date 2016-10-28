@@ -93,17 +93,29 @@ public class EnketoUrlService {
 
     }
     
-    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid) throws Exception {
+    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext,
+            String studyOid, CrfVersion crfVersion, StudyEvent studyEvent) throws Exception {
 
         String editURL = null;
+        StudyEventDefinition eventDef;
+        StudySubject subject;
 
-        // Lookup relevant data
-        StudyEventDefinition eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(subjectContext.getStudyEventDefinitionId());
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
-        StudySubject subject = studySubjectDao.findByOcOID(subjectContext.getStudySubjectOid());
-        StudyEvent event = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(eventDef.getOc_oid(), Integer.valueOf(subjectContext.getOrdinal()),
-                subject.getStudySubjectId());
-        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(event.getStudyEventId(), subject.getStudySubjectId(),
+        if (studyEvent == null) {
+            // Lookup relevant data
+            eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(subjectContext.getStudyEventDefinitionId());
+            subject = studySubjectDao.findByOcOID(subjectContext.getStudySubjectOid());
+            studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(eventDef.getOc_oid(), Integer.valueOf(subjectContext.getOrdinal()),
+                    subject.getStudySubjectId());
+
+
+        } else {
+            eventDef = studyEvent.getStudyEventDefinition();
+            subject = studyEvent.getStudySubject();
+        }
+        if (crfVersion == null) {
+            crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
+        }
+        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
                 crfVersion.getCrfVersionId());
 
         // Load populated instance
@@ -169,12 +181,11 @@ public class EnketoUrlService {
 
         ArrayList<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
         for (ItemGroup itemGroup : itemGroups) {
-            ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId()).get(
-                    0);
+            ItemGroupMetadata itemGroupMetadata = itemGroup.getItemGroupMetadatas().get(0);
             ArrayList<Item> items = (ArrayList<Item>) itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
-
+            Item firstItem = items.get(0);
             // Get max repeat in item data
-            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), items.get(0).getItemId());
+            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), firstItem.getItemId());
             // loop thru each repeat creating items in instance
             String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
             Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();

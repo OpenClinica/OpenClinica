@@ -14,16 +14,19 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
 
 
-    private static String findByEventCrfGroupOrdinalQuery = "select id from ItemData id, Item i, ItemGroupMetadata igm, CrfVersion crf, EventCrf ec " +
-            "where id.item.itemId = i.itemId " +
-            "and igm.item.itemId = id.item.itemId " +
-            "and id.eventCrf.eventCrfId = ec.eventCrfId " +
-            "and ec.crfVersion.crfVersionId = crf.crfVersionId " +
-            "and igm.crfVersion.crfVersionId = crf.crfVersionId " +
-            "and crf.crf.crfId = :crfId " +
-            "and igm.itemGroup.itemGroupId = :itemGroupId " +
-            "and id.ordinal = :ordinal " +
-            "and ec.eventCrfId = :eventCrfId";
+    private static String findByEventCrfGroupOrdinalQuery = "select id from ItemData id, "
+            + "Item i, "
+            + "ItemGroupMetadata igm, "
+            + "EventCrf ec "
+            + "where id.item.itemId = i.itemId "
+            + "and igm.item.itemId = id.item.itemId "
+            + "and id.eventCrf.eventCrfId = ec.eventCrfId "
+            + "and igm.crfVersion.crfVersionId = ec.crfVersion.crfVersionId "
+            + "and igm.itemGroup.itemGroupId = :itemGroupId "
+            + "and id.ordinal = :ordinal "
+            + "and ec.eventCrfId = :eventCrfId"
+            + "and id.deleted=FALSE";
+
 
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
@@ -50,8 +53,7 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
     }
 
     public ItemData findByEventCrfGroupOrdinal(EventCrf eventCrf, Integer itemGroupId, Integer ordinal) {
-        Query q = getCurrentSession().createQuery(findByEventCrfGroupOrdinalQuery);
-        q.setParameter("crfId", eventCrf.getCrfVersion().getCrf().getCrfId());
+        Query q = getCurrentSession().createQuery(findByEventCrfGroupOrdinalQuery).setCacheable(true);
         q.setParameter("eventCrfId", eventCrf.getEventCrfId());
         q.setParameter("itemGroupId", itemGroupId);
         q.setParameter("ordinal", ordinal);

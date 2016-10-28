@@ -6,6 +6,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.hibernate.query.Query;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,14 +16,17 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
 	private ApplicationEventPublisher eventPublisher;
 	private StudyEventChangeDetails changeDetails;
+    private static String findByStudyEventIdQuery = "select se from StudyEvent se "
+            + "join fetch se.studyEventDefinition as sed "
+            + "join fetch se.studySubject as ss "
+            + "where se.studyEventId = :studyEventId ";
 
 	public Class<StudyEvent> domainClass(){
 		return StudyEvent.class;
 	}
-    public StudyEvent findByStudyEventId(int study_event_id) {
-        String query = "from " + getDomainClassName() + " study_event  where study_event.studyEventId = :studyeventid ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyeventid", study_event_id);
+    public StudyEvent findByStudyEventId(int studyEventId) {
+        Query q = getCurrentSession().createQuery(findByStudyEventIdQuery);
+        q.setParameter("studyEventId", studyEventId);
         return (StudyEvent) q.uniqueResult();
     }
     

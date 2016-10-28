@@ -9,6 +9,13 @@ import org.hibernate.query.Query;
 
 public class ItemDao extends AbstractDomainDao<Item> {
 
+    static String findByItemGroupCrfVersionOrderedQuery = "select i from Item i "
+            + "join i.itemGroupMetadatas igm "
+            + "join igm.itemGroup ig "
+            + "where ig.itemGroupId= :itemGroupId "
+            + "and igm.crfVersion.crfVersionId= :crfVersionId "
+            + "order by i.itemId";
+
     @Override
     Class<Item> domainClass() {
         // TODO Auto-generated method stub
@@ -38,10 +45,10 @@ public class ItemDao extends AbstractDomainDao<Item> {
 
     @SuppressWarnings("unchecked")
     public ArrayList<Item> findByItemGroupCrfVersionOrdered(Integer itemGroupId, Integer crfVersionId) {
-        String query = "select distinct i.* from item i, item_group fg, item_group_metadata fgim " + " where fg.item_group_id= " + String.valueOf(itemGroupId)
-                + " and fg.item_group_id=fgim.item_group_id and fgim.crf_version_id= " + String.valueOf(crfVersionId)
-                + " and fgim.item_id=i.item_id order by i.item_id";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
+
+        Query q = getCurrentSession().createQuery(findByItemGroupCrfVersionOrderedQuery);
+        q.setParameter("itemGroupId", itemGroupId);
+        q.setParameter("crfVersionId", crfVersionId);
         return (ArrayList<Item>) q.list();
     }
 

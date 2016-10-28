@@ -97,7 +97,7 @@ public class OpenRosaSubmissionController {
 
         try {
             // Verify Study is allowed to submit
-            if (!mayProceed(studyOID)) {
+            if (!mayProceed(study)) {
                 logger.info("Submissions to the study not allowed.  Aborting submission.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
             }
@@ -171,6 +171,8 @@ public class OpenRosaSubmissionController {
     public ResponseEntity<String> doFieldSubmission(HttpServletRequest request, HttpServletResponse response,
             @PathVariable("studyOID") String studyOID, @RequestParam(FORM_CONTEXT) String ecid) {
 
+        long millis = System.currentTimeMillis();
+
         logger.info("Processing xform field submission.");
         HashMap<String, String> subjectContext = null;
         Locale locale = LocaleResolver.getLocale(request);
@@ -185,7 +187,7 @@ public class OpenRosaSubmissionController {
 
         try {
             // Verify Study is allowed to submit
-            if (!mayProceed(studyOID)) {
+            if (!mayProceed(study)) {
                 logger.info("Field Submissions to the study not allowed.  Aborting field submission.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
             }
@@ -241,6 +243,8 @@ public class OpenRosaSubmissionController {
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
+            long endMillis = System.currentTimeMillis();
+            System.out.println("Total time *********** " + (endMillis - millis));
             return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
         } else {
             logger.info("Field Submission contained errors. Sending error response");
@@ -277,33 +281,31 @@ public class OpenRosaSubmissionController {
 
         try {
             // Verify Study is allowed to submit
-            if (!mayProceed(studyOID)) {
+            if (!mayProceed(study)) {
                 logger.info("Field Deletions to the study not allowed.  Aborting field submission.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
             }
 
-  //          if (ServletFileUpload.isMultipartContent(request)) {
-                String dir = getAttachedFilePath(studyOID);
-                FileProperties fileProperties= new FileProperties();
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);
-                for (FileItem item : items) {
-                    if (item.getFieldName().equals("instance_id")) {
-                        instanceId = item.getString();
-                    } else if (item.getFieldName().equals("xml_submission_fragment_file")) {
-                        requestBody = item.getString("UTF-8");
-                    } else if (item.getContentType() != null) {
-                        if (!new File(dir).exists()) new File(dir).mkdirs();
+            String dir = getAttachedFilePath(studyOID);
+            FileProperties fileProperties= new FileProperties();
+            DiskFileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            upload.setFileSizeMax(fileProperties.getFileSizeMax());
+            List<FileItem> items = upload.parseRequest(request);
+            for (FileItem item : items) {
+                if (item.getFieldName().equals("instance_id")) {
+                    instanceId = item.getString();
+                } else if (item.getFieldName().equals("xml_submission_fragment_file")) {
+                    requestBody = item.getString("UTF-8");
+                } else if (item.getContentType() != null) {
+                    if (!new File(dir).exists()) new File(dir).mkdirs();
 
-                        File file = processUploadedFile(item, dir);
-                        map.put(item.getFieldName(), file.getPath());
+                    File file = processUploadedFile(item, dir);
+                    map.put(item.getFieldName(), file.getPath());
 
-                    }
                 }
-                listOfUploadFilePaths.add(map);
-//            }
+            }
+            listOfUploadFilePaths.add(map);
             if (instanceId == null)  {
                 logger.info("Field Submissions to the study not allowed without a valid instanceId.  Aborting field submission.");
                 return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -352,28 +354,27 @@ public class OpenRosaSubmissionController {
         return isParticipant;
     }
 
-    private Study getParentStudy(String studyOid) {
-        Study study = studyDao.findByOcOID(studyOid);
-        Study parentStudy = study.getStudy();
+    private Study getParentStudy(Study childStudy) {
+        Study parentStudy = childStudy.getStudy();
         if (parentStudy != null && parentStudy.getStudyId() > 0)
             return parentStudy;
         else
-            return study;
+            return childStudy;
     }
 
 
-    private boolean mayProceed(String studyOid) throws Exception {
-        return mayProceed(studyOid, null);
+    private boolean mayProceed(Study study) throws Exception {
+        return mayProceed(study, null);
     }
 
-    private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
+    private boolean mayProceed(Study childStudy, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
         ParticipantPortalRegistrar participantPortalRegistrar= new ParticipantPortalRegistrar();
-        Study study = getParentStudy(studyOid);
+        Study study = getParentStudy(childStudy);
         StudyParameterValue pStatus = studyParameterValueDao.findByStudyIdParameter(study.getStudyId(), "participantPortal");
 
         // ACTIVE, PENDING, or INACTIVE
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString();
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(childStudy.getOc_oid()).toString();
 
         // enabled or disabled
         String participateStatus = pStatus.getValue().toString();
