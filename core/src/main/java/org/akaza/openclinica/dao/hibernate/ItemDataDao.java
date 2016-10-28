@@ -31,7 +31,7 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
                 + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        org.hibernate.Query q = getCurrentSession().createQuery(query).setCacheable(true);
         q.setInteger("itemid", itemId);
         q.setInteger("eventcrfid", eventCrfId);
         q.setInteger("ordinal", ordinal);

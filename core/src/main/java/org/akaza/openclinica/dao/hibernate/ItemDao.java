@@ -12,6 +12,7 @@ public class ItemDao extends AbstractDomainDao<Item> {
     static String findByItemGroupCrfVersionOrderedQuery = "select i from Item i "
             + "join i.itemGroupMetadatas igm "
             + "join igm.itemGroup ig "
+            + "left join fetch i.itemFormMetadatas ifm "
             + "where ig.itemGroupId= :itemGroupId "
             + "and igm.crfVersion.crfVersionId= :crfVersionId "
             + "order by i.itemId";
@@ -46,7 +47,7 @@ public class ItemDao extends AbstractDomainDao<Item> {
     @SuppressWarnings("unchecked")
     public ArrayList<Item> findByItemGroupCrfVersionOrdered(Integer itemGroupId, Integer crfVersionId) {
 
-        Query q = getCurrentSession().createQuery(findByItemGroupCrfVersionOrderedQuery);
+        Query q = getCurrentSession().createQuery(findByItemGroupCrfVersionOrderedQuery).setCacheable(true);
         q.setParameter("itemGroupId", itemGroupId);
         q.setParameter("crfVersionId", crfVersionId);
         return (ArrayList<Item>) q.list();

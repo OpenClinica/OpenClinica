@@ -210,7 +210,7 @@ public class EnketoUrlService {
                 }
                 boolean hasItemData = false;
                 for (Item item : items) {
-                    ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();//itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
 
                     Element question = null;
