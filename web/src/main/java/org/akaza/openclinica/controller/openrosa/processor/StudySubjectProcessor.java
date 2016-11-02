@@ -1,14 +1,5 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import java.io.StringReader;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
@@ -29,21 +20,25 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
 @Order(value=3)
 public class StudySubjectProcessor implements Processor {
 
-    @Autowired
-    StudySubjectDao studySubjectDao;
-    @Autowired
-    UserAccountDao userAccountDao;
-    @Autowired
-    SubjectDao subjectDao;
-    @Autowired
-    StudyDao studyDao;
+    @Autowired StudySubjectDao studySubjectDao;
+    @Autowired UserAccountDao userAccountDao;
+    @Autowired SubjectDao subjectDao;
+    @Autowired StudyDao studyDao;
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     

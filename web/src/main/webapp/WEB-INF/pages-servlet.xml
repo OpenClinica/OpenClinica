@@ -84,8 +84,7 @@
     --> 
 	
 	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
-	
-    
+
     <!-- Resolves logical view names to JSP views -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"
           p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />

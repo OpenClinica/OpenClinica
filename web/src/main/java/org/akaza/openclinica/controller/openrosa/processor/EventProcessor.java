@@ -1,26 +1,9 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import java.util.Date;
-import java.util.List;
-
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.dao.hibernate.CompletionStatusDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
@@ -30,36 +13,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
+import java.util.Date;
+import java.util.List;
+
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
 @Order(value=5)
 public class EventProcessor implements Processor {
 
-    @Autowired
-    StudyEventDao studyEventDao;
+    @Autowired StudyEventDao studyEventDao;
     
-    @Autowired
-    StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired StudyEventDefinitionDao studyEventDefinitionDao;
     
-    @Autowired
-    EventCrfDao eventCrfDao;
+    @Autowired EventCrfDao eventCrfDao;
     
-    @Autowired
-    CrfVersionDao crfVersionDao;
+    @Autowired CrfVersionDao crfVersionDao;
     
-    @Autowired
-    CompletionStatusDao completionStatusDao;
+    @Autowired CompletionStatusDao completionStatusDao;
     
-    @Autowired
-    EventDefinitionCrfDao eventDefinitionCrfDao;
+    @Autowired EventDefinitionCrfDao eventDefinitionCrfDao;
     
-    @Autowired
-    ItemDataDao itemDataDao;
+    @Autowired ItemDataDao itemDataDao;
     
-    @Autowired
-    StudyDao studyDao;
+    @Autowired StudyDao studyDao;
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -68,13 +46,16 @@ public class EventProcessor implements Processor {
         Errors errors = container.getErrors();
         StudySubject studySubject = container.getSubject();
         StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(container.getSubjectContext().get("studyEventDefinitionID")));
-
+        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+        container.setCrfVersion(crfVersion);
         boolean isAnonymous = false;
         if (container.getSubjectContext().get("studySubjectOID") == null) isAnonymous = true;
 
         //Create study event if it doesn't exist
-        if (isAnonymous) processAnonymous(container,errors, studySubject, studyEventDefinition);
-        else processParticipant(container,errors, studySubject, studyEventDefinition);
+        if (isAnonymous)
+            processAnonymous(container,errors, studySubject, studyEventDefinition);
+        else
+            processParticipant(container,errors, studySubject, studyEventDefinition);
         
         //TODO:  May need to move this to a new processor that runs at the end
         // Update the EventCrf and StudyEvent to the proper status.
@@ -82,7 +63,8 @@ public class EventProcessor implements Processor {
         Study study = null;
         if (container.getSubjectContext().get("studyOID") != null)
             study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-        else study = container.getStudy();
+        else
+            study = container.getStudy();
         container.setEventCrf(updateEventCrf(container.getEventCrf(), study, studySubject, container.getUser(), isAnonymous));
         container.setStudyEvent(updateStudyEvent(container.getStudyEvent(), studyEventDefinition, study, studySubject, container.getUser(), isAnonymous));
         return ProcessorEnum.PROCEED;
@@ -105,14 +87,14 @@ public class EventProcessor implements Processor {
             errors.reject("This Crf Version has a Status Not available in this Study Event Defn");
             throw new Exception("This Crf Version has a Status Not available in this Study Event Defn");
         }
-        
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
-        EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(), container.getSubject().getStudySubjectId(), crfVersion.getCrf().getCrfId());
+
+        EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(),
+                container.getSubject().getStudySubjectId(), container.getCrfVersion().getCrf().getCrfId());
         if (existingEventCrf == null) {
             logger.info("***New EventCrf is created***");
             //create event crf
-            container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
-        } else if (existingEventCrf.getCrfVersion().getOcOid().equals(crfVersion.getOcOid())) {
+            container.setEventCrf(createEventCrf(container.getCrfVersion(), container.getStudyEvent(),container.getSubject(),container.getUser()));
+        } else if (existingEventCrf.getCrfVersion().getOcOid().equals(container.getCrfVersion().getOcOid())) {
             logger.info("***  Existing EventCrf with same CRF Version  ***");
             //use existing event crf
             container.setEventCrf(existingEventCrf);
@@ -136,7 +118,7 @@ public class EventProcessor implements Processor {
                 container.setStudyEvent(createStudyEvent(studySubject,studyEventDefinition,ordinal,container.getUser()));
                 container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
                 break;
-            } else if (!existingStudyEvent.getStatusId().equals(Status.AVAILABLE.getCode()) 
+            } else if (!existingStudyEvent.getStatusId().equals(Status.AVAILABLE.getCode())
                     || (!existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.SCHEDULED.getCode())
                     && !existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.NOT_SCHEDULED.getCode())
                     && !existingStudyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.DATA_ENTRY_STARTED.getCode()))){
@@ -269,11 +251,6 @@ public class EventProcessor implements Processor {
     /**
      * Update Status in Event CRF Table
      *
-     * @param ecBean
-     * @param studyBean
-     * @param studySubjectBean
-     * @param isAnonymous
-     * @return
      */
     private EventCrf updateEventCrf(EventCrf eventCrf, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
         eventCrf.setUpdateId(user.getUserId());

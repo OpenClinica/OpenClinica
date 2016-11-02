@@ -15,7 +15,6 @@ import java.util.Locale;
 
 import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
-
 @Component
 public class OpenRosaSubmissionService {
 
@@ -29,32 +28,29 @@ public class OpenRosaSubmissionService {
     private CrfVersionDao crfVersionDao;
     
     @Transactional
-    public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths) throws Exception {
+    public void processRequest(Study study, HashMap<String,String> subjectContext, String requestBody, Errors errors,
+            Locale locale, ArrayList <HashMap> listOfUploadFilePaths, SubmissionContainer.FieldRequestTypeEnum requestType) throws Exception {
         // Execute save as Hibernate transaction to avoid partial imports
         CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
         String requestPayload = parseSubmission(requestBody, crfVersion);
-        runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths);
+        runAsTransaction(study, requestPayload, subjectContext, errors, locale ,listOfUploadFilePaths, requestType);
     }
 
     @Transactional
-    public void processFieldSubmissionRequest(Study study, HashMap<String,String> subjectContext, String instanceId, String requestBody, Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths) throws Exception {
-        // Execute save as Hibernate transaction to avoid partial imports
-        // is this the initial form submission with just instanceId?
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(subjectContext.get("crfVersionOID"));
-        processFieldPayload(study, requestBody, subjectContext, errors, locale ,listOfUploadFilePaths);
-    }
-
-    private void runAsTransaction(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList <HashMap> listOfUploadFilePaths) throws Exception{
-
-        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);
-        container.setProcessorEnum(ProcessorEnum.SUBMISSION_PROCESSOR);
-        submissionProcessorChain.processSubmission(container);
-
-    }
-
-    private void processFieldPayload(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList <HashMap> listOfUploadFilePaths) throws Exception{
-        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths);
+    public void processFieldSubmissionRequest(Study study, HashMap<String,String> subjectContext, String instanceId, String requestBody,
+            Errors errors, Locale locale, ArrayList <HashMap> listOfUploadFilePaths, SubmissionContainer.FieldRequestTypeEnum requestType) throws Exception {
+        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths, requestType);
         container.setProcessorEnum(checkInitialInstanceIdSubmission(requestBody));
+        container.setFieldSubmissionFlag(true);
+        submissionProcessorChain.processSubmission(container);
+    }
+
+    private void runAsTransaction(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,
+            ArrayList <HashMap> listOfUploadFilePaths, SubmissionContainer.FieldRequestTypeEnum requestType) throws Exception{
+
+        SubmissionContainer container = new SubmissionContainer(study,requestBody,subjectContext,errors,locale ,listOfUploadFilePaths, requestType);
+        container.setProcessorEnum(ProcessorEnum.SUBMISSION_PROCESSOR);
+        container.setFieldSubmissionFlag(false);
         submissionProcessorChain.processSubmission(container);
 
     }

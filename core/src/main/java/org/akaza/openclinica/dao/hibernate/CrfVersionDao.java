@@ -3,8 +3,10 @@ package org.akaza.openclinica.dao.hibernate;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.hibernate.query.Query;
 
 public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
+    private static String findByOcIdQuery = "from CrfVersion cv  where cv.ocOid = :OCOID";
 
     @Override
     Class<CrfVersion> domainClass() {
@@ -14,16 +16,15 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
 
     public CrfVersion findByCrfVersionId(int crf_version_id) {
         String query = "from " + getDomainClassName() + " crf_version  where crf_version.crfVersionId = :crfversionid ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("crfversionid", crf_version_id);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("crfversionid", crf_version_id);
         return (CrfVersion) q.uniqueResult();
     }
 
     public CrfVersion findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
-        String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("OCOID", OCOID);
+        Query q = getCurrentSession().createQuery(findByOcIdQuery);
+        q.setParameter("OCOID", OCOID);
         return (CrfVersion) q.uniqueResult();
     }
 
