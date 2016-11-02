@@ -19,6 +19,7 @@ public class SubmissionContainer {
     private StudySubject subject = null;
     private UserAccount user = null;
     private EventCrf eventCrf = null;
+    private CrfVersion crfVersion = null;
     private List<ItemData> items = null;
     private Errors errors = null;
     private Locale locale = null;
@@ -46,6 +47,14 @@ public class SubmissionContainer {
         this.locale = locale;
         this.listOfUploadFilePaths=listOfUploadFilePaths;
         this.requestType = requestType;
+    }
+
+    public CrfVersion getCrfVersion() {
+        return crfVersion;
+    }
+
+    public void setCrfVersion(CrfVersion crfVersion) {
+        this.crfVersion = crfVersion;
     }
 
     public boolean isFieldSubmissionFlag() {

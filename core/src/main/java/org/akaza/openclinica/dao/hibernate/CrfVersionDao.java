@@ -16,17 +16,14 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
 
     public CrfVersion findByCrfVersionId(int crf_version_id) {
         String query = "from " + getDomainClassName() + " crf_version  where crf_version.crfVersionId = :crfversionid ";
-        Query q = getCurrentSession().createQuery(query).setCacheable(true);
+        Query q = getCurrentSession().createQuery(query);
         q.setParameter("crfversionid", crf_version_id);
         return (CrfVersion) q.uniqueResult();
     }
 
-    public void resetCache() {
-        getCurrentSession().getSessionFactory().getCache().evictAllRegions();
-    }
     public CrfVersion findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
-        Query q = getCurrentSession().createQuery(findByOcIdQuery).setCacheable(true);
+        Query q = getCurrentSession().createQuery(findByOcIdQuery);
         q.setParameter("OCOID", OCOID);
         return (CrfVersion) q.uniqueResult();
     }

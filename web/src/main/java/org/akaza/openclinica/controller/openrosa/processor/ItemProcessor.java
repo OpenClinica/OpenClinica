@@ -76,7 +76,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
 
-                        crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+                        crfVersion = container.getCrfVersion();
                         eventCrf = container.getEventCrf();
                         itemDataList = new ArrayList<ItemData>();
 
@@ -128,9 +128,10 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                     continue;
                 }
-
-                ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemMetadata im = itemGroupMetadataDao.findMetadataByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemGroupMetadata itemGroupMeta = im.getIgm();
+                ItemFormMetadata itemFormMetadata = im.getIfm();
+                        //ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                 Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(), itemDataList, item);
 
                 // Convert space separated Enketo multiselect values to comma separated OC multiselect values
@@ -185,8 +186,12 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
     }
 
     private boolean ShouldProcessItemNode(Node itemNode) {
-        return itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER") && !itemNode.getNodeName().endsWith(".SUBHEADER") && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL") && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID") && !itemNode.getNodeName()
-                .equals("OC.STUDY_SUBJECT_ID_CONFIRM");
+        return itemNode instanceof Element
+                && !itemNode.getNodeName().endsWith(".HEADER")
+                && !itemNode.getNodeName().endsWith(".SUBHEADER")
+                && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL")
+                && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")
+                && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID_CONFIRM");
     }
 
     private Item lookupItem(String itemName, CrfVersion crfVersion) {

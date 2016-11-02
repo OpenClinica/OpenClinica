@@ -47,7 +47,7 @@ public class ItemDao extends AbstractDomainDao<Item> {
     @SuppressWarnings("unchecked")
     public ArrayList<Item> findByItemGroupCrfVersionOrdered(Integer itemGroupId, Integer crfVersionId) {
 
-        Query q = getCurrentSession().createQuery(findByItemGroupCrfVersionOrderedQuery).setCacheable(true);
+        Query q = getCurrentSession().createQuery(findByItemGroupCrfVersionOrderedQuery);
         q.setParameter("itemGroupId", itemGroupId);
         q.setParameter("crfVersionId", crfVersionId);
         return (ArrayList<Item>) q.list();

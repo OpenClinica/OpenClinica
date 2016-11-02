@@ -46,13 +46,16 @@ public class EventProcessor implements Processor {
         Errors errors = container.getErrors();
         StudySubject studySubject = container.getSubject();
         StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(container.getSubjectContext().get("studyEventDefinitionID")));
-
+        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+        container.setCrfVersion(crfVersion);
         boolean isAnonymous = false;
         if (container.getSubjectContext().get("studySubjectOID") == null) isAnonymous = true;
 
         //Create study event if it doesn't exist
-        if (isAnonymous) processAnonymous(container,errors, studySubject, studyEventDefinition);
-        else processParticipant(container,errors, studySubject, studyEventDefinition);
+        if (isAnonymous)
+            processAnonymous(container,errors, studySubject, studyEventDefinition);
+        else
+            processParticipant(container,errors, studySubject, studyEventDefinition);
         
         //TODO:  May need to move this to a new processor that runs at the end
         // Update the EventCrf and StudyEvent to the proper status.
@@ -60,7 +63,8 @@ public class EventProcessor implements Processor {
         Study study = null;
         if (container.getSubjectContext().get("studyOID") != null)
             study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-        else study = container.getStudy();
+        else
+            study = container.getStudy();
         container.setEventCrf(updateEventCrf(container.getEventCrf(), study, studySubject, container.getUser(), isAnonymous));
         container.setStudyEvent(updateStudyEvent(container.getStudyEvent(), studyEventDefinition, study, studySubject, container.getUser(), isAnonymous));
         return ProcessorEnum.PROCEED;
@@ -83,14 +87,14 @@ public class EventProcessor implements Processor {
             errors.reject("This Crf Version has a Status Not available in this Study Event Defn");
             throw new Exception("This Crf Version has a Status Not available in this Study Event Defn");
         }
-        
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
-        EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(), container.getSubject().getStudySubjectId(), crfVersion.getCrf().getCrfId());
+
+        EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(),
+                container.getSubject().getStudySubjectId(), container.getCrfVersion().getCrf().getCrfId());
         if (existingEventCrf == null) {
             logger.info("***New EventCrf is created***");
             //create event crf
-            container.setEventCrf(createEventCrf(crfVersion,container.getStudyEvent(),container.getSubject(),container.getUser()));
-        } else if (existingEventCrf.getCrfVersion().getOcOid().equals(crfVersion.getOcOid())) {
+            container.setEventCrf(createEventCrf(container.getCrfVersion(), container.getStudyEvent(),container.getSubject(),container.getUser()));
+        } else if (existingEventCrf.getCrfVersion().getOcOid().equals(container.getCrfVersion().getOcOid())) {
             logger.info("***  Existing EventCrf with same CRF Version  ***");
             //use existing event crf
             container.setEventCrf(existingEventCrf);
@@ -247,11 +251,6 @@ public class EventProcessor implements Processor {
     /**
      * Update Status in Event CRF Table
      *
-     * @param ecBean
-     * @param studyBean
-     * @param studySubjectBean
-     * @param isAnonymous
-     * @return
      */
     private EventCrf updateEventCrf(EventCrf eventCrf, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
         eventCrf.setUpdateId(user.getUserId());

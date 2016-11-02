@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EnketoUrlService {
@@ -187,10 +188,10 @@ public class EnketoUrlService {
             // Get max repeat in item data
             int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), firstItem.getItemId());
             // loop thru each repeat creating items in instance
-            String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
             Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();
 
             // TODO: Test empty group here (no items). make sure doesn't get nullpointer exception
+
             for (int i = 0; i < maxGroupRepeat; i++) {
                 Element groupElement = null;
 
@@ -209,16 +210,17 @@ public class EnketoUrlService {
                     groupElement.setAttribute(ENKETO_LAST_USED_ORDINAL, String.valueOf(maxGroupRepeat));
                 }
                 boolean hasItemData = false;
-                for (Item item : items) {
-                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();//itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
+                // get itemData for all items
 
+                for (Item item : items) {
+                    //ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
+                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();//itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     Element question = null;
                     if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
                         question = doc.createElement(item.getName());
                     else
                         question = doc.createElement(item.getOcOid());
-
                     if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
                         ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
                         String itemValue = itemData.getValue();

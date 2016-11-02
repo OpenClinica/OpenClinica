@@ -3,6 +3,7 @@ package org.akaza.openclinica.dao.hibernate;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.hibernate.query.Query;
 
@@ -24,14 +25,34 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
             + "and igm.crfVersion.crfVersionId = ec.crfVersion.crfVersionId "
             + "and igm.itemGroup.itemGroupId = :itemGroupId "
             + "and id.ordinal = :ordinal "
-            + "and ec.eventCrfId = :eventCrfId"
-            + "and id.deleted=FALSE";
+            + "and ec.eventCrfId = :eventCrfId "
+            + "and id.deleted=false ";
 
+
+    private static String findByItemEventCrfOrdinalQuery =  "select id from ItemData id "
+            + "join id.item i where i in :items "
+            + "and id.eventCrf.eventCrfId = :eventCrfid "
+            + "and id.ordinal >= 1 and id.ordinal <= :numItems "
+            + "and id.deleted=false";
+
+
+    private static String getMaxGroupRepeatQuery = "select max(id.ordinal) from ItemData id "
+            + "join id.eventCrf ec on ec.eventCrfId = :eventCrfId "
+            + "join id.item i on i.itemId = :itemId "
+            + "and id.deleted = false";
+
+    public List<ItemData> findByItemsEventCrf(List<Item> items, Integer eventCrfId, Integer numItems) {
+        Query q = getCurrentSession().createQuery(findByItemEventCrfOrdinalQuery);
+        q.setParameter("items", items);
+        q.setParameter("eventCrfid", eventCrfId);
+        q.setParameter("numItems", numItems);
+        return (List<ItemData>) q.list();
+    }
 
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
                 + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal";
-        org.hibernate.Query q = getCurrentSession().createQuery(query).setCacheable(true);
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("itemid", itemId);
         q.setInteger("eventcrfid", eventCrfId);
         q.setInteger("ordinal", ordinal);
@@ -52,8 +73,9 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
       
     }
 
+
     public ItemData findByEventCrfGroupOrdinal(EventCrf eventCrf, Integer itemGroupId, Integer ordinal) {
-        Query q = getCurrentSession().createQuery(findByEventCrfGroupOrdinalQuery).setCacheable(true);
+        Query q = getCurrentSession().createQuery(findByEventCrfGroupOrdinalQuery);
         q.setParameter("eventCrfId", eventCrf.getEventCrfId());
         q.setParameter("itemGroupId", itemGroupId);
         q.setParameter("ordinal", ordinal);
@@ -69,8 +91,9 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
     }
     
     public int getMaxGroupRepeat(Integer eventCrfId, Integer itemId) {
-        String query = "select max(ordinal) from item_data where event_crf_id = " + eventCrfId + " and item_id = " + itemId;
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        Query q = getCurrentSession().createQuery(getMaxGroupRepeatQuery);
+        q.setParameter("eventCrfId", eventCrfId);
+        q.setParameter("itemId", itemId);
         Number result = (Number) q.uniqueResult();
         if (result == null) return 0;
         else return result.intValue();

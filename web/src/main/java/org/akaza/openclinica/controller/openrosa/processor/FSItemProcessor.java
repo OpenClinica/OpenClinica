@@ -69,7 +69,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
 
-                        crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+                        crfVersion = container.getCrfVersion();
                         eventCrf = container.getEventCrf();
 
                         NodeList groupNodeList = crfNode.getChildNodes();
