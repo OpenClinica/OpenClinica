@@ -18,7 +18,8 @@
 			<pattern>%msg%n</pattern>
 		</encoder>
 	</appender>
-
+	<logger name="org.hibernate.SQL" level="${hibernateSQLLogLevel}" />
+	<logger name="org.hibernate.type" level="${hibernateTypeLogLevel}" />
 	<root level="${logLevel}">
 		<appender-ref ref="FILE" />
 		<appender-ref ref="STDOUT" />

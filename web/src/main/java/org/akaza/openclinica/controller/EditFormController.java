@@ -86,7 +86,7 @@ public class EditFormController {
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(Integer.valueOf(subjectContextMap.get("studyEventOrdinal")));
 
-        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID);
+        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, null, null);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
