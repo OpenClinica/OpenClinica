@@ -22,16 +22,23 @@ Capture eCRF data from study sites via the web
 Monitor and manage clinical data
 Audit trails and electronic signatures
 Role-based access controls
-Import/Export Data
-Extract data for analysis and reporting
-Note: This is a generic introduction to requirements as well as requirements elicitation in the project (how is this done? How does the
-team decides on whether to implement a new features, etc. )
-Specific Requirements and Features (Functional and Non-Functional requirements)
-Grade: 5pts
-Use Cases (including diagrams)
-Grade: 6pts
-Domain Model
-Grade: 6 pts
-Submission date (i.e., last commit to the repository): 23:59, 30-10-2016.
+
+Funcionalidades implementadas
+
+- Organização de pesquisas clínicas por estudo, protocolo ou site, cada com o seu próprio conjunto de utilizadores autorizados, sujeitos,
+definições de materia estudada e CRFs. Apoio para partilha de recursos entre estudos de forma segura e transparente.
+
+-----Continuar aqui-----
+
+* Dynamic generation of web-based CRFs for electronic data capture via user-defined clinical parameters and validation logic specified 
+in portable Excel templates.
+* Management of longitudinal data for complex and recurring patient visits.
+* Data import/export tools for migration of clinical datasets in excel spreadsheets, local databases and legacy data formats.
+* Extensive interfaces for data query and retrieval, across subjects, time, and clinical parameters, with dataset 
+export in common statistical analysis formats. 
+* Compliance with 21 CFR Part 11 and HIPAA privacy and security guidelines including use of study-specific user roles and privileges, 
+SSL encryption, and auditing to monitor access and changes by users.
+* A robust and scalable technology infrastructure developed using the Java J2EE framework interoperable with relational databases 
+including PostgreSQL (open source) and Oracle 10G, to support the needs of the clinical research enterprise.
 
 Note: Include contribution of the team members in the report. It also has to be clear from the commits to the repository the contributions of the different team members. 
