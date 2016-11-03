@@ -4,41 +4,36 @@ Requerimentos: Introdução, Âmbito e Descrição
 
 A ferramenta deve suportar a criação de estudos médicos.
 
-Create eCRFs "electronic case report form (eCRF)."
-The industry defines an eCRF as a collection of a few data elements, corresponding to a
-computer screen of data. It amounts to what might have been collected on a single piece of paper. This definition of eCRF is inherently
-singular, unitary and backward-compatible with a common mental construct of a paper form.
-For the FDA, an eCRF is inherently about multiple forms, collections of forms, and forward-looking. At the agency, an eCRF is now a
-compilation of lots of data, possibly all of the data about one patient.
-"The eCRF is a vehicle used to assemble all the data from different electronic- and paper-based systems and makes it possible to capture
-and organize these diverse data in a manner that satisfies the study protocol and that enables the data to be systematically reviewed and
-analyzed."
-As conceived by the FDA, an eCRF is an uber-record containing both electronic and paper information. This is a legitimate perspective.
-Regulators could not allow important data to escape their review simply because it was collected in one medium but not another.
-
-Design rules/edit checks
-Schedule patient visits
-Capture eCRF data from study sites via the web
-Monitor and manage clinical data
-Audit trails and electronic signatures
-Role-based access controls
+Criar eCRFs "electronic case report form".
+A industria define um eCRF como uma colecção de alguns elementos de dados, correspondendo a uma ficha num ecrã de computador. Amonta ao
+que se pode encontrar numa simples folha de papel. Para o FDA (Food and Drug Administration), o eCRF são múltiplos formulários, a
+compilação de todos os tipos de dados que podem dizer respeito a um paciente.
+"O eCRF é um meio no qual se junta todos os dados, eletronicos ou não, e torna possivel capturar e organizar estes diversos dados de
+maneira a satisfaça protocolo de estudo e que permita que dados sejam sistematicamente revistos e analisados."
+Esta aplicação visa a criar e gerir eCRF a nível empresarial. Os requerimentos são fornecidos pela industria/utilizadores e são revistos
+pelos responsáveis pela aplicação, de seguida comunucão os requerimentos a equipa que começa o desenvolvimento.
 
 Funcionalidades implementadas
 
+Criar/editar exames
+Marcar consultas de pacientes
+Capturar dados do eCRF para sites de estudo através da web
+Monitorizar e gerir dados clinicos
+Auditar atalhos e assinaturas eletronicas
+Controlos de acesso
+
 - Organização de pesquisas clínicas por estudo, protocolo ou site, cada com o seu próprio conjunto de utilizadores autorizados, sujeitos,
 definições de materia estudada e CRFs. Apoio para partilha de recursos entre estudos de forma segura e transparente.
-
------Continuar aqui-----
-
-* Dynamic generation of web-based CRFs for electronic data capture via user-defined clinical parameters and validation logic specified 
-in portable Excel templates.
-* Management of longitudinal data for complex and recurring patient visits.
-* Data import/export tools for migration of clinical datasets in excel spreadsheets, local databases and legacy data formats.
-* Extensive interfaces for data query and retrieval, across subjects, time, and clinical parameters, with dataset 
-export in common statistical analysis formats. 
-* Compliance with 21 CFR Part 11 and HIPAA privacy and security guidelines including use of study-specific user roles and privileges, 
-SSL encryption, and auditing to monitor access and changes by users.
-* A robust and scalable technology infrastructure developed using the Java J2EE framework interoperable with relational databases 
-including PostgreSQL (open source) and Oracle 10G, to support the needs of the clinical research enterprise.
+- Geração dynamica de "web-based" CRFs para captura de data eletronica seguindo parametros clinicos definidos pelo utilizador. Validação
+de lógica expecficada em "templates" Excel portateis.
+- Gestão de dados logitudinais para pacientes complexos e/ou recorrentes.
+- Ferramentas para importação/exportação de dados de datasets clinicos em spreasheets excel, bases de dados locais e formats de dados
+"legacy".
+- Interfaces extensivos para query de dados e recuperção, através de tópicos, tempo e parametros clinicos, com exportação de datasets 
+em comum com formatos de analises estaticos.
+- Parametros de privacidade e segurança em conformidade com 21 CFR Part 11 e HIPAA incluindo o uso funções e privilégios 
+estudo-especificos, encriptação SSL e auditoria para monitorizar acesso e troca por utilizadores.
+- Tecnologia infraestrutural robusta e adaptavel desenvolvida usando a framework Java J2EE interoperavel com bases de dados relacionais
+incluindo PostgreSQL (open source) e Oracle 10G, para supportar as necessidades de pesquisa clinica empresarial.
 
 Note: Include contribution of the team members in the report. It also has to be clear from the commits to the repository the contributions of the different team members. 
