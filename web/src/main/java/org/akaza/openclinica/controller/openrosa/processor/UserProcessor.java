@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import java.util.Date;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -22,23 +20,22 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
+
+import java.util.Date;
+
 import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
 @Order(value=4)
 public class UserProcessor implements Processor {
 
-    @Autowired
-    UserAccountDao userAccountDao;
+    @Autowired UserAccountDao userAccountDao;
     
-    @Autowired
-    UserTypeDao userTypeDao;
+    @Autowired UserTypeDao userTypeDao;
     
-    @Autowired
-    StudyUserRoleDao studyUserRoleDao;
+    @Autowired StudyUserRoleDao studyUserRoleDao;
     
-    @Autowired
-    StudyDao studyDao;
+    @Autowired StudyDao studyDao;
     
     public static final String INPUT_FIRST_NAME = "Participant";
     public static final String INPUT_LAST_NAME = "User";

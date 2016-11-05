@@ -6,8 +6,20 @@ import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.hibernate.query.Query;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
+
+    String findByCrfVersionIdQuery = "select ig from ItemGroup ig "
+            + "join fetch ig.itemGroupMetadatas igm "
+            + "join fetch igm.crfVersion crf "
+            + "join fetch igm.item as i "
+            + "where crf.crfVersionId = :crfVersionId "
+            + "group by ig.itemGroupId, "
+            + "igm.itemGroupMetadataId, "
+            + "crf.crfVersionId, "
+            + "i.itemId "
+            + "order by i.itemId";
 
     @Override
     Class<ItemGroup> domainClass() {
@@ -33,9 +45,11 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
     @SuppressWarnings("unchecked")
     public ArrayList<ItemGroup> findByCrfVersionId(Integer crfVersionId) {
-        String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id = " + crfVersionId
-                + " and ig.item_group_id = igm.item_group_id";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
+        //String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id = " + crfVersionId
+        //        + " and ig.item_group_id = igm.item_group_id";
+
+        Query q = getCurrentSession().createQuery(findByCrfVersionIdQuery);
+        q.setParameter("crfVersionId", crfVersionId);
         return (ArrayList<ItemGroup>) q.list();
     }
 

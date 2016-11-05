@@ -147,11 +147,7 @@
             <artifactId>mail</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -380,5 +376,15 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>local</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
 </project>

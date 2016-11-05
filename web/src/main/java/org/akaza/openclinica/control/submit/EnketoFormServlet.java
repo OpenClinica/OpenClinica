@@ -27,7 +27,6 @@ public class EnketoFormServlet extends SecureController {
         CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
         StudyEventDao studyEventDao = (StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
-        
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         String crfVersionId = request.getParameter(CRF_VERSION_ID);
         String studyEventId = request.getParameter(STUDY_EVENT_ID);
@@ -49,7 +48,7 @@ public class EnketoFormServlet extends SecureController {
         
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid());
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), crfVersion, studyEvent);
         } else {
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid());
         }
