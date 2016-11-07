@@ -2,12 +2,14 @@ package org.akaza.openclinica.controller.openrosa;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -41,7 +43,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/openrosa")
@@ -197,7 +198,7 @@ public class OpenRosaSubmissionController {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);
+                List<FileItem> items = upload.parseRequest(request);              
                 for (FileItem item : items) {
                     if (item.getFieldName().equals("instance_id")) {
                         instanceId = item.getString();

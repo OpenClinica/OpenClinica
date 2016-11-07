@@ -26,11 +26,14 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author jxu
@@ -600,8 +603,23 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return executeFindAllQuery("findAllDefnIdandStudyIdForSite", variables);
     }
 
+    
+    
+    public List findAllCrfMigrationDoesNotPerform(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+        HashMap variables = new HashMap();
+        String eventStr =StringUtils.join(studyEventDefnlist, ",");
+        String siteStr =StringUtils.join(sitelist, ",");
+        variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
+        variables.put(2, eventStr);
+        variables.put(3, siteStr);
+        variables.put(4, String.valueOf(sourceCrfVersionBean.getId()));
+        variables.put(5, String.valueOf(targetCrfVersionBean.getId()));
+
+        return executeFindAllQuery("findAllCrfMigrationDoesNotPerform", variables);
+    }
 
     
+        
     public Collection findAllActiveParentsByEventDefinitionId(int definitionId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

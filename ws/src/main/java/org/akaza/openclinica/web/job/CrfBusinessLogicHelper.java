@@ -1,5 +1,10 @@
 package org.akaza.openclinica.web.job;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -20,10 +25,6 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Date;
 
 /*
  * Helper methods will be placed in this class - DRY
@@ -164,7 +165,7 @@ public class CrfBusinessLogicHelper {
      * 
      * @return
      */
-    public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub) throws Exception {
+    public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub, boolean inTransaction) throws Exception {
         DataEntryStage stage = ecb.getStage();
         EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
         ItemDataDAO itemDataDao = new ItemDataDAO(ds);
@@ -287,7 +288,7 @@ public class CrfBusinessLogicHelper {
         }
         logger.debug("just set subj event status, final status is " + seb.getSubjectEventStatus().getName());
         logger.debug("final overall status is " + seb.getStatus().getName());
-        seb = (StudyEventBean) sedao.update(seb);
+        seb = (StudyEventBean) sedao.update(seb,inTransaction);
 
         return true;
     }
@@ -298,7 +299,7 @@ public class CrfBusinessLogicHelper {
      * 
      * @return
      */
-    public boolean markCRFStarted(EventCRFBean ecb, UserAccountBean ub) throws Exception {
+    public boolean markCRFStarted(EventCRFBean ecb, UserAccountBean ub, boolean inTransaction) throws Exception {
         EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
         StudyDAO sdao = new StudyDAO(ds);
         StudyBean study = sdao.findByStudySubjectId(ecb.getStudySubjectId());
@@ -331,7 +332,7 @@ public class CrfBusinessLogicHelper {
             seb.setUpdatedDate(new Date());
             seb.setUpdater(ub);
             seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-            seb = (StudyEventBean) sedao.update(seb);
+            seb = (StudyEventBean) sedao.update(seb,inTransaction);
         }
 
         return true;

@@ -7,17 +7,19 @@
  */
 package org.akaza.openclinica.domain.rule.expression;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
 /**
  * @author Krikor Krumlian
@@ -28,7 +30,7 @@ import javax.persistence.Transient;
 @Table(name = "rule_expression")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_expression_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class ExpressionBean extends AbstractAuditableMutableDomainObject {
+public class ExpressionBean extends AbstractAuditableMutableDomainObject implements Serializable {
 
     private Context context;
     private String value;

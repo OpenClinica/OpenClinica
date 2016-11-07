@@ -3,22 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-
-	<changeSet author="kkrumlian" id="2015-11-17-6829-1">
-		<comment>Fix user_id in audit_log_event when SDV </comment>
-		<sql splitStatements="false">
-			update audit_log_event ale
-			set user_id = ec.sdv_update_id
-			FROM event_crf ec
-			WHERE ale.event_crf_id = ec.event_crf_id
-				AND audit_log_event_type_id = 32
-				AND ale.user_id != ec.sdv_update_id
-			    AND ec.sdv_update_id != 0
-				AND audit_id =
-					(select MAX(aleinner.audit_id) from audit_log_event aleinner where aleinner.audit_log_event_type_id = 32 and ec.event_crf_id = aleinner.event_crf_id);
-		</sql>
-	</changeSet>
-
      <changeSet author="kkrumlian" id="2015-11-17-6829-2" runOnChange="true">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />

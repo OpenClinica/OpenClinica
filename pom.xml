@@ -607,11 +607,6 @@
                 <version>1.8</version>
             </dependency>
             <dependency>
-                <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
-                <version>2.1.0.1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
@@ -627,9 +622,7 @@
                 <version>${spring.version}</version>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
-
 
     <!-- These dependencies are used by _all_ child projects -->
     <build>
