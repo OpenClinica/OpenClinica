@@ -56,6 +56,9 @@ public class LoggerStartupListener extends ContextAwareBase implements
 		context.putProperty("log.dir", getField("log.dir"));
 		context.putProperty("logLocation", getField("logLocation"));
 		context.putProperty("logLevel", getField("logLevel"));
+		context.putProperty("hibernateSQLLogLevel", getField("hibernateSQLLogLevel"));
+		context.putProperty("hibernateTypeLogLevel", getField("hibernateTypeLogLevel"));
+
 
 		started = true;
 	}
