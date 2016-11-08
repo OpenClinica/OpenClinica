@@ -9,7 +9,6 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.hibernate.query.Query;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
@@ -55,7 +54,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
          return se;
 	}
 	
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional
     public StudyEvent fetchByStudyEventDefOIDAndOrdinalTransactional(String oid,Integer ordinal,Integer studySubjectId){
         String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -89,7 +88,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return eventList;
       
 	}
-	
+	@Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
@@ -101,13 +100,6 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
-
-@Override
-	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-	 super.saveOrUpdate(domainObject);
-	        getCurrentSession().flush();
-	        return domainObject;
-	    }
 
 	@Override
 	public void setApplicationEventPublisher(
