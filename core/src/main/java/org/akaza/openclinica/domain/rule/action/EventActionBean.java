@@ -1,10 +1,10 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -24,7 +24,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @Entity
 @DiscriminatorValue("6")
-public class EventActionBean extends RuleActionBean {
+public class EventActionBean extends RuleActionBean implements Serializable {
 
 	
 

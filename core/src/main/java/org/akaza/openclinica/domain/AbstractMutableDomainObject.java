@@ -1,12 +1,14 @@
 package org.akaza.openclinica.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 @MappedSuperclass
-public abstract class AbstractMutableDomainObject implements MutableDomainObject {
+public abstract class AbstractMutableDomainObject implements MutableDomainObject, Serializable {
     @Override
     public int hashCode() {
         final int prime = 31;

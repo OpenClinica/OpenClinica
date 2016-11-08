@@ -33,7 +33,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -41,6 +40,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * <P>
@@ -325,6 +325,20 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findAllByStudySubject", variables);
     }
 
+    public List<EventCRFBean> findAllCRFMigrationReportList(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+        HashMap<Integer, Object> variables = new HashMap();
+        String eventStr =StringUtils.join(studyEventDefnlist, ",");
+        String siteStr =StringUtils.join(sitelist, ",");
+        variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
+        variables.put(2, eventStr);
+        variables.put(3, siteStr);
+        variables.put(4, String.valueOf(sourceCrfVersionBean.getId()));
+        variables.put(5, String.valueOf(targetCrfVersionBean.getId()));
+
+        return executeFindAllQuery("findAllCRFMigrationReportList", variables);
+    }
+    
+    
     public ArrayList findAllByStudyEventAndCrfOrCrfVersionOid(StudyEventBean studyEvent, String crfVersionOrCrfOID) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEvent.getId()));

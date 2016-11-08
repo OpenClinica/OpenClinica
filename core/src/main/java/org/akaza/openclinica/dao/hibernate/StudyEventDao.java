@@ -9,7 +9,6 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.hibernate.query.Query;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware{
@@ -24,6 +23,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	public Class<StudyEvent> domainClass(){
 		return StudyEvent.class;
 	}
+	@Transactional
     public StudyEvent findByStudyEventId(int studyEventId) {
         Query q = getCurrentSession().createQuery(findByStudyEventIdQuery);
         q.setParameter("studyEventId", studyEventId);
@@ -42,6 +42,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
        
         
     }
+    @Transactional
 	public StudyEvent fetchByStudyEventDefOIDAndOrdinal(String oid,Integer ordinal,Integer studySubjectId){
 		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
 		 org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -53,6 +54,18 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
          return se;
 	}
 	
+    @Transactional
+    public StudyEvent fetchByStudyEventDefOIDAndOrdinalTransactional(String oid,Integer ordinal,Integer studySubjectId){
+        String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studySubjectId", studySubjectId);
+        q.setString("oid", oid);
+        q.setInteger("ordinal", ordinal);
+        StudyEvent se = (StudyEvent) q.uniqueResult();
+        // this.eventPublisher.publishEvent(new OnStudyEventUpdated(se));
+        return se;
+    }
+
     public Integer findMaxOrdinalByStudySubjectStudyEventDefinition(int studySubjectId, int studyEventDefinitionId) {
         String query = "select max(sample_ordinal) from study_event where study_subject_id = " + studySubjectId + " and study_event_definition_id = " + studyEventDefinitionId;
         Query q = getCurrentSession().createSQLQuery(query);
@@ -75,8 +88,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return eventList;
       
 	}
-	
-	@Transactional(propagation = Propagation.NEVER)
+	@Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
@@ -88,13 +100,6 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
-
-@Override
-	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-	 super.saveOrUpdate(domainObject);
-	        getCurrentSession().flush();
-	        return domainObject;
-	    }
 
 	@Override
 	public void setApplicationEventPublisher(

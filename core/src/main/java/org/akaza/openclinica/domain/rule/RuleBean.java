@@ -7,14 +7,7 @@
  */
 package org.akaza.openclinica.domain.rule;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.oid.GenericOidGenerator;
-import org.akaza.openclinica.bean.oid.OidGenerator;
-import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -26,6 +19,14 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.oid.GenericOidGenerator;
+import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 /**
  * <p>
  * Rule, the object that collects rules associated with RuleSets.
@@ -36,7 +37,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "rule")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_id_seq") })
-public class RuleBean extends AbstractAuditableMutableDomainObject {
+public class RuleBean extends AbstractAuditableMutableDomainObject implements Serializable{
 
     private String oid;
     private String name;

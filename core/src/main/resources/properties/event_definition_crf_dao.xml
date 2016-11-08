@@ -315,4 +315,26 @@
 	        and parent_id is null
         </sql>
     </query>
+	<query>
+		<name>findAllCrfMigrationDoesNotPerform</name>
+		<sql>
+			select distinct edc.* from event_crf ec
+			JOIN study_subject ss on ss.study_subject_id = ec.study_subject_id
+			JOIN study_event se on se.study_event_id = ec.study_event_id
+			JOIN crf_version cv on cv.crf_version_id = ec.crf_version_id
+			JOIN study_event_definition sed on sed.study_event_definition_id= se.study_event_definition_id
+            JOIN study s on s.study_id=ss.study_id			
+			LEFT JOIN event_definition_crf edc on (edc.crf_id = cv.crf_id and
+			edc.study_id = ss.study_id and edc.study_event_definition_id=
+			se.study_event_definition_id)
+			where ec.crf_version_id=? 
+						and
+            (sed.oc_oid = ANY(string_to_array(?,',')))  
+                  and    
+            (s.oc_oid = ANY(string_to_array(?,',')))  			
+			and (? != ANY
+			(string_to_array(selected_version_ids,',')) or ? != ANY
+			(string_to_array(selected_version_ids,',')) )
+		</sql>
+	</query>
 </queries>
