@@ -192,6 +192,8 @@ public class SystemController {
 		loggingConfiguration.put("log.dir", CoreResources.getField("log.dir"));
 		loggingConfiguration.put("logLocation", CoreResources.getField("logLocation"));
 		loggingConfiguration.put("logLevel", CoreResources.getField("logLevel"));
+        loggingConfiguration.put("hibernateSQLLogLevel", CoreResources.getField("hibernateSQLLogLevel"));
+        loggingConfiguration.put("hibernateTypeLogLevel", CoreResources.getField("hibernateTypeLogLevel"));
 		loggingConfiguration.put("syslog.host", CoreResources.getField("syslog.host"));
 		loggingConfiguration.put("syslog.port", CoreResources.getField("syslog.port"));
 
