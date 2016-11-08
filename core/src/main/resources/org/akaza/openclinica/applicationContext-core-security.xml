@@ -97,6 +97,7 @@
         </constructor-arg>
     </bean>
 
+<!-- xformService moved to core-service-->
 
     <bean name="apiSecurityFilter" class="org.akaza.openclinica.web.filter.ApiSecurityFilter"/>
 

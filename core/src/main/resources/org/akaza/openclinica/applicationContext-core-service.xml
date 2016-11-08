@@ -153,7 +153,7 @@
         <property name="dataSource" ref="dataSource"></property>
         <property name="coreResources" ref="coreResources"/>
     </bean>
-
+<!-- moved from core-security-->
     <bean id="xformService" class="org.akaza.openclinica.service.crfdata.XformMetaDataService"/>
     <bean id="responseSetService" class="org.akaza.openclinica.service.crfdata.ResponseSetService"/>
 

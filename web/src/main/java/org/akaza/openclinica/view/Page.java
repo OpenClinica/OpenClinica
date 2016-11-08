@@ -30,7 +30,7 @@ public enum Page {
    /**
      * Page for logging out
      */
-                LOGOUT("/WEB-INF/jsp/login/logout.jsp", "OpenClinica Log Out"),
+                LOGOUT("/WEB-INF/jsp/login/logout.jsp", "OpenClinica JsonLog Out"),
 
     /**
      * Page to show the main menu of openclinica
@@ -396,11 +396,11 @@ public enum Page {
     CREATE_CRF_VERSION_ERROR ("/WEB-INF/jsp/admin/createCRFVersionError.jsp", "Create a new CRF error"),
     REMOVE_CRF_VERSION_DEF ("/WEB-INF/jsp/admin/removeCRFVersionDef.jsp", "Remove CRF Version From Definition"),
 
-    AUDIT_LOG_USER ("/WEB-INF/jsp/admin/auditLogUser.jsp", "Audit Log display by User"),
-    AUDIT_LOG_STUDY ("/WEB-INF/jsp/admin/auditLogStudy.jsp", "Audit Log display by Study"),
-    AUDIT_LOGS_STUDY ("/WEB-INF/jsp/admin/studyAuditLog.jsp", "Audit Log display by Study"),
+    AUDIT_LOG_USER ("/WEB-INF/jsp/admin/auditLogUser.jsp", "Audit JsonLog display by User"),
+    AUDIT_LOG_STUDY ("/WEB-INF/jsp/admin/auditLogStudy.jsp", "Audit JsonLog display by Study"),
+    AUDIT_LOGS_STUDY ("/WEB-INF/jsp/admin/studyAuditLog.jsp", "Audit JsonLog display by Study"),
 
-    AUDIT_LOGS_ITEMS ("/WEB-INF/jsp/admin/auditItem.jsp", "Audit Log for Item"),
+    AUDIT_LOGS_ITEMS ("/WEB-INF/jsp/admin/auditItem.jsp", "Audit JsonLog for Item"),
 
     /**
      * Page for extract datasets main, tbh
@@ -480,7 +480,7 @@ public enum Page {
     VIEW_ALL_JOBS ("/WEB-INF/jsp/" + "admin/viewAllJobs.jsp", "View Jobs"),
     VIEW_IMPORT_JOB ("/WEB-INF/jsp/" + "admin/viewImportJobs.jsp", "View Import Jobs"),
     VIEW_IMPORT_JOB_SERVLET ("/ViewImportJob", "View Import Jobs"),
-    VIEW_LOG_MESSAGE ("/WEB-INF/jsp/" + "admin/viewLogMessage.jsp", "View Log Message"),
+    VIEW_LOG_MESSAGE ("/WEB-INF/jsp/" + "admin/viewLogMessage.jsp", "View JsonLog Message"),
     // below line for redirect without having to generate the table, tbh
     VIEW_JOB_SERVLET ("/ViewJob", "View Jobs"),
     VIEW_SINGLE_JOB ("/WEB-INF/jsp/" + "admin/viewSingleJob.jsp", "View Jobs"),
