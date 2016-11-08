@@ -15,7 +15,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  * @author jxu
  * @version CVS: $Id: LogoutServlet.java 13689 2009-12-16 21:10:37Z kkrumlian $
  *
- * Performs Log out action
+ * Performs JsonLog out action
  */
 public class LogoutServlet extends SecureController {
 

@@ -300,7 +300,7 @@ function setYPos(id) {
 						<c:set var="resStatuses" value="${resolutionStatuses}"/>
 					</c:when>
 					<c:otherwise>
-						<%-- for FVC; for Query, it will be set per setElements function --%>
+						<%-- for FVC; for JsonQuery, it will be set per setElements function --%>
 						<c:set var="resStatuses" value="${resolutionStatuses2}"/>
 					</c:otherwise>
 					</c:choose>

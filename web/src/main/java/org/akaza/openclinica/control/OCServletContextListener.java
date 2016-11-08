@@ -49,7 +49,7 @@ public class OCServletContextListener implements ServletContextListener {
         // Fetch the OpenClinica started event details
         Map<String, String> OCStartEventDetails = getEventDetailsOCStart(context);
 
-        // Log usage statistics event OpenClinca started
+        // JsonLog usage statistics event OpenClinca started
         LogUsageStatsService.logEventOCStart(OCStartEventDetails);
 
         // Save the OpenClinica start time into database

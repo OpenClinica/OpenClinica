@@ -43,7 +43,7 @@
 
 			<br>
 
-			<!--<a href="#">View Log</a>-->
+			<!--<a href="#">View JsonLog</a>-->
 
 		</div>
 

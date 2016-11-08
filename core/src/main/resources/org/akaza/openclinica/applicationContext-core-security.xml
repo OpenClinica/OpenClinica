@@ -97,13 +97,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
-        <property name="dataSource" ref="dataSource"></property>
-        <property name="coreResources" ref="coreResources"/>
-    </bean>
-
-    <bean id="xformService" class="org.akaza.openclinica.service.crfdata.XformMetaDataService"/>
-    
+<!-- xformService moved to core-service-->
 
     <bean name="apiSecurityFilter" class="org.akaza.openclinica.web.filter.ApiSecurityFilter"/>
 

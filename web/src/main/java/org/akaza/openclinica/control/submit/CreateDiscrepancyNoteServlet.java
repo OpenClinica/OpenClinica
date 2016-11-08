@@ -448,8 +448,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // person who completed data entry
 
             /* Mantis issue: tbh 08/31/2009
-             * 0004092: CRCs and Investigators allowed to close a Query
-            	CRCs and Investigators are allowed to choose Closed for a Query. they are also allowed to choose New.
+             * 0004092: CRCs and Investigators allowed to close a JsonQuery
+            	CRCs and Investigators are allowed to choose Closed for a JsonQuery. they are also allowed to choose New.
 
             	They should only be allowed to choose Updated or Resolution Proposed.
              */

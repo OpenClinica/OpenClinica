@@ -146,7 +146,7 @@ public class OpenRosaSubmissionController {
         }
 
         if (!errors.hasErrors()) {
-            // Log submission with Participate
+            // JsonLog submission with Participate
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
@@ -240,7 +240,7 @@ public class OpenRosaSubmissionController {
         }
 
         if (!errors.hasErrors()) {
-            // Log submission with Participate
+            // JsonLog submission with Participate
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
@@ -333,7 +333,7 @@ public class OpenRosaSubmissionController {
         }
 
         if (!errors.hasErrors()) {
-            // Log submission with Participate
+            // JsonLog submission with Participate
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
