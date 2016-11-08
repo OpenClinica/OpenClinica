@@ -1,9 +1,6 @@
 package org.akaza.openclinica.domain.rule.action;
 
-import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
+import java.io.Serializable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,10 +9,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 @Entity
 @Table(name = "rule_action_property")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_action_property_id_seq") })
-public class PropertyBean extends AbstractMutableDomainObject {
+public class PropertyBean extends AbstractMutableDomainObject implements Serializable {
 
     private String oid;
     private String value;

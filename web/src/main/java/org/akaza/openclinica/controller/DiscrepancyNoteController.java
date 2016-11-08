@@ -226,7 +226,7 @@ public class DiscrepancyNoteController {
 		if (!resolutionStatus.equals("Updated") && !resolutionStatus.equals("Resolution Proposed") && !resolutionStatus.equals("Closed") && !resolutionStatus.equals("New")) {
 			result = false;
 		}
-		if (!noteType.equals("Annotation") && !noteType.equals("Query") && !noteType.equals("Reason for Change") && !noteType.equals("Failed Validation Check")) {
+		if (!noteType.equals("Annotation") && !noteType.equals("JsonQuery") && !noteType.equals("Reason for Change") && !noteType.equals("Failed Validation Check")) {
 			result = false;
 		}
 		if (!seBean.isActive()) {

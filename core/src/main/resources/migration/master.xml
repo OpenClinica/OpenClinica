@@ -15,6 +15,7 @@
   <include  file="migration/3.10/release.xml"/>  
   <include  file="migration/3.11/release.xml"/>
   <include  file="migration/quartz2_schema_update/release.xml"/>
+  <include  file="migration/3.12/release.xml"/>  
   <include  file="migration/4.0/release.xml"/>
 </databaseChangeLog> 
 

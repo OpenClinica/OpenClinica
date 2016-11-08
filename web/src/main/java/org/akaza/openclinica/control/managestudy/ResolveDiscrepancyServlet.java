@@ -359,8 +359,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // }
         // return;
         // }
-        // tbh 02/2009: now removed, to allow for the Query workflow and allow a
-        // Monitor to Resolve a Query.
+        // tbh 02/2009: now removed, to allow for the JsonQuery workflow and allow a
+        // Monitor to Resolve a JsonQuery.
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
             || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)
             || currentRole.getRole().equals(Role.MONITOR)) {

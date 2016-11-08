@@ -10,15 +10,11 @@ import org.hibernate.query.Query;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
-    String findByCrfVersionIdQuery = "select ig from ItemGroup ig "
+    String findByCrfVersionIdQuery = "select distinct ig from ItemGroup ig "
             + "join fetch ig.itemGroupMetadatas igm "
             + "join fetch igm.crfVersion crf "
             + "join fetch igm.item as i "
             + "where crf.crfVersionId = :crfVersionId "
-            + "group by ig.itemGroupId, "
-            + "igm.itemGroupMetadataId, "
-            + "crf.crfVersionId, "
-            + "i.itemId "
             + "order by i.itemId";
 
     @Override

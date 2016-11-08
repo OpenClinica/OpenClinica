@@ -91,6 +91,12 @@ public class ListCRFServlet extends SecureController {
             return;
         }
         request.setAttribute(MODULE, module);
+        
+        // if coming from change crf version -> display message
+        String crfVersionChangeMsg = fp.getString("isFromCRFVersionBatchChange");
+        if (crfVersionChangeMsg != null && !crfVersionChangeMsg.equals("")) {
+            addPageMessage(crfVersionChangeMsg);
+        }
 
         String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
         // crf

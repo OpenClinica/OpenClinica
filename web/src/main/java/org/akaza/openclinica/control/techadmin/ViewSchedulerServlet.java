@@ -13,7 +13,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Locale;
 
-// import org.apache.commons.logging.Log;
+// import org.apache.commons.logging.JsonLog;
 // import org.apache.commons.logging.impl.SimpleLog;
 //
 // import org.quartz.*;
@@ -33,7 +33,7 @@ public class ViewSchedulerServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
-        // Log psqlLogger = new SimpleLog("QuartzJobLog");
+        // JsonLog psqlLogger = new SimpleLog("QuartzJobLog");
         // //ServletContext ctx = request.getSession().getServletContext();
         // PostgreSQLDelegate delegate = new PostgreSQLDelegate(psqlLogger,
         // "qrtz_",

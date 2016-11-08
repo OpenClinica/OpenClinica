@@ -7,11 +7,13 @@
  */
 package org.akaza.openclinica.bean.oid;
 
+import java.io.Serializable;
+
 /**
  * @author Krikor Krumlian
  *
  */
-public class GenericOidGenerator extends OidGenerator {
+public class GenericOidGenerator extends OidGenerator implements Serializable {
 
     private final int argumentLength = 1;
 

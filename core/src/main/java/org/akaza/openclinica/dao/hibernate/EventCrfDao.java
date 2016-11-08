@@ -42,7 +42,7 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyeventid", studyEventId);
         q.setString("studysubjectoid", studySubjectOid);
-        return (List<EventCrf>) q.list();
+        return q.list();
 	}
     
     @SuppressWarnings("unchecked")
@@ -53,6 +53,8 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyeventid", studyEventId);
         q.setInteger("statusid", statusCode);
-        return (List<EventCrf>) q.list();
+        return q.list();
     }
+    
+        
 }

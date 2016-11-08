@@ -580,7 +580,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 dn.setId(key);
                 int dnTypeId = note.getDiscrepancyNoteTypeId();
                 dn.setDiscrepancyNoteTypeId(dnTypeId);
-                if (dnTypeId == 3) {// Query
+                if (dnTypeId == 3) {// JsonQuery
                     dn.setAssignedUserId(note.getOwnerId());
                 } else if (dnTypeId == 1) {// FVC
                     if (fvcInitAssigns.containsKey(key)) {

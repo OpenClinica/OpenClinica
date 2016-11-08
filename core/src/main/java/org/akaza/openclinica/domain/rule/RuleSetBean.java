@@ -7,6 +7,19 @@
  */
 package org.akaza.openclinica.domain.rule;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -22,19 +35,6 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 /**
  * <p> RuleSetBean, Holds a collection of Rules & Actions </p>
  * @author Krikor Krumlian
@@ -43,7 +43,7 @@ import javax.persistence.Transient;
 @Table(name = "rule_set")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class RuleSetBean extends AbstractAuditableMutableDomainObject {
+public class RuleSetBean extends AbstractAuditableMutableDomainObject implements Serializable{
 
     private StudyEventDefinitionBean studyEventDefinition;
     private StudyBean study;
@@ -410,6 +410,9 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
                 return false;
         } else if (!runTime.equals(other.runTime))
             return false;
+        if (expressions == null && other.expressions != null) return false;
+        if (expressions != null && other.expressions == null) return false;
+        if (expressions.size() != other.expressions.size()) return false;
         return true;
     }
 

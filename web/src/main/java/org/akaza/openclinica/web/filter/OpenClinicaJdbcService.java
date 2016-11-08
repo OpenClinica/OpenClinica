@@ -54,7 +54,7 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
     }
 
     /**
-     * Query object to look up a user.
+     * JsonQuery object to look up a user.
      */
     private class OcUsersByUsernameMapping extends MappingSqlQuery {
         protected OcUsersByUsernameMapping(DataSource ds) {

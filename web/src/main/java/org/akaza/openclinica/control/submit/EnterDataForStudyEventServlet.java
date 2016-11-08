@@ -130,8 +130,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
         int studyId = studySubjectBean.getStudyId();
-        studySubjectBean.setLabel(decodeForHtml(studySubjectBean.getLabel()));
-        studySubjectBean.setSecondaryLabel(decodeForHtml(studySubjectBean.getSecondaryLabel()));
 
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) studydao.findByPK(studyId);
