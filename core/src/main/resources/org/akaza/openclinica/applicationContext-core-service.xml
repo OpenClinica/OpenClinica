@@ -149,6 +149,13 @@
         <property name="xformParser" ref="xformParser"/>
     </bean>
 
+    <bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="coreResources" ref="coreResources"/>
+    </bean>
+
+    <bean id="xformService" class="org.akaza.openclinica.service.crfdata.XformMetaDataService"/>
+    <bean id="responseSetService" class="org.akaza.openclinica.service.crfdata.ResponseSetService"/>
 
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>
