@@ -79,6 +79,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
 	}
 
+	@Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
@@ -90,13 +91,6 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
-
-   @Override
-   public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-       super.saveOrUpdate(domainObject);
-       getCurrentSession().flush();
-       return domainObject;
-   }
 
 	@Override
 	public void setApplicationEventPublisher(
