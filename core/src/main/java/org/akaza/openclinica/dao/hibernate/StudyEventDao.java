@@ -65,7 +65,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
     }
 
 
-
+    @Transactional
 	public List<StudyEvent> fetchListByStudyEventDefOID(String oid,Integer studySubjectId){
 		List<StudyEvent> eventList = null;
 
