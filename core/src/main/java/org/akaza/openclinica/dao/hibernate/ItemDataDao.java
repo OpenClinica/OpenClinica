@@ -38,9 +38,7 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
     private static String getMaxGroupRepeatQuery = "select max(id.ordinal) from ItemData id "
             + "join id.eventCrf ec on ec.eventCrfId = :eventCrfId "
-            + "join id.item i on i.itemId = :itemId "
-            + "and id.deleted = false";
-
+            + "join id.item i on i.itemId = :itemId ";
     public List<ItemData> findByItemsEventCrf(List<Item> items, Integer eventCrfId, Integer numItems) {
         Query q = getCurrentSession().createQuery(findByItemEventCrfOrdinalQuery);
         q.setParameter("items", items);
