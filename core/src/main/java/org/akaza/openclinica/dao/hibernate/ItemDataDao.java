@@ -1,11 +1,11 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.List;
-
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.hibernate.query.Query;
+
+import java.util.List;
 
 public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
@@ -28,6 +28,10 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
             + "and ec.eventCrfId = :eventCrfId "
             + "and id.deleted=false ";
 
+    private static String findByEventCrfItemName = "select id from ItemData id "
+            + "join id.item i where i.name=:itemName "
+            + "and id.eventCrf.eventCrfId = :eventCrfId "
+            + "and id.deleted=false";
 
     private static String findByItemEventCrfOrdinalQuery =  "select id from ItemData id "
             + "join id.item i where i in :items "
@@ -49,7 +53,8 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
-                + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal";
+                + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal "
+                + "and deleted=false";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("itemid", itemId);
         q.setInteger("eventcrfid", eventCrfId);
@@ -77,6 +82,13 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         q.setParameter("eventCrfId", eventCrf.getEventCrfId());
         q.setParameter("itemGroupId", itemGroupId);
         q.setParameter("ordinal", ordinal);
+        return (ItemData) q.uniqueResult();
+    }
+
+    public ItemData findByEventCrfItemName(int eventCrfId, String itemName) {
+        Query q = getCurrentSession().createQuery(findByEventCrfItemName);
+        q.setParameter("eventCrfId", eventCrfId);
+        q.setParameter("itemName", itemName);
         return (ItemData) q.uniqueResult();
     }
 
