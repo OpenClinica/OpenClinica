@@ -182,45 +182,45 @@ public class EnketoUrlService {
 
         ArrayList<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
         for (ItemGroup itemGroup : itemGroups) {
-            ItemGroupMetadata itemGroupMetadata = itemGroup.getItemGroupMetadatas().get(0);
+            ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId()).get(
+                    0);
             ArrayList<Item> items = (ArrayList<Item>) itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
-            Item firstItem = items.get(0);
+
             // Get max repeat in item data
-            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), firstItem.getItemId());
+            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), items.get(0).getItemId());
             // loop thru each repeat creating items in instance
+            String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
             Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();
 
             // TODO: Test empty group here (no items). make sure doesn't get nullpointer exception
-
             for (int i = 0; i < maxGroupRepeat; i++) {
                 Element groupElement = null;
 
-                if (isXform) {
+                if (isXform)
                     groupElement = doc.createElement(itemGroup.getName());
-                } else {
+                else
                     groupElement = doc.createElement(itemGroup.getOcOid());
-                }
                 Element repeatOrdinal = null;
                 if (isrepeating) {
-                    repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
-                    repeatOrdinal.setTextContent(String.valueOf(i+1));
-                    groupElement.appendChild(repeatOrdinal);
                     // add enketo related attributes
                     groupElement.setAttribute(ENKETO_ORDINAL, String.valueOf(i+1));
                     groupElement.setAttribute(ENKETO_LAST_USED_ORDINAL, String.valueOf(maxGroupRepeat));
+
+                    repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
+                    repeatOrdinal.setTextContent(String.valueOf(i+1));
+                    groupElement.appendChild(repeatOrdinal);
                 }
                 boolean hasItemData = false;
-                // get itemData for all items
-
                 for (Item item : items) {
-                    //ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
-                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();//itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+
                     Element question = null;
                     if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
                         question = doc.createElement(item.getName());
                     else
                         question = doc.createElement(item.getOcOid());
+
                     if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
                         ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
                         String itemValue = itemData.getValue();
@@ -230,8 +230,8 @@ public class EnketoUrlService {
 
                         question.setTextContent(itemValue);
                     }
-                    if (itemData==null || !itemData.isDeleted()) { 
-                        hasItemData = true; 
+                    if ((itemData !=null) && (itemData.isDeleted() != true)) {
+                        hasItemData = true;
                         groupElement.appendChild(question);
                     }
                 } // end of item
@@ -240,7 +240,7 @@ public class EnketoUrlService {
                 }
             }
 
-        } // end of group
+        } // end of
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
