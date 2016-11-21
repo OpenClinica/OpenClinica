@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
@@ -32,6 +33,8 @@ import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDI
 public class FSItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
+    private QueryService queryService;
+    @Autowired
     private ItemDataDao itemDataDao;
     @Autowired
     private ItemDao itemDao;
@@ -47,6 +50,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private SubmissionContainer container;
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
+
         logger.info("Executing FSItem Processor.");
         this.container = container;
         ArrayList<HashMap> listOfUploadFilePaths = container.getListOfUploadFilePaths();
@@ -137,7 +141,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         // Item loop
         for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
             Node itemNode = itemNodeList.item(m);
-            if (ShouldProcessItemNode(itemNode)) {
+            if (queryService.getQueryAttribute(itemNode) != null) {
+                queryService.process(container, crfVersion, eventCrf);
+            } else if (shouldProcessItemNode(itemNode)) {
 
                 itemName = itemNode.getNodeName().trim();
                 itemValue = itemNode.getTextContent();
@@ -193,7 +199,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
     }
 
-    private boolean ShouldProcessItemNode(Node itemNode) {
+
+    private boolean shouldProcessItemNode(Node itemNode) {
         return itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
                 && !itemNode.getNodeName().endsWith(".SUBHEADER") && !itemNode.getNodeName()
                 .equals("OC.REPEAT_ORDINAL") && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID") && !itemNode.getNodeName()

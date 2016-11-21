@@ -1,34 +1,9 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.ItemMetadata;
+import org.akaza.openclinica.domain.datamap.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +15,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.*;
+
+import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 
 @Component
 @Order(value=6)
@@ -63,13 +45,11 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
     private EventCrf eventCrf;
     private ArrayList<ItemData> itemDataList;
     private SubmissionContainer container;
-    private boolean fieldSubmissionFlag;
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Item Processor.");
         this.container = container;
-        this.fieldSubmissionFlag = container.isFieldSubmissionFlag();
-        if (fieldSubmissionFlag) {
+        if (container.isFieldSubmissionFlag()) {
             return ProcessorEnum.PROCEED;
         }
         ArrayList<HashMap> listOfUploadFilePaths = container.getListOfUploadFilePaths();
