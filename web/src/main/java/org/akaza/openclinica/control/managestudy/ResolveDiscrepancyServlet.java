@@ -55,8 +55,8 @@ import org.akaza.openclinica.web.pform.PFormCache;
 /**
  * @author ssachs
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class ResolveDiscrepancyServlet extends SecureController {
 
@@ -92,7 +92,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
         } else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
             if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
-                 return Page.ENKETO_FORM_SERVLET;
+                return Page.ENKETO_FORM_SERVLET;
             } else {
                 return Page.ADMIN_EDIT_SERVLET;
             }
@@ -100,7 +100,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return null;
     }
 
-    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted) throws Exception {
+    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted)
+            throws Exception {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -140,7 +141,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             EventCRFDAO ecdao = new EventCRFDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
-            
+
             CRFVersionDAO cvdao = new CRFVersionDAO(ds);
             CRFVersionBean crfVersion = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
@@ -156,7 +157,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
                 StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
-                //Cache the subject context for use during xform submission
+                // Cache the subject context for use during xform submission
                 PFormCache cache = PFormCache.getInstance(context);
                 PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
                 subjectContext.setStudySubjectOid(ssb.getOid());
@@ -165,12 +166,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 subjectContext.setCrfVersionOid(crfVersion.getOid());
                 subjectContext.setUserAccountId(ub.getId());
                 String contextHash = cache.putSubjectContext(subjectContext);
-                
+                String flavor = "-query";
+
                 String formUrl = null;
                 if (ecb.getId() > 0) {
                     formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null);
                 } else {
-                    formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid());
+                    formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
                 }
 
                 request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
@@ -213,11 +215,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // check that the note has not already been closed
         ArrayList children = dndao.findAllByParent(discrepancyNoteBean);
         discrepancyNoteBean.setChildren(children);
-        //This logic has been reverted, issue-7459
-//        if (parentNoteIsClosed(discrepancyNoteBean)) {
-//            throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, respage
-//                    .getString("the_discrepancy_choose_has_been_closed_resolved_create_new"));
-//        }
+        // This logic has been reverted, issue-7459
+        // if (parentNoteIsClosed(discrepancyNoteBean)) {
+        // throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, respage
+        // .getString("the_discrepancy_choose_has_been_closed_resolved_create_new"));
+        // }
 
         // all clear, send the user to the resolved screen
         String entityType = discrepancyNoteBean.getEntityType().toLowerCase();
@@ -226,15 +228,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // BWP 03/17/2009 3166: if it's not an ItemData type note, redirect
         // Monitors to View Subject or
         // View Study Events <<
-        if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
-                && !"eventcrf".equalsIgnoreCase(entityType)) {
+        if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType) && !"eventcrf".equalsIgnoreCase(entityType)) {
             redirectMonitor(module, discrepancyNoteBean);
             return;
         }
         // >>
         // If Study is Frozen or Locked
-        if (currentStudy.getStatus().isFrozen() && !"itemdata".equalsIgnoreCase(entityType) 
-                && !"eventcrf".equalsIgnoreCase(entityType)) {
+        if (currentStudy.getStatus().isFrozen() && !"itemdata".equalsIgnoreCase(entityType) && !"eventcrf".equalsIgnoreCase(entityType)) {
             redirectMonitor(module, discrepancyNoteBean);
             return;
         }
@@ -264,19 +264,19 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
 
-        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted);
+        Page p = getPageForForwarding(discrepancyNoteBean, isCompleted);
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
-            throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, resexception
-                    .getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
+            throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET,
+                    resexception.getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
         } else {
-            if(p.getFileName().contains("?")) {
-                if(!p.getFileName().contains("fromViewNotes=1")) {
-                    p.setFileName(p.getFileName()+"&fromViewNotes=1");
+            if (p.getFileName().contains("?")) {
+                if (!p.getFileName().contains("fromViewNotes=1")) {
+                    p.setFileName(p.getFileName() + "&fromViewNotes=1");
                 }
             } else {
-                p.setFileName(p.getFileName()+"?fromViewNotes=1");
+                p.setFileName(p.getFileName() + "?fromViewNotes=1");
             }
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
             setPopUpURL(createNoteURL);
@@ -362,8 +362,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // tbh 02/2009: now removed, to allow for the JsonQuery workflow and allow a
         // Monitor to Resolve a JsonQuery.
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)
-            || currentRole.getRole().equals(Role.MONITOR)) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT)
+                || currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.MONITOR)) {
             return;
         }
 
@@ -392,7 +392,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             RequestDispatcher dispatcher = null;
             DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
-            if (entityType != null && !"".equalsIgnoreCase(entityType) && !"itemdata".equalsIgnoreCase(entityType) && !"eventcrf".equalsIgnoreCase(entityType)) {
+            if (entityType != null && !"".equalsIgnoreCase(entityType) && !"itemdata".equalsIgnoreCase(entityType)
+                    && !"eventcrf".equalsIgnoreCase(entityType)) {
                 // redirect to View Study Subject
                 // addPageMessage(resword.getString("monitors_do_not_have_permission_to_resolve_discrepancy_notes"));
                 if ("studySub".equalsIgnoreCase(entityType)) {

@@ -35,8 +35,8 @@ public class EnketoFormServlet extends SecureController {
 
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(Integer.valueOf(studyEventId));
         CrfVersion crfVersion = crfVersionDao.findByCrfVersionId(Integer.valueOf(crfVersionId));
-        
-        //Cache the subject context for use during xform submission
+
+        // Cache the subject context for use during xform submission
         PFormCache cache = PFormCache.getInstance(context);
         PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
         subjectContext.setStudySubjectOid(studyEvent.getStudySubject().getOcOid());
@@ -45,20 +45,19 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setCrfVersionOid(crfVersion.getOcOid());
         subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
-        
+        String flavor = "-query";
 
         if (Integer.valueOf(eventCrfId) > 0) {
             formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), crfVersion, studyEvent);
         } else {
-            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid());
+            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
         }
         request.setAttribute(FORM_URL, formUrl);
-        //request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
+        // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
 
         forwardPage(Page.ENKETO_FORM_SERVLET);
     }
-
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {

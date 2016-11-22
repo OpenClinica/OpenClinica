@@ -1,7 +1,55 @@
 package org.akaza.openclinica.web.pform;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.util.StatusPrinter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -13,7 +61,11 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -28,7 +80,6 @@ import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.manifest.Manifest;
 import org.akaza.openclinica.web.pform.manifest.MediaFile;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
@@ -40,46 +91,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import javax.sql.DataSource;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
-    
-    @Autowired UserAccountDao userAccountDao;
-    
-    @Autowired StudyDao studyDao;
 
+    @Autowired
+    UserAccountDao userAccountDao;
+
+    @Autowired
+    StudyDao studyDao;
+
+    public static final String QUERY = "-query";
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
     public static final String INPUT_LAST_NAME = "User";
@@ -145,14 +178,17 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+            @QueryParam("formID") String uniqeId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
 
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         // print logback's internal status
         StatusPrinter.print(lc);
         if (!mayProceedPreview(studyOID))
             return null;
-        
+        boolean query = false;
+        if (uniqeId.endsWith(QUERY))
+            query = true;
+
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean study = sdao.findByOid(studyOID);
 
@@ -163,7 +199,7 @@ public class OpenRosaServices {
         Collection<CRFVersionBean> crfVersions = cVersionDao.findAll();
 
         CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
-
+        String xform = "";
         try {
             XFormList formList = new XFormList();
             for (CRFBean crf : crfs) {
@@ -175,26 +211,39 @@ public class OpenRosaServices {
                         // TODO: For now all XForms get a date based hash to
                         // trick Enketo into always downloading
                         // TODO: them.
-                        if (version.getXformName() != null){
+                        if (version.getXformName() != "") {
                             Calendar cal = Calendar.getInstance();
                             // TODO Uncomment this before checking in
-                            form.setHash(DigestUtils.md5Hex(version.getXform()));
-                            //form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
-                        }else {
+                            xform = version.getXform();
+                            if (query) {
+                                xform = applyQuery(xform);
+                            }
+                            xform = updateRepeatGroupsWithOrdinal(xform);
+                            form.setHash(DigestUtils.md5Hex(xform));
+                            // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                        } else {
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(new Date());
                             form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
                         }
 
-
                         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-                        form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
-
-                        //TODO:  Change test here to see if user list should be appended.  Hardcode to always add for now.
+                        if (query) {
+                            form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid() + QUERY);
+                        } else {
+                            form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
+                        }
+                        // TODO: Change test here to see if user list should be appended. Hardcode to always add for
+                        // now.
                         List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getId());
-                        //if (mediaList != null && mediaList.size() > 0) {
-                        if (true) {
+                        // if (mediaList != null && mediaList.size() > 0) {
+                        if (query) {
+                            form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid() + QUERY);
+                        } else {
                             form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid());
+                        }
+                        if (query) {
+                            form.setFormID(version.getOid() + QUERY);
                         }
                         formList.add(form);
                     }
@@ -227,8 +276,7 @@ public class OpenRosaServices {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<Error>" + e.getMessage() + "</Error>";
         }
-        
-        
+
     }
 
     /**
@@ -245,9 +293,14 @@ public class OpenRosaServices {
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formId") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+            @QueryParam("formId") String uniqeId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
+
+        String crfOID = uniqeId;
+        if (uniqeId.endsWith(QUERY)) {
+            crfOID = uniqeId.replace(QUERY, "");
+        }
 
         CRFVersionDAO cVersionDao = new CRFVersionDAO(getDataSource());
         CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
@@ -269,8 +322,8 @@ public class OpenRosaServices {
                 manifest.add(mediaFile);
             }
         }
-        
-        //Add user list
+
+        // Add user list
         MediaFile userList = new MediaFile();
         Study study = studyDao.findByOcOID(studyOID);
         String userXml = getUserXml(study.getStudyId());
@@ -278,7 +331,7 @@ public class OpenRosaServices {
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
         manifest.add(userList);
-        
+
         try {
             // Create the XML manifest using a Castor mapping file.
             XMLContext xmlContext = new XMLContext();
@@ -327,19 +380,28 @@ public class OpenRosaServices {
             return null;
 
         String xform = null;
-
         // get parameters
         String formId = request.getParameter("formId");
         if (formId == null) {
             return "<error>formID is null :(</error>";
         }
 
+        boolean query = false;
+        if (formId.endsWith(QUERY)) {
+            query = true;
+            formId = formId.replace(QUERY, "");
+        }
+
         try {
             CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
             CRFVersionBean crfVersion = versionDAO.findByOid(formId);
 
-            if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")){
-                xform = updateRepeatGroupsWithOrdinal(crfVersion.getXform());
+            if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")) {
+                xform = crfVersion.getXform();
+                if (query) {
+                    xform = applyQuery(xform);
+                }
+                xform = updateRepeatGroupsWithOrdinal(xform);
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
@@ -350,7 +412,7 @@ public class OpenRosaServices {
             return "<error>" + e.getMessage() + "</error>";
         }
         response.setHeader("Content-Type", "text/xml; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + crfOID + ".xml" + "\";");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + formId + ".xml" + "\";");
         response.setContentType("text/xml; charset=utf-8");
         return xform;
 
@@ -381,11 +443,12 @@ public class OpenRosaServices {
         FileInputStream fis = new FileInputStream(image);
         StreamingOutput stream = new MediaStreamingOutput(fis);
         ResponseBuilder builder = Response.ok(stream);
-        
+
         // Set content type, if known
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
-        if (type != null && !type.isEmpty()) builder = builder.header("Content-Type", type);
+        if (type != null && !type.isEmpty())
+            builder = builder.header("Content-Type", type);
         return builder.build();
     }
 
@@ -402,11 +465,10 @@ public class OpenRosaServices {
     @GET
     @Path("/{studyOID}/downloadUsers")
     public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @RequestHeader("Authorization") String authorization, @Context ServletContext context)
-            throws Exception {
+            @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
-        
+
         Study study = studyDao.findByOcOID(studyOID);
         String userXml = getUserXml(study.getStudyId());
 
@@ -527,7 +589,6 @@ public class OpenRosaServices {
             logger.error("Unable to parse pformMaxSubmissionSize as an integer.");
         }
 
-
         // Build response headers
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         Date currentDate = new Date();
@@ -646,29 +707,116 @@ public class OpenRosaServices {
 
     }
 
-    private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
+    private String applyQuery(String xform) throws Exception {
+        InputStream is = new ByteArrayInputStream(xform.getBytes());
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        Document doc = factory.newDocumentBuilder().parse(is);
+        Element html = doc.getDocumentElement();
 
-    	NamedNodeMap attribs = fetchXformAttributes(xform);
-    	InputStream is = new ByteArrayInputStream(xform.getBytes());
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	factory.setNamespaceAware(false);
-    	Document doc = factory.newDocumentBuilder().parse(is);
+        html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:enk", "http://enketo.org/xforms");
+        NamedNodeMap attribs = html.getAttributes();
 
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         XPathExpression expr = null;
-        expr = xpath.compile("/html/body/group/repeat");
-        NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        expr = xpath.compile("/html/body");
 
-        for (int k = 0; k < repeatNodes.getLength(); k++) {
-        	Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
-        	String groupRef = groupElement.getAttribute("ref");
+        Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+        NodeList bodyChildNodes = bodyNode.getChildNodes();
+        int bodyChildLength = bodyChildNodes.getLength();
+        for (int b = 0; b < bodyChildLength; b++) {
+            Node bodyChildNode = bodyChildNodes.item(b);
 
-            expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
-            Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
-            Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
-        	group.appendChild(ordinal);
+            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && ("group".equals(bodyChildNode.getNodeName()))) {
+                Node groupNode = bodyChildNode;
+                NodeList groupChildNodes = groupNode.getChildNodes();
+                int groupChildLength = groupChildNodes.getLength();
+                for (int c = 0; c < groupChildLength; c++) {
+                    Node groupChildNode = groupChildNodes.item(c);
+
+                    if (groupChildNode.getNodeType() != Node.TEXT_NODE && ("repeat".equals(groupChildNode.getNodeName()))) {
+                        Node repeatNode = groupChildNode;
+                        NodeList repeatChildNodes = repeatNode.getChildNodes();
+                        int repeatChildLegth = repeatChildNodes.getLength();
+                        for (int j = 0; j < repeatChildLegth; j++) {
+                            Node repeatChildNode = repeatChildNodes.item(j);
+                            if (repeatChildNode.getNodeType() != Node.TEXT_NODE
+                                    && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
+                                            || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
+                                Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
+                                repeatNode.appendChild(newChildNode);
+                                repeatNode.appendChild(doc.createTextNode("\n"));
+                            }
+                        }
+                    }
+
+                    if (groupChildNode.getNodeType() != Node.TEXT_NODE
+                            && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
+                                    || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
+                        Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
+                        groupNode.appendChild(newChildNode);
+                        groupNode.appendChild(doc.createTextNode("\n"));
+                    }
+                }
             }
+            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
+                    || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
+                Element newChildNode = createChildElement(doc, bodyChildNode, bodyChildNode.getNodeName());
+                bodyNode.appendChild(newChildNode);
+                bodyNode.appendChild(doc.createTextNode("\n"));
+            }
+        }
+
+        expr = xpath.compile("/html/head/model");
+        Node modelNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+        NodeList modelChildNodes = modelNode.getChildNodes();
+        int modelChildLength = modelChildNodes.getLength();
+        for (int i = 0; i < modelChildLength; i++) {
+            Node modelChildNode = modelChildNodes.item(i);
+            if (modelChildNode.getNodeType() != Node.TEXT_NODE && "bind".equals(modelChildNode.getNodeName())) {
+                NamedNodeMap attr = modelChildNode.getAttributes();
+                Node nodesetAttr = attr.getNamedItem("nodeset");
+                Node relevantAttr = attr.getNamedItem("relevant");
+                String str = nodesetAttr.getNodeValue();
+                Element bind = doc.createElement("bind");
+
+                if (relevantAttr != null) {
+                    bind.setAttribute("relevant", relevantAttr.getNodeValue());
+                }
+
+                bind.setAttribute("nodeset", nodesetAttr.getNodeValue() + "_comment");
+                bind.setAttribute("enk:for", str);
+                bind.setAttribute("type", "string");
+                modelNode.appendChild(bind);
+                modelNode.appendChild(doc.createTextNode("\n"));
+            }
+
+            if (modelChildNode.getNodeType() != Node.TEXT_NODE && "instance".equals(modelChildNode.getNodeName()) && modelChildNode.getFirstChild() != null) {
+                Node icrfNode = modelChildNode.getFirstChild().getNextSibling();
+                NodeList igroupNodes = icrfNode.getChildNodes();
+                int igroupNodesLength = igroupNodes.getLength();
+                for (int m = 0; m < igroupNodesLength; m++) {
+                    Node igroupNode = igroupNodes.item(m).getNextSibling();
+                    if (igroupNode != null && igroupNode.getNodeType() != Node.TEXT_NODE && !igroupNode.getNodeName().equals("meta")) {
+                        NodeList icontexts = igroupNode.getChildNodes();
+                        int icontextsLength = icontexts.getLength();
+                        for (int j = 0; j < icontextsLength; j++) {
+                            Node icontextNode = icontexts.item(j);
+                            if (icontextNode.getNodeType() != Node.TEXT_NODE) {
+                                Element newChildNode = doc.createElement(icontextNode.getNodeName() + "_comment");
+                                igroupNode.appendChild(newChildNode);
+                                igroupNode.appendChild(doc.createTextNode("\n"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Element newInsanceNode = createInstanceElement(doc);
+        modelNode.appendChild(newInsanceNode);
+        modelNode.appendChild(doc.createTextNode("\n"));
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
@@ -682,31 +830,71 @@ public class OpenRosaServices {
         String modifiedXform = writer.toString();
         modifiedXform = applyXformAttributes(modifiedXform, attribs);
         logger.debug("Finalized xform source: " + modifiedXform);
-    	return modifiedXform;
-	}
+        return modifiedXform;
+    }
+
+    private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
+
+        NamedNodeMap attribs = fetchXformAttributes(xform);
+        InputStream is = new ByteArrayInputStream(xform.getBytes());
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        Document doc = factory.newDocumentBuilder().parse(is);
+
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        XPathExpression expr = null;
+        expr = xpath.compile("/html/body/group/repeat");
+        NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+        for (int k = 0; k < repeatNodes.getLength(); k++) {
+            Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
+            String groupRef = groupElement.getAttribute("ref");
+
+            expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
+            Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
+            Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
+            group.appendChild(ordinal);
+        }
+
+        TransformerFactory transformFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        String modifiedXform = writer.toString();
+        modifiedXform = applyXformAttributes(modifiedXform, attribs);
+        logger.debug("Finalized xform source: " + modifiedXform);
+        return modifiedXform;
+    }
 
     private String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
-    	String defaultNamespace = null;
-        for (int i=0;i<attribs.getLength();i++) {
-        	Attr attrib = (Attr) attribs.item(i);
-        	if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue();
+        String defaultNamespace = null;
+        for (int i = 0; i < attribs.getLength(); i++) {
+            Attr attrib = (Attr) attribs.item(i);
+            if (attrib.getName().equals("xmlns"))
+                defaultNamespace = attrib.getValue();
         }
-        String xformArray[] = xform.split("html",2);
+        String xformArray[] = xform.split("html", 2);
         String modifiedXform = xformArray[0] + "html xmlns=\"" + defaultNamespace + "\" " + xformArray[1];
         return modifiedXform;
-	}
+    }
 
-	private NamedNodeMap fetchXformAttributes(String xform) throws Exception {
-    	InputStream is = new ByteArrayInputStream(xform.getBytes());
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	factory.setNamespaceAware(true);
-    	Document doc = factory.newDocumentBuilder().parse(is);
+    private NamedNodeMap fetchXformAttributes(String xform) throws SAXException, IOException, ParserConfigurationException {
+        InputStream is = new ByteArrayInputStream(xform.getBytes());
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        Document doc = factory.newDocumentBuilder().parse(is);
         Element html = doc.getDocumentElement();
         NamedNodeMap attribs = html.getAttributes();
-		return attribs;
-	}
+        return attribs;
+    }
 
-    private String getUserXml(Integer studyId) throws Exception { 
+    private String getUserXml(Integer studyId) throws Exception {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -715,9 +903,8 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        
         List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
-        for ( UserAccount userAccount:users) {
+        for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
             userName.appendChild(doc.createTextNode(userAccount.getUserName()));
@@ -771,14 +958,14 @@ public class OpenRosaServices {
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
-                                                                                                      // PENDING ,
-                                                                                                      // INACTIVE
+        // PENDING ,
+        // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled")
-                && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen") || studyStatus
-                        .equalsIgnoreCase("locked"))
+                && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen")
+                        || studyStatus.equalsIgnoreCase("locked"))
                 && (pManageStatus.equalsIgnoreCase("ACTIVE") || pManageStatus.equalsIgnoreCase("PENDING") || pManageStatus.equalsIgnoreCase("INACTIVE"))) {
             accessPermission = true;
         }
@@ -801,4 +988,36 @@ public class OpenRosaServices {
             out.close();
         }
     }
+
+    private Element createChildElement(Document doc, Node childNode, String inputType) {
+
+        Element input = doc.createElement("input");
+        NamedNodeMap attr = childNode.getAttributes();
+        Node refAttr = attr.getNamedItem("ref");
+        input.setAttribute("appearance", "dn w1");
+        input.setAttribute("ref", refAttr.getNodeValue() + "_comment");
+        String labelText = "";
+
+        NodeList inputChildNodes = childNode.getChildNodes();
+        int inputChildLength = inputChildNodes.getLength();
+        for (int i = 0; i < inputChildLength; i++) {
+            Node inputChildNode = inputChildNodes.item(i);
+            if (inputChildNode.getNodeType() != Node.TEXT_NODE && "label".equals(inputChildNode.getNodeName())) {
+                labelText = inputChildNode.getTextContent();
+            }
+        }
+
+        Element label = doc.createElement("label");
+        label.appendChild(doc.createTextNode(labelText + "  Comment:"));
+        input.appendChild(label);
+        return input;
+    }
+
+    private Element createInstanceElement(Document doc) {
+        Element instance = doc.createElement("instance");
+        instance.setAttribute("id", "_users");
+        instance.setAttribute("src", "jr://file-csv/users.xml");
+        return instance;
+    }
+
 }

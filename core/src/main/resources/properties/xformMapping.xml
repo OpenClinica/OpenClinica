@@ -170,6 +170,25 @@
         </field>
     </class>
     
+   <class name="org.akaza.openclinica.domain.xform.dto.Upload">
+        <map-to xml="upload" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="ref" type="string">
+            <bind-xml name="ref" node="attribute" />
+        </field>
+        <field name="appearance" type="string">
+            <bind-xml name="appearance" node="attribute" />
+        </field>
+        <field name="label" type="org.akaza.openclinica.domain.xform.dto.Label">
+            <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="hint" type="org.akaza.openclinica.domain.xform.dto.Hint">
+            <bind-xml name="hint" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="mediatype" type="string">
+            <bind-xml name="mediatype" node="attribute" />
+        </field>
+    </class>
+
     <class name="org.akaza.openclinica.domain.xform.dto.ItemSet">
         <map-to xml="itemSet" />
         <field name="nodeSet" type="string">
