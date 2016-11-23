@@ -41,14 +41,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    private CrfVersion crfVersion;
-    private EventCrf eventCrf;
-    private ArrayList<ItemData> itemDataList;
-    private SubmissionContainer container;
-
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Item Processor.");
-        this.container = container;
         if (container.isFieldSubmissionFlag()) {
             return ProcessorEnum.PROCEED;
         }
@@ -74,9 +68,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
 
-                        crfVersion = container.getCrfVersion();
-                        eventCrf = container.getEventCrf();
-                        itemDataList = new ArrayList<ItemData>();
+                        CrfVersion crfVersion = container.getCrfVersion();
 
                         HashMap<Integer, Set<Integer>> groupOrdinalMapping = new HashMap<Integer, Set<Integer>>();
                         NodeList groupNodeList = crfNode.getChildNodes();
@@ -91,11 +83,11 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
                                     continue;
                                 }
-                                processGroupItems(listOfUploadFilePaths, groupOrdinalMapping, groupNode, itemGroup);
+                                processGroupItems(listOfUploadFilePaths, groupOrdinalMapping, groupNode, itemGroup, container);
                             }
                         }
                         // Delete rows that have been removed
-                        removeDeletedRows(groupOrdinalMapping);
+                        removeDeletedRows(groupOrdinalMapping, container);
                     }
                 }
             }
@@ -104,7 +96,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
     }
 
     private void processGroupItems(ArrayList<HashMap> listOfUploadFilePaths, HashMap<Integer,
-            Set<Integer>> groupOrdinalMapping, Node groupNode, ItemGroup itemGroup) throws Exception {
+            Set<Integer>> groupOrdinalMapping, Node groupNode, ItemGroup itemGroup, SubmissionContainer container) throws Exception {
         String itemName;
         String itemValue;
 
@@ -120,17 +112,17 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                 itemName = itemNode.getNodeName().trim();
                 itemValue = itemNode.getTextContent();
 
-                Item item = lookupItem(itemName, crfVersion);
+                Item item = lookupItem(itemName, container.getCrfVersion());
 
                 if (item == null) {
                     logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                     continue;
                 }
-                ItemMetadata im = itemGroupMetadataDao.findMetadataByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemMetadata im = itemGroupMetadataDao.findMetadataByItemCrfVersion(item.getItemId(), container.getCrfVersion().getCrfVersionId());
                 ItemGroupMetadata itemGroupMeta = im.getIgm();
                 ItemFormMetadata itemFormMetadata = im.getIfm();
                         //ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(), itemDataList, item);
+                Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(), container.getItems(), item);
 
                 // Convert space separated Enketo multiselect values to comma separated OC multiselect values
                 Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
@@ -152,19 +144,19 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                 ordinals.add(itemOrdinal);
                 groupOrdinalMapping.put(itemGroup.getItemGroupId(), ordinals);
 
-                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, eventCrf, container.getStudy(), container.getSubject(), container.getUser());
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container.getEventCrf(), container.getStudy(), container.getSubject(), container.getUser());
                 Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
                 if (itemErrors.hasErrors()) {
                     container.getErrors().addAllErrors(itemErrors);
                     throw new Exception("Item validation error.  Rolling back submission changes.");
                 } else {
-                    itemDataList.add(newItemData);
+                    container.getItems().add(newItemData);
                 }
-                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
                 if (existingItemData == null) {
                     // No existing value, create new item.
                     if (newItemData.getOrdinal() < 0) {
-                        newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
+                        newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(container.getEventCrf().getEventCrfId(), item.getItemId()) + 1);
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setStatus(Status.UNAVAILABLE);
@@ -200,7 +192,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
         }
     }
 
-    private Integer getItemOrdinal(Node groupNode, boolean isRepeating, ArrayList<ItemData> itemDataList, Item item) {
+    private Integer getItemOrdinal(Node groupNode, boolean isRepeating, List<ItemData> itemDataList, Item item) {
         if (!isRepeating)
             return 1;
 
@@ -225,11 +217,11 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
         return ordinal;
     }
 
-    private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping) {
+    private void removeDeletedRows(HashMap<Integer, Set<Integer>> groupOrdinalMapping, SubmissionContainer container) {
         Iterator<Integer> keys = groupOrdinalMapping.keySet().iterator();
         while (keys.hasNext()) {
             Integer itemGroupId = keys.next();
-            List<ItemData> itemDatas = itemDataDao.findByEventCrfGroup(eventCrf.getEventCrfId(), itemGroupId);
+            List<ItemData> itemDatas = itemDataDao.findByEventCrfGroup(container.getEventCrf().getEventCrfId(), itemGroupId);
             for (ItemData itemData : itemDatas) {
                 if (!groupOrdinalMapping.get(itemGroupId).contains(itemData.getOrdinal()) && !itemData.isDeleted()) {
                     itemData.setDeleted(true);

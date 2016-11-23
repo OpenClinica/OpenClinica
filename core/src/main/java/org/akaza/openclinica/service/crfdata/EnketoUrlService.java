@@ -210,6 +210,7 @@ public class EnketoUrlService {
                     groupElement = doc.createElement(itemGroup.getName());
                 else
                     groupElement = doc.createElement(itemGroup.getOcOid());
+
                 Element repeatOrdinal = null;
                 if (isrepeating) {
                     // add enketo related attributes
@@ -277,7 +278,7 @@ public class EnketoUrlService {
         dnItemDataMaps.sort((d1, d2) -> d2.getDiscrepancyNote().getDateCreated().compareTo(d1.getDiscrepancyNote().getDateCreated()));
 
         QueriesBean queriesBean = new QueriesBean();
-        // create a json query array
+        // create a json query list
         ListIterator<DnItemDataMap> queryIterator = dnItemDataMaps.listIterator();
         while(queryIterator.hasNext()) {
             DnItemDataMap dnItemDataMap = queryIterator.next();
