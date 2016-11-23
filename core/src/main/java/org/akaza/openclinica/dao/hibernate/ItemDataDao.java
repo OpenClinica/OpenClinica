@@ -29,8 +29,9 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
             + "and id.deleted=false ";
 
     private static String findByEventCrfItemName = "select id from ItemData id "
-            + "join id.item i where i.name=:itemName "
+            + "join id.item i where i.name = :itemName "
             + "and id.eventCrf.eventCrfId = :eventCrfId "
+            + "and id.ordinal = :ordinal "
             + "and id.deleted=false";
 
     private static String findByItemEventCrfOrdinalQuery =  "select id from ItemData id "
@@ -85,10 +86,11 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (ItemData) q.uniqueResult();
     }
 
-    public ItemData findByEventCrfItemName(int eventCrfId, String itemName) {
+    public ItemData findByEventCrfItemName(int eventCrfId, String itemName, int ordinal) {
         Query q = getCurrentSession().createQuery(findByEventCrfItemName);
         q.setParameter("eventCrfId", eventCrfId);
         q.setParameter("itemName", itemName);
+        q.setParameter("ordinal", ordinal);
         return (ItemData) q.uniqueResult();
     }
 

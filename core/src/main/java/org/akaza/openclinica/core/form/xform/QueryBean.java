@@ -27,6 +27,8 @@ public class QueryBean {
     private String comment;
     @JsonProperty("status")
     private String status;
+    @JsonProperty("user")
+    private String user;
     @JsonProperty("assigned_to")
     private String assigned_to;
     @JsonProperty("notify")
@@ -133,6 +135,28 @@ public class QueryBean {
     public void setAssigned_to(String assigned_to) {
         this.assigned_to = assigned_to;
     }
+
+
+    /**
+     *
+     * @return
+     *     The user
+     */
+    @JsonProperty("user")
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     *
+     * @param user
+     *     The user
+     */
+    @JsonProperty("user")
+    public void setUser(String user) {
+        this.user = user;
+    }
+
 
     /**
      * 

@@ -285,6 +285,9 @@ public class EnketoUrlService {
             if (StringUtils.isNotEmpty(discrepancyNote.getDetailedNotes())) {
                 QueryBean queryBean = new QueryBean();
                 queryBean.setComment(discrepancyNote.getDetailedNotes());
+                UserAccount owner = discrepancyNote.getUserAccountByOwnerId();
+                String queryCreator = owner.getFirstName() + " " + owner.getLastName() + " (" + owner.getUserName() + ")";
+                queryBean.setUser(queryCreator);
                 UserAccount userAccount = discrepancyNote.getUserAccount();
                 String assignedTo = userAccount.getFirstName() + " " + userAccount.getLastName() + " (" + userAccount.getUserName() + ")";
                 queryBean.setAssigned_to(assignedTo);

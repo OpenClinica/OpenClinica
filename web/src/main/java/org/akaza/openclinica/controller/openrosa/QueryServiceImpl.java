@@ -8,6 +8,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +42,7 @@ public class QueryServiceImpl implements QueryService {
     private CrfVersion crfVersion;
     private EventCrf eventCrf;
     private ItemData itemData;
-
+    private int itemOrdinal;
     @Autowired
     private ItemDao itemDao;
     @Autowired
@@ -61,23 +62,17 @@ public class QueryServiceImpl implements QueryService {
     private ApplicationContext appContext;
 
     private UserAccount userAccount;
+    private ResolutionStatus resStatus;
 
     @Override
-    public void process(SubmissionContainer container, CrfVersion crfVersion, EventCrf eventCrf)  throws Exception {
+    public void process(SubmissionContainer container, CrfVersion crfVersion, EventCrf eventCrf,
+            int itemOrdinal)  throws Exception {
         this.container = container;
         this.crfVersion = crfVersion;
         this.eventCrf = eventCrf;
+        this.itemOrdinal = itemOrdinal;
         itemData = getItemData();
-        createQuery();
-        saveQueryItemDatamap();
-    }
-
-    private void createQuery() throws Exception {
-        dn = new DiscrepancyNote();
-        ResolutionStatus resStatus = resolutionStatusDao.findByResolutionStatusId(1);
-        dn.setStudy(container.getStudy());
-        dn.setEntityType("itemData");
-        dn.setDescription("description");
+        resStatus = resolutionStatusDao.findByResolutionStatusId(1);
         QueriesBean queries = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -86,7 +81,20 @@ public class QueryServiceImpl implements QueryService {
             logger.error(e.getMessage());
             throw e;
         }
-        QueryBean queryBean = queries.getQueries().get(0);
+        for (QueryBean queryBean : queries.getQueries()) {
+            // Enketo passes JSON "id" attribute for unsubmitted queries only
+            if (StringUtils.isEmpty(queryBean.getId())) continue;
+            createQuery(queryBean);
+            saveQueryItemDatamap();
+            handleEmailNotification(queryBean, userAccount);
+        }
+    }
+
+    private void createQuery(QueryBean queryBean) throws Exception {
+        dn = new DiscrepancyNote();
+        dn.setStudy(container.getStudy());
+        dn.setEntityType("itemData");
+        dn.setDescription("description");
 
         dn.setDetailedNotes(queryBean.getComment());
         dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
@@ -105,7 +113,6 @@ public class QueryServiceImpl implements QueryService {
         dn.setParentDiscrepancyNote(findQueryParent());
         dn.setDateCreated(new Date());
         dn = discrepancyNoteDao.saveOrUpdate(dn);
-        handleEmailNotification(queryBean, userAccount);
     }
 
     private void handleEmailNotification(QueryBean queryBean, UserAccount userAccount) throws Exception {
@@ -115,11 +122,11 @@ public class QueryServiceImpl implements QueryService {
         prepareEmail();
     }
     private ItemData getItemData() {
-        ItemData id = itemDataDao.findByEventCrfItemName(eventCrf.getEventCrfId(), parentElementName);
+        ItemData id = itemDataDao.findByEventCrfItemName(eventCrf.getEventCrfId(), parentElementName, itemOrdinal);
         return id;
     }
 
-    protected ItemData createBlankItemData(UserAccount user) {
+    private ItemData createBlankItemData(UserAccount user) {
         Item item = itemDao.findByNameCrfId(parentElementName, crfVersion.getCrf().getCrfId());
         itemData = new ItemData();
         itemData.setItem(item);
@@ -154,12 +161,18 @@ public class QueryServiceImpl implements QueryService {
         mapping.setActivated(false);
         mapping.setDiscrepancyNote(dn);
         dnItemDataMapDao.saveOrUpdate(mapping);
-/*
+        updateParentQuery();
+    }
+
+    private void updateParentQuery() {
+        if (dn.getParentDiscrepancyNote() == null) return;
+
         DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
         itemParentNote.setResolutionStatus(resStatus);
         itemParentNote.setUserAccount(container.getUser());
-        discrepancyNoteDao.saveOrUpdate(itemParentNote);*/
+        discrepancyNoteDao.saveOrUpdate(itemParentNote);
     }
+
     public String getQueryAttribute(Node itemNode) {
         this.itemNode = itemNode;
         this.parentElementName = QueryService.super.getQueryAttribute(itemNode);
@@ -169,14 +182,12 @@ public class QueryServiceImpl implements QueryService {
     private void prepareEmail() throws Exception {
         StringBuffer message = new StringBuffer();
 
-
         message.append(MessageFormat.format(respage.getString("mailDNHeader"), userAccount.getFirstName(),userAccount.getLastName()));
         message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
                 + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + userAccount.getUserName()
                 + "&listNotes_f_entityName=" + parentElementName
                 + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
         message.append(respage.getString("you_received_this_from"));
-
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
@@ -203,28 +214,26 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disclaimer"));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("email_footer"));
+        String subject = MessageFormat.format(respage.getString("mailDNSubject"),
+                dn.getStudy().getName(), parentElementName);
 
         String emailBodyString = message.toString();
         try {
-            sendEmail(userAccount.getEmail().trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),
-                    dn.getStudy().getName(), parentElementName), emailBodyString, true, null,
-                    null, true);
+            sendEmail(userAccount.getEmail().trim(), subject, emailBodyString, true);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
         }
 
     }
-    public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail, String successMessage, String failMessage,
-            Boolean sendMessage) throws Exception {
+    private Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail) throws Exception {
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) appContext.getBean("mailSender");
-            //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
-            //retrieve the host name
             Properties javaMailProperties = mailSender.getJavaMailProperties();
             if(null != javaMailProperties){
-                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
+                if (javaMailProperties.get("mail.smtp.localhost") == null
+                        || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
                     javaMailProperties.put("mail.smtp.localhost", "localhost");
                 }
             }
@@ -232,7 +241,7 @@ public class QueryServiceImpl implements QueryService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
-            helper.setFrom(from);
+            helper.setFrom(EmailEngine.getAdminEmail());
             helper.setTo(processMultipleImailAddresses(to.trim()));
             helper.setSubject(subject);
             helper.setText(body, true);
@@ -241,8 +250,7 @@ public class QueryServiceImpl implements QueryService {
 
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
-            me.printStackTrace();
-            logger.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
+            logger.error("Email could not be sent on {} due to: {}", new Date(), me.getMessage());
             messageSent = false;
         }
         return messageSent;

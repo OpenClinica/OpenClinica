@@ -15,7 +15,7 @@ import static org.akaza.openclinica.service.crfdata.EnketoUrlService.FS_QUERY_AT
 public interface QueryService {
     Logger logger = LoggerFactory.getLogger(QueryService.class);
 
-    void process(SubmissionContainer container, CrfVersion crfVersion, EventCrf eventCrf) throws Exception;
+    void process(SubmissionContainer container, CrfVersion crfVersion, EventCrf eventCrf, int itemOrdinal) throws Exception;
     default String getQueryAttribute(Node itemNode) {
         if (!itemNode.hasAttributes())
             return null;

@@ -42,7 +42,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private ItemFormMetadataDao itemFormMetadataDao;
     @Autowired
     private CrfVersionDao crfVersionDao;
-    
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private CrfVersion crfVersion;
@@ -122,19 +122,19 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
 
         if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
-                ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal);
+            ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal);
 
-                existingItemData.setDeleted(true);
-                existingItemData.setValue("");
-                existingItemData.setOldStatus(existingItemData.getStatus());
-                existingItemData.setUserAccount(container.getUser());
-                existingItemData.setStatus(Status.AVAILABLE);
-                existingItemData.setUpdateId(container.getUser().getUserId());
-                existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+            existingItemData.setDeleted(true);
+            existingItemData.setValue("");
+            existingItemData.setOldStatus(existingItemData.getStatus());
+            existingItemData.setUserAccount(container.getUser());
+            existingItemData.setStatus(Status.AVAILABLE);
+            existingItemData.setUpdateId(container.getUser().getUserId());
+            existingItemData = itemDataDao.saveOrUpdate(existingItemData);
 
-                //Close discrepancy notes
-                closeItemDiscrepancyNotes(container, existingItemData);
-                return;
+            //Close discrepancy notes
+            closeItemDiscrepancyNotes(container, existingItemData);
+            return;
         }
 
         NodeList itemNodeList = groupNode.getChildNodes();
@@ -142,7 +142,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
             Node itemNode = itemNodeList.item(m);
             if (queryService.getQueryAttribute(itemNode) != null) {
-                queryService.process(container, crfVersion, eventCrf);
+                queryService.process(container, crfVersion, eventCrf, itemOrdinal);
             } else if (shouldProcessItemNode(itemNode)) {
 
                 itemName = itemNode.getNodeName().trim();
@@ -208,9 +208,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     }
 
     private Item lookupItem(String itemName, CrfVersion crfVersion) {
-        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) { 
+        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) {
             return itemDao.findByOcOID(itemName);
-        } else { 
+        } else {
             return itemDao.findByNameCrfId(itemName, crfVersion.getCrf().getCrfId());
         }
     }
