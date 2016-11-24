@@ -75,9 +75,9 @@ import java.util.*;
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
-    
+
     @Autowired UserAccountDao userAccountDao;
-    
+
     @Autowired StudyDao studyDao;
 
     public static final String INPUT_USER_SOURCE = "userSource";
@@ -152,7 +152,7 @@ public class OpenRosaServices {
         StatusPrinter.print(lc);
         if (!mayProceedPreview(studyOID))
             return null;
-        
+
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean study = sdao.findByOid(studyOID);
 
@@ -227,8 +227,8 @@ public class OpenRosaServices {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
             return "<Error>" + e.getMessage() + "</Error>";
         }
-        
-        
+
+
     }
 
     /**
@@ -269,7 +269,7 @@ public class OpenRosaServices {
                 manifest.add(mediaFile);
             }
         }
-        
+
         //Add user list
         MediaFile userList = new MediaFile();
         Study study = studyDao.findByOcOID(studyOID);
@@ -278,7 +278,7 @@ public class OpenRosaServices {
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
         manifest.add(userList);
-        
+
         try {
             // Create the XML manifest using a Castor mapping file.
             XMLContext xmlContext = new XMLContext();
@@ -381,7 +381,7 @@ public class OpenRosaServices {
         FileInputStream fis = new FileInputStream(image);
         StreamingOutput stream = new MediaStreamingOutput(fis);
         ResponseBuilder builder = Response.ok(stream);
-        
+
         // Set content type, if known
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
@@ -406,7 +406,7 @@ public class OpenRosaServices {
             throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
-        
+
         Study study = studyDao.findByOcOID(studyOID);
         String userXml = getUserXml(study.getStudyId());
 
@@ -648,11 +648,11 @@ public class OpenRosaServices {
 
     private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
 
-    	NamedNodeMap attribs = fetchXformAttributes(xform);
-    	InputStream is = new ByteArrayInputStream(xform.getBytes());
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	factory.setNamespaceAware(false);
-    	Document doc = factory.newDocumentBuilder().parse(is);
+        NamedNodeMap attribs = fetchXformAttributes(xform);
+        InputStream is = new ByteArrayInputStream(xform.getBytes());
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        Document doc = factory.newDocumentBuilder().parse(is);
 
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
@@ -661,14 +661,14 @@ public class OpenRosaServices {
         NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
         for (int k = 0; k < repeatNodes.getLength(); k++) {
-        	Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
-        	String groupRef = groupElement.getAttribute("ref");
+            Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
+            String groupRef = groupElement.getAttribute("ref");
 
             expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
             Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
             Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
-        	group.appendChild(ordinal);
-            }
+            group.appendChild(ordinal);
+        }
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
@@ -682,31 +682,31 @@ public class OpenRosaServices {
         String modifiedXform = writer.toString();
         modifiedXform = applyXformAttributes(modifiedXform, attribs);
         logger.debug("Finalized xform source: " + modifiedXform);
-    	return modifiedXform;
-	}
+        return modifiedXform;
+    }
 
     private String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
-    	String defaultNamespace = null;
+        String defaultNamespace = null;
         for (int i=0;i<attribs.getLength();i++) {
-        	Attr attrib = (Attr) attribs.item(i);
-        	if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue();
+            Attr attrib = (Attr) attribs.item(i);
+            if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue();
         }
         String xformArray[] = xform.split("html",2);
         String modifiedXform = xformArray[0] + "html xmlns=\"" + defaultNamespace + "\" " + xformArray[1];
         return modifiedXform;
-	}
+    }
 
-	private NamedNodeMap fetchXformAttributes(String xform) throws Exception {
-    	InputStream is = new ByteArrayInputStream(xform.getBytes());
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	factory.setNamespaceAware(true);
-    	Document doc = factory.newDocumentBuilder().parse(is);
+    private NamedNodeMap fetchXformAttributes(String xform) throws Exception {
+        InputStream is = new ByteArrayInputStream(xform.getBytes());
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        Document doc = factory.newDocumentBuilder().parse(is);
         Element html = doc.getDocumentElement();
         NamedNodeMap attribs = html.getAttributes();
-		return attribs;
-	}
+        return attribs;
+    }
 
-    private String getUserXml(Integer studyId) throws Exception { 
+    private String getUserXml(Integer studyId) throws Exception {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -715,7 +715,7 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        
+
         List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
         for ( UserAccount userAccount:users) {
             Element item = doc.createElement("item");
@@ -750,8 +750,8 @@ public class OpenRosaServices {
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
-                                                                                                      // PENDING ,
-                                                                                                      // INACTIVE
+        // PENDING ,
+        // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
@@ -771,14 +771,14 @@ public class OpenRosaServices {
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
-                                                                                                      // PENDING ,
-                                                                                                      // INACTIVE
+        // PENDING ,
+        // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled")
                 && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen") || studyStatus
-                        .equalsIgnoreCase("locked"))
+                .equalsIgnoreCase("locked"))
                 && (pManageStatus.equalsIgnoreCase("ACTIVE") || pManageStatus.equalsIgnoreCase("PENDING") || pManageStatus.equalsIgnoreCase("INACTIVE"))) {
             accessPermission = true;
         }
