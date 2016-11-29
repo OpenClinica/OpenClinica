@@ -2,14 +2,12 @@ package org.akaza.openclinica.controller.openrosa;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -35,6 +33,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.DataBinder;
@@ -43,6 +42,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/openrosa")
@@ -100,7 +100,7 @@ public class OpenRosaSubmissionController {
             // Verify Study is allowed to submit
             if (!mayProceed(study)) {
                 logger.info("Submissions to the study not allowed.  Aborting submission.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
             if (ServletFileUpload.isMultipartContent(request)) {
                 String dir = getAttachedFilePath(studyOID);
@@ -108,7 +108,7 @@ public class OpenRosaSubmissionController {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);              
+                List<FileItem> items = upload.parseRequest(request);
                 for (FileItem item : items) {
                     if (item.getContentType() != null && !item.getFieldName().equals("xml_submission_file") ) {
                         if (!new File(dir).exists()) new File(dir).mkdirs();
@@ -121,7 +121,7 @@ public class OpenRosaSubmissionController {
                     }
                 }
                 listOfUploadFilePaths.add(map);
-            } else  {                
+            } else  {
                 requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
             }
 
@@ -141,7 +141,7 @@ public class OpenRosaSubmissionController {
             if (errors.hasErrors()) {
                 // Send a failure response
                 logger.info("Submission caused internal error.  Sending error response.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -150,10 +150,10 @@ public class OpenRosaSubmissionController {
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
-            return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
+            return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
         } else {
             logger.info("Submission contained errors. Sending error response");
-            return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -190,7 +190,7 @@ public class OpenRosaSubmissionController {
             // Verify Study is allowed to submit
             if (!mayProceed(study)) {
                 logger.info("Field Submissions to the study not allowed.  Aborting field submission.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
             if (ServletFileUpload.isMultipartContent(request)) {
                 String dir = getAttachedFilePath(studyOID);
@@ -198,7 +198,7 @@ public class OpenRosaSubmissionController {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);              
+                List<FileItem> items = upload.parseRequest(request);
                 for (FileItem item : items) {
                     if (item.getFieldName().equals("instance_id")) {
                         instanceId = item.getString();
@@ -216,7 +216,7 @@ public class OpenRosaSubmissionController {
             }
             if (instanceId == null)  {
                 logger.info("Field Submissions to the study not allowed without a valid instanceId.  Aborting field submission.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
 
             // Load user context from ecid
@@ -235,7 +235,7 @@ public class OpenRosaSubmissionController {
             if (!errors.hasErrors()) {
                 // Send a failure response
                 logger.info("Submission caused internal error.  Sending error response.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -245,11 +245,11 @@ public class OpenRosaSubmissionController {
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             long endMillis = System.currentTimeMillis();
-            System.out.println("Total time *********** " + (endMillis - millis));
-            return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
+            logger.info("Total time *********** " + (endMillis - millis));
+            return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
         } else {
             logger.info("Field Submission contained errors. Sending error response");
-            return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -284,7 +284,7 @@ public class OpenRosaSubmissionController {
             // Verify Study is allowed to submit
             if (!mayProceed(study)) {
                 logger.info("Field Deletions to the study not allowed.  Aborting field submission.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
 
             String dir = getAttachedFilePath(studyOID);
@@ -309,7 +309,7 @@ public class OpenRosaSubmissionController {
             listOfUploadFilePaths.add(map);
             if (instanceId == null)  {
                 logger.info("Field Submissions to the study not allowed without a valid instanceId.  Aborting field submission.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+                return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
 
             // Load user context from ecid
@@ -328,7 +328,7 @@ public class OpenRosaSubmissionController {
             if (!errors.hasErrors()) {
                 // Send a failure response
                 logger.info("Submission caused internal error.  Sending error response.");
-                return new ResponseEntity<String>(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -337,10 +337,10 @@ public class OpenRosaSubmissionController {
             if (isParticipantSubmission(subjectContext)) notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
-            return new ResponseEntity<String>(responseMessage, org.springframework.http.HttpStatus.CREATED);
+            return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
         } else {
             logger.info("Field Submission contained errors. Sending error response");
-            return new ResponseEntity<String>(org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 

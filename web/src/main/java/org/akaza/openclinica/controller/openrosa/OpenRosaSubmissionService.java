@@ -80,21 +80,6 @@ public class OpenRosaSubmissionService {
         } else {
             return ProcessorEnum.FIELD_SUBMISSION_RPOCESSOR;
         }
-        /*
-        try {
-            final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(body)));
-            final XPathExpression xpath = XPathFactory.newInstance().newXPath().compile("//*[count(./*) = 0]");
-            final NodeList nodeList = (NodeList) xpath.evaluate(doc, XPathConstants.NODESET);
-            for(int i = 0; i < nodeList.getLength(); i++) {
-                final Element el = (Element) nodeList.item(i);
-                System.out.println(el.getNodeName());
-                System.out.println(el.getTextContent());
-                if (el.getNodeName().equalsIgnoreCase("instanceID"))
-                    return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
 }

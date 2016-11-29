@@ -1,19 +1,5 @@
 package org.akaza.openclinica.service.crfdata;
 
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-
-import javax.servlet.ServletContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -28,23 +14,15 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.ResponseType;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +32,27 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.servlet.ServletContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class EnketoUrlService {
 
     public static final String ENKETO_ORDINAL = "enk:ordinal";
     public static final String ENKETO_LAST_USED_ORDINAL = "enk:last-used-ordinal";
-
+    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String OC_QUERY_SUFFIX = "_OC_COMMENT";
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
@@ -114,6 +107,9 @@ public class EnketoUrlService {
         return enketo.getFormURL(subjectContext.getCrfVersionOid() + flavor) + "?ecid=" + subjectContextKey;
 
     }
+
+    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext,
+            String studyOid, CrfVersion crfVersion, StudyEvent studyEvent) throws Exception {
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, CrfVersion crfVersion,
             StudyEvent studyEvent) throws Exception {
@@ -183,7 +179,7 @@ public class EnketoUrlService {
 
     private String getPopulatedInstance(CrfVersion crfVersion, EventCrf eventCrf) throws Exception {
         boolean isXform = false;
-        if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
+        if (StringUtils.isNotEmpty(crfVersion.getXform()))
             isXform = true;
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -202,47 +198,49 @@ public class EnketoUrlService {
 
         ArrayList<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
         for (ItemGroup itemGroup : itemGroups) {
-            ItemGroupMetadata itemGroupMetadata = itemGroup.getItemGroupMetadatas().get(0);
+            ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId()).get(
+                    0);
             ArrayList<Item> items = (ArrayList<Item>) itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
-            Item firstItem = items.get(0);
+
             // Get max repeat in item data
-            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), firstItem.getItemId());
+            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), items.get(0).getItemId());
             // loop thru each repeat creating items in instance
+            String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
             Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();
 
             // TODO: Test empty group here (no items). make sure doesn't get nullpointer exception
-
             for (int i = 0; i < maxGroupRepeat; i++) {
                 Element groupElement = null;
 
-                if (isXform) {
+                if (isXform)
                     groupElement = doc.createElement(itemGroup.getName());
-                } else {
+                else
                     groupElement = doc.createElement(itemGroup.getOcOid());
-                }
+
                 Element repeatOrdinal = null;
                 if (isrepeating) {
                     repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
-                    repeatOrdinal.setTextContent(String.valueOf(i + 1));
+                    repeatOrdinal.setTextContent(String.valueOf(i+1));
                     groupElement.appendChild(repeatOrdinal);
                     // add enketo related attributes
                     groupElement.setAttribute(ENKETO_ORDINAL, String.valueOf(i + 1));
                     groupElement.setAttribute(ENKETO_LAST_USED_ORDINAL, String.valueOf(maxGroupRepeat));
+
+                    repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
+                    repeatOrdinal.setTextContent(String.valueOf(i+1));
+                    groupElement.appendChild(repeatOrdinal);
                 }
                 boolean hasItemData = false;
-                // get itemData for all items
-
                 for (Item item : items) {
-                    // ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(),
-                    // crfVersion.getCrfVersionId());
+                    //ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
-                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();// itemFormMetadataDao.findByItemCrfVersion(item.getItemId(),
-                                                                                                  // crfVersion.getCrfVersionId());
+                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();//itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     Element question = null;
                     if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
                         question = doc.createElement(item.getName());
                     else
                         question = doc.createElement(item.getOcOid());
+
                     if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
                         ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
                         String itemValue = itemData.getValue();
@@ -252,9 +250,13 @@ public class EnketoUrlService {
 
                         question.setTextContent(itemValue);
                     }
-                    if (itemData == null || !itemData.isDeleted()) {
-                        hasItemData = true;
+                    if (itemData==null || !itemData.isDeleted()) { 
+                        hasItemData = true; 
                         groupElement.appendChild(question);
+                        // add the corresponding query element
+                        if (isXform) {
+                            processQueryElement(doc, item.getName(), itemData, groupElement);
+                        }
                     }
                 } // end of item
                 if (hasItemData) {
@@ -274,5 +276,39 @@ public class EnketoUrlService {
         transformer.transform(source, result);
         String instance = writer.toString();
         return instance;
+    }
+    private void processQueryElement(Document doc, String itemName, ItemData itemData, Element groupElement) throws JsonProcessingException {
+        if (itemData == null) return;
+
+        List<DnItemDataMap> dnItemDataMaps = itemData.getDnItemDataMaps();
+        if (CollectionUtils.isEmpty(dnItemDataMaps)) {
+            return;
+        }
+        dnItemDataMaps.sort((d1, d2) -> d2.getDiscrepancyNote().getDateCreated().compareTo(d1.getDiscrepancyNote().getDateCreated()));
+
+        QueriesBean queriesBean = new QueriesBean();
+        // create a json query list
+        ListIterator<DnItemDataMap> queryIterator = dnItemDataMaps.listIterator();
+        while(queryIterator.hasNext()) {
+            DnItemDataMap dnItemDataMap = queryIterator.next();
+            DiscrepancyNote discrepancyNote = dnItemDataMap.getDiscrepancyNote();
+            if (StringUtils.isNotEmpty(discrepancyNote.getDetailedNotes())) {
+                QueryBean queryBean = new QueryBean();
+                queryBean.setComment(discrepancyNote.getDetailedNotes());
+                UserAccount owner = discrepancyNote.getUserAccountByOwnerId();
+                String queryCreator = owner.getFirstName() + " " + owner.getLastName() + " (" + owner.getUserName() + ")";
+                queryBean.setUser(queryCreator);
+                UserAccount userAccount = discrepancyNote.getUserAccount();
+                String assignedTo = userAccount.getFirstName() + " " + userAccount.getLastName() + " (" + userAccount.getUserName() + ")";
+                queryBean.setAssigned_to(assignedTo);
+                queryBean.setDate_time(discrepancyNote.getDateCreated().toString());
+                queriesBean.getQueries().add(queryBean);
+            }
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonQueries = mapper.writeValueAsString(queriesBean);
+        Element queryElement = doc.createElement(itemName + OC_QUERY_SUFFIX);
+        queryElement.setTextContent(jsonQueries);
+        groupElement.appendChild(queryElement);
     }
 }

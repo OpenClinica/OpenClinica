@@ -88,6 +88,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return eventList;
       
 	}
+	
 	@Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
