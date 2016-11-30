@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
@@ -32,6 +33,8 @@ import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDI
 public class FSItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
+    private QueryService queryService;
+    @Autowired
     private ItemDataDao itemDataDao;
     @Autowired
     private ItemDao itemDao;
@@ -39,16 +42,16 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private ItemFormMetadataDao itemFormMetadataDao;
     @Autowired
     private CrfVersionDao crfVersionDao;
-    
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    private CrfVersion crfVersion;
-    private EventCrf eventCrf;
-    private SubmissionContainer container;
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
+
         logger.info("Executing FSItem Processor.");
-        this.container = container;
+
+        // TODO keep this flag
+        if (container.isFieldSubmissionFlag() != true) return ProcessorEnum.PROCEED;
         ArrayList<HashMap> listOfUploadFilePaths = container.getListOfUploadFilePaths();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -69,8 +72,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
 
-                        crfVersion = container.getCrfVersion();
-                        eventCrf = container.getEventCrf();
+                        CrfVersion crfVersion = container.getCrfVersion();
 
                         NodeList groupNodeList = crfNode.getChildNodes();
 
@@ -84,7 +86,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
                                     continue;
                                 }
-                                processFieldSubmissionGroupItems(listOfUploadFilePaths, groupNode, itemGroup);
+                                processFieldSubmissionGroupItems(listOfUploadFilePaths, groupNode, itemGroup, container);
                             }
                         }
                     }
@@ -94,7 +96,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         return ProcessorEnum.PROCEED;
     }
 
-    private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, Node groupNode, ItemGroup itemGroup) throws Exception {
+    private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, Node groupNode, ItemGroup itemGroup, SubmissionContainer container) throws Exception {
         String itemName;
         String itemValue;
         Integer itemOrdinal = null;
@@ -118,38 +120,41 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
 
         if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
-                ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal);
+            ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
 
-                existingItemData.setDeleted(true);
-                existingItemData.setValue("");
-                existingItemData.setOldStatus(existingItemData.getStatus());
-                existingItemData.setUserAccount(container.getUser());
-                existingItemData.setStatus(Status.AVAILABLE);
-                existingItemData.setUpdateId(container.getUser().getUserId());
-                existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+            existingItemData.setDeleted(true);
+            existingItemData.setValue("");
+            existingItemData.setOldStatus(existingItemData.getStatus());
+            existingItemData.setUserAccount(container.getUser());
+            existingItemData.setStatus(Status.AVAILABLE);
+            existingItemData.setUpdateId(container.getUser().getUserId());
+            existingItemData = itemDataDao.saveOrUpdate(existingItemData);
 
-                //Close discrepancy notes
-                closeItemDiscrepancyNotes(container, existingItemData);
-                return;
+            //Close discrepancy notes
+            closeItemDiscrepancyNotes(container, existingItemData);
+            return;
         }
 
         NodeList itemNodeList = groupNode.getChildNodes();
         // Item loop
         for (int m = 0; m < itemNodeList.getLength(); m = m + 1) {
             Node itemNode = itemNodeList.item(m);
-            if (ShouldProcessItemNode(itemNode)) {
+            QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
+            if (queryService.getQueryAttribute(helperBean, itemNode) != null) {
+                queryService.process(helperBean, container, itemNode, itemOrdinal);
+            } else if (shouldProcessItemNode(itemNode)) {
 
                 itemName = itemNode.getNodeName().trim();
                 itemValue = itemNode.getTextContent();
 
-                Item item = lookupItem(itemName, crfVersion);
+                Item item = lookupItem(itemName, container.getCrfVersion());
 
                 if (item == null) {
                     logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                     continue;
                 }
 
-                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), container.getCrfVersion().getCrfVersionId());
 
                 // Convert space separated Enketo multiselect values to comma separated OC multiselect values
                 Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
@@ -167,7 +172,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
 
 
-                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, eventCrf, container.getStudy(),
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container.getEventCrf(), container.getStudy(),
                         container.getSubject(), container.getUser());
                 Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
                 if (itemErrors.hasErrors()) {
@@ -175,7 +180,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     throw new Exception("Item validation error.  Rolling back submission changes.");
                 }
 
-                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
                 if (existingItemData == null) {
                     newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
@@ -193,7 +198,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
     }
 
-    private boolean ShouldProcessItemNode(Node itemNode) {
+
+    private boolean shouldProcessItemNode(Node itemNode) {
         return itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER")
                 && !itemNode.getNodeName().endsWith(".SUBHEADER") && !itemNode.getNodeName()
                 .equals("OC.REPEAT_ORDINAL") && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID") && !itemNode.getNodeName()
@@ -201,15 +207,15 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     }
 
     private Item lookupItem(String itemName, CrfVersion crfVersion) {
-        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) { 
+        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) {
             return itemDao.findByOcOID(itemName);
-        } else { 
+        } else {
             return itemDao.findByNameCrfId(itemName, crfVersion.getCrf().getCrfId());
         }
     }
 
-    private ItemData lookupFieldItemData(ItemGroup itemGroup, Integer ordinal) {
-        return itemDataDao.findByEventCrfGroupOrdinal(eventCrf, itemGroup.getItemGroupId(), ordinal);
+    private ItemData lookupFieldItemData(ItemGroup itemGroup, Integer ordinal, SubmissionContainer container) {
+        return itemDataDao.findByEventCrfGroupOrdinal(container.getEventCrf(), itemGroup.getItemGroupId(), ordinal);
     }
 
 }

@@ -1,10 +1,10 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ItemMetadata;
 import org.hibernate.query.Query;
+
+import java.util.ArrayList;
 
 public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
 
