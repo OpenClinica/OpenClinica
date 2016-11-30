@@ -170,7 +170,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
                 String formUrl = null;
                 if (ecb.getId() > 0) {
-                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null);
+                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor);
                 } else {
                     formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
                 }

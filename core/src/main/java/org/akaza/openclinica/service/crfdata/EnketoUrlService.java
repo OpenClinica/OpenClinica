@@ -129,7 +129,7 @@ public class EnketoUrlService {
     }
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, CrfVersion crfVersion,
-            StudyEvent studyEvent) throws Exception {
+            StudyEvent studyEvent, String flavor) throws Exception {
 
         String editURL = null;
         StudyEventDefinition eventDef;
@@ -162,7 +162,8 @@ public class EnketoUrlService {
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
 
         // Return Enketo URL
-        editURL = enketo.getEditURL(crfVersion.getOcOid(), populatedInstance, subjectContextKey, redirectUrl).getEdit_url() + "&ecid=" + subjectContextKey;
+        editURL = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl).getEdit_url() + "&ecid="
+                + subjectContextKey;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;

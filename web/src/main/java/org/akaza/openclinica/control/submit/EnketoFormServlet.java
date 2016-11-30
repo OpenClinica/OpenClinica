@@ -48,7 +48,7 @@ public class EnketoFormServlet extends SecureController {
         String flavor = "-query";
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), crfVersion, studyEvent);
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), crfVersion, studyEvent, flavor);
         } else {
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
         }

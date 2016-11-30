@@ -3,6 +3,8 @@ package org.akaza.openclinica.web.pform.formlist;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -61,6 +63,62 @@ public class QueryFormDecorator extends FormDecorator {
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         XPathExpression expr = null;
+        expr = xpath.compile("/html/head/model");
+        Node modelNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+        NodeList modelChildNodes = modelNode.getChildNodes();
+        int modelChildLength = modelChildNodes.getLength();
+        List<String> nodesetAttrs = new ArrayList<>();
+        for (int i = 0; i < modelChildLength; i++) {
+            Node modelChildNode = modelChildNodes.item(i);
+            if (modelChildNode.getNodeType() != Node.TEXT_NODE && "bind".equals(modelChildNode.getNodeName())) {
+                NamedNodeMap attr = modelChildNode.getAttributes();
+                Node nodesetAttr = attr.getNamedItem("nodeset");
+                Node relevantAttr = attr.getNamedItem("relevant");
+                Node readonlyAttr = attr.getNamedItem("readonly");
+                String str = nodesetAttr.getNodeValue();
+                Element bind = doc.createElement("bind");
+
+                if (readonlyAttr == null || (readonlyAttr != null && !readonlyAttr.getNodeValue().equalsIgnoreCase("true()"))) {
+                    if (relevantAttr != null) {
+                        bind.setAttribute("relevant", relevantAttr.getNodeValue());
+                    }
+                    bind.setAttribute("nodeset", nodesetAttr.getNodeValue() + "_comment");
+                    bind.setAttribute("enk:for", str);
+                    bind.setAttribute("type", "string");
+                    modelNode.appendChild(bind);
+                    modelNode.appendChild(doc.createTextNode("\n"));
+                } else {
+                    nodesetAttrs.add(nodesetAttr.getNodeValue());
+                }
+            }
+        }
+        for (int i = 0; i < modelChildLength; i++) {
+            Node modelChildNode = modelChildNodes.item(i);
+            if (modelChildNode.getNodeType() != Node.TEXT_NODE && ("instance".equals(modelChildNode.getNodeName())
+                    && modelChildNode.getAttributes().getNamedItem("id") == null && modelChildNode.getFirstChild() != null)) {
+                Node icrfNode = modelChildNode.getFirstChild().getNextSibling();
+                String crfPath = "/" + icrfNode.getNodeName();
+                NodeList igroupNodes = icrfNode.getChildNodes();
+                int igroupNodesLength = igroupNodes.getLength();
+                for (int m = 0; m < igroupNodesLength; m++) {
+                    Node igroupNode = igroupNodes.item(m).getNextSibling();
+                    if (igroupNode != null && igroupNode.getNodeType() != Node.TEXT_NODE && !igroupNode.getNodeName().equals("meta")) {
+                        String groupPath = crfPath + "/" + igroupNode.getNodeName();
+                        NodeList icontexts = igroupNode.getChildNodes();
+                        int icontextsLength = icontexts.getLength();
+                        for (int j = 0; j < icontextsLength; j++) {
+                            Node icontextNode = icontexts.item(j);
+                            String itemPath = groupPath + "/" + icontextNode.getNodeName();
+                            if (icontextNode.getNodeType() != Node.TEXT_NODE && !nodesetAttrs.contains(itemPath)) {
+                                Element newChildNode = doc.createElement(icontextNode.getNodeName() + "_comment");
+                                igroupNode.appendChild(newChildNode);
+                                igroupNode.appendChild(doc.createTextNode("\n"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
         expr = xpath.compile("/html/body");
 
         Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
@@ -82,7 +140,9 @@ public class QueryFormDecorator extends FormDecorator {
                         int repeatChildLegth = repeatChildNodes.getLength();
                         for (int j = 0; j < repeatChildLegth; j++) {
                             Node repeatChildNode = repeatChildNodes.item(j);
-                            if (repeatChildNode.getNodeType() != Node.TEXT_NODE
+                            if (repeatChildNode.getNodeType() != Node.TEXT_NODE && repeatChildNode.getAttributes() != null
+                                    && repeatChildNode.getAttributes().getNamedItem("ref") != null
+                                    && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                                     && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
                                             || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
                                 Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
@@ -92,7 +152,9 @@ public class QueryFormDecorator extends FormDecorator {
                         }
                     }
 
-                    if (groupChildNode.getNodeType() != Node.TEXT_NODE
+                    if (groupChildNode.getNodeType() != Node.TEXT_NODE && groupChildNode.getAttributes() != null
+                            && groupChildNode.getAttributes().getNamedItem("ref") != null
+                            && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                             && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
                                     || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
                         Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
@@ -101,59 +163,14 @@ public class QueryFormDecorator extends FormDecorator {
                     }
                 }
             }
-            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
-                    || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
+            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && bodyChildNode.getAttributes() != null
+                    && bodyChildNode.getAttributes().getNamedItem("ref") != null
+                    && !nodesetAttrs.contains(bodyChildNode.getAttributes().getNamedItem("ref").getNodeValue())
+                    && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
+                            || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
                 Element newChildNode = createChildElement(doc, bodyChildNode, bodyChildNode.getNodeName());
                 bodyNode.appendChild(newChildNode);
                 bodyNode.appendChild(doc.createTextNode("\n"));
-            }
-        }
-
-        expr = xpath.compile("/html/head/model");
-        Node modelNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList modelChildNodes = modelNode.getChildNodes();
-        int modelChildLength = modelChildNodes.getLength();
-        for (int i = 0; i < modelChildLength; i++) {
-            Node modelChildNode = modelChildNodes.item(i);
-            if (modelChildNode.getNodeType() != Node.TEXT_NODE && "bind".equals(modelChildNode.getNodeName())) {
-                NamedNodeMap attr = modelChildNode.getAttributes();
-                Node nodesetAttr = attr.getNamedItem("nodeset");
-                Node relevantAttr = attr.getNamedItem("relevant");
-                String str = nodesetAttr.getNodeValue();
-                Element bind = doc.createElement("bind");
-
-                if (relevantAttr != null) {
-                    bind.setAttribute("relevant", relevantAttr.getNodeValue());
-                }
-
-                bind.setAttribute("nodeset", nodesetAttr.getNodeValue() + "_comment");
-                bind.setAttribute("enk:for", str);
-                bind.setAttribute("type", "string");
-                modelNode.appendChild(bind);
-                modelNode.appendChild(doc.createTextNode("\n"));
-            }
-
-            if (modelChildNode.getNodeType() != Node.TEXT_NODE && ("instance".equals(modelChildNode.getNodeName())
-                    && modelChildNode.getAttributes().getNamedItem("id") == null && modelChildNode.getFirstChild() != null)) {
-
-                Node icrfNode = modelChildNode.getFirstChild().getNextSibling();
-                NodeList igroupNodes = icrfNode.getChildNodes();
-                int igroupNodesLength = igroupNodes.getLength();
-                for (int m = 0; m < igroupNodesLength; m++) {
-                    Node igroupNode = igroupNodes.item(m).getNextSibling();
-                    if (igroupNode != null && igroupNode.getNodeType() != Node.TEXT_NODE && !igroupNode.getNodeName().equals("meta")) {
-                        NodeList icontexts = igroupNode.getChildNodes();
-                        int icontextsLength = icontexts.getLength();
-                        for (int j = 0; j < icontextsLength; j++) {
-                            Node icontextNode = icontexts.item(j);
-                            if (icontextNode.getNodeType() != Node.TEXT_NODE) {
-                                Element newChildNode = doc.createElement(icontextNode.getNodeName() + "_comment");
-                                igroupNode.appendChild(newChildNode);
-                                igroupNode.appendChild(doc.createTextNode("\n"));
-                            }
-                        }
-                    }
-                }
             }
         }
 
