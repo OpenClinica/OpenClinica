@@ -20,6 +20,7 @@
 
         <skipTests>false</skipTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
 
         <!-- Project's source control URL -->
         <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
@@ -33,6 +34,12 @@
         <db.test>localhost</db.test>
     </properties>
     <profiles>
+        <profile>
+            <id>walkme-design</id>
+            <properties>
+                <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/test/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
+            </properties>
+        </profile>
         <profile>
             <id>codeship</id>
             <properties>
@@ -743,6 +750,23 @@
 
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/global_functions_javascript.js</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
