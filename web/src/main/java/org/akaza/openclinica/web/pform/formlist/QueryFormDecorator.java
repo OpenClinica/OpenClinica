@@ -66,7 +66,7 @@ public class QueryFormDecorator extends FormDecorator {
         XPathExpression expr = null;
         expr = xpath.compile("/html/head/model");
         Node modelNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList modelChildNodes = removeTextNodes(modelNode.getChildNodes());
+        NodeList modelChildNodes = modelNode.getChildNodes();
         int modelChildLength = modelChildNodes.getLength();
         List<String> nodesetAttrs = new ArrayList<>();
 
@@ -103,36 +103,37 @@ public class QueryFormDecorator extends FormDecorator {
                 Node crfNode = modelChildNode.getFirstChild().getNextSibling();
                 String crfPath = "/" + crfNode.getNodeName();
 
-                NodeList sectionNodes = removeTextNodes(crfNode.getChildNodes());
+                NodeList sectionNodes = crfNode.getChildNodes();
                 int sectionNodesLength = sectionNodes.getLength();
                 for (int m = 0; m < sectionNodesLength; m++) {
                     Node sectionNode = sectionNodes.item(m);
                     if (!sectionNode.getNodeName().equals("meta")) {
                         String sectionPath = crfPath + "/" + sectionNode.getNodeName();
 
-                        NodeList groupNodes = removeTextNodes(sectionNode.getChildNodes());
+                        NodeList groupNodes = sectionNode.getChildNodes();
                         int groupNodesLength = groupNodes.getLength();
                         for (int n = 0; n < groupNodesLength; n++) {
                             Node groupNode = groupNodes.item(n);
                             String groupPath = sectionPath + "/" + groupNode.getNodeName();
+                            if (groupNode instanceof Element) {
+                                NodeList items = groupNode.getChildNodes();
+                                int itemsLength = items.getLength();
 
-                            NodeList items = removeTextNodes(groupNode.getChildNodes());
-                            int itemsLength = items.getLength();
-
-                            if (groupNode.getFirstChild() == null) {
-                                if (!nodesetAttrs.contains(groupPath)) {
-                                    Element newChildNode = doc.createElement(groupNode.getNodeName() + "_comment");
-                                    sectionNode.appendChild(newChildNode);
+                                if (groupNode.getFirstChild() == null) {
+                                    if (groupNode instanceof Element && !nodesetAttrs.contains(groupPath)) {
+                                        Element newChildNode = doc.createElement(groupNode.getNodeName() + "_comment");
+                                        sectionNode.appendChild(newChildNode);
+                                    }
                                 }
-                            }
 
-                            for (int j = 0; j < itemsLength; j++) {
-                                Node itemNode = items.item(j);
-                                String itemPath = groupPath + "/" + itemNode.getNodeName();
+                                for (int j = 0; j < itemsLength; j++) {
+                                    Node itemNode = items.item(j);
+                                    String itemPath = groupPath + "/" + itemNode.getNodeName();
 
-                                if (!nodesetAttrs.contains(itemPath)) {
-                                    Element newChildNode = doc.createElement(itemNode.getNodeName() + "_comment");
-                                    groupNode.appendChild(newChildNode);
+                                    if (itemNode instanceof Element && !nodesetAttrs.contains(itemPath)) {
+                                        Element newChildNode = doc.createElement(itemNode.getNodeName() + "_comment");
+                                        groupNode.appendChild(newChildNode);
+                                    }
                                 }
                             }
                         }
@@ -146,32 +147,33 @@ public class QueryFormDecorator extends FormDecorator {
 
         // Iterate Body Nodes
         Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList bodyChildNodes = removeTextNodes(bodyNode.getChildNodes());
+        NodeList bodyChildNodes = bodyNode.getChildNodes();
         int bodyChildLength = bodyChildNodes.getLength();
         for (int b = 0; b < bodyChildLength; b++) {
             Node bodyChildNode = bodyChildNodes.item(b);
 
             if ("group".equals(bodyChildNode.getNodeName())) {
                 Node sectionNode = bodyChildNode;
-                NodeList sectionChildNodes = removeTextNodes(sectionNode.getChildNodes());
+                NodeList sectionChildNodes = sectionNode.getChildNodes();
                 int sectionChildLength = sectionChildNodes.getLength();
                 for (int d = 0; d < sectionChildLength; d++) {
                     Node sectionChildNode = sectionChildNodes.item(d);
 
-                    if ("group".equals(sectionChildNode.getNodeName())) {
+                    if ("group".equals(sectionChildNode.getNodeName()) || "repeat".equals(sectionChildNode.getNodeName())) {
                         Node groupNode = sectionChildNode;
-                        NodeList groupChildNodes = removeTextNodes(groupNode.getChildNodes());
+                        NodeList groupChildNodes = groupNode.getChildNodes();
                         int groupChildLength = groupChildNodes.getLength();
                         for (int c = 0; c < groupChildLength; c++) {
                             Node groupChildNode = groupChildNodes.item(c);
 
                             if ("repeat".equals(groupChildNode.getNodeName())) {
                                 Node repeatNode = groupChildNode;
-                                NodeList repeatChildNodes = removeTextNodes(repeatNode.getChildNodes());
+                                NodeList repeatChildNodes = repeatNode.getChildNodes();
                                 int repeatChildLegth = repeatChildNodes.getLength();
                                 for (int j = 0; j < repeatChildLegth; j++) {
                                     Node repeatChildNode = repeatChildNodes.item(j);
-                                    if (repeatChildNode.getAttributes() != null && repeatChildNode.getAttributes().getNamedItem("ref") != null
+                                    if (repeatChildNode instanceof Element && repeatChildNode.getAttributes() != null
+                                            && repeatChildNode.getAttributes().getNamedItem("ref") != null
                                             && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                                             && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
                                                     || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
@@ -181,7 +183,8 @@ public class QueryFormDecorator extends FormDecorator {
                                 }
                             }
 
-                            if (groupChildNode.getAttributes() != null && groupChildNode.getAttributes().getNamedItem("ref") != null
+                            if (groupChildNode instanceof Element && groupChildNode.getAttributes() != null
+                                    && groupChildNode.getAttributes().getNamedItem("ref") != null
                                     && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                                     && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
                                             || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
@@ -190,7 +193,8 @@ public class QueryFormDecorator extends FormDecorator {
                             }
                         }
                     }
-                    if (sectionChildNode.getAttributes() != null && sectionChildNode.getAttributes().getNamedItem("ref") != null
+                    if (sectionChildNode instanceof Element && sectionChildNode.getAttributes() != null
+                            && sectionChildNode.getAttributes().getNamedItem("ref") != null
                             && !nodesetAttrs.contains(sectionChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                             && ("input".equals(sectionChildNode.getNodeName()) || "select1".equals(sectionChildNode.getNodeName())
                                     || "select".equals(sectionChildNode.getNodeName()) || "upload".equals(sectionChildNode.getNodeName()))) {
@@ -200,7 +204,7 @@ public class QueryFormDecorator extends FormDecorator {
 
                 }
             }
-            if (bodyChildNode.getAttributes() != null && bodyChildNode.getAttributes().getNamedItem("ref") != null
+            if (bodyChildNode instanceof Element && bodyChildNode.getAttributes() != null && bodyChildNode.getAttributes().getNamedItem("ref") != null
                     && !nodesetAttrs.contains(bodyChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                     && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
                             || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
@@ -250,7 +254,7 @@ public class QueryFormDecorator extends FormDecorator {
         return input;
     }
 
-    private NodeList removeTextNodes(NodeList nodelist) {
+    private NodeList removeTextNode(NodeList nodelist) {
         int nodelistLength = nodelist.getLength();
         for (int m = 0; m < nodelistLength; m++) {
             Node node = nodelist.item(m);
