@@ -100,22 +100,40 @@ public class QueryFormDecorator extends FormDecorator {
             Node modelChildNode = modelChildNodes.item(i);
             if ("instance".equals(modelChildNode.getNodeName()) && modelChildNode.getAttributes().getNamedItem("id") == null
                     && modelChildNode.getFirstChild() != null) {
-                Node icrfNode = modelChildNode.getFirstChild().getNextSibling();
-                String crfPath = "/" + icrfNode.getNodeName();
-                NodeList igroupNodes = removeTextNodes(icrfNode.getChildNodes());
-                int igroupNodesLength = igroupNodes.getLength();
-                for (int m = 0; m < igroupNodesLength; m++) {
-                    Node igroupNode = igroupNodes.item(m);
-                    if (!igroupNode.getNodeName().equals("meta")) {
-                        String groupPath = crfPath + "/" + igroupNode.getNodeName();
-                        NodeList icontexts = removeTextNodes(igroupNode.getChildNodes());
-                        int icontextsLength = icontexts.getLength();
-                        for (int j = 0; j < icontextsLength; j++) {
-                            Node icontextNode = icontexts.item(j);
-                            String itemPath = groupPath + "/" + icontextNode.getNodeName();
-                            if (!nodesetAttrs.contains(itemPath)) {
-                                Element newChildNode = doc.createElement(icontextNode.getNodeName() + "_comment");
-                                igroupNode.appendChild(newChildNode);
+                Node crfNode = modelChildNode.getFirstChild().getNextSibling();
+                String crfPath = "/" + crfNode.getNodeName();
+
+                NodeList sectionNodes = removeTextNodes(crfNode.getChildNodes());
+                int sectionNodesLength = sectionNodes.getLength();
+                for (int m = 0; m < sectionNodesLength; m++) {
+                    Node sectionNode = sectionNodes.item(m);
+                    if (!sectionNode.getNodeName().equals("meta")) {
+                        String sectionPath = crfPath + "/" + sectionNode.getNodeName();
+
+                        NodeList groupNodes = removeTextNodes(sectionNode.getChildNodes());
+                        int groupNodesLength = groupNodes.getLength();
+                        for (int n = 0; n < groupNodesLength; n++) {
+                            Node groupNode = groupNodes.item(n);
+                            String groupPath = sectionPath + "/" + groupNode.getNodeName();
+
+                            NodeList items = removeTextNodes(groupNode.getChildNodes());
+                            int itemsLength = items.getLength();
+
+                            if (groupNode.getFirstChild() == null) {
+                                if (!nodesetAttrs.contains(groupPath)) {
+                                    Element newChildNode = doc.createElement(groupNode.getNodeName() + "_comment");
+                                    sectionNode.appendChild(newChildNode);
+                                }
+                            }
+
+                            for (int j = 0; j < itemsLength; j++) {
+                                Node itemNode = items.item(j);
+                                String itemPath = groupPath + "/" + itemNode.getNodeName();
+
+                                if (!nodesetAttrs.contains(itemPath)) {
+                                    Element newChildNode = doc.createElement(itemNode.getNodeName() + "_comment");
+                                    groupNode.appendChild(newChildNode);
+                                }
                             }
                         }
                     }
@@ -134,35 +152,52 @@ public class QueryFormDecorator extends FormDecorator {
             Node bodyChildNode = bodyChildNodes.item(b);
 
             if ("group".equals(bodyChildNode.getNodeName())) {
-                Node groupNode = bodyChildNode;
-                NodeList groupChildNodes = removeTextNodes(groupNode.getChildNodes());
-                int groupChildLength = groupChildNodes.getLength();
-                for (int c = 0; c < groupChildLength; c++) {
-                    Node groupChildNode = groupChildNodes.item(c);
+                Node sectionNode = bodyChildNode;
+                NodeList sectionChildNodes = removeTextNodes(sectionNode.getChildNodes());
+                int sectionChildLength = sectionChildNodes.getLength();
+                for (int d = 0; d < sectionChildLength; d++) {
+                    Node sectionChildNode = sectionChildNodes.item(d);
 
-                    if ("repeat".equals(groupChildNode.getNodeName())) {
-                        Node repeatNode = groupChildNode;
-                        NodeList repeatChildNodes = removeTextNodes(repeatNode.getChildNodes());
-                        int repeatChildLegth = repeatChildNodes.getLength();
-                        for (int j = 0; j < repeatChildLegth; j++) {
-                            Node repeatChildNode = repeatChildNodes.item(j);
-                            if (repeatChildNode.getAttributes() != null && repeatChildNode.getAttributes().getNamedItem("ref") != null
-                                    && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                                    && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
-                                            || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
-                                Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
-                                repeatNode.appendChild(newChildNode);
+                    if ("group".equals(sectionChildNode.getNodeName())) {
+                        Node groupNode = sectionChildNode;
+                        NodeList groupChildNodes = removeTextNodes(groupNode.getChildNodes());
+                        int groupChildLength = groupChildNodes.getLength();
+                        for (int c = 0; c < groupChildLength; c++) {
+                            Node groupChildNode = groupChildNodes.item(c);
+
+                            if ("repeat".equals(groupChildNode.getNodeName())) {
+                                Node repeatNode = groupChildNode;
+                                NodeList repeatChildNodes = removeTextNodes(repeatNode.getChildNodes());
+                                int repeatChildLegth = repeatChildNodes.getLength();
+                                for (int j = 0; j < repeatChildLegth; j++) {
+                                    Node repeatChildNode = repeatChildNodes.item(j);
+                                    if (repeatChildNode.getAttributes() != null && repeatChildNode.getAttributes().getNamedItem("ref") != null
+                                            && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
+                                            && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
+                                                    || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
+                                        Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
+                                        repeatNode.appendChild(newChildNode);
+                                    }
+                                }
+                            }
+
+                            if (groupChildNode.getAttributes() != null && groupChildNode.getAttributes().getNamedItem("ref") != null
+                                    && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
+                                    && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
+                                            || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
+                                Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
+                                groupNode.appendChild(newChildNode);
                             }
                         }
                     }
-
-                    if (groupChildNode.getAttributes() != null && groupChildNode.getAttributes().getNamedItem("ref") != null
-                            && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                            && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
-                                    || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
-                        Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
-                        groupNode.appendChild(newChildNode);
+                    if (sectionChildNode.getAttributes() != null && sectionChildNode.getAttributes().getNamedItem("ref") != null
+                            && !nodesetAttrs.contains(sectionChildNode.getAttributes().getNamedItem("ref").getNodeValue())
+                            && ("input".equals(sectionChildNode.getNodeName()) || "select1".equals(sectionChildNode.getNodeName())
+                                    || "select".equals(sectionChildNode.getNodeName()) || "upload".equals(sectionChildNode.getNodeName()))) {
+                        Element newChildNode = createChildElement(doc, sectionChildNode, sectionChildNode.getNodeName());
+                        sectionNode.appendChild(newChildNode);
                     }
+
                 }
             }
             if (bodyChildNode.getAttributes() != null && bodyChildNode.getAttributes().getNamedItem("ref") != null
