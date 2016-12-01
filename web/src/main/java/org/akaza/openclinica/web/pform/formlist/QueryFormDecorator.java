@@ -60,17 +60,20 @@ public class QueryFormDecorator extends FormDecorator {
         html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:enk", "http://enketo.org/xforms");
         NamedNodeMap attribs = html.getAttributes();
 
+        // MODEL Element
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         XPathExpression expr = null;
         expr = xpath.compile("/html/head/model");
         Node modelNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList modelChildNodes = modelNode.getChildNodes();
+        NodeList modelChildNodes = removeTextNodes(modelNode.getChildNodes());
         int modelChildLength = modelChildNodes.getLength();
         List<String> nodesetAttrs = new ArrayList<>();
+
+        // Iterate Model to locate BIND elements
         for (int i = 0; i < modelChildLength; i++) {
             Node modelChildNode = modelChildNodes.item(i);
-            if (modelChildNode.getNodeType() != Node.TEXT_NODE && "bind".equals(modelChildNode.getNodeName())) {
+            if ("bind".equals(modelChildNode.getNodeName())) {
                 NamedNodeMap attr = modelChildNode.getAttributes();
                 Node nodesetAttr = attr.getNamedItem("nodeset");
                 Node relevantAttr = attr.getNamedItem("relevant");
@@ -86,97 +89,93 @@ public class QueryFormDecorator extends FormDecorator {
                     bind.setAttribute("enk:for", str);
                     bind.setAttribute("type", "string");
                     modelNode.appendChild(bind);
-                    modelNode.appendChild(doc.createTextNode("\n"));
                 } else {
                     nodesetAttrs.add(nodesetAttr.getNodeValue());
                 }
             }
         }
+
+        // Iterate Model to locate INSTANCE elements
         for (int i = 0; i < modelChildLength; i++) {
             Node modelChildNode = modelChildNodes.item(i);
-            if (modelChildNode.getNodeType() != Node.TEXT_NODE && ("instance".equals(modelChildNode.getNodeName())
-                    && modelChildNode.getAttributes().getNamedItem("id") == null && modelChildNode.getFirstChild() != null)) {
+            if ("instance".equals(modelChildNode.getNodeName()) && modelChildNode.getAttributes().getNamedItem("id") == null
+                    && modelChildNode.getFirstChild() != null) {
                 Node icrfNode = modelChildNode.getFirstChild().getNextSibling();
                 String crfPath = "/" + icrfNode.getNodeName();
-                NodeList igroupNodes = icrfNode.getChildNodes();
+                NodeList igroupNodes = removeTextNodes(icrfNode.getChildNodes());
                 int igroupNodesLength = igroupNodes.getLength();
                 for (int m = 0; m < igroupNodesLength; m++) {
-                    Node igroupNode = igroupNodes.item(m).getNextSibling();
-                    if (igroupNode != null && igroupNode.getNodeType() != Node.TEXT_NODE && !igroupNode.getNodeName().equals("meta")) {
+                    Node igroupNode = igroupNodes.item(m);
+                    if (!igroupNode.getNodeName().equals("meta")) {
                         String groupPath = crfPath + "/" + igroupNode.getNodeName();
-                        NodeList icontexts = igroupNode.getChildNodes();
+                        NodeList icontexts = removeTextNodes(igroupNode.getChildNodes());
                         int icontextsLength = icontexts.getLength();
                         for (int j = 0; j < icontextsLength; j++) {
                             Node icontextNode = icontexts.item(j);
                             String itemPath = groupPath + "/" + icontextNode.getNodeName();
-                            if (icontextNode.getNodeType() != Node.TEXT_NODE && !nodesetAttrs.contains(itemPath)) {
+                            if (!nodesetAttrs.contains(itemPath)) {
                                 Element newChildNode = doc.createElement(icontextNode.getNodeName() + "_comment");
                                 igroupNode.appendChild(newChildNode);
-                                igroupNode.appendChild(doc.createTextNode("\n"));
                             }
                         }
                     }
                 }
             }
         }
+
+        // BODY Element
         expr = xpath.compile("/html/body");
 
+        // Iterate Body Nodes
         Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList bodyChildNodes = bodyNode.getChildNodes();
+        NodeList bodyChildNodes = removeTextNodes(bodyNode.getChildNodes());
         int bodyChildLength = bodyChildNodes.getLength();
         for (int b = 0; b < bodyChildLength; b++) {
             Node bodyChildNode = bodyChildNodes.item(b);
 
-            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && ("group".equals(bodyChildNode.getNodeName()))) {
+            if ("group".equals(bodyChildNode.getNodeName())) {
                 Node groupNode = bodyChildNode;
-                NodeList groupChildNodes = groupNode.getChildNodes();
+                NodeList groupChildNodes = removeTextNodes(groupNode.getChildNodes());
                 int groupChildLength = groupChildNodes.getLength();
                 for (int c = 0; c < groupChildLength; c++) {
                     Node groupChildNode = groupChildNodes.item(c);
 
-                    if (groupChildNode.getNodeType() != Node.TEXT_NODE && ("repeat".equals(groupChildNode.getNodeName()))) {
+                    if ("repeat".equals(groupChildNode.getNodeName())) {
                         Node repeatNode = groupChildNode;
-                        NodeList repeatChildNodes = repeatNode.getChildNodes();
+                        NodeList repeatChildNodes = removeTextNodes(repeatNode.getChildNodes());
                         int repeatChildLegth = repeatChildNodes.getLength();
                         for (int j = 0; j < repeatChildLegth; j++) {
                             Node repeatChildNode = repeatChildNodes.item(j);
-                            if (repeatChildNode.getNodeType() != Node.TEXT_NODE && repeatChildNode.getAttributes() != null
-                                    && repeatChildNode.getAttributes().getNamedItem("ref") != null
+                            if (repeatChildNode.getAttributes() != null && repeatChildNode.getAttributes().getNamedItem("ref") != null
                                     && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                                     && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
                                             || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
                                 Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
                                 repeatNode.appendChild(newChildNode);
-                                repeatNode.appendChild(doc.createTextNode("\n"));
                             }
                         }
                     }
 
-                    if (groupChildNode.getNodeType() != Node.TEXT_NODE && groupChildNode.getAttributes() != null
-                            && groupChildNode.getAttributes().getNamedItem("ref") != null
+                    if (groupChildNode.getAttributes() != null && groupChildNode.getAttributes().getNamedItem("ref") != null
                             && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                             && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
                                     || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
                         Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
                         groupNode.appendChild(newChildNode);
-                        groupNode.appendChild(doc.createTextNode("\n"));
                     }
                 }
             }
-            if (bodyChildNode.getNodeType() != Node.TEXT_NODE && bodyChildNode.getAttributes() != null
-                    && bodyChildNode.getAttributes().getNamedItem("ref") != null
+            if (bodyChildNode.getAttributes() != null && bodyChildNode.getAttributes().getNamedItem("ref") != null
                     && !nodesetAttrs.contains(bodyChildNode.getAttributes().getNamedItem("ref").getNodeValue())
                     && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
                             || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
                 Element newChildNode = createChildElement(doc, bodyChildNode, bodyChildNode.getNodeName());
                 bodyNode.appendChild(newChildNode);
-                bodyNode.appendChild(doc.createTextNode("\n"));
             }
         }
 
         Element newInsanceNode = createInstanceElement(doc);
         modelNode.appendChild(newInsanceNode);
-        modelNode.appendChild(doc.createTextNode("\n"));
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();
@@ -214,6 +213,17 @@ public class QueryFormDecorator extends FormDecorator {
         label.appendChild(doc.createTextNode("Comment:"));
         input.appendChild(label);
         return input;
+    }
+
+    private NodeList removeTextNodes(NodeList nodelist) {
+        int nodelistLength = nodelist.getLength();
+        for (int m = 0; m < nodelistLength; m++) {
+            Node node = nodelist.item(m);
+            if (node != null && node.getNodeType() == Node.TEXT_NODE) {
+                node.getParentNode().removeChild(node);
+            }
+        }
+        return nodelist;
     }
 
 }
