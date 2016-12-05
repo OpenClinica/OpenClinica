@@ -1,55 +1,36 @@
 package org.akaza.openclinica.web.pform;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.util.StatusPrinter;
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.web.pform.formlist.XForm;
-import org.akaza.openclinica.web.pform.formlist.XFormList;
-import org.akaza.openclinica.web.pform.manifest.Manifest;
-import org.akaza.openclinica.web.pform.manifest.MediaFile;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.XMLContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
-import org.w3c.dom.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import javax.sql.DataSource;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -66,20 +47,82 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.web.pform.formlist.Form;
+import org.akaza.openclinica.web.pform.formlist.QueryFormDecorator;
+import org.akaza.openclinica.web.pform.formlist.XForm;
+import org.akaza.openclinica.web.pform.formlist.XFormList;
+import org.akaza.openclinica.web.pform.formlist.XFormObject;
+import org.akaza.openclinica.web.pform.manifest.Manifest;
+import org.akaza.openclinica.web.pform.manifest.MediaFile;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.XMLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
 
-    @Autowired UserAccountDao userAccountDao;
+    @Autowired
+    UserAccountDao userAccountDao;
 
-    @Autowired StudyDao studyDao;
+    @Autowired
+    StudyDao studyDao;
 
+    @Autowired
+    CrfDao crfDao;
+
+    @Autowired
+    CrfVersionDao crfVersionDao;
+
+    @Autowired
+    CrfVersionMediaDao mediaDao;
+
+    public static final String QUERY = "-query";
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
     public static final String INPUT_LAST_NAME = "User";
@@ -140,65 +183,50 @@ public class OpenRosaServices {
      *                    </xform>
      *                    </xforms>
      */
-
     @GET
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
-
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        // print logback's internal status
-        StatusPrinter.print(lc);
+            @QueryParam("formID") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
-
-        StudyDAO sdao = new StudyDAO(getDataSource());
-        StudyBean study = sdao.findByOid(studyOID);
-
-        CRFDAO cdao = new CRFDAO(getDataSource());
-        Collection<CRFBean> crfs = cdao.findAll();
-
-        CRFVersionDAO cVersionDao = new CRFVersionDAO(getDataSource());
-        Collection<CRFVersionBean> crfVersions = cVersionDao.findAll();
-
-        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
+        XFormList formList = null;
 
         try {
-            XFormList formList = new XFormList();
-            for (CRFBean crf : crfs) {
-                for (CRFVersionBean version : crfVersions) {
-                    if (version.getCrfId() == crf.getId()) {
-                        XForm form = new XForm(crf, version);
-                        // TODO: Need to generate hash based on contents of
-                        // XForm. Will be done in a later story.
-                        // TODO: For now all XForms get a date based hash to
-                        // trick Enketo into always downloading
-                        // TODO: them.
-                        if (version.getXformName() != null){
-                            Calendar cal = Calendar.getInstance();
-                            // TODO Uncomment this before checking in
-                            form.setHash(DigestUtils.md5Hex(version.getXform()));
-                            //form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
-                        }else {
-                            Calendar cal = Calendar.getInstance();
-                            cal.setTime(new Date());
-                            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+            if (StringUtils.isEmpty(uniqueId)) {
+                List<CrfBean> crfs = crfDao.findAll();
+                List<CrfVersion> crfVersions = crfVersionDao.findAll();
+                formList = new XFormList();
+                for (CrfBean crf : crfs) {
+                    for (CrfVersion version : crfVersions) {
+                        if (version.getCrf().getCrfId() == crf.getCrfId()) {
+                            XForm form = new XForm(crf, version);
+                            // TODO: Need to generate hash based on contents of
+                            // XForm. Will be done in a later story.
+                            // TODO: For now all XForms get a date based hash to
+                            // trick Enketo into always downloading
+                            // TODO: them.
+                            if (version.getXformName() != null) {
+                                form.setHash(DigestUtils.md5Hex(version.getXform()));
+                            } else {
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(new Date());
+                                form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                            }
+
+                            String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+                            form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOcOid());
+
+                            List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getCrfVersionId());
+                            if (mediaList != null && mediaList.size() > 0) {
+                                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOcOid());
+                            }
+                            formList.add(form);
                         }
-
-
-                        String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-                        form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOid());
-
-                        //TODO:  Change test here to see if user list should be appended.  Hardcode to always add for now.
-                        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getId());
-                        //if (mediaList != null && mediaList.size() > 0) {
-                        if (true) {
-                            form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOid());
-                        }
-                        formList.add(form);
                     }
                 }
+            } else {
+                formList = getForm(request, response, studyOID, uniqueId, authorization, context);
             }
 
             // Create the XML formList using a Castor mapping file.
@@ -228,7 +256,73 @@ public class OpenRosaServices {
             return "<Error>" + e.getMessage() + "</Error>";
         }
 
+    }
 
+    @GET
+    @Path("/{studyOID}/form")
+    @Produces(MediaType.TEXT_XML)
+    public XFormList getForm(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+            @QueryParam("formID") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        // print logback's internal status
+        StatusPrinter.print(lc);
+        if (!mayProceedPreview(studyOID))
+            return null;
+        boolean query = getQuerySet(uniqueId);
+        String crfVersionOid = getCrfVersionOid(uniqueId);
+
+        CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
+        CrfBean crf = crfDao.findById(version.getCrf().getCrfId());
+
+        String xform = "";
+        XFormList formList = null;
+        try {
+            formList = new XFormList();
+            XForm form = new XForm(crf, version);
+            XFormObject formObj = new XFormObject();
+
+            // TODO: Need to generate hash based on contents of
+            // XForm. Will be done in a later story.
+            // TODO: For now all XForms get a date based hash to
+            // trick Enketo into always downloading
+            // TODO: them.
+            if (StringUtils.isNotEmpty(version.getXform())) {
+                Calendar cal = Calendar.getInstance();
+                // TODO Uncomment this before checking in
+                xform = version.getXform();
+                formObj.setXform(xform);
+                if (query) {
+                    Form queryForm = new QueryFormDecorator(formObj);
+                    xform = queryForm.decorate();
+                }
+                xform = updateRepeatGroupsWithOrdinal(xform);
+                form.setHash(DigestUtils.md5Hex(xform));
+                // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+            } else {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+            }
+
+            String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+            List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(version.getCrfVersionId());
+            if (query) {
+                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOcOid() + QUERY);
+                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOcOid() + QUERY);
+                form.setFormID(version.getOcOid() + QUERY);
+            } else {
+                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + version.getOcOid());
+                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + version.getOcOid());
+            }
+            formList.add(form);
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+            // return "<Error>" + e.getMessage() + "</Error>";
+        }
+        return formList;
     }
 
     /**
@@ -245,18 +339,15 @@ public class OpenRosaServices {
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formId") String crfOID, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+            @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
 
-        CRFVersionDAO cVersionDao = new CRFVersionDAO(getDataSource());
-        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
-
-        CRFVersionBean crfVersion = cVersionDao.findByOid(crfOID);
-        List<MediaFile> mediaFiles = new ArrayList<MediaFile>();
+        String crfVersionOid = getCrfVersionOid(uniqueId);
+        CrfVersion crfVersion = crfVersionDao.findByOcOID(crfVersionOid);
         Manifest manifest = new Manifest();
 
-        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getId());
+        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(crfVersion.getCrfVersionId());
         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {
             for (CrfVersionMedia media : mediaList) {
@@ -270,7 +361,7 @@ public class OpenRosaServices {
             }
         }
 
-        //Add user list
+        // Add user list
         MediaFile userList = new MediaFile();
         Study study = studyDao.findByOcOID(studyOID);
         String userXml = getUserXml(study.getStudyId());
@@ -322,24 +413,34 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
     public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String crfOID, @RequestHeader("Authorization") String authorization) throws Exception {
+            @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
 
         String xform = null;
-
         // get parameters
         String formId = request.getParameter("formId");
         if (formId == null) {
             return "<error>formID is null :(</error>";
         }
 
-        try {
-            CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
-            CRFVersionBean crfVersion = versionDAO.findByOid(formId);
+        boolean query = getQuerySet(uniqueId);
+        String crfVersionOid = getCrfVersionOid(uniqueId);
 
-            if (crfVersion.getXform() != null && !crfVersion.getXform().equals("")){
-                xform = updateRepeatGroupsWithOrdinal(crfVersion.getXform());
+        try {
+            CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
+            XFormObject formObj = new XFormObject();
+
+            if (StringUtils.isNotEmpty(version.getXform())) {
+                xform = version.getXform();
+                formObj.setXform(xform);
+                if (query) {
+                    Form queryForm = new QueryFormDecorator(formObj);
+                    xform = queryForm.decorate();
+
+                    // xform = applyQuery(xform);
+                }
+                xform = updateRepeatGroupsWithOrdinal(xform);
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
@@ -350,7 +451,7 @@ public class OpenRosaServices {
             return "<error>" + e.getMessage() + "</error>";
         }
         response.setHeader("Content-Type", "text/xml; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + crfOID + ".xml" + "\";");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + formId + ".xml" + "\";");
         response.setContentType("text/xml; charset=utf-8");
         return xform;
 
@@ -374,7 +475,6 @@ public class OpenRosaServices {
         if (!mayProceedPreview(studyOID))
             return null;
 
-        CrfVersionMediaDao mediaDao = (CrfVersionMediaDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionMediaDao");
         CrfVersionMedia media = mediaDao.findById(Integer.valueOf(crfVersionMediaId));
 
         File image = new File(media.getPath() + media.getName());
@@ -385,7 +485,8 @@ public class OpenRosaServices {
         // Set content type, if known
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
-        if (type != null && !type.isEmpty()) builder = builder.header("Content-Type", type);
+        if (type != null && !type.isEmpty())
+            builder = builder.header("Content-Type", type);
         return builder.build();
     }
 
@@ -402,8 +503,7 @@ public class OpenRosaServices {
     @GET
     @Path("/{studyOID}/downloadUsers")
     public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @RequestHeader("Authorization") String authorization, @Context ServletContext context)
-            throws Exception {
+            @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
 
@@ -526,7 +626,6 @@ public class OpenRosaServices {
         } catch (Exception e) {
             logger.error("Unable to parse pformMaxSubmissionSize as an integer.");
         }
-
 
         // Build response headers
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -685,13 +784,14 @@ public class OpenRosaServices {
         return modifiedXform;
     }
 
-    private String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
+    public String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
         String defaultNamespace = null;
-        for (int i=0;i<attribs.getLength();i++) {
+        for (int i = 0; i < attribs.getLength(); i++) {
             Attr attrib = (Attr) attribs.item(i);
-            if (attrib.getName().equals("xmlns")) defaultNamespace = attrib.getValue();
+            if (attrib.getName().equals("xmlns"))
+                defaultNamespace = attrib.getValue();
         }
-        String xformArray[] = xform.split("html",2);
+        String xformArray[] = xform.split("html", 2);
         String modifiedXform = xformArray[0] + "html xmlns=\"" + defaultNamespace + "\" " + xformArray[1];
         return modifiedXform;
     }
@@ -715,9 +815,8 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-
         List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
-        for ( UserAccount userAccount:users) {
+        for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
             userName.appendChild(doc.createTextNode(userAccount.getUserName()));
@@ -777,8 +876,8 @@ public class OpenRosaServices {
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled")
-                && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen") || studyStatus
-                .equalsIgnoreCase("locked"))
+                && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen")
+                        || studyStatus.equalsIgnoreCase("locked"))
                 && (pManageStatus.equalsIgnoreCase("ACTIVE") || pManageStatus.equalsIgnoreCase("PENDING") || pManageStatus.equalsIgnoreCase("INACTIVE"))) {
             accessPermission = true;
         }
@@ -801,4 +900,20 @@ public class OpenRosaServices {
             out.close();
         }
     }
+
+    private String getCrfVersionOid(String uniqueId) {
+        if (uniqueId.endsWith(QUERY)) {
+            uniqueId = uniqueId.replace(QUERY, "");
+        }
+        return uniqueId;
+    }
+
+    private boolean getQuerySet(String uniqueId) {
+        if (uniqueId.endsWith(QUERY)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

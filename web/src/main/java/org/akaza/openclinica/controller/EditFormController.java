@@ -85,8 +85,9 @@ public class EditFormController {
         subjectContext.setCrfVersionOid(subjectContextMap.get("crfVersionOID"));
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(Integer.valueOf(subjectContextMap.get("studyEventOrdinal")));
+        String flavor = "-query";
 
-        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, null, null);
+        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, null, null, flavor);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);

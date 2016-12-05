@@ -1,10 +1,9 @@
 package org.akaza.openclinica.web.pform.formlist;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
 
 public class XForm {
     private String formID = null;
@@ -19,12 +18,11 @@ public class XForm {
 
     }
 
-    public XForm(CRFBean crf, CRFVersionBean version) throws NoSuchAlgorithmException {
-        this.formID = version.getOid();
+    public XForm(CrfBean crf, CrfVersion version) throws NoSuchAlgorithmException {
+        this.formID = version.getOcOid();
         this.name = crf.getName();
         this.majorMinorVersion = version.getName();
         this.version = version.getName();
-
     }
 
     public String getFormID() {
