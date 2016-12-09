@@ -20,7 +20,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-        <fmt:message key="confirm_restore_of_this_event_to_Study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="the_event_and_all_data_associated_with_it"  bundle="${resword}"/>
+        <fmt:message key="confirm_restore_of_this_event_to_Study"  bundle="${resword}"/> <c:out value="${subStudy.name}"/>. <fmt:message key="the_event_and_all_data_associated_with_it"  bundle="${resword}"/>
 		</div>
 
 		</td>
