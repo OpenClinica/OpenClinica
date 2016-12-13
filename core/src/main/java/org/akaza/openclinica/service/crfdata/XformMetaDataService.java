@@ -239,8 +239,10 @@ public class XformMetaDataService {
         ArrayList<String> usedItemOids = new ArrayList<String>();
         List<Group> htmlGroups = html.getBody().getGroup();
 
-        for (Group htmlGroup : htmlGroups) {
-            XformGroup xformGroup = container.findGroupByRef(htmlGroup.getRef());
+        // for (Group htmlGroup : htmlGroups) {
+        for (XformGroup xformGroup : container.getGroups()) {
+
+            // XformGroup xformGroup = container.findGroupByRef(htmlGroup.getRef());
             ItemGroup itemGroup = itemGroupDao.findByNameCrfId(xformGroup.getGroupName(), crf);
 
             if (itemGroup == null) {
@@ -255,22 +257,19 @@ public class XformMetaDataService {
                 itemGroup.setItemGroupId(itemGroupId);
             }
             List<UserControl> widgets = null;
-            boolean isRepeating = false;
-            if (htmlGroup.getRepeat() != null && htmlGroup.getRepeat().getUsercontrol() != null) {
-                widgets = htmlGroup.getRepeat().getUsercontrol();
-                isRepeating = true;
-            } else {
-                widgets = htmlGroup.getUsercontrol();
-            }
-            // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
-            for (UserControl widget : widgets) {
+            boolean isRepeating = xformGroup.isRepeating();
+            // Create Item specific DB entries: item,
+            // response_set,item_form_metadata,versioning_map,item_group_metadata
+            // for (UserControl widget : widgets) {
 
+            for (XformItem xformItem : xformGroup.getItems()) {
                 // Skip reserved name and read-only items here
-                XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
-                String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
+                // XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
+                String readonly = xformItem.getReadonly();
+
                 if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
                         && (readonly == null || !readonly.trim().equals("true()"))) {
-                    Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
+                    Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
@@ -362,8 +361,8 @@ public class XformMetaDataService {
         return itemFormMetadata;
     }
 
-    private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
-            ArrayList<String> usedItemOids, Errors errors) throws Exception {
+    private Item createItem(Html html, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, ArrayList<String> usedItemOids,
+            Errors errors) throws Exception {
         ItemDataType newDataType = getItemDataType(html, xformItem);
 
         if (newDataType == null) {
@@ -400,34 +399,18 @@ public class XformMetaDataService {
     }
 
     private String getLeftItemText(Html html, XformItem xformItem) {
-        for (Group group : html.getBody().getGroup()) {
-            if (group.getRepeat() != null && group.getRepeat().getUsercontrol() != null) {
-                for (UserControl control : group.getRepeat().getUsercontrol()) {
-                    if (control.getRef().equals(xformItem.getItemPath())) {
-                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                            return control.getLabel().getLabel();
-                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
-                            String ref = control.getLabel().getRef();
-                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
-                            return XformUtils.getDefaultTranslation(html, itextKey);
-                        } else
-                            return "";
-                    }
-                }
+        List<UserControl> controls = responseSetService.getUserControl(html);
 
-            } else {
-                for (UserControl control : group.getUsercontrol()) {
-                    if (control.getRef().equals(xformItem.getItemPath())) {
-                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                            return control.getLabel().getLabel();
-                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
-                            String ref = control.getLabel().getRef();
-                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
-                            return XformUtils.getDefaultTranslation(html, itextKey);
-                        } else
-                            return "";
-                    }
-                }
+        for (UserControl control : controls) {
+            if (control.getRef().equals(xformItem.getItemPath())) {
+                if (control.getLabel() != null && control.getLabel().getLabel() != null)
+                    return control.getLabel().getLabel();
+                else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
+                    String ref = control.getLabel().getRef();
+                    String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
+                    return XformUtils.getDefaultTranslation(html, itextKey);
+                } else
+                    return "";
             }
         }
         return "";

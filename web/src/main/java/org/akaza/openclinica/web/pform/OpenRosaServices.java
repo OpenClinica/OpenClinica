@@ -73,6 +73,7 @@ import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.formlist.Form;
 import org.akaza.openclinica.web.pform.formlist.QueryFormDecorator;
@@ -98,7 +99,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
@@ -146,6 +147,7 @@ public class OpenRosaServices {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
     StudySubjectDAO studySubjectDao;
+    XformParserHelper xformParserHelper = new XformParserHelper();
 
     /**
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
@@ -752,21 +754,21 @@ public class OpenRosaServices {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(false);
         Document doc = factory.newDocumentBuilder().parse(is);
+        List<String> repeatGroupList = new ArrayList<>();
 
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
-        XPathExpression expr = null;
-        expr = xpath.compile("/html/body/group/repeat");
-        NodeList repeatNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        XPathExpression expr = xpath.compile("/html/body");
 
-        for (int k = 0; k < repeatNodes.getLength(); k++) {
-            Element groupElement = ((Element) repeatNodes.item(k).getParentNode());
-            String groupRef = groupElement.getAttribute("ref");
+        Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+        repeatGroupList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupList);
 
-            expr = xpath.compile("/html/head/model/instance[1]" + groupRef);
+        for (String repeatGroup : repeatGroupList) {
+            expr = xpath.compile("/html/head/model/instance[1]" + repeatGroup);
             Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
             Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
             group.appendChild(ordinal);
+
         }
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();

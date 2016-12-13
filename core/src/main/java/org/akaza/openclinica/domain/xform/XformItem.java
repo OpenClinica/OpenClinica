@@ -8,6 +8,7 @@ public class XformItem {
     String itemGroup = null;
     String itemResponseType = null;
     String itemDataType = null;
+    String readonly = null;
 
     public String getItemPath() {
         return itemPath;
@@ -63,6 +64,14 @@ public class XformItem {
 
     public void setItemDataType(String itemDataType) {
         this.itemDataType = itemDataType;
+    }
+
+    public String getReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(String readonly) {
+        this.readonly = readonly;
     }
 
 }

@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ import org.w3c.dom.NodeList;
 public class QueryFormDecorator extends FormDecorator {
     public static final String QUERY = "-query";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+    XformParserHelper xformParserHelper = new XformParserHelper();
 
     public QueryFormDecorator(Form form) {
         super(form);
@@ -60,7 +63,7 @@ public class QueryFormDecorator extends FormDecorator {
         html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:enk", "http://enketo.org/xforms");
         NamedNodeMap attribs = html.getAttributes();
 
-        // MODEL Element
+        // MODEL Elements
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         XPathExpression expr = null;
@@ -102,43 +105,7 @@ public class QueryFormDecorator extends FormDecorator {
                     && modelChildNode.getFirstChild() != null) {
                 Node crfNode = modelChildNode.getFirstChild().getNextSibling();
                 String crfPath = "/" + crfNode.getNodeName();
-
-                NodeList sectionNodes = crfNode.getChildNodes();
-                int sectionNodesLength = sectionNodes.getLength();
-                for (int m = 0; m < sectionNodesLength; m++) {
-                    Node sectionNode = sectionNodes.item(m);
-                    if (!sectionNode.getNodeName().equals("meta")) {
-                        String sectionPath = crfPath + "/" + sectionNode.getNodeName();
-
-                        NodeList groupNodes = sectionNode.getChildNodes();
-                        int groupNodesLength = groupNodes.getLength();
-                        for (int n = 0; n < groupNodesLength; n++) {
-                            Node groupNode = groupNodes.item(n);
-                            String groupPath = sectionPath + "/" + groupNode.getNodeName();
-                            if (groupNode instanceof Element) {
-                                NodeList items = groupNode.getChildNodes();
-                                int itemsLength = items.getLength();
-
-                                if (groupNode.getFirstChild() == null) {
-                                    if (groupNode instanceof Element && !nodesetAttrs.contains(groupPath)) {
-                                        Element newChildNode = doc.createElement(groupNode.getNodeName() + "_comment");
-                                        sectionNode.appendChild(newChildNode);
-                                    }
-                                }
-
-                                for (int j = 0; j < itemsLength; j++) {
-                                    Node itemNode = items.item(j);
-                                    String itemPath = groupPath + "/" + itemNode.getNodeName();
-
-                                    if (itemNode instanceof Element && !nodesetAttrs.contains(itemPath)) {
-                                        Element newChildNode = doc.createElement(itemNode.getNodeName() + "_comment");
-                                        groupNode.appendChild(newChildNode);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                xformParserHelper.addCommentElementInInstance(doc, crfNode, crfPath, nodesetAttrs);
             }
         }
 
@@ -147,73 +114,10 @@ public class QueryFormDecorator extends FormDecorator {
 
         // Iterate Body Nodes
         Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        NodeList bodyChildNodes = bodyNode.getChildNodes();
-        int bodyChildLength = bodyChildNodes.getLength();
-        for (int b = 0; b < bodyChildLength; b++) {
-            Node bodyChildNode = bodyChildNodes.item(b);
+        xformParserHelper.iterateUserControlsInBodyAndAddCommentElement(doc, bodyNode, nodesetAttrs);
 
-            if ("group".equals(bodyChildNode.getNodeName())) {
-                Node sectionNode = bodyChildNode;
-                NodeList sectionChildNodes = sectionNode.getChildNodes();
-                int sectionChildLength = sectionChildNodes.getLength();
-                for (int d = 0; d < sectionChildLength; d++) {
-                    Node sectionChildNode = sectionChildNodes.item(d);
-
-                    if ("group".equals(sectionChildNode.getNodeName()) || "repeat".equals(sectionChildNode.getNodeName())) {
-                        Node groupNode = sectionChildNode;
-                        NodeList groupChildNodes = groupNode.getChildNodes();
-                        int groupChildLength = groupChildNodes.getLength();
-                        for (int c = 0; c < groupChildLength; c++) {
-                            Node groupChildNode = groupChildNodes.item(c);
-
-                            if ("repeat".equals(groupChildNode.getNodeName())) {
-                                Node repeatNode = groupChildNode;
-                                NodeList repeatChildNodes = repeatNode.getChildNodes();
-                                int repeatChildLegth = repeatChildNodes.getLength();
-                                for (int j = 0; j < repeatChildLegth; j++) {
-                                    Node repeatChildNode = repeatChildNodes.item(j);
-                                    if (repeatChildNode instanceof Element && repeatChildNode.getAttributes() != null
-                                            && repeatChildNode.getAttributes().getNamedItem("ref") != null
-                                            && !nodesetAttrs.contains(repeatChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                                            && ("input".equals(repeatChildNode.getNodeName()) || "select1".equals(repeatChildNode.getNodeName())
-                                                    || "select".equals(repeatChildNode.getNodeName()) || "upload".equals(repeatChildNode.getNodeName()))) {
-                                        Element newChildNode = createChildElement(doc, repeatChildNode, repeatChildNode.getNodeName());
-                                        repeatNode.appendChild(newChildNode);
-                                    }
-                                }
-                            }
-
-                            if (groupChildNode instanceof Element && groupChildNode.getAttributes() != null
-                                    && groupChildNode.getAttributes().getNamedItem("ref") != null
-                                    && !nodesetAttrs.contains(groupChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                                    && ("input".equals(groupChildNode.getNodeName()) || "select1".equals(groupChildNode.getNodeName())
-                                            || "select".equals(groupChildNode.getNodeName()) || "upload".equals(groupChildNode.getNodeName()))) {
-                                Element newChildNode = createChildElement(doc, groupChildNode, groupChildNode.getNodeName());
-                                groupNode.appendChild(newChildNode);
-                            }
-                        }
-                    }
-                    if (sectionChildNode instanceof Element && sectionChildNode.getAttributes() != null
-                            && sectionChildNode.getAttributes().getNamedItem("ref") != null
-                            && !nodesetAttrs.contains(sectionChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                            && ("input".equals(sectionChildNode.getNodeName()) || "select1".equals(sectionChildNode.getNodeName())
-                                    || "select".equals(sectionChildNode.getNodeName()) || "upload".equals(sectionChildNode.getNodeName()))) {
-                        Element newChildNode = createChildElement(doc, sectionChildNode, sectionChildNode.getNodeName());
-                        sectionNode.appendChild(newChildNode);
-                    }
-
-                }
-            }
-            if (bodyChildNode instanceof Element && bodyChildNode.getAttributes() != null && bodyChildNode.getAttributes().getNamedItem("ref") != null
-                    && !nodesetAttrs.contains(bodyChildNode.getAttributes().getNamedItem("ref").getNodeValue())
-                    && ("input".equals(bodyChildNode.getNodeName()) || "select1".equals(bodyChildNode.getNodeName())
-                            || "select".equals(bodyChildNode.getNodeName()) || "upload".equals(bodyChildNode.getNodeName()))) {
-                Element newChildNode = createChildElement(doc, bodyChildNode, bodyChildNode.getNodeName());
-                bodyNode.appendChild(newChildNode);
-            }
-        }
-
-        Element newInsanceNode = createInstanceElement(doc);
+        // Add Users instance
+        Element newInsanceNode = createUsersInstanceElement(doc);
         modelNode.appendChild(newInsanceNode);
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
@@ -232,37 +136,11 @@ public class QueryFormDecorator extends FormDecorator {
         return modifiedXform;
     }
 
-    private Element createInstanceElement(Document doc) {
+    private Element createUsersInstanceElement(Document doc) {
         Element instance = doc.createElement("instance");
         instance.setAttribute("id", "_users");
         instance.setAttribute("src", "jr://file-csv/users.xml");
         return instance;
-    }
-
-    private Element createChildElement(Document doc, Node childNode, String inputType) {
-
-        NamedNodeMap attr = childNode.getAttributes();
-        Node refAttr = attr.getNamedItem("ref");
-        Element input = doc.createElement("input");
-
-        input.setAttribute("appearance", "dn w1");
-        input.setAttribute("ref", refAttr.getNodeValue() + "_comment");
-
-        Element label = doc.createElement("label");
-        label.appendChild(doc.createTextNode("Comment:"));
-        input.appendChild(label);
-        return input;
-    }
-
-    private NodeList removeTextNode(NodeList nodelist) {
-        int nodelistLength = nodelist.getLength();
-        for (int m = 0; m < nodelistLength; m++) {
-            Node node = nodelist.item(m);
-            if (node != null && node.getNodeType() == Node.TEXT_NODE) {
-                node.getParentNode().removeChild(node);
-            }
-        }
-        return nodelist;
     }
 
 }
