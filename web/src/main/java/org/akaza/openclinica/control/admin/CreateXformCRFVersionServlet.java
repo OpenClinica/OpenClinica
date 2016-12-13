@@ -5,10 +5,16 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Utils;
@@ -25,6 +31,7 @@ import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -46,6 +53,7 @@ import org.w3c.dom.NodeList;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
+    XformParserHelper xformParserHelper = new XformParserHelper();
 
     @Override
     protected void processRequest() throws Exception {
@@ -56,7 +64,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ResourceBundleProvider.updateLocale(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
 
-        
         // Retrieve submission data from multipart request
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
@@ -73,33 +80,31 @@ public class CreateXformCRFVersionServlet extends SecureController {
         // Create container for holding validation errors
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
-        
-        // Validate all upload form fields were populated
-        validateFormFields(errors, version, submittedCrfName,submittedCrfVersionName,submittedCrfVersionDescription,
-        		submittedRevisionNotes,submittedXformText);
 
-        
-        if (!errors.hasErrors()){
-        	
+        // Validate all upload form fields were populated
+        validateFormFields(errors, version, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription, submittedRevisionNotes,
+                submittedXformText);
+
+        if (!errors.hasErrors()) {
+
             // Parse instance and xform
             XformParser parser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-            XformContainer container = parseInstance(submittedXformText);
+            XformContainer container = parseInstance(submittedXformText, errors);
             Html html = parser.unMarshall(submittedXformText);
 
-
-        	// Save meta-data in database
-	        XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
-	        try {
-	            xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-	                    submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
-	        } catch (RuntimeException e) {
-	            logger.error("Error encountered while saving CRF: " + e.getMessage());
-	            logger.error(ExceptionUtils.getStackTrace(e));
-	            // If there are no logged validation errors, this was an unanticipated exception
-	            // and should be allow to crash the page for now
-	            if (!errors.hasErrors())
-	                throw e;
-	        }
+            // Save meta-data in database
+            XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
+            try {
+                xformService.createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
+                        submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
+            } catch (RuntimeException e) {
+                logger.error("Error encountered while saving CRF: " + e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+                // If there are no logged validation errors, this was an unanticipated exception
+                // and should be allow to crash the page for now
+                if (!errors.hasErrors())
+                    throw e;
+            }
         }
         // Save errors to request so they can be displayed to the user
         if (errors.hasErrors()) {
@@ -109,51 +114,53 @@ public class CreateXformCRFVersionServlet extends SecureController {
             logger.debug("Didn't find any errors.  CRF data saved.");
 
             // Save any media files uploaded with xform
-	        CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId()) : crfDao.findByName(submittedCrfName);
-	        CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
-	        saveAttachedMedia(items, crf, newVersion);
+            CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId())
+                    : crfDao.findByName(submittedCrfName);
+            CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
+            saveAttachedMedia(items, crf, newVersion);
         }
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
     private void validateFormFields(Errors errors, CRFVersionBean version, String submittedCrfName, String submittedCrfVersionName,
-			String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
+            String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
 
-    	// Verify CRF Name is populated
+        // Verify CRF Name is populated
         if (version.getCrfId() == 0 && (submittedCrfName == null || submittedCrfName.equals(""))) {
             DataBinder crfDataBinder = new DataBinder(new CrfBean());
             Errors crfErrors = crfDataBinder.getBindingResult();
-            crfErrors.rejectValue("name","crf_val_crf_name_blank",resword.getString("CRF_name"));
+            crfErrors.rejectValue("name", "crf_val_crf_name_blank", resword.getString("CRF_name"));
             errors.addAllErrors(crfErrors);
         }
 
         DataBinder crfVersionDataBinder = new DataBinder(new CrfVersion());
         Errors crfVersionErrors = crfVersionDataBinder.getBindingResult();
 
-    	// Verify CRF Version Name is populated
+        // Verify CRF Version Name is populated
         if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
-        	crfVersionErrors.rejectValue("name","crf_ver_val_name_blank",resword.getString("version_name"));
+            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
         }
 
-    	// Verify CRF Version Description is populated
+        // Verify CRF Version Description is populated
         if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
-        	crfVersionErrors.rejectValue("description","crf_ver_val_desc_blank",resword.getString("crf_version_description"));
+            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", resword.getString("crf_version_description"));
         }
 
-    	// Verify CRF Version Revision Notes is populated
+        // Verify CRF Version Revision Notes is populated
         if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-        	crfVersionErrors.rejectValue("revisionNotes","crf_ver_val_rev_notes_blank",resword.getString("revision_notes"));
+            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
         }
 
-    	// Verify Xform text is populated
+        // Verify Xform text is populated
         if (submittedXformText == null || submittedXformText.equals("")) {
-        	crfVersionErrors.rejectValue("xform","crf_ver_val_xform_blank",resword.getString("xform"));
+            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
         }
+
         errors.addAllErrors(crfVersionErrors);
     }
 
-	private XformContainer parseInstance(String xform) throws Exception {
+    private XformContainer parseInstance(String xform, Errors errors) throws Exception {
 
         // Could use the following xpath to get all leaf nodes in the case
         // of multiple levels of groups: //*[count(./*) = 0]
@@ -183,45 +190,214 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
 
             // Get the form element
-            Element form = null;
+            Node form = null;
+            String path = "";
+            List<String> instanceItemsPath = new ArrayList<>();
             for (int i = 0; i < instance.getChildNodes().getLength(); i++) {
                 Node curNode = instance.getChildNodes().item(i);
                 if (curNode instanceof Element) {
-                    form = (Element) curNode;
-                    break;
+                    form = curNode;
+                    path = "/" + form.getNodeName();
+                    for (int j = 0; j < form.getChildNodes().getLength(); j++) {
+                        Node node = form.getChildNodes().item(j);
+                        if (node instanceof Element && !node.getNodeName().equals("meta") && !node.getNodeName().equals("formhub")) {
+                            instanceItemsPath = xformParserHelper.instanceItemPaths(node, instanceItemsPath, path + "/" + node.getNodeName());
+                        }
+                    }
+                    System.out.println("list size: " + instanceItemsPath.size());
                 }
             }
 
-            // Get the groups and grouped items
-            for (int i = 0; i < form.getChildNodes().getLength(); i++) {
-                if (form.getChildNodes().item(i) instanceof Element && ((Element) form.getChildNodes().item(i)).hasChildNodes()
-                        && !((Element) form.getChildNodes().item(i)).getTagName().equals("meta")) {
-                    Element group = (Element) form.getChildNodes().item(i);
-                    XformGroup newGroup = new XformGroup();
-                    newGroup.setGroupName(group.getTagName());
-                    newGroup.setGroupPath("/" + form.getTagName() + "/" + group.getTagName());
-                    groups.add(newGroup);
-                    for (int j = 0; j < group.getChildNodes().getLength(); j++) {
-                        if (group.getChildNodes().item(j) instanceof Element) {
-                            Element item = (Element) group.getChildNodes().item(j);
-                            XformItem newItem = new XformItem();
-                            newItem.setItemPath("/" + form.getTagName() + "/" + group.getTagName() + "/" + item.getTagName());
-                            newItem.setItemName(item.getTagName());
-                            // group is null;
-                            newGroup.getItems().add(newItem);
+            NodeList bind = doc.getElementsByTagName("bind");
+            List<XformItem> xformItems = new ArrayList<>();
+            for (int i = 0; i < bind.getLength(); i++) {
+                Element curBind = (Element) bind.item(i);
+                if (curBind instanceof Element) {
+                    for (String itemPath : instanceItemsPath) {
+                        if (itemPath.equals(curBind.getAttribute("nodeset"))) {
+                            XformItem xformItem = new XformItem();
+                            xformItem.setItemPath(itemPath);
+                            xformItem.setItemGroup(curBind.getAttribute("oc:group"));
+                            int index = itemPath.lastIndexOf("/");
+                            String itemName = itemPath.substring(index + 1);
+                            xformItem.setItemName(itemName);
+                            if (curBind.getAttribute("readonly") != null) {
+                                xformItem.setReadonly(curBind.getAttribute("readonly"));
+                            }
+                            xformItems.add(xformItem);
+                            break;
                         }
                     }
                 }
             }
+
+            XPathFactory xPathfactory = XPathFactory.newInstance();
+            XPath xpath = xPathfactory.newXPath();
+            XPathExpression expr = xpath.compile("/html/body");
+            List<String> repeatGroupPathList = new ArrayList<>();
+
+            Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+            repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
+
+            List<XformGroup> repeatingXformGroups = new ArrayList();
+
+            for (String repeatGroupPath : repeatGroupPathList) {
+                XformGroup repeatingXformGroup = null;
+                for (XformItem xformItem : xformItems) {
+                    String ipath = xformItem.getItemPath();
+                    int index = -1;
+                    while (index != 0) {
+                        index = ipath.lastIndexOf("/");
+                        ipath = ipath.substring(0, index);
+                        if (repeatGroupPath.equals(ipath)) {
+                            if (repeatingXformGroup == null) {
+                                repeatingXformGroup = new XformGroup();
+                                repeatingXformGroup.setGroupName(xformItem.getItemGroup());
+                                repeatingXformGroup.setGroupPath(repeatGroupPath);
+                                repeatingXformGroup.setRepeating(true);
+                                repeatingXformGroup.getItems().add(xformItem);
+                            } else {
+                                if (repeatingXformGroup.getGroupName().equals(xformItem.getItemGroup())) {
+                                    repeatingXformGroup.getItems().add(xformItem);
+                                } else {
+                                    // AC13: All items located directly or indirectly in a repeating layout group must
+                                    // be assigned
+                                    // to the same
+                                    // data group.
+                                    // AC14: The data group assigned to an Item in a repeating layout group must not be
+                                    // assigned to
+                                    // any Item
+                                    // that is not directly or indirectly in the same repeating layout group.
+                                    errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
+                                            "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
+                                }
+                                index = 0;
+                                if (!repeatingXformGroups.contains(repeatingXformGroup))
+                                    repeatingXformGroups.add(repeatingXformGroup);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            List<XformGroup> xformGroups = new ArrayList<>();
+            Set<String> groupSet = new HashSet<>();
+            for (XformItem xformItem : xformItems) {
+                groupSet.add(xformItem.getItemGroup());
+            }
+            for (String group : groupSet) {
+                XformGroup xformGroup = new XformGroup();
+                xformGroup.setGroupName(group);
+                xformGroups.add(xformGroup);
+            }
+
+            for (XformItem xformItem : xformItems) {
+                for (XformGroup xformGroup : xformGroups) {
+                    if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
+                        xformGroup.getItems().add(xformItem);
+                    }
+                }
+            }
+
+            List<XformGroup> nonRepeatingXformGroups = new ArrayList<>();
+            for (XformGroup xformGroup : xformGroups) {
+                if (!repeatingXformGroups.contains(xformGroup)) {
+                    nonRepeatingXformGroups.add(xformGroup);
+                }
+            }
+
+            List<XformGroup> allGroups = new ArrayList<>();
+            for (XformGroup repeatingXformGroup : repeatingXformGroups) {
+                allGroups.add(repeatingXformGroup);
+            }
+            for (XformGroup nonRepeatingXformGroup : nonRepeatingXformGroups) {
+                allGroups.add(nonRepeatingXformGroup);
+            }
+
+            // Repeating layout groups can be included at most one time in a nested layout groups structure
+            validateNestedRepeats(repeatGroupPathList, errors);
+
+            // itemName is unique within crf
+            validateItemUniquenessInCRF(instanceItemsPath, errors);
+
+            // AC11: CRFs must have a data group defined for every Item (i.e., no "ungrouped" Items allowed).
+            validateOcGroupNotNull(xformItems, errors);
+
+            // verify group names compatible with group naming convention
+
+            // AC15: Items that are not directly or indirectly in a repeating layout group can be assigned to the same
+            // data group as each other.
+
             XformContainer container = new XformContainer();
-            container.setGroups(groups);
-            container.setInstanceName(form.getTagName());
+            container.setGroups(allGroups);
+            container.setInstanceName(form.getNodeName());
             return container;
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
             throw new Exception(e);
         }
+    }
+
+    private void itemBelongsToRepeatGroup(List<String> repeatGroupList, String itemPath) {
+        for (String repeatGroup : repeatGroupList) {
+            int index = -1;
+            String parentPath = itemPath;
+            while (index != 0) {
+                index = parentPath.lastIndexOf("/");
+                parentPath = parentPath.substring(0, index);
+                if (repeatGroupList.contains(parentPath)) {
+
+                }
+            }
+
+        }
+    }
+
+    // nested repeating groups not allowed more than once
+    private void validateNestedRepeats(List<String> repeatGroupList, Errors errors) {
+        for (String repeatGroup : repeatGroupList) {
+            int index = -1;
+            String parentPath = repeatGroup;
+            while (index != 0) {
+                index = parentPath.lastIndexOf("/");
+                parentPath = parentPath.substring(0, index);
+                if (repeatGroupList.contains(parentPath)) {
+                    errors.rejectValue("name", "nested_repeat_group_not_allowed", "Repeat GroupPath:  " + repeatGroup);
+                    // errors.rejectValue("name", repeatGroup, resword.getString("nested_repeat_group_not_allowed"));
+                }
+            }
+
+        }
+    }
+
+    public void validateItemUniquenessInCRF(List<String> instanceItemsPath, Errors errors) {
+        List<String> itemNames = new ArrayList<>();
+        for (String itemPath : instanceItemsPath) {
+            int index = itemPath.lastIndexOf("/");
+            String item = itemPath.substring(index + 1);
+            if (itemNames.contains(item)) {
+                errors.rejectValue("name", "duplicate_item_name", "ItemName:  " + item);
+                // errors.rejectValue("name", item, resword.getString("duplicate_item_name"));
+            } else {
+                itemNames.add(item);
+            }
+        }
+
+    }
+
+    public void validateOcGroupNotNull(List<XformItem> xformItems, Errors errors) {
+        for (XformItem xformItem : xformItems) {
+            if (xformItem.getItemGroup() == null) {
+                errors.rejectValue("name", "group_name_missing_for_this_item", "ItemName:  " + xformItem.getItemName());
+                // errors.rejectValue("name", xformItem.getItemName(),
+                // resword.getString("group_name_missing_for_this_item"));
+            }
+        }
+
     }
 
     private String retrieveFormFieldValue(List<FileItem> items, String fieldName) throws Exception {

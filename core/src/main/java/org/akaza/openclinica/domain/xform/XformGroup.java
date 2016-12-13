@@ -7,6 +7,7 @@ public class XformGroup {
     private String groupName = null;
     private String groupDescription = null;
     private ArrayList<XformItem> items = null;
+    private boolean isRepeating = false;
 
     public XformGroup() {
         items = new ArrayList<XformItem>();
@@ -42,6 +43,31 @@ public class XformGroup {
 
     public void setItems(ArrayList<XformItem> items) {
         this.items = items;
+    }
+
+    public boolean isRepeating() {
+        return isRepeating;
+    }
+
+    public void setRepeating(boolean isRepeating) {
+        this.isRepeating = isRepeating;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        XformGroup other = (XformGroup) obj;
+        if (groupName == null) {
+            if (other.groupName != null)
+                return false;
+        } else if (!groupName.equals(other.groupName))
+            return false;
+        return true;
     }
 
 }

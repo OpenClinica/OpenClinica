@@ -1,10 +1,6 @@
 package org.akaza.openclinica.domain.xform.dto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.akaza.openclinica.bean.submit.SectionBean;
 
 public class Repeat {
 
@@ -16,6 +12,8 @@ public class Repeat {
     private String jrNoAddRemove;
     private String appearance;
     private String ref;
+    private List<Group> group;
+    private List<Repeat> repeat;
 
     public Repeat() {
     }
@@ -82,6 +80,22 @@ public class Repeat {
 
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    public List<Group> getGroup() {
+        return group;
+    }
+
+    public void setGroup(List<Group> group) {
+        this.group = group;
+    }
+
+    public List<Repeat> getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(List<Repeat> repeat) {
+        this.repeat = repeat;
     }
 
 }

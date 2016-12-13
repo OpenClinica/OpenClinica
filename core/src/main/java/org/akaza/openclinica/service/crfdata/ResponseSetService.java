@@ -2,6 +2,7 @@ package org.akaza.openclinica.service.crfdata;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,6 +23,7 @@ import org.akaza.openclinica.domain.xform.dto.Input;
 import org.akaza.openclinica.domain.xform.dto.Item;
 import org.akaza.openclinica.domain.xform.dto.ItemSet;
 import org.akaza.openclinica.domain.xform.dto.Label;
+import org.akaza.openclinica.domain.xform.dto.Repeat;
 import org.akaza.openclinica.domain.xform.dto.Select;
 import org.akaza.openclinica.domain.xform.dto.Select1;
 import org.akaza.openclinica.domain.xform.dto.Upload;
@@ -79,51 +81,95 @@ public class ResponseSetService {
             return existingSet;
     }
 
-    private String getOptionsText(Html html, String submittedXformText, XformItem xformItem, ResponseType responseType) throws Exception {
-        String optionsText = "";
-        List<Group> groups = html.getBody().getGroup();
+    public List<UserControl> groupItemsInBody(List<Group> groups, List<UserControl> controls) {
         for (Group group : groups) {
-            List<UserControl> controls = null;
-            if (group.getRepeat() != null)
-                controls = group.getRepeat().getUsercontrol();
-            else
-                controls = group.getUsercontrol();
+            if (group.getUsercontrol() != null) {
+                controls.addAll(group.getUsercontrol());
+            }
+            if (group.getGroup() != null) {
+                controls = groupItemsInBody(group.getGroup(), controls);
+            }
+            if (group.getRepeat() != null) {
+                List<Repeat> list = new ArrayList();
+                list.add(group.getRepeat());
+                controls = repeatItemsInBody(list, controls);
+            }
+        }
+        return controls;
+    }
 
-            for (UserControl control : controls) {
-                if (control.getRef().equals(xformItem.getItemPath())) {
+    public List<UserControl> repeatItemsInBody(List<Repeat> repeats, List<UserControl> controls) {
+        for (Repeat repeat : repeats) {
+            if (repeat.getUsercontrol() != null) {
+                controls.addAll(repeat.getUsercontrol());
+            }
+            if (repeat.getGroup() != null) {
+                controls = groupItemsInBody(repeat.getGroup(), controls);
+            }
+            if (repeat.getRepeat() != null) {
+                controls = repeatItemsInBody(repeat.getRepeat(), controls);
+            }
+        }
+        return controls;
+    }
 
-                    List<Item> items = null;
-                    ItemSet itemSet = null;
+    public List<UserControl> getUserControl(Html html) {
+        List<Group> groups = html.getBody().getGroup();
+        List<Repeat> repeats = html.getBody().getRepeat();
+        List<UserControl> usercontrol = html.getBody().getUsercontrol();
 
-                    if (control instanceof Input) {
-                        return responseType.getName();
-                    } else if (control instanceof Select) {
-                        items = ((Select) control).getItem();
-                        itemSet = ((Select) control).getItemSet();
-                    } else if (control instanceof Select1) {
-                        items = ((Select1) control).getItem();
-                        itemSet = ((Select1) control).getItemSet();
-                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
-                        return responseType.getName();
-                    } else {
-                        logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
-                        return null;
-                    }
+        List<UserControl> controls = new ArrayList<>();
+        if (usercontrol != null) {
+            controls.addAll(usercontrol);
+        }
+        if (groups != null) {
+            controls = groupItemsInBody(groups, controls);
+        }
+        if (repeats != null) {
+            controls = repeatItemsInBody(repeats, controls);
+        }
+        return controls;
+    }
 
-                    if (itemSet != null)
-                        optionsText = getOptionsTextFromItemSet(submittedXformText, itemSet, html);
-                    else {
-                        for (Item option : items) {
-                            String label = lookupLabel(html, option.getLabel());
-                            label = label.replaceAll(",", "\\\\,");
-                            if (optionsText.isEmpty())
-                                optionsText = label;
-                            else
-                                optionsText += "," + label;
-                        }
-                    }
+    private String getOptionsText(Html html, String submittedXformText, XformItem xformItem, ResponseType responseType) throws Exception {
 
+        String optionsText = "";
+        List<UserControl> controls = getUserControl(html);
+        for (UserControl control : controls) {
+            if (control.getRef().equals(xformItem.getItemPath())) {
+
+                List<Item> items = null;
+                ItemSet itemSet = null;
+
+                if (control instanceof Input) {
+                    return responseType.getName();
+                } else if (control instanceof Select) {
+                    items = ((Select) control).getItem();
+                    itemSet = ((Select) control).getItemSet();
+                } else if (control instanceof Select1) {
+                    items = ((Select1) control).getItem();
+                    itemSet = ((Select1) control).getItemSet();
+                } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
+                    return responseType.getName();
+                } else {
+                    logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
+                    return null;
                 }
+
+                if (itemSet != null)
+                    optionsText = getOptionsTextFromItemSet(submittedXformText, itemSet, html);
+                else {
+                    for (Item option : items) {
+                        String label = lookupLabel(html, option.getLabel());
+                        label = label.replaceAll(",", "\\\\,");
+                        if (optionsText.isEmpty())
+                            optionsText = label;
+                        else
+                            optionsText += "," + label;
+                    }
+                }
+
+                // }
             }
         }
         return optionsText;
@@ -173,48 +219,40 @@ public class ResponseSetService {
 
     private String getOptionsValues(Html html, String submittedXformText, XformItem xformItem, ResponseType responseType) throws Exception {
         String optionsValues = "";
-        List<Group> groups = html.getBody().getGroup();
-        for (Group group : groups) {
-            List<UserControl> controls = null;
-            if (group.getRepeat() != null)
-                controls = group.getRepeat().getUsercontrol();
-            else
-                controls = group.getUsercontrol();
+        List<UserControl> controls = getUserControl(html);
+        for (UserControl control : controls) {
+            if (control.getRef().equals(xformItem.getItemPath())) {
 
-            for (UserControl control : controls) {
-                if (control.getRef().equals(xformItem.getItemPath())) {
+                List<Item> items = null;
+                ItemSet itemSet = null;
 
-                    List<Item> items = null;
-                    ItemSet itemSet = null;
-
-                    if (control instanceof Input) {
-                        return responseType.getName();
-                    } else if (control instanceof Select) {
-                        items = ((Select) control).getItem();
-                        itemSet = ((Select) control).getItemSet();
-                    } else if (control instanceof Select1) {
-                        items = ((Select1) control).getItem();
-                        itemSet = ((Select1) control).getItemSet();
-                    } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
-                        return responseType.getName();
-                    } else {
-                        logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
-                        return null;
-                    }
-
-                    if (itemSet != null)
-                        optionsValues = getOptionsValuesFromItemSet(submittedXformText, itemSet, html);
-                    else {
-                        for (Item option : items) {
-                            String value = option.getValue();
-                            if (optionsValues.isEmpty())
-                                optionsValues = value;
-                            else
-                                optionsValues += "," + value;
-                        }
-                    }
-
+                if (control instanceof Input) {
+                    return responseType.getName();
+                } else if (control instanceof Select) {
+                    items = ((Select) control).getItem();
+                    itemSet = ((Select) control).getItemSet();
+                } else if (control instanceof Select1) {
+                    items = ((Select1) control).getItem();
+                    itemSet = ((Select1) control).getItemSet();
+                } else if (control instanceof Upload && control.getMediatype().equals("image/*")) {
+                    return responseType.getName();
+                } else {
+                    logger.debug("Found Unsupported UserControl (" + control.getClass().getName() + ".  Returning null text.");
+                    return null;
                 }
+
+                if (itemSet != null)
+                    optionsValues = getOptionsValuesFromItemSet(submittedXformText, itemSet, html);
+                else {
+                    for (Item option : items) {
+                        String value = option.getValue();
+                        if (optionsValues.isEmpty())
+                            optionsValues = value;
+                        else
+                            optionsValues += "," + value;
+                    }
+                }
+
             }
         }
         return optionsValues;
