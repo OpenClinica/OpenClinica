@@ -268,8 +268,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
                                     // assigned to
                                     // any Item
                                     // that is not directly or indirectly in the same repeating layout group.
-                                    errors.rejectValue("", xformItem.getItemGroup() + " -------" + xformItem.getItemPath(),
-                                            resword.getString("repeating_layout_group_item_assigned_to_wrong_group"));
+                                    errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
+                                            "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
                                 }
                                 index = 0;
                                 if (!repeatingXformGroups.contains(repeatingXformGroup))
@@ -366,8 +366,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 index = parentPath.lastIndexOf("/");
                 parentPath = parentPath.substring(0, index);
                 if (repeatGroupList.contains(parentPath)) {
-                    // errors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
-                    errors.rejectValue("name", repeatGroup, resword.getString("nested_repeat_group_not_allowed"));
+                    errors.rejectValue("name", "nested_repeat_group_not_allowed", "Repeat GroupPath:  " + repeatGroup);
+                    // errors.rejectValue("name", repeatGroup, resword.getString("nested_repeat_group_not_allowed"));
                 }
             }
 
@@ -380,7 +380,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
             int index = itemPath.lastIndexOf("/");
             String item = itemPath.substring(index + 1);
             if (itemNames.contains(item)) {
-                errors.rejectValue("name", item, resword.getString("duplicate_item_name"));
+                errors.rejectValue("name", "duplicate_item_name", "ItemName:  " + item);
+                // errors.rejectValue("name", item, resword.getString("duplicate_item_name"));
             } else {
                 itemNames.add(item);
             }
@@ -391,7 +392,9 @@ public class CreateXformCRFVersionServlet extends SecureController {
     public void validateOcGroupNotNull(List<XformItem> xformItems, Errors errors) {
         for (XformItem xformItem : xformItems) {
             if (xformItem.getItemGroup() == null) {
-                errors.rejectValue("name", xformItem.getItemName(), resword.getString("group_name_missing_for_this_item"));
+                errors.rejectValue("name", "group_name_missing_for_this_item", "ItemName:  " + xformItem.getItemName());
+                // errors.rejectValue("name", xformItem.getItemName(),
+                // resword.getString("group_name_missing_for_this_item"));
             }
         }
 
