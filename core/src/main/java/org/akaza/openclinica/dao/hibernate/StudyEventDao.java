@@ -106,5 +106,11 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	public void setChangeDetails(StudyEventChangeDetails changeDetails) {
 		this.changeDetails = changeDetails;
 	}
+    public StudyEvent findByStudyEventId(int studyEventId) {
+        String query = "from " + getDomainClassName() + " study_event  where study_event.studyEventId = :studyeventid ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventid", studyEventId);
+        return (StudyEvent) q.uniqueResult();
+    }
 
 }

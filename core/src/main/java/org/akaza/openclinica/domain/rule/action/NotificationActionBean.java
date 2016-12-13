@@ -1,5 +1,6 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -10,7 +11,7 @@ import javax.persistence.Transient;
 
 @Entity
 @DiscriminatorValue("7")
-public class NotificationActionBean extends RuleActionBean {
+public class NotificationActionBean extends RuleActionBean implements Serializable {
 
     private String to;
     private String subject="";
