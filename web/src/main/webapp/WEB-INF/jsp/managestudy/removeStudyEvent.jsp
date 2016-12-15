@@ -21,7 +21,7 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-        <fmt:message key="confirm_removal_of_this_event_from_study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="this_event_and_all_data_associated_with_it_in"  bundle="${resword}"/>
+        <fmt:message key="confirm_removal_of_this_event_from_study"  bundle="${resword}"/> <c:out value="${subStudy.name}"/>. <fmt:message key="this_event_and_all_data_associated_with_it_in"  bundle="${resword}"/>
         <fmt:message key="it_may_be_restored_by"  bundle="${resword}"/>
 
 		</div>
