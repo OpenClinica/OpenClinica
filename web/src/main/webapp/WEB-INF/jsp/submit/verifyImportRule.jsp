@@ -258,8 +258,8 @@
 
 </tr>
 <tr valign="top">
-    <td class="table_header_row">Target</td>
-    <td class="table_header_row">Rules</td>
+    <td class="table_header_row"><fmt:message key="target" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="rules" bundle="${resword}"/></td>
 </tr>
 
 <c:set var="rowCount" value="${0}" />

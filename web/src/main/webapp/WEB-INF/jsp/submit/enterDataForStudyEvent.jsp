@@ -643,7 +643,7 @@
    </td> 
    </c:if>
             <c:if test="${doRuleSetsExist[status.index]}" >
-             <td>   <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>">execute Rule</a></td>
+             <td>   <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>"><fmt:message key="execute_rule" bundle="${resword}"/></a></td>
             </c:if>
         </c:otherwise>
     </c:choose>
