@@ -111,7 +111,7 @@
   <td class="table_header_row"><fmt:message key="header" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="repeat_number" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="repeat_max" bundle="${resword}"/></td>
-  <td class="table_header_row">Is shown?</td>
+  <td class="table_header_row"><fmt:message key="is_shown" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="group_layout" bundle="${resword}"/></td>    
  </tr>
  <c:forEach var ="group" items="${section.groups}">
