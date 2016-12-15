@@ -225,7 +225,7 @@
                             <tr class="aka_stripes">
                                 <td class="aka_header_border" width="25%"><fmt:message key="ID" bundle="${resword}"/>: <b><c:out value="${note.value.id}"/></b></td>
                                 <td class="aka_header_border" width="25%"><fmt:message key="type" bundle="${resword}"/>: <b><c:out value="${note.value.disType.name}"/></b></td>
-                                <td class="aka_header_border" width="25%">Current Status: <b><c:out value="${note.value.resStatus.name}"/></b></td>
+                                <td class="aka_header_border" width="25%"><fmt:message key="current_status" bundle="${resword}"/>: <b><c:out value="${note.value.resStatus.name}"/></b></td>
                                 <td class="aka_header_border" width="25%"><fmt:message key="of_notes" bundle="${resword}"/>: <b><c:out value="${note.value.numChildren}" /></b></td>
                             </tr>
                         </table>

@@ -238,14 +238,15 @@ function notSelectAll() {
    --%>
 
    <td class="table_cell">
+       <fmt:message key="ungrouped" bundle="${resword}" var="ungrouped"/>
       <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
           <c:when test="${meta.groupLabel==null || meta.groupLabel==''}"></c:when>
           <c:when test="${status.last}">
-           <c:out value="${meta.groupLabel}" default="Ungrouped"/>
+           <c:out value="${meta.groupLabel}" default="${ungrouped}"/>
           </c:when>
           <c:otherwise>
-            <c:out value="${meta.groupLabel}" default="Ungrouped"/>,<br>
+            <c:out value="${meta.groupLabel}" default="${ungrouped}"/>,<br>
           </c:otherwise>
         </c:choose>
       </c:forEach>
@@ -345,14 +346,15 @@ function notSelectAll() {
    <%-- DEFAULT VALUE --%>
 
    <td class="table_cell">
+       <fmt:message key="none" bundle="${resword}" var="none"/>
       <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
           <c:when test="${meta.defaultValue==null || meta.defaultValue==''}"></c:when>
           <c:when test="${status.last}">
-           <c:out value="${meta.defaultValue}" default="None"/>
+           <c:out value="${meta.defaultValue}" default="${none}"/>
           </c:when>
           <c:otherwise>
-            <c:out value="${meta.defaultValue}" default="None"/>,<br>
+            <c:out value="${meta.defaultValue}" default="${none}"/>,<br>
           </c:otherwise>
         </c:choose>
       </c:forEach>

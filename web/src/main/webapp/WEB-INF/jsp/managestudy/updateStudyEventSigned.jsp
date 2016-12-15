@@ -583,14 +583,14 @@
 <div id="subjDiscNoteDiv" class="subjDiscNoteDiv" style="display:none">
     <table class="subjDiscNoteTable" cellpadding="0" cellspacing="0">
         <thead>
-            <th class="table_header_row_left">Event Name</th>
-            <th class="table_header_row">CRF Name</th>
-            <th class="table_header_row">New</th>
-            <th class="table_header_row">Updated</th>
-            <th class="table_header_row">Resolution Proposed</th>
-            <th class="table_header_row">Closed</th>
-            <th class="table_header_row">Not Applicable</th>
-            <th class="table_header_row">Actions</th>
+            <th class="table_header_row_left"><fmt:message key="event_name" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="crf_name" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="new" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="updated" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="resolved" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="closed" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="not_applicable" bundle="${resword}"/></th>
+            <th class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></th>
         </thead>
         <tbody>
             <c:set var="hasEventCRFs" value="${! (empty displayEventCRFs)}" />

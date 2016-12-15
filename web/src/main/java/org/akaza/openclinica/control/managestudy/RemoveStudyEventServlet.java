@@ -97,7 +97,8 @@ public class RemoveStudyEventServlet extends SecureController {
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-            request.setAttribute("study", study);
+            // changed attr name from study to subStudy
+            request.setAttribute("subStudy", study);
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {

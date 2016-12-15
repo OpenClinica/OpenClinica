@@ -522,8 +522,8 @@ function updateThis(multiSelEle, count) {
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 	<table border="0" cellpadding="0" cellspacing="0">
-		<tr><td class="table_header_column" colspan="3">Name</td><td><c:out value="${def.name}"/></td></tr>
-		<tr><td class="table_header_column" colspan="3">Description</td><td><c:out value="${def.description}"/></td></tr>
+		<tr><td class="table_header_column" colspan="3"><fmt:message key="name" bundle="${resword}"/></td><td><c:out value="${def.name}"/></td></tr>
+		<tr><td class="table_header_column" colspan="3"><fmt:message key="description" bundle="${resword}"/></td><td><c:out value="${def.description}"/></td></tr>
 	</table>
 	</div>
   	</div></div></div></div></div></div></div></div>
@@ -604,7 +604,7 @@ function updateThis(multiSelEle, count) {
 		    </td>
 		</tr>
 		<tr valign="top">
-		    <td class="table_cell" colspan="3"><fmt:message key="version_selection" bundle="${resword}"/>&nbsp:
+		    <td class="table_cell" colspan="3"><fmt:message key="version_selection" bundle="${resword}"/>&nbsp;
 		    <select multiple name="versionSelection<c:out value="${num}"/>" id="vs<c:out value="${num}"/>" onclick="updateThis(document.getElementById('vs<c:out value="${num}"/>'), '<c:out value="${num}"/>')" size="${fn:length(edc.versions)}">
 	            <c:forEach var="version" items="${edc.versions}">
 	            	<c:choose>
