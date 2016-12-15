@@ -77,6 +77,7 @@
               <c:out value="${uRole.role.description}"/>
           </c:if>
   </td></tr>
+  <tr><td class="table_header_column"><fmt:message key="role_status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${uRole.status.name}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="study" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${uStudy.name}"/></td></tr>
  
 </table>

@@ -955,6 +955,56 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     }
 
+    /**
+     * Find all assigned users in a study
+     * @param studyId
+     * @return
+     */
+    public ArrayList findAllAssignedUsersByStudy(int studyId) {
+        this.unsetTypeExpected();
+
+        this.setTypeExpected(1, TypeNames.STRING);
+        this.setTypeExpected(2, TypeNames.STRING);
+        this.setTypeExpected(3, TypeNames.STRING);
+        this.setTypeExpected(4, TypeNames.STRING);
+        this.setTypeExpected(5, TypeNames.INT);
+        this.setTypeExpected(6, TypeNames.INT);
+        this.setTypeExpected(7, TypeNames.DATE);
+        this.setTypeExpected(8, TypeNames.INT);
+        this.setTypeExpected(9, TypeNames.STRING);
+        this.setTypeExpected(10, TypeNames.INT);
+        this.setTypeExpected(11, TypeNames.INT);
+
+        ArrayList answer = new ArrayList();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyId));
+        variables.put(new Integer(2), new Integer(studyId));
+        ArrayList alist = this.select(digester.getQuery("findAllAssignedUsersByStudy"), variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            StudyUserRoleBean surb = new StudyUserRoleBean();
+            surb.setUserName((String) hm.get("user_name"));
+            surb.setLastName((String) hm.get("last_name"));
+            surb.setFirstName((String) hm.get("first_name"));
+            surb.setRoleName((String) hm.get("role_name"));
+            surb.setStudyName((String) hm.get("name"));
+            surb.setStudyId(((Integer) hm.get("study_id")).intValue());
+            surb.setParentStudyId(((Integer) hm.get("parent_study_id")).intValue());
+            surb.setUserAccountId(((Integer) hm.get("user_id")).intValue());
+            Integer statusId = (Integer) hm.get("status_id");
+            Date dateUpdated = (Date) hm.get("date_updated");
+
+            surb.setUpdatedDate(dateUpdated);
+            surb.setStatus(Status.get(statusId.intValue()));
+            answer.add(surb);
+        }
+
+        return answer;
+
+    }
+
     public ArrayList findAllUsersByStudyOrSite(int studyId, int parentStudyId, int studySubjectId) {
         this.unsetTypeExpected();
 
