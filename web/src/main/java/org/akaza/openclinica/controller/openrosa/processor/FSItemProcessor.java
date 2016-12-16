@@ -61,8 +61,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private ItemGroupDao itemGroupDao;
     @Autowired
     private CrfVersionDao crfVersionDao;
-
-    XformParserHelper xformParserHelper = new XformParserHelper();
+    @Autowired
+    private XformParserHelper xformParserHelper;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -85,7 +85,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         Node itemNode = null;
         Node repeatNode = null;
         NodeList instanceNodeList = doc.getElementsByTagName("instance");
-
         // Instance loop
         for (int i = 0; i < instanceNodeList.getLength(); i = i + 1) {
             Node instanceNode = instanceNodeList.item(i);
@@ -100,7 +99,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     itemNode = itemNodeSet.iterator().next();
                     processFieldSubmissionGroupItems(listOfUploadFilePaths, repeatNode, itemNode, container);
                 }
-
             }
         }
 
@@ -131,26 +129,31 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         }
 
         CrfVersion crfVersion = container.getCrfVersion();
-        Item item = itemDao.findByNameCrfId(itemNode.getNodeName(), crfVersion.getCrf().getCrfId());
-        ItemGroupMetadata igm = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-        ItemGroup itemGroup = igm.getItemGroup();
+        Item item = null;
+        ItemGroupMetadata igm = null;
+        ItemGroup itemGroup = null;
 
-        if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
-            ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
+        if (!itemNode.hasAttributes()) {
+            item = itemDao.findByNameCrfId(itemNode.getNodeName(), crfVersion.getCrf().getCrfId());
+            igm = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+            itemGroup = igm.getItemGroup();
 
-            existingItemData.setDeleted(true);
-            existingItemData.setValue("");
-            existingItemData.setOldStatus(existingItemData.getStatus());
-            existingItemData.setUserAccount(container.getUser());
-            existingItemData.setStatus(Status.AVAILABLE);
-            existingItemData.setUpdateId(container.getUser().getUserId());
-            existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+            if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
+                ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
 
-            // Close discrepancy notes
-            closeItemDiscrepancyNotes(container, existingItemData);
-            return;
+                existingItemData.setDeleted(true);
+                existingItemData.setValue("");
+                existingItemData.setOldStatus(existingItemData.getStatus());
+                existingItemData.setUserAccount(container.getUser());
+                existingItemData.setStatus(Status.AVAILABLE);
+                existingItemData.setUpdateId(container.getUser().getUserId());
+                existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+
+                // Close discrepancy notes
+                closeItemDiscrepancyNotes(container, existingItemData);
+                return;
+            }
         }
-
         // Item loop
         QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
         if (queryService.getQueryAttribute(helperBean, itemNode) != null) {

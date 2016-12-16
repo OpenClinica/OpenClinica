@@ -10,6 +10,7 @@ public class Bind {
     private String required;
     private String jrPreload;
     private String relevant;
+    private String itemGroup;
 
     public String getRelevant() {
         return relevant;
@@ -82,4 +83,13 @@ public class Bind {
     public void setJrPreload(String jrPreload) {
         this.jrPreload = jrPreload;
     }
+
+    public String getItemGroup() {
+        return itemGroup;
+    }
+
+    public void setItemGroup(String itemGroup) {
+        this.itemGroup = itemGroup;
+    }
+
 }

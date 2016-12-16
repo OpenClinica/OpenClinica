@@ -9,6 +9,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class XformParserHelper {
+    public static final String ENKETO_ORDINAL = "enk:ordinal";
+    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
 
     public void addCommentElementInInstance(Document doc, Node crfNode, String path, List<String> nodesetAttrs) {
         int outerNodeLength = crfNode.getChildNodes().getLength();
@@ -25,6 +27,7 @@ public class XformParserHelper {
                 } else {
                     if (!nodesetAttrs.contains(path + "/" + node.getNodeName())) {
                         Element newChildNode = doc.createElement(node.getNodeName() + "_comment");
+                        newChildNode.setAttribute(FS_QUERY_ATTRIBUTE, node.getNodeName());
                         node.getParentNode().appendChild(newChildNode);
                     }
                 }
@@ -112,7 +115,7 @@ public class XformParserHelper {
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
             if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
-                if (node.getAttributes() != null && node.getAttributes().getNamedItem("enk:ordinal") != null) {
+                if (node.getAttributes() != null && node.getAttributes().getNamedItem(ENKETO_ORDINAL) != null) {
                     set.add(node);
                 } else {
                     set = instanceEnketoAttr(node, set);

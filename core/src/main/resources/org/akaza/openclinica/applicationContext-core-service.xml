@@ -149,6 +149,8 @@
         <property name="xformParser" ref="xformParser"/>
     </bean>
 
+    <bean id="xformParserHelper" class="org.akaza.openclinica.domain.xform.XformParserHelper"/>
+
     <bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
         <property name="dataSource" ref="dataSource"></property>
         <property name="coreResources" ref="coreResources"/>
