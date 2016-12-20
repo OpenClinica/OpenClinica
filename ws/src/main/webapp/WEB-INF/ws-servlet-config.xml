@@ -5,14 +5,14 @@
 							http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
 
-     
+
      <!-- WSDL Definitions -->
 
      <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
         <property name="schemaCollection" ref="dataSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/data/v1"/>
-	<property name="targetNamespace" value="http://openclinica.org/ws/data/v1"/>  
+	<property name="targetNamespace" value="http://openclinica.org/ws/data/v1"/>
      </bean>
 
 	<bean id="dataSchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
@@ -24,7 +24,7 @@
     	</property>
     	<property name="inline" value="true"/>
 	</bean>
-	
+
      <bean id="studyEventDefinitionWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
         <property name="schemaCollection" ref="studyEventDefinitionSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
@@ -209,11 +209,13 @@
     </bean>
 
     <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
-      <property name="providers">
-          <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
-              <property name="userDetailsService" ref="ocUserDetailsService"/>
-          </bean>
-      </property>
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+                    <property name="userDetailsService" ref="ocUserDetailsService"/>
+                </bean>
+            </list>
+        </constructor-arg>
     </bean>
 
     <bean id="springSecurityHandler"
