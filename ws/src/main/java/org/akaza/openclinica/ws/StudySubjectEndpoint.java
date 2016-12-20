@@ -9,24 +9,23 @@ package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
@@ -72,6 +71,8 @@ public class StudySubjectEndpoint {
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/studySubject/v1";
     private String dateFormat;
 
+
+    private final StudySubjectService studySubjectService;
     private final SubjectServiceInterface subjectService;
     private final DataSource dataSource;
     private final MessageSource messages;
@@ -86,8 +87,9 @@ public class StudySubjectEndpoint {
      * @param subjectService
      * @param dataSource
      */
-    public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource, MessageSource messages) {
+    public StudySubjectEndpoint(SubjectServiceInterface subjectService, StudySubjectService studySubjectService, DataSource dataSource, MessageSource messages) {
         this.subjectService = subjectService;
+        this.studySubjectService = studySubjectService;
         this.dataSource = dataSource;
         this.messages = messages;
         this.locale = new Locale("en_US");
@@ -173,7 +175,6 @@ public class StudySubjectEndpoint {
     		) throws Exception {
     	ResourceBundleProvider.updateLocale(locale);
         Element subjectElement = (Element) subject.item(0);
-       // Element studyElement = (Element) study.item(0);
         SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);//,studyElement);
 
         DataBinder dataBinder = new DataBinder((subjectStudyBean));
@@ -213,6 +214,10 @@ public class StudySubjectEndpoint {
         // specific StudyRefTypes to be able to output the site's identifier
         Map<Integer, StudyRefType> studyIDRefMap = new HashMap<>(100);
         studyIDRefMap.put(study.getId(), studyRef);
+
+        UserAccountBean userAccountBean = getUserAccount();
+        StudyUserRoleBean studyUserRoleBean = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
+
         List<StudySubjectBean> studySubjects = this.subjectService.getStudySubject(study);
         for (StudySubjectBean studySubjectBean : studySubjects) {
             StudySubjectWithEventsType studySubjectType = new StudySubjectWithEventsType();
@@ -247,7 +252,7 @@ public class StudySubjectEndpoint {
             studySubjectType.setStudyRef(studyRefOutput);
 
             logger.debug(studySubjectBean.getLabel());
-            studySubjectType.setEvents(getEvents(studySubjectBean));
+            studySubjectType.setEvents(retrieveEvents(studySubjectBean, userAccountBean, studyUserRoleBean));
             studySubjectsType.getStudySubject().add(studySubjectType);
 
         }
@@ -261,18 +266,19 @@ public class StudySubjectEndpoint {
      * @return EventsType
      * @throws Exception
      */
-    private EventsType getEvents(StudySubjectBean studySubject) throws Exception {
-        StudyEventDAO eventDao = new StudyEventDAO(dataSource);
+    private EventsType retrieveEvents(StudySubjectBean studySubject, UserAccountBean userAccountBean, StudyUserRoleBean studyUserRoleBean) throws Exception {
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventsType eventsType = new EventsType();
-        List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
+        List<DisplayStudyEventBean> displayStudyEventBeanList =
+                studySubjectService.getDisplayStudyEventsForStudySubject(studySubject, userAccountBean, studyUserRoleBean);
 
-        for (StudyEventBean studyEventBean : events) {
-        	 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
-        	 studyEventBean.setStudyEventDefinition(sed);
+        for (DisplayStudyEventBean displayStudyEventBean : displayStudyEventBeanList) {
+            StudyEventBean studyEventBean = displayStudyEventBean.getStudyEvent();
+        	StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
+        	studyEventBean.setStudyEventDefinition(sed);
 
 
-             EventResponseType eventResponseType = new EventResponseType();
+            EventResponseType eventResponseType = new EventResponseType();
             eventResponseType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
             eventResponseType.setStatus(studyEventBean.getStatus().getName());
             eventResponseType.setOccurrence(studyEventBean.getSampleOrdinal() + "");
@@ -286,7 +292,7 @@ public class StudySubjectEndpoint {
 	            eventResponseType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
 	            eventResponseType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
             }
-            EventCrfInformationList eventCrfInformationList = createEventCrfInformationList(studyEventBean);
+            EventCrfInformationList eventCrfInformationList = createEventCrfInformationList(displayStudyEventBean);
             eventResponseType.getEventCrfInformation().add(eventCrfInformationList);
             
             eventsType.getEvent().add(eventResponseType);
@@ -296,19 +302,18 @@ public class StudySubjectEndpoint {
         return eventsType;
     }
 
-    private EventCrfInformationList createEventCrfInformationList(StudyEventBean studyEventBean) {
+    private EventCrfInformationList createEventCrfInformationList(DisplayStudyEventBean displayStudyEventBean) {
         EventCrfInformationList eventCrfInformationList = new EventCrfInformationList ();
-
         CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         CRFDAO crfdao = new CRFDAO(dataSource);
-
-        List<EventCRFBean> eventCRFBeanList = eventCRFDAO.findAllByStudyEvent(studyEventBean);
-        for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+        ArrayList<DisplayEventCRFBean> displayEventCRFBeanList = displayStudyEventBean.getDisplayEventCRFs();
+        for (DisplayEventCRFBean displayEventCRFBean : displayEventCRFBeanList) {
+            EventCRFBean eventCRFBean = displayEventCRFBean.getEventCRF();
             CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
             CRFBean crf = crfdao.findByVersionId(crfVersionBean.getCrfId());
+
             EventCrfType eventCrfType = new EventCrfType();
-            eventCrfType.setStatus(eventCRFBean.getStage().getName());
+            eventCrfType.setStatus(displayEventCRFBean.getStage().getName());
             eventCrfType.setName(crf.getName());
             eventCrfType.setVersion(crfVersionBean.getName());
             eventCrfType.setOid(crfVersionBean.getOid());
