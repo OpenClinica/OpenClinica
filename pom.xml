@@ -157,8 +157,9 @@
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core</artifactId>
-                <version>2.2.0.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -422,20 +423,30 @@
                 <artifactId>jaxb-impl</artifactId>
                 <version>2.1.5</version>
             </dependency>
+
             <dependency>
                 <groupId>com.sun.xml.wss</groupId>
                 <artifactId>xws-security</artifactId>
-                <version>3.0</version>
+                <version>2.0-FCS</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml</groupId>
+                        <artifactId>jaxp-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+
+            <!--
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core-tiger</artifactId>
                 <version>1.5.6</version>
             </dependency>
+            -->
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-security</artifactId>
-                <version>2.2.2.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.soap</groupId>
