@@ -179,6 +179,7 @@
     </bean>
 
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">
+        <constructor-arg ref="studySubjectService"/>
         <constructor-arg ref="subjectService"/>
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>

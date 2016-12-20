@@ -86,6 +86,7 @@
     
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">
         <constructor-arg ref="subjectService"/>
+        <constructor-arg ref="studySubjectService"/>
         <constructor-arg ref="dataSource"/>
         <property name="dateFormat" value="yyyy-MM-dd"/>
     </bean>
