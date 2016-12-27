@@ -118,6 +118,9 @@
         <field name="jrPreload" type="string" >
             <bind-xml name="jr:preload" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
         </field>
+        <field name="itemGroup" type="string" >
+            <bind-xml name="oc:itemgroup" node="attribute"  xmlns:oc="http://openclinica.org/xforms" />
+        </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Select">
         <map-to xml="select" ns-uri="http://www.w3.org/2002/xforms" />

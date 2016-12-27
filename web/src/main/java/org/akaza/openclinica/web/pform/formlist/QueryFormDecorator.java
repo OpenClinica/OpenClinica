@@ -34,17 +34,15 @@ public class QueryFormDecorator extends FormDecorator {
     public static final String QUERY = "-query";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    XformParserHelper xformParserHelper = new XformParserHelper();
-
     public QueryFormDecorator(Form form) {
         super(form);
     }
 
     @Override
-    public String decorate() throws Exception {
+    public String decorate(XformParserHelper xformParserHelper) throws Exception {
         String xform = "";
         try {
-            xform = applyQueryFormDecorator(form.decorate());
+            xform = applyQueryFormDecorator(form.decorate(), xformParserHelper);
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -53,7 +51,7 @@ public class QueryFormDecorator extends FormDecorator {
         return xform;
     }
 
-    private String applyQueryFormDecorator(String xform) throws Exception {
+    private String applyQueryFormDecorator(String xform, XformParserHelper xformParserHelper) throws Exception {
         InputStream is = new ByteArrayInputStream(xform.getBytes());
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(false);

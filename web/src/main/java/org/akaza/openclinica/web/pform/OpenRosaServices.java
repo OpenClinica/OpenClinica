@@ -123,6 +123,9 @@ public class OpenRosaServices {
     @Autowired
     CrfVersionMediaDao mediaDao;
 
+    @Autowired
+    XformParserHelper xformParserHelper;
+
     public static final String QUERY = "-query";
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -147,7 +150,6 @@ public class OpenRosaServices {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
     StudySubjectDAO studySubjectDao;
-    XformParserHelper xformParserHelper = new XformParserHelper();
 
     /**
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
@@ -296,9 +298,9 @@ public class OpenRosaServices {
                 formObj.setXform(xform);
                 if (query) {
                     Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate();
+                    xform = queryForm.decorate(xformParserHelper);
                 }
-                xform = updateRepeatGroupsWithOrdinal(xform);
+                // xform = updateRepeatGroupsWithOrdinal(xform);
                 form.setHash(DigestUtils.md5Hex(xform));
                 // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
             } else {
@@ -438,11 +440,9 @@ public class OpenRosaServices {
                 formObj.setXform(xform);
                 if (query) {
                     Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate();
-
-                    // xform = applyQuery(xform);
+                    xform = queryForm.decorate(xformParserHelper);
                 }
-                xform = updateRepeatGroupsWithOrdinal(xform);
+                // xform = updateRepeatGroupsWithOrdinal(xform);
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
@@ -916,6 +916,14 @@ public class OpenRosaServices {
         } else {
             return false;
         }
+    }
+
+    public XformParserHelper getXformParserHelper() {
+        return xformParserHelper;
+    }
+
+    public void setXformParserHelper(XformParserHelper xformParserHelper) {
+        this.xformParserHelper = xformParserHelper;
     }
 
 }

@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -53,7 +54,6 @@ import org.w3c.dom.NodeList;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    XformParserHelper xformParserHelper = new XformParserHelper();
 
     @Override
     protected void processRequest() throws Exception {
@@ -89,8 +89,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
             // Parse instance and xform
             XformParser parser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-            XformContainer container = parseInstance(submittedXformText, errors);
             Html html = parser.unMarshall(submittedXformText);
+            XformContainer container = parseInstance(submittedXformText, errors, html);
 
             // Save meta-data in database
             XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
@@ -160,7 +160,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
         errors.addAllErrors(crfVersionErrors);
     }
 
-    private XformContainer parseInstance(String xform, Errors errors) throws Exception {
+    private XformContainer parseInstance(String xform, Errors errors, Html html) throws Exception {
+        XformParserHelper xformParserHelper = (XformParserHelper) SpringServletAccess.getApplicationContext(context).getBean("xformParserHelper");
 
         // Could use the following xpath to get all leaf nodes in the case
         // of multiple levels of groups: //*[count(./*) = 0]
@@ -208,32 +209,52 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 }
             }
 
-            NodeList bind = doc.getElementsByTagName("bind");
             List<XformItem> xformItems = new ArrayList<>();
-            for (int i = 0; i < bind.getLength(); i++) {
-                Element curBind = (Element) bind.item(i);
-                if (curBind instanceof Element) {
-                    for (String itemPath : instanceItemsPath) {
-                        if (itemPath.equals(curBind.getAttribute("nodeset"))) {
-                            XformItem xformItem = new XformItem();
-                            xformItem.setItemPath(itemPath);
-                            xformItem.setItemGroup(curBind.getAttribute("oc:group"));
-                            int index = itemPath.lastIndexOf("/");
-                            String itemName = itemPath.substring(index + 1);
-                            xformItem.setItemName(itemName);
-                            if (curBind.getAttribute("readonly") != null) {
-                                xformItem.setReadonly(curBind.getAttribute("readonly"));
-                            }
-                            xformItems.add(xformItem);
-                            break;
-                        }
+            for (Bind bd : html.getHead().getModel().getBind()) {
+                if (bd.getItemGroup() != null) {
+                    XformItem xformItem = new XformItem();
+                    xformItem.setItemGroup(bd.getItemGroup());
+                    String itemPath = bd.getNodeSet();
+                    xformItem.setItemPath(itemPath);
+                    int index = itemPath.lastIndexOf("/");
+                    String itemName = itemPath.substring(index + 1);
+                    xformItem.setItemName(itemName);
+                    if (bd.getReadOnly() != null) {
+                        xformItem.setReadonly(bd.getReadOnly());
                     }
+                    xformItems.add(xformItem);
                 }
             }
 
+            /*
+             * for (int i = 0; i < bind.getLength(); i++) {
+             * Element curBind = (Element) bind.item(i);
+             * if (curBind instanceof Element) {
+             * for (String itemPath : instanceItemsPath) {
+             * if (itemPath.equals(curBind.getAttribute("nodeset"))) {
+             * XformItem xformItem = new XformItem();
+             * xformItem.setItemPath(itemPath);
+             * xformItem.setItemGroup(curBind.getAttribute("oc:group"));
+             * int index = itemPath.lastIndexOf("/");
+             * String itemName = itemPath.substring(index + 1);
+             * xformItem.setItemName(itemName);
+             * if (curBind.getAttribute("readonly") != null) {
+             * xformItem.setReadonly(curBind.getAttribute("readonly"));
+             * }
+             * xformItems.add(xformItem);
+             * break;
+             * }
+             * }
+             * }
+             * }
+             */
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
             XPathExpression expr = xpath.compile("/html/body");
+
+            // List<Body> body = (List<Body>) html.getBody();
+            // Body b = html.getBody();
+
             List<String> repeatGroupPathList = new ArrayList<>();
 
             Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);

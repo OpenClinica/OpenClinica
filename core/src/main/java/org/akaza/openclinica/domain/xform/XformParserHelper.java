@@ -9,6 +9,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class XformParserHelper {
+    public static final String ENKETO_ORDINAL = "enk:ordinal";
+    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
 
     public void addCommentElementInInstance(Document doc, Node crfNode, String path, List<String> nodesetAttrs) {
         int outerNodeLength = crfNode.getChildNodes().getLength();
@@ -25,6 +27,7 @@ public class XformParserHelper {
                 } else {
                     if (!nodesetAttrs.contains(path + "/" + node.getNodeName())) {
                         Element newChildNode = doc.createElement(node.getNodeName() + "_comment");
+                        newChildNode.setAttribute(FS_QUERY_ATTRIBUTE, node.getNodeName());
                         node.getParentNode().appendChild(newChildNode);
                     }
                 }
@@ -94,11 +97,28 @@ public class XformParserHelper {
             set.add(outerNode);
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
-                if (node.hasChildNodes()) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.hasChildNodes() && !(node.getChildNodes().getLength() == 1 && !(node.getFirstChild() instanceof Element))) {
                     set = instanceItemNodes(node, set);
                 } else {
                     set.add(node);
+                }
+            }
+        }
+        return set;
+    }
+
+    public Set<Node> instanceEnketoAttr(Node outerNode, Set<Node> set) {
+        int outerNodeLength = outerNode.getChildNodes().getLength();
+        if (outerNodeLength == 0)
+            set.add(outerNode);
+        for (int b = 0; b < outerNodeLength; b++) {
+            Node node = outerNode.getChildNodes().item(b);
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.getAttributes() != null && node.getAttributes().getNamedItem(ENKETO_ORDINAL) != null) {
+                    set.add(node);
+                } else {
+                    set = instanceEnketoAttr(node, set);
                 }
             }
         }
@@ -126,27 +146,12 @@ public class XformParserHelper {
         int outerNodeLength = outerNode.getChildNodes().getLength();
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
                 if (node.getNodeName().equals("repeat")) {
                     set.add(node);
                 }
                 if (node.hasChildNodes()) {
                     set = bodyRepeatNodes(node, set);
-                }
-            }
-        }
-        return set;
-    }
-
-    public Set<Node> instanceGroupNodes(Node crfNode, Set<Node> set, String path) {
-        int outerNodeLength = crfNode.getChildNodes().getLength();
-        for (int b = 0; b < outerNodeLength; b++) {
-            Node node = crfNode.getChildNodes().item(b);
-            if (node instanceof Element) {
-                if (node.hasChildNodes()) {
-                    set = instanceGroupNodes(node, set, path + "/" + node.getNodeName());
-                } else {
-                    set.add(node.getParentNode());
                 }
             }
         }

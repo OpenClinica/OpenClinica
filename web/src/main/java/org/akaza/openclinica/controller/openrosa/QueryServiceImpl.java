@@ -1,12 +1,39 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import static org.akaza.openclinica.control.core.SecureController.respage;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
+import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
+import org.akaza.openclinica.dao.hibernate.ItemDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNoteType;
+import org.akaza.openclinica.domain.datamap.DnItemDataMap;
+import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
@@ -18,16 +45,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-
-import static org.akaza.openclinica.control.core.SecureController.respage;
 
 /**
  * Created by yogi on 11/10/16.
@@ -54,8 +71,7 @@ public class QueryServiceImpl implements QueryService {
     private ApplicationContext appContext;
 
     @Override
-    public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode,
-            int itemOrdinal)  throws Exception {
+    public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
         helperBean.setContainer(container);
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
@@ -69,14 +85,50 @@ public class QueryServiceImpl implements QueryService {
             logger.error(e.getMessage());
             throw e;
         }
-        for (QueryBean queryBean : queries.getQueries()) {
-            // Enketo passes JSON "id" attribute for unsubmitted queries only
-            if (StringUtils.isEmpty(queryBean.getId())) continue;
-            DiscrepancyNote dn = createQuery(helperBean, queryBean);
-            helperBean.setDn(dn);
+
+        List<Integer> idList = new ArrayList();
+        List<QueryBean> qBeans = queries.getQueries();
+        QueryBean queryBean = null;
+        DiscrepancyNote childDN = null;
+        DiscrepancyNote parentDN = null;
+
+        if (qBeans.size() == 1) {
+            queryBean = qBeans.get(0);
+            // this is the first entry , expected to build 2 records in DN table, one parent, the other child
+            parentDN = createQuery(helperBean, queryBean);
+            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
+
+            childDN = createQuery(helperBean, queryBean);
+            childDN.setParentDiscrepancyNote(parentDN);
+            childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+
+            parentDN.setUserAccount(childDN.getUserAccount());
+            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
+            helperBean.setDn(parentDN);
             saveQueryItemDatamap(helperBean);
-            handleEmailNotification(helperBean, queryBean);
+
+        } else if (qBeans.size() > 1) {
+            for (QueryBean qBean : qBeans) {
+                idList.add(Integer.valueOf(qBean.getId()));
+            }
+            Collections.reverse(idList);
+            queryBean = qBeans.get(0);
+
+            // Enketo passes JSON "id" attribute for unsubmitted queries only
+            // if (StringUtils.isEmpty(queryBean.getId())){
+
+            childDN = createQuery(helperBean, queryBean);
+            childDN.setParentDiscrepancyNote(findQueryParent(helperBean));
+            childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+
+            parentDN = findQueryParent(helperBean);
+            parentDN.setUserAccount(childDN.getUserAccount());
+            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
+
         }
+        helperBean.setDn(childDN);
+        saveQueryItemDatamap(helperBean);
+        handleEmailNotification(helperBean, queryBean);
     }
 
     private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
@@ -88,21 +140,22 @@ public class QueryServiceImpl implements QueryService {
         dn.setDetailedNotes(queryBean.getComment());
         dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
         dn.setResolutionStatus(helperBean.getResStatus());
+
         String assignedTo = queryBean.getAssigned_to();
-        int endIndex = assignedTo.indexOf(")");
-        int begIndex = assignedTo.indexOf("(");
-        String userName = assignedTo.substring(begIndex + 1, endIndex);
-        UserAccount userAccount = userAccountDao.findByUserName(userName);
-        helperBean.setUserAccount(userAccount);
-        dn.setUserAccount(userAccount);
+        if (!StringUtils.isEmpty(assignedTo)) {
+            int endIndex = assignedTo.indexOf(")");
+            int begIndex = assignedTo.indexOf("(");
+            String userName = assignedTo.substring(begIndex + 1, endIndex);
+            UserAccount userAccount = userAccountDao.findByUserName(userName);
+            helperBean.setUserAccount(userAccount);
+            dn.setUserAccount(userAccount);
+        }
         dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
         // create itemData when a query is created without an autosaved itemdata
         if (helperBean.getItemData() == null) {
             helperBean.setItemData(createBlankItemData(helperBean));
         }
-        dn.setParentDiscrepancyNote(findQueryParent(helperBean));
         dn.setDateCreated(new Date());
-        dn = discrepancyNoteDao.saveOrUpdate(dn);
         return dn;
     }
 
@@ -112,8 +165,10 @@ public class QueryServiceImpl implements QueryService {
         }
         prepareEmail(helperBean);
     }
+
     private ItemData getItemData(QueryServiceHelperBean helperBean) {
-        ItemData id = itemDataDao.findByEventCrfItemName(helperBean.getContainer().getEventCrf().getEventCrfId(), helperBean.getParentElementName(), helperBean.getItemOrdinal());
+        ItemData id = itemDataDao.findByEventCrfItemName(helperBean.getContainer().getEventCrf().getEventCrfId(), helperBean.getParentElementName(),
+                helperBean.getItemOrdinal());
         return id;
     }
 
@@ -137,6 +192,7 @@ public class QueryServiceImpl implements QueryService {
         DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId());
         return parentDiscrepancyNote;
     }
+
     private void saveQueryItemDatamap(QueryServiceHelperBean helperBean) {
         // Create Mapping for new Discrepancy Note
         DnItemDataMapId dnItemDataMapId = new DnItemDataMapId();
@@ -156,11 +212,11 @@ public class QueryServiceImpl implements QueryService {
     }
 
     private void updateParentQuery(QueryServiceHelperBean helperBean) {
-        if (helperBean.getDn().getParentDiscrepancyNote() == null) return;
+        if (helperBean.getDn().getParentDiscrepancyNote() == null)
+            return;
 
         DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(helperBean.getDn().getParentDiscrepancyNote().getDiscrepancyNoteId());
         itemParentNote.setResolutionStatus(helperBean.getResStatus());
-        itemParentNote.setUserAccount(helperBean.getContainer().getUser());
         discrepancyNoteDao.saveOrUpdate(itemParentNote);
     }
 
@@ -173,24 +229,26 @@ public class QueryServiceImpl implements QueryService {
     private void prepareEmail(QueryServiceHelperBean helperBean) throws Exception {
         StringBuffer message = new StringBuffer();
 
-        message.append(MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
-        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
-                + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" +  helperBean.getUserAccount().getUserName()
-                + "&listNotes_f_entityName=" +  helperBean.getParentElementName()
-                + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
+        message.append(
+                MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
+        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user="
+                + helperBean.getUserAccount().getUserName() + "&listNotes_f_entityName=" + helperBean.getParentElementName() + "'>"
+                + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
         message.append(respage.getString("you_received_this_from"));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
-        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDescription(), helperBean.getDn().getDetailedNotes(), helperBean.getUserAccount().getUserName()));
+        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDescription(), helperBean.getDn().getDetailedNotes(),
+                helperBean.getUserAccount().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));
-        message.append(MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(), helperBean.getDn().getDescription()));
+        message.append(
+                MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(), helperBean.getDn().getDescription()));
 
-        if (!("studySub".equalsIgnoreCase(helperBean.getDn().getEntityType())
-                || "subject".equalsIgnoreCase(helperBean.getDn().getEntityType()))) {
-            message.append(MessageFormat.format(respage.getString("mailDNParameters3"), helperBean.getContainer().getStudyEvent().getStudyEventDefinition().getName()));
+        if (!("studySub".equalsIgnoreCase(helperBean.getDn().getEntityType()) || "subject".equalsIgnoreCase(helperBean.getDn().getEntityType()))) {
+            message.append(MessageFormat.format(respage.getString("mailDNParameters3"),
+                    helperBean.getContainer().getStudyEvent().getStudyEventDefinition().getName()));
             if (!"studyEvent".equalsIgnoreCase(helperBean.getDn().getEntityType())) {
                 message.append(MessageFormat.format(respage.getString("mailDNParameters4"), helperBean.getContainer().getCrfVersion().getCrf().getName()));
                 if (!"eventCrf".equalsIgnoreCase(helperBean.getDn().getEntityType())) {
@@ -205,8 +263,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disclaimer"));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("email_footer"));
-        String subject = MessageFormat.format(respage.getString("mailDNSubject"),
-                helperBean.getDn().getStudy().getName(), helperBean.getParentElementName());
+        String subject = MessageFormat.format(respage.getString("mailDNSubject"), helperBean.getDn().getStudy().getName(), helperBean.getParentElementName());
 
         String emailBodyString = message.toString();
         try {
@@ -217,13 +274,13 @@ public class QueryServiceImpl implements QueryService {
         }
 
     }
+
     private void sendEmail(String to, String subject, String body, Boolean htmlEmail) throws Exception {
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) appContext.getBean("mailSender");
             Properties javaMailProperties = mailSender.getJavaMailProperties();
-            if(null != javaMailProperties){
-                if (javaMailProperties.get("mail.smtp.localhost") == null
-                        || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
+            if (null != javaMailProperties) {
+                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String) javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("")) {
                     javaMailProperties.put("mail.smtp.localhost", "localhost");
                 }
             }
