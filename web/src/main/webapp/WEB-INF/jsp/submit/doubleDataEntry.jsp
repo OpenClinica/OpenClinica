@@ -629,11 +629,11 @@ window.onload = initmb;
         <c:choose>
             <c:when test="${thItem.metadata.header == ''}">
                 <c:if test="${! (empty questionNumber)}">
-                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.leftItemText}"/>
+                    <span style="margin-right:1em"><c:out value="${questionNumber}" escapeXml="false"/></span></c:if><c:out value="${thItem.metadata.leftItemText}" escapeXml="false"/>
             </c:when>
             <c:otherwise>
                 <c:if test="${! (empty questionNumber)}">
-                    <span style="margin-right:1em"><c:out value="${questionNumber}"/></span></c:if><c:out value="${thItem.metadata.header}"/>
+                    <span style="margin-right:1em"><c:out value="${questionNumber}" escapeXml="false"/></span></c:if><c:out value="${thItem.metadata.header}" escapeXml="false"/>
             </c:otherwise>
         </c:choose>
         </th>
