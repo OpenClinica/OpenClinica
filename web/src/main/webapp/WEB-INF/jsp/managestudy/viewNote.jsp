@@ -81,7 +81,8 @@
 	<c:when test="${singleNote.event.id > 0}">
 	<c:out value="${singleNote.event.name}"/>
 	</c:when>
-	<c:otherwise>N/A
+	<c:otherwise>
+		<fmt:message key="N/A" bundle="${resword}"/>
 	</c:otherwise>
 	</c:choose>
 	</td>
@@ -93,7 +94,8 @@
 	<c:when test="${singleNote.event.id>0}">
 	<fmt:formatDate value="${singleNote.event.dateStarted}" pattern="${dteFormat}"/>&nbsp;
 	</c:when>
-	<c:otherwise>N/A
+	<c:otherwise>
+		<fmt:message key="N/A" bundle="${resword}"/>
 	</c:otherwise>
 	</c:choose>
 	</td>
@@ -103,7 +105,8 @@
 	<c:when test="${singleNote.crfName != ''}">
 	<c:out value="${singleNote.crfName}"/>
 	</c:when>
-	<c:otherwise>N/A
+	<c:otherwise>
+		<fmt:message key="N/A" bundle="${resword}"/>
 	</c:otherwise>
 	</c:choose>
 	</td>
