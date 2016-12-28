@@ -580,13 +580,13 @@ window.onload = initmb;
       
             <c:when test="${isHorizontalCellLevel &&  (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
               thItem.metadata.responseSet.responseType.name eq 'radio')}">
-                <th colspan="<c:out value='${optionsLen}'/>" class="aka_headerBackground aka_padding_large aka_cellBorders">
+                <th colspan="<c:out value='${optionsLen}'/>" class="aka_headerBackground aka_padding_large aka_cellBorders" escapeXml="false">
                 <%-- compute total columns value for the add button row colspan attribute--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + optionsLen}" />
             </c:when>
         
             <c:otherwise>
-                <th class="aka_headerBackground aka_padding_large aka_cellBorders">
+                <th class="aka_headerBackground aka_padding_large aka_cellBorders" escapeXml="false">
                 <%-- compute total columns value for the add button row colspan attribute--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + 1}" />
             </c:otherwise>
