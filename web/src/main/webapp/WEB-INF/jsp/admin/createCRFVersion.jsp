@@ -42,8 +42,8 @@
 		  <fmt:message key="br_download_blank_CRF_spreadsheet_from" bundle="${respage}"/><br/><br/>
 		  <b><fmt:message key="example_CRF_br_spreadsheets" bundle="${resword}"/> : </b>
           <fmt:message key="br_download_example_CRF_instructions_from" bundle="${respage}"/><br/>
-		  
-		
+
+
 		</div>
 
 		</td>
@@ -193,7 +193,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
     <div style="width: 800px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-<div class="textbox_center">
+    <div class="textbox_center">
         <table border="0" cellpadding="0" cellspacing="0">
         <c:if test="${empty CrfId}">
           <tr>
@@ -201,6 +201,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
             <td><input type="text" id="crfName" name="crfName"/></td>
           </tr>
           </c:if>
+         <%--
          <tr>
             <td class="formlabel"><fmt:message key="version_name" bundle="${resword}"/>:</td>
             <td><input type="text" id="versionName" name="versionName"/></td>
@@ -213,10 +214,13 @@ function toggleSectionDisplay(showDivId,hideDivId){
             <td class="formlabel"><fmt:message key="revision_notes" bundle="${resword}"/>:</td>
             <td><input type="text" id="revisionNotes" name="revisionNotes"/></td>
           </tr>
+          --%>
         </table>
-</div>
+    </div>
+        <%--
         <div class="crf-upload-padded-div"><textarea class="crf-upload-padded-div" id="xformText" name="xformText" rows="40" cols="60"></textarea></div>
         <br>
+        --%>
         <div class="crf-upload-padded-div"><fmt:message key="xform_upload_media_instruction" bundle="${resword}"/></div>
         <br>
         <div class="textbox_center">
@@ -229,7 +233,7 @@ function toggleSectionDisplay(showDivId,hideDivId){
         </table>
         </div>
         <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-  
+
     </div></div></div></div></div></div></div></div>
     </div>
 

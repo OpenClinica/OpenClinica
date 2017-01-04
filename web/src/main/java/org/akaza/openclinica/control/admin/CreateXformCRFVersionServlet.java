@@ -176,6 +176,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
         DataBinder crfVersionDataBinder = new DataBinder(new CrfVersion());
         Errors crfVersionErrors = crfVersionDataBinder.getBindingResult();
 
+        /*
+        // Verify CRF Version Revision Notes is populated
+        if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
+            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
+        }
+
         // Verify CRF Version Name is populated
         if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
             crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
@@ -186,15 +192,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
             crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", resword.getString("crf_version_description"));
         }
 
-        // Verify CRF Version Revision Notes is populated
-        if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
-        }
-
         // Verify Xform text is populated
         if (submittedXformText == null || submittedXformText.equals("")) {
             crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
         }
+        */
 
         errors.addAllErrors(crfVersionErrors);
     }
