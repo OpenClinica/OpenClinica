@@ -248,6 +248,7 @@ public class XformMetaDataService {
             if (itemGroup == null) {
                 itemGroup = new ItemGroup();
                 itemGroup.setName(xformGroup.getGroupName());
+                itemGroup.setLayoutGroupPath(xformGroup.getGroupPath());
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
