@@ -38,6 +38,17 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (List<ItemData>) q.list();
     }
 
+    public ItemData findByItemEventCrfOrdinalDeleted(Integer itemId, Integer eventCrfId, Integer ordinal) {
+        String query = "from " + getDomainClassName()
+                + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal "
+                + "and deleted=true";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("itemid", itemId);
+        q.setInteger("eventcrfid", eventCrfId);
+        q.setInteger("ordinal", ordinal);
+        return (ItemData) q.uniqueResult();
+    }
+
     public ItemData findByItemEventCrfOrdinal(Integer itemId, Integer eventCrfId, Integer ordinal) {
         String query = "from " + getDomainClassName()
                 + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal "
@@ -57,6 +68,20 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemData.class);
 
         return (List<ItemData>) q.list();
+
+    }
+
+    public int getMaxCountByEventCrfGroup(Integer eventCrfId, Integer itemGroupId) {
+        String query = "select max(id.ordinal) from item_data id " + "join item i on id.item_id = i.item_id "
+                + "join event_crf ec on id.event_crf_id=ec.event_crf_id "
+                + "join item_group_metadata igm on i.item_id=igm.item_id and igm.crf_version_id = ec.crf_version_id " + "where id.event_crf_id = " + eventCrfId
+                + " and igm.item_group_id = " + itemGroupId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        Number result = (Number) q.uniqueResult();
+        if (result == null)
+            return 0;
+        else
+            return result.intValue();
 
     }
 

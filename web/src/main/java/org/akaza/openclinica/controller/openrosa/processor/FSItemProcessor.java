@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -94,10 +95,23 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (repeatNodeSet.size() != 0) {
                     repeatNode = repeatNodeSet.iterator().next();
                 }
+                ItemGroup itemGroup = null;
+                if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
+                    List<String> instanceItemsPath = new ArrayList<>();
+                    instanceItemsPath = xformParserHelper.instanceItemPaths(instanceNode, instanceItemsPath, "");
+                    List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(container.getCrfVersion().getCrfVersionId());
+                    for (ItemGroup ig : itemGroups) {
+                        if (ig.getLayoutGroupPath().equals(instanceItemsPath.get(0))) {
+                            itemGroup = ig;
+                            break;
+                        }
+                    }
+                }
+
                 itemNodeSet = xformParserHelper.instanceItemNodes(instanceNode, itemNodeSet);
                 if (itemNodeSet.size() != 0) {
                     itemNode = itemNodeSet.iterator().next();
-                    processFieldSubmissionGroupItems(listOfUploadFilePaths, repeatNode, itemNode, container);
+                    processFieldSubmissionGroupItems(listOfUploadFilePaths, repeatNode, itemNode, container, itemGroup);
                 }
             }
         }
@@ -106,8 +120,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     }
 
-    private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, Node repeatNode, Node itemNode, SubmissionContainer container)
-            throws Exception {
+    private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, Node repeatNode, Node itemNode, SubmissionContainer container,
+            ItemGroup itemGroup) throws Exception {
         String itemName;
         Integer itemOrdinal = 0;
         String itemValue;
@@ -131,29 +145,33 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         CrfVersion crfVersion = container.getCrfVersion();
         Item item = null;
         ItemGroupMetadata igm = null;
-        ItemGroup itemGroup = null;
 
-        if (!itemNode.hasAttributes()) {
-            item = itemDao.findByNameCrfId(itemNode.getNodeName(), crfVersion.getCrf().getCrfId());
-            igm = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-            itemGroup = igm.getItemGroup();
+        if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
+            List<ItemGroupMetadata> igms = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
 
-            if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
-                ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
+            for (ItemGroupMetadata ig : igms) {
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(ig.getItem().getItemId(), container.getEventCrf().getEventCrfId(),
+                        itemOrdinal);
 
-                existingItemData.setDeleted(true);
-                existingItemData.setValue("");
-                existingItemData.setOldStatus(existingItemData.getStatus());
-                existingItemData.setUserAccount(container.getUser());
-                existingItemData.setStatus(Status.AVAILABLE);
-                existingItemData.setUpdateId(container.getUser().getUserId());
-                existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+                // ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
+                if (existingItemData != null) {
+                    existingItemData.setDeleted(true);
+                    existingItemData.setValue("");
+                    existingItemData.setOldStatus(existingItemData.getStatus());
+                    existingItemData.setUserAccount(container.getUser());
+                    existingItemData.setStatus(Status.AVAILABLE);
+                    existingItemData.setUpdateId(container.getUser().getUserId());
+                    existingItemData = itemDataDao.saveOrUpdate(existingItemData);
 
-                // Close discrepancy notes
-                closeItemDiscrepancyNotes(container, existingItemData);
-                return;
+                    // Close discrepancy notes
+                    closeItemDiscrepancyNotes(container, existingItemData);
+                }
             }
+            return;
         }
+
+        // igm = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+
         // Item loop
         QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
         if (queryService.getQueryAttribute(helperBean, itemNode) != null) {
@@ -163,6 +181,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             itemName = itemNode.getNodeName().trim();
             itemValue = itemNode.getTextContent();
 
+            item = itemDao.findByNameCrfId(itemNode.getNodeName(), crfVersion.getCrf().getCrfId());
             if (item == null) {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
             }

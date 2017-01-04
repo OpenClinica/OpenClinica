@@ -76,7 +76,7 @@ public class QueryServiceImpl implements QueryService {
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
         helperBean.setItemData(getItemData(helperBean));
-        helperBean.setResStatus(resolutionStatusDao.findByResolutionStatusId(1));
+        // helperBean.setResStatus(resolutionStatusDao.findByResolutionStatusId(1));
         QueriesBean queries = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -139,7 +139,12 @@ public class QueryServiceImpl implements QueryService {
 
         dn.setDetailedNotes(queryBean.getComment());
         dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
-        dn.setResolutionStatus(helperBean.getResStatus());
+
+        if (queryBean.getStatus().equals("new")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(1));
+        } else if (queryBean.getStatus().equals("updated")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(2));
+        }
 
         String assignedTo = queryBean.getAssigned_to();
         if (!StringUtils.isEmpty(assignedTo)) {
@@ -181,7 +186,7 @@ public class QueryServiceImpl implements QueryService {
         itemData.setDateCreated(new Date());
         itemData.setStatus(Status.AVAILABLE);
         // TODO this value should change once you have an ordinal attribute specified in the query
-        itemData.setOrdinal(1);
+        itemData.setOrdinal(helperBean.getItemOrdinal());
         itemData.setUserAccount(helperBean.getUserAccount());
         itemData.setDeleted(false);
         itemDataDao.saveOrUpdate(itemData);
@@ -208,7 +213,7 @@ public class QueryServiceImpl implements QueryService {
         mapping.setActivated(false);
         mapping.setDiscrepancyNote(helperBean.getDn());
         dnItemDataMapDao.saveOrUpdate(mapping);
-        updateParentQuery(helperBean);
+        // updateParentQuery(helperBean);
     }
 
     private void updateParentQuery(QueryServiceHelperBean helperBean) {
