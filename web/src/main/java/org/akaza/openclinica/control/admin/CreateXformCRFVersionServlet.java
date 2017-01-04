@@ -309,10 +309,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
                                     errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
                                             "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
                                 }
-                                index = 0;
-                                if (!repeatingXformGroups.contains(repeatingXformGroup))
-                                    repeatingXformGroups.add(repeatingXformGroup);
                             }
+                            index = 0;
+                            if (!repeatingXformGroups.contains(repeatingXformGroup))
+                                repeatingXformGroups.add(repeatingXformGroup);
                         }
                     }
 
