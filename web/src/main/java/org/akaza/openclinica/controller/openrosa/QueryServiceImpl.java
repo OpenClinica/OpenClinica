@@ -144,6 +144,8 @@ public class QueryServiceImpl implements QueryService {
             dn.setResolutionStatus(resolutionStatusDao.findById(1));
         } else if (queryBean.getStatus().equals("updated")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(2));
+        } else if (queryBean.getStatus().equals("closed")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(4));
         }
 
         String assignedTo = queryBean.getAssigned_to();

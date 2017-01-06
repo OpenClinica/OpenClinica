@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 @Singleton
 public class QueryFormDecorator extends FormDecorator {
     public static final String QUERY = "-query";
+    public static final String COMMENT = "_comment";
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public QueryFormDecorator(Form form) {
@@ -79,6 +81,14 @@ public class QueryFormDecorator extends FormDecorator {
                 Node nodesetAttr = attr.getNamedItem("nodeset");
                 Node relevantAttr = attr.getNamedItem("relevant");
                 Node readonlyAttr = attr.getNamedItem("readonly");
+                Node requiredAttr = attr.getNamedItem("required");
+                // Node constraintAttr = attr.getNamedItem("constraint");
+                if (requiredAttr != null && requiredAttr.getNodeValue().equalsIgnoreCase("true()")) {
+                    String nodeValue = nodesetAttr.getNodeValue() + COMMENT;
+                    String requiredValue = nodeValue + "='' or comment-status(" + nodeValue + ") = 'closed'";
+                    requiredAttr.setNodeValue(requiredValue);
+                }
+
                 String str = nodesetAttr.getNodeValue();
                 Element bind = doc.createElement("bind");
 
@@ -86,7 +96,7 @@ public class QueryFormDecorator extends FormDecorator {
                     if (relevantAttr != null) {
                         bind.setAttribute("relevant", relevantAttr.getNodeValue());
                     }
-                    bind.setAttribute("nodeset", nodesetAttr.getNodeValue() + "_comment");
+                    bind.setAttribute("nodeset", nodesetAttr.getNodeValue() + COMMENT);
                     bind.setAttribute("enk:for", str);
                     bind.setAttribute("type", "string");
                     modelNode.appendChild(bind);

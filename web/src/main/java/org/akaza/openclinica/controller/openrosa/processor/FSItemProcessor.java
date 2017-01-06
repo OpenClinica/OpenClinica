@@ -123,7 +123,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private void processFieldSubmissionGroupItems(ArrayList<HashMap> listOfUploadFilePaths, Node repeatNode, Node itemNode, SubmissionContainer container,
             ItemGroup itemGroup) throws Exception {
         String itemName;
-        Integer itemOrdinal = 0;
+        Integer itemOrdinal = 1;
         String itemValue;
 
         // Node repeatGroupNode = itemNode.getParentNode();

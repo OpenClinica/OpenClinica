@@ -1,9 +1,12 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
@@ -38,6 +42,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
@@ -67,7 +72,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -331,21 +335,15 @@ public class EnketoUrlService {
                 }
             }
         }
-
-        String formName = crfVersion.getCrf().getName();
-        String url = "http://fm.openclinica.info:8080/api/protocol/" + studyOid + "/forms/" + formName;
-        RestTemplate rest = new RestTemplate();
-        Crf crf = rest.getForObject(url, Crf.class);
         String templateStr = null;
-        String xform = null;
-
-        if (crf != null) {
-            List<Version> versions = crf.getVersions();
-            List<String> fileLinks = versions.get(0).getFileLinks();
-
-            for (String fileLink : fileLinks) {
-                if (fileLink.endsWith(INSTANCE_SUFFIX)) {
-                    templateStr = rest.getForObject(fileLink, String.class);
+        CrfBean crfBean = crfDao.findById(crfVersion.getCrf().getCrfId());
+        String directoryPath = Utils.getCrfMediaFilePath(crfBean, crfVersion);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(INSTANCE_SUFFIX)) {
+                    templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }
             }
