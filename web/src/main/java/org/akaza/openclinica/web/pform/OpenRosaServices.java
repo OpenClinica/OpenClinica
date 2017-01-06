@@ -319,7 +319,6 @@ public class OpenRosaServices {
                     } else {
                         Form queryForm = new QueryFormDecorator(formObj);
                         xform = queryForm.decorate(xformParserHelper);
-                        xform = xformWithQueries;
                     }
                 }
                 // xform = updateRepeatGroupsWithOrdinal(xform);
@@ -480,7 +479,6 @@ public class OpenRosaServices {
                     } else {
                         Form queryForm = new QueryFormDecorator(formObj);
                         xform = queryForm.decorate(xformParserHelper);
-                        xform = xformWithQueries;
                     }
                 }
 
