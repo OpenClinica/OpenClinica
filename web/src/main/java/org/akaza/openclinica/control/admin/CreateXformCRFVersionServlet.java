@@ -281,11 +281,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 }
             }
 
-            // List<Body> body = (List<Body>) html.getBody();
-            // Body b = html.getBody();
-
             List<String> repeatGroupPathList = new ArrayList<>();
-
             repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
 
             List<XformGroup> repeatingXformGroups = new ArrayList();
@@ -342,9 +338,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
 
             for (XformItem xformItem : xformItems) {
-                for (XformGroup xformGroup : xformGroups) {
-                    if (xformItem.getItemGroup() != null && xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
-                        xformGroup.getItems().add(xformItem);
+                if (xformItem.getItemGroup() != null) {
+                    for (XformGroup xformGroup : xformGroups) {
+                        if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
+                            xformGroup.getItems().add(xformItem);
+                        }
                     }
                 }
             }
