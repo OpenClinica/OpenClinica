@@ -841,7 +841,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
-        System.out.println("URL:  " + url);
 
         HtmlBuilder actionLink = new HtmlBuilder();
         // actionLink.a().href("url?id=" + studySubject.getId());
