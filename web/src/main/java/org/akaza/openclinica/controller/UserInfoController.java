@@ -7,8 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,10 +33,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,10 +55,6 @@ public class UserInfoController {
 	@Autowired
 	ServletContext context;
 
-	@Autowired
-	AuthenticationManager authenticationManager;
-
-	public static final String FORM_CONTEXT = "ecid";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	public static final String INPUT_EMAIL = "";
@@ -74,12 +69,16 @@ public class UserInfoController {
 
 	
     /**
-     * @api {get} /pages/accounts/authenticatedSession Retrieve the CRC user account associated with this session
+     * @api {get} /pages/userinfo/study/:studyOid/crc Retrieve a user account - crc
      * @apiName getCrcAccountBySession
      * @apiPermission Module participate - enabled & admin
      * @apiVersion 3.12.2
      * @apiGroup User Account
      * @apiDescription Retrieves the crc user account associated with the current session.
+     * @apiParamExample {json} Request-Example:
+     *                  {
+     *                  "studyOid": " S_BL101",
+     *                  }
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
@@ -96,18 +95,20 @@ public class UserInfoController {
      */
 
     @RequestMapping(value = "/study/{studyOid}/crc", method = RequestMethod.GET)
-    public ResponseEntity<UserDTO> getCrcAccountBySession(HttpServletRequest request, HttpSession session) throws Exception {
+    public ResponseEntity<UserDTO> getCrcAccountBySession(@PathVariable("studyOid") String studyOid) throws Exception {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-        UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principle = null;
         if (auth != null) principle = auth.getPrincipal();
 
+        sdao = new StudyDAO(dataSource);
+        StudyBean currentStudy = sdao.findByOid(studyOid);
+        udao = new UserAccountDAO(dataSource);
+        UserAccountBean userAccount = (UserAccountBean) udao.findByUserName(((User)principle).getUsername());
+
         uDTO = null;
-        System.out.println("I'm in getCrcAccountBySession");
 
         StudyBean parentStudy = getParentStudy(currentStudy.getOid());
         Integer pStudyId = parentStudy.getId();
@@ -135,65 +136,7 @@ public class UserInfoController {
         return new ResponseEntity<UserDTO>(uDTO, headers,org.springframework.http.HttpStatus.OK);
     }
 
-    /**
-     * @api {get} /pages/accounts/authenticatedSession Retrieve the CRC user account associated with this session
-     * @apiName getCrcAccountBySession
-     * @apiPermission Module participate - enabled & admin
-     * @apiVersion 3.12.2
-     * @apiGroup User Account
-     * @apiDescription Retrieves the crc user account associated with the current session.
-     * @apiSuccessExample {json} Success-Response:
-     *                    HTTP/1.1 200 OK
-     *                    {
-     *                    "lName": "Jackson",
-     *                    "mobile": "",
-     *                    "accessCode": "",
-     *                    "apiKey": "6e8b69f6fb774e899f9a6c349c5adace",
-     *                    "password": "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
-     *                    "email": "abc@yahoo.com",
-     *                    "userName": "crc_user",
-     *                    "studySubjectId": null,
-     *                    "fName": "joe"
-     *                    }
-     */
-    /*
-    @RequestMapping(value = "/study/{studyOid}/crcmap", method = RequestMethod.GET)
-    public @ResponseBody Map getCrcAccountMapBySession(HttpServletRequest request, HttpSession session) throws Exception {
 
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
-
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-        UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object principle = null;
-        if (auth != null) principle = auth.getPrincipal();
-
-        uDTO = null;
-        System.out.println("I'm in getCrcAccountMapBySession");
-
-        StudyBean parentStudy = getParentStudy(currentStudy.getOid());
-        Integer pStudyId = parentStudy.getId();
-        String oid = parentStudy.getOid();
-
-        if (isStudyASiteLevelStudy(currentStudy.getOid()))
-            return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (!mayProceed(oid))
-            return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (isStudyDoesNotExist(oid))
-            return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (isCRCUserAccountDoesNotExist(userAccount.getName()))
-            return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (doesCRCNotHaveStudyAccessRole(userAccount.getName(), pStudyId))
-            return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        buildMap(userAccount);
-        return new ResponseEntity<Map>(null, org.springframework.http.HttpStatus.OK);
-    }
-    */
 	public Boolean isCRCHasAccessToStudySubject(String studyOid, String crcUserName, String studySubjectId) {
 		uDTO = null;
 		System.out.println("I'm in getAccount4");
