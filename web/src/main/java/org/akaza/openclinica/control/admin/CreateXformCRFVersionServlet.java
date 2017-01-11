@@ -252,9 +252,17 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 }
             }
 
+            XPathFactory xPathfactory = XPathFactory.newInstance();
+            XPath xpath = xPathfactory.newXPath();
+            XPathExpression expr = xpath.compile("/html/body");
+
+            Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+            List<String> bodyGroupPaths = new ArrayList<>();
+            bodyGroupPaths = xformParserHelper.bodyGroupNodePaths(bodyNode, bodyGroupPaths);
+
             List<XformItem> xformItems = new ArrayList<>();
             for (Bind bd : html.getHead().getModel().getBind()) {
-                if (bd.getItemGroup() != null) {
+                if (!bd.getNodeSet().equals("/form/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
                     XformItem xformItem = new XformItem();
                     xformItem.setItemGroup(bd.getItemGroup());
                     String itemPath = bd.getNodeSet();
@@ -273,16 +281,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 }
             }
 
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            XPathExpression expr = xpath.compile("/html/body");
-
-            // List<Body> body = (List<Body>) html.getBody();
-            // Body b = html.getBody();
-
             List<String> repeatGroupPathList = new ArrayList<>();
-
-            Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
             repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
 
             List<XformGroup> repeatingXformGroups = new ArrayList();
@@ -339,9 +338,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
 
             for (XformItem xformItem : xformItems) {
-                for (XformGroup xformGroup : xformGroups) {
-                    if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
-                        xformGroup.getItems().add(xformItem);
+                if (xformItem.getItemGroup() != null) {
+                    for (XformGroup xformGroup : xformGroups) {
+                        if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
+                            xformGroup.getItems().add(xformItem);
+                        }
                     }
                 }
             }

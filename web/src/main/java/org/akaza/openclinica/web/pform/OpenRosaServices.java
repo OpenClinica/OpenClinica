@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,6 +51,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -138,6 +141,7 @@ public class OpenRosaServices {
     public static final String INPUT_DISPLAY_PWD = "displayPwd";
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+    public static final String QUERY_SUFFIX = "form-queries.xml";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -279,6 +283,19 @@ public class OpenRosaServices {
         CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
         CrfBean crf = crfDao.findById(version.getCrf().getCrfId());
 
+        String xformWithQueries = "";
+        String directoryPath = Utils.getCrfMediaFilePath(crf, version);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+
         String xform = "";
         XFormList formList = null;
         try {
@@ -297,8 +314,12 @@ public class OpenRosaServices {
                 xform = version.getXform();
                 formObj.setXform(xform);
                 if (query) {
-                    Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate(xformParserHelper);
+                    if (StringUtils.isNotEmpty(xformWithQueries)) {
+                        xform = xformWithQueries;
+                    } else {
+                        Form queryForm = new QueryFormDecorator(formObj);
+                        xform = queryForm.decorate(xformParserHelper);
+                    }
                 }
                 // xform = updateRepeatGroupsWithOrdinal(xform);
                 form.setHash(DigestUtils.md5Hex(xform));
@@ -430,18 +451,37 @@ public class OpenRosaServices {
 
         boolean query = getQuerySet(uniqueId);
         String crfVersionOid = getCrfVersionOid(uniqueId);
+        CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
+        CrfBean crf = version.getCrf();
+
+        String xformWithQueries = "";
+        String directoryPath = Utils.getCrfMediaFilePath(crf, version);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
 
         try {
-            CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
             XFormObject formObj = new XFormObject();
 
             if (StringUtils.isNotEmpty(version.getXform())) {
                 xform = version.getXform();
                 formObj.setXform(xform);
                 if (query) {
-                    Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate(xformParserHelper);
+                    if (StringUtils.isNotEmpty(xformWithQueries)) {
+                        xform = xformWithQueries;
+                    } else {
+                        Form queryForm = new QueryFormDecorator(formObj);
+                        xform = queryForm.decorate(xformParserHelper);
+                    }
                 }
+
                 // xform = updateRepeatGroupsWithOrdinal(xform);
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);

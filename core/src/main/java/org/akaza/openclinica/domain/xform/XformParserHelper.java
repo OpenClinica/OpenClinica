@@ -162,4 +162,21 @@ public class XformParserHelper {
         return set;
     }
 
+    public List<String> bodyGroupNodePaths(Node outerNode, List<String> list) {
+        int outerNodeLength = outerNode.getChildNodes().getLength();
+        for (int b = 0; b < outerNodeLength; b++) {
+            Node node = outerNode.getChildNodes().item(b);
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.getNodeName().equals("group")) {
+                    Node groupNode = node.getAttributes().getNamedItem("ref");
+                    list.add(groupNode.getNodeValue());
+                }
+                if (node.hasChildNodes()) {
+                    list = bodyGroupNodePaths(node, list);
+                }
+            }
+        }
+        return list;
+    }
+
 }
