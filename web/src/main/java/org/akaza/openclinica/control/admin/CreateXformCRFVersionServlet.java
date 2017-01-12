@@ -182,18 +182,18 @@ public class CreateXformCRFVersionServlet extends SecureController {
          * crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank",
          * resword.getString("revision_notes"));
          * }
-         * 
+         *
          * // Verify CRF Version Name is populated
          * if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
          * crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
          * }
-         * 
+         *
          * // Verify CRF Version Description is populated
          * if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
          * crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank",
          * resword.getString("crf_version_description"));
          * }
-         * 
+         *
          * // Verify Xform text is populated
          * if (submittedXformText == null || submittedXformText.equals("")) {
          * crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
@@ -262,7 +262,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
             List<XformItem> xformItems = new ArrayList<>();
             for (Bind bd : html.getHead().getModel().getBind()) {
-                if (!bd.getNodeSet().equals("/form/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
+                if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
                     XformItem xformItem = new XformItem();
                     xformItem.setItemGroup(bd.getItemGroup());
                     String itemPath = bd.getNodeSet();
