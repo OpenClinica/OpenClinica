@@ -46,6 +46,12 @@
                 <db.test>107.170.116.150</db.test>
             </properties>
         </profile>
+	<profile>
+            <id>jenkins</id>
+            <properties>
+                <db.test>162.243.236.131</db.test>
+            </properties>
+        </profile>
         <profile>
             <!-- This profile is not compatible with Maven v2. Use it with Maven v3
                 only. -->
