@@ -1,21 +1,20 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.hibernate.query.Query;
 
-import java.util.ArrayList;
-
 public class ItemDao extends AbstractDomainDao<Item> {
 
-    static String findByItemGroupCrfVersionOrderedQuery = "select i from Item i "
-            + "join i.itemGroupMetadatas igm "
-            + "join igm.itemGroup ig "
-            + "left join fetch i.itemFormMetadatas ifm "
-            + "where ig.itemGroupId= :itemGroupId "
-            + "and igm.crfVersion.crfVersionId= :crfVersionId "
+    static String findByItemGroupCrfVersionOrderedQuery = "select i from Item i " + "join i.itemGroupMetadatas igm " + "join igm.itemGroup ig "
+            + "left join fetch i.itemFormMetadatas ifm " + "where ig.itemGroupId= :itemGroupId " + "and igm.crfVersion.crfVersionId= :crfVersionId "
             + "order by i.itemId";
+
+    static String findAllByCrfVersion = "select i from Item i " + " join fetch i.itemFormMetadatas ifm where ifm.crfVersionId= :crfVersionId "
+            + " order by i.itemId ";
 
     @Override
     Class<Item> domainClass() {
@@ -37,7 +36,6 @@ public class ItemDao extends AbstractDomainDao<Item> {
         return ((Item) q.uniqueResult());
     }
 
-
     public int getItemDataTypeId(Item item) {
         String query = "select item_data_type_id from item where item_id = " + item.getItemId();
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
@@ -53,8 +51,15 @@ public class ItemDao extends AbstractDomainDao<Item> {
         return (ArrayList<Item>) q.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public ArrayList<Item> findAllByCrfVersion(Integer crfVersionId) {
+        Query q = getCurrentSession().createQuery(findAllByCrfVersion);
+        q.setParameter("crfVersionId", crfVersionId);
+        return (ArrayList<Item>) q.list();
+    }
+
     public String getValidOid(Item item, String crfName, String itemLabel, ArrayList<String> oidList) {
-    OidGenerator oidGenerator = new ItemOidGenerator();
+        OidGenerator oidGenerator = new ItemOidGenerator();
         String oid = getOid(item, crfName, itemLabel);
         String oidPreRandomization = oid;
         while (findByOcOID(oid) != null || oidList.contains(oid)) {
