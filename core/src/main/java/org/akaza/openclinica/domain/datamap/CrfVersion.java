@@ -127,7 +127,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.status = status;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "crf_id", nullable = false)
     public CrfBean getCrf() {
         return this.crf;
@@ -240,7 +240,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.versioningMaps = versioningMaps;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "crfVersion")
     public List<EventCrf> getEventCrfs() {
         return this.eventCrfs;
     }
