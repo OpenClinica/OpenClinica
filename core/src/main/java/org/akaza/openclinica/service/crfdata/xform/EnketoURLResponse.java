@@ -10,6 +10,7 @@ public class EnketoURLResponse {
     private String offline_url = null;
     private String iframe_url = null;
     private String code = null;
+    private boolean markComplete=true;
 
     private String single_fieldsubmission_iframe_url = null;
 
@@ -67,5 +68,13 @@ public class EnketoURLResponse {
     public void setSingle_fieldsubmission_iframe_url(String single_fieldsubmission_iframe_url) {
         this.single_fieldsubmission_iframe_url = single_fieldsubmission_iframe_url;
     }
+
+	public boolean isMarkComplete() {
+		return markComplete;
+	}
+
+	public void setMarkComplete(boolean markComplete) {
+		this.markComplete = markComplete;
+	}
 
 }

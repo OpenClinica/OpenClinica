@@ -42,6 +42,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
@@ -60,6 +61,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -183,18 +185,21 @@ public class EnketoUrlService {
 
         // Load populated instance
         String populatedInstance = populateInstance(crfVersion, eventCrf, studyOid);
-        // String populatedInstance = populateInstance(crfVersion, eventCrf);
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
-
+ 
+        boolean markComplete=true;
+        if(eventCrf.getStatusId()==Status.UNAVAILABLE.getCode()){
+        	markComplete=false;
+        }
         // Return Enketo URL
-        editURL = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl).getEdit_url() + "&ecid="
-                + subjectContextKey;
-        logger.debug("Generating Enketo edit url for form: " + editURL);
+        EnketoURLResponse eur = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl,markComplete);
+        editURL =eur.getEdit_url()+ "&ecid=" + subjectContextKey+ "&completeButton="+eur.isMarkComplete();
+          logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
 
