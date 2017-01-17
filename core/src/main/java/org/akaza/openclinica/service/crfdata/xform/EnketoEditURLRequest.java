@@ -7,15 +7,15 @@ public class EnketoEditURLRequest {
     private String instance_id = null;
     private String return_url = null;
     private String instance = null;
-    private boolean markComplete=true;
+    private boolean complete_button=true;
 
-    public EnketoEditURLRequest(String server_url, String form_id, String instance_id, String return_url, String instance,boolean markComplete) {
+    public EnketoEditURLRequest(String server_url, String form_id, String instance_id, String return_url, String instance,boolean complete_button) {
         this.server_url = server_url;
         this.form_id = form_id;
         this.instance_id = instance_id;
         this.return_url = return_url;
         this.instance = instance;
-        this.markComplete=markComplete;
+        this.complete_button=complete_button;
     }
 
     public String getServer_url() {
@@ -58,12 +58,13 @@ public class EnketoEditURLRequest {
         this.instance = instance;
     }
 
-	public boolean isMarkComplete() {
-		return markComplete;
+	public boolean isComplete_button() {
+		return complete_button;
 	}
 
-	public void setMarkComplete(boolean markComplete) {
-		this.markComplete = markComplete;
+	public void setComplete_button(boolean complete_button) {
+		this.complete_button = complete_button;
 	}
+
 
 }

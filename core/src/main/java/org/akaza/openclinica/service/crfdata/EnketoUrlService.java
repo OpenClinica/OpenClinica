@@ -198,7 +198,7 @@ public class EnketoUrlService {
         }
         // Return Enketo URL
         EnketoURLResponse eur = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl,markComplete);
-        editURL =eur.getEdit_url()+ "&ecid=" + subjectContextKey+ "&completeButton="+eur.isMarkComplete();
+        editURL =eur.getEdit_url()+ "&ecid=" + subjectContextKey;
           logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
