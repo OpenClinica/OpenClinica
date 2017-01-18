@@ -33,7 +33,6 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
-import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
@@ -94,7 +93,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
                 return Page.ENKETO_FORM_SERVLET;
             } else {
-                return Page.ADMIN_EDIT_SERVLET;
+                return Page.ENKETO_FORM_SERVLET;
             }
         }
         return null;
@@ -153,34 +152,34 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
             ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
 
-            if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
-                EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
-                StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+            // if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
+            EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
+            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
-                // Cache the subject context for use during xform submission
-                PFormCache cache = PFormCache.getInstance(context);
-                PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
-                subjectContext.setStudySubjectOid(ssb.getOid());
-                subjectContext.setStudyEventDefinitionId(seb.getStudyEventDefinitionId());
-                subjectContext.setOrdinal(seb.getSampleOrdinal());
-                subjectContext.setCrfVersionOid(crfVersion.getOid());
-                subjectContext.setUserAccountId(ub.getId());
-                String contextHash = cache.putSubjectContext(subjectContext);
-                String flavor = "-query";
+            // Cache the subject context for use during xform submission
+            PFormCache cache = PFormCache.getInstance(context);
+            PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
+            subjectContext.setStudySubjectOid(ssb.getOid());
+            subjectContext.setStudyEventDefinitionId(seb.getStudyEventDefinitionId());
+            subjectContext.setOrdinal(seb.getSampleOrdinal());
+            subjectContext.setCrfVersionOid(crfVersion.getOid());
+            subjectContext.setUserAccountId(ub.getId());
+            String contextHash = cache.putSubjectContext(subjectContext);
+            String flavor = "-query";
 
-                String formUrl = null;
-                if (ecb.getId() > 0) {
-                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor);
-                } else {
-                    formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
-                }
-
-                request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
+            String formUrl = null;
+            if (ecb.getId() > 0) {
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor);
             } else {
-                request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
-                request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
-
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
             }
+
+            request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
+            // } else {
+            // request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
+            // request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
+
+            // }
         }
 
         return true;
