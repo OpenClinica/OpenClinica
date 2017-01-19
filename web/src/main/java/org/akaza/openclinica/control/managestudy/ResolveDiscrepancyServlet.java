@@ -66,6 +66,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
+    private static final String FLAVOR = "-query";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -152,7 +153,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
             ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
 
-            // if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
@@ -165,21 +165,15 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setCrfVersionOid(crfVersion.getOid());
             subjectContext.setUserAccountId(ub.getId());
             String contextHash = cache.putSubjectContext(subjectContext);
-            String flavor = "-query";
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor);
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, FLAVOR);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), FLAVOR);
             }
 
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
-            // } else {
-            // request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
-            // request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
-
-            // }
         }
 
         return true;
