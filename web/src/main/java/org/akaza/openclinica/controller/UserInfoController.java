@@ -1,10 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -14,15 +11,11 @@ import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -38,7 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -57,17 +49,13 @@ public class UserInfoController {
 
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	public static final String INPUT_EMAIL = "";
-	public static final String INPUT_INSTITUTION = "PFORM";
 	UserAccountDAO udao;
 	StudyDAO sdao;
 	StudySubjectDAO ssdao;
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
-    private AuditUserLoginDao auditUserLoginDao;
 
-	
     /**
      * @api {get} /pages/userinfo/study/:studyOid/crc Retrieve a user account - crc
      * @apiName getCrcAccountBySession
@@ -98,98 +86,49 @@ public class UserInfoController {
     public ResponseEntity<UserDTO> getCrcAccountBySession(@PathVariable("studyOid") String studyOid) throws Exception {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        sdao = new StudyDAO(dataSource);
+        udao = new UserAccountDAO(dataSource);
+        boolean isRequestValid = true;
+        uDTO = null;
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principle = null;
         if (auth != null) principle = auth.getPrincipal();
-
-        sdao = new StudyDAO(dataSource);
         StudyBean currentStudy = sdao.findByOid(studyOid);
-        udao = new UserAccountDAO(dataSource);
         UserAccountBean userAccount = (UserAccountBean) udao.findByUserName(((UserDetails)principle).getUsername());
-
-        uDTO = null;
 
         StudyBean parentStudy = getParentStudy(currentStudy.getOid());
         Integer pStudyId = parentStudy.getId();
         String oid = parentStudy.getOid();
 
         if (isStudyASiteLevelStudy(currentStudy.getOid()))
+            isRequestValid = false;
+        else if (!mayProceed(oid))
+            isRequestValid = false;
+        else if (isStudyDoesNotExist(oid))
+            isRequestValid = false;
+        else if (isCRCUserAccountDoesNotExist(userAccount.getName()))
+            isRequestValid = false;
+        else if (doesCRCNotHaveStudyAccessRole(userAccount.getName(), pStudyId))
+            isRequestValid = false;
+
+        if (isRequestValid) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            buildUserDTO(userAccount);
+            return new ResponseEntity<UserDTO>(uDTO, headers,org.springframework.http.HttpStatus.OK);
+        } else {
             return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (!mayProceed(oid))
-            return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (isStudyDoesNotExist(oid))
-            return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (isCRCUserAccountDoesNotExist(userAccount.getName()))
-            return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        if (doesCRCNotHaveStudyAccessRole(userAccount.getName(), pStudyId))
-            return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        buildUserDTO(userAccount);
-        return new ResponseEntity<UserDTO>(uDTO, headers,org.springframework.http.HttpStatus.OK);
+        }
     }
-
 
 	public Boolean isCRCHasAccessToStudySubject(String studyOid, String crcUserName, String studySubjectId) {
 		uDTO = null;
-		System.out.println("I'm in getAccount4");
-		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer pStudyId = parentStudy.getId();
-		String oid = parentStudy.getOid();
-
 		if (isStudySubjecAndCRCRolesMatch(studySubjectId, crcUserName, studyOid))
 			return true;
 
 		return false;
 	}
-
-    @RequestMapping(value = "/auditcrc", method = RequestMethod.POST)
-    public ResponseEntity<HashMap> auditcrc(@RequestBody HashMap<String, String> requestMap) throws Exception {
-       HashMap map = new HashMap();
-       
-       String crcUserName = requestMap.get("crcUserName");
-       String studyOid = requestMap.get("studyOid");
-       String studySubjectId = requestMap.get("studySubjectId");
-       
-       StudyBean parentStudy = getParentStudy(studyOid);
-       StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
-
-       // build UserName
-       HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
-       String pUserName = mapValues.get("pUserName"); // Participant User Name
-       AuditUserLoginBean auditUserLogin =new AuditUserLoginBean();
-       UserAccountBean userAccount =getUserAccount(crcUserName); 
-                  
-       auditUserLogin.setUserName(userAccount.getName());
-       auditUserLogin.setLoginStatus(LoginStatus.ACCESS_CODE_VIEWED);
-       auditUserLogin.setLoginAttemptDate(new Date());
-       auditUserLogin.setUserAccountId(userAccount != null ? userAccount.getId() : null);
-       auditUserLogin.setDetails(pUserName);
-       
-       
-       
-       getAuditUserLoginDao().save(auditUserLogin);
-       
-       
-
-       
-       return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
-    }
-
-    public AuditUserLoginDao getAuditUserLoginDao() {
-        auditUserLoginDao =
-            this.auditUserLoginDao != null ? auditUserLoginDao : (AuditUserLoginDao) SpringServletAccess.getApplicationContext(context).getBean(
-                    "auditUserLoginDao");
-        return auditUserLoginDao;
-    }
-
 
 public Boolean isApiKeyExist(String uuid) {
     UserAccountDAO udao = new UserAccountDAO(dataSource);
@@ -211,18 +150,6 @@ private UserDTO buildUserDTO(UserAccountBean userAccountBean) {
     uDTO.setPassword(userAccountBean.getPasswd());
     uDTO.setEmail(userAccountBean.getEmail());
     return uDTO;
-}
-
-private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
-    Map<String,Object> map = new HashMap<String,Object>();
-    map.put("fName",userAccountBean.getFirstName());
-    map.put("lName",userAccountBean.getLastName());
-    map.put("mobile",userAccountBean.getPhone());
-    map.put("userName",userAccountBean.getName());
-    map.put("accessCode",userAccountBean.getAccessCode());
-    map.put("password",userAccountBean.getPasswd());
-    map.put("email",userAccountBean.getEmail());
-    return map;
 }
 
 	private UserAccountBean getUserAccount(String userName) {
@@ -253,7 +180,6 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean == null) {
 			logger.info("***Study  Does Not Exist ***");
-			System.out.println("***Study  Does Not Exist ***");
 			return true;
 		}
 		return false;
@@ -263,7 +189,6 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean.getParentStudyId() != 0) {
 			logger.info("***Study provided in the URL is a Site study***");
-			System.out.println("***Study provided in the URL is a Site study***");
 			return true;
 		}
 		return false;
@@ -273,26 +198,9 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
 		if (!ownerUserAccount.isActive()) {
 			logger.info("***  CRC user acount does not Exist in the User Table ***");
-			System.out.println("***  CRC user acount does not Exist in the User Table ***");
 			return true;
 		}
 		return false;
-	}
-
-	private HashMap buildParticipantUserName(StudySubjectBean studySubjectBean) {
-		HashMap<String, String> map = new HashMap();
-		String studySubjectOid = studySubjectBean.getOid();
-		Integer studyId = studySubjectBean.getStudyId();
-		StudyBean study = getParentStudy(studyId);
-		Integer pStudyId = study.getId();
-
-		String pUserName = study.getOid() + "." + studySubjectOid;
-		System.out.println("participate Username: " + pUserName);
-		map.put("pUserName", pUserName);
-		map.put("pStudyId", pStudyId.toString());
-		map.put("studySubjectOid", studySubjectOid);
-
-		return map;
 	}
 
 	private Boolean doesCRCNotHaveStudyAccessRole(String crcUserName, Integer pStudyId) {
@@ -300,22 +208,14 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
 			StudyBean study = getParentStudy(studyUserRoleBean.getStudyId());
-			System.out.println("-------------");
-			System.out.println("Study Id to compare: " + studyUserRoleBean.getStudyId());
-			System.out.println("parent study Id to compare: " + study.getId());
-			System.out.println("Parent Study Id    " + pStudyId);
-			System.out.println("Role: " + studyUserRoleBean.getRoleName());
-			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
 
 			if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
-				System.out.println("if found :" + found);
 				break;
 			}
 		}
 		if (!found) {
 			logger.info("*** CRC Does not have access to the study/site OR CRC Does not have 'Data Entry Person' role ***");
-			System.out.println("*** CRC Does not have access to the study/site  OR CRC Does not have 'Data Entry Person' role  ***");
 			return true;
 		}
 		return false;
@@ -325,28 +225,20 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
-			System.out.println("-------------");
-			System.out.println("StudySubject Study Id to compare to   " + subjectStudyId);
 
 			if (studyUserRoleBean.getStudyId() == getParentStudy(subjectStudyId).getId()) {
 				subjectStudyId = getParentStudy(subjectStudyId).getId();
 				System.out.println("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
 			}
 
-			System.out.println("CRC Study Id to compare to : " + studyUserRoleBean.getStudyId());
-			System.out.println("Role: " + studyUserRoleBean.getRoleName());
-			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
-
 			if ((studyUserRoleBean.getStudyId() == subjectStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))
 					&& studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
-				System.out.println("if found :" + found);
 				break;
 			}
 		}
 		if (!found) {
 			logger.info("*** CRC Role does not match with StudySubject assignment ***");
-			System.out.println("*** CRC Role does not match with StudySubject assignment ***");
 			return true;
 		}
 		return false;
@@ -362,15 +254,8 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		// crc is study studySubject is study , pass
 
 		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer studyIdFromStudyOid = parentStudy.getId();
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 		Integer studyIdFromStudySubjectId = studySubjectBean.getStudyId();
-
-		System.out.println("    ------------------     ");
-		System.out.println("studyIdFromStudyOid :  " + studyIdFromStudyOid);
-
-		System.out.println("studySubjectId:  " + studySubjectId);
-		System.out.println("studyIdFromStudySubjectId:  " + studyIdFromStudySubjectId);
 
 		return doesStudySubjecAndCRCRolesMatch(crcUserName, studyIdFromStudySubjectId);
 
@@ -409,7 +294,6 @@ private Map<String,Object> buildMap(UserAccountBean userAccountBean) {
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
-		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
 		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
 		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
