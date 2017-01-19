@@ -41,7 +41,7 @@
         
       <p>You hereby authorize "<c:out value="${client.clientId}"/>" to access your protected resources.</p>
       -->
-      <p>Loading Rule Designer ...</p>
+      <p>Loading...</p>
       
 
       <form id="confirmationForm" name="confirmationForm" action="<%=request.getContextPath() + VerificationCodeFilter.DEFAULT_PROCESSING_URL%>" method="POST">
