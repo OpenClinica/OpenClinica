@@ -17,7 +17,7 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
         <property name="jobFactory">
             <bean  class="org.akaza.openclinica.job.AutowiringSpringBeanJobFactory" />
         </property>
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="multiSchemaDataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="quartzProperties">
         	<props>
@@ -49,7 +49,7 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
          <task:annotation-driven scheduler="taskScheduler"/>
      <task:scheduler id="taskScheduler" pool-size="42"/>
         <bean id="jobTriggerService" class="org.akaza.openclinica.service.JobTriggerService" autowire="byName">
-                <constructor-arg ref="dataSource"/>
+                <constructor-arg ref="multiSchemaDataSource"/>
                 <constructor-arg ref="ruleSetDao"/>
                 <constructor-arg ref="ruleSetService"/>        
     </bean>

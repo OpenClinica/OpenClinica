@@ -630,7 +630,7 @@ public class Page {
     public final static String MANAGE_STUDY_MODULE = "/pages/studymodule";
 
     public final static Page VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp", "View default crf versions print");
-    
+
 
     /**
      * Constructs the JSP Page instance

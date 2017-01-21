@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd"
-    >
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"
+>
 
     <!-- 
     <bean id="testDao" class="org.akaza.openclinica.dao.test.TestDao">
@@ -22,8 +22,9 @@
     </bean>
      -->
 
+
     <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase" depends-on="coreResources">
-      <property name="dataSource" ref="dataSource" />
+      <property name="dataSource" ref="multiSchemaDataSource" />
       <property name="changeLog" value="classpath:migration/master.xml" />
       <property name="defaultSchema" value="s[schema]"/>
       
@@ -31,7 +32,7 @@
     </bean>
 
     <!-- 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
         p:driverClassName="s[driver]"
         p:maxActive="50" p:maxIdle="2"
         p:maxWait="180000"
@@ -49,7 +50,7 @@
          -->
         
         
-      <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+     <!-- <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
       <property name="driverClassName" value="s[driver]"/>
       <property name="maxActive" value="50"/>
       <property name="maxIdle" value="2"/>
@@ -65,8 +66,45 @@
       <property name="username" value="s[username]"/>
       <property name="password" value="s[password]"/>
       <property name="bigStringTryClob" value="true"/>
-       </bean>  
-     
+       </bean>-->
+
+    <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="maxTotal" value="50"/>
+        <property name="maxIdle" value="2"/>
+        <property name="maxWaitMillis" value="180000"/>
+        <property name="removeAbandonedOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="300000"/>
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/oc_liqui"/>
+        <property name="username" value="clinica"/>
+        <property name="password" value="clinica"/>
+        <property name="bigStringTryClob" value="true"/>
+    </bean>
+
+    <bean id="multiSchemaDataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="maxTotal" value="50"/>
+        <property name="maxIdle" value="2"/>
+        <property name="maxWaitMillis" value="180000"/>
+        <property name="removeAbandonedOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="300000"/>
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/oc_liqui"/>
+        <property name="username" value="clinica"/>
+        <property name="password" value="clinica"/>
+        <property name="bigStringTryClob" value="true"/>
+        <property name="accessToUnderlyingConnectionAllowed" value="true"/>
+    </bean>
+
     <!-- 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="targetObject"><ref local="dataSource"/></property>
