@@ -1,26 +1,27 @@
 
 package org.akaza.openclinica.core.form.xform;
 
-import com.fasterxml.jackson.annotation.*;
-
-import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Generated;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "id",
-    "date_time",
-    "comment",
-    "status",
-    "assigned_to",
-    "notify"
-})
+@JsonPropertyOrder({ "type", "id", "date_time", "comment", "status", "assigned_to", "notify" })
 public class QueryBean {
 
     @JsonProperty("id")
     private String id;
+    @JsonProperty("type")
+    private String type;
     @JsonProperty("date_time")
     private String date_time;
     @JsonProperty("comment")
@@ -39,7 +40,7 @@ public class QueryBean {
     /**
      * 
      * @return
-     *     The id
+     *         The id
      */
     @JsonProperty("id")
     public String getId() {
@@ -49,7 +50,7 @@ public class QueryBean {
     /**
      * 
      * @param id
-     *     The id
+     *            The id
      */
     @JsonProperty("id")
     public void setId(String id) {
@@ -59,7 +60,7 @@ public class QueryBean {
     /**
      * 
      * @return
-     *     The date_time
+     *         The date_time
      */
     @JsonProperty("date_time")
     public String getDate_time() {
@@ -69,7 +70,7 @@ public class QueryBean {
     /**
      * 
      * @param date_time
-     *     The date_time
+     *            The date_time
      */
     @JsonProperty("date_time")
     public void setDate_time(String date_time) {
@@ -79,7 +80,7 @@ public class QueryBean {
     /**
      * 
      * @return
-     *     The comment
+     *         The comment
      */
     @JsonProperty("comment")
     public String getComment() {
@@ -89,7 +90,7 @@ public class QueryBean {
     /**
      * 
      * @param comment
-     *     The comment
+     *            The comment
      */
     @JsonProperty("comment")
     public void setComment(String comment) {
@@ -99,7 +100,7 @@ public class QueryBean {
     /**
      * 
      * @return
-     *     The status
+     *         The status
      */
     @JsonProperty("status")
     public String getStatus() {
@@ -109,7 +110,7 @@ public class QueryBean {
     /**
      * 
      * @param status
-     *     The status
+     *            The status
      */
     @JsonProperty("status")
     public void setStatus(String status) {
@@ -119,7 +120,7 @@ public class QueryBean {
     /**
      * 
      * @return
-     *     The assigned_to
+     *         The assigned_to
      */
     @JsonProperty("assigned_to")
     public String getAssigned_to() {
@@ -129,18 +130,17 @@ public class QueryBean {
     /**
      * 
      * @param assigned_to
-     *     The assigned_to
+     *            The assigned_to
      */
     @JsonProperty("assigned_to")
     public void setAssigned_to(String assigned_to) {
         this.assigned_to = assigned_to;
     }
 
-
     /**
      *
      * @return
-     *     The user
+     *         The user
      */
     @JsonProperty("user")
     public String getUser() {
@@ -150,18 +150,17 @@ public class QueryBean {
     /**
      *
      * @param user
-     *     The user
+     *            The user
      */
     @JsonProperty("user")
     public void setUser(String user) {
         this.user = user;
     }
 
-
     /**
      * 
      * @return
-     *     The notify
+     *         The notify
      */
     @JsonProperty("notify")
     public Boolean getNotify() {
@@ -171,7 +170,7 @@ public class QueryBean {
     /**
      * 
      * @param notify
-     *     The notify
+     *            The notify
      */
     @JsonProperty("notify")
     public void setNotify(Boolean notify) {
@@ -186,6 +185,14 @@ public class QueryBean {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
 }

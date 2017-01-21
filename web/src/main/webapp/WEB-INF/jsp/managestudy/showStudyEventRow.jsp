@@ -335,7 +335,7 @@
     			</c:if>
     			<c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available)}">
         		   
-        		    <a href="#"
+		           <a href="EnketoFormServlet?crfVersionId=<c:out value="${dec.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
 				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'AdministrativeEditing?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
