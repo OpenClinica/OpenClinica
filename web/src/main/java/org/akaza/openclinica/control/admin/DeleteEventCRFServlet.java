@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -43,6 +44,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -160,8 +162,11 @@ public class DeleteEventCRFServlet extends SecureController {
                 for (ItemDataBean itemdata : itemData) {
                     // OC-6343 Rule behaviour must be reset if an Event CRF is deleted
                     // delete the records from ruleActionRunLogDao
-                    // getRuleActionRunLogDao().delete(itemdata.getId());
 
+                    List<RuleActionRunLogBean> ruleActionRunLog = getRuleActionRunLogDao().findAllItemData(itemdata.getId());
+                    if (ruleActionRunLog.size() != 0) {
+                        getRuleActionRunLogDao().delete(itemdata.getId());
+                    }
                     // OC-6344 Notes & Discrepancies must be set to "closed" when event CRF is deleted
                     // parentDiscrepancyNoteList is the list of the parent DNs records only
                     ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = getDnDao().findParentNotesOnlyByItemData(itemdata.getId());
