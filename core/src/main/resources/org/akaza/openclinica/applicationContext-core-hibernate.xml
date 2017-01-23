@@ -1,16 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+	    xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                             http://www.springframework.org/schema/tx
                             http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
->
+                            >
 
 
 
+    <!-- A Hibernate SessionFactory for mapping Domain Objects from object to relation tables -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mappingLocations">
+            <list>
+                <value>classpath:org/akaza/openclinica/typedefs.hbm.xml</value>
+            </list>
+        </property>
+        <property name="annotatedClasses">
+            <list>
+                <value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>
+                <value>org.akaza.openclinica.domain.rule.expression.ExpressionBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetRuleBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RuleActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RuleActionRunBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.NotificationActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.ShowActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.HideActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.InsertActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.EventActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RandomizeActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.StratificationFactorBean</value>
+                <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
+                <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.ConfigurationBean</value>
+                <value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
+                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean</value>
+                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean</value>
+                <value>org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean</value>
+                <value>org.akaza.openclinica.domain.usageStats.LogUsageStatsBean</value>
+                <value>org.akaza.openclinica.domain.OpenClinicaVersionBean</value>
+ 
+                <!-- The following beans are coded for data maping, currently they are partially working, to resume the work uncomment it -->
+                <value>org.akaza.openclinica.domain.datamap.Study</value> 
+                <value>org.akaza.openclinica.domain.user.UserAccount</value>
+                <value>org.akaza.openclinica.domain.user.UserType</value>
+                <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
+                <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>  
+                <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>  
+                <value>org.akaza.openclinica.domain.datamap.CrfVersionMedia</value>  
+                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>  
+                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>  
+                <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value>
+                <value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value>
+                <value>org.akaza.openclinica.domain.datamap.DnItemDataMap</value>
+                <value>org.akaza.openclinica.domain.datamap.DnItemDataMapId </value>
+                <value>org.akaza.openclinica.domain.datamap.DnStudyEventMap      </value>
+                <value>org.akaza.openclinica.domain.datamap.DnStudySubjectMap                 </value>
+                <value>org.akaza.openclinica.domain.datamap.DnSubjectMap                 </value>
+                <value>org.akaza.openclinica.domain.datamap.DnStudyEventMapId    </value>
+                <value>org.akaza.openclinica.domain.datamap.VersioningMap    </value>
+                <value>org.akaza.openclinica.domain.datamap.VersioningMapId    </value>
+                <value>org.akaza.openclinica.domain.datamap.EventCrf             </value>  
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>  
+                <value>org.akaza.openclinica.domain.datamap.Item                 </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemData             </value>  
+ 
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag </value>  
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag</value>  
+
+                <value>org.akaza.openclinica.domain.datamap.ItemDataFlag </value>  
+                <value>org.akaza.openclinica.domain.datamap.EventCrfFlag   </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow </value>  
+                <value>org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow   </value>  
+
+                <value>org.akaza.openclinica.domain.datamap.IdtView   </value>  
+                <value>org.akaza.openclinica.domain.datamap.Tag   </value>  
+
+                <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>  
+                <value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>  
+                <value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>  
+                <value>org.akaza.openclinica.domain.datamap.ResponseType          </value>  
+                <value>org.akaza.openclinica.domain.datamap.Section               </value>  
+                <value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>  
+                <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>  
+                <value>org.akaza.openclinica.domain.datamap.StudySubject</value>  
+                <value>org.akaza.openclinica.domain.datamap.Subject</value>  
+        
+                <!-- the following were not tested, to be remain commented as of now -->         
+                <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
+                <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>   
+                <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>  
+                <!-- to be remain commented for now -->
+                <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>  
+                <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
+                <!-- <value>org.akaza.openclinica.domain.datamap.NullValueType         </value>   -->
+                <!-- <value>org.akaza.openclinica.domain.datamap.OpenclinicaVersion    </value>   -->
+                <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>  
+                <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
+                <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
+                <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
+                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValueId</value>   -->
+                <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
+                <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>
+                <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>
+
+       
+                
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
+                <prop key="hibernate.default_schema">s[schema]</prop>
+                <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
+                <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
+            </props>
+        </property>
+        <!-- convet aaBb to aa_bb -->
+        <property name="PhysicalNamingStrategy">
+            <bean class="org.akaza.openclinica.dao.hibernate.ImprovedNamingStrategy" />
+        </property>
+        <!-- convet aa_bb to aaBb -->
+        <property name="implicitNamingStrategy">
+            <bean class="org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl" />
+        </property>
+
+    </bean>
 
   <!-- A transaction manager for working with Hibernate SessionFactories -->
   <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
@@ -94,7 +234,7 @@
   <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
-    <property name="dataSource" ref="multiSchemaDataSource"/>
+    <property name="dataSource" ref="dataSource"/>
     <property name="queryStore" ref="queryStore"/>
   </bean>
   
@@ -110,155 +250,5 @@
   </bean>
   <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
   <bean id="userTypeDao" class="org.akaza.openclinica.dao.hibernate.UserTypeDao" parent="abstractDomainDao" autowire="byName"/>
-  <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean>
-
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-        <property name="dataSource" ref="multiSchemaDataSource" />
-        <property name="mappingLocations">
-            <list>
-                <value>classpath:org/akaza/openclinica/typedefs.hbm.xml</value>
-            </list>
-        </property>
-        <property name="annotatedClasses">
-            <list>
-                <value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
-                <value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>
-                <value>org.akaza.openclinica.domain.rule.expression.ExpressionBean</value>
-                <value>org.akaza.openclinica.domain.rule.RuleSetRuleBean</value>
-                <value>org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean</value>
-                <value>org.akaza.openclinica.domain.rule.RuleBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.RuleActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.RuleActionRunBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.NotificationActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.ShowActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.HideActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.InsertActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.EventActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.RandomizeActionBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
-                <value>org.akaza.openclinica.domain.rule.action.StratificationFactorBean</value>
-                <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
-                <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
-                <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>
-                <value>org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean</value>
-                <value>org.akaza.openclinica.domain.technicaladmin.ConfigurationBean</value>
-                <value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
-                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean</value>
-                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean</value>
-                <value>org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean</value>
-                <value>org.akaza.openclinica.domain.usageStats.LogUsageStatsBean</value>
-                <value>org.akaza.openclinica.domain.OpenClinicaVersionBean</value>
-
-                <!-- The following beans are coded for data maping, currently they are partially working, to resume the work uncomment it -->
-                <value>org.akaza.openclinica.domain.datamap.Study</value>
-                <value>org.akaza.openclinica.domain.user.UserAccount</value>
-                <value>org.akaza.openclinica.domain.user.UserType</value>
-                <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>
-                <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>
-                <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>
-                <value>org.akaza.openclinica.domain.datamap.CrfVersionMedia</value>
-                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>
-                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>
-                <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value>
-                <value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value>
-                <value>org.akaza.openclinica.domain.datamap.DnItemDataMap</value>
-                <value>org.akaza.openclinica.domain.datamap.DnItemDataMapId </value>
-                <value>org.akaza.openclinica.domain.datamap.DnStudyEventMap      </value>
-                <value>org.akaza.openclinica.domain.datamap.DnStudySubjectMap                 </value>
-                <value>org.akaza.openclinica.domain.datamap.DnSubjectMap                 </value>
-                <value>org.akaza.openclinica.domain.datamap.DnStudyEventMapId    </value>
-                <value>org.akaza.openclinica.domain.datamap.VersioningMap    </value>
-                <value>org.akaza.openclinica.domain.datamap.VersioningMapId    </value>
-                <value>org.akaza.openclinica.domain.datamap.EventCrf             </value>
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>
-                <value>org.akaza.openclinica.domain.datamap.Item                 </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemData             </value>
-
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag </value>
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag</value>
-
-                <value>org.akaza.openclinica.domain.datamap.ItemDataFlag </value>
-                <value>org.akaza.openclinica.domain.datamap.EventCrfFlag   </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow </value>
-                <value>org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow   </value>
-
-                <value>org.akaza.openclinica.domain.datamap.IdtView   </value>
-                <value>org.akaza.openclinica.domain.datamap.Tag   </value>
-
-                <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>
-                <value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>
-                <value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>
-                <value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>
-                <value>org.akaza.openclinica.domain.datamap.ResponseType          </value>
-                <value>org.akaza.openclinica.domain.datamap.Section               </value>
-                <value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>
-                <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>
-                <value>org.akaza.openclinica.domain.datamap.StudySubject</value>
-                <value>org.akaza.openclinica.domain.datamap.Subject</value>
-
-                <!-- the following were not tested, to be remain commented as of now -->
-                <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
-                <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>
-                <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>
-                <!-- to be remain commented for now -->
-                <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>
-                <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.NullValueType         </value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.OpenclinicaVersion    </value>   -->
-                <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>
-                <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
-                <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>
-                <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyParameterValueId</value>   -->
-                <!-- <value>org.akaza.openclinica.domain.datamap.StudyType</value>   -->
-                <value>org.akaza.openclinica.domain.datamap.StudyUserRole</value>
-                <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>
-                <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>
-
-
-
-            </list>
-        </property>
-
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.format_sql">true</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
-                <prop key="hibernate.generate_statistics">true</prop>
-                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
-                <prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
-                <prop key="hibernate.multiTenancy">SCHEMA</prop>
-                <prop key="hibernate.connection.password">clinica</prop>
-                <prop key="hibernate.connection.url">jdbc:postgresql://localhost:5432/oc_liqui</prop>
-                <prop key="hibernate.connection.username">clinica</prop>
-                <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop>
-                <prop key ="hibernate.multi_tenant_connection_provider">org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl</prop>
-                <prop key="hibernate.tenant_identifier_resolver">org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl</prop>
-            </props>
-        </property>
-        <!-- convet aaBb to aa_bb -->
-        <property name="PhysicalNamingStrategy">
-            <bean class="org.akaza.openclinica.dao.hibernate.ImprovedNamingStrategy" />
-        </property>
-        <!-- convet aa_bb to aaBb -->
-        <property name="implicitNamingStrategy">
-            <bean class="org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl" />
-        </property>
-        <property name="multiTenantConnectionProvider" ref="simpleTenantConnectionProvider"/>
-        <property name="currentTenantIdentifierResolver" ref="currentTenantIdentifierResolverImpl"/>
-    </bean>
-    <bean id="currentTenantIdentifierResolverImpl"
-          class="org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantIdentifierResolver"/>
-
-    <bean id="simpleTenantConnectionProvider" class="org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl"/>
+  <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean> 
 </beans>
