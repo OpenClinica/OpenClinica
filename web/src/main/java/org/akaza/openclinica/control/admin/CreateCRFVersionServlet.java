@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -408,7 +409,15 @@ public class CreateCRFVersionServlet extends SecureController {
                 session.setAttribute("version", version);
                 return tempFile;
 
-            } else {
+            }
+            else if (DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE.equalsIgnoreCase(f.getName().toUpperCase())) {
+                // ignore case because some insentive OS's use case-insentive FileSystems.
+                String error = MessageFormat.format(respage.getString("error.crfupload.filename.equal.to.template"), DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+                Validator.addError(errors, "excel_file", error);
+                session.setAttribute("version", version);
+                return tempFile;
+            }
+            else {
                 logger.debug("file name:" + f.getName());
                 tempFile = f.getName();
                 // create the inputstream here, so that it can be enclosed in a
