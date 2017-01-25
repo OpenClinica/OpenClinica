@@ -728,9 +728,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 
             // Save meta-data in database
 
+            // Below section requires change to accommodate multiple crf versions
             try {
-                xformService.createCRFMetaData(crfVersion, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                        submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
+                // xformService.createCRFMetaData(crfVersion, container, currentStudy, ub, html, submittedCrfName,
+                // submittedCrfVersionName,
+                // submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
             } catch (Exception e) {
                 e.printStackTrace();
             }

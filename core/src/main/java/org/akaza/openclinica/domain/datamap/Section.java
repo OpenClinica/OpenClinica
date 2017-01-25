@@ -1,4 +1,5 @@
 package org.akaza.openclinica.domain.datamap;
+
 import java.util.Date;
 import java.util.List;
 
@@ -30,91 +31,89 @@ import org.hibernate.annotations.Type;
 @Table(name = "section")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "section_section_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Section  extends DataMapDomainObject {
+public class Section extends DataMapDomainObject {
 
-	private int sectionId;
-	private UserAccount userAccount;
-	private CrfVersion crfVersion;
-	private Status status;
-	private String label;
-	private String title;
-	private String subtitle;
-	private String instructions;
-	private String pageNumberLabel;
-	private Integer ordinal;
-	private Integer parentId;
-	private Date dateCreated;
-	private Date dateUpdated;
-	private Integer updateId;
-	private Integer borders;
-	private List<ItemFormMetadata> itemFormMetadatas;
+    private int sectionId;
+    private UserAccount userAccount;
+    private CrfVersion crfVersion;
 
-	public Section() {
-	}
+    private Status status;
+    private String label;
+    private String title;
+    private String subtitle;
+    private String instructions;
+    private String pageNumberLabel;
+    private Integer ordinal;
+    private Integer parentId;
+    private Date dateCreated;
+    private Date dateUpdated;
+    private Integer updateId;
+    private Integer borders;
+    private List<ItemFormMetadata> itemFormMetadatas;
 
-	public Section(int sectionId, UserAccount userAccount, CrfVersion crfVersion) {
-		this.sectionId = sectionId;
-		this.userAccount = userAccount;
-		this.crfVersion = crfVersion;
-	}
+    public Section() {
+    }
 
-	public Section(int sectionId, UserAccount userAccount,
-			CrfVersion crfVersion, Status status, String label, String title,
-			String subtitle, String instructions, String pageNumberLabel,
-			Integer ordinal, Integer parentId, Date dateCreated,
-			Date dateUpdated, Integer updateId, Integer borders,
-			List<ItemFormMetadata> itemFormMetadatas) {
-		this.sectionId = sectionId;
-		this.userAccount = userAccount;
-		this.crfVersion = crfVersion;
-		this.status = status;
-		this.label = label;
-		this.title = title;
-		this.subtitle = subtitle;
-		this.instructions = instructions;
-		this.pageNumberLabel = pageNumberLabel;
-		this.ordinal = ordinal;
-		this.parentId = parentId;
-		this.dateCreated = dateCreated;
-		this.dateUpdated = dateUpdated;
-		this.updateId = updateId;
-		this.borders = borders;
-		this.itemFormMetadatas = itemFormMetadatas;
-	}
+    public Section(int sectionId, UserAccount userAccount, CrfVersion crfVersion) {
+        this.sectionId = sectionId;
+        this.userAccount = userAccount;
+        this.crfVersion = crfVersion;
+    }
 
-	@Id
-	@Column(name = "section_id", unique = true, nullable = false)
-	@GeneratedValue(generator = "id-generator")
+    public Section(int sectionId, UserAccount userAccount, CrfVersion crfVersion, Status status, String label, String title, String subtitle,
+            String instructions, String pageNumberLabel, Integer ordinal, Integer parentId, Date dateCreated, Date dateUpdated, Integer updateId,
+            Integer borders, List<ItemFormMetadata> itemFormMetadatas) {
+        this.sectionId = sectionId;
+        this.userAccount = userAccount;
+        this.crfVersion = crfVersion;
+        this.status = status;
+        this.label = label;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.instructions = instructions;
+        this.pageNumberLabel = pageNumberLabel;
+        this.ordinal = ordinal;
+        this.parentId = parentId;
+        this.dateCreated = dateCreated;
+        this.dateUpdated = dateUpdated;
+        this.updateId = updateId;
+        this.borders = borders;
+        this.itemFormMetadatas = itemFormMetadatas;
+    }
 
-	public int getSectionId() {
-		return this.sectionId;
-	}
+    @Id
+    @Column(name = "section_id", unique = true, nullable = false)
+    @GeneratedValue(generator = "id-generator")
 
-	public void setSectionId(int sectionId) {
-		this.sectionId = sectionId;
-	}
+    public int getSectionId() {
+        return this.sectionId;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_id", nullable = false)
-	public UserAccount getUserAccount() {
-		return this.userAccount;
-	}
+    public void setSectionId(int sectionId) {
+        this.sectionId = sectionId;
+    }
 
-	public void setUserAccount(UserAccount userAccount) {
-		this.userAccount = userAccount;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    public UserAccount getUserAccount() {
+        return this.userAccount;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "crf_version_id", nullable = false)
-	public CrfVersion getCrfVersion() {
-		return this.crfVersion;
-	}
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
 
-	public void setCrfVersion(CrfVersion crfVersion) {
-		this.crfVersion = crfVersion;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crf_version_id", nullable = false)
+    public CrfVersion getCrfVersion() {
+        return this.crfVersion;
+    }
 
-	@Type(type = "status")
+    public void setCrfVersion(CrfVersion crfVersion) {
+        this.crfVersion = crfVersion;
+    }
+
+    @Type(type = "status")
     @Column(name = "status_id")
     public Status getStatus() {
         if (status != null) {
@@ -123,72 +122,72 @@ public class Section  extends DataMapDomainObject {
             return Status.AVAILABLE;
     }
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
-	@Column(name = "label", length = 2000)
-	public String getLabel() {
-		return this.label;
-	}
+    @Column(name = "label", length = 2000)
+    public String getLabel() {
+        return this.label;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	@Column(name = "title", length = 2000)
-	public String getTitle() {
-		return this.title;
-	}
+    @Column(name = "title", length = 2000)
+    public String getTitle() {
+        return this.title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	@Column(name = "subtitle", length = 2000)
-	public String getSubtitle() {
-		return this.subtitle;
-	}
+    @Column(name = "subtitle", length = 2000)
+    public String getSubtitle() {
+        return this.subtitle;
+    }
 
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
-	}
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
 
-	@Column(name = "instructions", length = 2000)
-	public String getInstructions() {
-		return this.instructions;
-	}
+    @Column(name = "instructions", length = 2000)
+    public String getInstructions() {
+        return this.instructions;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
 
-	@Column(name = "page_number_label", length = 5)
-	public String getPageNumberLabel() {
-		return this.pageNumberLabel;
-	}
+    @Column(name = "page_number_label", length = 5)
+    public String getPageNumberLabel() {
+        return this.pageNumberLabel;
+    }
 
-	public void setPageNumberLabel(String pageNumberLabel) {
-		this.pageNumberLabel = pageNumberLabel;
-	}
+    public void setPageNumberLabel(String pageNumberLabel) {
+        this.pageNumberLabel = pageNumberLabel;
+    }
 
-	@Column(name = "ordinal")
-	public Integer getOrdinal() {
-		return this.ordinal;
-	}
+    @Column(name = "ordinal")
+    public Integer getOrdinal() {
+        return this.ordinal;
+    }
 
-	public void setOrdinal(Integer ordinal) {
-		this.ordinal = ordinal;
-	}
+    public void setOrdinal(Integer ordinal) {
+        this.ordinal = ordinal;
+    }
 
-	@Column(name = "parent_id")
-	public Integer getParentId() {
-		return this.parentId;
-	}
+    @Column(name = "parent_id")
+    public Integer getParentId() {
+        return this.parentId;
+    }
 
-	public void setParentId(Integer parentId) {
-		this.parentId = parentId;
-	}
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
 
     @Temporal(TemporalType.DATE)
     @Column(name = "date_created", length = 4, updatable = false)
@@ -199,46 +198,45 @@ public class Section  extends DataMapDomainObject {
             return new Date();
     }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_updated", length = 4)
-	public Date getDateUpdated() {
-		return this.dateUpdated;
-	}
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_updated", length = 4)
+    public Date getDateUpdated() {
+        return this.dateUpdated;
+    }
 
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
 
-	@Column(name = "update_id")
-	public Integer getUpdateId() {
-		return this.updateId;
-	}
+    @Column(name = "update_id")
+    public Integer getUpdateId() {
+        return this.updateId;
+    }
 
-	public void setUpdateId(Integer updateId) {
-		this.updateId = updateId;
-	}
+    public void setUpdateId(Integer updateId) {
+        this.updateId = updateId;
+    }
 
-	@Column(name = "borders")
-	public Integer getBorders() {
-		return this.borders;
-	}
+    @Column(name = "borders")
+    public Integer getBorders() {
+        return this.borders;
+    }
 
-	public void setBorders(Integer borders) {
-		this.borders = borders;
-	}
+    public void setBorders(Integer borders) {
+        this.borders = borders;
+    }
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "section")
-	public List<ItemFormMetadata> getItemFormMetadatas() {
-		return this.itemFormMetadatas;
-	}
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "section")
+    public List<ItemFormMetadata> getItemFormMetadatas() {
+        return this.itemFormMetadatas;
+    }
 
-	public void setItemFormMetadatas(List<ItemFormMetadata> itemFormMetadatas) {
-		this.itemFormMetadatas = itemFormMetadatas;
-	}
+    public void setItemFormMetadatas(List<ItemFormMetadata> itemFormMetadatas) {
+        this.itemFormMetadatas = itemFormMetadatas;
+    }
 
-	
 }

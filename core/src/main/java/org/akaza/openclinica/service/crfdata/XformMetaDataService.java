@@ -7,10 +7,10 @@ import java.util.List;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataTypeDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemDataType;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -43,9 +44,10 @@ import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Group;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
+import org.akaza.openclinica.service.dto.Crf;
+import org.akaza.openclinica.service.dto.Version;
 import org.akaza.openclinica.validator.xform.ItemValidator;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,9 @@ public class XformMetaDataService {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private FormLayoutDao formLayoutDao;
 
     @Autowired
     private CrfVersionMediaDao crfVersionMediaDao;
@@ -104,92 +109,100 @@ public class XformMetaDataService {
     @Autowired
     private ResponseSetService responseSetService;
 
-    public Errors runService(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html, String submittedCrfName,
-            String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText,
-            List<FileItem> formItems) {
-
-        // Create container for holding validation errors
-        DataBinder dataBinder = new DataBinder(new CrfVersion());
-        Errors errors = dataBinder.getBindingResult();
-
-        try {
-            createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription,
-                    submittedRevisionNotes, submittedXformText, formItems, errors);
-        } catch (Exception e) {
-            // Transaction has been rolled back due to an exception.
-            // TODO: Should we add an error message here?
-            logger.error("Error encountered while saving CRF: " + e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return errors;
-    }
-
     @Transactional
-    public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
-            String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
-            String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
+    public CrfVersion createCRFMetaData(Crf crf, Version version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html, String xform,
+            List<FileItem> formItems, Errors errors) throws Exception {
 
-        CrfVersion crfVersion;
+        CrfVersion crfVersion = null;
+        FormLayout formLayout = null;
+        CrfBean crfBean = null;
+        Section section = null;
 
-        // Retrieve CrfBean. Create one if it doesn't exist yet.
-        CrfBean crf = null;
-        if (version.getCrfId() > 0) {
-            crf = (CrfBean) crfDao.findById(version.getCrfId());
-            crf.setUpdateId(ub.getId());
-            crf.setDateUpdated(new Date());
-            crfDao.saveOrUpdate(crf);
+        crfBean = (CrfBean) crfDao.findByOcOID(crf.getOcoid());
+        if (crfBean != null) {
+            crfBean.setUpdateId(ub.getId());
+            crfBean.setDateUpdated(new Date());
+            crfBean = crfDao.saveOrUpdate(crfBean);
 
-            crfVersion = crfVersionDao.findByOcOID(version.getOid());
-            // crfVersion.setXform(submittedXformText);
-            crfVersion.setXformName(container.getInstanceName());
-            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+            formLayout = formLayoutDao.findByOcOID(version.getOcoid());
+            if (formLayout == null) {
+                formLayout = new FormLayout();
+                formLayout.setName(version.getName());
+                formLayout.setDescription(version.getDescription());
+                formLayout.setCrf(crfBean);
+                formLayout.setUserAccount(userDao.findById(ub.getId()));
+                formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+                formLayout.setRevisionNotes(version.getDescription());
+                formLayout.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), formLayout.getName()));
+                formLayout.setXform(xform);
+                formLayout.setXformName(container.getInstanceName());
+                formLayout = formLayoutDao.saveOrUpdate(formLayout);
+            } else {
+                return crfVersion;
+            }
+
+            crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
+            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
 
         } else {
-            crf = new CrfBean();
-            crf.setName(submittedCrfName);
-            crf.setDescription(submittedCrfVersionDescription);
-            crf.setUserAccount(userDao.findById(ub.getId()));
-            crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            crf.setStudy(studyDao.findById(currentStudy.getId()));
-            crf.setOcOid(crfDao.getValidOid(new CrfBean(), submittedCrfName));
-            crf.setUpdateId(ub.getId());
-            crf.setDateUpdated(new Date());
-            Integer crfId = (Integer) crfDao.save(crf);
-            crf.setCrfId(crfId);
+            crfBean = new CrfBean();
+            crfBean.setName(crf.getName());
+            crfBean.setDescription(crf.getDescription());
+            crfBean.setUserAccount(userDao.findById(ub.getId()));
+            crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            crfBean.setStudy(studyDao.findById(currentStudy.getId()));
+            crfBean.setOcOid(crfDao.getValidOid(new CrfBean(), crf.getName()));
+            crfBean.setUpdateId(ub.getId());
+            crfBean.setDateUpdated(new Date());
+            Integer crfId = (Integer) crfDao.save(crfBean);
+            crfBean.setCrfId(crfId);
+
+            // Create new Form Layout
+            formLayout = new FormLayout();
+            formLayout.setName(version.getName());
+            formLayout.setDescription(version.getDescription());
+            formLayout.setCrf(crfBean);
+            formLayout.setUserAccount(userDao.findById(ub.getId()));
+            formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            formLayout.setRevisionNotes(version.getDescription());
+            formLayout.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), formLayout.getName()));
+            formLayout.setXform(xform);
+            formLayout.setXformName(container.getInstanceName());
+            formLayout = formLayoutDao.saveOrUpdate(formLayout);
 
             // Create new CRF Version
             crfVersion = new CrfVersion();
-            crfVersion.setName(submittedCrfVersionName);
-            crfVersion.setDescription(submittedCrfVersionDescription);
-            crfVersion.setCrf(crf);
+            crfVersion.setName(version.getName());
+            crfVersion.setDescription(version.getDescription());
+            crfVersion.setCrf(crfBean);
             crfVersion.setUserAccount(userDao.findById(ub.getId()));
             crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            crfVersion.setRevisionNotes(submittedRevisionNotes);
-            crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
-            crfVersion.setXform(submittedXformText);
+            crfVersion.setRevisionNotes(version.getDescription());
+            crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), crfVersion.getName()));
+            crfVersion.setXform(xform);
             crfVersion.setXformName(container.getInstanceName());
-            Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
-            crfVersion.setCrfVersionId(crfVersionId);
-        }
-        // Create Section
-        Section section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
-        if (section == null) {
-            section = new Section();
-            section.setCrfVersion(crfVersion);
-            section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            section.setLabel("");
-            section.setTitle("");
-            section.setSubtitle("");
-            section.setPageNumberLabel("");
-            section.setOrdinal(1);
-            section.setUserAccount(userDao.findById(ub.getId())); // not null
-            section.setBorders(0);
-            sectionDao.saveOrUpdate(section);
-            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
-        }
-        createGroups(container, html, submittedXformText, crf, crfVersion, section, ub, errors);
+            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
 
-        saveMedia(formItems, crf, crfVersion);
+            // Create Section
+            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+            if (section == null) {
+                section = new Section();
+                section.setCrfVersion(crfVersion);
+                section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+                section.setLabel("");
+                section.setTitle("");
+                section.setSubtitle("");
+                section.setPageNumberLabel("");
+                section.setOrdinal(1);
+                section.setUserAccount(userDao.findById(ub.getId())); // not null
+                section.setBorders(0);
+                sectionDao.saveOrUpdate(section);
+                section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+            }
+        }
+        createGroups(container, html, xform, crfBean, crfVersion, formLayout, section, ub, errors);
+
+        saveMedia(formItems, crfBean, crfVersion);
 
         if (errors.hasErrors()) {
             logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
@@ -232,8 +245,8 @@ public class XformMetaDataService {
         }
     }
 
-    private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion version, Section section,
-            UserAccountBean ub, Errors errors) throws Exception {
+    private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout,
+            Section section, UserAccountBean ub, Errors errors) throws Exception {
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
         ArrayList<String> usedItemOids = new ArrayList<String>();
@@ -274,17 +287,18 @@ public class XformMetaDataService {
                     Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);
-                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
+                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, crfVersion, responseType, item,
+                                errors);
                         // add if statement
-                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                         if (ifmd == null) {
-                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
+                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, crfVersion, itemOrdinal);
                         }
-                        createVersioningMap(version, item);
+                        createVersioningMap(crfVersion, item);
                         //
-                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
+                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                         if (igmd == null) {
-                            igmd = createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
+                            igmd = createItemGroupMetadata(html, item, crfVersion, itemGroup, isRepeating, itemOrdinal);
                         }
                         itemOrdinal++;
                     }
@@ -294,7 +308,8 @@ public class XformMetaDataService {
 
     }
 
-    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
+    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion crfVersion, ItemGroup itemGroup, boolean isRepeating,
+            Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);
         itemGroupMetadata.setHeader("");
@@ -311,7 +326,7 @@ public class XformMetaDataService {
         }
         itemGroupMetadata.setRepeatArray("");
         itemGroupMetadata.setRowStartNumber(0);
-        itemGroupMetadata.setCrfVersion(version);
+        itemGroupMetadata.setCrfVersion(crfVersion);
         itemGroupMetadata.setItem(item);
         itemGroupMetadata.setOrdinal(itemOrdinal);
         itemGroupMetadata.setShowGroup(true);
@@ -319,23 +334,24 @@ public class XformMetaDataService {
         return itemGroupMetadata;
     }
 
-    private void createVersioningMap(CrfVersion version, Item item) {
+    private void createVersioningMap(CrfVersion crfVersion, Item item) {
+        List<VersioningMap> vm = versioningMapDao.findByVersionIdAndItemId(crfVersion.getCrfVersionId(), item.getItemId());
+        if (vm.size() == 0) {
+            VersioningMapId versioningMapId = new VersioningMapId();
+            versioningMapId.setCrfVersionId(crfVersion.getCrfVersionId());
+            versioningMapId.setItemId(item.getItemId());
+            VersioningMap versioningMap = new VersioningMap();
+            versioningMap.setItem(item);
+            versioningMap.setVersionMapId(versioningMapId);
+            versioningMapDao.saveOrUpdate(versioningMap);
+        }
 
-        VersioningMapId versioningMapId = new VersioningMapId();
-        versioningMapId.setCrfVersionId(version.getCrfVersionId());
-        versioningMapId.setItemId(item.getItemId());
-
-        VersioningMap versioningMap = new VersioningMap();
-        versioningMap.setCrfVersion(version);
-        versioningMap.setItem(item);
-        versioningMap.setVersionMapId(versioningMapId);
-        versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
+    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
             Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
-        itemFormMetadata.setCrfVersionId(version.getCrfVersionId());
+        itemFormMetadata.setCrfVersionId(crfVersion.getCrfVersionId());
         itemFormMetadata.setResponseSet(responseSet);
         itemFormMetadata.setItem(item);
         itemFormMetadata.setSubheader("");
@@ -388,8 +404,7 @@ public class XformMetaDataService {
             item.setUserAccount(userDao.findById(ub.getId()));
             item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
             usedItemOids.add(item.getOcOid());
-            Integer itemId = (Integer) itemDao.save(item);
-            item.setItemId(itemId);
+            item = itemDao.saveOrUpdate(item);
         }
         ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType);
         DataBinder dataBinder = new DataBinder(item);

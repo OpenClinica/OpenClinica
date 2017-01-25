@@ -22,7 +22,8 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "item_group_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "item_group_metadata_item_group_metadata_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = {
+        @Parameter(name = "sequence_name", value = "item_group_metadata_item_group_metadata_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ItemGroupMetadata extends DataMapDomainObject {
 
@@ -50,6 +51,7 @@ public class ItemGroupMetadata extends DataMapDomainObject {
 
     private int itemGroupMetadataId;
     private CrfVersion crfVersion;
+    private FormLayout formLayout;
     private Item item;
     private ItemGroup itemGroup;
     private String header;
@@ -67,18 +69,20 @@ public class ItemGroupMetadata extends DataMapDomainObject {
     public ItemGroupMetadata() {
     }
 
-    public ItemGroupMetadata(int itemGroupMetadataId, CrfVersion crfVersion, Item item, ItemGroup itemGroup, int ordinal, boolean repeatingGroup) {
+    public ItemGroupMetadata(int itemGroupMetadataId, CrfVersion crfVersion, Item item, ItemGroup itemGroup, int ordinal, boolean repeatingGroup,
+            FormLayout formLayout) {
         this.itemGroupMetadataId = itemGroupMetadataId;
         this.crfVersion = crfVersion;
         this.item = item;
         this.itemGroup = itemGroup;
         this.ordinal = ordinal;
         this.repeatingGroup = repeatingGroup;
+        this.formLayout = formLayout;
     }
 
     public ItemGroupMetadata(int itemGroupMetadataId, CrfVersion crfVersion, Item item, ItemGroup itemGroup, String header, String subheader, String layout,
             Integer repeatNumber, Integer repeatMax, String repeatArray, Integer rowStartNumber, int ordinal, Integer borders, Boolean showGroup,
-            boolean repeatingGroup) {
+            boolean repeatingGroup, FormLayout formLayout) {
         this.itemGroupMetadataId = itemGroupMetadataId;
         this.crfVersion = crfVersion;
         this.item = item;
@@ -94,6 +98,7 @@ public class ItemGroupMetadata extends DataMapDomainObject {
         this.borders = borders;
         this.showGroup = showGroup;
         this.repeatingGroup = repeatingGroup;
+        this.formLayout = formLayout;
     }
 
     @Id
@@ -234,6 +239,16 @@ public class ItemGroupMetadata extends DataMapDomainObject {
 
     public void setRepeatingGroup(boolean repeatingGroup) {
         this.repeatingGroup = repeatingGroup;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_layout_id", nullable = false)
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
     }
 
 }
