@@ -24,7 +24,7 @@ public class RuleActionRunLogDao extends AbstractDomainDao<RuleActionRunLogBean>
 
     public void delete(int itemDataId) {
         String query = " delete from " + getDomainClassName() + "  where itemDataId =:itemDataId ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        Query q = getCurrentSession().createQuery(query);
         q.setInteger("itemDataId", itemDataId);
         q.executeUpdate();
     }
