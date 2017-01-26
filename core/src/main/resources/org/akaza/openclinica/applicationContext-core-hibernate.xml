@@ -94,7 +94,7 @@
   <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
-    <property name="dataSource" ref="multiSchemaDataSource"/>
+    <property name="dataSource" ref="dataSource"/>
     <property name="queryStore" ref="queryStore"/>
   </bean>
   
@@ -113,7 +113,7 @@
   <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-        <property name="dataSource" ref="multiSchemaDataSource" />
+        <property name="dataSource" ref="dataSource" />
         <property name="mappingLocations">
             <list>
                 <value>classpath:org/akaza/openclinica/typedefs.hbm.xml</value>

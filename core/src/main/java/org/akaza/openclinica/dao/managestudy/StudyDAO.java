@@ -16,30 +16,19 @@ package org.akaza.openclinica.dao.managestudy;
  * 
  * 
  */
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
+import org.akaza.openclinica.dao.core.*;
 
 import javax.sql.DataSource;
-
+import java.sql.Types;
+import java.util.*;
 public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
-
     public StudyDAO(DataSource ds) {
         super(ds);
     }

@@ -13,26 +13,22 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.DEFAULT_TENANT_ID;
+
 @Component
 public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl {
 
-	private static final String DEFAULT_TENANT_ID = "tenant1";
 
-	@Autowired private BasicDataSource multiSchemaDataSource;
-
-	//@Autowired
-	//private DataSource dataSource2;
-
-	//@Autowired
-	//private DataSource dataSource3;
+	@Autowired private BasicDataSource dataSource;
 
 	private static Map<String, DataSource> map;
 
 	@PostConstruct public void load() {
 		map = new HashMap<>();
-		map.put(DEFAULT_TENANT_ID, multiSchemaDataSource);
-		map.put("tenant2", multiSchemaDataSource);
-		map.put("tenant3", multiSchemaDataSource);
+		map.put(DEFAULT_TENANT_ID, dataSource);
+        map.put("tenant1", dataSource);
+        map.put("tenant2", dataSource);
+		map.put("tenant3", dataSource);
 	}
 
 	@Override protected DataSource selectAnyDataSource() {

@@ -32,6 +32,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpSession;
+
+import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 public class CoreResources implements ResourceLoaderAware {
 
@@ -429,9 +435,16 @@ public class CoreResources implements ResourceLoaderAware {
 
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
-        String schema = DATAINFO.getProperty("schema");
+        String schema = null;
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpSession session = requestAttributes.getRequest().getSession();
+            schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+        }
+        if (StringUtils.isEmpty(schema))
+            schema = DATAINFO.getProperty("schema");
         try {
-            statement.execute("set search_path to '" + schema + "'");
+            statement.execute("set session search_path to '" + schema + "'");
         } finally {
             statement.close();
         }
