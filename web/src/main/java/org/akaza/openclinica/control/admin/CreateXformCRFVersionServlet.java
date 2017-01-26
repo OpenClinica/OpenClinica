@@ -27,8 +27,10 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
@@ -75,6 +77,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     protected void processRequest() throws Exception {
         CrfDao crfDao = (CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
         CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
+        FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
 
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
@@ -155,10 +158,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
                     // Save any media files uploaded with xform
                     CrfBean crfBean = (CrfBean) crfDao.findByOcOID(crf.getOcoid());
-                    CrfVersion crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
+                    // CrfVersion crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
+                    FormLayout formLayout = formLayoutDao.findAllByCrfId(crfBean.getCrfId()).get(0);
 
                     // saveAttachedMedia(items, crf, newVersion);
-                    saveArtifactsInFM(fileLinks, crfBean, crfVersion);
+                    saveArtifactsInFM(fileLinks, crfBean, formLayout);
 
                 }
             }
@@ -437,7 +441,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
         return "";
     }
 
-    private void saveAttachedMedia(List<FileItem> items, CrfBean crf, CrfVersion version) {
+    private void saveAttachedMedia(List<FileItem> items, CrfBean crf, FormLayout formLayout) {
         boolean hasFiles = false;
         for (FileItem item : items) {
             if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
@@ -446,7 +450,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
         if (hasFiles) {
             // Create the directory structure for saving the media
-            String dir = Utils.getCrfMediaFilePath(crf, version);
+            String dir = Utils.getCrfMediaFilePath(crf, formLayout);
             if (!new File(dir).exists()) {
                 new File(dir).mkdirs();
                 logger.debug("Made the directory " + dir);
@@ -473,9 +477,9 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
     }
 
-    private void saveArtifactsInFM(List<String> fileLinks, CrfBean crf, CrfVersion version) throws IOException {
+    private void saveArtifactsInFM(List<String> fileLinks, CrfBean crf, FormLayout formLayout) throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaFilePath(crf, version);
+        String dir = Utils.getCrfMediaFilePath(crf, formLayout);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
             logger.debug("Made the directory " + dir);

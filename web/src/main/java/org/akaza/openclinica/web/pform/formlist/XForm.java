@@ -3,7 +3,7 @@ package org.akaza.openclinica.web.pform.formlist;
 import java.security.NoSuchAlgorithmException;
 
 import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 
 public class XForm {
     private String formID = null;
@@ -13,16 +13,17 @@ public class XForm {
     private String hash = null;
     private String downloadURL = null;
     private String manifestURL = null;
+    private String formLayout = null;
 
     public XForm() {
 
     }
 
-    public XForm(CrfBean crf, CrfVersion version) throws NoSuchAlgorithmException {
-        this.formID = version.getOcOid();
+    public XForm(CrfBean crf, FormLayout formLayout) throws NoSuchAlgorithmException {
+        this.formID = formLayout.getOcOid();
         this.name = crf.getName();
-        this.majorMinorVersion = version.getName();
-        this.version = version.getName();
+        this.majorMinorVersion = formLayout.getName();
+        this.version = formLayout.getName();
     }
 
     public String getFormID() {
@@ -79,6 +80,14 @@ public class XForm {
 
     public void setManifestURL(String manifestURL) {
         this.manifestURL = manifestURL;
+    }
+
+    public String getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(String formLayout) {
+        this.formLayout = formLayout;
     }
 
 }

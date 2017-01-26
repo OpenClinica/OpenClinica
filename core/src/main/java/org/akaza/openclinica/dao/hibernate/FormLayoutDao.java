@@ -1,6 +1,8 @@
 
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.FormLayout;
@@ -56,6 +58,13 @@ public class FormLayoutDao extends AbstractDomainDao<FormLayout> {
         }
         return oid;
 
+    }
+
+    public List<FormLayout> findAllByCrfId(int crfId) {
+        String query = "from " + getDomainClassName() + " form_layout  where form_layout.crf.crfId = :crfId ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("crfId", crfId);
+        return (List<FormLayout>) q.list();
     }
 
 }

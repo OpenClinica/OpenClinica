@@ -31,6 +31,7 @@ import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -48,6 +49,7 @@ import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -106,6 +108,9 @@ public class EnketoUrlService {
     private CrfVersionDao crfVersionDao;
 
     @Autowired
+    private FormLayoutDao formLayoutDao;
+
+    @Autowired
     private StudyEventDao studyEventDao;
 
     @Autowired
@@ -155,11 +160,11 @@ public class EnketoUrlService {
             throws Exception {
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
-        return enketo.getFormURL(subjectContext.getCrfVersionOid() + flavor) + "?ecid=" + subjectContextKey;
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
 
     }
 
-    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, CrfVersion crfVersion,
+    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
             StudyEvent studyEvent, String flavor) throws Exception {
 
         String editURL = null;
@@ -177,29 +182,31 @@ public class EnketoUrlService {
             eventDef = studyEvent.getStudyEventDefinition();
             subject = studyEvent.getStudySubject();
         }
-        if (crfVersion == null) {
-            crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
+        if (formLayout == null) {
+            // crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
+            formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         }
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
-                crfVersion.getCrfVersionId());
+                formLayout.getFormLayoutId());
 
+        CrfVersion crfVersion = eventCrf.getCrfVersion();
         // Load populated instance
-        String populatedInstance = populateInstance(crfVersion, eventCrf, studyOid);
+        String populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid);
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
- 
-        boolean markComplete=true;
-        if(eventCrf.getStatusId()==Status.UNAVAILABLE.getCode()){
-        	markComplete=false;
+
+        boolean markComplete = true;
+        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+            markComplete = false;
         }
         // Return Enketo URL
-        EnketoURLResponse eur = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl,markComplete);
-        editURL =eur.getEdit_url()+ "&ecid=" + subjectContextKey;
-          logger.debug("Generating Enketo edit url for form: " + editURL);
+        EnketoURLResponse eur = enketo.getEditURL(formLayout.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete);
+        editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
+        logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
 
@@ -259,7 +266,7 @@ public class EnketoUrlService {
             return null;
     }
 
-    private String populateInstance(CrfVersion crfVersion, EventCrf eventCrf, String studyOid) throws Exception {
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid) throws Exception {
         boolean flavor = true;
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -341,8 +348,8 @@ public class EnketoUrlService {
             }
         }
         String templateStr = null;
-        CrfBean crfBean = crfDao.findById(crfVersion.getCrf().getCrfId());
-        String directoryPath = Utils.getCrfMediaFilePath(crfBean, crfVersion);
+        CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
+        String directoryPath = Utils.getCrfMediaFilePath(crfBean, formLayout);
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {

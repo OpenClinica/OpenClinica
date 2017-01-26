@@ -2,9 +2,9 @@ package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -19,22 +19,28 @@ public class EnketoFormServlet extends SecureController {
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String FORM_URL = "formURL";
     public static final String CRF_VERSION_ID = "crfVersionId";
+    public static final String FORM_LAYOUT_ID = "formLayoutId";
     public static final String STUDY_EVENT_ID = "studyEventId";
     public static final String EVENT_CRF_ID = "eventCrfId";
 
     @Override
     protected void processRequest() throws Exception {
-        CrfVersionDao crfVersionDao = (CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
+        // CrfVersionDao crfVersionDao = (CrfVersionDao)
+        // SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
+        FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
         StudyEventDao studyEventDao = (StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
-        String crfVersionId = request.getParameter(CRF_VERSION_ID);
+        // String crfVersionId = request.getParameter(CRF_VERSION_ID);
+        String formLayoutId = request.getParameter(FORM_LAYOUT_ID);
+
         String studyEventId = request.getParameter(STUDY_EVENT_ID);
         String eventCrfId = request.getParameterValues(EVENT_CRF_ID)[0];
         String formUrl = null;
 
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(Integer.valueOf(studyEventId));
-        CrfVersion crfVersion = crfVersionDao.findByCrfVersionId(Integer.valueOf(crfVersionId));
+        // CrfVersion crfVersion = crfVersionDao.findByCrfVersionId(Integer.valueOf(crfVersionId));
+        FormLayout formLayout = formLayoutDao.findById(Integer.valueOf(formLayoutId));
 
         // Cache the subject context for use during xform submission
         PFormCache cache = PFormCache.getInstance(context);
@@ -42,13 +48,14 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setStudySubjectOid(studyEvent.getStudySubject().getOcOid());
         subjectContext.setStudyEventDefinitionId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId());
         subjectContext.setOrdinal(studyEvent.getSampleOrdinal());
-        subjectContext.setCrfVersionOid(crfVersion.getOcOid());
+        subjectContext.setFormLayoutOid(formLayout.getOcOid());
+        // subjectContext.setCrfVersionOid(crfVersion.getOcOid());
         subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
         String flavor = "-query";
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), crfVersion, studyEvent, flavor);
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), formLayout, studyEvent, flavor);
         } else {
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
         }

@@ -8,12 +8,6 @@
 
 package org.akaza.openclinica.bean.core;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.ParseException;
@@ -26,6 +20,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 public class Utils {
 
@@ -228,14 +228,14 @@ public class Utils {
         return attachedFilePath;
     }
 
-    public static String getCrfMediaFilePath(CrfBean crf, CrfVersion version) {
+    public static String getCrfMediaFilePath(CrfBean crf, FormLayout formLayout) {
         String attachedFilePath = CoreResources.getField("attached_file_location");
 
         if (attachedFilePath == null || attachedFilePath.length() <= 0) {
-            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + crf.getOcOid() + File.separator + version.getOcOid()
+            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + crf.getOcOid() + File.separator + formLayout.getOcOid()
                     + File.separator;
         } else {
-            attachedFilePath += crf.getOcOid() + File.separator + version.getOcOid() + File.separator;
+            attachedFilePath += crf.getOcOid() + File.separator + formLayout.getOcOid() + File.separator;
         }
         return attachedFilePath;
     }

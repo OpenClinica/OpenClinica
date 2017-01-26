@@ -88,5 +88,9 @@
         </addColumn>
     </changeSet>
     
+        <changeSet author="jkeremian" id="2017-01-24-OC-7770-8">
+                <dropForeignKeyConstraint baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst"/>
+            </changeSet>
+    
     
 </databaseChangeLog>

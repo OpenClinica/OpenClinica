@@ -111,6 +111,14 @@
 		</sql>
 	</query>
 	<query>
+		<name>findByLayoutId</name>
+		<sql>
+			SELECT DISTINCT c.*
+			FROM crf c, form_layout v
+			WHERE c.crf_id=v.crf_id AND v.form_layout_id=?
+		</sql>
+	</query>
+	<query>
 		<name>findAllByStudyId</name>
 		<sql>
 			SELECT DISTINCT c.*

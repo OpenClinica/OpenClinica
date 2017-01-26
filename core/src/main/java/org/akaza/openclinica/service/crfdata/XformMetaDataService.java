@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataTypeDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -24,8 +25,8 @@ import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemDataType;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -78,6 +79,9 @@ public class XformMetaDataService {
 
     @Autowired
     private FormLayoutDao formLayoutDao;
+
+    @Autowired
+    private FormLayoutMediaDao formLayoutMediaDao;
 
     @Autowired
     private CrfVersionMediaDao crfVersionMediaDao;
@@ -202,7 +206,7 @@ public class XformMetaDataService {
         }
         createGroups(container, html, xform, crfBean, crfVersion, formLayout, section, ub, errors);
 
-        saveMedia(formItems, crfBean, crfVersion);
+        saveMedia(formItems, crfBean, formLayout);
 
         if (errors.hasErrors()) {
             logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
@@ -211,7 +215,7 @@ public class XformMetaDataService {
         return crfVersion;
     }
 
-    private void saveMedia(List<FileItem> items, CrfBean crf, CrfVersion version) {
+    private void saveMedia(List<FileItem> items, CrfBean crf, FormLayout formLayout) {
         boolean hasFiles = false;
         for (FileItem item : items) {
             if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
@@ -219,7 +223,7 @@ public class XformMetaDataService {
         }
 
         if (hasFiles) {
-            String dir = Utils.getCrfMediaFilePath(crf, version);
+            String dir = Utils.getCrfMediaFilePath(crf, formLayout);
             // Save any media files
             for (FileItem item : items) {
                 if (!item.isFormField()) {
@@ -231,13 +235,16 @@ public class XformMetaDataService {
                         fileName = fileName.substring(startIndex + 1, fileName.length());
                     }
 
-                    CrfVersionMedia media = crfVersionMediaDao.findByCrfVersionIdAndFileName(version.getCrfVersionId(), fileName);
+                    // CrfVersionMedia media =
+                    // crfVersionMediaDao.findByCrfVersionIdAndFileName(formLayout.getFormLayoutId(), fileName);
+                    FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFileName(formLayout.getFormLayoutId(), fileName);
                     if (media == null) {
-                        media = new CrfVersionMedia();
-                        media.setCrfVersion(version);
+                        // media = new CrfVersionMedia();
+                        media = new FormLayoutMedia();
+                        media.setFormLayout(formLayout);
                         media.setName(fileName);
                         media.setPath(dir);
-                        crfVersionMediaDao.saveOrUpdate(media);
+                        formLayoutMediaDao.saveOrUpdate(media);
                     }
 
                 }
