@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -23,13 +25,12 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.Locale;
 
 /**
  * @author Krikor Krumlian
@@ -51,7 +52,9 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private CRFDAO crfDAO;
     Locale locale;
     private boolean showMoreLink;
-	private Object crfVersionDAO;
+    private Object crfVersionDAO;
+    private FormLayoutDAO formLayoutDAO;
+
     /*
      * (non-Javadoc)
      *
@@ -78,17 +81,17 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        if(fp.getString("showMoreLink").equals("")){
+        if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
-        }else {
+        } else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            //Shaoyu Su
-            //int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-            //request.setAttribute("label", new Integer(nextLabel).toString());
+            // Shaoyu Su
+            // int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
+            // request.setAttribute("label", new Integer(nextLabel).toString());
             request.setAttribute("label", resword.getString("id_generated_Save_Add"));
         }
 
@@ -119,6 +122,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setCrfDAO(getCrfDAO());
         factory.setCrfVersionDAO(getCRFVersionDAO());
+        factory.setFormLayoutDAO(getFormLayoutDAO());
         factory.setSelectedStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(definitionId));
         String listEventsForSubjectsHtml = factory.createTable(request, response).render();
         request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
@@ -184,13 +188,19 @@ public class ListEventsForSubjectsServlet extends SecureController {
         return crfDAO;
     }
 
-    public CRFVersionDAO getCRFVersionDAO(){
-    	CRFVersionDAO	crfVersionDAO =new CRFVersionDAO(sm.getDataSource());
-    	return crfVersionDAO;
-    	}
+    public CRFVersionDAO getCRFVersionDAO() {
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(sm.getDataSource());
+        return crfVersionDAO;
+    }
+
     public StudyGroupDAO getStudyGroupDAO() {
         studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
         return studyGroupDAO;
+    }
+
+    public FormLayoutDAO getFormLayoutDAO() {
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
+        return formLayoutDAO;
     }
 
 }

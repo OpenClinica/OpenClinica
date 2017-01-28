@@ -186,7 +186,7 @@ public class EnketoUrlService {
             // crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
             formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         }
-        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
+        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
                 formLayout.getFormLayoutId());
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();

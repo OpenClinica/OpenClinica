@@ -38,6 +38,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -56,6 +57,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -394,6 +396,7 @@ public class ViewStudySubjectServlet extends SecureController {
         StudyEventDAO sedao = new StudyEventDAO(ds);
         CRFDAO cdao = new CRFDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+        FormLayoutDAO fldao = new FormLayoutDAO(ds);
         ItemDataDAO iddao = new ItemDataDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
@@ -411,6 +414,8 @@ public class ViewStudySubjectServlet extends SecureController {
 
             CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
             ecb.setCrfVersion(cvb);
+            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
+            ecb.setFormLayout(flb);
 
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags

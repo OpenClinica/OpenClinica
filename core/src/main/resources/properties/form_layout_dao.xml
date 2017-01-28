@@ -138,7 +138,7 @@
 		<sql>delete from item_group_metadata where form_layout_id=</sql>
 	</query>
 	<query>
-		<name>getCRFIdFromCRFVersionId</name>
+		<name>getCRFIdFromFormLayoutId</name>
 		<sql>SELECT crf_id FROM form_layout WHERE form_layout_id=?</sql>
 	</query>
 	<query>

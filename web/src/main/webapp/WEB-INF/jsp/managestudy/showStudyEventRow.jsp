@@ -149,23 +149,37 @@
 
                  </c:forEach>
                  </select>
-                 
 
                  <SCRIPT LANGUAGE="JavaScript">
+                 
+                 var studyEventId = '<c:out value="${currRow.bean.studyEvent.id}"/>';
+                 var eventCRFStatusId = '<c:out value="${dedc.eventCRF.status.id}"/>';
+                 var originationPage  = '<c:out value="${originatingPage}" />';
+                 var crfId = '<c:out value="${dedc.edc.crf.id}"/>';
+                 
                  function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
                   var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
-                  alert(qer);
+                  document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
+                  document.getElementById('ide-' + studyEventId + crfId).href = buildUrl(qer,studyEventId,eventCRFStatusId,originationPage );
+                 }
+                 
+                  function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage){
+                 	 return "EnketoFormServlet?formLayoutId="+ formLayoutId + 
+                 			 "&studyEventId=" + studyEventId + 
+                 			 "&eventCrfId=" + eventCRFStatusId + 
+                 			 "&originatingPage=" + originatingPage;
                   }
                  
-                </SCRIPT>
-                
+                 
+                 </SCRIPT>
+
+                                   
                  </c:when>
 
-				 <c:otherwise><c:out value="${dedc.eventCRF.crfVersion.name}"/>
-				             <c:set var="formLayoutOID" value="${dedc.eventCRF.crfVersion.oid}"/>
+				 <c:otherwise><c:out value="${dedc.eventCRF.formLayout.name}"/>
+				             <c:set var="formLayoutOID" value="${dedc.eventCRF.formLayout.oid}"/>
 				 
 				 </c:otherwise>
-
 				 </c:choose>
 
 				</td>
@@ -206,7 +220,6 @@
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 				 <td>
                 <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
-
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
                     <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
@@ -216,7 +229,9 @@
                     </a>
                     </c:when>
                     <c:otherwise>
-                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${formLayoutId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+                    
+                    <a id="ide-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" 
+                      href="EnketoFormServlet?formLayoutId=<c:out value="${formLayoutId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
@@ -263,11 +278,10 @@
 
 
 	</c:forEach>
-
 	<c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
 	<tr>
 		<td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}" /></td>
-		<td class="table_cell" width="100"><c:out value="${dec.eventCRF.crfVersion.name}" /></td>
+		<td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" /></td>
 		<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 		<c:choose>
 		 <c:when test="${dec.stage.initialDE}">

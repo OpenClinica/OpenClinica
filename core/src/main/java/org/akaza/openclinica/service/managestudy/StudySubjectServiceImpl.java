@@ -141,7 +141,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             // CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
             // CRFVersionBean cvb = crfVersionById.get(crfVersionId);
             FormLayoutBean flb = formLayoutById.get(formLayoutId);
-            ecb.setFormLayoutBean(flb);
+            ecb.setFormLayout(flb);
 
             // CRFBean cb = crfDao.findByVersionId(crfVersionId);
             CRFBean cb = crfById.get(flb.getCrfId());

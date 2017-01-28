@@ -26,7 +26,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 public class EventCRFBean extends AuditableEntityBean {
     private int studyEventId = 0;
     private int CRFVersionId = 0;
-    private int formLayoutId;
+    private int formLayoutId = 0;
     private Date dateInterviewed;
     private String interviewerName = "";
     private int completionStatusId = 0;
@@ -52,7 +52,7 @@ public class EventCRFBean extends AuditableEntityBean {
 
     private StudySubjectBean studySubject;
     private StudyEventBean studyEvent;
-    private FormLayoutBean formLayoutBean;
+    private FormLayoutBean formLayout;
     // the following properties are not in the table; they are meant for
     // convenience
     private CRFBean crf = new CRFBean();
@@ -94,6 +94,7 @@ public class EventCRFBean extends AuditableEntityBean {
         this.ownerId = eventCRFBean.getOwnerId();
         this.createdDate = eventCRFBean.getCreatedDate();
         this.updaterId = eventCRFBean.getUpdaterId();
+        this.formLayoutId = eventCRFBean.getFormLayoutId();
     }
 
     public EventCRFBean copy() {
@@ -532,20 +533,20 @@ public class EventCRFBean extends AuditableEntityBean {
         this.studyEvent = studyEvent;
     }
 
-    public FormLayoutBean getFormLayoutBean() {
-        return formLayoutBean;
-    }
-
-    public void setFormLayoutBean(FormLayoutBean formLayoutBean) {
-        this.formLayoutBean = formLayoutBean;
-    }
-
     public int getFormLayoutId() {
         return formLayoutId;
     }
 
     public void setFormLayoutId(int formLayoutId) {
         this.formLayoutId = formLayoutId;
+    }
+
+    public FormLayoutBean getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayoutBean formLayout) {
+        this.formLayout = formLayout;
     }
 
 }

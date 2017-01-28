@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -142,7 +143,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             itemOrdinal = 1;
         }
 
-        CrfVersion crfVersion = container.getCrfVersion();
+        FormLayout formLayout = container.getFormLayout();
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(formLayout.getCrf().getCrfId()).get(0);
+        container.setCrfVersion(crfVersion);
         Item item = null;
         ItemGroupMetadata igm = null;
 
@@ -186,7 +189,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
             }
 
-            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), container.getCrfVersion().getCrfVersionId());
+            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
 
             // Convert space separated Enketo multiselect values to comma separated OC multiselect values
             Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();

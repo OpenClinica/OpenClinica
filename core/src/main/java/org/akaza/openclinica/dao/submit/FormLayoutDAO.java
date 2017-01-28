@@ -449,7 +449,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         return executeFindAllQuery("findAllByOid", variables);
     }
 
-    public int getCRFIdFromCRFVersionId(int CRFVersionId) {
+    public int getCRFIdFromFormLayoutId(int CRFVersionId) {
         int answer = 0;
 
         this.unsetTypeExpected();
@@ -458,7 +458,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(CRFVersionId));
 
-        String sql = digester.getQuery("getCRFIdFromCRFVersionId");
+        String sql = digester.getQuery("getCRFIdFromFormLayoutId");
         ArrayList rows = select(sql, variables);
 
         if (rows.size() > 0) {

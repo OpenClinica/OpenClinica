@@ -40,6 +40,7 @@ public class EnketoFormServlet extends SecureController {
 
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(Integer.valueOf(studyEventId));
         // CrfVersion crfVersion = crfVersionDao.findByCrfVersionId(Integer.valueOf(crfVersionId));
+
         FormLayout formLayout = formLayoutDao.findById(Integer.valueOf(formLayoutId));
 
         // Cache the subject context for use during xform submission
@@ -49,7 +50,6 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setStudyEventDefinitionId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId());
         subjectContext.setOrdinal(studyEvent.getSampleOrdinal());
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
-        // subjectContext.setCrfVersionOid(crfVersion.getOcOid());
         subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
         String flavor = "-query";

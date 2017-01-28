@@ -25,8 +25,8 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -39,8 +39,8 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -142,8 +142,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-            CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-            CRFVersionBean crfVersion = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+            // CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+            // CRFVersionBean crfVersion = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
+            FormLayoutDAO fldao = new FormLayoutDAO(ds);
+            FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(ecb.getFormLayoutId());
 
             StudyEventDAO sedao = new StudyEventDAO(ds);
 
@@ -151,7 +153,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 
             ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
-            ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getCRFVersionId());
+            ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getFormLayoutId());
 
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
@@ -162,7 +164,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setStudySubjectOid(ssb.getOid());
             subjectContext.setStudyEventDefinitionId(seb.getStudyEventDefinitionId());
             subjectContext.setOrdinal(seb.getSampleOrdinal());
-            subjectContext.setCrfVersionOid(crfVersion.getOid());
+            subjectContext.setFormLayoutOid(formLayout.getOid());
             subjectContext.setUserAccountId(ub.getId());
             String contextHash = cache.putSubjectContext(subjectContext);
 

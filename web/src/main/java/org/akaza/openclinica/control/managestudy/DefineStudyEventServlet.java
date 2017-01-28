@@ -7,38 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.bean.CRFRow;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.apache.commons.lang.StringUtils;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -48,10 +16,37 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.bean.CRFRow;
+import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author jxu
  * 
- * Defines a new study event
+ *         Defines a new study event
  */
 public class DefineStudyEventServlet extends SecureController {
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
@@ -96,12 +91,13 @@ public class DefineStudyEventServlet extends SecureController {
         if (crfsWithVersion == null) {
             crfsWithVersion = new ArrayList();
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+            // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+            FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
             ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
 
             for (int i = 0; i < crfs.size(); i++) {
                 CRFBean crf = (CRFBean) crfs.get(i);
-                ArrayList versions = cvdao.findAllByCRFId(crf.getId());
+                ArrayList versions = fldao.findAllByCRFId(crf.getId());
                 if (!versions.isEmpty()) {
                     crfsWithVersion.add(crf);
                 }
@@ -131,19 +127,20 @@ public class DefineStudyEventServlet extends SecureController {
                             forwardPage(Page.LIST_DEFINITION_SERVLET);
                         } else if (nextAction.intValue() == 2) {
                             submitDefinition();
-                            //forwardPage(Page.LIST_DEFINITION_SERVLET);
+                            // forwardPage(Page.LIST_DEFINITION_SERVLET);
                             ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
                             session.setAttribute("pageMessages", pageMessages);
                             response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
-                            //forwardPage(Page.MANAGE_STUDY_MODULE);
-//                            request.getRequestDispatcher("/pages/studymodule").forward(request, response);
-//                            org.akaza.openclinica.service.sdv.SDVUtil sdvUtil = new org.akaza.openclinica.service.sdv.SDVUtil();
-//                            sdvUtil.forwardRequestFromController(request,response,"http://localhost:8080/OpenClinica-SNAPSHOT/pages/studymodule");
+                            // forwardPage(Page.MANAGE_STUDY_MODULE);
+                            // request.getRequestDispatcher("/pages/studymodule").forward(request, response);
+                            // org.akaza.openclinica.service.sdv.SDVUtil sdvUtil = new
+                            // org.akaza.openclinica.service.sdv.SDVUtil();
+                            // sdvUtil.forwardRequestFromController(request,response,"http://localhost:8080/OpenClinica-SNAPSHOT/pages/studymodule");
 
-                            //This last part is necessary because the compiler will complain about the return;
-                            //statement in the absence of the "if" [the following statements are "reachable"]
-//                            boolean redir = "y".equalsIgnoreCase((String)request.getParameter("r"));
-//                            if(redir)  { return;}
+                            // This last part is necessary because the compiler will complain about the return;
+                            // statement in the absence of the "if" [the following statements are "reachable"]
+                            // boolean redir = "y".equalsIgnoreCase((String)request.getParameter("r"));
+                            // if(redir) { return;}
                         } else {
                             logger.debug("actionName ==> 3");
                             submitDefinition();
@@ -197,7 +194,7 @@ public class DefineStudyEventServlet extends SecureController {
     private void confirmDefinition1() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-        
+
         v.addValidation("name", Validator.NO_BLANKS);
         v.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
         v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
@@ -210,8 +207,8 @@ public class DefineStudyEventServlet extends SecureController {
         if (errors.isEmpty()) {
             logger.debug("no errors in the first section");
             // logger.debug("actionName*******" + fp.getString("actionName"));
-            //debugger.debug("pageNum*******" + fp.getString("pageNum"));
-            CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+            // debugger.debug("pageNum*******" + fp.getString("pageNum"));
+            // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             ArrayList crfArray = new ArrayList();
             /*
              * The tmpCRFIdMap will hold all the selected CRFs in the session
@@ -242,27 +239,26 @@ public class DefineStudyEventServlet extends SecureController {
 
             EntityBeanTable table = fp.getEntityBeanTable();
             ArrayList allRows = CRFRow.generateRowsFromBeans(crfsWithVersion);
-            String[] columns =
-                { resword.getString("CRF_name"), resword.getString("date_created"), resword.getString("owner"), resword.getString("date_updated"),
-                    resword.getString("last_updated_by"), resword.getString("selected") };
+            String[] columns = { resword.getString("CRF_name"), resword.getString("date_created"), resword.getString("owner"),
+                    resword.getString("date_updated"), resword.getString("last_updated_by"), resword.getString("selected") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(5);
             StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) session.getAttribute("definition");
             HashMap args = new HashMap();
             args.put("actionName", "next");
             args.put("pageNum", "1");
-            args.put("name", URLEncoder.encode(def1.getName(),"UTF-8"));
+            args.put("name", URLEncoder.encode(def1.getName(), "UTF-8"));
             args.put("repeating", new Boolean(def1.isRepeating()).toString());
             args.put("category", def1.getCategory());
-            args.put("description", URLEncoder.encode(def1.getDescription(),"UTF-8"));
+            args.put("description", URLEncoder.encode(def1.getDescription(), "UTF-8"));
             args.put("type", def1.getType());
             table.setQuery("DefineStudyEvent", args, true);
             table.setRows(allRows);
             table.computeDisplay();
 
             request.setAttribute("table", table);
-            
-             forwardPage(Page.DEFINE_STUDY_EVENT2);
+
+            forwardPage(Page.DEFINE_STUDY_EVENT2);
 
         } else {
             logger.debug("has validation errors in the first section");
@@ -280,18 +276,17 @@ public class DefineStudyEventServlet extends SecureController {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-        
 
-        
         ArrayList eventDefinitionCRFs = new ArrayList();
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         for (int i = 0; i < sed.getCrfs().size(); i++) {
             EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
             int crfId = fp.getInt("crfId" + i);
             int defaultVersionId = fp.getInt("defaultVersionId" + i);
             edcBean.setCrfId(crfId);
             edcBean.setDefaultVersionId(defaultVersionId);
-            CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
+            FormLayoutBean defaultVersion = (FormLayoutBean) fldao.findByPK(edcBean.getDefaultVersionId());
             edcBean.setDefaultVersionName(defaultVersion.getName());
 
             String crfName = fp.getString("crfName" + i);
@@ -307,7 +302,6 @@ public class DefineStudyEventServlet extends SecureController {
             String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
             String submissionUrl = fp.getString("submissionUrl" + i);
             String offline = fp.getString("offline" + i);
-            
 
             // issue 312 BWP<<
             String hiddenCrf = fp.getString("hiddenCrf" + i);
@@ -316,7 +310,7 @@ public class DefineStudyEventServlet extends SecureController {
                 edcBean.setHideCrf(true);
             } else {
                 edcBean.setHideCrf(false);
-              }
+            }
             // >>
             String sdvOption = fp.getString("sdvOption" + i);
             if (!StringUtils.isBlank(sdvOption)) {
@@ -366,7 +360,7 @@ public class DefineStudyEventServlet extends SecureController {
             if (edcBean.isParticipantForm() && edcBean.isAllowAnonymousSubmission()) {
                 edcBean.setSubmissionUrl(submissionUrl.trim());
             }
-            ArrayList <CRFVersionBean> versions = cvdao.findAllByCRFId(crfId);
+            ArrayList<CRFVersionBean> versions = fldao.findAllByCRFId(crfId);
             edcBean.setVersions(versions);
 
             String nullString = "";
@@ -385,26 +379,26 @@ public class DefineStudyEventServlet extends SecureController {
             edcBean.setStudyId(ub.getActiveStudyId());
             eventDefinitionCRFs.add(edcBean);
         }
-        
 
-        
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
-            String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-             request.setAttribute("participateFormStatus",participateFormStatus );
-             if (participateFormStatus.equals("enabled")) baseUrl();
-   
-             request.setAttribute("participateFormStatus",participateFormStatus );
-        
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+        String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
+        request.setAttribute("participateFormStatus", participateFormStatus);
+        if (participateFormStatus.equals("enabled"))
+            baseUrl();
+
+        request.setAttribute("participateFormStatus", participateFormStatus);
+
         request.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
         session.setAttribute("edCRFs", eventDefinitionCRFs);// not used on page
-    
-        ArrayList <EventDefinitionCRFBean>  edcsInSession = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("edCRFs");
-        int parentStudyId=sed.getStudyId();
+
+        ArrayList<EventDefinitionCRFBean> edcsInSession = (ArrayList<EventDefinitionCRFBean>) session.getAttribute("edCRFs");
+        int parentStudyId = sed.getStudyId();
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        ArrayList <EventDefinitionCRFBean> eventDefCrfList =(ArrayList <EventDefinitionCRFBean>) edcdao.findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
-       
-        if(eventDefCrfList.size()!=0)
-        validateSubmissionUrl(edcsInSession,eventDefCrfList,v);
+        ArrayList<EventDefinitionCRFBean> eventDefCrfList = (ArrayList<EventDefinitionCRFBean>) edcdao
+                .findAllActiveSitesAndStudiesPerParentStudy(parentStudyId);
+
+        if (eventDefCrfList.size() != 0)
+            validateSubmissionUrl(edcsInSession, eventDefCrfList, v);
         errors = v.validate();
 
         if (!errors.isEmpty()) {
@@ -416,11 +410,11 @@ public class DefineStudyEventServlet extends SecureController {
             request.setAttribute("sdvOptions", sdvOptions);
 
             logger.info("has errors");
-           session.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
+            session.setAttribute("eventDefinitionCRFs", eventDefinitionCRFs);
             request.setAttribute("formMessages", errors);
             forwardPage(Page.DEFINE_STUDY_EVENT4);
-        } 
-        
+        }
+
         forwardPage(Page.DEFINE_STUDY_EVENT_CONFIRM);
 
     }
@@ -431,22 +425,20 @@ public class DefineStudyEventServlet extends SecureController {
      * @return
      */
     private StudyEventDefinitionBean createStudyEventDefinition() {
-    	
 
         FormProcessor fp = new FormProcessor(request);
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-        
-        try{
-	        String name = URLDecoder.decode(request.getParameter("name"), "UTF-8");
-	        String description = URLDecoder.decode(request.getParameter("description"), "UTF-8");
-	    
-	        sed.setName(name);
-	        sed.setDescription(description);
-        }
-        catch(Exception e){
-        	//leaving old code here 
-        	sed.setName(fp.getString("name"));
-	        sed.setDescription(fp.getString("description"));
+
+        try {
+            String name = URLDecoder.decode(request.getParameter("name"), "UTF-8");
+            String description = URLDecoder.decode(request.getParameter("description"), "UTF-8");
+
+            sed.setName(name);
+            sed.setDescription(description);
+        } catch (Exception e) {
+            // leaving old code here
+            sed.setName(fp.getString("name"));
+            sed.setDescription(fp.getString("description"));
         }
         // YW <<
         String temp = fp.getString("repeating");
@@ -457,7 +449,7 @@ public class DefineStudyEventServlet extends SecureController {
         }
         // YW >>
         sed.setCategory(fp.getString("category"));
-        
+
         sed.setType(fp.getString("type"));
         return sed;
 
@@ -465,16 +457,15 @@ public class DefineStudyEventServlet extends SecureController {
 
     private void confirmDefinition2() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+        // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ArrayList crfArray = new ArrayList();
         Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
         // trying to avoid NPE not sure why we would get it there ((tmpCRFIdMap.containsKey(id))), tbh
         if (tmpCRFIdMap == null) {
             tmpCRFIdMap = new HashMap();
         }
-        
 
-        
         ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
         for (int i = 0; i < crfsWithVersion.size(); i++) {
             int id = fp.getInt("id" + i);
@@ -489,7 +480,7 @@ public class DefineStudyEventServlet extends SecureController {
                 cb.setName(name);
 
                 // only find active verions
-                ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
+                ArrayList versions = (ArrayList) fldao.findAllActiveByCRF(cb.getId());
                 cb.setVersions(versions);
 
                 crfArray.add(cb);
@@ -516,15 +507,15 @@ public class DefineStudyEventServlet extends SecureController {
                 cb.setName(name);
 
                 // only find active verions
-                ArrayList versions = (ArrayList) vdao.findAllActiveByCRF(cb.getId());
+                ArrayList versions = (ArrayList) fldao.findAllActiveByCRF(cb.getId());
                 cb.setVersions(versions);
 
                 crfArray.add(cb);
             }
         }
         session.removeAttribute("tmpCRFIdMap");
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
-        
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+
         if (crfArray.size() == 0) {// no crf seleted
             // addPageMessage("At least one CRF must be selected.");
             // request.setAttribute("crfs", crfs);
@@ -532,7 +523,7 @@ public class DefineStudyEventServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
             sed.setCrfs(new ArrayList());
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-             request.setAttribute("participateFormStatus",participateFormStatus );
+            request.setAttribute("participateFormStatus", participateFormStatus);
             session.setAttribute("definition", sed);
             request.setAttribute("eventDefinitionCRFs", new ArrayList());
             session.setAttribute("edCRFs", new ArrayList());// not used on page
@@ -545,9 +536,10 @@ public class DefineStudyEventServlet extends SecureController {
             session.setAttribute("eventDefinitionCRFs", new ArrayList());
             session.setAttribute("definition", sed);
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-            if (participateFormStatus.equals("enabled")) baseUrl();
+            if (participateFormStatus.equals("enabled"))
+                baseUrl();
 
-            request.setAttribute("participateFormStatus",participateFormStatus );
+            request.setAttribute("participateFormStatus", participateFormStatus);
 
             ArrayList<String> sdvOptions = new ArrayList<String>();
             sdvOptions.add(SourceDataVerification.AllREQUIRED.toString());
@@ -603,10 +595,10 @@ public class DefineStudyEventServlet extends SecureController {
             edc.setStudyEventDefinitionId(sed1.getId());
             edc.setOrdinal(i + 1);
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(sed.getId());
-            CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());                
-            String crfPath=sedBean.getOid()+"."+cBean.getOid();
-            getEventDefinitionCrfTagService().saveEventDefnCrfOfflineTag(2, crfPath, edc ,sedBean);
-          
+            CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());
+            String crfPath = sedBean.getOid() + "." + cBean.getOid();
+            getEventDefinitionCrfTagService().saveEventDefnCrfOfflineTag(2, crfPath, edc, sedBean);
+
             cdao.create(edc);
         }
 
@@ -618,47 +610,50 @@ public class DefineStudyEventServlet extends SecureController {
 
     }
 
-    public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
-    	for (int i = 0; i < edcsInSession.size(); i++) {
-            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
-            EventDefinitionCRFBean sessionBean=null;
+    public void validateSubmissionUrl(ArrayList<EventDefinitionCRFBean> edcsInSession, ArrayList<EventDefinitionCRFBean> eventDefCrfList, Validator v) {
+        for (int i = 0; i < edcsInSession.size(); i++) {
+            v.addValidation("submissionUrl" + i, Validator.NO_SPACES_ALLOWED);
+            EventDefinitionCRFBean sessionBean = null;
             boolean isExist = false;
-            for (EventDefinitionCRFBean eventDef : eventDefCrfList){ 
-            		  sessionBean = edcsInSession.get(i);
-                  	if(!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()){ 
-                    	isExist = true;
-                		break;
-                	}
-            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
-            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
-            		System.out.println();
-            	if(sessionBean.getSubmissionUrl() == null || sessionBean.getSubmissionUrl()==""){
-            		break;
-            	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()) ||
-                		(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId()==0)){
-                	v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                	System.out.println("Duplicate ****************************");
-                	isExist = true;
-            	   break;
-            	}else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId()!=0){
-                	System.out.println("Not Duplicate  ***********");
-                	isExist = true;
-            		break;
-            	}
-            	  }
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList) {
+                sessionBean = edcsInSession.get(i);
+                if (!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()) {
+                    isExist = true;
+                    break;
+                }
+                System.out.println("iter:           " + eventDef.getId() + "--db:    " + eventDef.getSubmissionUrl());
+                System.out.println("edcsInSession:  " + sessionBean.getId() + "--session:" + sessionBean.getSubmissionUrl());
+                System.out.println();
+                if (sessionBean.getSubmissionUrl() == null || sessionBean.getSubmissionUrl() == "") {
+                    break;
+                } else {
+                    if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId())
+                            || (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
+                                    && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() == 0)) {
+                        v.addValidation("submissionUrl" + i, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                        System.out.println("Duplicate ****************************");
+                        isExist = true;
+                        break;
+                    } else if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
+                            && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() != 0) {
+                        System.out.println("Not Duplicate  ***********");
+                        isExist = true;
+                        break;
+                    }
+                }
             }
-            	if(!isExist){ 
-            		eventDefCrfList.add(sessionBean);
-            	}
+            if (!isExist) {
+                eventDefCrfList.add(sessionBean);
+            }
         }
 
     }
-    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
-        eventDefinitionCrfTagService=
-         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
 
-         return eventDefinitionCrfTagService;
-     }
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService = this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService
+                : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+        return eventDefinitionCrfTagService;
+    }
 
 }
