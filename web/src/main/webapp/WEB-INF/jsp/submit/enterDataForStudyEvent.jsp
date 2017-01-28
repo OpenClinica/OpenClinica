@@ -338,7 +338,6 @@
 
 
 
-
         <SCRIPT LANGUAGE="JavaScript">
         var studyEventId = '<c:out value="${studyEvent.id}"/>';
         var eventCRFStatusId = '<c:out value="${dedc.eventCRF.id}"/>';

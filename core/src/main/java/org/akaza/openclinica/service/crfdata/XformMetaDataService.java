@@ -205,7 +205,6 @@ public class XformMetaDataService {
             }
         }
         createGroups(container, html, xform, crfBean, crfVersion, formLayout, section, ub, errors);
-
         saveMedia(formItems, crfBean, formLayout);
 
         if (errors.hasErrors()) {
@@ -235,11 +234,8 @@ public class XformMetaDataService {
                         fileName = fileName.substring(startIndex + 1, fileName.length());
                     }
 
-                    // CrfVersionMedia media =
-                    // crfVersionMediaDao.findByCrfVersionIdAndFileName(formLayout.getFormLayoutId(), fileName);
                     FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFileName(formLayout.getFormLayoutId(), fileName);
                     if (media == null) {
-                        // media = new CrfVersionMedia();
                         media = new FormLayoutMedia();
                         media.setFormLayout(formLayout);
                         media.setName(fileName);

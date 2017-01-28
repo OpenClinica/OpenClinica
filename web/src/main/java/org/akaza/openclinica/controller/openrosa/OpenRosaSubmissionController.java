@@ -225,7 +225,6 @@ public class OpenRosaSubmissionController {
         int studyEventDefinitionID = Integer.valueOf(subjectContext.get("studyEventDefinitionID"));
         int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
         String studySubjectOID = subjectContext.get("studySubjectOID");
-        String crfVersionOID = subjectContext.get("crfVersionOID");
         String formLayoutOID = subjectContext.get("formLayoutOID");
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
 
@@ -233,8 +232,8 @@ public class OpenRosaSubmissionController {
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
         Study study = studyDao.findByOcOID(studyOID);
         StudyEventDefinition sed = studyEventDefinitionDao.findById(studyEventDefinitionID);
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(crfVersionOID);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOID);
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(formLayout.getCrf().getCrfId()).get(0);
         StudyEvent studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinalTransactional(sed.getOc_oid(), studyEventOrdinal,
                 studySubject.getStudySubjectId());
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(),
@@ -260,7 +259,7 @@ public class OpenRosaSubmissionController {
         for (EventCrf evCrf : eventCrfs) {
             if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()) {
                 for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getCrfVersion().getCrf().getCrfId()) {
+                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
                         count++;
                         break;
                     }
@@ -582,9 +581,6 @@ public class OpenRosaSubmissionController {
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
-        // eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(),
-        // studySubject.getStudySubjectId(),
-        // formLayout.getFormLayoutId());
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }

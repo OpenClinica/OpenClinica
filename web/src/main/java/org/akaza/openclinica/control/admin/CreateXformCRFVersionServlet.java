@@ -88,16 +88,16 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ServletFileUpload upload = new ServletFileUpload(factory);
         List<FileItem> items = upload.parseRequest(request);
         String crfName = retrieveFormFieldValue(items, "crfName");
+        int crfId = Integer.valueOf(retrieveFormFieldValue(items, "crfId"));
         String xform = "";
 
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
 
-        int crfId = Integer.valueOf(request.getParameter("crfId"));
-
         String crfOid = "";
         if (crfId != 0) {
             CrfBean crfBean = crfDao.findByCrfId(crfId);
+            crfName = crfBean.getName();
             if (crfBean != null) {
                 crfOid = crfBean.getOcOid();
             }
@@ -158,7 +158,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
                     // Save any media files uploaded with xform
                     CrfBean crfBean = (CrfBean) crfDao.findByOcOID(crf.getOcoid());
-                    // CrfVersion crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
                     FormLayout formLayout = formLayoutDao.findAllByCrfId(crfBean.getCrfId()).get(0);
 
                     // saveAttachedMedia(items, crf, newVersion);
@@ -233,7 +232,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
                             instanceItemsPath = xformParserHelper.instanceItemPaths(node, instanceItemsPath, path + "/" + node.getNodeName());
                         }
                     }
-                    System.out.println("list size: " + instanceItemsPath.size());
+                    logger.info("list size: " + instanceItemsPath.size());
                 }
             }
 

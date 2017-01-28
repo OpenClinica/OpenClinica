@@ -103,7 +103,7 @@
 				<c:choose>
 				<c:when test="${dedc.eventCRF.id > 0}">
 				<!-- found an event crf id -->
-					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.CRFVersionId}"/>">
+					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.formLayoutId}"/>">
 				</c:when>
 				<c:otherwise>
 				<!-- did not find an event crf id -->
