@@ -258,17 +258,14 @@ public class OdmController {
                         EventCRFBean eventCRF = participantEventService.getExistingEventCRF(studySubjectBean, nextEvent, eventDefCrf);
                         boolean itemDataExists = false;
                         boolean validStatus = true;
-                        // CRFVersionBean crfVersion = null;
                         FormLayoutBean formLayout = null;
                         if (eventCRF != null) {
                             if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;
-                            // crfVersion = (CRFVersionBean) versionDAO.findByPK(eventCRF.getCRFVersionId());
                             formLayout = (FormLayoutBean) versionDAO.findByPK(eventCRF.getFormLayoutId());
                         } else
-                            // crfVersion = (CRFVersionBean) versionDAO.findByPK(eventDefCrf.getDefaultVersionId());
                             formLayout = (FormLayoutBean) formLayoutDAO.findByPK(eventDefCrf.getDefaultVersionId());
 
                         if (validStatus) {

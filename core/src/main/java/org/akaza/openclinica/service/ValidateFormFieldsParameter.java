@@ -1,11 +1,13 @@
 package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.springframework.validation.Errors;
 
 public class ValidateFormFieldsParameter {
     private Errors errors;
     private CRFVersionBean version;
+    private FormLayoutBean formLayoutBean;
     private String submittedCrfName;
     private String submittedCrfVersionName;
     private String submittedCrfVersionDescription;
@@ -81,4 +83,13 @@ public class ValidateFormFieldsParameter {
     public void setSubmittedXformText(String submittedXformText) {
         this.submittedXformText = submittedXformText;
     }
+
+    public FormLayoutBean getFormLayoutBean() {
+        return formLayoutBean;
+    }
+
+    public void setFormLayoutBean(FormLayoutBean formLayoutBean) {
+        this.formLayoutBean = formLayoutBean;
+    }
+
 }

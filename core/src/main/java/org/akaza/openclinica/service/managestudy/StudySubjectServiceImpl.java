@@ -85,7 +85,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         Set<Integer> nonEmptyEventCrf = eventCrfDao.buildNonEmptyEventCrfIds(studySubject.getId());
 
-        // Map<Integer, CRFVersionBean> crfVersionById = crfVersionDao.buildCrfVersionById(studySubject.getId());
         Map<Integer, FormLayoutBean> formLayoutById = formLayoutDAO.buildCrfVersionById(studySubject.getId());
 
         Map<Integer, CRFBean> crfById = crfDao.buildCrfById(studySubject.getId());
@@ -135,15 +134,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
 
             // populate the event CRF with its crf bean
-            // int crfVersionId = ecb.getCRFVersionId();
             int formLayoutId = ecb.getFormLayoutId();
 
-            // CRFVersionBean cvb = crfVersionById.get(ecb.getCRFVersionId());
-            // CRFVersionBean cvb = crfVersionById.get(crfVersionId);
             FormLayoutBean flb = formLayoutById.get(formLayoutId);
             ecb.setFormLayout(flb);
 
-            // CRFBean cb = crfDao.findByVersionId(crfVersionId);
             CRFBean cb = crfById.get(flb.getCrfId());
             ecb.setCrf(cb);
 
@@ -225,10 +220,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         for (i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-            // System.out.println("########event crf id:" + ecrf.getId());
-            // int crfId =
-            // crfVersionDao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
-            // int crfId = crfVersionById.get(ecrf.getCRFVersionId()).getCrfId();
             int crfId = formLayoutById.get(ecrf.getFormLayoutId()).getCrfId();
 
             if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data
@@ -268,21 +259,16 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     public void populateUncompletedCRFsWithCRFAndVersions(ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
             Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
 
-        // CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
         FormLayoutDAO formLayoutDAo = new FormLayoutDAO(dataSource);
 
         int size = uncompletedEventDefinitionCRFs.size();
         for (int i = 0; i < size; i++) {
             DisplayEventDefinitionCRFBean dedcrf = uncompletedEventDefinitionCRFs.get(i);
-            // CRFBean cb = (CRFBean)
-            // crfDao.findByPK(dedcrf.getEdc().getCrfId());
             CRFBean cb = crfById.get(dedcrf.getEdc().getCrfId());
             dedcrf.getEdc().setCrf(cb);
 
             ArrayList<FormLayoutBean> theVersions = (ArrayList<FormLayoutBean>) formLayoutDAo.findAllActiveByCRF(dedcrf.getEdc().getCrfId());
-            // ArrayList<CRFVersionBean> versions = new ArrayList<CRFVersionBean>();
             ArrayList<FormLayoutBean> versions = new ArrayList<FormLayoutBean>();
-            // HashMap<String, CRFVersionBean> crfVersionIds = new HashMap<String, CRFVersionBean>();
             HashMap<String, FormLayoutBean> formLayoutIds = new HashMap<String, FormLayoutBean>();
 
             for (int j = 0; j < theVersions.size(); j++) {

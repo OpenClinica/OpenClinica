@@ -104,7 +104,6 @@ public class ListCRFServlet extends SecureController {
         logger.debug("found directory: " + dir);
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ArrayList crfs = (ArrayList) cdao.findAll();
         for (int i = 0; i < crfs.size(); i++) {
@@ -130,7 +129,6 @@ public class ListCRFServlet extends SecureController {
             eb.setVersions(versions);
 
         }
-        // request.setAttribute("crfs", crfs);
 
         EntityBeanTable table = fp.getEntityBeanTable();
         ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);

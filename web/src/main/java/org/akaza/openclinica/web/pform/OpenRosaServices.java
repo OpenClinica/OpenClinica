@@ -207,12 +207,10 @@ public class OpenRosaServices {
         try {
             if (StringUtils.isEmpty(uniqueId)) {
                 List<CrfBean> crfs = crfDao.findAll();
-                // List<CrfVersion> crfVersions = crfVersionDao.findAll();
                 List<FormLayout> formLayouts = formLayoutDao.findAll();
 
                 formList = new XFormList();
                 for (CrfBean crf : crfs) {
-                    // for (CrfVersion version : crfVersions) {
                     for (FormLayout formLayout : formLayouts) {
                         if (formLayout.getCrf().getCrfId() == crf.getCrfId()) {
                             XForm form = new XForm(crf, formLayout);
@@ -285,10 +283,8 @@ public class OpenRosaServices {
         if (!mayProceedPreview(studyOID))
             return null;
         boolean query = getQuerySet(uniqueId);
-        // String crfVersionOid = getCrfVersionOid(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
 
-        // CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
 
@@ -377,8 +373,6 @@ public class OpenRosaServices {
         if (!mayProceedPreview(studyOID))
             return null;
 
-        // String crfVersionOid = getCrfVersionOid(uniqueId);
-        // CrfVersion crfVersion = crfVersionDao.findByOcOID(crfVersionOid);
         String formLayoutOid = getFormLayoutOid(uniqueId);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
 
@@ -462,11 +456,9 @@ public class OpenRosaServices {
         }
 
         boolean query = getQuerySet(uniqueId);
-        // String crfVersionOid = getCrfVersionOid(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
 
-        // CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
         CrfBean crf = formLayout.getCrf();
 
         String xformWithQueries = "";

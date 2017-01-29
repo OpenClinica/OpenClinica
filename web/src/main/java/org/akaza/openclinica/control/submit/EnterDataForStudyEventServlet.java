@@ -308,7 +308,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
             startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
         }
 
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         for (i = 0; i < eventCRFs.size(); i++) {
@@ -372,7 +371,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
     private void populateUncompletedCRFsWithCRFAndVersions(ArrayList uncompletedEventDefinitionCRFs) {
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
         int size = uncompletedEventDefinitionCRFs.size();
@@ -464,7 +462,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
         }
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
 

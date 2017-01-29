@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -14,6 +15,7 @@ public class PopulateEventDefinitionCrfParameter {
     private UserAccount userAccount;
     private CrfBean crf;
     private CrfVersion crfVersion;
+    private FormLayout formLayout;
     private OCodmComplexTypeDefinitionConfigurationParameters conf;
     private Study study;
     private StudyEventDefinition studyEventDefinition;
@@ -28,6 +30,7 @@ public class PopulateEventDefinitionCrfParameter {
         this.study = paramObj.study;
         this.studyEventDefinition = paramObj.studyEventDefinition;
         this.odmFormRef = paramObj.odmFormRef;
+        this.formLayout = paramObj.formLayout;
     }
 
     public PopulateEventDefinitionCrfParameter() {
@@ -97,4 +100,13 @@ public class PopulateEventDefinitionCrfParameter {
     public void setOdmFormRef(ODMcomplexTypeDefinitionFormRef odmFormRef) {
         this.odmFormRef = odmFormRef;
     }
+
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
+    }
+
 }

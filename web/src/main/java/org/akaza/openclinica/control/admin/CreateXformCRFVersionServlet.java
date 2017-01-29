@@ -536,7 +536,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
         List<String> tempFileNames = new ArrayList<>();
         ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
-        // Crf response = restTemplate.postForObject(uploadFilesUrl, requestEntity, Crf.class);
 
         String uploadFilesUrl = "http://fm.openclinica.info:8080/api/protocol/" + studyOid + "/forms/" + formOid + "/artifacts";
         map.add("file", byteArrayResources);

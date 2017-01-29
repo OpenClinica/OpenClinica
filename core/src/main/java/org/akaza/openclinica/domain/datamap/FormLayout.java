@@ -54,9 +54,7 @@ public class FormLayout extends DataMapDomainObject {
     private String url;
     private Set filterFormLayoutMaps = new HashSet(0);
     private List<EventCrf> eventCrfs;
-    private List<EventDefinitionCrf> eventDefinitionCrfs;
     private Set decisionConditions = new HashSet(0);
-    private Set<ItemGroupMetadata> itemGroupMetadatas;
     private List<FileItem> fileItems;
 
     public FormLayout() {
@@ -70,7 +68,7 @@ public class FormLayout extends DataMapDomainObject {
 
     public FormLayout(int formLayoutId, UserAccount userAccount, Status status, CrfBean crf, String name, String description, String revisionNotes,
             Date dateCreated, Date dateUpdated, Integer updateId, String ocOid, String xform, String xformName, Set filterFormLayoutMaps,
-            List<EventCrf> eventCrfs, List<EventDefinitionCrf> eventDefinitionCrfs, Set decisionConditions, Set<ItemGroupMetadata> itemGroupMetadatas) {
+            List<EventCrf> eventCrfs, Set decisionConditions) {
         this.formLayoutId = formLayoutId;
         this.userAccount = userAccount;
         this.status = status;
@@ -86,9 +84,7 @@ public class FormLayout extends DataMapDomainObject {
         this.xformName = xformName;
         this.filterFormLayoutMaps = filterFormLayoutMaps;
         this.eventCrfs = eventCrfs;
-        this.eventDefinitionCrfs = eventDefinitionCrfs;
         this.decisionConditions = decisionConditions;
-        this.itemGroupMetadatas = itemGroupMetadatas;
     }
 
     @Id
@@ -225,24 +221,6 @@ public class FormLayout extends DataMapDomainObject {
 
     public void setEventCrfs(List<EventCrf> eventCrfs) {
         this.eventCrfs = eventCrfs;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formLayout")
-    public List<EventDefinitionCrf> getEventDefinitionCrfs() {
-        return this.eventDefinitionCrfs;
-    }
-
-    public void setEventDefinitionCrfs(List<EventDefinitionCrf> eventDefinitionCrfs) {
-        this.eventDefinitionCrfs = eventDefinitionCrfs;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formLayout")
-    public Set<ItemGroupMetadata> getItemGroupMetadatas() {
-        return this.itemGroupMetadatas;
-    }
-
-    public void setItemGroupMetadatas(Set<ItemGroupMetadata> itemGroupMetadatas) {
-        this.itemGroupMetadatas = itemGroupMetadatas;
     }
 
     @Column(name = "url")

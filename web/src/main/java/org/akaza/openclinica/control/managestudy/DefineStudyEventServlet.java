@@ -91,7 +91,6 @@ public class DefineStudyEventServlet extends SecureController {
         if (crfsWithVersion == null) {
             crfsWithVersion = new ArrayList();
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
             FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
             ArrayList crfs = (ArrayList) cdao.findAllByStatus(Status.AVAILABLE);
 
@@ -208,7 +207,6 @@ public class DefineStudyEventServlet extends SecureController {
             logger.debug("no errors in the first section");
             // logger.debug("actionName*******" + fp.getString("actionName"));
             // debugger.debug("pageNum*******" + fp.getString("pageNum"));
-            // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             ArrayList crfArray = new ArrayList();
             /*
              * The tmpCRFIdMap will hold all the selected CRFs in the session
@@ -278,7 +276,6 @@ public class DefineStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
 
         ArrayList eventDefinitionCRFs = new ArrayList();
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         for (int i = 0; i < sed.getCrfs().size(); i++) {
             EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
@@ -290,9 +287,7 @@ public class DefineStudyEventServlet extends SecureController {
             edcBean.setDefaultVersionName(defaultVersion.getName());
 
             String crfName = fp.getString("crfName" + i);
-            // String crfLabel = fp.getString("crfLabel" + i);
             edcBean.setCrfName(crfName);
-            // edcBean.setCrfLabel(crfLabel);
 
             String requiredCRF = fp.getString("requiredCRF" + i);
             String doubleEntry = fp.getString("doubleEntry" + i);
@@ -457,7 +452,6 @@ public class DefineStudyEventServlet extends SecureController {
 
     private void confirmDefinition2() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ArrayList crfArray = new ArrayList();
         Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
@@ -518,7 +512,6 @@ public class DefineStudyEventServlet extends SecureController {
 
         if (crfArray.size() == 0) {// no crf seleted
             // addPageMessage("At least one CRF must be selected.");
-            // request.setAttribute("crfs", crfs);
             addPageMessage(respage.getString("no_CRF_selected_for_definition_add_later"));
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
             sed.setCrfs(new ArrayList());

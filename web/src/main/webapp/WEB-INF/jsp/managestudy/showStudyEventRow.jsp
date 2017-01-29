@@ -372,7 +372,7 @@
 
 		 </td>
 		 <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>

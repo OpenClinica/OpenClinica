@@ -39,7 +39,6 @@ public class EventDefinitionCrf extends DataMapDomainObject {
     private UserAccount userAccount;
     private StudyEventDefinition studyEventDefinition;
     private CrfVersion crfVersion;
-    private FormLayout formLayout;
     private Study study;
     private Integer statusId;
     private CrfBean crf;
@@ -72,8 +71,7 @@ public class EventDefinitionCrf extends DataMapDomainObject {
     public EventDefinitionCrf(int eventDefinitionCrfId, UserAccount userAccount, StudyEventDefinition studyEventDefinition, CrfVersion crfVersion, Study study,
             Integer statusId, CrfBean crf, Boolean requiredCrf, Boolean doubleEntry, Boolean requireAllTextFilled, Boolean decisionConditions,
             String nullValues, Date dateCreated, Date dateUpdated, Integer updateId, Integer ordinal, Boolean electronicSignature, Boolean hideCrf,
-            Boolean participantForm, Integer sourceDataVerificationCode, String selectedVersionIds, Integer parentId, Set datasetCrfVersionMaps,
-            FormLayout formLayout) {
+            Boolean participantForm, Integer sourceDataVerificationCode, String selectedVersionIds, Integer parentId, Set datasetCrfVersionMaps) {
         this.eventDefinitionCrfId = eventDefinitionCrfId;
         this.userAccount = userAccount;
         this.studyEventDefinition = studyEventDefinition;
@@ -97,7 +95,6 @@ public class EventDefinitionCrf extends DataMapDomainObject {
         this.selectedVersionIds = selectedVersionIds;
         this.parentId = parentId;
         this.datasetCrfVersionMaps = datasetCrfVersionMaps;
-        this.formLayout = formLayout;
     }
 
     @Id
@@ -326,16 +323,6 @@ public class EventDefinitionCrf extends DataMapDomainObject {
 
     public void setSubmissionUrl(String submissionUrl) {
         this.submissionUrl = submissionUrl;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_layout_id")
-    public FormLayout getFormLayout() {
-        return formLayout;
-    }
-
-    public void setFormLayout(FormLayout formLayout) {
-        this.formLayout = formLayout;
     }
 
     // @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventDefinitionCrf")

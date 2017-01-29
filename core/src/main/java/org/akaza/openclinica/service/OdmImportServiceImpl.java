@@ -18,11 +18,12 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
@@ -92,6 +94,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private CrfDao crfDao;
     private CrfVersionDao crfVersionDao;
+    private FormLayoutDao formLayoutDao;
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private StudyParameterValueDao studyParameterValueDao;
@@ -142,7 +145,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions);
 
         CrfBean crf = null;
-        CrfVersion crfVersion = null;
+        FormLayout formLayout = null;
         saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs);
         List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
@@ -175,7 +178,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                         if (defaultVersionOid == null) {
                             defaultVersionOid = formLayoutRefs.get(0).getOID();
                         }
-                        crfVersion = getCrfVersionDao().findByOcOID(defaultVersionOid);
+                        formLayout = getFormLayoutDao().findByOcOID(defaultVersionOid);
                         PopulateEventDefinitionCrfParameter paramObj = new PopulateEventDefinitionCrfParameter();
                         paramObj.setUserAccount(userAccount);
                         paramObj.setConf(conf);
@@ -183,7 +186,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                         paramObj.setEventDefinitionCrf(eventDefinitionCrf);
                         paramObj.setOdmFormRef(odmFormRef);
                         paramObj.setStudy(study);
-                        paramObj.setCrfVersion(crfVersion);
+                        paramObj.setFormLayout(formLayout);
                         paramObj.setStudyEventDefinition(studyEventDefinition);
 
                         PopulateEDCTagParameter populateEDCTagParameter = new PopulateEDCTagParameter();
@@ -243,7 +246,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
     private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Crf[] fmCrfs) {
         CrfBean crf;
-        CrfVersion version;
+        // CrfVersion version;
+        FormLayout formLayout;
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             crf = getCrfDao().findByOcOID(odmFormDef.getOID());
 
@@ -254,10 +258,10 @@ public class OdmImportServiceImpl implements OdmImportService {
             } else {
                 crf = getCrfDao().saveOrUpdate(updateCrf(odmFormDef, userAccount, crf, study));
             }
-            version = saveOrUpdateCrfVersion(userAccount, crf, odmFormDef, fmCrfs);
-            if (version.getXform() != null) {
+            formLayout = saveOrUpdateCrfVersion(userAccount, crf, odmFormDef, fmCrfs);
+            if (formLayout.getXform() != null) {
                 try {
-                    parseCrfVersion(crf, version, study, userAccount);
+                    parseCrfVersion(crf, formLayout, study, userAccount);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -265,11 +269,12 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
     }
 
-    private CrfVersion saveOrUpdateCrfVersion(UserAccount userAccount, CrfBean crf, ODMcomplexTypeDefinitionFormDef odmFormDef, Crf[] fmCrfs) {
-        CrfVersion crfVersion = null;
+    private FormLayout saveOrUpdateCrfVersion(UserAccount userAccount, CrfBean crf, ODMcomplexTypeDefinitionFormDef odmFormDef, Crf[] fmCrfs) {
+        // CrfVersion crfVersion = null;
+        FormLayout formLayout = null;
         List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
-            crfVersion = getCrfVersionDao().findByOcOID(formLayoutDef.getOID());
+            formLayout = getFormLayoutDao().findByOcOID(formLayoutDef.getOID());
             String url = formLayoutDef.getURL();
 
             PopulateCrfVersionParameter populateCrfVersionParameter = new PopulateCrfVersionParameter();
@@ -279,17 +284,17 @@ public class OdmImportServiceImpl implements OdmImportService {
             populateCrfVersionParameter.setUserAccount(userAccount);
             populateCrfVersionParameter.setUrl(url);
 
-            if (crfVersion == null) {
-                crfVersion = new CrfVersion();
-                crfVersion.setOcOid(formLayoutDef.getOID());
-                populateCrfVersionParameter.setCrfVersion(crfVersion);
-                crfVersion = getCrfVersionDao().saveOrUpdate(populateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
+            if (formLayout == null) {
+                formLayout = new FormLayout();
+                formLayout.setOcOid(formLayoutDef.getOID());
+                populateCrfVersionParameter.setFormLayout(formLayout);
+                formLayout = getFormLayoutDao().saveOrUpdate(populateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             } else {
-                populateCrfVersionParameter.setCrfVersion(crfVersion);
-                crfVersion = getCrfVersionDao().saveOrUpdate(updateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
+                populateCrfVersionParameter.setFormLayout(formLayout);
+                formLayout = getFormLayoutDao().saveOrUpdate(updateCrfVersion(new PopulateCrfVersionParameter(populateCrfVersionParameter)));
             }
         }
-        return crfVersion;
+        return formLayout;
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
@@ -414,43 +419,43 @@ public class OdmImportServiceImpl implements OdmImportService {
         return crf;
     }
 
-    private CrfVersion populateCrfVersion(PopulateCrfVersionParameter paramObj) {
+    private FormLayout populateCrfVersion(PopulateCrfVersionParameter paramObj) {
         for (Crf fmCrf : paramObj.getFmCrfs()) {
             if (fmCrf.getOcoid().equals(paramObj.getCrf().getOcOid())) {
                 for (Version version : fmCrf.getVersions()) {
-                    if (version.getOcoid().equals(paramObj.getCrfVersion().getOcOid())) {
-                        paramObj.getCrfVersion().setDescription("Description");
-                        paramObj.getCrfVersion().setRevisionNotes("Revision");
-                        paramObj.getCrfVersion().setName(version.getName());
+                    if (version.getOcoid().equals(paramObj.getFormLayout().getOcOid())) {
+                        paramObj.getFormLayout().setDescription("Description");
+                        paramObj.getFormLayout().setRevisionNotes("Revision");
+                        paramObj.getFormLayout().setName(version.getName());
                         if (version.getFileLinks() != null) {
                             List<FileItem> fileItems = new ArrayList<>();
                             for (String fileLink : version.getFileLinks()) {
                                 if (fileLink.endsWith(".xml")) {
-                                    paramObj.getCrfVersion().setXform(getXFormFromFormManager(fileLink));
-                                    paramObj.getCrfVersion().setXformName("default");
+                                    paramObj.getFormLayout().setXform(getXFormFromFormManager(fileLink));
+                                    paramObj.getFormLayout().setXformName("default");
                                 }
-                                FileItem fileItem = getMediaFileItemFromFormManager(fileLink, paramObj.getCrf(), paramObj.getCrfVersion());
+                                FileItem fileItem = getMediaFileItemFromFormManager(fileLink, paramObj.getCrf(), paramObj.getFormLayout());
                                 fileItems.add(fileItem);
                             }
-                            paramObj.getCrfVersion().setFileItems(fileItems);
+                            paramObj.getFormLayout().setFileItems(fileItems);
                         }
                     }
                 }
             }
         }
-        paramObj.getCrfVersion().setCrf(paramObj.getCrf());
-        paramObj.getCrfVersion().setUrl(paramObj.getUrl());
-        paramObj.getCrfVersion().setUserAccount(paramObj.getUserAccount());
-        paramObj.getCrfVersion().setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        return paramObj.getCrfVersion();
+        paramObj.getFormLayout().setCrf(paramObj.getCrf());
+        paramObj.getFormLayout().setUrl(paramObj.getUrl());
+        paramObj.getFormLayout().setUserAccount(paramObj.getUserAccount());
+        paramObj.getFormLayout().setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        return paramObj.getFormLayout();
     }
 
-    private CrfVersion updateCrfVersion(PopulateCrfVersionParameter paramObj) {
-        CrfVersion crfVersion = paramObj.getCrfVersion();
-        crfVersion = populateCrfVersion(new PopulateCrfVersionParameter(paramObj));
-        crfVersion.setUpdateId(paramObj.getUserAccount().getUserId());
-        crfVersion.setDateUpdated(new Date());
-        return crfVersion;
+    private FormLayout updateCrfVersion(PopulateCrfVersionParameter paramObj) {
+        FormLayout formLayout = paramObj.getFormLayout();
+        formLayout = populateCrfVersion(new PopulateCrfVersionParameter(paramObj));
+        formLayout.setUpdateId(paramObj.getUserAccount().getUserId());
+        formLayout.setDateUpdated(new Date());
+        return formLayout;
     }
 
     private UserAccount getCurrentUser() {
@@ -624,7 +629,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         return crfs;
     }
 
-    public FileItem getMediaFileItemFromFormManager(String fileLink, CrfBean crf, CrfVersion crfVersion) {
+    public FileItem getMediaFileItemFromFormManager(String fileLink, CrfBean crf, FormLayout formLayout) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
         HttpHeaders headers = new HttpHeaders();
@@ -638,7 +643,7 @@ public class OdmImportServiceImpl implements OdmImportService {
             try {
                 String disposition = response.getHeaders().get("Content-Disposition").get(0);
                 fileName = disposition.replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
-                String dir = Utils.getCrfMediaFilePath(crf, crfVersion);
+                String dir = Utils.getCrfMediaFilePath(crf, formLayout);
                 if (!new File(dir).exists()) {
                     new File(dir).mkdirs();
                     logger.debug("Made the directory " + dir);
@@ -687,21 +692,22 @@ public class OdmImportServiceImpl implements OdmImportService {
         return xform;
     }
 
-    private void parseCrfVersion(CrfBean crf, CrfVersion version, Study study, UserAccount userAccount) throws Exception {
+    private void parseCrfVersion(CrfBean crf, FormLayout formLayout, Study study, UserAccount userAccount) throws Exception {
         String submittedCrfName = crf.getName();
-        String submittedCrfVersionName = version.getName();
-        String submittedCrfVersionDescription = version.getDescription();
-        String submittedRevisionNotes = version.getRevisionNotes();
-        String submittedXformText = version.getXform();
+        String submittedCrfVersionName = formLayout.getName();
+        String submittedCrfVersionDescription = formLayout.getDescription();
+        String submittedRevisionNotes = formLayout.getRevisionNotes();
+        String submittedXformText = formLayout.getXform();
 
         // Create container for holding validation errors
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
 
         // Validate all upload form fields were populated
-        CRFVersionBean crfVersion = new CRFVersionBean();
-        crfVersion.setOid(version.getOcOid());
-        crfVersion.setCrfId(version.getCrf().getCrfId());
+        // CRFVersionBean crfVersion = new CRFVersionBean();
+        FormLayoutBean formLayoutBean = new FormLayoutBean();
+        formLayoutBean.setOid(formLayout.getOcOid());
+        formLayoutBean.setCrfId(formLayout.getCrf().getCrfId());
         ValidateFormFieldsParameter validateFormFieldsParameter = new ValidateFormFieldsParameter();
         validateFormFieldsParameter.setErrors(errors);
         validateFormFieldsParameter.setSubmittedCrfName(submittedCrfName);
@@ -709,7 +715,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         validateFormFieldsParameter.setSubmittedCrfVersionName(submittedCrfVersionName);
         validateFormFieldsParameter.setSubmittedRevisionNotes(submittedRevisionNotes);
         validateFormFieldsParameter.setSubmittedXformText(submittedXformText);
-        validateFormFieldsParameter.setVersion(crfVersion);
+        validateFormFieldsParameter.setFormLayoutBean(formLayoutBean);
 
         validateFormFields(validateFormFieldsParameter);
 
@@ -717,7 +723,7 @@ public class OdmImportServiceImpl implements OdmImportService {
             // Parse instance and xform
             XformContainer container = parseInstance(submittedXformText);
             Html html = xformParser.unMarshall(submittedXformText);
-            List<FileItem> items = version.getFileItems();
+            List<FileItem> items = formLayout.getFileItems();
 
             StudyBean currentStudy = new StudyBean();
             currentStudy.setId(study.getStudyId());
@@ -844,6 +850,14 @@ public class OdmImportServiceImpl implements OdmImportService {
             crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", "Xform");
         }
         paramObj.getErrors().addAllErrors(crfVersionErrors);
+    }
+
+    public FormLayoutDao getFormLayoutDao() {
+        return formLayoutDao;
+    }
+
+    public void setFormLayoutDao(FormLayoutDao formLayoutDao) {
+        this.formLayoutDao = formLayoutDao;
     }
 
 }

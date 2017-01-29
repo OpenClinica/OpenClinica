@@ -160,7 +160,6 @@ public class AddCRFToDefinitionServlet extends SecureController {
     private void addCRF() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ArrayList crfArray = new ArrayList();
         Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");

@@ -142,8 +142,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-            // CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-            // CRFVersionBean crfVersion = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
             FormLayoutDAO fldao = new FormLayoutDAO(ds);
             FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(ecb.getFormLayoutId());
 
@@ -193,7 +191,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int noteId = fp.getInt(INPUT_NOTE_ID);
         String module = (String) session.getAttribute("module");
-        // Integer subjectId = (Integer) session.getAttribute("subjectId");
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
 
@@ -327,7 +324,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         String module = (String) session.getAttribute("module");
-        // Integer subjectId = (Integer) session.getAttribute("subjectId");
         /*
          * BWP: This caused a problem with page refreshing (the subjectId was
          * lost); so I had to comment it out if(subjectId != null){

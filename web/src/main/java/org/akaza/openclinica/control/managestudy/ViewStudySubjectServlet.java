@@ -405,9 +405,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
             // populate the event CRF with its crf bean
             int crfVersionId = ecb.getCRFVersionId();
-            // CRFBean cb = cdao.findByVersionId(crfVersionId);
-            // ecb.setCrf(cb);
-
             int formLayoutId = ecb.getFormLayoutId();
             CRFBean cb = cdao.findByLayoutId(formLayoutId);
             ecb.setCrf(cb);

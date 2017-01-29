@@ -67,8 +67,6 @@ public class ResponseSetService {
                 responseSet.setResponseType(responseType);
                 responseSet.setVersionId(crfVersion.getCrfVersionId());
                 responseSet = responseSetDao.saveOrUpdate(responseSet);
-                // responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(),
-                // formLayout.getFormLayoutId());
             }
             // Run validation against it
             ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);

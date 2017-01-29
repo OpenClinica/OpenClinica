@@ -117,7 +117,6 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
 
-            // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
             FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             ArrayList newEventDefinitionCRFs = new ArrayList();
@@ -131,8 +130,6 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 edc.setParticipantForm(edc.isParticipantForm());
                 // TO DO: use a better way on JSP page,eg.function tag
                 edc.setNullFlags(processNullValues(edc));
-                // CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
-                // edc.setDefaultVersionName(defaultVersion.getName());
                 FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(edc.getDefaultVersionId());
                 edc.setDefaultVersionName(formLayout.getName());
 

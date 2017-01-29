@@ -22,16 +22,14 @@ public class EnketoFormServlet extends SecureController {
     public static final String FORM_LAYOUT_ID = "formLayoutId";
     public static final String STUDY_EVENT_ID = "studyEventId";
     public static final String EVENT_CRF_ID = "eventCrfId";
+    public static final String QUERY_FLAVOR = "-query";
 
     @Override
     protected void processRequest() throws Exception {
-        // CrfVersionDao crfVersionDao = (CrfVersionDao)
-        // SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
         FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
         StudyEventDao studyEventDao = (StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
-        // String crfVersionId = request.getParameter(CRF_VERSION_ID);
         String formLayoutId = request.getParameter(FORM_LAYOUT_ID);
 
         String studyEventId = request.getParameter(STUDY_EVENT_ID);
@@ -39,8 +37,6 @@ public class EnketoFormServlet extends SecureController {
         String formUrl = null;
 
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(Integer.valueOf(studyEventId));
-        // CrfVersion crfVersion = crfVersionDao.findByCrfVersionId(Integer.valueOf(crfVersionId));
-
         FormLayout formLayout = formLayoutDao.findById(Integer.valueOf(formLayoutId));
 
         // Cache the subject context for use during xform submission
@@ -52,12 +48,11 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
-        String flavor = "-query";
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), formLayout, studyEvent, flavor);
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), formLayout, studyEvent, QUERY_FLAVOR);
         } else {
-            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
+            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), QUERY_FLAVOR);
         }
         request.setAttribute(FORM_URL, formUrl);
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");

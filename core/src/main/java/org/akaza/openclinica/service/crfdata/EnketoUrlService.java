@@ -156,16 +156,16 @@ public class EnketoUrlService {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor)
+    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String queryFlavor)
             throws Exception {
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
-        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + queryFlavor) + "?ecid=" + subjectContextKey;
 
     }
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
-            StudyEvent studyEvent, String flavor) throws Exception {
+            StudyEvent studyEvent, String queryFlavor) throws Exception {
 
         String editURL = null;
         StudyEventDefinition eventDef;
@@ -183,7 +183,6 @@ public class EnketoUrlService {
             subject = studyEvent.getStudySubject();
         }
         if (formLayout == null) {
-            // crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
             formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         }
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
@@ -204,7 +203,7 @@ public class EnketoUrlService {
             markComplete = false;
         }
         // Return Enketo URL
-        EnketoURLResponse eur = enketo.getEditURL(formLayout.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete);
+        EnketoURLResponse eur = enketo.getEditURL(formLayout.getOcOid() + queryFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete);
         editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 

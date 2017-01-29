@@ -126,7 +126,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
         sed.setType(fp.getString("type"));
 
         session.setAttribute("definition", sed);
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ArrayList<EventDefinitionCRFBean> edcs = (ArrayList) session.getAttribute("eventDefinitionCRFs");
         for (int i = 0; i < edcs.size(); i++) {

@@ -67,12 +67,6 @@
     </changeSet>
     
     
-        <changeSet author="jkeremian" id="2017-01-24-OC-7770-5">
-        <comment>adding form_layout_id column in event_definition_crf</comment>
-        <addColumn tableName="event_definition_crf">
-                <column name="form_layout_id" type="int"/>
-        </addColumn>
-    </changeSet>
     
         <changeSet author="jkeremian" id="2017-01-24-OC-7770-6">
         <comment>adding form_layout_id column in event_crf</comment>
@@ -81,12 +75,6 @@
         </addColumn>
     </changeSet>
     
-        <changeSet author="jkeremian" id="2017-01-24-OC-7770-7">
-        <comment>adding form_layout_id column in item_group_metadata</comment>
-        <addColumn tableName="item_group_metadata">
-                <column name="form_layout_id" type="int"/>
-        </addColumn>
-    </changeSet>
     
         <changeSet author="jkeremian" id="2017-01-24-OC-7770-8">
                 <dropForeignKeyConstraint baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst"/>
