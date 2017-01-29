@@ -245,23 +245,22 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Crf[] fmCrfs) {
-        CrfBean crf;
-        // CrfVersion version;
+        CrfBean crfBean;
         FormLayout formLayout;
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
-            crf = getCrfDao().findByOcOID(odmFormDef.getOID());
+            crfBean = getCrfDao().findByOcOID(odmFormDef.getOID());
 
-            if (crf == null) {
-                crf = new CrfBean();
-                crf.setOcOid(odmFormDef.getOID());
-                crf = getCrfDao().saveOrUpdate(populateCrf(odmFormDef, userAccount, crf, study));
+            if (crfBean == null) {
+                crfBean = new CrfBean();
+                crfBean.setOcOid(odmFormDef.getOID());
+                crfBean = getCrfDao().saveOrUpdate(populateCrf(odmFormDef, userAccount, crfBean, study));
             } else {
-                crf = getCrfDao().saveOrUpdate(updateCrf(odmFormDef, userAccount, crf, study));
+                crfBean = getCrfDao().saveOrUpdate(updateCrf(odmFormDef, userAccount, crfBean, study));
             }
-            formLayout = saveOrUpdateCrfVersion(userAccount, crf, odmFormDef, fmCrfs);
+            formLayout = saveOrUpdateCrfVersion(userAccount, crfBean, odmFormDef, fmCrfs);
             if (formLayout.getXform() != null) {
                 try {
-                    parseCrfVersion(crf, formLayout, study, userAccount);
+                    parseCrfVersion(crfBean, formLayout, study, userAccount);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -270,7 +269,6 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private FormLayout saveOrUpdateCrfVersion(UserAccount userAccount, CrfBean crf, ODMcomplexTypeDefinitionFormDef odmFormDef, Crf[] fmCrfs) {
-        // CrfVersion crfVersion = null;
         FormLayout formLayout = null;
         List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
@@ -404,19 +402,19 @@ public class OdmImportServiceImpl implements OdmImportService {
         return studyEventDefinition;
     }
 
-    private CrfBean populateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crf, Study study) {
-        crf.setStudy(study);
-        crf.setName(odmFormDef.getName());
-        crf.setUserAccount(userAccount);
-        crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        return crf;
+    private CrfBean populateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crfBean, Study study) {
+        crfBean.setStudy(study);
+        crfBean.setName(odmFormDef.getName());
+        crfBean.setUserAccount(userAccount);
+        crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        return crfBean;
     }
 
-    private CrfBean updateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crf, Study study) {
-        crf = populateCrf(odmFormDef, userAccount, crf, study);
-        crf.setUpdateId(userAccount.getUserId());
-        crf.setDateUpdated(new Date());
-        return crf;
+    private CrfBean updateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crfBean, Study study) {
+        crfBean = populateCrf(odmFormDef, userAccount, crfBean, study);
+        crfBean.setUpdateId(userAccount.getUserId());
+        crfBean.setDateUpdated(new Date());
+        return crfBean;
     }
 
     private FormLayout populateCrfVersion(PopulateCrfVersionParameter paramObj) {
@@ -692,19 +690,19 @@ public class OdmImportServiceImpl implements OdmImportService {
         return xform;
     }
 
-    private void parseCrfVersion(CrfBean crf, FormLayout formLayout, Study study, UserAccount userAccount) throws Exception {
-        String submittedCrfName = crf.getName();
+    private void parseCrfVersion(CrfBean crfBean, FormLayout formLayout, Study study, UserAccount userAccount) throws Exception {
+        String submittedCrfName = crfBean.getName();
         String submittedCrfVersionName = formLayout.getName();
         String submittedCrfVersionDescription = formLayout.getDescription();
         String submittedRevisionNotes = formLayout.getRevisionNotes();
         String submittedXformText = formLayout.getXform();
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(formLayout.getCrf().getCrfId()).get(0);
 
         // Create container for holding validation errors
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
 
         // Validate all upload form fields were populated
-        // CRFVersionBean crfVersion = new CRFVersionBean();
         FormLayoutBean formLayoutBean = new FormLayoutBean();
         formLayoutBean.setOid(formLayout.getOcOid());
         formLayoutBean.setCrfId(formLayout.getCrf().getCrfId());
@@ -736,8 +734,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
             // Below section requires change to accommodate multiple crf versions
             try {
-                // xformService.createCRFMetaData(crfVersion, container, currentStudy, ub, html, submittedCrfName,
-                // submittedCrfVersionName,
+                // xformService.createCRFMetaData(crfBean,crfVersion, container, currentStudy, ub, html,
+                // submittedCrfName, submittedCrfVersionName,
                 // submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
             } catch (Exception e) {
                 e.printStackTrace();
