@@ -727,7 +727,6 @@ window.onload = initmb;
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${false}"/>
                         <c:param name="originJSP" value="doubleDataEntry"/>
                     </c:import>
                 </td>
@@ -754,7 +753,6 @@ window.onload = initmb;
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="isTemplate" value="${false}"/>
                     <c:param name="originJSP" value="doubleDataEntry"/>
                 </c:import>
 				<c:import url="../submit/generateGroupItemTxt.jsp">
@@ -848,7 +846,6 @@ window.onload = initmb;
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="isTemplate" value="${true}"/>
                             <c:param name="originJSP" value="doubleDataEntry"/>
                         </c:import>
                     </td>
@@ -878,7 +875,6 @@ window.onload = initmb;
                         <c:param name="isNewItem" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${true}"/>
                         <c:param name="originJSP" value="doubleDataEntry"/>
                     </c:import>
 					<!-- link text here -->

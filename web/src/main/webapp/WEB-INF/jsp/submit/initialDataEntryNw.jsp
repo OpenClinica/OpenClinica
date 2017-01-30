@@ -797,7 +797,6 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${false}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
                     </c:import>
                 </td>
@@ -825,7 +824,6 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="isTemplate" value="${false}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
                 </c:import>
                 <c:import url="../submit/generateGroupItemTxt.jsp">
@@ -932,7 +930,6 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="isTemplate" value="${true}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
 
                         </c:import>
@@ -962,7 +959,6 @@ but the custom tag uses that, not this jstl code--%>
 						<c:param name="isNewItem" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${true}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
                     </c:import>
                     <c:import url="../submit/generateGroupItemTxt.jsp">

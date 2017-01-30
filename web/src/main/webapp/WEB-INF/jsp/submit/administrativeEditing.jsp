@@ -602,7 +602,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${false}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
                         <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>
@@ -630,7 +629,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:param name="isLast" value="${false}"/>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="isTemplate" value="${false}"/>
                     <c:param name="originJSP" value="administrativeEditing"/>
                     <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                 </c:import>
@@ -704,7 +702,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="isTemplate" value="${true}"/>
                             <c:param name="originJSP" value="administrativeEditing"/>
                             <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                         </c:import>
@@ -733,7 +730,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="isNewItem" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="isTemplate" value="${true}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
                         <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>

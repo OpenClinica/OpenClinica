@@ -253,7 +253,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="parsedInputName" value="${repeatParentId}_${rowCount}input${itemId}" />
 <c:set var="isHorizontal" value="${param.isHorizontal}" />
 <c:set var="defValue" value="${param.defaultValue}" />
-<c:set var="isTemplate" value="${param.isTemplate}" />
 
 
 
@@ -329,7 +328,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 	<label for="<c:out value="${inputName}"/>"></label>
 	<c:set var="pathAndName" value="${displayItem.data.value}"/>
 	<c:choose>
-	<c:when test="${inputTxtValue==null || empty inputTxtValue || isTemplate}">
+	<c:when test="${inputTxtValue==null || empty inputTxtValue || isLast}">
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">
 		<c:choose>
     	<c:when test="${isInError}">
@@ -343,7 +342,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 			<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
 		</div>
 		<c:choose>
-		<c:when test="${isTemplate}">
+		<c:when test="${isLast}">
         <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value >
 		</c:when>
 		<c:otherwise>
