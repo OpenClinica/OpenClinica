@@ -80,5 +80,12 @@
                 <dropForeignKeyConstraint baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst"/>
             </changeSet>
     
+    	<changeSet author="jkeremian" id="2017-01-30-OC-7778-01" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Event Crf Table</comment>
+		<sql>
+        ALTER TABLE event_crf ADD CONSTRAINT duplicate_event_crf_uniqueness_key UNIQUE (study_event_id, study_subject_id, form_layout_id);
+        </sql>
+	</changeSet>
+    
     
 </databaseChangeLog>
