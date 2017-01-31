@@ -100,6 +100,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         variables.put(Integer.valueOf(7), getValidOid(cvb, cvb.getName(), cvb.getOid()));
         variables.put(Integer.valueOf(8), cvb.getXform());
         variables.put(Integer.valueOf(9), cvb.getXformName());
+        variables.put(Integer.valueOf(10), cvb.getUrl());
 
         // am i the only one who runs their daos' unit tests after I change
         // things, tbh?
@@ -141,6 +142,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         this.setTypeExpected(11, TypeNames.STRING);
         this.setTypeExpected(12, TypeNames.STRING);
         this.setTypeExpected(13, TypeNames.STRING);
+        this.setTypeExpected(14, TypeNames.STRING);
 
     }
 
@@ -159,6 +161,8 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         eb.setOid((String) hm.get("oc_oid"));
         eb.setXform((String) hm.get("xform"));
         eb.setXformName((String) hm.get("xform_name"));
+        eb.setUrl((String) hm.get("url"));
+
         return eb;
     }
 

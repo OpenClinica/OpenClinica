@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,9 +101,10 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
                     List<String> instanceItemsPath = new ArrayList<>();
                     instanceItemsPath = xformParserHelper.instanceItemPaths(instanceNode, instanceItemsPath, "");
+                    int idx = StringUtils.ordinalIndexOf(instanceItemsPath.get(0), "/", 2);
                     List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(container.getCrfVersion().getCrfVersionId());
                     for (ItemGroup ig : itemGroups) {
-                        if (ig.getLayoutGroupPath().equals(instanceItemsPath.get(0))) {
+                        if (ig.getLayoutGroupPath() != null && ig.getLayoutGroupPath().equals(instanceItemsPath.get(0).substring(idx))) {
                             itemGroup = ig;
                             break;
                         }

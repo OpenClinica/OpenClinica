@@ -50,6 +50,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -282,7 +283,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
                             if (repeatingXformGroup == null) {
                                 repeatingXformGroup = new XformGroup();
                                 repeatingXformGroup.setGroupName(xformItem.getItemGroup());
-                                repeatingXformGroup.setGroupPath(repeatGroupPath);
+                                int idx = StringUtils.ordinalIndexOf(repeatGroupPath, "/", 2);
+                                repeatingXformGroup.setGroupPath(repeatGroupPath.substring(idx));
                                 repeatingXformGroup.setRepeating(true);
                                 repeatingXformGroup.getItems().add(xformItem);
                             } else {

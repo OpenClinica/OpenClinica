@@ -20,7 +20,9 @@ import java.util.List;
 
 public class FormDefBean extends ElementDefBean {
     private List<ElementRefBean> itemGroupRefs;
-    //openclinica extension
+    private List<ElementRefBean> formLayoutRefs;
+
+    // openclinica extension
     private FormDetailsBean formDetails;
 
     public FormDefBean() {
@@ -43,4 +45,13 @@ public class FormDefBean extends ElementDefBean {
     public void setFormDetails(FormDetailsBean formDetails) {
         this.formDetails = formDetails;
     }
+
+    public List<ElementRefBean> getFormLayoutRefs() {
+        return formLayoutRefs;
+    }
+
+    public void setFormLayoutRefs(List<ElementRefBean> formLayoutRefs) {
+        this.formLayoutRefs = formLayoutRefs;
+    }
+
 }

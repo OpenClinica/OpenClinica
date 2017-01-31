@@ -7,11 +7,11 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
-
-import java.util.Date;
 
 /**
  * The object to carry CRF versions in the application.
@@ -37,6 +37,7 @@ public class FormLayoutBean extends AuditableEntityBean {
 
     private String xform;
     private String xformName;
+    private String url;
 
     public FormLayoutBean() {
         this.oidGenerator = new CrfVersionOidGenerator();
@@ -157,6 +158,14 @@ public class FormLayoutBean extends AuditableEntityBean {
 
     public void setXformName(String xformName) {
         this.xformName = xformName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     /*
