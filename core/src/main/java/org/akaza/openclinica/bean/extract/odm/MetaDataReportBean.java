@@ -328,15 +328,23 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(currentIndent + indent + "<FormRef FormOID=\"" + StringEscapeUtils.escapeXml(formRef.getElementDefOID()) + "\" Mandatory=\""
                         + formRef.getMandatory() + "\">");
                 xml.append(nls);
-                ConfigurationParameters conf = formRef.getConfigurationParameters();
-                xml.append(currentIndent + indent + indent + "<OpenClinica:ConfigurationParameters HideCRF=\"" + conf.isHiddenCrf() + "\" ParticipantForm=\""
-                        + conf.isParticipantForm() + "\" AllowAnonymousSubmission=\"" + conf.isParticipantForm() + "\" Offline=\"" + conf.isOffline() + "\"/>");
-                xml.append(nls);
-                ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) formRef.getFormLayoutRefs();
-                for (ElementRefBean formLayoutRef : formLayoutRefs) {
-                    xml.append(currentIndent + indent + indent + "<OpenClinica:FormLayoutRef Name=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName())
-                            + "\" IsDefaultVersion=\"" + formLayoutRef.isDefaultVersion() + "\"/>");
+                ConfigurationParameters conf;
+                if (isStudy) {
+                    conf = formRef.getConfigurationParameters();
+                } else {
+                    conf = formRef.getConfigurationParameters();
+                }
+                if (conf != null) {
+                    xml.append(currentIndent + indent + indent + "<OpenClinica:ConfigurationParameters HideCRF=\"" + conf.isHiddenCrf()
+                            + "\" ParticipantForm=\"" + conf.isParticipantForm() + "\" AllowAnonymousSubmission=\"" + conf.isParticipantForm()
+                            + "\" SubmissionUrl=\"" + conf.getSubmissionUrl() + "\" Offline=\"" + conf.isOffline() + "\"/>");
                     xml.append(nls);
+                    ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) formRef.getFormLayoutRefs();
+                    for (ElementRefBean formLayoutRef : formLayoutRefs) {
+                        xml.append(currentIndent + indent + indent + "<OpenClinica:FormLayoutRef Name=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName())
+                                + "\" IsDefaultVersion=\"" + formLayoutRef.isDefaultVersion() + "\"/>");
+                        xml.append(nls);
+                    }
                 }
                 xml.append(currentIndent + indent + "</FormRef>");
                 xml.append(nls);

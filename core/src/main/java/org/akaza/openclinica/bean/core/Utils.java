@@ -230,14 +230,19 @@ public class Utils {
 
     public static String getCrfMediaFilePath(CrfBean crf, FormLayout formLayout) {
         String attachedFilePath = CoreResources.getField("attached_file_location");
-
+        String filePath = crf.getOcOid() + File.separator + formLayout.getOcOid() + File.separator;
         if (attachedFilePath == null || attachedFilePath.length() <= 0) {
             attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + crf.getOcOid() + File.separator + formLayout.getOcOid()
                     + File.separator;
         } else {
-            attachedFilePath += crf.getOcOid() + File.separator + formLayout.getOcOid() + File.separator;
+            attachedFilePath += filePath;
         }
         return attachedFilePath;
+    }
+
+    public static String getCrfMediaFilePathWithoutSysPath(CrfBean crf, FormLayout formLayout) {
+        String filePath = crf.getOcOid() + File.separator + formLayout.getOcOid() + File.separator;
+        return filePath;
     }
 
     public static String getAttachedFileRootPath() {

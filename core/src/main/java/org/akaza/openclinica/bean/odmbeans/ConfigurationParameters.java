@@ -5,6 +5,7 @@ public class ConfigurationParameters {
     private boolean participantForm;
     private boolean allowAnynymousSubmission;
     private boolean offline;
+    private String submissionUrl;
 
     public boolean isHiddenCrf() {
         return hiddenCrf;
@@ -36,6 +37,14 @@ public class ConfigurationParameters {
 
     public void setOffline(boolean offline) {
         this.offline = offline;
+    }
+
+    public String getSubmissionUrl() {
+        return submissionUrl;
+    }
+
+    public void setSubmissionUrl(String submissionUrl) {
+        this.submissionUrl = submissionUrl;
     }
 
 }

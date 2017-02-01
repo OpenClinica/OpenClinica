@@ -714,6 +714,7 @@ public class OdmExtractDAO extends DatasetDAO {
             Boolean cvRequired = (Boolean) row.get("cv_required");
             String nullValue = (String) row.get("null_values");
             String crfName = (String) row.get("crf_name");
+            String crfOid = (String) row.get("crf_oid");
 
             StudyEventDefBean sedef = new StudyEventDefBean();
             if (sedprev.equals(sedOID)) {
@@ -736,14 +737,14 @@ public class OdmExtractDAO extends DatasetDAO {
             }
 
             ElementRefBean formref = new ElementRefBean();
-            formref.setElementDefOID(cvOID);
+            formref.setElementDefOID(crfOid);
             formref.setMandatory(cvRequired ? "Yes" : "No");
             sedef.getFormRefs().add(formref);
 
             if (!cvIdPoses.containsKey(cvId)) {
                 FormDefBean formdef = new FormDefBean();
-                formdef.setOid(cvOID);
-                formdef.setName(crfName + " - " + cvName);
+                formdef.setOid(crfOid);
+                formdef.setName(crfName);
                 formdef.setRepeating("No");
                 metadata.getFormDefs().add(formdef);
                 cvIdPoses.put(cvId, metadata.getFormDefs().size() - 1);
@@ -3706,6 +3707,7 @@ public class OdmExtractDAO extends DatasetDAO {
         conf.setOffline(edc.isOffline());
         conf.setHiddenCrf(edc.isHideCrf());
         conf.setParticipantForm(edc.isParticipantForm());
+        conf.setSubmissionUrl(edc.getSubmissionUrl());
         return conf;
     }
 
