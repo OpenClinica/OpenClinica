@@ -251,7 +251,9 @@ public class OpenRosaSubmissionController {
 
         int count = 0;
         for (EventCrf evCrf : eventCrfs) {
-            if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()) {
+            if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
+                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
+                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
                 for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
                     if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getCrfVersion().getCrf().getCrfId()) {
                         count++;
