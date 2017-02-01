@@ -13,3 +13,8 @@
     <input type="submit" value="tenant3">
 </form>
 
+<form action="/pages/schema/post"  method="post">
+    <input type="text" name="studyOID">
+    <input type="submit" value="Study OID">
+</form>
+

@@ -239,7 +239,7 @@
                 <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
                 <prop key="hibernate.multiTenancy">SCHEMA</prop>
                 <prop key="hibernate.connection.password">clinica</prop>
-                <prop key="hibernate.connection.url">jdbc:postgresql://localhost:5432/oc_liqui</prop>
+                <prop key="hibernate.connection.url">jdbc:postgresql://localhost:5432/oc_test</prop>
                 <prop key="hibernate.connection.username">clinica</prop>
                 <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop>
                 <prop key ="hibernate.multi_tenant_connection_provider">org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl</prop>

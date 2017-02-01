@@ -16,8 +16,8 @@
 <br>
 <table>
     <tr>
-        <td>Study Subject</td>
-        <td>${studySubject}</td>
+        <td>Item Data Value</td>
+        <td>${item_data_value}</td>
     </tr>
 </table>
 </body>

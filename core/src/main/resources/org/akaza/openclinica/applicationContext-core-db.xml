@@ -43,7 +43,7 @@
         <property name="testOnReturn" value="true"/>
         <property name="timeBetweenEvictionRunsMillis" value="300000"/>
         <property name="minEvictableIdleTimeMillis" value="600000"/>
-        <property name="url" value="jdbc:postgresql://localhost:5432/oc_liqui"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/oc_test"/>
         <property name="username" value="clinica"/>
         <property name="password" value="clinica"/>
         <property name="bigStringTryClob" value="true"/>
