@@ -134,8 +134,8 @@ public class ListCRFServlet extends SecureController {
         ArrayList allRows = ListCRFRow.generateRowsFromBeans(crfs);
 
         String[] columns = { resword.getString("CRF_name"), resword.getString("date_updated"), resword.getString("last_updated_by"),
-                resword.getString("crf_oid"), resword.getString("versions"), resword.getString("version_oid"), resword.getString("date_created"),
-                resword.getString("owner"), resword.getString("status"), resword.getString("download"), resword.getString("actions") };
+                resword.getString("crf_oid"), resword.getString("versions"), resword.getString("date_created"), resword.getString("owner"),
+                resword.getString("status"), resword.getString("download"), resword.getString("actions") };
 
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(3);

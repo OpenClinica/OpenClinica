@@ -105,6 +105,7 @@ import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 public class OdmExtractDAO extends DatasetDAO {
     EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
     StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
+    CRFVersionDAO cvdao = new CRFVersionDAO<>(ds);
     CRFDAO crfdao = new CRFDAO(ds);
     StudyDAO sdao = new StudyDAO(ds);
     FormLayoutDAO fldao = new FormLayoutDAO(ds);
@@ -398,6 +399,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // cv_oid
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // item_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // crf_oid
     }
 
     public void setStudyUsersTypesExpected() {
@@ -1327,12 +1330,13 @@ public class OdmExtractDAO extends DatasetDAO {
      */
     public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
         this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
+
         String cvIds = metadata.getCvIds();
         if (odmVersion.startsWith("oc")) {
             // add CRFVersions that itemDef belong to
             HashMap<String, String> itDefCVs = new HashMap<String, String>();
             this.setItemCVOIDsTypesExpected();
-            ArrayList al = this.select(this.getItemCVOIDsSql(cvIds));
+            ArrayList al = this.select(this.getItemCVOIDsSqlUpdated(cvIds));
             Iterator iter = al.iterator();
             while (iter.hasNext()) {
                 HashMap row = (HashMap) iter.next();
@@ -1341,14 +1345,16 @@ public class OdmExtractDAO extends DatasetDAO {
                 Integer itId = (Integer) row.get("item_id");
                 String cvOID = (String) row.get("cv_oid");
                 String itOID = (String) row.get("item_oid");
+                String crfOID = (String) row.get("crf_oid");
+
                 if (itDefCVs.containsKey(itOID)) {
                     String cvs = itDefCVs.get(itOID);
-                    if (!cvs.contains(cvOID + ",")) {
-                        cvs += cvOID + ",";
+                    if (!cvs.contains(crfOID + ",")) {
+                        cvs += crfOID + ",";
                     }
                     itDefCVs.put(itOID, cvs);
                 } else {
-                    itDefCVs.put(itOID, cvOID + ",");
+                    itDefCVs.put(itOID, crfOID + ",");
                 }
             }
             for (ItemDefBean itdef : metadata.getItemDefs()) {
@@ -1409,7 +1415,7 @@ public class OdmExtractDAO extends DatasetDAO {
             // add CRFVersions that itemDef belong to
             HashMap<String, String> itDefCVs = new HashMap<String, String>();
             this.setItemCVOIDsTypesExpected();
-            ArrayList al = this.select(this.getItemCVOIDsSql(cvIds));
+            ArrayList al = this.select(this.getItemCVOIDsSqlUpdated(cvIds));
             Iterator iter = al.iterator();
             while (iter.hasNext()) {
                 HashMap row = (HashMap) iter.next();
@@ -1418,14 +1424,16 @@ public class OdmExtractDAO extends DatasetDAO {
                 Integer itId = (Integer) row.get("item_id");
                 String cvOID = (String) row.get("cv_oid");
                 String itOID = (String) row.get("item_oid");
+                String crfOID = (String) row.get("crf_oid");
+
                 if (itDefCVs.containsKey(itOID)) {
                     String cvs = itDefCVs.get(itOID);
-                    if (!cvs.contains(cvOID + ",")) {
-                        cvs += cvOID + ",";
+                    if (!cvs.contains(crfOID + ",")) {
+                        cvs += crfOID + ",";
                     }
                     itDefCVs.put(itOID, cvs);
                 } else {
-                    itDefCVs.put(itOID, cvOID + ",");
+                    itDefCVs.put(itOID, crfOID + ",");
                 }
             }
             for (ItemDefBean itdef : metadata.getItemDefs()) {
@@ -2208,6 +2216,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 Integer sampleOrdinal = (Integer) row.get("sample_ordinal");
                 String cvOID = (String) row.get("crf_version_oid");
                 Integer ecId = (Integer) row.get("event_crf_id");// ecId
+                CRFVersionBean cvBean = cvdao.findByOid(cvOID);
+                CRFBean cBean = (CRFBean) crfdao.findByPK(cvBean.getCrfId());
+
                 // should
                 // be unique;
 
@@ -2246,7 +2257,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     form = se.getExportFormData().get(se.getExportFormData().size() - 1);
                 } else {
                     formprev = key;
-                    form.setFormOID(cvOID);
+                    form.setFormOID(cBean.getOid());
                     se.getExportFormData().add(form);
                     igprev = "";
                 }
@@ -2978,6 +2989,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer ecId = (Integer) row.get("event_crf_id");// ecId should
             // be unique;
             Date dob = (Date) row.get("date_of_birth");
+            CRFVersionBean cvBean = cvdao.findByOid(cvOID);
+            CRFBean cBean = (CRFBean) crfdao.findByPK(cvBean.getCrfId());
 
             String key = studySubjectLabel;
             ExportSubjectDataBean sub = new ExportSubjectDataBean();
@@ -3102,7 +3115,7 @@ public class OdmExtractDAO extends DatasetDAO {
             } else {
                 formprev = key;
                 ecIds += "'" + ecId + "', ";
-                form.setFormOID(cvOID);
+                form.setFormOID(cBean.getOid());
                 // ----- add openclinica crf attributes
                 if (dataset.isShowCRFversion()) {
                     form.setCrfVersion((String) row.get("crf_version"));
@@ -3665,6 +3678,13 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid"
                 + " from crf_version cv, versioning_map vm, item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
                 + " and vm.crf_version_id = cv.crf_version_id and vm.item_id = item.item_id" + " order by cv.crf_id, cv.crf_version_id desc, item.item_id";
+    }
+
+    protected String getItemCVOIDsSqlUpdated(String crfVersionIds) {
+        return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid , c.oc_oid as crf_oid "
+                + " from crf_version cv, versioning_map vm, crf c , item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
+                + " and vm.crf_version_id = cv.crf_version_id and c.crf_id = cv.crf_id and vm.item_id = item.item_id"
+                + " order by cv.crf_id, cv.crf_version_id desc, item.item_id";
     }
 
     protected String getSectionLabelsSql(String sectionIds) {
