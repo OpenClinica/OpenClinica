@@ -78,9 +78,7 @@
         <tr id="CRF_infobox_closed" style="display: none;">
             <td style="padding-top: 3px; padding-left: 6px; width: 90px;" nowrap>
                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-                <b>CRF Info</b>
-
+                <b><fmt:message key="crf_info" bundle="${resword}"/></b>
             </td>
         </tr>
         <tr id="CRF_infobox_open" style="display: all">
@@ -96,9 +94,7 @@
                                             <div class="tab_R_h" style="padding-right: 0px;">
                                                 <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
                                                     <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><img src="images/sidebar_collapse.gif" border="0" align="right"></a>
-
-                                                    <b>CRF Info</b>
-
+                                                    <b><fmt:message key="crf_info" bundle="${resword}"/></b>
                                                 </div>
                                             </div>
                                         </div>
@@ -180,7 +176,7 @@
                                                                 <tr>
                                                                     <td class="table_cell_noborder"><b><fmt:message key="interviewer" bundle="${resword}"/>:</b></td>
                                                                     <td class="table_cell_noborder"><c:out value="${EventCRFBean.interviewerName}"/> (<fmt:formatDate value="${EventCRFBean.dateInterviewed}" pattern="${dteFormat}"/>)</td>
-                                                                    <td class="table_cell_top"><b><fmt:message key="Gender" bundle="${resword}"/>:</b></td>
+                                                                    <td class="table_cell_top"><b><fmt:message key="gender" bundle="${resword}"/>:</b></td>
                                                                     <td class="table_cell_noborder"><c:choose>
                                                                         <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
                                                                         <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
@@ -323,7 +319,6 @@
             </c:if>
         </tr>
     </table>
-
 </form>
 
 <c:choose>
