@@ -180,10 +180,13 @@
         <property name="coreResources" ref="coreResources"/>
         <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
         <property name="openRosaSubmissionController" ref="openRosaSubmissionController" />
+        <property name="xformParserHelper" ref="xformParserHelper" />
+
     </bean>
 
     <bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
     </bean>
+    <bean id="xformParserHelper" class="org.akaza.openclinica.domain.xform.XformParserHelper"/>
 
 
 </beans>

@@ -9,11 +9,16 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class XformParserHelper {
+    public static final String ENKETO_ORDINAL = "enk:ordinal";
+    public static final String ENKETO_LAST_USED_ORDINAL = "enk:last-used-ordinal";
+    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String QUERY_SUFFIX = "_comment";
+    public static final String JR_TEMPLATE = "jr:template";
 
     public void addCommentElementInInstance(Document doc, Node crfNode, String path, List<String> nodesetAttrs) {
         int outerNodeLength = crfNode.getChildNodes().getLength();
         if (outerNodeLength == 0 && !nodesetAttrs.contains(path + "/" + crfNode.getNodeName())) {
-            Element newChildNode = doc.createElement(crfNode.getNodeName() + "_comment");
+            Element newChildNode = doc.createElement(crfNode.getNodeName() + QUERY_SUFFIX);
             crfNode.getParentNode().appendChild(newChildNode);
         }
 
@@ -24,7 +29,9 @@ public class XformParserHelper {
                     addCommentElementInInstance(doc, node, path + "/" + node.getNodeName(), nodesetAttrs);
                 } else {
                     if (!nodesetAttrs.contains(path + "/" + node.getNodeName())) {
-                        Element newChildNode = doc.createElement(node.getNodeName() + "_comment");
+                        Element newChildNode = doc.createElement(node.getNodeName() + QUERY_SUFFIX);
+                        newChildNode.setAttribute(FS_QUERY_ATTRIBUTE, node.getNodeName());
+                        // this is where I need to add query Element for Edit mode.
                         node.getParentNode().appendChild(newChildNode);
                     }
                 }
@@ -39,7 +46,7 @@ public class XformParserHelper {
         Element input = doc.createElement("input");
 
         input.setAttribute("appearance", "dn w1");
-        input.setAttribute("ref", refAttr.getNodeValue() + "_comment");
+        input.setAttribute("ref", refAttr.getNodeValue() + QUERY_SUFFIX);
 
         Element label = doc.createElement("label");
         label.appendChild(doc.createTextNode("Comment:"));
@@ -77,8 +84,8 @@ public class XformParserHelper {
             list.add(path);
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
-                if (node.hasChildNodes()) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.hasChildNodes() && node.getChildNodes().getLength() != 1) {
                     list = instanceItemPaths(node, list, path + "/" + node.getNodeName());
                 } else {
                     list.add(path + "/" + node.getNodeName());
@@ -94,11 +101,28 @@ public class XformParserHelper {
             set.add(outerNode);
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
-                if (node.hasChildNodes()) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.hasChildNodes() && !(node.getChildNodes().getLength() == 1 && !(node.getFirstChild() instanceof Element))) {
                     set = instanceItemNodes(node, set);
                 } else {
                     set.add(node);
+                }
+            }
+        }
+        return set;
+    }
+
+    public Set<Node> instanceEnketoAttr(Node outerNode, Set<Node> set) {
+        int outerNodeLength = outerNode.getChildNodes().getLength();
+        if (outerNodeLength == 0)
+            set.add(outerNode);
+        for (int b = 0; b < outerNodeLength; b++) {
+            Node node = outerNode.getChildNodes().item(b);
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.getAttributes() != null && node.getAttributes().getNamedItem(ENKETO_ORDINAL) != null) {
+                    set.add(node);
+                } else {
+                    set = instanceEnketoAttr(node, set);
                 }
             }
         }
@@ -109,7 +133,7 @@ public class XformParserHelper {
         int outerNodeLength = outerNode.getChildNodes().getLength();
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
                 if (node.getNodeName().equals("repeat")) {
                     Node repeatNode = node.getAttributes().getNamedItem("nodeset");
                     list.add(repeatNode.getNodeValue());
@@ -126,7 +150,7 @@ public class XformParserHelper {
         int outerNodeLength = outerNode.getChildNodes().getLength();
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
-            if (node instanceof Element) {
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
                 if (node.getNodeName().equals("repeat")) {
                     set.add(node);
                 }
@@ -138,19 +162,21 @@ public class XformParserHelper {
         return set;
     }
 
-    public Set<Node> instanceGroupNodes(Node crfNode, Set<Node> set, String path) {
-        int outerNodeLength = crfNode.getChildNodes().getLength();
+    public List<String> bodyGroupNodePaths(Node outerNode, List<String> list) {
+        int outerNodeLength = outerNode.getChildNodes().getLength();
         for (int b = 0; b < outerNodeLength; b++) {
-            Node node = crfNode.getChildNodes().item(b);
-            if (node instanceof Element) {
+            Node node = outerNode.getChildNodes().item(b);
+            if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
+                if (node.getNodeName().equals("group")) {
+                    Node groupNode = node.getAttributes().getNamedItem("ref");
+                    list.add(groupNode.getNodeValue());
+                }
                 if (node.hasChildNodes()) {
-                    set = instanceGroupNodes(node, set, path + "/" + node.getNodeName());
-                } else {
-                    set.add(node.getParentNode());
+                    list = bodyGroupNodePaths(node, list);
                 }
             }
         }
-        return set;
+        return list;
     }
 
 }
