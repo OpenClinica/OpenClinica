@@ -248,6 +248,7 @@ public class XformMetaDataService {
             if (itemGroup == null) {
                 itemGroup = new ItemGroup();
                 itemGroup.setName(xformGroup.getGroupName());
+                itemGroup.setLayoutGroupPath(xformGroup.getGroupPath());
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
@@ -266,9 +267,10 @@ public class XformMetaDataService {
                 // Skip reserved name and read-only items here
                 // XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
                 String readonly = xformItem.getReadonly();
+                boolean calculate = xformItem.isCalculate();
 
                 if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
-                        && (readonly == null || !readonly.trim().equals("true()"))) {
+                        && (readonly == null || !readonly.trim().equals("true()") || (readonly.trim().equals("true()") && calculate))) {
                     Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
                         ResponseType responseType = getResponseType(html, xformItem);

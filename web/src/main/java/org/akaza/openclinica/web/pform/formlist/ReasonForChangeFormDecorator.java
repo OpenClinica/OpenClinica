@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.pform.formlist;
 
+import org.akaza.openclinica.domain.xform.XformParserHelper;
+
 public class ReasonForChangeFormDecorator extends FormDecorator {
 
     public ReasonForChangeFormDecorator(Form form) {
@@ -15,5 +17,11 @@ public class ReasonForChangeFormDecorator extends FormDecorator {
     private String applyReasonForChange(String xform) {
         System.out.println("Applying Reason For Change on XForm ");
         return xform;
+    }
+
+    @Override
+    public String decorate(XformParserHelper xformParserHelper) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

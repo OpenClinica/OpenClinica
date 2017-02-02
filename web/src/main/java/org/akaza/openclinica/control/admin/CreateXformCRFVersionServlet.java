@@ -2,9 +2,12 @@ package org.akaza.openclinica.control.admin;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -32,19 +35,33 @@ import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.Crf;
+import org.akaza.openclinica.service.crfdata.Version;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
+import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,7 +70,7 @@ import org.w3c.dom.NodeList;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    XformParserHelper xformParserHelper = new XformParserHelper();
+    public static final String FORM_SUFFIX = "form.xml";
 
     @Override
     protected void processRequest() throws Exception {
@@ -81,6 +98,25 @@ public class CreateXformCRFVersionServlet extends SecureController {
         DataBinder dataBinder = new DataBinder(new CrfVersion());
         Errors errors = dataBinder.getBindingResult();
 
+        Crf response = filesTofm(items, currentStudy.getOid(), submittedCrfName);
+        List<String> fileLinks = null;
+
+        RestTemplate rest = new RestTemplate();
+        if (response != null) {
+            List<Version> versions = response.getVersions();
+            Version vs = versions.get(0);
+            fileLinks = vs.getFileLinks();
+            submittedCrfVersionName = vs.getName();
+
+            for (String fileLink : fileLinks) {
+                if (fileLink.endsWith(FORM_SUFFIX)) {
+                    submittedXformText = rest.getForObject(fileLink, String.class);
+                    break;
+                }
+            }
+
+        }
+
         // Validate all upload form fields were populated
         validateFormFields(errors, version, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription, submittedRevisionNotes,
                 submittedXformText);
@@ -89,8 +125,8 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
             // Parse instance and xform
             XformParser parser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-            XformContainer container = parseInstance(submittedXformText, errors);
             Html html = parser.unMarshall(submittedXformText);
+            XformContainer container = parseInstance(submittedXformText, errors, html, submittedCrfName);
 
             // Save meta-data in database
             XformMetaDataService xformService = (XformMetaDataService) SpringServletAccess.getApplicationContext(context).getBean("xformMetaDataService");
@@ -117,7 +153,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
             CrfBean crf = (submittedCrfName == null || submittedCrfName.equals("")) ? crfDao.findByCrfId(version.getCrfId())
                     : crfDao.findByName(submittedCrfName);
             CrfVersion newVersion = crfVersionDao.findByNameCrfId(submittedCrfVersionName, crf.getCrfId());
-            saveAttachedMedia(items, crf, newVersion);
+            // saveAttachedMedia(items, crf, newVersion);
+
+            saveArtifactsInFM(fileLinks, crf, newVersion);
+
         }
 
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
@@ -137,30 +176,35 @@ public class CreateXformCRFVersionServlet extends SecureController {
         DataBinder crfVersionDataBinder = new DataBinder(new CrfVersion());
         Errors crfVersionErrors = crfVersionDataBinder.getBindingResult();
 
-        // Verify CRF Version Name is populated
-        if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
-            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
-        }
-
-        // Verify CRF Version Description is populated
-        if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
-            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", resword.getString("crf_version_description"));
-        }
-
-        // Verify CRF Version Revision Notes is populated
-        if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", resword.getString("revision_notes"));
-        }
-
-        // Verify Xform text is populated
-        if (submittedXformText == null || submittedXformText.equals("")) {
-            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
-        }
+        /*
+         * // Verify CRF Version Revision Notes is populated
+         * if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
+         * crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank",
+         * resword.getString("revision_notes"));
+         * }
+         *
+         * // Verify CRF Version Name is populated
+         * if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
+         * crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", resword.getString("version_name"));
+         * }
+         *
+         * // Verify CRF Version Description is populated
+         * if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
+         * crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank",
+         * resword.getString("crf_version_description"));
+         * }
+         *
+         * // Verify Xform text is populated
+         * if (submittedXformText == null || submittedXformText.equals("")) {
+         * crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", resword.getString("xform"));
+         * }
+         */
 
         errors.addAllErrors(crfVersionErrors);
     }
 
-    private XformContainer parseInstance(String xform, Errors errors) throws Exception {
+    private XformContainer parseInstance(String xform, Errors errors, Html html, String submittedCrfName) throws Exception {
+        XformParserHelper xformParserHelper = (XformParserHelper) SpringServletAccess.getApplicationContext(context).getBean("xformParserHelper");
 
         // Could use the following xpath to get all leaf nodes in the case
         // of multiple levels of groups: //*[count(./*) = 0]
@@ -208,35 +252,36 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 }
             }
 
-            NodeList bind = doc.getElementsByTagName("bind");
-            List<XformItem> xformItems = new ArrayList<>();
-            for (int i = 0; i < bind.getLength(); i++) {
-                Element curBind = (Element) bind.item(i);
-                if (curBind instanceof Element) {
-                    for (String itemPath : instanceItemsPath) {
-                        if (itemPath.equals(curBind.getAttribute("nodeset"))) {
-                            XformItem xformItem = new XformItem();
-                            xformItem.setItemPath(itemPath);
-                            xformItem.setItemGroup(curBind.getAttribute("oc:group"));
-                            int index = itemPath.lastIndexOf("/");
-                            String itemName = itemPath.substring(index + 1);
-                            xformItem.setItemName(itemName);
-                            if (curBind.getAttribute("readonly") != null) {
-                                xformItem.setReadonly(curBind.getAttribute("readonly"));
-                            }
-                            xformItems.add(xformItem);
-                            break;
-                        }
-                    }
-                }
-            }
-
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
             XPathExpression expr = xpath.compile("/html/body");
-            List<String> repeatGroupPathList = new ArrayList<>();
 
             Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
+            List<String> bodyGroupPaths = new ArrayList<>();
+            bodyGroupPaths = xformParserHelper.bodyGroupNodePaths(bodyNode, bodyGroupPaths);
+
+            List<XformItem> xformItems = new ArrayList<>();
+            for (Bind bd : html.getHead().getModel().getBind()) {
+                if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
+                    XformItem xformItem = new XformItem();
+                    xformItem.setItemGroup(bd.getItemGroup());
+                    String itemPath = bd.getNodeSet();
+                    xformItem.setItemPath(itemPath);
+                    int index = itemPath.lastIndexOf("/");
+                    String itemName = itemPath.substring(index + 1);
+                    xformItem.setItemName(itemName);
+                    if (bd.getReadOnly() != null) {
+                        xformItem.setReadonly(bd.getReadOnly());
+                    }
+                    if (bd.getCalculate() != null) {
+                        xformItem.setCalculate(true);
+                    } else {
+                    }
+                    xformItems.add(xformItem);
+                }
+            }
+
+            List<String> repeatGroupPathList = new ArrayList<>();
             repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
 
             List<XformGroup> repeatingXformGroups = new ArrayList();
@@ -271,10 +316,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
                                     errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
                                             "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
                                 }
-                                index = 0;
-                                if (!repeatingXformGroups.contains(repeatingXformGroup))
-                                    repeatingXformGroups.add(repeatingXformGroup);
                             }
+                            index = 0;
+                            if (!repeatingXformGroups.contains(repeatingXformGroup))
+                                repeatingXformGroups.add(repeatingXformGroup);
                         }
                     }
 
@@ -293,9 +338,11 @@ public class CreateXformCRFVersionServlet extends SecureController {
             }
 
             for (XformItem xformItem : xformItems) {
-                for (XformGroup xformGroup : xformGroups) {
-                    if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
-                        xformGroup.getItems().add(xformItem);
+                if (xformItem.getItemGroup() != null) {
+                    for (XformGroup xformGroup : xformGroups) {
+                        if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
+                            xformGroup.getItems().add(xformItem);
+                        }
                     }
                 }
             }
@@ -331,7 +378,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
             XformContainer container = new XformContainer();
             container.setGroups(allGroups);
-            container.setInstanceName(form.getNodeName());
+            container.setInstanceName(submittedCrfName);
             return container;
         } catch (
 
@@ -445,6 +492,39 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
     }
 
+    private void saveArtifactsInFM(List<String> fileLinks, CrfBean crf, CrfVersion version) throws IOException {
+        // Create the directory structure for saving the media
+        String dir = Utils.getCrfMediaFilePath(crf, version);
+        if (!new File(dir).exists()) {
+            new File(dir).mkdirs();
+            logger.debug("Made the directory " + dir);
+        }
+        // Save any media files
+        for (String fileLink : fileLinks) {
+            String fileName = "";
+            int startIndex = fileLink.lastIndexOf('/');
+            if (startIndex != -1) {
+                fileName = fileLink.substring(startIndex + 1);
+            }
+            saveAttachedFiles(fileLink, dir, fileName);
+        }
+    }
+
+    public void saveAttachedFiles(String uri, String dir, String fileName) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class, "1");
+
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            FileOutputStream output = new FileOutputStream(new File(dir + File.separator + fileName));
+            IOUtils.write(response.getBody(), output);
+        }
+    }
+
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
@@ -467,4 +547,34 @@ public class CreateXformCRFVersionServlet extends SecureController {
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
+    private Crf filesTofm(List<FileItem> files, String studyOid, String formName) {
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        List<String> tempFileNames = new ArrayList<>();
+        ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
+        RestTemplate restTemplate = new RestTemplate();
+        String uploadFilesUrl = "http://fm.openclinica.info:8080/api/protocol/" + studyOid + "/forms/" + formName + "/artifacts";
+        map.add("file", byteArrayResources);
+
+        for (FileItem file : files) {
+            String filename = file.getName();
+            if (!file.isFormField()) {
+                ByteArrayResource contentsAsResource = new ByteArrayResource(file.get()) {
+                    @Override
+                    public String getFilename() {
+                        return filename;
+                    }
+                };
+                map.get("file").add(contentsAsResource);
+            }
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+        // TODO: replace with Crf object instead of String object
+        Crf response = restTemplate.postForObject(uploadFilesUrl, requestEntity, Crf.class);
+
+        return response;
+    }
 }

@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,6 +51,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -123,6 +126,9 @@ public class OpenRosaServices {
     @Autowired
     CrfVersionMediaDao mediaDao;
 
+    @Autowired
+    XformParserHelper xformParserHelper;
+
     public static final String QUERY = "-query";
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -135,6 +141,7 @@ public class OpenRosaServices {
     public static final String INPUT_DISPLAY_PWD = "displayPwd";
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+    public static final String QUERY_SUFFIX = "form-queries.xml";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -147,7 +154,6 @@ public class OpenRosaServices {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
     StudySubjectDAO studySubjectDao;
-    XformParserHelper xformParserHelper = new XformParserHelper();
 
     /**
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
@@ -277,6 +283,19 @@ public class OpenRosaServices {
         CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
         CrfBean crf = crfDao.findById(version.getCrf().getCrfId());
 
+        String xformWithQueries = "";
+        String directoryPath = Utils.getCrfMediaFilePath(crf, version);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+
         String xform = "";
         XFormList formList = null;
         try {
@@ -295,10 +314,14 @@ public class OpenRosaServices {
                 xform = version.getXform();
                 formObj.setXform(xform);
                 if (query) {
-                    Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate();
+                    if (StringUtils.isNotEmpty(xformWithQueries)) {
+                        xform = xformWithQueries;
+                    } else {
+                        Form queryForm = new QueryFormDecorator(formObj);
+                        xform = queryForm.decorate(xformParserHelper);
+                    }
                 }
-                xform = updateRepeatGroupsWithOrdinal(xform);
+                // xform = updateRepeatGroupsWithOrdinal(xform);
                 form.setHash(DigestUtils.md5Hex(xform));
                 // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
             } else {
@@ -428,21 +451,38 @@ public class OpenRosaServices {
 
         boolean query = getQuerySet(uniqueId);
         String crfVersionOid = getCrfVersionOid(uniqueId);
+        CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
+        CrfBean crf = version.getCrf();
+
+        String xformWithQueries = "";
+        String directoryPath = Utils.getCrfMediaFilePath(crf, version);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
 
         try {
-            CrfVersion version = crfVersionDao.findByOcOID(crfVersionOid);
             XFormObject formObj = new XFormObject();
 
             if (StringUtils.isNotEmpty(version.getXform())) {
                 xform = version.getXform();
                 formObj.setXform(xform);
                 if (query) {
-                    Form queryForm = new QueryFormDecorator(formObj);
-                    xform = queryForm.decorate();
-
-                    // xform = applyQuery(xform);
+                    if (StringUtils.isNotEmpty(xformWithQueries)) {
+                        xform = xformWithQueries;
+                    } else {
+                        Form queryForm = new QueryFormDecorator(formObj);
+                        xform = queryForm.decorate(xformParserHelper);
+                    }
                 }
-                xform = updateRepeatGroupsWithOrdinal(xform);
+
+                // xform = updateRepeatGroupsWithOrdinal(xform);
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
@@ -537,6 +577,30 @@ public class OpenRosaServices {
         ResponseBuilder builder = Response.noContent();
 
         ResponseEntity<String> responseEntity = openRosaSubmissionController.doSubmission(request, response, studyOID, context);
+        if (responseEntity == null) {
+            LOGGER.debug("Null response from OpenRosaSubmissionController.");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.CREATED)) {
+            LOGGER.debug("Successful OpenRosa submission");
+            builder.entity("<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>");
+            return builder.status(Response.Status.CREATED).build();
+        } else if (responseEntity.getStatusCode().equals(org.springframework.http.HttpStatus.NOT_ACCEPTABLE)) {
+            LOGGER.debug("Failed OpenRosa submission");
+            return builder.status(Response.Status.NOT_ACCEPTABLE).build();
+        } else {
+            LOGGER.debug("Failed OpenRosa submission with unhandled error");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @POST
+    @Path("/{studyOID}/fieldsubmission/complete")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmissionComplete(@Context HttpServletRequest request, @Context HttpServletResponse response,
+            @Context ServletContext servletContext, @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) throws Exception {
+
+        ResponseBuilder builder = Response.noContent();
+        ResponseEntity<String> responseEntity = openRosaSubmissionController.markComplete(request, response, studyOID, context);
         if (responseEntity == null) {
             LOGGER.debug("Null response from OpenRosaSubmissionController.");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -916,6 +980,14 @@ public class OpenRosaServices {
         } else {
             return false;
         }
+    }
+
+    public XformParserHelper getXformParserHelper() {
+        return xformParserHelper;
+    }
+
+    public void setXformParserHelper(XformParserHelper xformParserHelper) {
+        this.xformParserHelper = xformParserHelper;
     }
 
 }

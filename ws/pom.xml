@@ -61,10 +61,18 @@
 			<artifactId>xws-security</artifactId>
 		</dependency>
 
+
+
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.ws.xmlschema</groupId>
+			<artifactId>xmlschema-core</artifactId>
+			<version>2.0.1</version>
 		</dependency>
 
 		<dependency>
@@ -80,8 +88,25 @@
             <artifactId>spring-security-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.ws.security</groupId>
+			<artifactId>wss4j</artifactId>
+			<version>1.6.19</version>
+		</dependency>
+
+		<!--
+		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core-tiger</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>wsdl4j</groupId>
+			<artifactId>wsdl4j</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
@@ -243,30 +268,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>auto-clean</id>
-						<phase>install</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<filesets>
-								<fileset>
-									<directory>target</directory>
-									<includes>
-										<include>**/*.jar</include>
-										<include>*.war</include>
-									</includes>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
         </plugins>
     </build>
 

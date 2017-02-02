@@ -9,6 +9,7 @@ public class XformItem {
     String itemResponseType = null;
     String itemDataType = null;
     String readonly = null;
+    boolean calculate = false;
 
     public String getItemPath() {
         return itemPath;
@@ -72,6 +73,14 @@ public class XformItem {
 
     public void setReadonly(String readonly) {
         this.readonly = readonly;
+    }
+
+    public boolean isCalculate() {
+        return calculate;
+    }
+
+    public void setCalculate(boolean calculate) {
+        this.calculate = calculate;
     }
 
 }
