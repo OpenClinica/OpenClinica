@@ -5,17 +5,9 @@
 
     <changeSet id="2017-02-02-7394-1" author="sdibona">
         <addUniqueConstraint
-            columnNames="study_event_id, crf_version_id"
-            constraintName="uniq_study_event_crf_version"
+            columnNames="study_event_id, crf_version_id, study_subject_id"
+            constraintName="uniq_study_event_crf_version_study_subject"
             tableName="event_crf" />
         <comment>Adding unique constraint to prevent duplicate entries in event_crf</comment>
-    </changeSet>
-
-    <changeSet id="2017-02-02-7394-2" author="sdibona">
-        <addUniqueConstraint
-            columnNames="study_event_definition_id, crf_id"
-            constraintName="uniq_study_event_def_crf"
-            tableName="event_definition_crf" />
-        <comment>Adding unique constraint to prevent duplicate entries in event_definition_crf</comment>
     </changeSet>
 </databaseChangeLog>
