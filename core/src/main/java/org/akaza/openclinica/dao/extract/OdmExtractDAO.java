@@ -176,6 +176,8 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING);// crf_oid
         ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// crf_description
+        ++i;
         this.setTypeExpected(i, TypeNames.STRING);// null_values
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // default_version_id
@@ -937,6 +939,7 @@ public class OdmExtractDAO extends DatasetDAO {
         formDetails.setName(crfVBean.getName());
         formDetails.setOid(crfVBean.getOid());
         formDetails.setParentFormOid(crfBean.getOid());
+        formDetails.setDescription(crfBean.getDescription());
 
         setSectionBean(formDetails, new Integer(crfVBean.getId()));
 
@@ -1527,6 +1530,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String cvDesc = (String) row.get("version_description");
             String notes = (String) row.get("revision_notes");
             String cOID = (String) row.get("crf_oid");
+            String crfDescription = (String) row.get("crf_description");
             String nullValue = (String) row.get("null_values");
             Integer dvId = (Integer) row.get("default_version_id");
             Boolean pwdRequired = (Boolean) row.get("electronic_signature");
@@ -1547,9 +1551,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 sedDetails.put(sedOID, sedDetail);
             }
 
-            if (formDetails.containsKey(cvOID)) {
+            if (formDetails.containsKey(cOID)) {
 
-                FormDetailsBean formDetail = formDetails.get(cvOID);
+                FormDetailsBean formDetail = formDetails.get(cOID);
                 PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
                 p.setStudyEventOid(sedOID);
                 p.setDoubleDataEntry(doubleEntry == false ? "No" : "Yes");
@@ -1565,10 +1569,11 @@ public class OdmExtractDAO extends DatasetDAO {
                 formDetail.getPresentInEventDefinitions().add(p);
             } else {
                 FormDetailsBean formDetail = new FormDetailsBean();
-                formDetail.setOid(cvOID);
+                formDetail.setOid(cOID);
                 formDetail.setRevisionNotes(notes);
                 formDetail.setParentFormOid(cOID);
                 formDetail.setVersionDescription(cvDesc);
+                formDetail.setDescription(crfDescription);
                 // ArrayList sectionBeansRows = this.select(this.getSectionDetails(cvOID),cvId);
                 formDetail = setSectionBean(formDetail, cvId);
                 PresentInEventDefinitionBean p = new PresentInEventDefinitionBean();
@@ -1586,7 +1591,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 p.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
                 formDetail.getPresentInEventDefinitions().add(p);
 
-                formDetails.put(cvOID, formDetail);
+                formDetails.put(cOID, formDetail);
             }
         }
 
@@ -1596,7 +1601,7 @@ public class OdmExtractDAO extends DatasetDAO {
         for (FormDefBean formdef : forms) {
             List<ElementRefBean> formLayoutRefs = getFormLayoutRefs(formdef);
             formdef.setFormLayoutRefs(formLayoutRefs);
-            // formdef.setFormDetails(formDetails.get(formdef.getOid()));
+            formdef.setFormDetails(formDetails.get(formdef.getOid()));
         }
     }
 
@@ -3306,7 +3311,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
                 + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
-                + " crf.oc_oid as crf_oid, edc.null_values, edc.default_version_id, edc.electronic_signature,"
+                + " crf.oc_oid as crf_oid, crf.description as crf_description, edc.null_values, edc.default_version_id, edc.electronic_signature,"
                 + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code"
                 + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite);
     }

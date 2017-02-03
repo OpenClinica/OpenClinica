@@ -4,7 +4,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.springframework.validation.Errors;
 
-public class ValidateFormFieldsParameter {
+public class FormFieldValidatorDTO {
     private Errors errors;
     private CRFVersionBean version;
     private FormLayoutBean formLayoutBean;
@@ -14,17 +14,17 @@ public class ValidateFormFieldsParameter {
     private String submittedRevisionNotes;
     private String submittedXformText;
 
-    public ValidateFormFieldsParameter(ValidateFormFieldsParameter validateFormFieldsParameter) {
-        this.errors = validateFormFieldsParameter.errors;
-        this.version = validateFormFieldsParameter.version;
-        this.submittedCrfName = validateFormFieldsParameter.submittedCrfName;
-        this.submittedCrfVersionName = validateFormFieldsParameter.submittedCrfVersionName;
-        this.submittedCrfVersionDescription = validateFormFieldsParameter.submittedCrfVersionDescription;
-        this.submittedRevisionNotes = validateFormFieldsParameter.submittedRevisionNotes;
-        this.submittedXformText = validateFormFieldsParameter.submittedXformText;
+    public FormFieldValidatorDTO(FormFieldValidatorDTO formFieldValidatorObj) {
+        this.errors = formFieldValidatorObj.errors;
+        this.version = formFieldValidatorObj.version;
+        this.submittedCrfName = formFieldValidatorObj.submittedCrfName;
+        this.submittedCrfVersionName = formFieldValidatorObj.submittedCrfVersionName;
+        this.submittedCrfVersionDescription = formFieldValidatorObj.submittedCrfVersionDescription;
+        this.submittedRevisionNotes = formFieldValidatorObj.submittedRevisionNotes;
+        this.submittedXformText = formFieldValidatorObj.submittedXformText;
     }
 
-    public ValidateFormFieldsParameter() {
+    public FormFieldValidatorDTO() {
         // TODO Auto-generated constructor stub
     }
 

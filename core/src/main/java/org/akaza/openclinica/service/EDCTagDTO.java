@@ -5,7 +5,7 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionConfigurationParameters;
 
-public class PopulateEDCTagParameter {
+public class EDCTagDTO {
     private EventDefinitionCrf eventDefinitionCrf;
     private UserAccount userAccount;
     private OCodmComplexTypeDefinitionConfigurationParameters conf;
@@ -13,16 +13,16 @@ public class PopulateEDCTagParameter {
     private String crfPath;
     private EventDefinitionCrfTag eventDefinitionCrfTag;
 
-    public PopulateEDCTagParameter(PopulateEDCTagParameter paramObj) {
-        this.eventDefinitionCrf = paramObj.eventDefinitionCrf;
-        this.userAccount = paramObj.userAccount;
-        this.conf = paramObj.conf;
-        this.tagId = paramObj.tagId;
-        this.crfPath = paramObj.crfPath;
-        this.eventDefinitionCrfTag = paramObj.eventDefinitionCrfTag;
+    public EDCTagDTO(EDCTagDTO edcTagObj) {
+        this.eventDefinitionCrf = edcTagObj.eventDefinitionCrf;
+        this.userAccount = edcTagObj.userAccount;
+        this.conf = edcTagObj.conf;
+        this.tagId = edcTagObj.tagId;
+        this.crfPath = edcTagObj.crfPath;
+        this.eventDefinitionCrfTag = edcTagObj.eventDefinitionCrfTag;
     }
 
-    public PopulateEDCTagParameter() {
+    public EDCTagDTO() {
         // TODO Auto-generated constructor stub
     }
 

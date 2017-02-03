@@ -289,7 +289,7 @@ public class OpenRosaServices {
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
 
         String xformWithQueries = "";
-        String directoryPath = Utils.getCrfMediaFilePath(crf, formLayout);
+        String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
@@ -462,7 +462,7 @@ public class OpenRosaServices {
         CrfBean crf = formLayout.getCrf();
 
         String xformWithQueries = "";
-        String directoryPath = Utils.getCrfMediaFilePath(crf, formLayout);
+        String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {

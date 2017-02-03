@@ -87,5 +87,11 @@
         </sql>
 	</changeSet>
     
+    	<changeSet author="jkeremian" id="2017-01-30-OC-7778-02" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Form_Layout Table</comment>
+		<sql>
+        ALTER TABLE form_layout ADD CONSTRAINT duplicate_form_layout_uniqueness_key UNIQUE (crf_id, name);
+        </sql>
+	</changeSet>
     
 </databaseChangeLog>

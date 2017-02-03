@@ -40,7 +40,6 @@ import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.PresentInEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.PresentInFormBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
-import org.akaza.openclinica.bean.odmbeans.SectionDetails;
 import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
@@ -336,7 +335,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     xml.append(nls);
                     ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) formRef.getFormLayoutRefs();
                     for (ElementRefBean formLayoutRef : formLayoutRefs) {
-                        xml.append(currentIndent + indent + indent + "<OpenClinica:FormLayoutRef Name=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName())
+                        xml.append(currentIndent + indent + indent + "<OpenClinica:FormLayoutRef OID=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName())
                                 + "\" IsDefaultVersion=\"" + formLayoutRef.isDefaultVersion() + "\"/>");
                         xml.append(nls);
                     }
@@ -372,7 +371,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) form.getFormLayoutRefs();
             for (ElementRefBean formLayoutRef : formLayoutRefs) {
 
-                xml.append(currentIndent + indent + "<OpenClinica:FormLayoutDef Name=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName()) + "\">");
+                xml.append(currentIndent + indent + "<OpenClinica:FormLayoutDef OID=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName()) + "\">");
                 xml.append(nls);
                 xml.append(currentIndent + indent + "<OpenClinica:URL>" + StringEscapeUtils.escapeXml(formLayoutRef.getUrl()) + "</OpenClinica:URL>");
                 xml.append(nls);
@@ -382,7 +381,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 
             // add FormDetails for oc1.3
             if ("oc1.3".equals(this.getODMVersion())) {
-                // this.addFormDetails(form.getFormDetails(), currentIndent + indent);
+                this.addFormDetails(form.getFormDetails(), currentIndent + indent);
             }
             xml.append(currentIndent + "</FormDef>");
             xml.append(nls);
@@ -981,35 +980,13 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     public void addFormDetails(FormDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
-        String temp = "";
-        xml.append(currentIndent + "<OpenClinica:FormDetails FormOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\" ParentFormOID=\""
-                + StringEscapeUtils.escapeXml(detail.getParentFormOid()) + "\"");
-        xml.append(">");
+        String description = "";
+        xml.append(currentIndent + "<OpenClinica:FormDetails>");
         xml.append(nls);
 
-        xml.append(currentIndent + indent + "<OpenClinica:SectionDetails>");
-        xml.append(nls);
-        ArrayList<SectionDetails> sections = (ArrayList<SectionDetails>) detail.getSectionDetails();
-        for (SectionDetails ig : sections) {
-            xml.append(currentIndent + indent + indent + "<OpenClinica:Section SectionLabel=\"" + StringEscapeUtils.escapeXml(ig.getSectionLabel())
-                    + "\" SectionTitle=\"" + StringEscapeUtils.escapeXml(ig.getSectionTitle()) + "\" SectionSubtitle=\""
-                    + StringEscapeUtils.escapeXml(ig.getSectionSubtitle()) + "\" SectionInstructions=\""
-                    + StringEscapeUtils.escapeXml(ig.getSectionInstructions()) + "\" SectionPageNumber=\""
-                    + StringEscapeUtils.escapeXml(ig.getSectionPageNumber()) + "\"/>");
-            xml.append(nls);
-        }
-
-        xml.append(currentIndent + indent + "</OpenClinica:SectionDetails>");
-        xml.append(nls);
-        temp = detail.getVersionDescription();
-        xml.append(temp != null && temp.length() > 0
-                ? currentIndent + indent + "<OpenClinica:VersionDescription>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:VersionDescription>" + nls
-                : "");
-        temp = detail.getRevisionNotes();
-        xml.append(temp != null && temp.length() > 0
-                ? currentIndent + indent + "<OpenClinica:RevisionNotes>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:RevisionNotes>" + nls : "");
-        //
-        this.addPresentInEventDefinitions(detail, currentIndent + indent);
+        description = detail.getDescription();
+        xml.append(description != null && description.length() > 0
+                ? currentIndent + indent + "<OpenClinica:Description>" + StringEscapeUtils.escapeXml(description) + "</OpenClinica:Description>" + nls : "");
         xml.append(currentIndent + "</OpenClinica:FormDetails>");
         xml.append(nls);
     }

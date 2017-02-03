@@ -10,7 +10,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormRef;
 import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionConfigurationParameters;
 
-public class PopulateEventDefinitionCrfParameter {
+public class EventDefinitionCrfDTO {
     private EventDefinitionCrf eventDefinitionCrf;
     private UserAccount userAccount;
     private CrfBean crf;
@@ -21,19 +21,19 @@ public class PopulateEventDefinitionCrfParameter {
     private StudyEventDefinition studyEventDefinition;
     private ODMcomplexTypeDefinitionFormRef odmFormRef;
 
-    public PopulateEventDefinitionCrfParameter(PopulateEventDefinitionCrfParameter paramObj) {
-        this.eventDefinitionCrf = paramObj.eventDefinitionCrf;
-        this.userAccount = paramObj.userAccount;
-        this.crf = paramObj.crf;
-        this.crfVersion = paramObj.crfVersion;
-        this.conf = paramObj.conf;
-        this.study = paramObj.study;
-        this.studyEventDefinition = paramObj.studyEventDefinition;
-        this.odmFormRef = paramObj.odmFormRef;
-        this.formLayout = paramObj.formLayout;
+    public EventDefinitionCrfDTO(EventDefinitionCrfDTO edcObj) {
+        this.eventDefinitionCrf = edcObj.eventDefinitionCrf;
+        this.userAccount = edcObj.userAccount;
+        this.crf = edcObj.crf;
+        this.crfVersion = edcObj.crfVersion;
+        this.conf = edcObj.conf;
+        this.study = edcObj.study;
+        this.studyEventDefinition = edcObj.studyEventDefinition;
+        this.odmFormRef = edcObj.odmFormRef;
+        this.formLayout = edcObj.formLayout;
     }
 
-    public PopulateEventDefinitionCrfParameter() {
+    public EventDefinitionCrfDTO() {
         // TODO Auto-generated constructor stub
     }
 
