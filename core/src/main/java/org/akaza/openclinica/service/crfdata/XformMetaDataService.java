@@ -23,7 +23,6 @@ import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
@@ -119,9 +118,6 @@ public class XformMetaDataService {
 
     @Autowired
     private FormLayoutMediaDao formLayoutMediaDao;
-
-    @Autowired
-    private CrfVersionMediaDao crfVersionMediaDao;
 
     @Autowired
     private ItemGroupDao itemGroupDao;

@@ -103,7 +103,7 @@
         <sql>delete from form_layout where form_layout_id=</sql>
     </query>    
     <query>
-        <name>deleteCrfVersionMediaByVersion</name>
+        <name>deleteFormLayoutMediaByVersion</name>
         <sql>delete from form_layout_media where form_layout_id=</sql>
     </query>    
 	<query>

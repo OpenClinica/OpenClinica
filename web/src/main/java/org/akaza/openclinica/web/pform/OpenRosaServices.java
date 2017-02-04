@@ -61,8 +61,8 @@ import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -73,8 +73,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -128,7 +128,7 @@ public class OpenRosaServices {
     FormLayoutDao formLayoutDao;
 
     @Autowired
-    CrfVersionMediaDao mediaDao;
+    FormLayoutMediaDao formLayoutMediaDao;
 
     @Autowired
     XformParserHelper xformParserHelper;
@@ -230,7 +230,7 @@ public class OpenRosaServices {
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                             form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
 
-                            List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(formLayout.getFormLayoutId());
+                            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
                             if (mediaList != null && mediaList.size() > 0) {
                                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
                             }
@@ -336,7 +336,7 @@ public class OpenRosaServices {
             }
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-            List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(formLayout.getFormLayoutId());
+            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
             if (query) {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY);
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY);
@@ -378,16 +378,17 @@ public class OpenRosaServices {
 
         Manifest manifest = new Manifest();
 
-        List<CrfVersionMedia> mediaList = mediaDao.findByCrfVersionId(formLayout.getFormLayoutId());
+        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+
         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {
-            for (CrfVersionMedia media : mediaList) {
+            for (FormLayoutMedia media : mediaList) {
 
                 MediaFile mediaFile = new MediaFile();
                 mediaFile.setFilename(media.getName());
-                File image = new File(media.getPath() + media.getName());
+                File image = new File(Utils.getCrfMediaSysPath() + media.getPath() + media.getName());
                 mediaFile.setHash(DigestUtils.md5Hex(media.getName()) + Double.toString(image.length()));
-                mediaFile.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?crfVersionMediaId=" + media.getCrfVersionMediaId());
+                mediaFile.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?formLayoutMediaId=" + media.getFormLayoutMediaId());
                 manifest.add(mediaFile);
             }
         }
@@ -519,14 +520,14 @@ public class OpenRosaServices {
     @GET
     @Path("/{studyOID}/downloadMedia")
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("crfVersionMediaId") String crfVersionMediaId, @RequestHeader("Authorization") String authorization, @Context ServletContext context)
+            @QueryParam("formLayoutMediaId") String formLayoutMediaId, @RequestHeader("Authorization") String authorization, @Context ServletContext context)
             throws Exception {
         if (!mayProceedPreview(studyOID))
             return null;
 
-        CrfVersionMedia media = mediaDao.findById(Integer.valueOf(crfVersionMediaId));
+        FormLayoutMedia media = formLayoutMediaDao.findById(Integer.valueOf(formLayoutMediaId));
 
-        File image = new File(media.getPath() + media.getName());
+        File image = new File(Utils.getCrfMediaSysPath() + media.getPath() + media.getName());
         FileInputStream fis = new FileInputStream(image);
         StreamingOutput stream = new MediaStreamingOutput(fis);
         ResponseBuilder builder = Response.ok(stream);

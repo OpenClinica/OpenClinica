@@ -403,7 +403,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
 
         sql = digester.getQuery("deleteResponseSetByVersion") + versionId;
         sqls.add(sql);
-        sql = digester.getQuery("deleteCrfVersionMediaByVersion") + versionId;
+        sql = digester.getQuery("deleteFormLayoutMediaByVersion") + versionId;
         sqls.add(sql);
         sql = digester.getQuery("delete") + versionId;
         sqls.add(sql);
