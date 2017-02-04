@@ -245,7 +245,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         for (Crf crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
-                xformService.executeIndividualCrf(new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, true, crfName, crfDescription));
+                xformService.executeIndividualCrf(
+                        new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, true, crfName, crfDescription));
             }
         }
 
@@ -403,6 +404,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             eventDefinitionCrf.setHideCrf(false);
         }
+        eventDefinitionCrf.setSubmissionUrl(conf.getSubmissionUrl());
+
         return eventDefinitionCrf;
     }
 

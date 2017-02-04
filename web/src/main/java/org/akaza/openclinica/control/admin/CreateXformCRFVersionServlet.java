@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -23,6 +21,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Crf;
+import org.akaza.openclinica.service.dto.Version;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.fileupload.FileItem;
@@ -76,7 +75,14 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
 
         Crf crf = getFormArtifactsFromFM(items, currentStudy.getOid(), crfOid);
-        List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = null;
+        List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
+        OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
+        for (Version version : crf.getVersions()) {
+            formLayoutDef = new OCodmComplexTypeDefinitionFormLayoutDef();
+            formLayoutDef.setOID(version.getName());
+            formLayoutDef.setURL(version.getArtifactURL());
+            formLayoutDefs.add(formLayoutDef);
+        }
 
         xformService.executeIndividualCrf(new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName, crfDescription));
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);

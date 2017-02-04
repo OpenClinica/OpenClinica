@@ -94,6 +94,7 @@ public class XformMetaDataService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_SUFFIX = "form.xml";
+    public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
     public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
     public static final String XLS_SUFFIX = ".xls";
@@ -156,7 +157,7 @@ public class XformMetaDataService {
     private XformParser xformParser;
 
     @Transactional
-    public void createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
+    public FormLayout createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
 
         CrfVersion crfVersion = null;
         FormLayout formLayout = null;
@@ -205,46 +206,12 @@ public class XformMetaDataService {
             }
         }
         createGroups(cmdObject.container, cmdObject.html, cmdObject.xform, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
-        saveMedia(cmdObject.formItems, crfBean, formLayout);
 
         if (cmdObject.errors.hasErrors()) {
             logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
             throw new RuntimeException("Encountered validation errors while saving CRF.");
         }
-    }
-
-    private void saveMedia(List<FileItem> items, CrfBean crf, FormLayout formLayout) {
-        boolean hasFiles = false;
-        for (FileItem item : items) {
-            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
-                hasFiles = true;
-        }
-
-        if (hasFiles) {
-            String dir = Utils.getCrfMediaFilePathWithoutSysPath(crf.getOcOid(), formLayout.getOcOid());
-            // Save any media files
-            for (FileItem item : items) {
-                if (!item.isFormField()) {
-
-                    String fileName = item.getName();
-                    // Some browsers IE 6,7 getName returns the whole path
-                    int startIndex = fileName.lastIndexOf('\\');
-                    if (startIndex != -1) {
-                        fileName = fileName.substring(startIndex + 1, fileName.length());
-                    }
-
-                    FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFileName(formLayout.getFormLayoutId(), fileName);
-                    if (media == null) {
-                        media = new FormLayoutMedia();
-                        media.setFormLayout(formLayout);
-                        media.setName(fileName);
-                        media.setPath(dir);
-                        formLayoutMediaDao.saveOrUpdate(media);
-                    }
-
-                }
-            }
-        }
+        return formLayout;
     }
 
     private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout,
@@ -769,11 +736,12 @@ public class XformMetaDataService {
     }
 
     public void executeIndividualCrf(ExecuteIndividualCrfObject eicObject) {
-        List<FileItem> items = eicObject.items;
-        if (items == null) {
-            items = new ArrayList();
-        }
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
+            FormLayout formLayout;
+            List<FileItem> items = eicObject.items;
+            if (items == null) {
+                items = new ArrayList();
+            }
 
             List<String> fileLinks = null;
             String xform = "";
@@ -786,17 +754,10 @@ public class XformMetaDataService {
                         for (String fileLink : fileLinks) {
                             if (fileLink.endsWith(FORM_SUFFIX)) {
                                 xform = rest.getForObject(fileLink, String.class);
-                                break;
-                            }
-                            if (eicObject.odmImport && !fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX)
-                                    && !fileLink.endsWith(FORMQUERIES_SUFFIX) && !fileLink.endsWith(XLS_SUFFIX)) {
-                                FileItem fileItem = getMediaFileItemFromFormManager(fileLink, eicObject.crf.getOcoid(), version.getOcoid());
-                                items.add(fileItem);
                             }
                         }
 
                         if (!eicObject.errors.hasErrors()) {
-
                             // Parse instance and xform
                             Html html = null;
                             try {
@@ -816,8 +777,11 @@ public class XformMetaDataService {
                             // Save meta-data in database
                             try {
                                 try {
-                                    createCRFMetaData(new CrfMetaDataObject(eicObject.crf, version, container, eicObject.currentStudy, eicObject.ub, html, xform, items, eicObject.errors,
-                                            formLayoutDef.getURL(), eicObject.crfName, eicObject.crfDescription));
+                                    formLayout = createCRFMetaData(
+                                            new CrfMetaDataObject(eicObject.crf, version, container, eicObject.currentStudy, eicObject.ub, html, xform, items,
+                                                    eicObject.errors, formLayoutDef.getURL(), eicObject.crfName, eicObject.crfDescription));
+                                    saveFormArtifactsInOCDataDirectory(fileLinks, eicObject.crf.getOcoid(), version.getOcoid());
+                                    saveMediaFiles(fileLinks, eicObject.crf.getOcoid(), formLayout);
                                 } catch (Exception e) {
                                     // TODO Auto-generated catch block
                                     e.printStackTrace();
@@ -825,30 +789,9 @@ public class XformMetaDataService {
                             } catch (RuntimeException e) {
                                 logger.error("Error encountered while saving CRF: " + e.getMessage());
                                 logger.error(ExceptionUtils.getStackTrace(e));
-                                // If there are no logged validation errors, this was an unanticipated exception
-                                // and should be allow to crash the page for now
                                 if (!eicObject.errors.hasErrors())
                                     throw e;
                             }
-                        }
-                        // Save errors to request so they can be displayed to the user
-                        if (eicObject.errors.hasErrors()) {
-                            logger.debug("Found at least one error.  CRF data not saved.");
-                        } else {
-                            logger.debug("Didn't find any errors.  CRF data saved.");
-
-                            // Save any media files uploaded with xform
-                            CrfBean crfBean = (CrfBean) crfDao.findByOcOID(eicObject.crf.getOcoid());
-                            FormLayout formLayout = formLayoutDao.findAllByCrfId(crfBean.getCrfId()).get(0);
-
-                            // saveAttachedMedia(items, crf, newVersion);
-                            try {
-                                saveFormArtifactsInOCDataDirectory(fileLinks, crfBean, formLayout);
-                            } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-
                         }
                     }
                 }
@@ -856,9 +799,9 @@ public class XformMetaDataService {
         }
     }
 
-    private void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, CrfBean crf, FormLayout formLayout) throws IOException {
+    private void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
+        String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
             logger.debug("Made the directory " + dir);
@@ -938,6 +881,30 @@ public class XformMetaDataService {
         section.setUserAccount(userDao.findById(cmdObject.ub.getId())); // not null
         section.setBorders(0);
         return section;
+    }
+
+    private void saveMediaFiles(List<String> fileLinks, String crfOid, FormLayout formLayout) throws IOException {
+        // Create the directory structure for saving the media
+        String dir = Utils.getCrfMediaFilePathWithoutSysPath(crfOid, formLayout.getOcOid());
+        for (String fileLink : fileLinks) {
+            String fileName = "";
+            int startIndex = fileLink.lastIndexOf('/');
+            if (startIndex != -1) {
+                fileName = fileLink.substring(startIndex + 1);
+            }
+            if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
+                    && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX)) {
+
+                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFilePath(formLayout.getFormLayoutId(), dir);
+                if (media == null) {
+                    media = new FormLayoutMedia();
+                    media.setFormLayout(formLayout);
+                    media.setName(fileName);
+                    media.setPath(dir);
+                    formLayoutMediaDao.saveOrUpdate(media);
+                }
+            }
+        }
     }
 
 }

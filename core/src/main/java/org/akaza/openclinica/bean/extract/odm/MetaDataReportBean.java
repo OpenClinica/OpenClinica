@@ -329,9 +329,10 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
                 ConfigurationParameters conf = formRef.getConfigurationParameters();
                 if (conf != null) {
-                    xml.append(currentIndent + indent + indent + "<OpenClinica:ConfigurationParameters HideCRF=\"" + conf.isHiddenCrf()
-                            + "\" ParticipantForm=\"" + conf.isParticipantForm() + "\" AllowAnonymousSubmission=\"" + conf.isAllowAnynymousSubmission()
-                            + "\" SubmissionUrl=\"" + conf.getSubmissionUrl() + "\" Offline=\"" + conf.isOffline() + "\"/>");
+                    xml.append(currentIndent + indent + indent + "<OpenClinica:ConfigurationParameters HideCRF=\"" + (conf.isHiddenCrf() ? "Yes" : "No")
+                            + "\" ParticipantForm=\"" + (conf.isParticipantForm() ? "Yes" : "No") + "\" AllowAnonymousSubmission=\""
+                            + (conf.isAllowAnynymousSubmission() ? "Yes" : "No") + "\" SubmissionUrl=\"" + conf.getSubmissionUrl() + "\" Offline=\""
+                            + (conf.isOffline() ? "Yes" : "No") + "\"/>");
                     xml.append(nls);
                     ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) formRef.getFormLayoutRefs();
                     for (ElementRefBean formLayoutRef : formLayoutRefs) {
