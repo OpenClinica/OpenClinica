@@ -59,7 +59,6 @@
                 <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
                 <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>  
                 <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>  
-                <value>org.akaza.openclinica.domain.datamap.CrfVersionMedia</value>  
                 <value>org.akaza.openclinica.domain.datamap.FormLayout</value>  
                 <value>org.akaza.openclinica.domain.datamap.FormLayoutMedia</value>  
                 <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>  
@@ -199,7 +198,6 @@
   <bean id="formLayoutDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="crfVersionMediaDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="formLayoutMediaDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />

@@ -399,8 +399,6 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
 
         sql = digester.getQuery("deleteResponseSetByVersion") + versionId;
         sqls.add(sql);
-        sql = digester.getQuery("deleteCrfVersionMediaByVersion") + versionId;
-        sqls.add(sql);
         sql = digester.getQuery("delete") + versionId;
         sqls.add(sql);
         return sqls;
