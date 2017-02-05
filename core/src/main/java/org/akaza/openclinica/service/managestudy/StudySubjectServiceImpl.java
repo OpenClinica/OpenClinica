@@ -39,7 +39,6 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 
@@ -62,7 +61,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
         CRFDAO crfDao = new CRFDAO(dataSource);
-        CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
 
         ArrayList events = studyEventDao.findAllByStudySubject(studySubject);
@@ -85,7 +83,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         Set<Integer> nonEmptyEventCrf = eventCrfDao.buildNonEmptyEventCrfIds(studySubject.getId());
 
-        Map<Integer, FormLayoutBean> formLayoutById = formLayoutDAO.buildCrfVersionById(studySubject.getId());
+        Map<Integer, FormLayoutBean> formLayoutById = formLayoutDAO.buildFormLayoutById(studySubject.getId());
 
         Map<Integer, CRFBean> crfById = crfDao.buildCrfById(studySubject.getId());
 

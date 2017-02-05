@@ -157,7 +157,7 @@
 		<sql>SELECT form_layout_ID FROM form_layout WHERE CRF_ID=? AND NAME =? </sql>
 	</query>
     <query>
-        <name>buildCrfVersionById</name>
+        <name>buildFormLayoutById</name>
         <sql>select * from form_layout where form_layout_id in (
         select distinct form_layout_id from event_crf where study_subject_id = ?)</sql>
     </query>

@@ -282,11 +282,11 @@
         <c:choose>
         <c:when test="${dedc.eventCRF.id > 0}">
         <!-- found an event crf id -->
-        <input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.formLayoutId}"/>">
+        <input type="hidden" name="formLayoutId" value="<c:out value="${dedc.eventCRF.formLayout.id}"/>">
         </c:when>
         <c:otherwise>
         <!-- did not find an event crf id -->
-        <input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
+        <input type="hidden" name="formLayoutId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
         </c:otherwise>
         </c:choose>
 
@@ -303,7 +303,7 @@
         <c:forEach var="version" items="${dedc.edc.versions}">
         
            <c:out value="${version.name}"/>
-           <c:set var="crfVersionOID" value="${version.oid}"/>
+           <c:set var="formLayoutOID" value="${version.oid}"/>
           
         </c:forEach>
 
@@ -339,14 +339,11 @@
 
 
         <SCRIPT LANGUAGE="JavaScript">
-        var studyEventId = '<c:out value="${studyEvent.id}"/>';
-        var eventCRFStatusId = '<c:out value="${dedc.eventCRF.id}"/>';
-        var originationPage  = '<c:out value="${originatingPage}" />';
-        var crfId = '<c:out value="${dedc.edc.crf.id}"/>';
             function changeQuery<c:out value="${dedc.edc.crf.id}"/>() {
                 var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
-                document.startForm<c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
-                document.getElementById('ide-' + studyEventId + crfId).href = buildUrl(qer,studyEventId,eventCRFStatusId,originationPage );
+                document.startForm<c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
+                document.getElementById('ide-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href = 
+                	buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
             }
                 function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage){
                 	 return "EnketoFormServlet?formLayoutId="+ formLayoutId + 
@@ -361,8 +358,8 @@
         </c:when>
 
         <c:otherwise>
-        <c:out value="${dedc.eventCRF.crfVersion.name}"/>
-            <c:set var="crfVersionOID" value="${dedc.eventCRF.formLayout.oid}"/>
+        <c:out value="${dedc.eventCRF.formLayout.name}"/>
+            <c:set var="formLayoutOID" value="${dedc.eventCRF.formLayout.oid}"/>
         </c:otherwise>
 
         </c:choose>
@@ -424,7 +421,7 @@
                         </c:when>
                         <c:otherwise>
                               <a id="ide-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>"                         
-                               href="EnketoFormServlet?formLayoutId=<c:out value="${formLayoutId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+                               href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
                                <img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;

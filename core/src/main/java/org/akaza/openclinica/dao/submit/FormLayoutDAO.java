@@ -520,7 +520,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
      * @param studySubjectId
      * @return
      */
-    public Map<Integer, FormLayoutBean> buildCrfVersionById(Integer studySubjectId) {
+    public Map<Integer, FormLayoutBean> buildFormLayoutById(Integer studySubjectId) {
         this.setTypesExpected(); // <== Must be called first
         Map<Integer, FormLayoutBean> result = new HashMap<Integer, FormLayoutBean>();
 
@@ -528,7 +528,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         int i = 1;
         param.put(i++, studySubjectId);
 
-        List selectResult = select(digester.getQuery("buildCrfVersionById"), param);
+        List selectResult = select(digester.getQuery("buildFormLayoutById"), param);
 
         Iterator it = selectResult.iterator();
 
