@@ -2,28 +2,31 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.dto.Crf;
 import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormDef;
 
-public class PopulateCrfVersionParameter {
+public class FormLayoutDTO {
     private ODMcomplexTypeDefinitionFormDef odmFormDef;
     private UserAccount userAccount;
     private CrfVersion crfVersion;
+    private FormLayout formLayout;
     private CrfBean crf;
     private String url;
     private Crf[] fmCrfs;
 
-    public PopulateCrfVersionParameter(PopulateCrfVersionParameter paramObj) {
-        this.odmFormDef = paramObj.odmFormDef;
-        this.userAccount = paramObj.userAccount;
-        this.crfVersion = paramObj.crfVersion;
-        this.crf = paramObj.crf;
-        this.url = paramObj.url;
-        this.fmCrfs = paramObj.fmCrfs;
+    public FormLayoutDTO(FormLayoutDTO formLayoutObj) {
+        this.odmFormDef = formLayoutObj.odmFormDef;
+        this.userAccount = formLayoutObj.userAccount;
+        this.crfVersion = formLayoutObj.crfVersion;
+        this.crf = formLayoutObj.crf;
+        this.url = formLayoutObj.url;
+        this.fmCrfs = formLayoutObj.fmCrfs;
+        this.formLayout = formLayoutObj.formLayout;
     }
 
-    public PopulateCrfVersionParameter() {
+    public FormLayoutDTO() {
         // TODO Auto-generated constructor stub
     }
 
@@ -74,4 +77,13 @@ public class PopulateCrfVersionParameter {
     public void setFmCrfs(Crf[] fmCrfs) {
         this.fmCrfs = fmCrfs;
     }
+
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
+    }
+
 }

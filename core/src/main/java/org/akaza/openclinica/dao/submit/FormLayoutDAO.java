@@ -19,7 +19,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
@@ -35,25 +35,25 @@ import org.akaza.openclinica.dao.core.TypeNames;
  * 
  * 
  */
-public class CRFVersionDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
+public class FormLayoutDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
 
     @Override
     protected void setDigesterName() {
-        digesterName = SQLFactory.getInstance().DAO_CRFVERSION;
+        digesterName = SQLFactory.getInstance().DAO_FORMLAYOUT;
     }
 
-    public CRFVersionDAO(DataSource ds) {
+    public FormLayoutDAO(DataSource ds) {
         super(ds);
     }
 
-    public CRFVersionDAO(DataSource ds, DAODigester digester) {
+    public FormLayoutDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
     // member variable in EntityDAO, and its initializeI18nStrings() method
-    public CRFVersionDAO(DataSource ds, DAODigester digester, Locale locale) {
+    public FormLayoutDAO(DataSource ds, DAODigester digester, Locale locale) {
 
         this(ds, digester);
         this.locale = locale;
@@ -63,7 +63,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         // UPDATE CRF_VERSION SET CRF_ID=?,STATUS_ID=?,NAME=?,
         // DESCRIPTION=?,DATE_UPDATED=NOW(),UPDATE_ID=?,REVISION_NOTES =? WHERE
         // CRF_VERSION_ID=?
-        CRFVersionBean ib = (CRFVersionBean) eb;
+        FormLayoutBean ib = (FormLayoutBean) eb;
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(ib.getCrfId()));
         variables.put(new Integer(2), new Integer(ib.getStatus().getId()));
@@ -88,7 +88,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         // DATE_CREATED, REVISION_NOTES)
         // VALUES (?,?,?,?,?,NOW(),?)</sql>
 
-        CRFVersionBean cvb = (CRFVersionBean) eb;
+        FormLayoutBean cvb = (FormLayoutBean) eb;
         HashMap variables = new HashMap();
         // variables.put(Integer.valueOf(2), cb.getLabel());
         variables.put(Integer.valueOf(1), Integer.valueOf(cvb.getCrfId()));
@@ -100,6 +100,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         variables.put(Integer.valueOf(7), getValidOid(cvb, cvb.getName(), cvb.getOid()));
         variables.put(Integer.valueOf(8), cvb.getXform());
         variables.put(Integer.valueOf(9), cvb.getXformName());
+        variables.put(Integer.valueOf(10), cvb.getUrl());
 
         // am i the only one who runs their daos' unit tests after I change
         // things, tbh?
@@ -141,6 +142,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         this.setTypeExpected(11, TypeNames.STRING);
         this.setTypeExpected(12, TypeNames.STRING);
         this.setTypeExpected(13, TypeNames.STRING);
+        this.setTypeExpected(14, TypeNames.STRING);
 
     }
 
@@ -148,9 +150,9 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         // CRF_VERSION_ID NAME DESCRIPTION
         // CRF_ID STATUS_ID DATE_CREATED DATE_UPDATED
         // OWNER_ID REVISION_NUMBER UPDATE_ID
-        CRFVersionBean eb = new CRFVersionBean();
+        FormLayoutBean eb = new FormLayoutBean();
         super.setEntityAuditInformation(eb, hm);
-        eb.setId(((Integer) hm.get("crf_version_id")).intValue());
+        eb.setId(((Integer) hm.get("form_layout_id")).intValue());
 
         eb.setName((String) hm.get("name"));
         eb.setDescription((String) hm.get("description"));
@@ -159,6 +161,8 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         eb.setOid((String) hm.get("oc_oid"));
         eb.setXform((String) hm.get("xform"));
         eb.setXformName((String) hm.get("xform_name"));
+        eb.setUrl((String) hm.get("url"));
+
         return eb;
     }
 
@@ -170,7 +174,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
 
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            FormLayoutBean eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
         return al;
@@ -191,7 +195,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            FormLayoutBean eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
         return al;
@@ -206,7 +210,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            FormLayoutBean eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
         return al;
@@ -290,7 +294,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
         while (it.hasNext()) {
-            CRFVersionBean eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            FormLayoutBean eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
         return al;
@@ -325,7 +329,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
     }
 
     public EntityBean findByPK(int ID) {
-        CRFVersionBean eb = new CRFVersionBean();
+        FormLayoutBean eb = new FormLayoutBean();
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
@@ -336,14 +340,14 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
-            eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
         }
         return eb;
 
     }
 
     public EntityBean findByFullName(String version, String crfName) {
-        CRFVersionBean eb = new CRFVersionBean();
+        FormLayoutBean eb = new FormLayoutBean();
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
@@ -355,7 +359,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
-            eb = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            eb = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
         }
         return eb;
 
@@ -399,13 +403,15 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
 
         sql = digester.getQuery("deleteResponseSetByVersion") + versionId;
         sqls.add(sql);
+        sql = digester.getQuery("deleteFormLayoutMediaByVersion") + versionId;
+        sqls.add(sql);
         sql = digester.getQuery("delete") + versionId;
         sqls.add(sql);
         return sqls;
 
     }
 
-    private String getOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {
+    private String getOid(FormLayoutBean crfVersion, String crfName, String crfVersionName) {
 
         String oid;
         try {
@@ -416,7 +422,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         }
     }
 
-    public String getValidOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {
+    public String getValidOid(FormLayoutBean crfVersion, String crfName, String crfVersionName) {
 
         String oid = getOid(crfVersion, crfName, crfVersionName);
         logger.debug(oid);
@@ -447,7 +453,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         return executeFindAllQuery("findAllByOid", variables);
     }
 
-    public int getCRFIdFromCRFVersionId(int CRFVersionId) {
+    public int getCRFIdFromFormLayoutId(int CRFVersionId) {
         int answer = 0;
 
         this.unsetTypeExpected();
@@ -456,7 +462,7 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(CRFVersionId));
 
-        String sql = digester.getQuery("getCRFIdFromCRFVersionId");
+        String sql = digester.getQuery("getCRFIdFromFormLayoutId");
         ArrayList rows = select(sql, variables);
 
         if (rows.size() > 0) {
@@ -484,13 +490,13 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         Integer crfVersionId = null;
         if (result.iterator().hasNext()) {
             map = (HashMap) result.iterator().next();
-            crfVersionId = (Integer) map.get("crf_version_id");
+            crfVersionId = (Integer) map.get("form_layout_id");
         }
         return crfVersionId;
     }
 
-    public CRFVersionBean findByOid(String oid) {
-        CRFVersionBean crfVersionBean = new CRFVersionBean();
+    public FormLayoutBean findByOid(String oid) {
+        FormLayoutBean FormLayoutBean = new FormLayoutBean();
         this.unsetTypeExpected();
         setTypesExpected();
 
@@ -502,8 +508,8 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {
-            crfVersionBean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
-            return crfVersionBean;
+            FormLayoutBean = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
+            return FormLayoutBean;
         } else {
             return null;
         }
@@ -514,20 +520,20 @@ public class CRFVersionDAO<K extends String, V extends ArrayList> extends Audita
      * @param studySubjectId
      * @return
      */
-    public Map<Integer, CRFVersionBean> buildCrfVersionById(Integer studySubjectId) {
+    public Map<Integer, FormLayoutBean> buildFormLayoutById(Integer studySubjectId) {
         this.setTypesExpected(); // <== Must be called first
-        Map<Integer, CRFVersionBean> result = new HashMap<Integer, CRFVersionBean>();
+        Map<Integer, FormLayoutBean> result = new HashMap<Integer, FormLayoutBean>();
 
         HashMap<Integer, Object> param = new HashMap<Integer, Object>();
         int i = 1;
         param.put(i++, studySubjectId);
 
-        List selectResult = select(digester.getQuery("buildCrfVersionById"), param);
+        List selectResult = select(digester.getQuery("buildFormLayoutById"), param);
 
         Iterator it = selectResult.iterator();
 
         while (it.hasNext()) {
-            CRFVersionBean bean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            FormLayoutBean bean = (FormLayoutBean) this.getEntityFromHashMap((HashMap) it.next());
             result.put(bean.getId(), bean);
         }
 

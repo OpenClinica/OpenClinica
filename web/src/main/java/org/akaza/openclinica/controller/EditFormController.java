@@ -83,6 +83,8 @@ public class EditFormController {
         PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
         subjectContext.setStudyEventDefinitionId(Integer.valueOf(subjectContextMap.get("studyEventDefinitionID")));
         subjectContext.setCrfVersionOid(subjectContextMap.get("crfVersionOID"));
+        subjectContext.setFormLayoutOid(subjectContextMap.get("formLayoutOID"));
+
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(Integer.valueOf(subjectContextMap.get("studyEventOrdinal")));
         String flavor = "-query";

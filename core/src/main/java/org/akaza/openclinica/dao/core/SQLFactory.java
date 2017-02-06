@@ -46,12 +46,13 @@ public class SQLFactory {
     public final String DAO_AUDIT = "audit";
 
     //
-    //    public final String DAO_DATAVIEW = "dataview_dao";
+    // public final String DAO_DATAVIEW = "dataview_dao";
     public final String DAO_ITEM = "item";
     public final String DAO_ITEMDATA = "item_data";
     public final String DAO_ITEMFORMMETADATA = "item_form_metadata";
     public final String DAO_CRF = "crf";
     public final String DAO_CRFVERSION = "crfversion";
+    public final String DAO_FORMLAYOUT = "formlayout";
     public final String DAO_DATASET = "dataset";
     public final String DAO_SECTION = "section";
     public final String DAO_MASKING = "masking";
@@ -74,13 +75,11 @@ public class SQLFactory {
     // YW, 05-2008, for odm extract
     public final String DAO_ODM_EXTRACT = "odm_extract";
 
-    private SQLFactory(){
-    	//to thwart any instantiation of this class
+    private SQLFactory() {
+        // to thwart any instantiation of this class
     }
-    
-    
+
     public static EhCacheWrapper ehCacheWrapper;
-    
 
     public EhCacheWrapper getEhCacheWrapper() {
         return ehCacheWrapper;
@@ -106,9 +105,9 @@ public class SQLFactory {
     static public SQLFactory getInstance() {
         // set so that we could test an xml file in a unit test, tbh
         if (facInstance == null) {
-        	synchronized(SQLFactory.class) {
-            facInstance = new SQLFactory();
-        	}
+            synchronized (SQLFactory.class) {
+                facInstance = new SQLFactory();
+            }
         }
         return facInstance;
     }
@@ -123,10 +122,6 @@ public class SQLFactory {
         return (DAODigester) digesters.get(name);
     }
 
-    
-    
-    
-    
     public void run(String dbName, ResourceLoader resourceLoader) {
         // we get the type of the database and run the factory, picking
         // up all the queries. NOTE that this should only be run
@@ -142,24 +137,20 @@ public class SQLFactory {
         // filename
         HashMap fileList = new HashMap();
         CacheManager cacheManager = new CacheManager();
-        
-        
-       
-      
+
         try {
-            if(resourceLoader!=null && cacheManager!=null)
-            cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/ehcache.xml").getInputStream());
+            if (resourceLoader != null && cacheManager != null)
+                cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/ehcache.xml").getInputStream());
         } catch (CacheException e) {
-          
+
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        EhCacheWrapper ehCache = new EhCacheWrapper("com.akaza.openclinica.dao.core.DAOCache",cacheManager);
-        
-        
+        EhCacheWrapper ehCache = new EhCacheWrapper("com.akaza.openclinica.dao.core.DAOCache", cacheManager);
+
         setEhCacheWrapper(ehCache);
-        
+
         if ("oracle".equals(dbName)) {
             // logger.warn("Oracle Test");
             fileList.put(this.DAO_USERACCOUNT, "oracle_useraccount_dao.xml");
@@ -197,7 +188,7 @@ public class SQLFactory {
             fileList.put(this.DAO_RULESET_AUDIT, "oracle_ruleset_audit_dao.xml");
             fileList.put(this.DAO_RULESETRULE_AUDIT, "oracle_rulesetrule_audit_dao.xml");
             fileList.put(this.DAO_ODM_EXTRACT, "oracle_odm_extract_dao.xml");
-//            fileList.put(this.DAO_SUBJECTTRANSFER, "oracle_subjecttransfer_dao.xml");
+            // fileList.put(this.DAO_SUBJECTTRANSFER, "oracle_subjecttransfer_dao.xml");
         } else if ("postgres".equals(dbName)) {
             fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
             fileList.put(this.DAO_ARCHIVED_DATASET_FILE, "archived_dataset_file_dao.xml");
@@ -216,6 +207,7 @@ public class SQLFactory {
             fileList.put(this.DAO_ITEMDATA, "itemdata_dao.xml");
             fileList.put(this.DAO_CRF, "crf_dao.xml");
             fileList.put(this.DAO_CRFVERSION, "crfversion_dao.xml");
+            fileList.put(this.DAO_FORMLAYOUT, "form_layout_dao.xml");
             fileList.put(this.DAO_DATASET, "dataset_dao.xml");
             fileList.put(this.DAO_SECTION, "section_dao.xml");
             fileList.put(this.DAO_FILTER, "filter_dao.xml");
@@ -239,8 +231,8 @@ public class SQLFactory {
             fileList.put(this.DAO_ODM_EXTRACT, "odm_extract_dao.xml");
 
             // add files here as we port over to postgres, tbh
-        }// should be either oracle or postgres, but what if the file is
-        // gone?
+        } // should be either oracle or postgres, but what if the file is
+          // gone?
         else {
             // throw an exception here, ssachs
         }
@@ -255,25 +247,25 @@ public class SQLFactory {
             DAODigester newDaoDigester = new DAODigester();
 
             try {
-         
+
                 if (System.getProperty("catalina.home") == null) {
                     String path = getPropertiesDir();
                     newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 } else {
                     String path = CoreResources.PROPERTIES_DIR;
                     newDaoDigester.setInputStream(resourceLoader.getResource("classpath:properties/" + DAOFileName).getInputStream());
-                    //newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
+                    // newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 }
                 try {
                     newDaoDigester.run();
                     digesters.put(DAOName, newDaoDigester);
                 } catch (SAXException saxe) {
                     saxe.printStackTrace();
-                }// end try block for xml
+                } // end try block for xml
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-            }// end try block for files
-        }// end for loop
+            } // end try block for files
+        } // end for loop
 
     }
 
@@ -283,7 +275,7 @@ public class SQLFactory {
         URL path = this.getClass().getClassLoader().getResource(resource);
         if (null != path) {
             absolutePath = path.getPath();
-        }else{
+        } else {
             throw new RuntimeException("Could not get a path please investigate !!");
         }
         absolutePath = absolutePath.replaceAll("placeholder.properties", "");

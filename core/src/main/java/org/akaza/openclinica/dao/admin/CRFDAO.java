@@ -315,6 +315,26 @@ public class CRFDAO<K extends String, V extends ArrayList> extends AuditableEnti
         return answer;
     }
 
+    public CRFBean findByLayoutId(int formLayoutId) {
+        CRFBean answer = new CRFBean();
+
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(formLayoutId));
+
+        String sql = digester.getQuery("findByLayoutId");
+        ArrayList rows = select(sql, variables);
+
+        if (rows.size() > 0) {
+            HashMap row = (HashMap) rows.get(0);
+            answer = (CRFBean) getEntityFromHashMap(row);
+        }
+
+        return answer;
+    }
+
     private String getOid(CRFBean crfBean, String crfName) {
 
         String oid;

@@ -327,6 +327,7 @@
             , SDV_STATUS=?
             , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
+            , FORM_LAYOUT_ID=?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>

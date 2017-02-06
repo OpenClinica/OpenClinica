@@ -5,27 +5,24 @@ import java.util.LinkedHashMap;
 
 import javax.sql.DataSource;
 
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
-
-import org.akaza.openclinica.bean.extract.odm.ClinicalDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
-import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.cdisc.ns.odm.v130_sb.ODM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import net.sf.json.JSON;
+import net.sf.json.xml.XMLSerializer;
 
 /**
  * R
@@ -49,63 +46,52 @@ public class MetadataCollectorResource {
     private CoreResources coreResources;
 
     @Autowired
-    //Testing purposes TODO:remove me
+    // Testing purposes TODO:remove me
     private StudyDao studyDaoHib;
 
     public StudyDao getStudyDaoHib() {
         return studyDaoHib;
     }
 
-
     public void setStudyDaoHib(StudyDao studyDaoHib) {
         this.studyDaoHib = studyDaoHib;
     }
-
 
     public CoreResources getCoreResources() {
         return coreResources;
     }
 
-
     public void setCoreResources(CoreResources coreResources) {
         this.coreResources = coreResources;
     }
-
 
     public RuleSetRuleDao getRuleSetRuleDao() {
         return ruleSetRuleDao;
     }
 
-
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
-
 
     public StudyDAO getStudyDao() {
         return new StudyDAO(dataSource);
     }
 
-
     public void setStudyDao(StudyDAO studyDao) {
         this.studyDao = studyDao;
     }
-
 
     public DataSource getDataSource() {
         return dataSource;
     }
 
-
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-
     public MetadataCollectorResource() {
 
     }
-
 
     public String collectODMMetadata(String studyOID) {
 
@@ -115,13 +101,16 @@ public class MetadataCollectorResource {
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
+        ODM odm = new ODM();
+
         ODMBean odmb = mdc.getODMBean();
         odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
         xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
         xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+
         odmb.setXmlnsList(xmlnsList);
         odmb.setODMVersion("oc1.3");
         mdc.setODMBean(odmb);
@@ -141,14 +130,12 @@ public class MetadataCollectorResource {
 
     }
 
-
     public String collectODMMetadataJson(String studyOID) {
         net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
         JSON json = xmlserializer.read(collectODMMetadata(studyOID));
         return json.toString(INDENT_LEVEL);
 
     }
-
 
     public JSON collectODMMetadataJson(String studyOID, String formVersionOID) {
         net.sf.json.xml.XMLSerializer xmlserializer = new XMLSerializer();
@@ -174,7 +161,7 @@ public class MetadataCollectorResource {
         odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
         xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
         xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
         odmb.setXmlnsList(xmlnsList);
@@ -195,12 +182,11 @@ public class MetadataCollectorResource {
         report.setODMVersion("oc1.3");
         report.createStudyMetaOdmXml(Boolean.FALSE);
 
-
         return report.getXmlOutput().toString().trim();
     }
 
-
-    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap) {
+    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID,
+            LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
@@ -212,7 +198,7 @@ public class MetadataCollectorResource {
         odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
         xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
         xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
         odmb.setXmlnsList(xmlnsList);
@@ -225,17 +211,15 @@ public class MetadataCollectorResource {
             mdc.collectFileData();
         adc.collectFileData();
 
-
         FullReportBean report = new FullReportBean();
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());
         report.setOdmBean(mdc.getODMBean());
-        //report.setClinicalData(odmClinicalDataBean);
+        // report.setClinicalData(odmClinicalDataBean);
 
         report.setClinicalDataMap(clinicalDataMap);
         report.setODMVersion("oc1.3");
-
 
         return report;
     }
@@ -259,6 +243,5 @@ public class MetadataCollectorResource {
 
         return studyBean;
     }
-
 
 }
