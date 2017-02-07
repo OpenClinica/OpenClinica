@@ -122,7 +122,14 @@
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
+    <filter>
+        <filter-name>multiTenantFilter</filter-name>
+        <filter-class>org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>multiTenantFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <filter>
         <filter-name>hibernateFilter</filter-name>
         <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
@@ -154,16 +161,8 @@
         <url-pattern>/pages/auth/api/*</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>multiTenantFilter</filter-name>
-        <filter-class>org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>multiTenantFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
     <servlet>
+        <servlet-name>pages</servlet-name>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>

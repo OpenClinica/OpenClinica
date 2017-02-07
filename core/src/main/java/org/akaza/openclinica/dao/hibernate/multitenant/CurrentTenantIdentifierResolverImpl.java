@@ -9,6 +9,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -19,38 +20,27 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
 
     public static final String DEFAULT_TENANT_ID = "public";
     public static final String CURRENT_TENANT_ID = "current_tenant_id";
-    private ThreadLocal currentTenantId = new ThreadLocal();
 
     @Override
     public String resolveCurrentTenantIdentifier() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
+            String tenant = null;
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-            String path = attr.getRequest().getPathInfo();
-            UserAccountBean ub = (UserAccountBean) attr.getRequest().getSession().getAttribute("userBean");
+            HttpServletRequest request = attr.getRequest();
+            HttpSession session = request.getSession();
 
-            if (ub != null) {
-                HttpSession session = attr.getRequest().getSession();
-                if (StringUtils.isNotEmpty(path) && path.contains("/schema/tenant")) {
-                    String identifier = path.substring(path.lastIndexOf("/") + 1);
-                    if (StringUtils.isNotEmpty(identifier)) {
-                        System.out.println("Returning tenant:" + identifier);
-                        session.setAttribute(CURRENT_TENANT_ID, identifier);
-                        currentTenantId.set(identifier);
-                        session.setAttribute("study", null);
-                        return identifier;
-                    }
-                } else if (session.getAttribute(CURRENT_TENANT_ID) != null) {
-                    return (String) session.getAttribute(CURRENT_TENANT_ID);
-                }
-            }
+            if (request.getAttribute(CURRENT_TENANT_ID) != null)
+                tenant = (String) request.getAttribute(CURRENT_TENANT_ID);
+            else if (session != null && session.getAttribute(CURRENT_TENANT_ID) != null)
+                tenant = (String) session.getAttribute(CURRENT_TENANT_ID);
+
+            if (StringUtils.isNotEmpty(tenant))
+                return tenant;
         }
-        if (currentTenantId.get() != null)
-            return (String) currentTenantId.get();
-        else {
-            System.out.println("Returning default tenant:" + DEFAULT_TENANT_ID);
-            return DEFAULT_TENANT_ID;
-        }
+        System.out.println("Returning default tenant:" + DEFAULT_TENANT_ID);
+        return DEFAULT_TENANT_ID;
+
     }
 
     @Override
