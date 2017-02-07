@@ -273,6 +273,10 @@ public class OpenRosaSubmissionController {
             studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
             studyEvent.setUserAccount(userAccount);
             studyEventDao.saveOrUpdate(studyEvent);
+        } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
+            studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+            studyEvent.setUserAccount(userAccount);
+            studyEventDao.saveOrUpdate(studyEvent);
         }
 
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
