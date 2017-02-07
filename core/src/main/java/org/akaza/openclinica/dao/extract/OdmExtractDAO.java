@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCrfTagBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
@@ -83,6 +84,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCrfTagDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -95,6 +97,7 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -109,6 +112,9 @@ public class OdmExtractDAO extends DatasetDAO {
     CRFDAO crfdao = new CRFDAO(ds);
     StudyDAO sdao = new StudyDAO(ds);
     FormLayoutDAO fldao = new FormLayoutDAO(ds);
+    EventDefinitionCrfTagDAO edctdao = new EventDefinitionCrfTagDAO(ds);
+
+    EventDefinitionCrfTagService eventDefinitionCrfTagService;
 
     public OdmExtractDAO(DataSource ds) {
         super(ds);
@@ -1502,7 +1508,9 @@ public class OdmExtractDAO extends DatasetDAO {
             for (ElementRefBean formRef : formRefs) {
                 ConfigurationParameters conf = new ConfigurationParameters();
                 EventDefinitionCRFBean edc = getEventDefCRF(sed, formRef, studyId);
-                conf = populateConfigurationParameters(edc, conf);
+                CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());
+                String crfPath = sed.getOid() + "." + cBean.getOid();
+                conf = populateConfigurationParameters(edc, conf, crfPath);
                 formRef.setConfigurationParameters(conf);
                 int defaultVersionId = edc.getDefaultVersionId();
                 formRef.setFormLayoutRefs(getFormLayoutRefs(formRef, defaultVersionId));
@@ -3727,9 +3735,10 @@ public class OdmExtractDAO extends DatasetDAO {
         return edcdao.findByStudyEventDefinitionIdAndCRFId(studyBean, sedBean.getId(), crfBean.getId());
     }
 
-    private ConfigurationParameters populateConfigurationParameters(EventDefinitionCRFBean edc, ConfigurationParameters conf) {
+    private ConfigurationParameters populateConfigurationParameters(EventDefinitionCRFBean edc, ConfigurationParameters conf, String crfPath) {
         conf.setAllowAnynymousSubmission(edc.isAllowAnonymousSubmission());
-        conf.setOffline(edc.isOffline());
+
+        conf.setOffline(getEventDefnCrfOfflineStatus(2, crfPath, true));
         conf.setHiddenCrf(edc.isHideCrf());
         conf.setParticipantForm(edc.isParticipantForm());
         conf.setSubmissionUrl(edc.getSubmissionUrl());
@@ -3766,6 +3775,14 @@ public class OdmExtractDAO extends DatasetDAO {
             elementRefs.add(element);
         }
         return elementRefs;
+    }
+
+    public boolean getEventDefnCrfOfflineStatus(int tagId, String crfPath, boolean active) {
+        EventDefinitionCrfTagBean eventDefinitionCrfTag = edctdao.findByCrfPath(tagId, crfPath, active);
+        if (eventDefinitionCrfTag == null)
+            return false;
+        else
+            return true;
     }
 
 }

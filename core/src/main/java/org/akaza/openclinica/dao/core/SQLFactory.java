@@ -42,6 +42,7 @@ public class SQLFactory {
     public final String DAO_SUBJECTGROUPMAP = "subject_group_map";
     public final String DAO_STUDYEVENT = "study_event";
     public final String DAO_EVENTDEFINITIONCRF = "event_definition_crf";
+    public final String DAO_EVENTDEFINITIONCRFTAG = "event_definition_crf_tag";
     public final String DAO_AUDITEVENT = "audit_event";
     public final String DAO_AUDIT = "audit";
 
@@ -201,6 +202,7 @@ public class SQLFactory {
             fileList.put(this.DAO_SUBJECT, "subject_dao.xml");
             fileList.put(this.DAO_SUBJECTGROUPMAP, "subject_group_map_dao.xml");
             fileList.put(this.DAO_EVENTDEFINITIONCRF, "event_definition_crf_dao.xml");
+            fileList.put(this.DAO_EVENTDEFINITIONCRFTAG, "event_definition_crf_tag_dao.xml");
             fileList.put(this.DAO_AUDITEVENT, "audit_event_dao.xml");
             fileList.put(this.DAO_AUDIT, "audit_dao.xml");
             fileList.put(this.DAO_ITEM, "item_dao.xml");
