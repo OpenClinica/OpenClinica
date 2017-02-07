@@ -6,7 +6,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.service.dto.Crf;
 import org.apache.commons.fileupload.FileItem;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutDef;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
 import org.springframework.validation.Errors;
 
 public class ExecuteIndividualCrfObject {

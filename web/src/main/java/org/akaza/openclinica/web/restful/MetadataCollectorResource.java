@@ -17,7 +17,7 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
-import org.cdisc.ns.odm.v130_sb.ODM;
+import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -104,7 +104,7 @@ public class MetadataCollectorResource {
         ODM odm = new ODM();
 
         ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
         // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
@@ -158,7 +158,7 @@ public class MetadataCollectorResource {
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
         // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
@@ -195,7 +195,7 @@ public class MetadataCollectorResource {
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
         // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");

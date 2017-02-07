@@ -7,8 +7,8 @@ import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormRef;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionConfigurationParameters;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
 
 public class EventDefinitionCrfDTO {
     private EventDefinitionCrf eventDefinitionCrf;

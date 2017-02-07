@@ -1,5 +1,15 @@
 package org.akaza.openclinica.controller;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -12,9 +22,25 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.rule.*;
-import org.akaza.openclinica.domain.rule.action.*;
-import org.akaza.openclinica.domain.rule.expression.*;
+import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
+import org.akaza.openclinica.domain.rule.RuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.action.EventActionBean;
+import org.akaza.openclinica.domain.rule.action.EventPropertyBean;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.domain.rule.expression.Context;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
+import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
+import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
@@ -27,7 +53,20 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.openclinica.ns.response.v31.MessagesType;
 import org.openclinica.ns.response.v31.Response;
-import org.openclinica.ns.rules.v31.*;
+import org.openclinica.ns.rules.v31.DiscrepancyNoteActionType;
+import org.openclinica.ns.rules.v31.EmailActionType;
+import org.openclinica.ns.rules.v31.EventActionType;
+import org.openclinica.ns.rules.v31.EventDestinationType;
+import org.openclinica.ns.rules.v31.HideActionType;
+import org.openclinica.ns.rules.v31.InsertActionType;
+import org.openclinica.ns.rules.v31.NotificationActionType;
+import org.openclinica.ns.rules.v31.PropertyType;
+import org.openclinica.ns.rules.v31.RuleAssignmentType;
+import org.openclinica.ns.rules.v31.RuleDefType;
+import org.openclinica.ns.rules.v31.RuleRefType;
+import org.openclinica.ns.rules.v31.RunOnScheduleType;
+import org.openclinica.ns.rules.v31.ShowActionType;
+import org.openclinica.ns.rules.v31.TargetType;
 import org.openclinica.ns.rules_test.v31.ParameterType;
 import org.openclinica.ns.rules_test.v31.RulesTestMessagesType;
 import org.slf4j.Logger;
@@ -39,17 +78,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/rule")
@@ -227,7 +262,7 @@ public class RuleController {
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
         // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
@@ -300,9 +335,8 @@ public class RuleController {
     }
 
     @RequestMapping(value = "/studies/{study}/connect", method = RequestMethod.POST)
-    public @ResponseBody
-    org.openclinica.ns.response.v31.Response create(@RequestBody org.openclinica.ns.response.v31.Response responeType, Model model, HttpSession session,
-            @PathVariable("study") String studyOid) throws Exception {
+    public @ResponseBody org.openclinica.ns.response.v31.Response create(@RequestBody org.openclinica.ns.response.v31.Response responeType, Model model,
+            HttpSession session, @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         StudyDAO studyDao = new StudyDAO(dataSource);
         StudyBean currentStudy = studyDao.findByOid(studyOid);
@@ -321,9 +355,8 @@ public class RuleController {
     }
 
     @RequestMapping(value = "/studies/{study}/validateRule", method = RequestMethod.POST)
-    public @ResponseBody
-    Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid)
-            throws Exception {
+    public @ResponseBody Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session,
+            @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
         StudyDAO studyDao = new StudyDAO(dataSource);
@@ -359,9 +392,8 @@ public class RuleController {
     }
 
     @RequestMapping(value = "/studies/{study}/validateAndSaveRule", method = RequestMethod.POST)
-    public @ResponseBody
-    Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid,
-            @RequestParam("ignoreDuplicates") Boolean ignoreDuplicates) throws Exception {
+    public @ResponseBody Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session,
+            @PathVariable("study") String studyOid, @RequestParam("ignoreDuplicates") Boolean ignoreDuplicates) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
         StudyDAO studyDao = new StudyDAO(dataSource);
@@ -406,9 +438,8 @@ public class RuleController {
     }
 
     @RequestMapping(value = "/studies/{study}/validateAndTestRule", method = RequestMethod.POST)
-    public @ResponseBody
-    org.openclinica.ns.rules_test.v31.RulesTest create(@RequestBody org.openclinica.ns.rules_test.v31.RulesTest ruleTest, Model model, HttpSession session,
-            @PathVariable("study") String studyOid) throws Exception {
+    public @ResponseBody org.openclinica.ns.rules_test.v31.RulesTest create(@RequestBody org.openclinica.ns.rules_test.v31.RulesTest ruleTest, Model model,
+            HttpSession session, @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(ruleTest.getRules());
         StudyDAO studyDao = new StudyDAO(dataSource);
@@ -444,8 +475,8 @@ public class RuleController {
         for (ParameterType parameterType : ruleTest.getParameters()) {
             p.put(parameterType.getKey(), parameterType.getValue());
         }
-        ExpressionObjectWrapper eow =
-                new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
+        ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(),
+                rpic.getRuleSets().get(0));
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
 
         // Run expression with populated HashMap
@@ -453,8 +484,8 @@ public class RuleController {
         HashMap<String, String> result = ep.testEvaluateExpression(p);
         DateTime end = new DateTime();
         Duration dur = new Duration(start, end);
-        PeriodFormatter yearsAndMonths =
-                new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds").toFormatter();
+        PeriodFormatter yearsAndMonths = new PeriodFormatterBuilder().printZeroAlways().appendSecondsWithMillis().appendSuffix(" second", " seconds")
+                .toFormatter();
         yearsAndMonths.print(dur.toPeriod());
 
         // Run expression with empty HashMap to check rule validity, because
@@ -468,7 +499,8 @@ public class RuleController {
             parameterType.setValue(entry.getValue());
             ruleTest.getParameters().add(parameterType);
         }
-        // if (theResult.get("ruleValidation").equals("rule_valid") && result.get("ruleValidation").equals("rule_invalid")) {
+        // if (theResult.get("ruleValidation").equals("rule_valid") &&
+        // result.get("ruleValidation").equals("rule_invalid")) {
         // result.put("ruleValidation", "rule_valid");
         // result.put("ruleEvaluatesTo", resword.getString("test_rules_rule_fail") + " " +
         // result.get("ruleValidationFailMessage"));
