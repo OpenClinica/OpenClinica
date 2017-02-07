@@ -337,7 +337,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     ArrayList<ElementRefBean> formLayoutRefs = (ArrayList<ElementRefBean>) formRef.getFormLayoutRefs();
                     for (ElementRefBean formLayoutRef : formLayoutRefs) {
                         xml.append(currentIndent + indent + indent + "<OpenClinica:FormLayoutRef OID=\"" + StringEscapeUtils.escapeXml(formLayoutRef.getName())
-                                + "\" IsDefaultVersion=\"" + formLayoutRef.isDefaultVersion() + "\"/>");
+                                + "\" IsDefaultVersion=\"" + (formLayoutRef.isDefaultVersion() ? "Yes" : "No") + "\"/>");
                         xml.append(nls);
                     }
                 }

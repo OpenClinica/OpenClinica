@@ -163,7 +163,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         if (!"-1".equals(ig.getItemGroupRepeatKey())) {
                             xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
                         }
-                        xml.append("OpenClinica:Removed=\"" + ig.getItemData().get(0).isDeleted() + "\" ");
+                        xml.append("OpenClinica:Removed=\"" + (ig.getItemData().get(0).isDeleted() ? "Yes" : "No") + "\" ");
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
