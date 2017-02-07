@@ -19,7 +19,7 @@ public class OdmImportController {
     OdmImportServiceImpl odmImportServiceImpl;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public @ResponseBody void importOdmToOC(@RequestBody org.cdisc.ns.odm.v130_sb.ODM odm, HttpServletResponse response, HttpServletRequest request)
+    public @ResponseBody void importOdmToOC(@RequestBody org.cdisc.ns.odm.v130.ODM odm, HttpServletResponse response, HttpServletRequest request)
             throws Exception {
         odmImportServiceImpl.importOdmToOC(odm);
     }

@@ -3,7 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionConfigurationParameters;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
 
 public class EDCTagDTO {
     private EventDefinitionCrf eventDefinitionCrf;

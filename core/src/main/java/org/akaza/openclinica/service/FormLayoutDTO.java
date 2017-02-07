@@ -5,7 +5,7 @@ import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.dto.Crf;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormDef;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 
 public class FormLayoutDTO {
     private ODMcomplexTypeDefinitionFormDef odmFormDef;
