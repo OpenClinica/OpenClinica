@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.submit;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -834,7 +835,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         HtmlBuilder actionLink = new HtmlBuilder();
         // actionLink.a().href("url?id=" + studySubject.getId());
-        actionLink.a().href(url + "?ssid=" + studySubject.getLabel());
+        actionLink.a().href(url + "?ssid=" + URLEncoder.encode(studySubject.getLabel(),"UTF-8"));
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Participate1','images/bt_Ocui_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Participate1','images/bt_Ocui.gif');\"").close();
         actionLink.img().name("bt_Participate1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant"))
