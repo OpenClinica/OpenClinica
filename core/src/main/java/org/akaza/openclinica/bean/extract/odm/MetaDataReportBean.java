@@ -471,7 +471,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
             }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                xml.append(" OpenClinica:FormOIDs=\"" + item.getFormOIDs() + "\"");
+                xml.append(" OpenClinica:FormOID=\"" + item.getFormOIDs() + "\"");
             }
             boolean hasNode = false;
             // add question
