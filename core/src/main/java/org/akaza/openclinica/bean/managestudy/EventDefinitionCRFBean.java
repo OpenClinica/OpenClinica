@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
 /**
@@ -170,18 +170,18 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     private boolean decisionCondition = true;
 
     private int defaultVersionId = 0;
-    //This value must match what is in the database presently, which are mostly blank values
+    // This value must match what is in the database presently, which are mostly blank values
     private SourceDataVerification sourceDataVerification = null;
 
-    //private SourceDataVerification sourceDataVerification = SourceDataVerification.NOTREQUIRED;
+    // private SourceDataVerification sourceDataVerification = SourceDataVerification.NOTREQUIRED;
     private String selectedVersionIds = "";
     private int parentId = 0;
     private boolean participantForm;
     private boolean allowAnonymousSubmission;
     private String submissionUrl;
     private boolean offline;
-    
-    //Not in db
+
+    // Not in db
     private String eventName;
 
     public String getSelectedVersionIds() {
@@ -257,9 +257,8 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
     private String selectedVersionNames = "";// not in DB
     private ArrayList<Integer> selectedVersionIdList = new ArrayList<Integer>(); // not
-    
-    private CRFVersionBean defaultCRF;
-    
+
+    private FormLayoutBean defaultCRF;
 
     // in
     // DB
@@ -490,7 +489,6 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
             nullFlags.put("MSK", "0");
             nullFlags.put("NPE", "0");
 
-
         }
         return nullFlags;
     }
@@ -579,38 +577,38 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
         this.eventName = eventName;
     }
 
-	public CRFVersionBean getDefaultCRF() {
-		return defaultCRF;
-	}
+    public FormLayoutBean getDefaultCRF() {
+        return defaultCRF;
+    }
 
-	public void setDefaultCRF(CRFVersionBean defaultCRF) {
-		this.defaultCRF = defaultCRF;
-	}
+    public void setDefaultCRF(FormLayoutBean defaultCRF) {
+        this.defaultCRF = defaultCRF;
+    }
 
-	public boolean isParticipantForm() {
-		return participantForm == true;
-	}
+    public boolean isParticipantForm() {
+        return participantForm == true;
+    }
 
-	public void setParticipantForm(boolean participantForm) {
-		this.participantForm = participantForm;
-	}
+    public void setParticipantForm(boolean participantForm) {
+        this.participantForm = participantForm;
+    }
 
-	public boolean isAllowAnonymousSubmission() {
-		return allowAnonymousSubmission == true;
-	}
+    public boolean isAllowAnonymousSubmission() {
+        return allowAnonymousSubmission == true;
+    }
 
-	public void setAllowAnonymousSubmission(boolean allowAnonymousSubmission) {
-		this.allowAnonymousSubmission = allowAnonymousSubmission;
-	}
+    public void setAllowAnonymousSubmission(boolean allowAnonymousSubmission) {
+        this.allowAnonymousSubmission = allowAnonymousSubmission;
+    }
 
-	public String getSubmissionUrl() {
-		return submissionUrl;
-	}
+    public String getSubmissionUrl() {
+        return submissionUrl;
+    }
 
-	public void setSubmissionUrl(String submissionUrl) {
-		this.submissionUrl = submissionUrl;
-		
-	}
+    public void setSubmissionUrl(String submissionUrl) {
+        this.submissionUrl = submissionUrl;
+
+    }
 
     public boolean isOffline() {
         return offline;
@@ -620,5 +618,4 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
         this.offline = offline;
     }
 
-	
 }

@@ -56,6 +56,7 @@ public class FormLayout extends DataMapDomainObject {
     private List<EventCrf> eventCrfs;
     private Set decisionConditions = new HashSet(0);
     private List<FileItem> fileItems;
+    private List<VersioningMap> versioningMaps;
 
     public FormLayout() {
     }
@@ -68,7 +69,7 @@ public class FormLayout extends DataMapDomainObject {
 
     public FormLayout(int formLayoutId, UserAccount userAccount, Status status, CrfBean crf, String name, String description, String revisionNotes,
             Date dateCreated, Date dateUpdated, Integer updateId, String ocOid, String xform, String xformName, Set filterFormLayoutMaps,
-            List<EventCrf> eventCrfs, Set decisionConditions) {
+            List<EventCrf> eventCrfs, Set decisionConditions, List<VersioningMap> versioningMaps) {
         this.formLayoutId = formLayoutId;
         this.userAccount = userAccount;
         this.status = status;
@@ -85,6 +86,7 @@ public class FormLayout extends DataMapDomainObject {
         this.filterFormLayoutMaps = filterFormLayoutMaps;
         this.eventCrfs = eventCrfs;
         this.decisionConditions = decisionConditions;
+        this.versioningMaps = versioningMaps;
     }
 
     @Id
@@ -239,6 +241,15 @@ public class FormLayout extends DataMapDomainObject {
 
     public void setFileItems(List<FileItem> fileItems) {
         this.fileItems = fileItems;
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formLayout")
+    public List<VersioningMap> getVersioningMaps() {
+        return versioningMaps;
+    }
+
+    public void setVersioningMaps(List<VersioningMap> versioningMaps) {
+        this.versioningMaps = versioningMaps;
     }
 
 }

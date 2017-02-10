@@ -27,8 +27,9 @@ public class VersioningMap extends DataMapDomainObject {
 
     private VersioningMapId versionMapId;
     private CrfVersion crfVersion;
-
+    private FormLayout formLayout;
     private Item item;
+    private int itemInFormLayout;
 
     public VersioningMap() {
     }
@@ -37,15 +38,20 @@ public class VersioningMap extends DataMapDomainObject {
         this.versionMapId = id;
     }
 
-    public VersioningMap(VersioningMapId id, CrfVersion crfVersion, Item item) {
+    public VersioningMap(VersioningMapId id, CrfVersion crfVersion, Item item, FormLayout formLayout, int itemInFormLayout) {
         this.versionMapId = id;
         this.crfVersion = crfVersion;
         this.item = item;
+        this.formLayout = formLayout;
+        this.itemInFormLayout = itemInFormLayout;
     }
 
     @EmbeddedId
     @AttributeOverrides({ @AttributeOverride(name = "crfVersionId", column = @Column(name = "crf_version_id")),
-            @AttributeOverride(name = "itemId", column = @Column(name = "item_id")) })
+            @AttributeOverride(name = "itemId", column = @Column(name = "item_id")),
+            @AttributeOverride(name = "formLayoutId", column = @Column(name = "form_layout_id")),
+            @AttributeOverride(name = "itemOrderInForm", column = @Column(name = "item_order_in_form")) })
+
     public VersioningMapId getVersionMapId() {
         return this.versionMapId;
     }
@@ -72,6 +78,25 @@ public class VersioningMap extends DataMapDomainObject {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_layout_id", insertable = false, updatable = false)
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
+    }
+
+    @Column(name = "item_order_in_form", insertable = false, updatable = false)
+    public int getItemInFormLayout() {
+        return itemInFormLayout;
+    }
+
+    public void setItemInFormLayout(int itemInFormLayout) {
+        this.itemInFormLayout = itemInFormLayout;
     }
 
 }
