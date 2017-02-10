@@ -180,7 +180,7 @@ public class ParticipantPortalRegistrar {
                 String port = "";
                 if (url.getPort() > 0)
                     port = ":" + String.valueOf(url.getPort());
-                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/registrar/verify";
+                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/app/oauth2";
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
