@@ -9,7 +9,6 @@
 
 package org.akaza.openclinica.bean.submit.crfdata;
 
-
 /**
  * OpenClinica form attributes have been included in addition to ODM FormData
  * attributes
@@ -22,6 +21,7 @@ public class ExportFormDataBean extends FormDataBean {
     private String interviewerName;
     private String interviewDate;
     private String status;
+    private String formLayout;
 
     public ExportFormDataBean() {
         super();
@@ -58,4 +58,13 @@ public class ExportFormDataBean extends FormDataBean {
     public String getStatus() {
         return this.status;
     }
+
+    public String getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(String formLayout) {
+        this.formLayout = formLayout;
+    }
+
 }

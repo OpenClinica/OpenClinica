@@ -136,9 +136,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 for (ExportFormDataBean form : forms) {
                     xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        String crfVersion = form.getCrfVersion();
-                        if (crfVersion != null && crfVersion.length() > 0) {
-                            xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(crfVersion));
+                        String formLayout = form.getFormLayout();
+
+                        if (formLayout != null && formLayout.length() > 0) {
+                            xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(formLayout));
                         }
                         String interviewerName = form.getInterviewerName();
                         if (interviewerName != null && interviewerName.length() > 0) {
