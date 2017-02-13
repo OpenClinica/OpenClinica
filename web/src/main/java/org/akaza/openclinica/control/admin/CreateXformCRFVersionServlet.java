@@ -40,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
+    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
 
     @Override
     protected void processRequest() throws Exception {
@@ -68,13 +69,25 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 crfOid = crfBean.getOcOid();
             }
         } else {
-            String url = "http://fm.openclinica.info:8080/api/protocol/" + currentStudy.getOid() + "/forms/" + crfName;
+            String url = FM_BASEURL + currentStudy.getOid() + "/forms/" + crfName;
             RestTemplate restTemplate = new RestTemplate();
             Crf resp = restTemplate.getForObject(url, Crf.class);
             crfOid = resp.getOcoid();
         }
 
         Crf crf = getFormArtifactsFromFM(items, currentStudy.getOid(), crfOid);
+        /**
+         * ODM odm = new ODM();
+         * ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
+         * List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
+         * for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
+         * if (crfOid.equals(odmFormDef.getOID())) {
+         * List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
+         * break;
+         * }
+         * }
+         **/
+
         List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
         OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
         for (Version version : crf.getVersions()) {
@@ -84,7 +97,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
             formLayoutDefs.add(formLayoutDef);
         }
 
-        xformService.executeIndividualCrf(new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName, crfDescription));
+        ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName,
+                crfDescription);
+
+        xformService.executeIndividualCrf(eicObj);
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
@@ -175,7 +191,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        String uploadFilesUrl = "http://fm.openclinica.info:8080/api/protocol/" + studyOid + "/forms/" + formOid + "/artifacts";
+        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + formOid + "/artifacts";
         map.add("file", byteArrayResources);
 
         for (FileItem file : files) {

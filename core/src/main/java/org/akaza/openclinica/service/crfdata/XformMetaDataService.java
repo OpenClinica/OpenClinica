@@ -259,13 +259,14 @@ public class XformMetaDataService {
                         if (ifmd == null) {
                             ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, crfVersion, itemOrdinal);
                         }
-                        createVersioningMap(crfVersion, item);
+                        createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
                         //
                         ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                         if (igmd == null) {
                             igmd = createItemGroupMetadata(html, item, crfVersion, itemGroup, isRepeating, itemOrdinal);
                         }
                         itemOrdinal++;
+
                     }
                 }
             }
@@ -299,17 +300,23 @@ public class XformMetaDataService {
         return itemGroupMetadata;
     }
 
-    private void createVersioningMap(CrfVersion crfVersion, Item item) {
+    private void createVersioningMap(CrfVersion crfVersion, Item item, FormLayout formLayout, int itemOrderInForm) {
         List<VersioningMap> vm = versioningMapDao.findByVersionIdAndItemId(crfVersion.getCrfVersionId(), item.getItemId());
-        if (vm.size() == 0) {
-            VersioningMapId versioningMapId = new VersioningMapId();
-            versioningMapId.setCrfVersionId(crfVersion.getCrfVersionId());
-            versioningMapId.setItemId(item.getItemId());
-            VersioningMap versioningMap = new VersioningMap();
-            versioningMap.setItem(item);
-            versioningMap.setVersionMapId(versioningMapId);
-            versioningMapDao.saveOrUpdate(versioningMap);
-        }
+        // if (vm.size() == 0) {
+        VersioningMapId versioningMapId = new VersioningMapId();
+        versioningMapId.setCrfVersionId(crfVersion.getCrfVersionId());
+        versioningMapId.setItemId(item.getItemId());
+        versioningMapId.setFormLayoutId(formLayout.getFormLayoutId());
+        versioningMapId.setItemOrderInForm(itemOrderInForm);
+
+        VersioningMap versioningMap = new VersioningMap();
+        versioningMap.setItem(item);
+        versioningMap.setVersionMapId(versioningMapId);
+        versioningMap.setCrfVersion(crfVersion);
+        versioningMap.setFormLayout(formLayout);
+        versioningMap.setItemInFormLayout(itemOrderInForm);
+        versioningMapDao.saveOrUpdate(versioningMap);
+        // }
 
     }
 
@@ -521,8 +528,10 @@ public class XformMetaDataService {
             bodyGroupPaths = xformParserHelper.bodyGroupNodePaths(bodyNode, bodyGroupPaths);
 
             List<XformItem> xformItems = new ArrayList<>();
+            int itemOrderInForm = 0;
             for (Bind bd : html.getHead().getModel().getBind()) {
                 if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
+                    itemOrderInForm++;
                     XformItem xformItem = new XformItem();
                     xformItem.setItemGroup(bd.getItemGroup());
                     String itemPath = bd.getNodeSet();
@@ -530,6 +539,7 @@ public class XformMetaDataService {
                     int index = itemPath.lastIndexOf("/");
                     String itemName = itemPath.substring(index + 1);
                     xformItem.setItemName(itemName);
+                    xformItem.setItemOrderInForm(itemOrderInForm);
                     if (bd.getReadOnly() != null) {
                         xformItem.setReadonly(bd.getReadOnly());
                     }

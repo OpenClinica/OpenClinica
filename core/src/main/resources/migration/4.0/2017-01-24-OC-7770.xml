@@ -94,4 +94,29 @@
         </sql>
 	</changeSet>
     
+    
+    
+            <changeSet author="jkeremian" id="2017-01-24-OC-7770-9">
+        <comment>adding form_layout_id column in versioning_map</comment>
+        <addColumn tableName="versioning_map">
+            <column name="form_layout_id" type="int"/>
+            <column name="item_order_in_form" type="int"/>            
+        </addColumn>
+    </changeSet>
+
+
+            <changeSet author="jkeremian" id="2017-01-24-OC-7770-10">
+                <addForeignKeyConstraint baseColumnNames="form_layout_id" baseTableName="versioning_map" constraintName="fk_versioni_fk_versio_form_layout" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="form_layout_id" referencedTableName="form_layout" />
+            </changeSet>
+
+    
+    	<changeSet author="jkeremian" id="2017-01-24-OC-7770-11" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Versioning_map Table</comment>
+		<sql>
+        ALTER TABLE versioning_map ADD CONSTRAINT duplicate_item_form_layout_item_in_form_ordinal_uniqueness_key UNIQUE (form_layout_id, item_id,item_order_in_form);
+        </sql>
+	</changeSet>
+    
+    
+    
 </databaseChangeLog>

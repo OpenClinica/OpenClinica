@@ -59,7 +59,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
 
 public class OdmImportServiceImpl implements OdmImportService {
-
+    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
     private UserAccountDao userAccountDao;
     private StudyUserRoleDao studyUserRoleDao;
     private StudyEventDefinitionDao studyEventDefDao;
@@ -247,8 +247,9 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         for (Crf crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
-                xformService.executeIndividualCrf(
-                        new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, true, crfName, crfDescription));
+                ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, true, crfName,
+                        crfDescription);
+                xformService.executeIndividualCrf(eicObj);
             }
         }
 
@@ -532,7 +533,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         // String protocolId = study.getUniqueIdentifier();
         String protocolId = study.getOc_oid();
 
-        String url = "http://fm.openclinica.info:8080/api/protocol/" + protocolId + "/forms";
+        String url = FM_BASEURL + protocolId + "/forms";
         RestTemplate restTemplate = new RestTemplate();
         Crf[] crfs = null;
         try {

@@ -360,7 +360,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                     if (ecrf.getCrfVersion().getName() != null)
                         dataBean.setCrfVersion(ecrf.getFormLayout().getName());
                     if (collectAudits)
-                        dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getOcOid(), null));
+                        dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
                     if (collectDns)
                         dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
 
@@ -601,7 +601,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         LOGGER.info("Fetching the discrepancy notes..");
         List<DnEventCrfMap> dnEventCrfMaps = eventCrf.getDnEventCrfMaps();
         DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean();
-        dnNotesBean.setEntityID(eventCrf.getCrfVersion().getOcOid());
+        dnNotesBean.setEntityID(eventCrf.getCrfVersion().getCrf().getOcOid());
         DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
         ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
         boolean addDN = true;

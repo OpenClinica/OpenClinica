@@ -26,6 +26,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -136,9 +137,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 for (ExportFormDataBean form : forms) {
                     xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        String crfVersion = form.getCrfVersion();
-                        if (crfVersion != null && crfVersion.length() > 0) {
-                            xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(crfVersion));
+                        String formLayout = form.getFormLayout();
+
+                        if (!StringUtils.isEmpty(formLayout)) {
+                            xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(formLayout));
                         }
                         String interviewerName = form.getInterviewerName();
                         if (interviewerName != null && interviewerName.length() > 0) {

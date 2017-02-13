@@ -26,7 +26,7 @@ public class CrfMetaDataObject {
     public String crfDescription;
 
     public CrfMetaDataObject(Crf crf, Version version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html, String xform,
-            List<FileItem> formItems, Errors errors, String fromLayoutUrl, String crfName, String crfDescription) {
+            List<FileItem> formItems, Errors errors, String formLayoutUrl, String crfName, String crfDescription) {
         this.crf = crf;
         this.version = version;
         this.container = container;
@@ -36,7 +36,7 @@ public class CrfMetaDataObject {
         this.xform = xform;
         this.formItems = formItems;
         this.errors = errors;
-        this.formLayoutUrl = fromLayoutUrl;
+        this.formLayoutUrl = formLayoutUrl;
         this.crfName = crfName;
         this.crfDescription = crfDescription;
     }
