@@ -191,6 +191,7 @@ public class QueryServiceImpl implements QueryService {
         itemData.setOrdinal(helperBean.getItemOrdinal());
         itemData.setUserAccount(helperBean.getUserAccount());
         itemData.setDeleted(false);
+        itemData.setInstanceId(helperBean.getContainer().getInstanceId());
         itemDataDao.saveOrUpdate(itemData);
         return itemData;
     }

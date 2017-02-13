@@ -166,6 +166,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUserAccount(container.getUser());
                     existingItemData.setStatus(Status.AVAILABLE);
                     existingItemData.setUpdateId(container.getUser().getUserId());
+                    existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
 
                     // Close discrepancy notes
@@ -207,8 +208,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
             }
 
-            ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container.getEventCrf(), container.getStudy(), container.getSubject(),
-                    container.getUser());
+            ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);
             Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
             if (itemErrors.hasErrors()) {
                 container.getErrors().addAllErrors(itemErrors);
@@ -224,6 +224,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
             } else {
                 // Existing item. Value changed. Update existing value.
+                existingItemData.setInstanceId(container.getInstanceId());
                 existingItemData.setValue(newItemData.getValue());
                 existingItemData.setUpdateId(container.getUser().getUserId());
                 existingItemData.setDateUpdated(new Date());

@@ -1,6 +1,7 @@
 // default package
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 package org.akaza.openclinica.domain.datamap;
+
 import java.util.Date;
 import java.util.List;
 
@@ -35,91 +36,90 @@ import org.hibernate.annotations.Type;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "item_data_item_data_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
-public class ItemData  extends DataMapDomainObject {
+public class ItemData extends DataMapDomainObject {
 
-	private int itemDataId;
-	private UserAccount userAccount;
-	private EventCrf eventCrf;
-	private Item item;
-	private Status status;
-	private String value;
-	private Date dateCreated;
-	private Date dateUpdated;
-	private Integer updateId;
-	private Integer ordinal;
-	private Status oldStatus;
-	private Boolean deleted;
-	private List<DnItemDataMap> dnItemDataMaps;
+    private int itemDataId;
+    private UserAccount userAccount;
+    private EventCrf eventCrf;
+    private Item item;
+    private Status status;
+    private String value;
+    private Date dateCreated;
+    private Date dateUpdated;
+    private Integer updateId;
+    private Integer ordinal;
+    private Status oldStatus;
+    private Boolean deleted;
+    private String instanceId;
+    private List<DnItemDataMap> dnItemDataMaps;
 
-	public ItemData() {
-	}
+    public ItemData() {
+    }
 
-	public ItemData(int itemDataId, Item item) {
-		this.itemDataId = itemDataId;
-		this.item = item;
-	}
+    public ItemData(int itemDataId, Item item) {
+        this.itemDataId = itemDataId;
+        this.item = item;
+    }
 
-	public ItemData(int itemDataId, UserAccount userAccount, EventCrf eventCrf,
-			Item item, Status status, String value, Date dateCreated,
-			Date dateUpdated, Integer updateId, Integer ordinal, Boolean ocformDeleted,
-			 List<DnItemDataMap> dnItemDataMaps) {
-		this.itemDataId = itemDataId;
-		this.userAccount = userAccount;
-		this.eventCrf = eventCrf;
-		this.item = item;
-		this.status = status;
-		this.value = value;
-		this.dateCreated = dateCreated;
-		this.dateUpdated = dateUpdated;
-		this.updateId = updateId;
-		this.ordinal = ordinal;
-		this.deleted = ocformDeleted;
+    public ItemData(int itemDataId, UserAccount userAccount, EventCrf eventCrf, Item item, Status status, String value, Date dateCreated, Date dateUpdated,
+            Integer updateId, Integer ordinal, Boolean ocformDeleted, List<DnItemDataMap> dnItemDataMaps) {
+        this.itemDataId = itemDataId;
+        this.userAccount = userAccount;
+        this.eventCrf = eventCrf;
+        this.item = item;
+        this.status = status;
+        this.value = value;
+        this.dateCreated = dateCreated;
+        this.dateUpdated = dateUpdated;
+        this.updateId = updateId;
+        this.ordinal = ordinal;
+        this.deleted = ocformDeleted;
 
-		this.dnItemDataMaps = dnItemDataMaps;
-	}
+        this.dnItemDataMaps = dnItemDataMaps;
+    }
 
-	@Id
-	@Column(name = "item_data_id", unique = true, nullable = false)
-	@GeneratedValue(generator = "id-generator")
-	public int getItemDataId() {
-		return this.itemDataId;
-	}
+    @Id
+    @Column(name = "item_data_id", unique = true, nullable = false)
+    @GeneratedValue(generator = "id-generator")
+    public int getItemDataId() {
+        return this.itemDataId;
+    }
 
-	public void setItemDataId(int itemDataId) {
-		this.itemDataId = itemDataId;
-	}
+    public void setItemDataId(int itemDataId) {
+        this.itemDataId = itemDataId;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_id")
-	public UserAccount getUserAccount() {
-		return this.userAccount;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    public UserAccount getUserAccount() {
+        return this.userAccount;
+    }
 
-	public void setUserAccount(UserAccount userAccount) {
-		this.userAccount = userAccount;
-	}
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "event_crf_id")
-	public EventCrf getEventCrf() {
-		return this.eventCrf;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_crf_id")
+    public EventCrf getEventCrf() {
+        return this.eventCrf;
+    }
 
-	public void setEventCrf(EventCrf eventCrf) {
-		this.eventCrf = eventCrf;
-	}
+    public void setEventCrf(EventCrf eventCrf) {
+        this.eventCrf = eventCrf;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "item_id", nullable = false)
-	public Item getItem() {
-		return this.item;
-	}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
+    public Item getItem() {
+        return this.item;
+    }
 
-	public void setItem(Item item) {
-		this.item = item;
-	}
+    public void setItem(Item item) {
+        this.item = item;
+    }
 
-	@Type(type = "status")
+    @Type(type = "status")
     @Column(name = "status_id")
     public Status getStatus() {
         if (status != null) {
@@ -128,56 +128,56 @@ public class ItemData  extends DataMapDomainObject {
             return Status.AVAILABLE;
     }
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
-	@Column(name = "value", length = 4000)
-	public String getValue() {
-		return this.value;
-	}
+    @Column(name = "value", length = 4000)
+    public String getValue() {
+        return this.value;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_created", length = 4)
-	public Date getDateCreated() {
-		return this.dateCreated;
-	}
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_created", length = 4)
+    public Date getDateCreated() {
+        return this.dateCreated;
+    }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "date_updated", length = 4)
-	public Date getDateUpdated() {
-		return this.dateUpdated;
-	}
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_updated", length = 4)
+    public Date getDateUpdated() {
+        return this.dateUpdated;
+    }
 
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
 
-	@Column(name = "update_id")
-	public Integer getUpdateId() {
-		return this.updateId;
-	}
+    @Column(name = "update_id")
+    public Integer getUpdateId() {
+        return this.updateId;
+    }
 
-	public void setUpdateId(Integer updateId) {
-		this.updateId = updateId;
-	}
+    public void setUpdateId(Integer updateId) {
+        this.updateId = updateId;
+    }
 
-	@Column(name = "ordinal")
-	public Integer getOrdinal() {
-		return this.ordinal;
-	}
+    @Column(name = "ordinal")
+    public Integer getOrdinal() {
+        return this.ordinal;
+    }
 
     @Type(type = "status")
     @Column(name = "old_status_id")
-	public Status getOldStatus() {
+    public Status getOldStatus() {
         return oldStatus;
     }
 
@@ -186,29 +186,35 @@ public class ItemData  extends DataMapDomainObject {
     }
 
     public void setOrdinal(Integer ordinal) {
-		this.ordinal = ordinal;
-	}
+        this.ordinal = ordinal;
+    }
 
-	@Column(name = "deleted", nullable = false)
-	public Boolean isDeleted() {
-		return this.deleted;
-	}
+    @Column(name = "deleted", nullable = false)
+    public Boolean isDeleted() {
+        return this.deleted;
+    }
 
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL }, mappedBy = "itemData")
+    @OrderBy("discrepancyNote")
+    public List<DnItemDataMap> getDnItemDataMaps() {
+        return this.dnItemDataMaps;
+    }
 
-	@OneToMany(fetch = FetchType.LAZY,cascade = {CascadeType.ALL}, mappedBy = "itemData")
-	@OrderBy("discrepancyNote")
-	public List<DnItemDataMap> getDnItemDataMaps() {
-		return this.dnItemDataMaps;
-	}
+    public void setDnItemDataMaps(List<DnItemDataMap> dnItemDataMaps) {
+        this.dnItemDataMaps = dnItemDataMaps;
+    }
 
-	public void setDnItemDataMaps(List<DnItemDataMap> dnItemDataMaps) {
-		this.dnItemDataMaps = dnItemDataMaps;
-	}
+    @Column(name = "instance_id", nullable = false)
+    public String getInstanceId() {
+        return instanceId;
+    }
 
-
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
 
 }

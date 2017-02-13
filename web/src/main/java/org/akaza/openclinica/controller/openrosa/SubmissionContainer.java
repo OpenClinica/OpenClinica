@@ -18,6 +18,7 @@ import org.springframework.validation.Errors;
 
 public class SubmissionContainer {
     private String requestBody = null;
+    private String instanceId = null;
     private HashMap<String, String> subjectContext = null;
     private Study study = null;
     private StudyEvent studyEvent = null;
@@ -48,7 +49,7 @@ public class SubmissionContainer {
     private FieldRequestTypeEnum requestType;
 
     public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,
-            ArrayList<HashMap> listOfUploadFilePaths, FieldRequestTypeEnum requestType) {
+            ArrayList<HashMap> listOfUploadFilePaths, FieldRequestTypeEnum requestType, String instanceId) {
         this.study = study;
         this.requestBody = requestBody;
         this.subjectContext = subjectContext;
@@ -56,6 +57,7 @@ public class SubmissionContainer {
         this.locale = locale;
         this.listOfUploadFilePaths = listOfUploadFilePaths;
         this.requestType = requestType;
+        this.instanceId = instanceId;
     }
 
     public CrfVersion getCrfVersion() {
@@ -176,6 +178,14 @@ public class SubmissionContainer {
 
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
 }
