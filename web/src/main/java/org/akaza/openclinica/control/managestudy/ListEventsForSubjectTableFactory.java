@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -314,7 +315,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         if (eventDefinitionCrf.getId() == 0) {
             eventDefinitionCrf = getEventDefintionCRFDAO().findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfBean.getId());
         }
-        CRFVersionBean defaultVersion = (CRFVersionBean) getCrfVersionDAO().findByPK(eventDefinitionCrf.getDefaultVersionId());
+        FormLayoutBean defaultVersion = (FormLayoutBean) getFormLayoutDAO().findByPK(eventDefinitionCrf.getDefaultVersionId());
         eventDefinitionCrf.setDefaultCRF(defaultVersion);
         return eventDefinitionCrf;
     }
