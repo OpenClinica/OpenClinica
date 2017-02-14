@@ -794,14 +794,16 @@ public class OdmExtractDAO extends DatasetDAO {
      */
 
     // The method underneath tries to reuse the code based on getODMMetadata
-    public void getODMMetadataForForm(MetaDataVersionBean metadata, String formVersionOID, String odmVersion) {
+    public void getODMMetadataForForm(MetaDataVersionBean metadata, String formOID, String odmVersion) {
         FormDefBean formDef = new FormDefBean();
         String cvIds = new String("");
-        CRFVersionDAO<String, ArrayList> crfVersionDAO = new CRFVersionDAO<String, ArrayList>(this.ds);
-        CRFVersionBean crfVersionBean = crfVersionDAO.findByOid(formVersionOID);
+        CRFBean crfBean = crfdao.findByOid(formOID);
+        List<CRFVersionBean> crfVersions = (List<CRFVersionBean>) cvdao.findAllActiveByCRF(crfBean.getId());
+        CRFVersionBean crfVersionBean = crfVersions.get(0);
+
         cvIds = crfVersionBean.getId() + "";
 
-        applyStudyEventDef(metadata, formVersionOID);
+        applyStudyEventDef(metadata, formOID);
 
         fetchItemGroupMetaData(metadata, cvIds, odmVersion);
         getOCMetadataForGlobals(crfVersionBean.getId(), metadata, odmVersion);
@@ -828,7 +830,7 @@ public class OdmExtractDAO extends DatasetDAO {
             maxLengths.put((Integer) row.get("item_id"), (Integer) row.get("max_length"));
         }
         ItemDefBean itDef = new ItemDefBean();
-        formDef = fetchFormDetails(crfVersionBean, formDef);
+        formDef = fetchFormDetails(crfBean, formDef);
         this.setItemGroupAndItemMetaWithUnitTypesExpected();
         rows.clear();
         String prevCvIg = "";
@@ -918,7 +920,7 @@ public class OdmExtractDAO extends DatasetDAO {
         metadata.getFormDefs().add(formDef);
     }
 
-    private void applyStudyEventDef(MetaDataVersionBean metadata, String formVersionOID) {
+    private void applyStudyEventDef(MetaDataVersionBean metadata, String formOID) {
 
         StudyEventDefBean studyEventDef = new StudyEventDefBean();
         studyEventDef.setOid(MetadataUnit.FAKE_STUDY_EVENT_OID);
@@ -926,28 +928,28 @@ public class OdmExtractDAO extends DatasetDAO {
         studyEventDef.setRepeating(MetadataUnit.FAKE_SE_REPEATING);
 
         ElementRefBean formRefBean = new ElementRefBean();
-        formRefBean.setElementDefOID(formVersionOID);
+        formRefBean.setElementDefOID(formOID);
         studyEventDef.getFormRefs().add(formRefBean);
 
         metadata.getStudyEventDefs().add(studyEventDef);
 
     }
 
-    public FormDefBean fetchFormDetails(CRFVersionBean crfVBean, FormDefBean formDef) {
+    public FormDefBean fetchFormDetails(CRFBean crfBean, FormDefBean formDef) {
 
-        CRFDAO<String, ArrayList> crfDao = new CRFDAO(this.ds);
-        CRFBean crfBean = (CRFBean) crfDao.findByPK(crfVBean.getCrfId());
-        formDef.setOid(crfVBean.getOid());
-        formDef.setName(crfBean.getName() + " - " + crfVBean.getName());
+        formDef.setOid(crfBean.getOid());
+        formDef.setName(crfBean.getName());
 
+        List<ElementRefBean> formLayoutRefs = getFormLayoutRefs(formDef);
+        formDef.setFormLayoutRefs(formLayoutRefs);
         formDef.setRepeating("No");
         FormDetailsBean formDetails = new FormDetailsBean();
-        formDetails.setName(crfVBean.getName());
-        formDetails.setOid(crfVBean.getOid());
+        formDetails.setName(crfBean.getName());
+        formDetails.setOid(crfBean.getOid());
         formDetails.setParentFormOid(crfBean.getOid());
         formDetails.setDescription(crfBean.getDescription());
 
-        setSectionBean(formDetails, new Integer(crfVBean.getId()));
+        setSectionBean(formDetails, new Integer(crfBean.getId()));
 
         formDef.setFormDetails(formDetails);
 
