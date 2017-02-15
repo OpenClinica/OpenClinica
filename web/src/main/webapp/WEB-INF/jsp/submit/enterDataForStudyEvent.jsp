@@ -604,8 +604,7 @@
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
                 <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
                     </a></td>
                 </c:if>
