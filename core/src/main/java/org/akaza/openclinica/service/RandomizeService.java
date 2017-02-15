@@ -33,8 +33,8 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
-import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -248,7 +248,6 @@ public class RandomizeService extends RandomizationRegistrar {
         subjectMap.add("siteIdentifier", studyBean.getOid());
         subjectMap.add("user", user);
         for (StratificationFactorBean stratificationFactorBean : stratificationFactorBeans) {
-            i++;
             exp = stratificationFactorBean.getStratificationFactor().getValue();
             if (exp.startsWith("SS.")) {
                 subjectMap.add("question" + i, getStudySubjectAttrValue(exp, eventCrfBean, ruleSet));
@@ -258,6 +257,7 @@ public class RandomizeService extends RandomizationRegistrar {
                 String output = getExpressionValue(exp, eventCrfBean, ruleSet);
                 subjectMap.add("question" + i, output);
             }
+            i++;
         }
 
         String body = null;
