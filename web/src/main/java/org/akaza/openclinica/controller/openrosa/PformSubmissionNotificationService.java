@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.service.pmanage.Study;
 import org.akaza.openclinica.service.pmanage.Submission;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -19,13 +20,16 @@ public class PformSubmissionNotificationService {
     @Autowired
     private CrfVersionDao crfVersionDao;
 
+    @Autowired
+    private FormLayoutDao fldao;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public void notify(String studyOid, HashMap<String, String> subjectContext) {
         try {
             Integer studyEventDefnId = Integer.valueOf(subjectContext.get("studyEventDefinitionID"));
             Integer studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
-            String crfVersionOid = subjectContext.get("crfVersionOID");
+            String formLayoutOid = subjectContext.get("formLayoutOID");
 
             String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/submission";
             Submission submission = new Submission();
@@ -35,7 +39,7 @@ public class PformSubmissionNotificationService {
             submission.setStudy(pManageStudy);
             submission.setStudy_event_def_id(studyEventDefnId);
             submission.setStudy_event_def_ordinal(studyEventOrdinal);
-            submission.setCrf_version_id(crfVersionDao.findByOcOID(crfVersionOid).getCrfVersionId());
+            submission.setForm_layout_id(fldao.findByOcOID(formLayoutOid).getFormLayoutId());
 
             RestTemplate rest = new RestTemplate();
             String result = rest.postForObject(pManageUrl, submission, String.class);

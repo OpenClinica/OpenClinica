@@ -66,7 +66,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
-    private static final String FLAVOR = "-query";
+    private static final String QUERY_FLAVOR = "-query";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -168,9 +168,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, FLAVOR);
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, QUERY_FLAVOR);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), FLAVOR);
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), QUERY_FLAVOR);
             }
 
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);

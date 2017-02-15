@@ -46,11 +46,11 @@ public class PFormCache {
         return new PFormCache(context);
     }
 
-    public String getPFormURL(String studyOID, String crfVersionOID) throws Exception {
-        return getPFormURL(studyOID, crfVersionOID, false);
+    public String getPFormURL(String studyOID, String formLayoutOID) throws Exception {
+        return getPFormURL(studyOID, formLayoutOID, false);
     }
 
-    public String getPFormURL(String studyOID, String crfVersionOID, boolean isOffline) throws Exception {
+    public String getPFormURL(String studyOID, String formLayoutOID, boolean isOffline) throws Exception {
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
         if (isOffline)
@@ -61,29 +61,29 @@ public class PFormCache {
             studyURLs = new HashMap<String, String>();
             String url = null;
             if (isOffline)
-                url = enketo.getOfflineFormURL(crfVersionOID);
+                url = enketo.getOfflineFormURL(formLayoutOID);
             else
-                url = enketo.getFormURL(crfVersionOID);
+                url = enketo.getFormURL(formLayoutOID);
 
             if (url.equals("")) {
                 throw new Exception("Unable to get enketo form url.");
             }
-            studyURLs.put(crfVersionOID, url);
+            studyURLs.put(formLayoutOID, url);
             if (isOffline)
                 offlineUrlCache.put(studyOID, studyURLs);
             else
                 urlCache.put(studyOID, studyURLs);
             return url;
-        } else if (studyURLs.get(crfVersionOID) == null) {
+        } else if (studyURLs.get(formLayoutOID) == null) {
             String url = null;
             if (isOffline)
-                url = enketo.getOfflineFormURL(crfVersionOID);
+                url = enketo.getOfflineFormURL(formLayoutOID);
             else
-                url = enketo.getFormURL(crfVersionOID);
-            studyURLs.put(crfVersionOID, url);
+                url = enketo.getFormURL(formLayoutOID);
+            studyURLs.put(formLayoutOID, url);
             return url;
         } else
-            return studyURLs.get(crfVersionOID);
+            return studyURLs.get(formLayoutOID);
     }
 
     public HashMap<String, String> getSubjectContext(String key) throws Exception {
