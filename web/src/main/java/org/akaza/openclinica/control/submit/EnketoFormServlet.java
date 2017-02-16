@@ -23,6 +23,7 @@ public class EnketoFormServlet extends SecureController {
     public static final String STUDY_EVENT_ID = "studyEventId";
     public static final String EVENT_CRF_ID = "eventCrfId";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String NO_FLAVOR = "";
 
     @Override
     protected void processRequest() throws Exception {

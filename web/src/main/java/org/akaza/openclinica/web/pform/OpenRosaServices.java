@@ -146,6 +146,9 @@ public class OpenRosaServices {
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
     public static final String QUERY_SUFFIX = "form-queries.xml";
+    public static final String NO_SUFFIX = "form.xml";
+    public static final String QUERY_FLAVOR = "-query";
+    public static final String NO_FLAVOR = "";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -282,20 +285,20 @@ public class OpenRosaServices {
         StatusPrinter.print(lc);
         if (!mayProceedPreview(studyOID))
             return null;
-        boolean query = getQuerySet(uniqueId);
+        String flavor = getQuerySet(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
 
-        String xformWithQueries = "";
+        String xformOutput = "";
         String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
             for (File child : directoryListing) {
-                if (child.getName().endsWith(QUERY_SUFFIX)) {
-                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX) || flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX)) {
+                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }
             }
@@ -313,31 +316,22 @@ public class OpenRosaServices {
             // TODO: For now all XForms get a date based hash to
             // trick Enketo into always downloading
             // TODO: them.
-            if (StringUtils.isNotEmpty(formLayout.getXform())) {
-                Calendar cal = Calendar.getInstance();
-                // TODO Uncomment this before checking in
+            // TODO Uncomment this before checking in
+            if (StringUtils.isNotEmpty(xformOutput)) {
+                xform = xformOutput;
+            } else {
                 xform = formLayout.getXform();
                 formObj.setXform(xform);
-                if (query) {
-                    if (StringUtils.isNotEmpty(xformWithQueries)) {
-                        xform = xformWithQueries;
-                    } else {
-                        Form queryForm = new QueryFormDecorator(formObj);
-                        xform = queryForm.decorate(xformParserHelper);
-                    }
-                }
-                // xform = updateRepeatGroupsWithOrdinal(xform);
-                form.setHash(DigestUtils.md5Hex(xform));
-                // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
-            } else {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+                Form queryForm = new QueryFormDecorator(formObj);
+                xform = queryForm.decorate(xformParserHelper);
             }
+
+            form.setHash(DigestUtils.md5Hex(xform));
+            // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
-            if (query) {
+            if (flavor.equals(QUERY_FLAVOR)) {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY);
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY);
                 form.setFormID(formLayout.getOcOid() + QUERY);
@@ -456,20 +450,20 @@ public class OpenRosaServices {
             return "<error>formID is null :(</error>";
         }
 
-        boolean query = getQuerySet(uniqueId);
+        String flavor = getQuerySet(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
 
         CrfBean crf = formLayout.getCrf();
 
-        String xformWithQueries = "";
+        String xformOutput = "";
         String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
             for (File child : directoryListing) {
-                if (child.getName().endsWith(QUERY_SUFFIX)) {
-                    xformWithQueries = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX) || flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX)) {
+                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }
             }
@@ -479,12 +473,12 @@ public class OpenRosaServices {
             XFormObject formObj = new XFormObject();
 
             if (StringUtils.isNotEmpty(formLayout.getXform())) {
-                xform = formLayout.getXform();
-                formObj.setXform(xform);
-                if (query) {
-                    if (StringUtils.isNotEmpty(xformWithQueries)) {
-                        xform = xformWithQueries;
+                if (flavor.equals(QUERY_FLAVOR)) {
+                    if (StringUtils.isNotEmpty(xformOutput)) {
+                        xform = xformOutput;
                     } else {
+                        xform = formLayout.getXform();
+                        formObj.setXform(xform);
                         Form queryForm = new QueryFormDecorator(formObj);
                         xform = queryForm.decorate(xformParserHelper);
                     }
@@ -989,11 +983,11 @@ public class OpenRosaServices {
         return uniqueId;
     }
 
-    private boolean getQuerySet(String uniqueId) {
+    private String getQuerySet(String uniqueId) {
         if (uniqueId.endsWith(QUERY)) {
-            return true;
+            return QUERY_FLAVOR;
         } else {
-            return false;
+            return NO_FLAVOR;
         }
     }
 
