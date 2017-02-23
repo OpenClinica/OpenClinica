@@ -581,7 +581,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 passwdTimeOut();
             }
             mayProceed();
-            pingJobServer(request);
+      //      pingJobServer(request);
             processRequest();
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();

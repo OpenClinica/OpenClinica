@@ -45,7 +45,6 @@ public class MultiTenantFilter implements Filter {
         String tenant = null;
         HttpServletRequest req = (HttpServletRequest) request;
         HttpSession session = req.getSession();
-
         // first check the header elements
         tenant = req.getHeader("studyOid");
         if (StringUtils.isEmpty(tenant)) {
@@ -57,10 +56,16 @@ public class MultiTenantFilter implements Filter {
             } else if (req.getParameter("studyOid") != null) {
                 tenant = req.getParameter("studyOid");
             } else {
-                String path = req.getPathInfo();
+                String path = req.getRequestURI();
                 if (StringUtils.isNotEmpty(path)) {
-                    if (path.contains("/schema/tenant")) {
+                    if (path.endsWith("/schema/tenant") || path.contains("/schema/public")) {
                         tenant = path.substring(path.lastIndexOf("/") + 1);
+                    } else if (path.endsWith("/protocol/build")) {
+                        req.setAttribute("requestSchema", "public");
+                        System.out.println("Comes here");
+                    } else if (path.endsWith("/ListStudy")) {
+                        req.setAttribute("requestSchema", "public");
+                        System.out.println("Comes here");
                     }
                     if (StringUtils.isNotEmpty(tenant)) {
                         System.out.println("Returning tenant:" + tenant);

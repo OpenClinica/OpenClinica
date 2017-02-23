@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver {
 
-    public static final String DEFAULT_TENANT_ID = "public";
+    public static final String DEFAULT_TENANT_ID = CoreResources.getField("schema");
     public static final String CURRENT_TENANT_ID = "current_tenant_id";
 
     @Override
@@ -29,18 +29,29 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             HttpServletRequest request = attr.getRequest();
             HttpSession session = request.getSession();
-
-            if (request.getAttribute(CURRENT_TENANT_ID) != null)
+            if (request.getAttribute("requestSchema") != null) {
+                tenant = (String) request.getAttribute("requestSchema");
+            } else if (request.getAttribute(CURRENT_TENANT_ID) != null) {
                 tenant = (String) request.getAttribute(CURRENT_TENANT_ID);
-            else if (session != null && session.getAttribute(CURRENT_TENANT_ID) != null)
-                tenant = (String) session.getAttribute(CURRENT_TENANT_ID);
-
-            if (StringUtils.isNotEmpty(tenant))
+            } else if (session != null) {
+                if (session.getAttribute("requestSchema") != null) {
+                    tenant = (String) request.getAttribute("requestSchema");;
+                } else if (session.getAttribute(CURRENT_TENANT_ID) != null) {
+                    tenant = (String) session.getAttribute(CURRENT_TENANT_ID);
+                }
+            }
+            if (StringUtils.isNotEmpty(tenant)) {
+                CoreResources.tenantSchema.set(tenant);
                 return tenant;
+            }
         }
-        System.out.println("Returning default tenant:" + DEFAULT_TENANT_ID);
-        return DEFAULT_TENANT_ID;
 
+        String tenant = CoreResources.tenantSchema.get();
+        if (StringUtils.isEmpty(tenant)) {
+            tenant = DEFAULT_TENANT_ID;
+        }
+        System.out.println("Returning default tenant:" + tenant);
+        return tenant;
     }
 
     @Override

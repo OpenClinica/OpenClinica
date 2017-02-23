@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<form action="/pages/schema/public">
+    <input type="submit" value="public" method="get">
+</form>
+<BR>
 <form action="/pages/schema/tenant1">
     <input type="submit" value="tenant1" method="get">
 </form>

@@ -103,7 +103,7 @@ public class Study   extends DataMapDomainObject {
 	private List<DiscrepancyNote> discrepancyNotes ;
 	private List<StudyModuleStatus> studyModuleStatuses ;
 	private Integer version;
-
+	private String schemaName;
 	public Study() {
 	}
 
@@ -798,6 +798,15 @@ public class Study   extends DataMapDomainObject {
 
 	public void setDiscrepancyNotes(List<DiscrepancyNote> discrepancyNotes) {
 		this.discrepancyNotes = discrepancyNotes;
+	}
+
+	@Column(name = "schema_name", length = 64)
+	public String getSchemaName() {
+		return this.schemaName;
+	}
+
+	public void setSchemaName(String schemaName) {
+		this.schemaName = schemaName;
 	}
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")

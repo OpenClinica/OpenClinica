@@ -24,9 +24,14 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -35,6 +40,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
@@ -44,6 +50,7 @@ public class CoreResources implements ResourceLoaderAware {
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
+    public static ThreadLocal<String> tenantSchema = new ThreadLocal<>();
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
 
@@ -168,7 +175,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
             // instance
-
+            tenantSchema.set(DATAINFO.getProperty("schema"));
             EXTRACTINFO = extractInfo;
 
             DB_NAME = dbName;
@@ -309,7 +316,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
             DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
-        DATAINFO.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+        DATAINFO.setProperty("org.quartz.jobStore.class", "org.akaza.openclinica.dao.core.MultiSchemaJobStoreTx");//"org.quartz.impl.jdbcjobstore.JobStoreTX");
 
         if (database.equalsIgnoreCase("oracle")) {
             DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate");
@@ -436,15 +443,37 @@ public class CoreResources implements ResourceLoaderAware {
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
         String schema = null;
+
+        if (tenantSchema.get() == null)
+            tenantSchema.set(conn.getSchema());
+
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
             HttpSession session = requestAttributes.getRequest().getSession();
-            schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+            if (request.getAttribute("requestSchema") != null) {
+                schema = (String) request.getAttribute("requestSchema");
+            } else if (session != null) {
+                    schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+            } else {
+                    schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+            }
+            if (StringUtils.isNotEmpty(schema))
+                tenantSchema.set(schema);
         }
-        if (StringUtils.isEmpty(schema))
-            schema = DATAINFO.getProperty("schema");
+        if (StringUtils.isEmpty(schema)) {
+            if (tenantSchema.get() != null) {
+                schema = tenantSchema.get();
+            } else
+                schema = DATAINFO.getProperty("schema");
+        }
+
+
+        System.out.println("**********Using schema:" + schema);
+        if (conn.getSchema().equalsIgnoreCase(schema))
+            return;
         try {
-            statement.execute("set session search_path to '" + schema + "'");
+            statement.execute("set search_path to '" + schema + "'");
         } finally {
             statement.close();
         }

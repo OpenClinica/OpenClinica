@@ -11,9 +11,8 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
 
     <bean id="schedulerFactoryBean" class="org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean"
              destroy-method="destroy">
-        <property name="autoStartup">
-            <value>true</value>
-        </property>
+        <property name="schedulerName" value="public"/>
+        <property name="autoStartup" value="true"/>
         <property name="jobFactory">
             <bean  class="org.akaza.openclinica.job.AutowiringSpringBeanJobFactory" />
         </property>
@@ -29,7 +28,7 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
         		<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
 				<prop key="org.quartz.threadPool.threadCount">s[org.quartz.threadPool.threadCount]</prop>
 				<prop key="org.quartz.threadPool.threadPriority">s[org.quartz.threadPool.threadPriority]</prop>
-        		
+
         	</props>
         </property>
         
@@ -46,7 +45,8 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
             </list>
         </property>
     </bean>
-         <task:annotation-driven scheduler="taskScheduler"/>
+
+    <task:annotation-driven scheduler="taskScheduler"/>
      <task:scheduler id="taskScheduler" pool-size="42"/>
         <bean id="jobTriggerService" class="org.akaza.openclinica.service.JobTriggerService" autowire="byName">
                 <constructor-arg ref="dataSource"/>

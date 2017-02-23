@@ -470,7 +470,7 @@ public class XsltTransformJob extends QuartzJobBean {
                             + " dataset on the View Datasets page.";
                     auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, actionMsg);
                 }
-                mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
+               // mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
 
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
@@ -571,7 +571,7 @@ public class XsltTransformJob extends QuartzJobBean {
         try {
             ApplicationContext ctx = (ApplicationContext) scheduler.getContext().get("applicationContext");
             DataSource dataSource = ctx.getBean(DataSource.class);
-
+            CoreResources.tenantSchema.set(scheduler.getSchedulerName());
             mailSender = ctx.getBean(OpenClinicaMailSender.class);
             auditEventDAO = ctx.getBean(AuditEventDAO.class);
             datasetDao = ctx.getBean(DatasetDAO.class);

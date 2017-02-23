@@ -23,12 +23,10 @@
      -->
 
 
-    <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase" depends-on="coreResources">
+    <bean id="liquibase" class="org.akaza.openclinica.core.OCMultiTenantSpringLiquibase" depends-on="coreResources">
       <property name="dataSource" ref="dataSource" />
       <property name="changeLog" value="classpath:migration/master.xml" />
       <property name="defaultSchema" value="s[schema]"/>
-      
-      
     </bean>
 
     <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">

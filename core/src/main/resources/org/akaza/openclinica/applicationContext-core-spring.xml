@@ -33,6 +33,7 @@
         <!--  <property name="messageSource" ref="messageSource"/> -->
     </bean>
 
+
     <bean id="dataInfoProperties" factory-bean="coreResources" factory-method="getDataInfo"/>
 
     <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
