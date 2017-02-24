@@ -21,4 +21,15 @@ public class VersioningMapDao extends AbstractDomainDao<VersioningMap> {
         return (ArrayList<VersioningMap>) q.list();
     }
 
+    public ArrayList<VersioningMap> findByVersionIdFormLayoutIdAndItemId(int versionId, int formLayoutId, int itemId, int itemOrdinal) {
+        String query = "from " + getDomainClassName()
+                + " vm  where vm.crfVersion.crfVersionId = :versionId and vm.formLayout.formLayoutId = :formLayoutId and vm.item.itemId = :itemId and vm.itemInFormLayout = :itemOrdinal";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("versionId", versionId);
+        q.setParameter("formLayoutId", formLayoutId);
+        q.setParameter("itemId", itemId);
+        q.setParameter("itemOrdinal", itemOrdinal);
+        return (ArrayList<VersioningMap>) q.list();
+    }
+
 }
