@@ -120,7 +120,7 @@ public class ParticipantPortalRegistrar {
     }
 
     public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
-    	String host = hostname.substring(0,hostname.indexOf("/#/login"));
+    	String host = hostname.substring(0,hostname.indexOf("/app/oauth2"));
        	String pManageUrl =host + "/app/rest/oc/email";
 
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
