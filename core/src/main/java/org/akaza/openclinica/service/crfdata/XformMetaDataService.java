@@ -526,8 +526,10 @@ public class XformMetaDataService {
             List<XformItem> xformItems = new ArrayList<>();
             int itemOrderInForm = 0;
             for (Bind bd : html.getHead().getModel().getBind()) {
+                // OC-7690 AC1: CRF elements can be defined as read-only = yes and calculation attribute = non-null to
+                // make them read-only calculated elements.
                 if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet()) && (bd.getReadOnly() == null
-                        || !bd.getReadOnly().trim().equals("true()") || (bd.getReadOnly().trim().equals("true()") && bd.getCalculate() != null))) {
+                        || bd.getReadOnly().equals("false()") || (bd.getReadOnly().equals("true()") && bd.getCalculate() != null))) {
                     itemOrderInForm++;
                     XformItem xformItem = new XformItem();
                     xformItem.setItemGroup(bd.getItemGroup());

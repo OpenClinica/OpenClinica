@@ -327,7 +327,6 @@ public class OpenRosaServices {
                 xform = queryForm.decorate(xformParserHelper);
             }
 
-            // form.setHash(DigestUtils.md5Hex(xform));
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
