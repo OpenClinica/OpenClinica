@@ -259,7 +259,11 @@ public class XformMetaDataService {
                         if (ifmd == null) {
                             ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, crfVersion, itemOrdinal);
                         }
-                        createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
+                        ArrayList<VersioningMap> vm = versioningMapDao.findByVersionIdFormLayoutIdAndItemId(crfVersion.getCrfVersionId(),
+                                formLayout.getFormLayoutId(), item.getItemId(), itemOrdinal);
+                        if (vm.size() == 0) {
+                            createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
+                        }
                         //
                         ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                         if (igmd == null) {
@@ -301,8 +305,6 @@ public class XformMetaDataService {
     }
 
     private void createVersioningMap(CrfVersion crfVersion, Item item, FormLayout formLayout, int itemOrderInForm) {
-        List<VersioningMap> vm = versioningMapDao.findByVersionIdAndItemId(crfVersion.getCrfVersionId(), item.getItemId());
-        // if (vm.size() == 0) {
         VersioningMapId versioningMapId = new VersioningMapId();
         versioningMapId.setCrfVersionId(crfVersion.getCrfVersionId());
         versioningMapId.setItemId(item.getItemId());
@@ -310,14 +312,8 @@ public class XformMetaDataService {
         versioningMapId.setItemOrderInForm(itemOrderInForm);
 
         VersioningMap versioningMap = new VersioningMap();
-        versioningMap.setItem(item);
         versioningMap.setVersionMapId(versioningMapId);
-        versioningMap.setCrfVersion(crfVersion);
-        versioningMap.setFormLayout(formLayout);
-        versioningMap.setItemInFormLayout(itemOrderInForm);
         versioningMapDao.saveOrUpdate(versioningMap);
-        // }
-
     }
 
     private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
@@ -530,7 +526,10 @@ public class XformMetaDataService {
             List<XformItem> xformItems = new ArrayList<>();
             int itemOrderInForm = 0;
             for (Bind bd : html.getHead().getModel().getBind()) {
-                if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())) {
+                // OC-7690 AC1: CRF elements can be defined as read-only = yes and calculation attribute = non-null to
+                // make them read-only calculated elements.
+                if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet()) && (bd.getReadOnly() == null
+                        || bd.getReadOnly().equals("false()") || (bd.getReadOnly().equals("true()") && bd.getCalculate() != null))) {
                     itemOrderInForm++;
                     XformItem xformItem = new XformItem();
                     xformItem.setItemGroup(bd.getItemGroup());

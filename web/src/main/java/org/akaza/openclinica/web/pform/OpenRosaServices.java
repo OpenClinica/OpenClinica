@@ -306,6 +306,7 @@ public class OpenRosaServices {
 
         String xform = "";
         XFormList formList = null;
+
         try {
             formList = new XFormList();
             XForm form = new XForm(crf, formLayout);
@@ -326,8 +327,9 @@ public class OpenRosaServices {
                 xform = queryForm.decorate(xformParserHelper);
             }
 
-            form.setHash(DigestUtils.md5Hex(xform));
-            // form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
@@ -483,8 +485,7 @@ public class OpenRosaServices {
                         xform = queryForm.decorate(xformParserHelper);
                     }
                 }
-
-                // xform = updateRepeatGroupsWithOrdinal(xform);
+                xform = xformOutput;
             } else {
                 OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
                 xform = generator.buildForm(formId);
