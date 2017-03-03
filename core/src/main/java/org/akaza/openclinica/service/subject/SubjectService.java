@@ -69,7 +69,7 @@ public class SubjectService implements SubjectServiceInterface {
     private StudySubjectBean createStudySubject(SubjectBean subject, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
         StudySubjectBean studySubject = new StudySubjectBean();
         studySubject.setSecondaryLabel(secondaryId);
-        studySubject.setOwner(getUserAccount());
+        studySubject.setOwner(createUserAccount(subject.getOwnerId()));
         studySubject.setEnrollmentDate(enrollmentDate);
         studySubject.setSubjectId(subject.getId());
         studySubject.setStudyId(studyBean.getId());
@@ -97,14 +97,14 @@ public class SubjectService implements SubjectServiceInterface {
     }
 
     /**
-     * Getting the first user account from the database. This would be replaced by an authenticated user who is doing the SOAP requests .
-     * 
+     * Create the user account to register the SOAP-action in the audit-log.
+     * @param Id the technial ID of the user performing the SOAP-actions.
      * @return UserAccountBean
      */
-    private UserAccountBean getUserAccount() {
+    private UserAccountBean createUserAccount(int Id) {
 
         UserAccountBean user = new UserAccountBean();
-        user.setId(1);
+        user.setId(Id);
         return user;
     }
 
@@ -152,7 +152,7 @@ public class SubjectService implements SubjectServiceInterface {
     }
 
     /**
-     * @param datasource
+     * @param dataSource
      *            the datasource to set
      */
     public void setDatasource(DataSource dataSource) {
