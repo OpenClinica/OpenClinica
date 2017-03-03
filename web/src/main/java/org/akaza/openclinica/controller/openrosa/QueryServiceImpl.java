@@ -76,7 +76,9 @@ public class QueryServiceImpl implements QueryService {
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
         helperBean.setItemData(getItemData(helperBean));
-        // helperBean.setResStatus(resolutionStatusDao.findByResolutionStatusId(1));
+        if (helperBean.getItemData() == null) {
+            helperBean.setItemData(createBlankItemData(helperBean));
+        }
         QueriesBean queries = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
