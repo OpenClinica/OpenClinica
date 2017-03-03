@@ -506,14 +506,6 @@
             <column name="overridable" valueBoolean="false"/>
         </insert>
     </changeSet>
-    <changeSet author="pgawade" id="1235684743487-431">
-        <insert tableName="study_parameter_value">
-            <column name="study_parameter_value_id" valueNumeric="14"/>
-            <column name="study_id" valueNumeric="1"/>
-            <column name="value" value="false"/>
-            <column name="parameter" value="secondaryLabelViewable"/>
-        </insert>
-    </changeSet>
     <changeSet author="pgawade" id="1235684743487-432">
         <addColumn tableName="item_form_metadata">
             <column name="width_decimal" type="VARCHAR(10)"/>

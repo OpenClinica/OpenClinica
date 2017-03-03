@@ -63,7 +63,7 @@ public class MultiTenantFilter implements Filter {
                     } else if (path.endsWith("/protocol/build")) {
                         req.setAttribute("requestSchema", "public");
                         System.out.println("Comes here");
-                    } else if (path.endsWith("/ListStudy")) {
+                    } else if (path.endsWith("/ListStudy") || path.endsWith("/ChangeStudy")) {
                         req.setAttribute("requestSchema", "public");
                         System.out.println("Comes here");
                     }

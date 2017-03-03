@@ -433,65 +433,7 @@
             SELECT USER_ID_SEQ.NEXTVAL FROM dual;
         </sql>
     </changeSet>    
-	<changeSet author="pgawade (generated)" id="1235684743487-280">
-		<insert tableName="study">
-		    <column name="study_id" valueNumeric="1"/>
-		    <column name="parent_study_id"/>
-		    <column name="unique_identifier" value="default-study"/>
-		    <column name="secondary_identifier" value="default-study"/>
-		    <column name="name" value="Default Study"/>
-		    <column name="summary" value=""/>
-		    <column name="date_planned_start" valueDate="2006-10-23"/>
-		    <column name="date_planned_end" valueDate="2006-10-23"/>
-		    <column name="date_created" valueDate="2006-10-23"/>
-		    <column name="date_updated" valueDate="2006-10-23"/>
-		    <column name="owner_id" valueNumeric="1"/>
-		    <column name="update_id"/>
-		    <column name="type_id" valueNumeric="1"/>
-		    <column name="status_id" valueNumeric="1"/>
-		    <column name="principal_investigator" value="default"/>
-		    <column name="facility_name" value=""/>
-		    <column name="facility_city" value=""/>
-		    <column name="facility_state" value=""/>
-		    <column name="facility_zip" value=""/>
-		    <column name="facility_country" value=""/>
-		    <column name="facility_recruitment_status" value=""/>
-		    <column name="facility_contact_name" value=""/>
-		    <column name="facility_contact_degree" value=""/>
-		    <column name="facility_contact_phone" value=""/>
-		    <column name="facility_contact_email" value=""/>
-		    <column name="protocol_type" value="observational"/>
-		    <column name="protocol_description" value=""/>
-		    <column name="protocol_date_verification" valueDate="2006-10-23"/>
-		    <column name="phase" value="default"/>
-		    <column name="expected_total_enrollment" valueNumeric="0"/>
-		    <column name="sponsor" value="default"/>
-		    <column name="collaborators" value=""/>
-		    <column name="medline_identifier" value=""/>
-		    <column name="url" value=""/>
-		    <column name="url_description" value=""/>
-		    <column name="conditions" value=""/>
-		    <column name="keywords" value=""/>
-		    <column name="eligibility" value=""/>
-		    <column name="gender" value="both"/>
-		    <column name="age_max" value=""/>
-		    <column name="age_min" value=""/>
-		    <column name="healthy_volunteer_accepted" valueBoolean="false"/>
-		    <column name="purpose" value="Natural History"/>
-		    <column name="allocation" value=""/>
-		    <column name="masking" value=""/>
-		    <column name="control" value=""/>
-		    <column name="assignment" value=""/>
-		    <column name="endpoint" value=""/>
-		    <column name="interventions" value=""/>
-		    <column name="duration" value="longitudinal"/>
-		    <column name="selection" value="Convenience Sample"/>
-		    <column name="timing" value="Retrospective"/>
-		    <column name="official_title" value=""/>
-		    <column name="results_reference" valueBoolean="false"/>
-		    <column name="oc_oid" value="S_DEFAULTS1"/>
-		</insert>
-    </changeSet>
+
     <changeSet author="kkrumlian" id="1235684743487-280-1">
 		<preConditions onFail="MARK_RAN">
 			<dbms type="postgresql" />			
@@ -831,141 +773,16 @@
 	    <column name="mime_type" value="text/plain"/>
 	</insert>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-318">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="1"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="1"/>
-	    <column name="parameter" value="collectDob"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-319">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="2"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="discrepancyManagement"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-320">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="3"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="genderRequired"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-321">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="4"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="required"/>
-	    <column name="parameter" value="subjectPersonIdRequired"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-322">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="5"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="interviewerNameRequired"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-323">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="6"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="blank"/>
-	    <column name="parameter" value="interviewerNameDefault"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-324">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="7"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="interviewerNameEditable"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-325">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="8"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="interviewDateRequired"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-326">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="9"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="blank"/>
-	    <column name="parameter" value="interviewDateDefault"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-327">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="10"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="interviewDateEditable"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-328">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="11"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="manual"/>
-	    <column name="parameter" value="subjectIdGeneration"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-329">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="12"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value=""/>
-	    <column name="parameter" value="subjectIdPrefixSuffix"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-330">
-	<insert tableName="study_parameter_value">
-	    <column name="study_parameter_value_id" valueNumeric="13"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="value" value="true"/>
-	    <column name="parameter" value="personIdShownOnCRF"/>
-	</insert>
-    </changeSet>
+
+
     <changeSet author="pgawade (generated)" id="1235684743487-331">
 	<insert tableName="item_reference_type">
 	    <column name="item_reference_type_id" valueNumeric="1"/>
 	    <column name="name" value="literal"/>
 	    <column name="description"/>
 	</insert>
-    </changeSet>    
-    <changeSet author="pgawade (generated)" id="1235684743487-332">
-	<insert tableName="study_user_role">
-	    <column name="role_name" value="admin"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="status_id" valueNumeric="1"/>
-	    <column name="owner_id" valueNumeric="1"/>
-	    <column name="date_created" valueDate="2006-10-23"/>
-	    <column name="date_updated"/>
-	    <column name="update_id"/>
-	    <column name="user_name" value="root"/>
-	</insert>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-333">
-	<insert tableName="study_user_role">
-	    <column name="role_name" value="director"/>
-	    <column name="study_id" valueNumeric="1"/>
-	    <column name="status_id" valueNumeric="1"/>
-	    <column name="owner_id" valueNumeric="1"/>
-	    <column name="date_created" valueDate="2006-10-23"/>
-	    <column name="date_updated"/>
-	    <column name="update_id"/>
-	    <column name="user_name" value="root"/>
-	</insert>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-334">
 	<insert tableName="item_data_type">
 	    <column name="item_data_type_id" valueNumeric="1"/>

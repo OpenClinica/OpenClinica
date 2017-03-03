@@ -13,7 +13,7 @@ public class OCMultiTenantSpringLiquibase extends MultiTenantSpringLiquibase {
     public void afterPropertiesSet() throws Exception {
         List<String> schemas = new ArrayList<>();
         schemas.add("public");
-        schemas.add("tenant1");
+        //schemas.add("tenant1");
         super.setSchemas(schemas);
         super.afterPropertiesSet();
     }

@@ -22,21 +22,33 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
+import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.LiquibaseOnDemandService;
+import org.akaza.openclinica.service.ProtocolBuildService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.httpclient.HttpStatus;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -47,8 +59,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +75,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
+
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
 public class StudyController {
@@ -67,6 +84,8 @@ public class StudyController {
 	@Autowired
 	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
+	@Autowired ProtocolBuildService protocolBuildService;
+	@Autowired LiquibaseOnDemandService liquibaseOnDemandService;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -402,6 +421,106 @@ public class StudyController {
 		return response;
 
 	}
+
+
+    @RequestMapping(value = "/createStudy", method = RequestMethod.POST)
+    public ResponseEntity<Object> createNewSkeletonStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
+        ArrayList<ErrorObject> errorObjects = new ArrayList();
+	    StudyDTO studyDTO = new StudyDTO();
+        StudyBean studyBean = null;
+        System.out.println("I'm in Create Study");
+        ResponseEntity<Object> response = null;
+
+        String validation_failed_message = "VALIDATION FAILED";
+        String validation_passed_message = "SUCCESS";
+
+        String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+        String name = (String) map.get("briefTitle");
+
+	    UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+	    if (ownerUserAccount == null) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
+		    errorObjects.add(errorOBject);
+
+	    }
+
+        String schema = protocolBuildService.process(uniqueProtocolID, name, request);
+	    Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID, request);
+
+
+        if (uniqueProtocolID == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+            errorObjects.add(errorOBject);
+        } else {
+            uniqueProtocolID = uniqueProtocolID.trim();
+        }
+        if (name == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
+            errorObjects.add(errorOBject);
+        } else {
+            name = name.trim();
+        }
+
+        Validator v0 = new Validator(request);
+        v0.addValidation("name", Validator.NO_BLANKS);
+        HashMap vError0 = v0.validate();
+        if (!vError0.isEmpty()) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
+            errorObjects.add(errorOBject);
+        }
+
+        Validator v1 = new Validator(request);
+        v1.addValidation("uniqueProId", Validator.NO_BLANKS);
+        HashMap vError1 = v1.validate();
+        if (!vError1.isEmpty()) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+            errorObjects.add(errorOBject);
+        }
+
+        Validator v6 = new Validator(request);
+        HashMap vError6 = v6.validate();
+        if (uniqueProtocolID != null)
+            validateUniqueProId(request, vError6);
+        if (!vError6.isEmpty()) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+            errorObjects.add(errorOBject);
+        }
+
+        Validator v7 = new Validator(request);
+        v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
+        HashMap vError7 = v7.validate();
+        if (!vError7.isEmpty()) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
+            errorObjects.add(errorOBject);
+        }
+
+        studyDTO.setErrors(errorObjects);
+
+        if (errorObjects != null && errorObjects.size() != 0) {
+            studyDTO.setMessage(validation_failed_message);
+            response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else {
+
+            studyDTO.setStudyOid(study.getOc_oid());
+            studyDTO.setMessage(validation_passed_message);
+
+            StudyUserRoleBean sub = new StudyUserRoleBean();
+            sub.setRole(Role.COORDINATOR);
+            sub.setStudyId(study.getId());
+            sub.setStatus(Status.AVAILABLE);
+            sub.setOwner(ownerUserAccount);
+            StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+            ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+            responseSuccess.setMessage(studyDTO.getMessage());
+            responseSuccess.setStudyOid(studyDTO.getStudyOid());
+            responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
+			responseSuccess.setSchemaName(schema);
+            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+        }
+
+        return response;
+
+    }
 
 	/**
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
@@ -1075,6 +1194,14 @@ public class StudyController {
 		return studyDTO;
 	}
 
+    public StudyDTO buildNewStudyDTO(String uniqueProtocolID, String name) {
+        StudyDTO studyDTO = new StudyDTO();
+        studyDTO.setUniqueProtocolID(uniqueProtocolID);
+        studyDTO.setBriefTitle(name);
+        studyDTO.setStatus("design");
+        return studyDTO;
+    }
+
 	public SiteDTO buildSiteDTO(String uniqueSiteProtocolID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate, String protocolDateVerification,
 			String secondaryProId, ArrayList<UserRole> userList) {
 
@@ -1129,6 +1256,20 @@ public class StudyController {
 
 		return study;
 	}
+
+    public StudyBean buildNewStudyBean(String uniqueProtocolId, String name, UserAccountBean accountBean) {
+
+        StudyBean study = new StudyBean();
+        ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+
+        ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
+        study.setStatus(Status.PENDING);
+
+        study.setIdentifier(uniqueProtocolId);
+        study.setName(name);
+        study.setOwner(accountBean);
+        return study;
+    }
 
 	public ErrorObject createErrorObject(String resource, String code, String field) {
 		ErrorObject errorOBject = new ErrorObject();

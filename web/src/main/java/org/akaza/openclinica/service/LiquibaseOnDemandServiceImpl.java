@@ -1,8 +1,14 @@
 package org.akaza.openclinica.service;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
+import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
 /**
  * Created by yogi on 2/23/17.
@@ -27,8 +37,10 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
     ApplicationContext context;
     @Autowired
     private StudyDao studyDao;
-    public void process(String schemaName, String name, String uniqueId, String ocId, HttpServletRequest request,
-            HttpServletResponse response) {
+    @Autowired
+    private StudyUserRoleDao studyUserRoleDao;
+    public Study process(String schemaName, String name, String uniqueId, String ocId, HttpServletRequest request) {
+        Study schemaStudy = null;
         Session session = studyDao.getSessionFactory().getCurrentSession();
 
         try {
@@ -40,22 +52,36 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
         } catch (Exception e) {
             System.out.println("Error while creating a schema error 3");
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
+            return schemaStudy;
         }
         try {
             request.setAttribute("requestSchema", schemaName);
-            Study schemaStudy = new Study();
+            schemaStudy = new Study();
             schemaStudy.setName(name);
             schemaStudy.setUniqueIdentifier(uniqueId);
             schemaStudy.setOc_oid(ocId);
+            schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             ((SessionImpl) session).connection().setSchema(schemaName);
-            studyDao.save(schemaStudy);
-            response.setStatus(HttpServletResponse.SC_OK);
+            Integer studyId = (Integer) studyDao.save(schemaStudy);
+            HttpSession httpSession = request.getSession();
+            if (httpSession == null) {
+                System.out.println("Session cannot be null");
+            }
+            UserAccountBean ub = (UserAccountBean) httpSession.getAttribute(USER_BEAN_NAME);
+            StudyUserRole studyUserRole = new StudyUserRole();
+            StudyUserRoleId userRoleId = new StudyUserRoleId();
+            studyUserRole.setId(userRoleId);
+            userRoleId.setUserName(ub.getName());
+            userRoleId.setOwnerId(ub.getOwnerId());
+            userRoleId.setRoleName(Role.COORDINATOR.getName());
+            userRoleId.setStudyId(studyId);
+            userRoleId.setDateCreated(new Date());
+            userRoleId.setStatusId(org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
+            studyUserRoleDao.save(studyUserRole);
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+        return schemaStudy;
     }
 }
 

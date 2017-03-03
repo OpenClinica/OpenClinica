@@ -72,7 +72,7 @@ public class StudyBean extends AuditableEntityBean {
     private String collaborators = "";
     private String medlineIdentifier = "";
     private boolean resultsReference = false;
-    
+    private String schemaName = "";
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;
@@ -258,9 +258,23 @@ public class StudyBean extends AuditableEntityBean {
      * @param collaborators
      *            The collaborators to set.
      */
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    /**
+     * @param collaborators
+     *            The collaborators to set.
+     */
     public void setCollaborators(String collaborators) {
         this.collaborators = collaborators;
     }
+
 
     /**
      * @return Returns the conditions.

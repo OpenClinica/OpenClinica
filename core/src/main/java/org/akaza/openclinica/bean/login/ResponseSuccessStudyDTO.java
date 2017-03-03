@@ -5,6 +5,7 @@ public class ResponseSuccessStudyDTO {
 	private String message;
 	private String uniqueProtocolID;
 	private String studyOid;
+	private String schemaName;
 
 	public String getUniqueProtocolID() {
 		return uniqueProtocolID;
@@ -30,4 +31,11 @@ public class ResponseSuccessStudyDTO {
 		this.message = message;
 	}
 
+	public String getSchemaName() {
+		return schemaName;
+	}
+
+	public void setSchemaName(String schemaName) {
+		this.schemaName = schemaName;
+	}
 }

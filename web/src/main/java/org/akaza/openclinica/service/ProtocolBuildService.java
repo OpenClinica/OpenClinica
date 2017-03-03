@@ -17,6 +17,5 @@ import static org.akaza.openclinica.service.crfdata.EnketoUrlService.FS_QUERY_AT
  */
 public interface ProtocolBuildService {
     Logger logger = LoggerFactory.getLogger(ProtocolBuildService.class);
-    public String process(String name, String uniqueId, String ocId, HttpServletRequest request,
-            HttpServletResponse response);
+    public String process(String name, String uniqueId, HttpServletRequest request);
 }

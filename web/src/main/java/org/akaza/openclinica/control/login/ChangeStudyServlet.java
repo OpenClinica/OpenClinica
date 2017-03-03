@@ -40,6 +40,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -99,12 +100,14 @@ public class ChangeStudyServlet extends SecureController {
         }
 
         ArrayList validStudies = new ArrayList();
+        ArrayList<StudyBean> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
             StudyBean study = (StudyBean) sdao.findByPK(sr.getStudyId());
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(study.getStatus());
             }
+            studyList.add(study);
             validStudies.add(sr);
         }
 
@@ -116,7 +119,7 @@ public class ChangeStudyServlet extends SecureController {
         } else {
             if ("confirm".equalsIgnoreCase(action)) {
                 logger.info("confirm");
-                confirmChangeStudy(studies);
+                confirmChangeStudy(studies, studyList);
 
             } else if ("submit".equalsIgnoreCase(action)) {
                 logger.info("submit");
@@ -126,7 +129,7 @@ public class ChangeStudyServlet extends SecureController {
 
     }
 
-    private void confirmChangeStudy(ArrayList studies) throws Exception {
+    private void confirmChangeStudy(List<StudyUserRoleBean> studies, List<StudyBean> studyList) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         v.addValidation("studyId", Validator.IS_AN_INTEGER);
@@ -144,6 +147,15 @@ public class ChangeStudyServlet extends SecureController {
                 if (studyWithRole.getStudyId() == studyId) {
                     request.setAttribute("studyId", new Integer(studyId));
                     session.setAttribute("studyWithRole", studyWithRole);
+                    ProtocolInfo protocolInfo = getProtocolInfo(studyId, studyList);
+                    if (protocolInfo == null)
+                        break;
+                    if (StringUtils.isNotEmpty(protocolInfo.schema))
+                        request.setAttribute("changeStudySchema", protocolInfo.schema);
+                    else // should this be DEFAULT_TENANT_ID from CoreResources?
+                        request.setAttribute("changeStudySchema", "public");
+
+                    request.setAttribute("uniqueStudyId", protocolInfo.uniqueStudyId);
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
@@ -156,14 +168,32 @@ public class ChangeStudyServlet extends SecureController {
         }
     }
 
+    private class ProtocolInfo {
+        public ProtocolInfo(String uniqueStudyId, String schema) {
+            this.uniqueStudyId = uniqueStudyId;
+            this.schema = schema;
+        }
+
+        String uniqueStudyId;
+        String schema;
+    }
+    private ProtocolInfo getProtocolInfo(int studyId, List<StudyBean>studyList) {
+        for (StudyBean study: studyList) {
+            if (study.getId() == studyId) {
+                ProtocolInfo protocolInfo = new ProtocolInfo(study.getIdentifier(), study.getSchemaName());
+                return protocolInfo;
+            }
+        }
+        return null;
+    }
     private void changeStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-        int studyId = fp.getInt("studyId");
-        int prevStudyId = currentStudy.getId();
+        String uniqueStudyId = fp.getString("uniqueStudyId");
+        String prevStudyId = currentStudy.getIdentifier();
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean current = (StudyBean) sdao.findByPK(studyId);
+        StudyBean current = (StudyBean) sdao.findByUniqueIdentifier(uniqueStudyId);
 
         // reset study parameters -jxu 02/09/2007
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
@@ -274,7 +304,7 @@ public class ChangeStudyServlet extends SecureController {
         }
         ub.incNumVisitsToMainMenu();
         // YW 2-18-2008, if study has been really changed <<
-        if (prevStudyId != studyId) {
+        if (StringUtils.equals(prevStudyId, uniqueStudyId) != true)  {
             session.removeAttribute("eventsForCreateDataset");
             session.setAttribute("tableFacadeRestore", "false");
         }

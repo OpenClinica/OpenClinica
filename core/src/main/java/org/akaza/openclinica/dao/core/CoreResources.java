@@ -451,7 +451,12 @@ public class CoreResources implements ResourceLoaderAware {
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             HttpSession session = requestAttributes.getRequest().getSession();
-            if (request.getAttribute("requestSchema") != null) {
+            if (request.getParameter("changeStudySchema") != null) {
+                schema = (String) request.getParameter("changeStudySchema");
+                if (session != null) {
+                    session.setAttribute(CURRENT_TENANT_ID, schema);
+                }
+            } else if (request.getAttribute("requestSchema") != null) {
                 schema = (String) request.getAttribute("requestSchema");
             } else if (session != null) {
                     schema = (String) session.getAttribute(CURRENT_TENANT_ID);

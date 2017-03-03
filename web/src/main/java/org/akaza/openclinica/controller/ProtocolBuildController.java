@@ -18,7 +18,8 @@ import javax.servlet.http.HttpSession;
 public class ProtocolBuildController {
 	@Autowired
 	ProtocolBuildService protocolBuildService;
-	@Autowired LiquibaseOnDemandService liquibaseOnDemandService;
+	@Autowired
+	LiquibaseOnDemandService liquibaseOnDemandService;
 
 	@RequestMapping(value = "/build", method = RequestMethod.GET)
 	public @ResponseBody void createProtocol(
@@ -28,7 +29,7 @@ public class ProtocolBuildController {
 			HttpServletResponse response)
 	{
 		System.out.println("name:" + name + " id: " + id);
-		String schemaneName = protocolBuildService.process(name, id, id, request, response);
-		liquibaseOnDemandService.process(schemaneName, name, id, id, request, response);
+		String schemaneName = protocolBuildService.process(name, id, request);
+		liquibaseOnDemandService.process(schemaneName, name, id, id, request);
 	}
 }

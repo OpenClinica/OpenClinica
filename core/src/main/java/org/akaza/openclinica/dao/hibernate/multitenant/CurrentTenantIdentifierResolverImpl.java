@@ -29,7 +29,12 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             HttpServletRequest request = attr.getRequest();
             HttpSession session = request.getSession();
-            if (request.getAttribute("requestSchema") != null) {
+            if (request.getParameter("changeStudySchema") != null) {
+                tenant = (String) request.getParameter("changeStudySchema");
+                if (session != null) {
+                    session.setAttribute(CURRENT_TENANT_ID, tenant);
+                }
+            } else if (request.getAttribute("requestSchema") != null) {
                 tenant = (String) request.getAttribute("requestSchema");
             } else if (request.getAttribute(CURRENT_TENANT_ID) != null) {
                 tenant = (String) request.getAttribute(CURRENT_TENANT_ID);

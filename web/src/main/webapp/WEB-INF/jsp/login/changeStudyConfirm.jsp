@@ -45,6 +45,9 @@
 <form action="ChangeStudy" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="studyId" value="<c:out value="${studyId}"/>">
+<input type="hidden" name="changeStudySchema" value="<c:out value="${changeStudySchema}"/>">
+<input type="hidden" name="uniqueStudyId" value="<c:out value="${uniqueStudyId}"/>">
+
 <p><fmt:message key="choosing_switch_to_study" bundle="${restext}"/>: <c:out value="${studyWithRole.studyName}"/> <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${studyWithRole.role.description}"/>.
 <fmt:message key="the_study_site_status_is" bundle="${restext}"/> <c:out value="${currentStudy.status.name}"/></p>
 <br>

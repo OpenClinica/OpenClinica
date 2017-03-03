@@ -167,6 +167,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(55, TypeNames.STRING);// oc oid
         // this.setTypeExpected(56, TypeNames.BOOL);//discrepancy_management
         this.setTypeExpected(56, TypeNames.INT);
+        this.setTypeExpected(57, TypeNames.STRING);// schema name
     }
 
     /**
@@ -614,6 +615,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         eb.setOid((String) hm.get("oc_oid"));
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
+        eb.setSchemaName((String) hm.get("schema_name"));
         return eb;
     }
 
