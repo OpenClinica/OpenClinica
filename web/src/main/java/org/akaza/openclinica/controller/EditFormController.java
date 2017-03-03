@@ -45,6 +45,8 @@ public class EditFormController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     UserAccountDAO udao;
     StudyDAO sdao;
+    public static final String QUERY_FLAVOR = "-query";
+    public static final String NO_FLAVOR = "";
 
     /**
      * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
@@ -82,12 +84,12 @@ public class EditFormController {
         HashMap<String, String> subjectContextMap = cache.getSubjectContext(formContext);
         PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
         subjectContext.setStudyEventDefinitionId(Integer.valueOf(subjectContextMap.get("studyEventDefinitionID")));
-        subjectContext.setCrfVersionOid(subjectContextMap.get("crfVersionOID"));
+        subjectContext.setFormLayoutOid(subjectContextMap.get("formLayoutOID"));
+
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(Integer.valueOf(subjectContextMap.get("studyEventOrdinal")));
-        String flavor = "-query";
 
-        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, null, null, flavor);
+        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, null, null, NO_FLAVOR);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);

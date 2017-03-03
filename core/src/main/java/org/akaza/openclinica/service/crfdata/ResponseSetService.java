@@ -51,10 +51,10 @@ public class ResponseSetService {
     public ResponseSetService() {
     }
 
-    public ResponseSet getResponseSet(Html html, String submittedXformText, XformItem xformItem, CrfVersion version, ResponseType responseType,
+    public ResponseSet getResponseSet(Html html, String submittedXformText, XformItem xformItem, CrfVersion crfVersion, ResponseType responseType,
             org.akaza.openclinica.domain.datamap.Item item, Errors errors) throws Exception {
 
-        ResponseSet existingSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+        ResponseSet existingSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), crfVersion.getCrfVersionId());
         if (existingSet == null) {
             // Create the response set
             ResponseSet responseSet = new ResponseSet();
@@ -65,9 +65,8 @@ public class ResponseSetService {
                 responseSet.setOptionsText(optionText);
                 responseSet.setOptionsValues(getOptionsValues(html, submittedXformText, xformItem, responseType));
                 responseSet.setResponseType(responseType);
-                responseSet.setVersionId(version.getCrfVersionId());
-                responseSetDao.saveOrUpdate(responseSet);
-                responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), version.getCrfVersionId());
+                responseSet.setVersionId(crfVersion.getCrfVersionId());
+                responseSet = responseSetDao.saveOrUpdate(responseSet);
             }
             // Run validation against it
             ResponseSetValidator validator = new ResponseSetValidator(responseSetDao, item);

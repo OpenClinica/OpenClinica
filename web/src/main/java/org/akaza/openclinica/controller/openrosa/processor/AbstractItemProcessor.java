@@ -1,5 +1,9 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.util.Date;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.controller.openrosa.ItemItemDataContainer;
 import org.akaza.openclinica.controller.openrosa.PformValidator;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -8,16 +12,18 @@ import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.DnItemDataMap;
+import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ResolutionStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
-
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * Created by yogi on 10/24/16.
@@ -41,9 +47,11 @@ public abstract class AbstractItemProcessor {
         // parentDiscrepancyNoteList is the list of the parent DNs records only
         List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(itemData.getItemDataId());
         for (DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNoteList) {
-            if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != 4) { // if the DN's resolution status is not set to Closed
+            if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != 4) { // if the DN's resolution
+                                                                                            // status is not set to
+                                                                                            // Closed
                 String description = resword.getString("dn_auto-closed_description");
-                String detailedNotes =resword.getString("dn_auto_closed_item_detailed_notes");
+                String detailedNotes = resword.getString("dn_auto_closed_item_detailed_notes");
                 // create new DN record , new DN Map record , also update the parent record
                 DiscrepancyNote dn = new DiscrepancyNote();
                 ResolutionStatus resStatus = resolutionStatusDao.findByResolutionStatusId(4);
@@ -83,7 +91,7 @@ public abstract class AbstractItemProcessor {
 
         // Deactivate existing mappings for this ItemData
         List<DnItemDataMap> existingMappings = dnItemDataMapDao.findByItemData(itemData.getItemDataId());
-        for (DnItemDataMap mapping:existingMappings) {
+        for (DnItemDataMap mapping : existingMappings) {
             mapping.setActivated(false);
             dnItemDataMapDao.saveOrUpdate(mapping);
         }
@@ -97,17 +105,17 @@ public abstract class AbstractItemProcessor {
         }
     }
 
-    protected ItemData createItemData(Item item, String itemValue, Integer itemOrdinal, EventCrf eventCrf, Study study,
-            StudySubject studySubject, UserAccount user) {
+    protected ItemData createItemData(Item item, String itemValue, Integer itemOrdinal, SubmissionContainer container) {
         ItemData itemData = new ItemData();
         itemData.setItem(item);
-        itemData.setEventCrf(eventCrf);
+        itemData.setEventCrf(container.getEventCrf());
         itemData.setValue(itemValue);
         itemData.setDateCreated(new Date());
         itemData.setStatus(Status.AVAILABLE);
         itemData.setOrdinal(itemOrdinal);
-        itemData.setUserAccount(user);
+        itemData.setUserAccount(container.getUser());
         itemData.setDeleted(false);
+        itemData.setInstanceId(container.getInstanceId());
         return itemData;
     }
 
@@ -120,4 +128,3 @@ public abstract class AbstractItemProcessor {
         return errors;
     }
 }
-

@@ -11,6 +11,7 @@ public class Submission {
     private Integer study_event_def_ordinal;
 
     private Integer crf_version_id;
+    private Integer form_layout_id;
 
     public Study getStudy() {
         return study;
@@ -42,6 +43,14 @@ public class Submission {
 
     public void setCrf_version_id(Integer crf_version_id) {
         this.crf_version_id = crf_version_id;
+    }
+
+    public Integer getForm_layout_id() {
+        return form_layout_id;
+    }
+
+    public void setForm_layout_id(Integer form_layout_id) {
+        this.form_layout_id = form_layout_id;
     }
 
 }

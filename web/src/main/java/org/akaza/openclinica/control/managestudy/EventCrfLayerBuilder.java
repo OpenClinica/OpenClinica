@@ -566,8 +566,15 @@ public class EventCrfLayerBuilder {
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
             StudyEventBean studyEvent) {
-        String href = "EnketoFormServlet?crfVersionId=" + eventDefinitionCrf.getDefaultVersionId() + "&studyEventId=" + studyEvent.getId() + "&eventCrfId="
-                + eventCrf.getId() + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
+        int formLayoutId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+        }
+
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
+                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
         builder.a().href(href).close();
         builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
         builder.aEnd();
@@ -575,8 +582,14 @@ public class EventCrfLayerBuilder {
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
             StudyEventBean studyEvent, String link) {
-        String href = "EnketoFormServlet?crfVersionId=" + eventDefinitionCrf.getDefaultVersionId() + "&studyEventId=" + studyEvent.getId() + "&eventCrfId="
-                + eventCrf.getId() + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
+        int formLayoutId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+        }
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
+                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();

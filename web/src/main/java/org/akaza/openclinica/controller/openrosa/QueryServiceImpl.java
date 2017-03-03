@@ -91,44 +91,40 @@ public class QueryServiceImpl implements QueryService {
         QueryBean queryBean = null;
         DiscrepancyNote childDN = null;
         DiscrepancyNote parentDN = null;
-
-        if (qBeans.size() == 1) {
-            queryBean = qBeans.get(0);
-            // this is the first entry , expected to build 2 records in DN table, one parent, the other child
-            parentDN = createQuery(helperBean, queryBean);
-            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
-
-            childDN = createQuery(helperBean, queryBean);
-            childDN.setParentDiscrepancyNote(parentDN);
-            childDN = discrepancyNoteDao.saveOrUpdate(childDN);
-
-            parentDN.setUserAccount(childDN.getUserAccount());
-            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
-            helperBean.setDn(parentDN);
-            saveQueryItemDatamap(helperBean);
-
-        } else if (qBeans.size() > 1) {
+        List<DiscrepancyNote> childDns = null;
+        if (qBeans.size() > 0) {
             for (QueryBean qBean : qBeans) {
                 idList.add(Integer.valueOf(qBean.getId()));
             }
             Collections.reverse(idList);
             queryBean = qBeans.get(0);
-
-            // Enketo passes JSON "id" attribute for unsubmitted queries only
-            // if (StringUtils.isEmpty(queryBean.getId())){
-
-            childDN = createQuery(helperBean, queryBean);
-            childDN.setParentDiscrepancyNote(findQueryParent(helperBean));
-            childDN = discrepancyNoteDao.saveOrUpdate(childDN);
-
             parentDN = findQueryParent(helperBean);
-            parentDN.setUserAccount(childDN.getUserAccount());
-            parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
+            if (parentDN == null) {
+                parentDN = createQuery(helperBean, queryBean);
+                parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
+                helperBean.setDn(parentDN);
+                saveQueryItemDatamap(helperBean);
+            }
+
+            childDns = findChildQueries(helperBean);
+            if (childDns.size() < qBeans.size()) {
+
+                // Enketo passes JSON "id" attribute for unsubmitted queries only
+                // if (StringUtils.isEmpty(queryBean.getId())){
+
+                childDN = createQuery(helperBean, queryBean);
+                childDN.setParentDiscrepancyNote(parentDN);
+                childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+
+                parentDN.setUserAccount(childDN.getUserAccount());
+                parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
+
+                helperBean.setDn(childDN);
+                saveQueryItemDatamap(helperBean);
+                handleEmailNotification(helperBean, queryBean);
+            }
         }
-        helperBean.setDn(childDN);
-        saveQueryItemDatamap(helperBean);
-        handleEmailNotification(helperBean, queryBean);
     }
 
     private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
@@ -191,6 +187,7 @@ public class QueryServiceImpl implements QueryService {
         itemData.setOrdinal(helperBean.getItemOrdinal());
         itemData.setUserAccount(helperBean.getUserAccount());
         itemData.setDeleted(false);
+        itemData.setInstanceId(helperBean.getContainer().getInstanceId());
         itemDataDao.saveOrUpdate(itemData);
         return itemData;
     }
@@ -198,6 +195,11 @@ public class QueryServiceImpl implements QueryService {
     private DiscrepancyNote findQueryParent(QueryServiceHelperBean helperBean) {
         DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId());
         return parentDiscrepancyNote;
+    }
+
+    private List<DiscrepancyNote> findChildQueries(QueryServiceHelperBean helperBean) {
+        List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(helperBean.getItemData().getItemDataId());
+        return childDiscrepancyNotes;
     }
 
     private void saveQueryItemDatamap(QueryServiceHelperBean helperBean) {

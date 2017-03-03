@@ -41,6 +41,7 @@ public class EventCrf extends DataMapDomainObject {
     private StudyEvent studyEvent;
     private StudySubject studySubject;
     private CrfVersion crfVersion;
+    private FormLayout formLayout;
     private Integer statusId;
     private Date dateInterviewed;
     private String interviewerName;
@@ -73,7 +74,7 @@ public class EventCrf extends DataMapDomainObject {
             CrfVersion crfVersion, Integer statusId, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
             Date dateValidate, Date dateValidateCompleted, String validatorAnnotations, String validateString, Date dateCreated, Date dateUpdated,
             Integer updateId, Boolean electronicSignatureStatus, boolean sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
-            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas) {
+            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout) {
         this.eventCrfId = eventCrfId;
         this.userAccount = userAccount;
         this.completionStatus = completionStatus;
@@ -99,6 +100,7 @@ public class EventCrf extends DataMapDomainObject {
         this.sdvUpdateId = sdvUpdateId;
         this.dnEventCrfMaps = dnEventCrfMaps;
         this.itemDatas = itemDatas;
+        this.formLayout = formLayout;
     }
 
     @Id
@@ -342,6 +344,16 @@ public class EventCrf extends DataMapDomainObject {
 
     public void setItemDatas(List<ItemData> itemDatas) {
         this.itemDatas = itemDatas;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "form_layout_id")
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
     }
 
 }

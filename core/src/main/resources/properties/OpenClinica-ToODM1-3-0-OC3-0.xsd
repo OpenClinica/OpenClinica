@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.cdisc.org/ns/odm/v1.3" xmlns="http://www.cdisc.org/ns/odm/v1.3"
+           xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+           xmlns:OpenClinicaRules="http://www.openclinica.org/ns/rules/v3.1"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import schemaLocation="OpenClinica-ODM1-3-0-OC3-0-foundation.xsd"
+	           namespace="http://www.openclinica.org/ns/odm_ext_v130/v3.1" />
+	<xs:import schemaLocation="rules-ODM.xsd" namespace="http://www.openclinica.org/ns/rules/v3.1" />
+	<xs:redefine schemaLocation="ODM1-3-0-foundation.xsd">
+	
+		
+		<xs:group name="MetaDataVersionElementExtension">
+			<xs:sequence>
+				<xs:group ref="MetaDataVersionElementExtension"/>
+				<xs:element ref="OpenClinica:MultiSelectList" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:StudyGroupClassList" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:StudyDetails" minOccurs="0" maxOccurs="unbounded"/> 
+				<xs:element ref="OpenClinicaRules:Rules" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		
+		<xs:group name="StudyEventDefElementExtension">
+			<xs:sequence>
+				<xs:group ref="StudyEventDefElementExtension" />
+				<xs:element ref="OpenClinica:EventDefinitionDetails" minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="FormRefElementExtension">
+			<xs:sequence>
+				<xs:group ref="FormRefElementExtension" />
+				<xs:element ref="OpenClinica:ConfigurationParameters" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="OpenClinica:FormLayoutRef" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:group>
+		
+		<xs:group name="FormDefElementExtension">
+			<xs:sequence>
+				<xs:group ref="FormDefElementExtension" />
+				<xs:element ref="OpenClinica:FormLayoutDef" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="OpenClinica:FormDetails" minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="ItemGroupDefElementExtension">
+			<xs:sequence>
+				<xs:group ref="ItemGroupDefElementExtension" />
+				<xs:element ref="OpenClinica:ItemGroupDetails" minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="ItemDefElementExtension">
+			<xs:sequence>
+				<xs:group ref="ItemDefElementExtension" />
+				<xs:element ref="OpenClinica:MultiSelectListRef" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="OpenClinica:ItemDetails" minOccurs="0" maxOccurs="1" />
+			</xs:sequence>
+		</xs:group>
+		
+		<xs:group name="SubjectDataElementExtension">
+			<xs:sequence>
+				<xs:group ref="SubjectDataElementExtension" />
+				<xs:element ref="OpenClinica:SubjectGroupData" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:AuditLogs" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:DiscrepancyNotes" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="StudyEventDataElementExtension">
+			<xs:sequence>
+				<xs:group ref="StudyEventDataElementExtension" />
+				<xs:element ref="OpenClinica:AuditLogs" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:DiscrepancyNotes" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="FormDataElementExtension">
+			<xs:sequence>
+				<xs:group ref="FormDataElementExtension" />
+				<xs:element ref="OpenClinica:AuditLogs" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:DiscrepancyNotes" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+		<xs:group name="ItemDataElementExtension">
+			<xs:sequence>
+				<xs:group ref="ItemDataElementExtension" />
+				<xs:element ref="OpenClinica:AuditLogs" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="OpenClinica:DiscrepancyNotes" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:group>
+
+
+
+        <xs:attributeGroup name="ClinicalDataAttributeExtension">
+            <xs:attributeGroup ref="ClinicalDataAttributeExtension"/>
+            <xs:attribute ref="OpenClinica:StudyName"/>
+        </xs:attributeGroup>
+        <xs:attributeGroup name="FormDefAttributeExtension">
+			<xs:attributeGroup ref="FormDefAttributeExtension"/>
+			<xs:attribute ref="OpenClinica:StudyEventOIDs"/>
+		</xs:attributeGroup>
+		<xs:attributeGroup name="ItemDefAttributeExtension">
+			<xs:attributeGroup ref="ItemDefAttributeExtension" />
+			<xs:attribute ref="OpenClinica:FormOIDs"  />
+		</xs:attributeGroup> 
+		<xs:attributeGroup name="QuestionAttributeExtension">
+			<xs:attributeGroup ref="QuestionAttributeExtension" />
+			<xs:attribute ref="OpenClinica:QuestionNumber" />
+		</xs:attributeGroup> 
+
+		<xs:attributeGroup name="SubjectDataAttributeExtension">
+			<xs:attributeGroup ref="SubjectDataAttributeExtension"/>
+			<xs:attribute ref="OpenClinica:StudySubjectID" />
+			<xs:attribute ref="OpenClinica:UniqueIdentifier" />
+			<xs:attribute ref="OpenClinica:Status" />
+			<xs:attribute ref="OpenClinica:SecondaryID" />
+			<xs:attribute ref="OpenClinica:DateOfBirth" />
+			<xs:attribute ref="OpenClinica:YearOfBirth" />
+			<xs:attribute ref="OpenClinica:Sex" />
+		</xs:attributeGroup>		
+		<xs:attributeGroup name="StudyEventDataAttributeExtension">
+			<xs:attributeGroup ref="StudyEventDataAttributeExtension"/>
+			<xs:attribute ref="OpenClinica:StudyEventLocation" />
+            <xs:attribute ref="OpenClinica:EventName" />
+			<xs:attribute ref="OpenClinica:StartDate" />
+			<xs:attribute ref="OpenClinica:EndDate" />
+			<xs:attribute ref="OpenClinica:Status" />
+			<xs:attribute ref="OpenClinica:SubjectAgeAtEvent" />
+		</xs:attributeGroup>
+		<xs:attributeGroup name="FormDataAttributeExtension">
+			<xs:attributeGroup ref="FormDataAttributeExtension" />
+			<xs:attribute ref="OpenClinica:Version" />
+			<xs:attribute ref="OpenClinica:InterviewerName" />
+			<xs:attribute ref="OpenClinica:InterviewDate" />
+			<xs:attribute ref="OpenClinica:Status" />
+            <xs:attribute ref="OpenClinica:FormName" />
+            <xs:attribute ref="OpenClinica:Description" />
+            <xs:attribute ref="OpenClinica:VersionDescription" />
+            <xs:attribute ref="OpenClinica:Url" />
+            <xs:attribute ref="OpenClinica:StatusChangeTimeStamp" />
+		</xs:attributeGroup>
+
+		<xs:attributeGroup name="ItemDataAttributeExtension">
+		  <xs:attributeGroup ref="ItemDataAttributeExtension" />
+		  <xs:attribute ref="OpenClinica:ReasonForNull" />
+		</xs:attributeGroup>
+	</xs:redefine>
+</xs:schema>
+

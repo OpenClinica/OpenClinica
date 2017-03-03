@@ -1,4 +1,4 @@
-<xs:schema targetNamespace="http://www.cdisc.org/ns/odm/v1.3" 
+<xs:schema targetNamespace="http://www.cdisc.org/ns/odm/v1.3"
            xmlns="http://www.cdisc.org/ns/odm/v1.3"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
@@ -1412,7 +1412,7 @@
         
         <xs:complexType name="ODMcomplexTypeDefinition-FormRef">
           <xs:sequence>
-            <xs:group        ref="FormRefElementExtension" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group        ref="FormRefElementExtension" minOccurs="0"/>
           </xs:sequence>
           <xs:attributeGroup ref="FormRefAttributeDefinition"/>
           <xs:attributeGroup ref="RefAttributeSharedDefinition"/>
@@ -1656,7 +1656,7 @@
             <xs:element      ref="Description" minOccurs="0"/>
             <xs:element      ref="ItemGroupRef" maxOccurs="unbounded"/>
             <xs:element      ref="ArchiveLayout" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:group        ref="FormDefElementExtension" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group        ref="FormDefElementExtension" minOccurs="0"/>
           </xs:sequence>
           <xs:attributeGroup ref="FormDefAttributeDefinition"/>
           <xs:attributeGroup ref="FormDefAttributeExtension"/>

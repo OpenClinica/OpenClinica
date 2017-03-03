@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import java.util.List;
+
 import org.akaza.openclinica.bean.oid.CrfVersionOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
@@ -21,6 +23,13 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
         return (CrfVersion) q.uniqueResult();
     }
 
+    public List<CrfVersion> findAllByCrfId(int crfId) {
+        String query = "from " + getDomainClassName() + " crf_version  where crf_version.crf.crfId = :crfId ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("crfId", crfId);
+        return (List<CrfVersion>) q.list();
+    }
+
     public CrfVersion findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
         Query q = getCurrentSession().createQuery(findByOcIdQuery);
@@ -34,7 +43,7 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(CrfVersion.class);
         return ((CrfVersion) q.uniqueResult());
     }
-    
+
     private String getOid(CrfVersion crfVersion, String crfName, String crfVersionName) {
         OidGenerator oidGenerator = new CrfVersionOidGenerator();
         String oid;
@@ -56,6 +65,5 @@ public class CrfVersionDao extends AbstractDomainDao<CrfVersion> {
         return oid;
 
     }
-
 
 }

@@ -25,7 +25,6 @@
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.oid}"/>&nbsp;</td>
   <td class="table_cell">(<fmt:message key="original" bundle="${resword}"/>)</td>
     <%--oid space --%>
-  <td class="table_cell">&nbsp;</td>
   <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
   <td class="table_cell"><c:out value="${currRow.bean.owner.name}"/></td>
   <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.status.name}"/></td>
@@ -91,7 +90,6 @@
   </c:choose>
   <tr valign="top">
     <td class="table_cell"><c:out value="${version.name}"/></td>
-    <td class="table_cell"><c:out value="${version.oid}"/></td>    
     <td class="table_cell"><fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${version.owner.name}"/></td>
     <td class="table_cell <c:out value='${className}'/>"><c:out value="${version.status.name}"/></td>
