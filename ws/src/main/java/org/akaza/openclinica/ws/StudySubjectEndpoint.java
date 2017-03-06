@@ -310,7 +310,7 @@ public class StudySubjectEndpoint {
         for (DisplayEventCRFBean displayEventCRFBean : displayEventCRFBeanList) {
             EventCRFBean eventCRFBean = displayEventCRFBean.getEventCRF();
             CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
-            CRFBean crf = crfdao.findByVersionId(crfVersionBean.getCrfId());
+            CRFBean crf = crfdao.findByVersionId(crfVersionBean.getId());
 
             EventCrfType eventCrfType = new EventCrfType();
             eventCrfType.setStatus(displayEventCRFBean.getStage().getName());
