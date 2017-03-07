@@ -64,6 +64,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,7 @@ public class EnketoUrlService {
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
     public static final String NO_FLAVOR = "";
+    public static final String COMMENT = "comment";
 
     @Autowired
     @Qualifier("dataSource")
@@ -248,9 +250,16 @@ public class EnketoUrlService {
             }
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
-            query.setDate_time(dn.getDateCreated().toString());
+
+            DateTime dateTime = new DateTime(dn.getDateCreated());
+            String dt = dateTime.toString();
+            dt = dt.replaceAll("T", " ");
+            dt = dt.substring(0, 19) + " " + dt.substring(23);
+            query.setDate_time(dt);
             query.setNotify(false);
+            query.setType(COMMENT);
             queryBeans.add(query);
+
         }
         // logs.add(logBean);
         queryElement.setQueries(queryBeans);
