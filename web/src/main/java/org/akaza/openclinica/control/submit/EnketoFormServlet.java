@@ -5,8 +5,10 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -30,6 +32,7 @@ public class EnketoFormServlet extends SecureController {
         FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
         StudyEventDao studyEventDao = (StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
+        EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         String formLayoutId = request.getParameter(FORM_LAYOUT_ID);
 
@@ -49,11 +52,12 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(ub.getId());
         String contextHash = cache.putSubjectContext(subjectContext);
+        Study study = enketoCredentials.getParentStudy(currentStudy.getOid());
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), formLayout, studyEvent, QUERY_FLAVOR);
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, study.getOc_oid(), formLayout, studyEvent, QUERY_FLAVOR);
         } else {
-            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), QUERY_FLAVOR);
+            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, study.getOc_oid(), QUERY_FLAVOR);
         }
         request.setAttribute(FORM_URL, formUrl);
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");

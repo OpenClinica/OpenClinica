@@ -72,6 +72,9 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
+        String node = itemNode.getTextContent();
+        if (StringUtils.isEmpty(node))
+            return;
         helperBean.setContainer(container);
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
@@ -84,7 +87,7 @@ public class QueryServiceImpl implements QueryService {
         QueriesBean queries = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            queries = objectMapper.readValue(itemNode.getTextContent(), QueriesBean.class);
+            queries = objectMapper.readValue(node, QueriesBean.class);
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw e;
