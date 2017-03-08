@@ -46,7 +46,7 @@ import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

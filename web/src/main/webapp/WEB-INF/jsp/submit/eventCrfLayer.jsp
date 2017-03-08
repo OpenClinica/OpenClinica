@@ -232,10 +232,10 @@
 						    	      <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							          <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								      <tr valign="top"><td class="table_cell_left">
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								      
 								      <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								      
 								      <fmt:message key="print" bundle="${resword}"/></a></td></tr>
                                     <!-- New Statement for locked or frozen study -->
@@ -275,20 +275,20 @@
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&crfVersionId=<c:out value="${crfVersionId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus =='invalid' }">
 						 	           <tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							           <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								       <tr valign="top"><td class="table_cell_left">
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								       
 								       
 								       <img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp;
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 								       
 								       
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
@@ -325,10 +325,10 @@
 							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								  
 									<tr valign="top"><td class="table_cell_left">
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 									
 									<img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${currRow.bean.studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
 									
 									<fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								  

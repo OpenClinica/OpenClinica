@@ -47,7 +47,7 @@ public class EnketoAPI {
         if (enketoURL == null)
             return "";
         URL eURL = new URL(enketoURL + "/api/v2/survey/single/fieldsubmission/iframe");
-        //URL eURL = new URL(enketoURL + "/api/v2/survey/iframe");
+        // URL eURL = new URL(enketoURL + "/api/v2/survey/iframe");
 
         EnketoURLResponse response = getURL(eURL, crfOID);
         if (response != null) {
@@ -94,7 +94,7 @@ public class EnketoAPI {
         return null;
     }
 
-    public EnketoURLResponse getEditURL(String crfOid, String instance, String ecid, String redirect,boolean markComplete) {
+    public EnketoURLResponse getEditURL(String crfOid, String instance, String ecid, String redirect, boolean markComplete) {
         if (enketoURL == null)
             return null;
 
@@ -104,18 +104,18 @@ public class EnketoAPI {
             cal.setTime(new Date());
             String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
-            String instanceId = encoder.encodePassword(hashString,null);
+            String instanceId = encoder.encodePassword(hashString, null);
 
             URL eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
-            //URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
-            
+            // URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
+
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance,markComplete);
+            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, markComplete);
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

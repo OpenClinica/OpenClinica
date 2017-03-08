@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -33,6 +34,7 @@ import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -95,6 +97,9 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private FormLayoutDao formLayoutDao;
 
     @Autowired
     private CrfDao crfDao;
@@ -220,21 +225,22 @@ public class OpenRosaSubmissionController {
         int studyEventDefinitionID = Integer.valueOf(subjectContext.get("studyEventDefinitionID"));
         int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
         String studySubjectOID = subjectContext.get("studySubjectOID");
-        String crfVersionOID = subjectContext.get("crfVersionOID");
+        String formLayoutOID = subjectContext.get("formLayoutOID");
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
 
         UserAccount userAccount = userAccountDao.findById(userAccountID);
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
         Study study = studyDao.findByOcOID(studyOID);
         StudyEventDefinition sed = studyEventDefinitionDao.findById(studyEventDefinitionID);
-        CrfVersion crfVersion = crfVersionDao.findByOcOID(crfVersionOID);
+        FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOID);
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(formLayout.getCrf().getCrfId()).get(0);
         StudyEvent studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinalTransactional(sed.getOc_oid(), studyEventOrdinal,
                 studySubject.getStudySubjectId());
-        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(),
-                crfVersion.getCrfVersionId());
+        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(),
+                formLayout.getFormLayoutId());
 
         if (eventCrf == null) {
-            eventCrf = createEventCrf(crfVersion, studyEvent, studySubject, userAccount);
+            eventCrf = createEventCrf(formLayout, studyEvent, studySubject, userAccount);
             List<Item> items = itemDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
             createItemData(items.get(0), "", eventCrf, userAccount);
         }
@@ -251,9 +257,11 @@ public class OpenRosaSubmissionController {
 
         int count = 0;
         for (EventCrf evCrf : eventCrfs) {
-            if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()) {
+            if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
+                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
+                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
                 for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getCrfVersion().getCrf().getCrfId()) {
+                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
                         count++;
                         break;
                     }
@@ -263,6 +271,10 @@ public class OpenRosaSubmissionController {
 
         if (count == eventDefinitionCrfs.size()) {
             studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+            studyEvent.setUserAccount(userAccount);
+            studyEventDao.saveOrUpdate(studyEvent);
+        } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
+            studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
             studyEvent.setUserAccount(userAccount);
             studyEventDao.saveOrUpdate(studyEvent);
         }
@@ -552,12 +564,14 @@ public class OpenRosaSubmissionController {
         return uploadedFile;
     }
 
-    private EventCrf createEventCrf(CrfVersion crfVersion, StudyEvent studyEvent, StudySubject studySubject, UserAccount user) {
+    private EventCrf createEventCrf(FormLayout formLayout, StudyEvent studyEvent, StudySubject studySubject, UserAccount user) {
         EventCrf eventCrf = new EventCrf();
+        CrfVersion crfVersion = crfVersionDao.findAllByCrfId(formLayout.getCrf().getCrfId()).get(0);
         Date currentDate = new Date();
         eventCrf.setAnnotations("");
         eventCrf.setDateCreated(currentDate);
         eventCrf.setCrfVersion(crfVersion);
+        eventCrf.setFormLayout(formLayout);
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
@@ -572,9 +586,7 @@ public class OpenRosaSubmissionController {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrfDao.saveOrUpdate(eventCrf);
-        eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(),
-                crfVersion.getCrfVersionId());
+        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }

@@ -57,24 +57,22 @@ public class OdmFileCreation {
     private DataSource dataSource;
     private CoreResources coreResources;
 
-    private static File files[]=null;
+    private static File files[] = null;
     private static List<File> oldFiles = new LinkedList<File>();
 
-    public HashMap<String,Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir,
-            DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
+    public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, StudyBean currentStudy,
+            String generalFileDirCopy, ExtractBean eb, Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
             boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean) {
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy,ruleSetRuleDao);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy, ruleSetRuleDao);
         AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy);
         ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy);
 
         MetaDataCollector.setTextLength(200);
-        if(deleteOld){
+        if (deleteOld) {
             File file = new File(generalFileDir);
-            if(file.isDirectory())
-            {
+            if (file.isDirectory()) {
                 files = file.listFiles();
                 oldFiles = Arrays.asList(files);
             }
@@ -93,11 +91,11 @@ public class OdmFileCreation {
                 cdc.setODMBean(odmb);
             } else if ("oc1.2".equals(odmVersion)) {
                 ODMBean odmb = new ODMBean();
-                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1.xsd");
+                // odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1.xsd");
                 odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1-OC1.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.2\"");
-                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.2\"");
+                // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.2\"");
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v121/v3.1\"");
                 xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
@@ -107,12 +105,12 @@ public class OdmFileCreation {
                 cdc.setODMBean(odmb);
             } else if ("oc1.3".equals(odmVersion)) {
                 ODMBean odmb = mdc.getODMBean();
-                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
-                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
-                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+                // odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
+                // odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
+                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+                // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
                 xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
@@ -128,22 +126,18 @@ public class OdmFileCreation {
         //////////////////////////////////////////
         ////////// MetaData Extraction //////////
         mdc.collectFileData();
-        MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap(),coreResources);
+        MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap(), coreResources);
         metaReport.setODMVersion(odmVersion);
         metaReport.setOdmBean(mdc.getODMBean());
         metaReport.createChunkedOdmXml(Boolean.TRUE);
 
-
-
-
         long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
         String ODMXMLFileName = mdc.getODMBean().getFileOID() + ".xml";
-        int fId =
-            createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
+        int fId = createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
+                zipped, deleteOld, userBean);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 =
-                createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                        false, zipped, deleteOld, userBean);
+            int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
+                    false, zipped, deleteOld, userBean);
         }
         //////////////////////////////////////////
         ////////// AdminData Extraction //////////
@@ -154,15 +148,12 @@ public class OdmFileCreation {
         adminReport.setOdmBean(mdc.getODMBean());
         adminReport.createChunkedOdmXml(Boolean.TRUE);
 
-
-
         sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-        fId =
-            createFileK(ODMXMLFileName, generalFileDir, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
+        fId = createFileK(ODMXMLFileName, generalFileDir, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
+                zipped, deleteOld, userBean);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 =
-                createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                        false, zipped, deleteOld, userBean);
+            int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
+                    false, zipped, deleteOld, userBean);
         }
 
         //////////////////////////////////////////
@@ -181,9 +172,8 @@ public class OdmFileCreation {
             JobTerminationMonitor.check();
 
             OdmStudyBase u = it.next();
-            ArrayList newRows =
-                dsdao.selectStudySubjects(u.getStudy().getId(), 0, st_sed_in, st_itemid_in, dsdao.genDatabaseDateConstraint(eb), ecStatusConstraint,
-                        itStatusConstraint);
+            ArrayList newRows = dsdao.selectStudySubjects(u.getStudy().getId(), 0, st_sed_in, st_itemid_in, dsdao.genDatabaseDateConstraint(eb),
+                    ecStatusConstraint, itStatusConstraint);
 
             ///////////////
             int fromIndex = 0;
@@ -199,7 +189,7 @@ public class OdmFileCreation {
                     StudySubjectBean sub = new StudySubjectBean();
                     sub = (StudySubjectBean) x.get(i);
                     studySubjectIds += "," + sub.getId();
-                }//for
+                } // for
                 studySubjectIds = studySubjectIds.replaceFirst(",", "");
 
                 ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds);
@@ -210,7 +200,7 @@ public class OdmFileCreation {
                 report.setClinicalData(cdata.getOdmClinicalData());
                 report.setOdmStudyMap(mdc.getOdmStudyMap());
                 report.setODMVersion(odmVersion);
-                //report.setOdmStudy(mdc.getOdmStudy());
+                // report.setOdmStudy(mdc.getOdmStudy());
                 report.setOdmBean(mdc.getODMBean());
                 if (firstIteration && fromIndex >= newRows.size()) {
                     report.createChunkedOdmXml(Boolean.TRUE, true, true);
@@ -223,11 +213,11 @@ public class OdmFileCreation {
                 } else {
                     report.createChunkedOdmXml(Boolean.TRUE, false, false);
                 }
-                fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                                    false, zipped, deleteOld, userBean);
+                fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
+                        zipped, deleteOld, userBean);
                 if (!"".equals(generalFileDirCopy)) {
                     int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd,
-                                ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
+                            ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
                 }
             }
         }
@@ -235,84 +225,85 @@ public class OdmFileCreation {
         sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
         fId = createFileK(ODMXMLFileName, generalFileDir, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, saveToDB, zipped, deleteOld, userBean);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
+            int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld,
+                    userBean);
         }
 
         //////////////////////////////////////////
         ////////// pre pagination extraction /////
         /*
-        mdc.collectFileData();
-        adc.collectOdmAdminDataMap();
-        cdc.collectOdmClinicalDataMap();
-        FullReportBean report = new FullReportBean();
-        report.setClinicalDataMap(cdc.getOdmClinicalDataMap());
-        report.setAdminDataMap(adc.getOdmAdminDataMap());
-        report.setOdmStudyMap(mdc.getOdmStudyMap());
-        report.setOdmBean(mdc.getODMBean());
-        report.setODMVersion(odmVersion);
-        report.createOdmXml(Boolean.TRUE);
-        long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-        String ODMXMLFileName = mdc.getODMBean().getFileOID() + ".xml";
-        int fId = this.createFile(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, true);
-        if (!"".equals(generalFileDirCopy)) {
-            int fId2 = this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false);
-        } */
+         * mdc.collectFileData();
+         * adc.collectOdmAdminDataMap();
+         * cdc.collectOdmClinicalDataMap();
+         * FullReportBean report = new FullReportBean();
+         * report.setClinicalDataMap(cdc.getOdmClinicalDataMap());
+         * report.setAdminDataMap(adc.getOdmAdminDataMap());
+         * report.setOdmStudyMap(mdc.getOdmStudyMap());
+         * report.setOdmBean(mdc.getODMBean());
+         * report.setODMVersion(odmVersion);
+         * report.createOdmXml(Boolean.TRUE);
+         * long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
+         * String ODMXMLFileName = mdc.getODMBean().getFileOID() + ".xml";
+         * int fId = this.createFile(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean,
+         * sysTimeEnd, ExportFormatBean.XMLFILE, true);
+         * if (!"".equals(generalFileDirCopy)) {
+         * int fId2 = this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean,
+         * sysTimeEnd, ExportFormatBean.XMLFILE, false);
+         * }
+         */
         HashMap answerMap = new HashMap<String, Integer>();
-        //JN: Zipped in the next stage as thats where the ODM file is named and copied over in default categories.
-//        if(zipped)
-//        { try {
-//              zipFile(ODMXMLFileName,generalFileDir);
-//
-//          } catch (IOException e) {
-//              // TODO Auto-generated catch block
-//              logger.error(e.getMessage());
-//              e.printStackTrace();
-//          }
-//
-//        }   // return ODMXMLFileName;
+        // JN: Zipped in the next stage as thats where the ODM file is named and copied over in default categories.
+        // if(zipped)
+        // { try {
+        // zipFile(ODMXMLFileName,generalFileDir);
+        //
+        // } catch (IOException e) {
+        // // TODO Auto-generated catch block
+        // logger.error(e.getMessage());
+        // e.printStackTrace();
+        // }
+        //
+        // } // return ODMXMLFileName;
 
         answerMap.put(ODMXMLFileName, new Integer(fId));
-    //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
+        // if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
 
         return answerMap;
     }
 
-    public int createFileK(String name, String dir, String content,
-            DatasetBean datasetBean, long time, ExportFormatBean efb,
-            boolean saveToDB, boolean zipped, boolean deleteOld, UserAccountBean userBean) {
+    public int createFileK(String name, String dir, String content, DatasetBean datasetBean, long time, ExportFormatBean efb, boolean saveToDB, boolean zipped,
+            boolean deleteOld, UserAccountBean userBean) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh 04/2010 #4915 replace all names' spaces with underscores
         name = name.replaceAll(" ", "_");
         fbFinal.setId(0);
-        BufferedWriter w =null;
+        BufferedWriter w = null;
         try {
-
-
 
             File complete = new File(dir);
             if (!complete.isDirectory()) {
                 complete.mkdirs();
             }
 
-//            else  if(deleteOld)// so directory exists check if the files are there
-//            {
-//              deleteDirectory(complete);
-//            }
+            // else if(deleteOld)// so directory exists check if the files are there
+            // {
+            // deleteDirectory(complete);
+            // }
 
-            //File newFile = new File(complete, name);
-            //newFile.setLastModified(System.currentTimeMillis());
+            // File newFile = new File(complete, name);
+            // newFile.setLastModified(System.currentTimeMillis());
 
             File oldFile = new File(complete, name);
             File newFile = null;
             if (oldFile.exists()) {
                 newFile = oldFile;
-                if(oldFiles!=null || !oldFiles.isEmpty() )
-                oldFiles.remove(oldFile);
+                if (oldFiles != null || !oldFiles.isEmpty())
+                    oldFiles.remove(oldFile);
             } else {
                 newFile = new File(complete, name);
             }
 
-            //File
+            // File
             newFile.setLastModified(System.currentTimeMillis());
 
             w = new BufferedWriter(new FileWriter(newFile, true));
@@ -365,9 +356,8 @@ public class OdmFileCreation {
         } catch (Exception e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
-        }
-        finally{
-            if(w!=null)
+        } finally {
+            if (w != null)
                 try {
                     w.close();
                 } catch (IOException e) {
@@ -378,11 +368,11 @@ public class OdmFileCreation {
         return fbFinal.getId();
     }
 
-    private Integer getStudySubjectNumber(String studySubjectNumber){
-        try{
-        Integer value = Integer.valueOf(studySubjectNumber);
-        return value > 0 ? value : 99;
-        }catch (NumberFormatException e) {
+    private Integer getStudySubjectNumber(String studySubjectNumber) {
+        try {
+            Integer value = Integer.valueOf(studySubjectNumber);
+            return value > 0 ? value : 99;
+        } catch (NumberFormatException e) {
             return 99;
         }
     }

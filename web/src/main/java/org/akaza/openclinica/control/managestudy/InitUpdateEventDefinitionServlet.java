@@ -7,8 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,28 +18,20 @@ import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -73,8 +63,8 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
                 return;
             } else {
-                addPageMessage(respage.getString("no_have_permission_to_update_study_event_definition")
-                    + respage.getString("please_contact_sysadmin_questions"));
+                addPageMessage(
+                        respage.getString("no_have_permission_to_update_study_event_definition") + respage.getString("please_contact_sysadmin_questions"));
                 throw new InsufficientPermissionException(Page.LIST_DEFINITION_SERVLET, resexception.getString("not_study_director"), "1");
 
             }
@@ -112,14 +102,14 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             // definition id
             int defId = Integer.valueOf(idString.trim()).intValue();
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());    
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             String participateFormStatus = spvdao.findByHandleAndStudy(sed.getStudyId(), "participantPortal").getValue();
-              if (participateFormStatus.equals("enabled")) 	baseUrl();
-            request.setAttribute("participateFormStatus",participateFormStatus );
+            if (participateFormStatus.equals("enabled"))
+                baseUrl();
+            request.setAttribute("participateFormStatus", participateFormStatus);
 
             if (currentStudy.getId() != sed.getStudyId()) {
-                addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-                        + " " + respage.getString("change_active_study_or_contact"));
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                 forwardPage(Page.MENU_SERVLET);
                 return;
             }
@@ -127,12 +117,12 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);
 
-            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+            FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             ArrayList newEventDefinitionCRFs = new ArrayList();
             for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
                 EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-                ArrayList versions = (ArrayList) cvdao.findAllActiveByCRF(edc.getCrfId());
+                ArrayList versions = (ArrayList) fldao.findAllActiveByCRF(edc.getCrfId());
                 edc.setVersions(versions);
                 CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
                 edc.setCrfName(crf.getName());
@@ -140,11 +130,11 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 edc.setParticipantForm(edc.isParticipantForm());
                 // TO DO: use a better way on JSP page,eg.function tag
                 edc.setNullFlags(processNullValues(edc));
-                CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
-                edc.setDefaultVersionName(defaultVersion.getName());
+                FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(edc.getDefaultVersionId());
+                edc.setDefaultVersionName(formLayout.getName());
 
-                String crfPath=sed.getOid()+"."+edc.getCrf().getOid();
-                edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2,crfPath,true));
+                String crfPath = sed.getOid() + "." + edc.getCrf().getOid();
+                edc.setOffline(getEventDefinitionCrfTagService().getEventDefnCrfOfflineStatus(2, crfPath, true));
                 newEventDefinitionCRFs.add(edc);
             }
 
@@ -165,7 +155,6 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
     }
 
-    
     private HashMap processNullValues(EventDefinitionCRFBean edc) {
         HashMap flags = new LinkedHashMap();
         String s = "";// edc.getNullValues();
@@ -198,12 +187,12 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
         return flags;
     }
-    
-    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
-        eventDefinitionCrfTagService=
-         this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
 
-         return eventDefinitionCrfTagService;
-     }
+    public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {
+        eventDefinitionCrfTagService = this.eventDefinitionCrfTagService != null ? eventDefinitionCrfTagService
+                : (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+
+        return eventDefinitionCrfTagService;
+    }
 
 }

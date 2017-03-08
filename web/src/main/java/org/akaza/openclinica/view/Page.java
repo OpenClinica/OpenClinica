@@ -651,10 +651,9 @@ public enum Page {
      MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
      VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL ("/ViewSectionDataEntryRESTUrlServlet", "View Section Data Entry Servlet for REST Url call"),
      PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet"),
-     ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet"),
-     VIEW_MULTI_SCHEMA("/WEB-INF/jsp/multischema/index.jsp", "MultiSchema Support");
-
- //  private final static String path = "/WEB-INF/jsp/";
+     ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet");
+      	
+  //  private final static String path = "/WEB-INF/jsp/";
   //  public final static String servletPath = "/OpenClinica";
     
 	private String fileName;

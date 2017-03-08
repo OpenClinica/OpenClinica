@@ -103,17 +103,17 @@
 				<c:choose>
 				<c:when test="${dedc.eventCRF.id > 0}">
 				<!-- found an event crf id -->
-					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.eventCRF.CRFVersionId}"/>">
+					<input type="hidden" name="formLayoutId" value="<c:out value="${dedc.eventCRF.formLayout.id}"/>">
 				</c:when>
 				<c:otherwise>
 				<!-- did not find an event crf id -->
-					<input type="hidden" name="crfVersionId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
+					<input type="hidden" name="formLayoutId" value="<c:out value="${dedc.edc.defaultVersionId}"/>">
 				</c:otherwise>
 				</c:choose>
 
 				  <c:set var="versionCount" value="0"/>
 				  <c:forEach var="version" items="${dedc.edc.versions}">
-                    <c:set var="crfVersionOID" value="${version.oid}"/>
+                    <c:set var="formLayoutOID" value="${version.oid}"/>
 				    <c:set var="versionCount" value="${versionCount+1}"/>
 				  </c:forEach>
 
@@ -127,7 +127,6 @@
 				 <c:when test="${dedc.eventCRF.id == 0}">
 
 				<select name="versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" onchange="javascript:changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>();">
-
 				 <c:forEach var="version" items="${dedc.edc.versions}">
 
 				 <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${currRow.bean.studyEvent.id}&subjectId=${studySub.subjectId}" />
@@ -136,35 +135,43 @@
                   <c:when test="${dedc.edc.defaultVersionId==version.id}">
                   <option value="<c:out value="${version.id}"/>" selected>
 					<c:out value="${version.name}"/>
-                       <c:set var="crfVersionOID" value="${version.oid}"/>
+                       <c:set var="formLayoutOID" value="${version.oid}"/>
 				  </option>
                   </c:when>
                   <c:otherwise>
                     <option value="<c:out value="${version.id}"/>">
 						<c:out value="${version.name}"/>
-						 <c:set var="crfVersionOID" value="${version.oid}"/>
+						 <c:set var="formLayoutOID" value="${version.oid}"/>
 					</option>
                   </c:otherwise>
                   </c:choose>
 
                  </c:forEach>
                  </select>
-                 
 
-                 <SCRIPT LANGUAGE="JavaScript">
+                 <SCRIPT LANGUAGE="JavaScript">                 
                  function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
                   var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
-                  document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.crfVersionId.value=qer;
-
+                  document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
+                  document.getElementById('ide-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href = 
+                	  buildUrl(qer,'<c:out value="${currRow.bean.studyEvent.id}"/>','<c:out value="${dedc.eventCRF.status.id}"/>','<c:out value="${originatingPage}"/>' );
                  }
-                </SCRIPT>
+                 
+                  function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage){
+                 	 return "EnketoFormServlet?formLayoutId="+ formLayoutId + 
+                 			 "&studyEventId=" + studyEventId + 
+                 			 "&eventCrfId=" + eventCRFStatusId + 
+                 			 "&originatingPage=" + originatingPage;
+                  }                                  
+                 </SCRIPT>
+
+                                   
                  </c:when>
 
-				 <c:otherwise><c:out value="${dedc.eventCRF.crfVersion.name}"/>
-				             <c:set var="crfVersionOID" value="${dedc.eventCRF.crfVersion.oid}"/>
+				 <c:otherwise><c:out value="${dedc.eventCRF.formLayout.name}"/>
+				             <c:set var="formLayoutOID" value="${dedc.eventCRF.formLayout.oid}"/>
 				 
 				 </c:otherwise>
-
 				 </c:choose>
 
 				</td>
@@ -205,17 +212,18 @@
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 				 <td>
                 <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
-
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
-                    <a href="EnketoFormServlet?crfVersionId=<c:out value="${dedc.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
                     </a>
                     </c:when>
                     <c:otherwise>
-                    <a href="EnketoFormServlet?crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+                    
+                    <a id="ide-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" 
+                      href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                       onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                       onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                      <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
@@ -240,7 +248,7 @@
                  </td>
 
 		         <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${formLayoutOID}')"
 			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
@@ -262,11 +270,10 @@
 
 
 	</c:forEach>
-
 	<c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
 	<tr>
 		<td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}" /></td>
-		<td class="table_cell" width="100"><c:out value="${dec.eventCRF.crfVersion.name}" /></td>
+		<td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" /></td>
 		<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 		<c:choose>
 		 <c:when test="${dec.stage.initialDE}">
@@ -313,7 +320,7 @@
 	     <td>
 			<c:if test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
 			    <c:if test="${dec.continueInitialDataEntryPermitted}">
-		           <a href="EnketoFormServlet?crfVersionId=<c:out value="${dec.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+		           <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
 				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                        <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
@@ -335,10 +342,9 @@
     			</c:if>
     			<c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available)}">
         		   
-		           <a href="EnketoFormServlet?crfVersionId=<c:out value="${dec.eventCRF.crfVersion.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+		           <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'AdministrativeEditing?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
+				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
 				    <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
 				    </a>
                 </c:if>
@@ -357,7 +363,7 @@
 
 		 </td>
 		 <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>

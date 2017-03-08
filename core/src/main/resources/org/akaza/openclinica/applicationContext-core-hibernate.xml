@@ -94,7 +94,7 @@
   <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
-    <property name="dataSource" ref="dataSource"/>
+    <property name="dataSource" ref="multiSchemaDataSource"/>
     <property name="queryStore" ref="queryStore"/>
   </bean>
   
@@ -231,16 +231,16 @@
             <props>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.format_sql">true</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</prop>
+                <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
                 <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
                 <prop key="hibernate.multiTenancy">SCHEMA</prop>
-                <prop key="hibernate.connection.password">clinica</prop>
-                <prop key="hibernate.connection.url">jdbc:postgresql://localhost:5432/oc_test</prop>
-                <prop key="hibernate.connection.username">clinica</prop>
+                <prop key="hibernate.connection.password">s[password]</prop>
+                <prop key="hibernate.connection.url">s[url]</prop>
+                <prop key="hibernate.connection.username">s[username]</prop>
                 <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop>
                 <prop key ="hibernate.multi_tenant_connection_provider">org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl</prop>
                 <prop key="hibernate.tenant_identifier_resolver">org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl</prop>

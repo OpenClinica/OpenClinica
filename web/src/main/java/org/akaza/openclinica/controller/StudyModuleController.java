@@ -37,7 +37,7 @@ import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

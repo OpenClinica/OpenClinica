@@ -23,8 +23,8 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -32,21 +32,21 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.ParticipantEventService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.cdisc.ns.odm.v130_api.ODM;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionClinicalData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionFormData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionStudyEventData;
-import org.cdisc.ns.odm.v130_api.ODMcomplexTypeDefinitionSubjectData;
+import org.cdisc.ns.odm.v130.ODM;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionClinicalData;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormData;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventData;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionSubjectData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,8 +217,7 @@ public class OdmController {
      */
 
     @RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
-    public @ResponseBody
-    ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
+    public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         return getODM(studyOid, studySubjectOid);
@@ -231,7 +230,7 @@ public class OdmController {
             return null;
         }
 
-        CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
@@ -252,31 +251,32 @@ public class OdmController {
                     return odm;
 
                 List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
-                for (EventDefinitionCRFBean eventDefCrf:eventDefCrfs) {
+                for (EventDefinitionCRFBean eventDefCrf : eventDefCrfs) {
                     if (eventDefCrf.isParticipantForm()) {
                         EventCRFBean eventCRF = participantEventService.getExistingEventCRF(studySubjectBean, nextEvent, eventDefCrf);
                         boolean itemDataExists = false;
                         boolean validStatus = true;
-                        CRFVersionBean crfVersion = null;
-                        if (eventCRF!=null) {
+                        FormLayoutBean formLayout = null;
+                        if (eventCRF != null) {
                             if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;
-                            crfVersion = (CRFVersionBean) versionDAO.findByPK(eventCRF.getCRFVersionId());
-                        } else crfVersion = (CRFVersionBean) versionDAO.findByPK(eventDefCrf.getDefaultVersionId());
+                            formLayout = (FormLayoutBean) formLayoutDAO.findByPK(eventCRF.getFormLayoutId());
+                        } else
+                            formLayout = (FormLayoutBean) formLayoutDAO.findByPK(eventDefCrf.getDefaultVersionId());
 
                         if (validStatus) {
                             String formUrl = null;
                             if (!itemDataExists)
-                                formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
+                                formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid);
                             else
-                                formUrl = createEditUrl(studyOID, crfVersion, nextEvent, ssoid);
-                            formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
+                                formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid);
+                            formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                         }
                     }
                 }
-            return createOdm(study, studySubjectBean, nextEvent, formDatas);
+                return createOdm(study, studySubjectBean, nextEvent, formDatas);
             } else {
                 logger.debug("Unable to find next event for subject.");
             }
@@ -310,41 +310,41 @@ public class OdmController {
         return odm;
     }
 
-    private String createEnketoUrl(String studyOID, CRFVersionBean crfVersion, StudyEventBean nextEvent, String ssoid) throws Exception {
+    private String createEnketoUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
-        String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
-        String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+        String enketoURL = cache.getPFormURL(studyOID, formLayout.getOid());
+        String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
+                formLayout.getOid());
 
         String url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
-        logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
+        logger.debug("Enketo URL for " + formLayout.getName() + "= " + url);
         return url;
 
     }
 
-    private String createEditUrl(String studyOID, CRFVersionBean crfVersion, StudyEventBean nextEvent, String ssoid) throws Exception {
+    private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
-        String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+        String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
+                formLayout.getOid());
         String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
 
         String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
-        logger.debug("Edit URL for " + crfVersion.getName() + "= " + url);
+        logger.debug("Edit URL for " + formLayout.getName() + "= " + url);
         return url;
 
     }
 
-    private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent, List<EventCRFBean> eventCrfs,
-            CRFDAO crfDAO, String formUrl,boolean itemDataExists) {
+    private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(FormLayoutBean formLayout, StudyEventBean nextEvent, List<EventCRFBean> eventCrfs, CRFDAO crfDAO,
+            String formUrl, boolean itemDataExists) {
         EventCRFBean selectedEventCRFBean = null;
-        CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getId());
+        CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(formLayout.getId());
         for (EventCRFBean eventCRFBean : eventCrfs) {
-            if (eventCRFBean.getCRFVersionId() == crfVersion.getId()) {
+            if (eventCRFBean.getCRFVersionId() == formLayout.getId()) {
                 selectedEventCRFBean = eventCRFBean;
                 break;
             }
         }
-        return generateFormData(crfVersion, nextEvent, selectedEventCRFBean, crfBean, formUrl, itemDataExists);
+        return generateFormData(formLayout, nextEvent, selectedEventCRFBean, crfBean, formUrl, itemDataExists);
 
     }
 
@@ -373,23 +373,23 @@ public class OdmController {
         return studyEventData;
     }
 
-    private ODMcomplexTypeDefinitionFormData generateFormData(CRFVersionBean crfVersionBean, StudyEventBean nextEvent, EventCRFBean eventCRFBean,
-            CRFBean crfBean, String formUrl,boolean itemDataExists) {
+    private ODMcomplexTypeDefinitionFormData generateFormData(FormLayoutBean formLayout, StudyEventBean nextEvent, EventCRFBean eventCRFBean, CRFBean crfBean,
+            String formUrl, boolean itemDataExists) {
         ODMcomplexTypeDefinitionFormData formData = new ODMcomplexTypeDefinitionFormData();
-        formData.setFormOID(crfVersionBean.getOid());
+        formData.setFormOID(formLayout.getOid());
         formData.setFormName(crfBean.getName());
-        formData.setVersionDescription(crfVersionBean.getDescription());
+        formData.setVersionDescription(formLayout.getDescription());
         formData.setUrl(formUrl);
         if (eventCRFBean == null) {
             formData.setStatus("Not Started");
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
-            if (!itemDataExists){
-                formData.setStatus("Not Started");                
-            }else{
-                formData.setStatus(eventCRFBean.getStatus().getName());                
-            } 
-            
+            if (!itemDataExists) {
+                formData.setStatus("Not Started");
+            } else {
+                formData.setStatus(eventCRFBean.getStatus().getName());
+            }
+
             if (eventCrf.getDateUpdated() != null) {
                 // returns time as UTC
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");

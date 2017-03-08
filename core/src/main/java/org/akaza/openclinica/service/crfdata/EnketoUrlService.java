@@ -14,13 +14,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.core.form.xform.LogBean;
@@ -31,6 +24,7 @@ import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -48,6 +42,7 @@ import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -66,7 +61,7 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -92,8 +87,11 @@ public class EnketoUrlService {
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
     public static final String OC_QUERY_SUFFIX = "_OC_COMMENT";
     public static final String QUERY_SUFFIX = "_comment";
-    public static final String INSTANCE_SUFFIX = "instance-queries.tpl";
+    public static final String INSTANCE_QUERIES_SUFFIX = "instance-queries.tpl";
+    public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String FORM_SUFFIX = "form.xml";
+    public static final String QUERY_FLAVOR = "-query";
+    public static final String NO_FLAVOR = "";
 
     @Autowired
     @Qualifier("dataSource")
@@ -104,6 +102,9 @@ public class EnketoUrlService {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private FormLayoutDao formLayoutDao;
 
     @Autowired
     private StudyEventDao studyEventDao;
@@ -155,11 +156,11 @@ public class EnketoUrlService {
             throws Exception {
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
-        return enketo.getFormURL(subjectContext.getCrfVersionOid() + flavor) + "?ecid=" + subjectContextKey;
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
 
     }
 
-    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, CrfVersion crfVersion,
+    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
             StudyEvent studyEvent, String flavor) throws Exception {
 
         String editURL = null;
@@ -177,29 +178,30 @@ public class EnketoUrlService {
             eventDef = studyEvent.getStudyEventDefinition();
             subject = studyEvent.getStudySubject();
         }
-        if (crfVersion == null) {
-            crfVersion = crfVersionDao.findByOcOID(subjectContext.getCrfVersionOid());
+        if (formLayout == null) {
+            formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         }
-        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfVersionId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
-                crfVersion.getCrfVersionId());
+        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
+                formLayout.getFormLayoutId());
 
+        CrfVersion crfVersion = eventCrf.getCrfVersion();
         // Load populated instance
-        String populatedInstance = populateInstance(crfVersion, eventCrf, studyOid);
+        String populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
- 
-        boolean markComplete=true;
-        if(eventCrf.getStatusId()==Status.UNAVAILABLE.getCode()){
-        	markComplete=false;
+
+        boolean markComplete = true;
+        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+            markComplete = false;
         }
         // Return Enketo URL
-        EnketoURLResponse eur = enketo.getEditURL(crfVersion.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl,markComplete);
-        editURL =eur.getEdit_url()+ "&ecid=" + subjectContextKey;
-          logger.debug("Generating Enketo edit url for form: " + editURL);
+        EnketoURLResponse eur = enketo.getEditURL(formLayout.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete);
+        editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
+        logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
 
@@ -259,8 +261,7 @@ public class EnketoUrlService {
             return null;
     }
 
-    private String populateInstance(CrfVersion crfVersion, EventCrf eventCrf, String studyOid) throws Exception {
-        boolean flavor = true;
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, String flavor) throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
 
@@ -278,7 +279,7 @@ public class EnketoUrlService {
                 hashMap.put("lastUsedOrdinal", 1);
                 for (ItemGroupMetadata igm : igms) {
                     hashMap.put(igm.getItem().getName(), "");
-                    if (flavor)
+                    if (flavor.equals(QUERY_FLAVOR))
                         hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, "");
                 }
                 hashMapList.add(hashMap);
@@ -305,7 +306,7 @@ public class EnketoUrlService {
                         for (ItemGroupMetadata igm : igms) {
                             ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
                             hashMap.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
-                            if (flavor) {
+                            if (flavor.equals(QUERY_FLAVOR)) {
                                 if (itemData != null) {
                                     ObjectMapper mapper = new ObjectMapper();
                                     QueriesBean queriesBean = buildQueryElement(itemData);
@@ -328,7 +329,7 @@ public class EnketoUrlService {
                 for (ItemGroupMetadata igm : igms) {
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
                     data.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
-                    if (flavor) {
+                    if (flavor.equals(QUERY_FLAVOR)) {
                         if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
                             QueriesBean queriesBean = buildQueryElement(itemData);
@@ -341,16 +342,19 @@ public class EnketoUrlService {
             }
         }
         String templateStr = null;
-        CrfBean crfBean = crfDao.findById(crfVersion.getCrf().getCrfId());
-        String directoryPath = Utils.getCrfMediaFilePath(crfBean, crfVersion);
+        CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
+        String directoryPath = Utils.getCrfMediaFilePath(crfBean.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
             for (File child : directoryListing) {
-                if (child.getName().endsWith(INSTANCE_SUFFIX)) {
+
+                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(INSTANCE_QUERIES_SUFFIX)
+                        || flavor.equals(NO_FLAVOR) && child.getName().endsWith(INSTANCE_SUFFIX)) {
                     templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }
+
             }
         }
 
@@ -360,110 +364,6 @@ public class EnketoUrlService {
         template.process(data, wtr);
 
         String instance = wtr.toString();
-        System.out.println(instance);
-        return instance;
-    }
-
-    private String getPopulatedInstance(CrfVersion crfVersion, EventCrf eventCrf) throws Exception {
-        boolean isXform = false;
-        if (StringUtils.isNotEmpty(crfVersion.getXform()))
-            isXform = true;
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setNamespaceAware(true);
-        DocumentBuilder build = docFactory.newDocumentBuilder();
-        Document doc = build.newDocument();
-
-        Element crfElement = null;
-        if (isXform) {
-            crfElement = doc.createElement(crfVersion.getXformName());
-            crfElement.setAttribute("xmlns:enk", "http://enketo.org/xforms");
-        } else {
-            crfElement = doc.createElement(crfVersion.getOcOid());
-        }
-        doc.appendChild(crfElement);
-
-        ArrayList<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
-        for (ItemGroup itemGroup : itemGroups) {
-            ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemGroupCrfVersion(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId())
-                    .get(0);
-            ArrayList<Item> items = (ArrayList<Item>) itemDao.findByItemGroupCrfVersionOrdered(itemGroup.getItemGroupId(), crfVersion.getCrfVersionId());
-
-            // Get max repeat in item data
-            int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), items.get(0).getItemId());
-            // loop thru each repeat creating items in instance
-            String repeatGroupMin = itemGroupMetadata.getRepeatNumber().toString();
-            Boolean isrepeating = itemGroupMetadata.isRepeatingGroup();
-
-            // TODO: Test empty group here (no items). make sure doesn't get nullpointer exception
-            for (int i = 0; i < maxGroupRepeat; i++) {
-                Element groupElement = null;
-
-                if (isXform)
-                    groupElement = doc.createElement(itemGroup.getName());
-                else
-                    groupElement = doc.createElement(itemGroup.getOcOid());
-
-                Element repeatOrdinal = null;
-                if (isrepeating) {
-                    repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
-                    repeatOrdinal.setTextContent(String.valueOf(i + 1));
-                    groupElement.appendChild(repeatOrdinal);
-                    // add enketo related attributes
-                    groupElement.setAttribute(ENKETO_ORDINAL, String.valueOf(i + 1));
-                    groupElement.setAttribute(ENKETO_LAST_USED_ORDINAL, String.valueOf(maxGroupRepeat));
-
-                    repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
-                    repeatOrdinal.setTextContent(String.valueOf(i + 1));
-                    groupElement.appendChild(repeatOrdinal);
-                }
-                boolean hasItemData = false;
-                for (Item item : items) {
-                    // ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(),
-                    // crfVersion.getCrfVersionId());
-                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
-                    ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();// itemFormMetadataDao.findByItemCrfVersion(item.getItemId(),
-                                                                                                  // crfVersion.getCrfVersionId());
-                    Element question = null;
-                    if (crfVersion.getXform() != null && !crfVersion.getXform().equals(""))
-                        question = doc.createElement(item.getName());
-                    else
-                        question = doc.createElement(item.getOcOid());
-
-                    if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
-                        ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
-                        String itemValue = itemData.getValue();
-                        if (responseType.getResponseTypeId() == 3 || responseType.getResponseTypeId() == 7) {
-                            itemValue = itemValue.replaceAll(",", " ");
-                        }
-
-                        question.setTextContent(itemValue);
-                    }
-                    if (itemData == null || !itemData.isDeleted()) {
-                        hasItemData = true;
-                        groupElement.appendChild(question);
-                        // add the corresponding query element
-                        if (isXform) {
-                            processQueryElement(doc, item.getName(), itemData, groupElement);
-                        }
-                    }
-                } // end of item
-                if (hasItemData) {
-                    crfElement.appendChild(groupElement);
-                }
-            }
-
-        } // end of group
-
-        TransformerFactory transformFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        DOMSource source = new DOMSource(doc);
-        transformer.transform(source, result);
-        String instance = writer.toString();
         System.out.println(instance);
         return instance;
     }

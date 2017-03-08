@@ -373,11 +373,6 @@
         <servlet-name>ContactServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.login.ContactServlet</servlet-class>
     </servlet>
-    <servlet>
-        <display-name>MultiTenantServlet</display-name>
-        <servlet-name>MultiTenantServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.login.MultiTenantServlet</servlet-class>
-    </servlet>
     <!--    <servlet>
             <display-name>RequestAccountServlet</display-name>
             <servlet-name>RequestAccountServlet</servlet-name>
@@ -1615,10 +1610,6 @@
     <servlet-mapping>
         <servlet-name>ContactServlet</servlet-name>
         <url-pattern>/Contact</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>MultiTenantServlet</servlet-name>
-        <url-pattern>/MultiTenant</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ListUserAccountsServlet</servlet-name>

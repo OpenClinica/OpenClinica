@@ -7,14 +7,14 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.util.Date;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-
-import java.util.Date;
 
 /**
  * <P>
@@ -26,6 +26,7 @@ import java.util.Date;
 public class EventCRFBean extends AuditableEntityBean {
     private int studyEventId = 0;
     private int CRFVersionId = 0;
+    private int formLayoutId = 0;
     private Date dateInterviewed;
     private String interviewerName = "";
     private int completionStatusId = 0;
@@ -43,7 +44,7 @@ public class EventCRFBean extends AuditableEntityBean {
     private boolean electronicSignatureStatus = false;
     private boolean sdvStatus = false;
     private int sdvUpdateId = 0;
-    //the following are not in the table
+    // the following are not in the table
     private String studySubjectName = "";
     private String eventName = "";
     private String studyName = "";
@@ -51,7 +52,7 @@ public class EventCRFBean extends AuditableEntityBean {
 
     private StudySubjectBean studySubject;
     private StudyEventBean studyEvent;
-    
+    private FormLayoutBean formLayout;
     // the following properties are not in the table; they are meant for
     // convenience
     private CRFBean crf = new CRFBean();
@@ -93,6 +94,7 @@ public class EventCRFBean extends AuditableEntityBean {
         this.ownerId = eventCRFBean.getOwnerId();
         this.createdDate = eventCRFBean.getCreatedDate();
         this.updaterId = eventCRFBean.getUpdaterId();
+        this.formLayoutId = eventCRFBean.getFormLayoutId();
     }
 
     public EventCRFBean copy() {
@@ -392,7 +394,7 @@ public class EventCRFBean extends AuditableEntityBean {
      * The problem with the above data entry stage getter is that you can never
      * set the stage back to 'invalid'.
      *
-     *            invalidate, allowing us to invalidate the stage again
+     * invalidate, allowing us to invalidate the stage again
      */
     // public DataEntryStage getStage(boolean invalidate) {
     // if (stage != null) {
@@ -462,7 +464,8 @@ public class EventCRFBean extends AuditableEntityBean {
     }
 
     /**
-     * @param eventName the eventName to set
+     * @param eventName
+     *            the eventName to set
      */
     public void setEventName(String eventName) {
         this.eventName = eventName;
@@ -476,7 +479,8 @@ public class EventCRFBean extends AuditableEntityBean {
     }
 
     /**
-     * @param studyName the studyName to set
+     * @param studyName
+     *            the studyName to set
      */
     public void setStudyName(String studyName) {
         this.studyName = studyName;
@@ -490,7 +494,8 @@ public class EventCRFBean extends AuditableEntityBean {
     }
 
     /**
-     * @param studySubjectName the studySubjectName to set
+     * @param studySubjectName
+     *            the studySubjectName to set
      */
     public void setStudySubjectName(String studySubjectName) {
         this.studySubjectName = studySubjectName;
@@ -512,20 +517,36 @@ public class EventCRFBean extends AuditableEntityBean {
         this.sdvUpdateId = sdvUpdateId;
     }
 
-	public StudySubjectBean getStudySubject() {
-		return studySubject;
-	}
+    public StudySubjectBean getStudySubject() {
+        return studySubject;
+    }
 
-	public void setStudySubject(StudySubjectBean studySubject) {
-		this.studySubject = studySubject;
-	}
+    public void setStudySubject(StudySubjectBean studySubject) {
+        this.studySubject = studySubject;
+    }
 
-	public StudyEventBean getStudyEvent() {
-		return studyEvent;
-	}
+    public StudyEventBean getStudyEvent() {
+        return studyEvent;
+    }
 
-	public void setStudyEvent(StudyEventBean studyEvent) {
-		this.studyEvent = studyEvent;
-	}
+    public void setStudyEvent(StudyEventBean studyEvent) {
+        this.studyEvent = studyEvent;
+    }
+
+    public int getFormLayoutId() {
+        return formLayoutId;
+    }
+
+    public void setFormLayoutId(int formLayoutId) {
+        this.formLayoutId = formLayoutId;
+    }
+
+    public FormLayoutBean getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayoutBean formLayout) {
+        this.formLayout = formLayout;
+    }
 
 }

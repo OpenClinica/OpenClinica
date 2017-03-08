@@ -1,9 +1,33 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.ItemDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.Item;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.ItemMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,28 +40,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-import java.util.*;
-
-import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-
 @Component
-@Order(value=6)
+@Order(value = 6)
 public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
-    @Autowired private ItemDataDao itemDataDao;
+    @Autowired
+    private ItemDataDao itemDataDao;
 
-    @Autowired private ItemDao itemDao;
+    @Autowired
+    private ItemDao itemDao;
 
-    @Autowired private ItemGroupDao itemGroupDao;
+    @Autowired
+    private ItemGroupDao itemGroupDao;
 
-    @Autowired private ItemGroupMetadataDao itemGroupMetadataDao;
+    @Autowired
+    private ItemGroupMetadataDao itemGroupMetadataDao;
 
-    @Autowired private ItemFormMetadataDao itemFormMetadataDao;
+    @Autowired
+    private ItemFormMetadataDao itemFormMetadataDao;
 
-    @Autowired private CrfVersionDao crfVersionDao;
+    @Autowired
+    private CrfVersionDao crfVersionDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -95,8 +118,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
         return ProcessorEnum.PROCEED;
     }
 
-    private void processGroupItems(ArrayList<HashMap> listOfUploadFilePaths, HashMap<Integer,
-            Set<Integer>> groupOrdinalMapping, Node groupNode, ItemGroup itemGroup, SubmissionContainer container) throws Exception {
+    private void processGroupItems(ArrayList<HashMap> listOfUploadFilePaths, HashMap<Integer, Set<Integer>> groupOrdinalMapping, Node groupNode,
+            ItemGroup itemGroup, SubmissionContainer container) throws Exception {
         String itemName;
         String itemValue;
 
@@ -121,7 +144,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                 ItemMetadata im = itemGroupMetadataDao.findMetadataByItemCrfVersion(item.getItemId(), container.getCrfVersion().getCrfVersionId());
                 ItemGroupMetadata itemGroupMeta = im.getIgm();
                 ItemFormMetadata itemFormMetadata = im.getIfm();
-                        //ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                // ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(),
+                // crfVersion.getCrfVersionId());
                 Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(), container.getItems(), item);
 
                 // Convert space separated Enketo multiselect values to comma separated OC multiselect values
@@ -144,7 +168,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                 ordinals.add(itemOrdinal);
                 groupOrdinalMapping.put(itemGroup.getItemGroupId(), ordinals);
 
-                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container.getEventCrf(), container.getStudy(), container.getSubject(), container.getUser());
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);
                 Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
                 if (itemErrors.hasErrors()) {
                     container.getErrors().addAllErrors(itemErrors);
@@ -160,6 +184,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setStatus(Status.UNAVAILABLE);
+                    newItemData.setInstanceId(container.getInstanceId());
                     itemDataDao.saveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
@@ -176,11 +201,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
     }
 
     private boolean ShouldProcessItemNode(Node itemNode) {
-        return itemNode instanceof Element
-                && !itemNode.getNodeName().endsWith(".HEADER")
-                && !itemNode.getNodeName().endsWith(".SUBHEADER")
-                && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL")
-                && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")
+        return itemNode instanceof Element && !itemNode.getNodeName().endsWith(".HEADER") && !itemNode.getNodeName().endsWith(".SUBHEADER")
+                && !itemNode.getNodeName().equals("OC.REPEAT_ORDINAL") && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID")
                 && !itemNode.getNodeName().equals("OC.STUDY_SUBJECT_ID_CONFIRM");
     }
 
@@ -230,9 +252,10 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     itemData.setUserAccount(container.getUser());
                     itemData.setStatus(Status.AVAILABLE);
                     itemData.setUpdateId(container.getUser().getUserId());
+                    itemData.setInstanceId(container.getInstanceId());
                     itemData = itemDataDao.saveOrUpdate(itemData);
 
-                    //Close discrepancy notes
+                    // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, itemData);
                 }
             }

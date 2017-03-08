@@ -3,6 +3,6 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified" attributeFormDefault="unqualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
-   <!-- <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"   schemaLocation="xmldsig-core-schema.xsd"/> -->
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"   schemaLocation="xmldsig-core-schema.xsd"/>
 	<xs:include schemaLocation="OpenClinica-ToODM1-2-1-OC1.xsd" />
 </xs:schema>

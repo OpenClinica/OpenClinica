@@ -51,7 +51,7 @@
         <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
     </bean>
     
-    <oxm:jaxb2-marshaller id="jaxbMarshaller" context-path="org.cdisc.ns.odm.v130:org.cdisc.ns.odm.v130_api:org.cdisc.ns.odm.v130_sb:org.openclinica.ns.odm_ext_v130.v31_api:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.odm_ext_v130.v31_sb:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>
+    <oxm:jaxb2-marshaller id="jaxbMarshaller" context-path="org.cdisc.ns.odm.v130:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>
     
     <bean id="marshallingHttpMessageConverter"  class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <property name="marshaller" ref="jaxbMarshaller" />

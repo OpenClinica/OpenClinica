@@ -38,6 +38,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -56,6 +57,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -70,7 +72,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jxu
  *
- * Processes 'view subject' request
+ *         Processes 'view subject' request
  */
 public class ViewStudySubjectServlet extends SecureController {
     // The study subject has an existing discrepancy note related to their
@@ -105,7 +107,7 @@ public class ViewStudySubjectServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
-//        mayAccess();
+        // mayAccess();
         getCrfLocker().unlockAllForUser(ub.getId());
         if (ub.isSysAdmin()) {
             return;
@@ -174,12 +176,12 @@ public class ViewStudySubjectServlet extends SecureController {
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
 
-		       // if coming from change crf version -> display message
+        // if coming from change crf version -> display message
         String crfVersionChangeMsg = fp.getString("isFromCRFVersionChange");
-        if ( crfVersionChangeMsg!= null && !crfVersionChangeMsg.equals("")){
-        	addPageMessage(crfVersionChangeMsg);
+        if (crfVersionChangeMsg != null && !crfVersionChangeMsg.equals("")) {
+            addPageMessage(crfVersionChangeMsg);
 
-       }
+        }
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
             forwardPage(Page.LIST_STUDY_SUBJECTS);
@@ -200,9 +202,9 @@ public class ViewStudySubjectServlet extends SecureController {
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studyId);
-            //Check if this StudySubject would be accessed from the Current Study
-            if(studySub.getStudyId() != currentStudy.getId()){
-                if(currentStudy.getParentStudyId() > 0){
+            // Check if this StudySubject would be accessed from the Current Study
+            if (studySub.getStudyId() != currentStudy.getId()) {
+                if (currentStudy.getParentStudyId() > 0) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
                     return;
@@ -210,7 +212,8 @@ public class ViewStudySubjectServlet extends SecureController {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
                     Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
                     if (!sites.contains(study.getId())) {
-                        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                        addPageMessage(
+                                respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                         forwardPage(Page.MENU_SERVLET);
                         return;
                     }
@@ -263,7 +266,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
             request.setAttribute("subject", subject);
 
-
             /*
              * StudyDAO studydao = new StudyDAO(sm.getDataSource()); StudyBean
              * study = (StudyBean) studydao.findByPK(studyId);
@@ -288,15 +290,14 @@ public class ViewStudySubjectServlet extends SecureController {
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 
-            StudySubjectService studySubjectService = (StudySubjectService)
-                    WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
-            List<DisplayStudyEventBean> displayEvents =
-                    studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
-            for(int i = 0; i < displayEvents.size(); i++){
+            StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                    .getBean("studySubjectService");
+            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
+            for (int i = 0; i < displayEvents.size(); i++) {
                 DisplayStudyEventBean decb = displayEvents.get(i);
-                    if(!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()){
-                         decb.getStudyEvent().setEditable(false);
-                    }
+                if (!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
+                    decb.getStudyEvent().setEditable(false);
+                }
             }
             if (currentStudy.getParentStudyId() > 0) {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
@@ -310,16 +311,15 @@ public class ViewStudySubjectServlet extends SecureController {
             // date, desc
             ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-            String[] columns =
-                { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"),
+            String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"),
                     resword.getString("location"), resword.getString("status"), resword.getString("actions"), resword.getString("CRFs_atrib") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(4);
             table.hideColumnLink(5);
             if (!"removed".equalsIgnoreCase(studySub.getStatus().getName()) && !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
                 if (currentStudy.getStatus().isAvailable() && !currentRole.getRole().equals(Role.MONITOR)) {
-                    table.addLink(resword.getString("add_new_event"), "CreateNewStudyEvent?"
-                        + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
+                    table.addLink(resword.getString("add_new_event"),
+                            "CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
                 }
             }
             HashMap args = new HashMap();
@@ -396,6 +396,7 @@ public class ViewStudySubjectServlet extends SecureController {
         StudyEventDAO sedao = new StudyEventDAO(ds);
         CRFDAO cdao = new CRFDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+        FormLayoutDAO fldao = new FormLayoutDAO(ds);
         ItemDataDAO iddao = new ItemDataDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
@@ -404,11 +405,14 @@ public class ViewStudySubjectServlet extends SecureController {
 
             // populate the event CRF with its crf bean
             int crfVersionId = ecb.getCRFVersionId();
-            CRFBean cb = cdao.findByVersionId(crfVersionId);
+            int formLayoutId = ecb.getFormLayoutId();
+            CRFBean cb = cdao.findByLayoutId(formLayoutId);
             ecb.setCrf(cb);
 
             CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
             ecb.setCrfVersion(cvb);
+            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
+            ecb.setFormLayout(flb);
 
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
@@ -509,7 +513,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if (!idata.isEmpty()) {// this crf has data already
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
-               // System.out.println("added one into startedButIncompleted" + ecrf.getId());
+                // System.out.println("added one into startedButIncompleted" + ecrf.getId());
                 startedButIncompleted.put(new Integer(crfId), ecrf);
             }
         }

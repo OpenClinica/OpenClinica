@@ -10,6 +10,7 @@ public class XformItem {
     String itemDataType = null;
     String readonly = null;
     boolean calculate = false;
+    int itemOrderInForm;
 
     public String getItemPath() {
         return itemPath;
@@ -81,6 +82,14 @@ public class XformItem {
 
     public void setCalculate(boolean calculate) {
         this.calculate = calculate;
+    }
+
+    public int getItemOrderInForm() {
+        return itemOrderInForm;
+    }
+
+    public void setItemOrderInForm(int itemOrderInForm) {
+        this.itemOrderInForm = itemOrderInForm;
     }
 
 }
