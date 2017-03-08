@@ -4,6 +4,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,6 +22,7 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
 
     public static final String DEFAULT_TENANT_ID = CoreResources.getField("schema");
     public static final String CURRENT_TENANT_ID = "current_tenant_id";
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Override
     public String resolveCurrentTenantIdentifier() {
@@ -55,7 +58,7 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
         if (StringUtils.isEmpty(tenant)) {
             tenant = DEFAULT_TENANT_ID;
         }
-        System.out.println("Returning default tenant:" + tenant);
+        logger.debug("Returning default tenant:" + tenant);
         return tenant;
     }
 

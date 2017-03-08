@@ -474,7 +474,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
 
-        System.out.println("**********Using schema:" + schema);
+        logger.debug("Using schema in CoreResources:schema:" + schema);
         if (conn.getSchema().equalsIgnoreCase(schema))
             return;
         try {

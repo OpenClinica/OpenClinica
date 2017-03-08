@@ -8,6 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +31,8 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
 @Component
 public class MultiTenantFilter implements Filter {
 
-    //@Value("${multitenant.tenantKey}")
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static String tenantKey = CURRENT_TENANT_ID;
-
-    //@Value("${multitenant.defaultTenant}")
     public static String defaultTenant = DEFAULT_TENANT_ID;
 
     @Override
@@ -62,13 +62,13 @@ public class MultiTenantFilter implements Filter {
                         tenant = path.substring(path.lastIndexOf("/") + 1);
                     } else if (path.endsWith("/protocol/build")) {
                         req.setAttribute("requestSchema", "public");
-                        System.out.println("Comes here");
+                        logger.debug("Request schema is set to 'public'");
                     } else if (path.endsWith("/ListStudy") || path.endsWith("/ChangeStudy")) {
                         req.setAttribute("requestSchema", "public");
-                        System.out.println("Comes here");
+                        logger.debug("Request schema is set to 'public'");
                     }
                     if (StringUtils.isNotEmpty(tenant)) {
-                        System.out.println("Returning tenant:" + tenant);
+                        logger.debug("Returning tenant:" + tenant);
 
                         if (session != null) {
                             session.setAttribute("study", null);

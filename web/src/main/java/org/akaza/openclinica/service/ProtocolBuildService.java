@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.slf4j.Logger;
@@ -17,5 +18,5 @@ import static org.akaza.openclinica.service.crfdata.EnketoUrlService.FS_QUERY_AT
  */
 public interface ProtocolBuildService {
     Logger logger = LoggerFactory.getLogger(ProtocolBuildService.class);
-    public String process(String name, String uniqueId, HttpServletRequest request);
+    public String process(String name, String uniqueId, UserAccountBean ub);
 }

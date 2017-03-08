@@ -7,6 +7,8 @@ import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTen
 import org.hibernate.service.spi.ServiceRegistryAwareService;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.service.spi.Stoppable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -17,6 +19,7 @@ import java.sql.SQLException;
 public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl
 		implements ServiceRegistryAwareService, Stoppable {
 
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private BasicDataSource dataSource;
 
@@ -30,7 +33,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDa
     }
 	@Override public Connection getConnection(String tenantIdentifier) throws SQLException {
 		Connection conn = super.getConnection(tenantIdentifier);
-		System.out.println("*************************Tenant schema:" + tenantIdentifier);
+		logger.debug("Tenant schema:" + tenantIdentifier);
 		conn.setSchema(tenantIdentifier);
 		return conn;
 	}
@@ -39,7 +42,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDa
         final Object dataSourceConfigValue = serviceRegistry.getService( ConfigurationService.class )
                 .getSettings()
                 .get( AvailableSettings.DATASOURCE );
-        System.out.println("class" + dataSourceConfigValue.getClass().toString());
+	    logger.debug("using datasource class" + dataSourceConfigValue.getClass().toString());
         dataSource = (BasicDataSource) dataSourceConfigValue;
     }
 

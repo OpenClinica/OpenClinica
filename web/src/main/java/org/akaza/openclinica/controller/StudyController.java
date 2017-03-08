@@ -3,7 +3,6 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.ErrorObject;
 import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
 import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
@@ -13,69 +12,42 @@ import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.EventDefinitionDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
 import org.akaza.openclinica.service.ProtocolBuildService;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.httpclient.HttpStatus;
-import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
-import java.math.BigInteger;
-import java.text.MessageFormat;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-
-import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
@@ -84,8 +56,12 @@ public class StudyController {
 	@Autowired
 	@Qualifier("dataSource")
 	private BasicDataSource dataSource;
-	@Autowired ProtocolBuildService protocolBuildService;
-	@Autowired LiquibaseOnDemandService liquibaseOnDemandService;
+	@Autowired
+	private StudyDao studyDao;
+	@Autowired
+	private ProtocolBuildService protocolBuildService;
+	@Autowired
+	private LiquibaseOnDemandService liquibaseOnDemandService;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -428,7 +404,7 @@ public class StudyController {
         ArrayList<ErrorObject> errorObjects = new ArrayList();
 	    StudyDTO studyDTO = new StudyDTO();
         StudyBean studyBean = null;
-        System.out.println("I'm in Create Study");
+        logger.info("In Create Study");
         ResponseEntity<Object> response = null;
 
         String validation_failed_message = "VALIDATION FAILED";
@@ -443,58 +419,55 @@ public class StudyController {
 		    errorObjects.add(errorOBject);
 
 	    }
+	    if (uniqueProtocolID == null) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+		    errorObjects.add(errorOBject);
+	    } else {
+		    uniqueProtocolID = uniqueProtocolID.trim();
+	    }
+	    if (name == null) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
+		    errorObjects.add(errorOBject);
+	    } else {
+		    name = name.trim();
+	    }
+	    Locale locale = new Locale("en_US");
+	    request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+	    ResourceBundleProvider.updateLocale(locale);
+	    request.setAttribute("uniqueProId", uniqueProtocolID);
+	    request.setAttribute("name", name); // Brief Title
+	    Validator v0 = new Validator(request);
+	    v0.addValidation("name", Validator.NO_BLANKS);
+	    HashMap vError0 = v0.validate();
+	    if (!vError0.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
+		    errorObjects.add(errorOBject);
+	    }
 
-        String schema = protocolBuildService.process(uniqueProtocolID, name, request);
-	    Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID, request);
+	    Validator v1 = new Validator(request);
+	    v1.addValidation("uniqueProId", Validator.NO_BLANKS);
+	    HashMap vError1 = v1.validate();
+	    if (!vError1.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+		    errorObjects.add(errorOBject);
+	    }
+
+	    Validator v6 = new Validator(request);
+	    HashMap vError6 = v6.validate();
+	    if (uniqueProtocolID != null)
+		    validateUniqueProId(request, vError6);
+	    if (!vError6.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+		    errorObjects.add(errorOBject);
+	    }
 
 
-        if (uniqueProtocolID == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
-            errorObjects.add(errorOBject);
-        } else {
-            uniqueProtocolID = uniqueProtocolID.trim();
-        }
-        if (name == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
-            errorObjects.add(errorOBject);
-        } else {
-            name = name.trim();
-        }
+	    studyDTO.setErrors(errorObjects);
 
-        Validator v0 = new Validator(request);
-        v0.addValidation("name", Validator.NO_BLANKS);
-        HashMap vError0 = v0.validate();
-        if (!vError0.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
-            errorObjects.add(errorOBject);
-        }
+	    String schema = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+		Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID, ownerUserAccount);
 
-        Validator v1 = new Validator(request);
-        v1.addValidation("uniqueProId", Validator.NO_BLANKS);
-        HashMap vError1 = v1.validate();
-        if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v6 = new Validator(request);
-        HashMap vError6 = v6.validate();
-        if (uniqueProtocolID != null)
-            validateUniqueProId(request, vError6);
-        if (!vError6.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v7 = new Validator(request);
-        v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
-        HashMap vError7 = v7.validate();
-        if (!vError7.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
-            errorObjects.add(errorOBject);
-        }
-
-        studyDTO.setErrors(errorObjects);
+	    logger.debug("returning from liquibase study:" + study.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
             studyDTO.setMessage(validation_failed_message);
@@ -503,10 +476,12 @@ public class StudyController {
 
             studyDTO.setStudyOid(study.getOc_oid());
             studyDTO.setMessage(validation_passed_message);
+	        studyDTO.setUniqueProtocolID(study.getUniqueIdentifier());
+	        logger.debug("study oc_id:" + study.getOc_oid());
 
             StudyUserRoleBean sub = new StudyUserRoleBean();
             sub.setRole(Role.COORDINATOR);
-            sub.setStudyId(study.getId());
+            sub.setStudyId(study.getStudyId());
             sub.setStatus(Status.AVAILABLE);
             sub.setOwner(ownerUserAccount);
             StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
@@ -521,6 +496,152 @@ public class StudyController {
         return response;
 
     }
+
+	@RequestMapping(value = "/asyncProtocolStatus", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAyncProtocolStatus(HttpServletRequest request, @RequestParam("uniqueId") String uniqueId) throws Exception {
+		ResponseEntity<Object> response = null;
+		AsyncStudyHelper asyncStudyHelper = AsyncStudyHelper.asyncStudyMap.get(uniqueId);
+		if (asyncStudyHelper != null) {
+			response = new ResponseEntity<Object>(asyncStudyHelper, HttpStatus.OK);
+		} else {
+			// database lookup
+			Study s = studyDao.findByColumnName(uniqueId, "uniqueIdentifier");
+			HttpStatus httpStatus;
+			if (s != null && StringUtils.isNotEmpty(s.getSchemaName())) {
+				if (studyDao.doesProtocolExist(uniqueId, s.getSchemaName())) {
+					asyncStudyHelper = new AsyncStudyHelper("Protocol Found", "ACTIVE");
+					httpStatus = HttpStatus.OK;
+				} else {
+					asyncStudyHelper = new AsyncStudyHelper("Protocol Not Found", "ERROR");
+					httpStatus = HttpStatus.NOT_FOUND;
+				}
+			} else {
+				asyncStudyHelper = new AsyncStudyHelper("Protocol Not Found", "ERROR");
+				httpStatus = HttpStatus.NOT_FOUND;
+			}
+			response = new ResponseEntity<Object>(asyncStudyHelper, httpStatus);
+		}
+
+		return response;
+	}
+
+	@RequestMapping(value = "/createStudyAsync", method = RequestMethod.POST)
+	public ResponseEntity<Object> createNewSkeletonStudyAsync(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
+		ArrayList<ErrorObject> errorObjects = new ArrayList();
+		StudyDTO studyDTO = new StudyDTO();
+		StudyBean studyBean = null;
+		logger.info("In Create Study");
+		ResponseEntity<Object> response = null;
+
+		String validation_failed_message = "VALIDATION FAILED";
+		String validation_passed_message = "SUCCESS";
+
+		String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+		String name = (String) map.get("briefTitle");
+
+		UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+		if (ownerUserAccount == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
+			errorObjects.add(errorOBject);
+
+		}
+		if (uniqueProtocolID == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+			errorObjects.add(errorOBject);
+		} else {
+			uniqueProtocolID = uniqueProtocolID.trim();
+		}
+		if (name == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
+			errorObjects.add(errorOBject);
+		} else {
+			name = name.trim();
+		}
+		Locale locale = new Locale("en_US");
+		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+		ResourceBundleProvider.updateLocale(locale);
+		request.setAttribute("uniqueProId", uniqueProtocolID);
+		request.setAttribute("name", name); // Brief Title
+		Validator v0 = new Validator(request);
+		v0.addValidation("name", Validator.NO_BLANKS);
+		HashMap vError0 = v0.validate();
+		if (!vError0.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v1 = new Validator(request);
+		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
+		HashMap vError1 = v1.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v6 = new Validator(request);
+		HashMap vError6 = v6.validate();
+		if (uniqueProtocolID != null)
+			validateUniqueProId(request, vError6);
+		if (!vError6.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+			errorObjects.add(errorOBject);
+		}
+
+		studyDTO.setErrors(errorObjects);
+		if (errorObjects != null && errorObjects.size() != 0) {
+			studyDTO.setMessage(validation_failed_message);
+			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+		} else {
+			String studyLink = StringUtils.replace(request.getRequestURL().toString(),
+					"createStudyAsync", "asyncProtocolStatus?uniqueId=" + uniqueProtocolID);
+			studyDTO.setUniqueProtocolID(studyLink);
+			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.SEE_OTHER);
+		}
+		final String protocolId = uniqueProtocolID;
+		final String studyName = name;
+		// Lambda Runnable
+		Runnable studyTask = () -> {
+			AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING");
+			AsyncStudyHelper.asyncStudyMap.put(protocolId, asyncStudyHelper);
+			processStudyAsync(request, errorObjects, studyDTO, validation_failed_message,
+					validation_passed_message, protocolId, studyName,
+					ownerUserAccount);
+			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
+			AsyncStudyHelper.asyncStudyMap.put(protocolId, asyncStudyDone);
+		};
+		new Thread(studyTask).start();
+		return response;
+	}
+
+	private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, ArrayList<ErrorObject> errorObjects, StudyDTO studyDTO,
+			String validation_failed_message, String validation_passed_message, String uniqueProtocolID, String name, UserAccountBean ownerUserAccount) {
+		ResponseEntity<Object> response;
+		Locale locale = new Locale("en_US");
+		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+		ResourceBundleProvider.updateLocale(locale);
+		String schema = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
+		AsyncStudyHelper.asyncStudyMap.put(uniqueProtocolID, asyncStudyHelper);
+		Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID,ownerUserAccount);
+
+		logger.debug("returning from liquibase study:" + study.getStudyId());
+		logger.debug("study oc_id:" + study.getOc_oid());
+
+		StudyUserRoleBean sub = new StudyUserRoleBean();
+		sub.setRole(Role.COORDINATOR);
+		sub.setStudyId(study.getStudyId());
+		sub.setStatus(Status.AVAILABLE);
+		sub.setOwner(ownerUserAccount);
+		StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+		ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+		responseSuccess.setMessage(validation_passed_message);
+		responseSuccess.setStudyOid(study.getOc_oid());
+		responseSuccess.setUniqueProtocolID(uniqueProtocolID);
+		responseSuccess.setSchemaName(schema);
+		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+
+		return response;
+	}
 
 	/**
 	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site

@@ -123,8 +123,7 @@ public class UserAccountController {
 
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
 	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
-		logger.info("I'm in createUserAccount");
-		System.out.println("I'm in createUserAccount");
+		logger.info("In createUserAccount");
 		uBean = null;
 
 		String username = map.get("username");
@@ -145,7 +144,6 @@ public class UserAccountController {
 		request.setAttribute("study_name", studyName);
 		request.setAttribute("role_name", roleName);
 
-		// UserAccountBean ownerUserAccount = getUserAccountByApiKey(apiKey);
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (!ownerUserAccount.isActive() && (!ownerUserAccount.isTechAdmin() || !ownerUserAccount.isSysAdmin())) {
 			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
@@ -155,26 +153,25 @@ public class UserAccountController {
 
 		// generate password
 		String password = ""; // generate
-		String passwordHash = UserAccountBean.LDAP_PASSWORD;
 		SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
 		password = secm.genPassword();
-		passwordHash = secm.encrytPassword(password, null);
+		String passwordHash = secm.encrytPassword(password, null);
 
 		// Validate Entry Fields
-        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), new Locale("en_US"));
-		Validator v = new Validator(request);
+        Locale locale = new Locale("en_US");
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+        ResourceBundleProvider.updateLocale(locale);
+        Validator v = new Validator(request);
 		addValidationToFields(v, username);
 		HashMap errors = v.validate();
 		if (!errors.isEmpty()) {
-			logger.info("Validation Error: " + errors.toString());
-			System.out.println("Validation Error: " + errors.toString());
+			logger.error("Validation Error: " + errors.toString());
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
 		StudyBean study = getStudyByName(studyName);
 		if (!study.isActive()) {
-			logger.info("The Study Name is not Valid");
-			System.out.println("The Study Name is not Valid");
+			logger.error("The Study Name is not Valid");
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
@@ -193,8 +190,7 @@ public class UserAccountController {
 		}
 
 		if (!found) {
-			logger.info("The Role is not a Valid Role for the Study or Site");
-			System.out.println("The Role is not a Valid Role for the Study or Site");
+			logger.error("The Role is not a Valid Role for the Study or Site");
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 
@@ -212,9 +208,7 @@ public class UserAccountController {
 		}
 
 		if (!found) {
-			logger.info("The Type is not a Valid User Type");
-			System.out.println("The Type is not a Valid User Type");
-
+			logger.error("The Type is not a Valid User Type");
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
 		// build UserName

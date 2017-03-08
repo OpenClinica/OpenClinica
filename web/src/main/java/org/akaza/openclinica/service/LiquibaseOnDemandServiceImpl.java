@@ -5,10 +5,10 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
+import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +18,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
 /**
  * Created by yogi on 2/23/17.
@@ -39,7 +34,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
     private StudyDao studyDao;
     @Autowired
     private StudyUserRoleDao studyUserRoleDao;
-    public Study process(String schemaName, String name, String uniqueId, String ocId, HttpServletRequest request) {
+    public Study process(String schemaName, String name, String uniqueId, String ocId, UserAccountBean ub) {
         Study schemaStudy = null;
         Session session = studyDao.getSessionFactory().getCurrentSession();
 
@@ -49,13 +44,15 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemas.add(schemaName);
             liquibase.setSchemas(schemas);
             liquibase.dynamicAfterPropertiesSet(schemas);
+            AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Created schema for this protocol", "PENDING");
+            AsyncStudyHelper.asyncStudyMap.put(uniqueId, asyncStudyHelper);
         } catch (Exception e) {
             System.out.println("Error while creating a schema error 3");
             e.printStackTrace();
             return schemaStudy;
         }
+
         try {
-            request.setAttribute("requestSchema", schemaName);
             schemaStudy = new Study();
             schemaStudy.setName(name);
             schemaStudy.setUniqueIdentifier(uniqueId);
@@ -63,11 +60,8 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             ((SessionImpl) session).connection().setSchema(schemaName);
             Integer studyId = (Integer) studyDao.save(schemaStudy);
-            HttpSession httpSession = request.getSession();
-            if (httpSession == null) {
-                System.out.println("Session cannot be null");
-            }
-            UserAccountBean ub = (UserAccountBean) httpSession.getAttribute(USER_BEAN_NAME);
+            AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
+            AsyncStudyHelper.asyncStudyMap.put(uniqueId, asyncStudyHelper);
             StudyUserRole studyUserRole = new StudyUserRole();
             StudyUserRoleId userRoleId = new StudyUserRoleId();
             studyUserRole.setId(userRoleId);
@@ -78,6 +72,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             userRoleId.setDateCreated(new Date());
             userRoleId.setStatusId(org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
             studyUserRoleDao.save(studyUserRole);
+            System.out.println("liquibase: studyId" + studyId);
         } catch (Exception e) {
             e.printStackTrace();
         }

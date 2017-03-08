@@ -29,7 +29,7 @@ public class ProtocolBuildController {
 			HttpServletResponse response)
 	{
 		System.out.println("name:" + name + " id: " + id);
-		String schemaneName = protocolBuildService.process(name, id, request);
-		liquibaseOnDemandService.process(schemaneName, name, id, id, request);
+	//	String schemaneName = protocolBuildService.process(name, id, request);
+	//	liquibaseOnDemandService.process(schemaneName, name, id, id, request);
 	}
 }

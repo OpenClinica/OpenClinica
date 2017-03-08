@@ -62,7 +62,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
     @Autowired
     private StudyUserRoleDao studyUserRoleDao;
 
-    public String process(String name, String uniqueId, HttpServletRequest request) {
+    public String process(String name, String uniqueId, UserAccountBean ub) {
         Session session = studyDao.getSessionFactory().getCurrentSession();
         String schemaName = null;
         try {
@@ -80,11 +80,6 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             schemaName = "tenant" + schemaId;
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);
-            HttpSession httpSession = request.getSession();
-            if (httpSession == null) {
-                System.out.println("Session cannot be null");
-            }
-            UserAccountBean ub = (UserAccountBean) httpSession.getAttribute(USER_BEAN_NAME);
             StudyUserRole studyUserRole = new StudyUserRole();
             StudyUserRoleId userRoleId = new StudyUserRoleId();
             studyUserRole.setId(userRoleId);

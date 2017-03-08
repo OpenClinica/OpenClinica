@@ -36,11 +36,12 @@ public class StudyOidGenerator extends OidGenerator implements Serializable {
     	String oid = "S_";
         String uniqueProtocolID = keys[0];
         uniqueProtocolID = truncateTo8Chars(capitalize(stripNonAlphaNumeric(uniqueProtocolID)));
-
+        System.out.println("*****unique id:" + uniqueProtocolID);
         if (uniqueProtocolID.length() == 0) {
             uniqueProtocolID = randomizeOid("");
         }
         oid = oid + uniqueProtocolID;
+        System.out.println("****oid=" + oid);
         return oid;
     }
 
