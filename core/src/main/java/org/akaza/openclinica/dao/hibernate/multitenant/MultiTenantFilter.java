@@ -3,27 +3,16 @@ package org.akaza.openclinica.dao.hibernate.multitenant;
 /**
  * Created by yogi on 2/1/17.
  */
-import org.akaza.openclinica.core.form.StringUtil;
-import org.apache.commons.io.IOUtils;
+
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Iterator;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.DEFAULT_TENANT_ID;
@@ -58,12 +47,7 @@ public class MultiTenantFilter implements Filter {
             } else {
                 String path = req.getRequestURI();
                 if (StringUtils.isNotEmpty(path)) {
-                    if (path.endsWith("/schema/tenant") || path.contains("/schema/public")) {
-                        tenant = path.substring(path.lastIndexOf("/") + 1);
-                    } else if (path.endsWith("/protocol/build")) {
-                        req.setAttribute("requestSchema", "public");
-                        logger.debug("Request schema is set to 'public'");
-                    } else if (path.endsWith("/ListStudy") || path.endsWith("/ChangeStudy")) {
+                    if (path.endsWith("/ListStudy") || path.endsWith("/ChangeStudy")) {
                         req.setAttribute("requestSchema", "public");
                         logger.debug("Request schema is set to 'public'");
                     }

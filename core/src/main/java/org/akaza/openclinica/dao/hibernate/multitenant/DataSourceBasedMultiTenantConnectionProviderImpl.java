@@ -20,7 +20,6 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDa
 		implements ServiceRegistryAwareService, Stoppable {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
 	private BasicDataSource dataSource;
 
 

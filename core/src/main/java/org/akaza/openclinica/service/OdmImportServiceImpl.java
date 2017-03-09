@@ -1,35 +1,11 @@
 package org.akaza.openclinica.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.hibernate.CrfDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
@@ -37,16 +13,7 @@ import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Crf;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.fileupload.FileItem;
-import org.cdisc.ns.odm.v130.EventType;
-import org.cdisc.ns.odm.v130.ODM;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionGlobalVariables;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionMetaDataVersion;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudy;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventDef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventRef;
-import org.cdisc.ns.odm.v130.YesOrNo;
+import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionEventDefinitionDetails;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
@@ -57,6 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class OdmImportServiceImpl implements OdmImportService {
     public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";

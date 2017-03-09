@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +26,19 @@ public class OCMultiTenantSpringLiquibase extends MultiTenantSpringLiquibase {
     public void afterPropertiesSet() throws Exception {
         List<String> schemas = new ArrayList<>();
         schemas.add("public");
-        ArrayList<Study> studies = studyDao.findAll();
-        for (Study study: studies) {
-            if (StringUtils.isNotEmpty(study.getSchemaName())) {
-                logger.info("Adding a schema:" + study.getSchemaName() + " to Liquibase");
-                schemas.add(study.getSchemaName());
+        ArrayList<Study> studies = null;
+        try {
+            studies = studyDao.findAll();
+            for (Study study: studies) {
+                if (StringUtils.isNotEmpty(study.getSchemaName())) {
+                    logger.info("Adding a schema:" + study.getSchemaName() + " to Liquibase");
+                    schemas.add(study.getSchemaName());
+                }
             }
+        } catch (Exception e) {
+            logger.info("There are no tables created as of yet");
         }
+
         super.setSchemas(schemas);
         super.afterPropertiesSet();
     }

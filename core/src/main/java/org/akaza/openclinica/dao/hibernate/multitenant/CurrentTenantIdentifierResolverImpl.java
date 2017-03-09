@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.hibernate.multitenant;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
@@ -9,11 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 /**
  * Created by yogi on 1/16/17.

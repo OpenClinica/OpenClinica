@@ -3,19 +3,11 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.ErrorObject;
-import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
-import org.akaza.openclinica.bean.login.SiteDTO;
-import org.akaza.openclinica.bean.login.StudyDTO;
-import org.akaza.openclinica.bean.login.EventDefinitionDTO;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.login.UserRole;
+import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -25,10 +17,8 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
 import org.akaza.openclinica.service.ProtocolBuildService;
-import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +29,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
