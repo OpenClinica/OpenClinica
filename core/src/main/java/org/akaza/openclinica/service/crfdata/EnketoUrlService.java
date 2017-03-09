@@ -49,6 +49,7 @@ import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ResponseType;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -147,6 +148,9 @@ public class EnketoUrlService {
     @Autowired
     private XformParserHelper xformParserHelper;
 
+    @Autowired
+    private EnketoCredentials enketoCredentials;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -157,6 +161,8 @@ public class EnketoUrlService {
     public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor)
             throws Exception {
         // Call Enketo api to get edit url
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
         return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
 
@@ -164,6 +170,8 @@ public class EnketoUrlService {
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
             StudyEvent studyEvent, String flavor) throws Exception {
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
 
         String editURL = null;
         StudyEventDefinition eventDef;
@@ -250,7 +258,6 @@ public class EnketoUrlService {
             }
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
-
             DateTime dateTime = new DateTime(dn.getDateCreated());
             String dt = dateTime.toString();
             dt = dt.replaceAll("T", " ");
@@ -259,7 +266,6 @@ public class EnketoUrlService {
             query.setNotify(false);
             query.setType(COMMENT);
             queryBeans.add(query);
-
         }
         // logs.add(logBean);
         queryElement.setQueries(queryBeans);
