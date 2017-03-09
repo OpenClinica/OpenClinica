@@ -852,6 +852,14 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+            <id>openclinica.jfrog.io-libs-release</id>
+            <name>openclinica.jfrog.io-libs-release</name>
+            <url>https://openclinica.jfrog.io/openclinica/libs-release</url>
+        </repository>
+         <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
             <id>central</id>
             <name>libs-release</name>
             <url>http://dev.openclinica.com/artifactory/libs-release</url>
