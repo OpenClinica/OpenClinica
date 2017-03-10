@@ -11,6 +11,10 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>auth0-spring-security-mvc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>OpenClinica-core</artifactId>
         </dependency>
