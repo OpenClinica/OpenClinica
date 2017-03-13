@@ -226,7 +226,7 @@
 			WHERE ua.user_name=sur.user_name
 			AND (sur.study_id=s.study_id)
 			AND ua.status_id=1
-			AND sur.status_id!=0
+			AND sur.status_id IN (1,5,7)
 			AND (s.study_id=? OR s.parent_study_id=?)
 			AND  ua.user_name NOT LIKE '%.SS_%'
 			ORDER BY ua.date_created ASC
