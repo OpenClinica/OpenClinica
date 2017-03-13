@@ -212,15 +212,15 @@
 							<c:if test="${column.showLink}"><a href="<c:out value="${orderByQuery}"/>"></c:if>
             <%-- Alter header format to reduce table space--%>
             <c:choose>
-            	<c:when test="${column.name eq 'Date Updated'}">
-					<fmt:message key="date_br_updated" bundle="${resword}"/>
-            	</c:when>
-            	<c:when test="${column.name eq 'Last Updated by'}">
-					<fmt:message key="last_br_updated_by" bundle="${resword}"/>
-            	</c:when>
-            	<c:when test="${column.name eq 'Date Created'}">
-					<fmt:message key="date_br_created" bundle="${resword}"/>
-            	</c:when>
+							<c:when test="${column.name eq 'Date Updated'}">
+								<c:out value="Date<br />Updated" escapeXml="false" />
+							</c:when>
+							<c:when test="${column.name eq 'Last Updated by'}">
+								<c:out value="Last<br /> Updated by" escapeXml="false" />
+							</c:when>
+							<c:when test="${column.name eq 'Date Created'}">
+								<c:out value="Date<br />Created" escapeXml="false" />
+							</c:when>
             	<c:otherwise>
             		<c:out value="${column.name}" />
             	</c:otherwise>

@@ -160,7 +160,7 @@
 
 <div class="table_title_Admin">
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');">
-    <img name="ExpandGroup5" src="images/bt_Expand.gif" border="0">&nbsp;Study Event </a></a></div>
+    <img name="ExpandGroup5" src="images/bt_Expand.gif" border="0">&nbsp;<fmt:message key="study_event" bundle="${resword}"/> </a></a></div>
 
  <div id="globalRecord" style="display:">
   <div style="width: 350px">

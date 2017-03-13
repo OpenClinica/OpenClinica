@@ -6,6 +6,7 @@
 <jsp:useBean scope="request" id="sec" class="org.akaza.openclinica.bean.submit.SectionBean"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -60,7 +61,7 @@
 
 <c:if test="${studySubject != null && studySubject.id>0}">
     <p>
-    <div class="homebox_bullets"><a href="ViewEventCRF?id=<c:out value="${EventCRFBean.id}"/>&studySubId=<c:out value="${studySubject.id}"/>">View Event CRF Properties</a></div>
+    <div class="homebox_bullets"><a href="ViewEventCRF?id=<c:out value="${EventCRFBean.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"><fmt:message key="view_event_CRF_properties" bundle="${resworkflow}"/></a></div>
     <p>
     <p>
     <div class="homebox_bullets" style="width:117px">

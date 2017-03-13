@@ -316,10 +316,10 @@ function notSelectAll() {
 
       	<c:when test="${!status.last}"></c:when>
       	<c:when test="${meta.required}">
-        	Yes
+          <fmt:message key="yes" bundle="${resword}"/>
       	</c:when>
       	<c:otherwise>
-        	No
+          <fmt:message key="no" bundle="${resword}"/>
       	</c:otherwise>
 
     </c:choose>

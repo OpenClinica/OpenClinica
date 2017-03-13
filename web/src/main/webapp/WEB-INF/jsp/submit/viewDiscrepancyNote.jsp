@@ -132,13 +132,13 @@
                         </c:otherwise>
                     </c:choose></b>
                 </td>
-                <td class="table_cell_noborder" padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                <td class="table_cell_noborder"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                 <td class="table_cell_noborder">
                     <b><c:choose>
                         <c:when test="${crf != null}">
                             <c:out value="${crf.name}"/>
                         </c:when>
-                        <c:otherwise>N/A
+                        <c:otherwise><fmt:message key="n_a" bundle="${resword}"/>
                         </c:otherwise>
                     </c:choose></b>
                 </td>
@@ -146,7 +146,7 @@
             	<tr>
             	<td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                 <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
-                <td class="table_cell_noborder" padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                <td class="table_cell_noborder"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                 <td class="table_cell_noborder">
                 <c:choose>
                 <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
