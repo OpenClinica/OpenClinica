@@ -81,7 +81,7 @@
                    <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                    <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                    <c:out value="${studyRole.studyName}"/>
-                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
+                       <c:if test="${statusId==4}">(<fmt:message key="design" bundle="${resword}"/>)&nbsp;</c:if>
                        (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
                </c:if>
@@ -110,7 +110,7 @@
                   <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                       <c:out value="${studyRole.studyName}"/>
-                      <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
+                      <c:if test="${statusId==4}">(<fmt:message key="design" bundle="${resword}"/>)&nbsp;</c:if>
                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
