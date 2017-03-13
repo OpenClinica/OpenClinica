@@ -158,6 +158,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected HttpServletResponse response;
     protected UserAccountBean ub;
     protected StudyBean currentStudy;
+    protected StudyBean currentPublicStudy;
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
     protected UserAccountDao userDaoDomain;
@@ -390,6 +391,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
         currentStudy = (StudyBean) session.getAttribute("study");
+        currentPublicStudy  = (StudyBean) session.getAttribute("publicStudy");
         currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
@@ -424,49 +426,56 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             session.setAttribute("userBean", ub);
 
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            if (currentStudy == null || currentStudy.getId() <= 0) {
+            if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-                    currentStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
+                    currentPublicStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
 
-                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
+                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentPublicStudy);
 
-                    currentStudy.setStudyParameters(studyParameters);
+                    currentPublicStudy.setStudyParameters(studyParameters);
 
                     StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-                    if (currentStudy.getParentStudyId() <= 0) {// top study
-                        scs.setParametersForStudy(currentStudy);
+                    if (currentPublicStudy.getParentStudyId() <= 0) {// top study
+                        scs.setParametersForStudy(currentPublicStudy);
 
                     } else {
                         // YW <<
-                        currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
+                        currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
                         // YW >>
-                        scs.setParametersForSite(currentStudy);
+                        scs.setParametersForSite(currentPublicStudy);
                     }
 
                     // set up the panel here, tbh
                     panel.reset();
                     /*
-                     * panel.setData("Study", currentStudy.getName()); panel.setData("Summary", currentStudy.getSummary());
-                     * panel.setData("Start Date", sdf.format(currentStudy.getDatePlannedStart())); panel.setData("End Date",
-                     * sdf.format(currentStudy.getDatePlannedEnd())); panel.setData("Principal Investigator",
-                     * currentStudy.getPrincipalInvestigator());
+                     * panel.setData("Study", currentPublicStudy.getName()); panel.setData("Summary", currentPublicStudy.getSummary());
+                     * panel.setData("Start Date", sdf.format(currentPublicStudy.getDatePlannedStart())); panel.setData("End Date",
+                     * sdf.format(currentPublicStudy.getDatePlannedEnd())); panel.setData("Principal Investigator",
+                     * currentPublicStudy.getPrincipalInvestigator());
                      */
                     session.setAttribute(STUDY_INFO_PANEL, panel);
                 } else {
-                    currentStudy = new StudyBean();
+                    currentPublicStudy = new StudyBean();
                 }
+                session.setAttribute("publicStudy", currentPublicStudy);
+                request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+                currentStudy = (StudyBean) sdao.findByUniqueIdentifier(currentPublicStudy.getIdentifier());
+                request.setAttribute("requestSchema", "public");
                 session.setAttribute("study", currentStudy);
-            } else if (currentStudy.getId() > 0) {
+            } else if (currentPublicStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
-                if (currentStudy.getParentStudyId() > 0) {
+                if (currentPublicStudy.getParentStudyId() > 0) {
+                    currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
+                    request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
+                    request.setAttribute("requestSchema", "public");
                 }
                 // YW >>
             }
 
-            if (currentStudy.getParentStudyId() > 0) {
+            if (currentPublicStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user logged in at study lever or site level.
                  * issue-2422
@@ -527,15 +536,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
 
             if (currentRole == null || currentRole.getId() <= 0) {
-                // if (ub.getId() > 0 && currentStudy.getId() > 0) {
+                // if (ub.getId() > 0 && currentPublicStudy.getId() > 0) {
                 // if current study has been "removed", current role will be
                 // kept as "invalid" -- YW 06-21-2007
-                if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
-                    currentRole = ub.getRoleByStudy(currentStudy.getId());
-                    if (currentStudy.getParentStudyId() > 0) {
-                        // Checking if currentStudy has been removed or not will
+                if (ub.getId() > 0 && currentPublicStudy.getId() > 0 && !currentPublicStudy.getStatus().getName().equals("removed")) {
+                    currentRole = ub.getRoleByStudy(currentPublicStudy.getId());
+                    if (currentPublicStudy.getParentStudyId() > 0) {
+                        // Checking if currentPublicStudy has been removed or not will
                         // ge good enough -- YW 10-17-2007
-                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getParentStudyId());
+                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentPublicStudy.getParentStudyId());
                         // inherited role from parent study, pick the higher
                         // role
                         currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
@@ -548,7 +557,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             // YW << For the case that current role is not "invalid" but current
             // active study has been removed.
-            else if (currentRole.getId() > 0 && (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(Status.AUTO_DELETED))) {
+            else if (currentRole.getId() > 0 && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
                 currentRole.setRole(Role.INVALID);
                 currentRole.setStatus(Status.DELETED);
                 session.setAttribute("userRole", currentRole);
@@ -580,6 +589,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut();
             }
+            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
             mayProceed();
       //      pingJobServer(request);
             processRequest();
@@ -901,7 +911,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
         } else {
             parentStudyId = currentStudy.getId();
-            studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentStudy);
+            studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentPublicStudy);
         }
 
         for (int i = 0; i < studyGroupClasses.size(); i++) {
@@ -1129,7 +1139,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
             int subjectId = note.getEntityId();
-            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentPublicStudy);
             note.setSubjectName(ss.getName());
         }
 

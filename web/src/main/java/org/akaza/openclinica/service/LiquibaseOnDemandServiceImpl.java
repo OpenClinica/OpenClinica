@@ -49,7 +49,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             liquibase.setSchemas(schemas);
             liquibase.dynamicAfterPropertiesSet(schemas);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Created schema for this protocol", "PENDING");
-            AsyncStudyHelper.asyncStudyMap.put(uniqueId, asyncStudyHelper);
+            AsyncStudyHelper.put(uniqueId, asyncStudyHelper);
         } catch (Exception e) {
             logger.error("Error while creating a liquibase schema:" + schemaName);
             logger.error(e.getMessage(), e);
@@ -65,7 +65,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaServiceDao.setConnectionSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(schemaStudy);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
-            AsyncStudyHelper.asyncStudyMap.put(uniqueId, asyncStudyHelper);
+            AsyncStudyHelper.put(uniqueId, asyncStudyHelper);
             StudyUserRole studyUserRole = new StudyUserRole();
             StudyUserRoleId userRoleId = new StudyUserRoleId();
             studyUserRole.setId(userRoleId);

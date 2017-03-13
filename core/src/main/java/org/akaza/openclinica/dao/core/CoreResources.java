@@ -444,6 +444,19 @@ public class CoreResources implements ResourceLoaderAware {
         Statement statement = conn.createStatement();
         String schema = null;
 
+        schema = handleMultiSchemaConnection(conn, schema);
+
+        logger.debug("Using schema in CoreResources:schema:" + schema);
+        if (conn.getSchema().equalsIgnoreCase(schema))
+            return;
+        try {
+            statement.execute("set search_path to '" + schema + "'");
+        } finally {
+            statement.close();
+        }
+    }
+
+    private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
         if (tenantSchema.get() == null)
             tenantSchema.set(conn.getSchema());
 
@@ -451,17 +464,21 @@ public class CoreResources implements ResourceLoaderAware {
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             HttpSession session = requestAttributes.getRequest().getSession();
-            if (request.getParameter("changeStudySchema") != null) {
-                schema = (String) request.getParameter("changeStudySchema");
+            if (request.getAttribute("changeStudySchema") != null) {
+                schema = (String) request.getAttribute("changeStudySchema");
+                logger.debug("request.getAttribute(\"changeStudySchema\"):" + schema);
                 if (session != null) {
                     session.setAttribute(CURRENT_TENANT_ID, schema);
                 }
             } else if (request.getAttribute("requestSchema") != null) {
                 schema = (String) request.getAttribute("requestSchema");
+                logger.debug("request.getAttribute(\"requestSchema\"):" + schema);
             } else if (session != null) {
                     schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+                    logger.debug("Session schema:" + schema);
             } else {
                     schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+                    logger.debug("Request schema:" + schema);
             }
             if (StringUtils.isNotEmpty(schema))
                 tenantSchema.set(schema);
@@ -472,16 +489,9 @@ public class CoreResources implements ResourceLoaderAware {
             } else
                 schema = DATAINFO.getProperty("schema");
         }
-
-
-        logger.debug("Using schema in CoreResources:schema:" + schema);
-        if (conn.getSchema().equalsIgnoreCase(schema))
-            return;
-        try {
-            statement.execute("set search_path to '" + schema + "'");
-        } finally {
-            statement.close();
-        }
+        logger.debug("Current thread schema:" + tenantSchema.get());
+        logger.debug("Current schema for JDBC connections:" + schema);
+        return schema;
     }
 
     private void setDatabaseProperties(String database) {

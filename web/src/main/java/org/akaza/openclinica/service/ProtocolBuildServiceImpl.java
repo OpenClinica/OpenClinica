@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
@@ -45,7 +46,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             StudyOidGenerator studyOidGenerator = new StudyOidGenerator();
             study.setOc_oid(studyOidGenerator.generateOid(uniqueId));
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            schemaName = "tenant" + schemaId;
+            schemaName = CoreResources.getField("schemaPrefix")+ schemaId;
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);
             StudyUserRole studyUserRole = new StudyUserRole();

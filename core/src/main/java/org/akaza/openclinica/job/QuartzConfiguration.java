@@ -16,7 +16,8 @@ import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
 import static org.akaza.openclinica.service.extract.XsltTriggerService.*;
 
-@Configuration 
+@Configuration
+@EnableAspectJAutoProxy
 public class QuartzConfiguration {
 	@Bean
 	@Scope("prototype")

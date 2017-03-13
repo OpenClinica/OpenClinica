@@ -178,25 +178,7 @@ public class ExtractController {
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
-        if (request.getAttribute(CURRENT_TENANT_ID) != null) {
-            String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
-            if (StringUtils.isNotEmpty(schema) &&
-                    (schema.equalsIgnoreCase("public") != true)) {
-                try {
-                    jobScheduler = (Scheduler) context.getBean(schema);
-                } catch (NoSuchBeanDefinitionException e) {
-                    createSchedulerFactoryBean(context, schema);
-                    try {
-                        jobScheduler = (Scheduler) context.getBean(schema);
-                    } catch (BeansException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (BeansException e) {
-                    e.printStackTrace();
-
-                }
-            }
-        }
+        jobScheduler = getSchemaScheduler(request, context, jobScheduler);
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
         simpleTrigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                 generalFileDir, // xml_file_path
@@ -231,7 +213,32 @@ public class ExtractController {
         return map;
     }
 
+    private Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
+        if (request.getAttribute(CURRENT_TENANT_ID) != null) {
+            String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+            if (StringUtils.isNotEmpty(schema) &&
+                    (schema.equalsIgnoreCase("public") != true)) {
+                try {
+                    jobScheduler = (Scheduler) context.getBean(schema);
+                    logger.debug("Existing schema scheduler found:" + schema);
+                } catch (NoSuchBeanDefinitionException e) {
+                    createSchedulerFactoryBean(context, schema);
+                    try {
+                        jobScheduler = (Scheduler) context.getBean(schema);
+                    } catch (BeansException e1) {
+                        e1.printStackTrace();
+                    }
+                } catch (BeansException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+        return jobScheduler;
+    }
+
     public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
+        logger.debug("Creating a new schema scheduler:" + schema);
         OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
         sFBean.setSchedulerName(schema);
         Properties properties = new Properties();
@@ -245,19 +252,29 @@ public class ExtractController {
         sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
         sFBean.setGlobalTriggerListeners(new JobTriggerListener());
 
-        properties.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
-        properties.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
-        properties.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
-        properties.setProperty("org.quartz.jobStore.useProperties", "false");
-        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + ".oc_qrtz_");
-        properties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-        properties.setProperty("org.quartz.threadPool.threadCount", "1");
-        properties.setProperty("org.quartz.threadPool.threadPriority", "5");
+        // use global Quartz properties
+        properties.setProperty("org.quartz.jobStore.misfireThreshold",
+                CoreResources.getField("org.quartz.jobStore.misfireThreshold"));
+        properties.setProperty("org.quartz.jobStore.class",
+                CoreResources.getField("org.quartz.jobStore.class"));
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
+                CoreResources.getField("org.quartz.jobStore.driverDelegateClass"));
+        properties.setProperty("org.quartz.jobStore.useProperties",
+                CoreResources.getField("org.quartz.jobStore.useProperties"));
+        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "."+
+                CoreResources.getField("org.quartz.jobStore.tablePrefix"));
+        properties.setProperty("org.quartz.threadPool.class",
+                CoreResources.getField("org.quartz.threadPool.class"));
+        properties.setProperty("org.quartz.threadPool.threadCount",
+                CoreResources.getField("org.quartz.threadPool.threadCount"));
+        properties.setProperty("org.quartz.threadPool.threadPriority",
+                CoreResources.getField("org.quartz.threadPool.threadPriority"));
         sFBean.setQuartzProperties(properties);
         try {
             sFBean.afterPropertiesSet();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error creating the scheduler bean:" + schema, e.getMessage(), e);
+            return;
         }
         sFBean.start();
         ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();

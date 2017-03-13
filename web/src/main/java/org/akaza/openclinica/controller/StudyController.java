@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.*;
 
 @Controller
@@ -397,6 +398,9 @@ public class StudyController {
         String uniqueProtocolID = (String) map.get("uniqueProtocolID");
         String name = (String) map.get("briefTitle");
 
+	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
+	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
+
 	    UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
 	    if (ownerUserAccount == null) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
@@ -477,14 +481,18 @@ public class StudyController {
             response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
         }
 
-        return response;
+	    AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
+	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyDone);
+
+	    return response;
 
     }
 
 	@RequestMapping(value = "/asyncProtocolStatus", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAyncProtocolStatus(HttpServletRequest request, @RequestParam("uniqueId") String uniqueId) throws Exception {
-		ResponseEntity<Object> response = null;
-		AsyncStudyHelper asyncStudyHelper = AsyncStudyHelper.asyncStudyMap.get(uniqueId);
+		ResponseEntity<Object> response;
+
+		AsyncStudyHelper asyncStudyHelper = AsyncStudyHelper.get(uniqueId);
 		if (asyncStudyHelper != null) {
 			response = new ResponseEntity<Object>(asyncStudyHelper, HttpStatus.OK);
 		} else {
@@ -583,17 +591,19 @@ public class StudyController {
 		}
 		final String protocolId = uniqueProtocolID;
 		final String studyName = name;
+
 		// Lambda Runnable
 		Runnable studyTask = () -> {
-			AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING");
-			AsyncStudyHelper.asyncStudyMap.put(protocolId, asyncStudyHelper);
+			AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
+			AsyncStudyHelper.put(protocolId, asyncStudyHelper);
 			processStudyAsync(request, errorObjects, studyDTO, validation_failed_message,
 					validation_passed_message, protocolId, studyName,
 					ownerUserAccount);
 			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
-			AsyncStudyHelper.asyncStudyMap.put(protocolId, asyncStudyDone);
+			AsyncStudyHelper.put(protocolId, asyncStudyDone);
 		};
 		new Thread(studyTask).start();
+
 		return response;
 	}
 
@@ -605,7 +615,7 @@ public class StudyController {
 		ResourceBundleProvider.updateLocale(locale);
 		String schema = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
 		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
-		AsyncStudyHelper.asyncStudyMap.put(uniqueProtocolID, asyncStudyHelper);
+		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
 		Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID,ownerUserAccount);
 
 		logger.debug("returning from liquibase study:" + study.getStudyId());

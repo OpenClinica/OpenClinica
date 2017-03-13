@@ -36,7 +36,7 @@ public class OCMultiTenantSpringLiquibase extends MultiTenantSpringLiquibase {
                 }
             }
         } catch (Exception e) {
-            logger.info("There are no tables created as of yet");
+            logger.info("There are no tables created as of yet.", e.getMessage(), e);
         }
 
         super.setSchemas(schemas);

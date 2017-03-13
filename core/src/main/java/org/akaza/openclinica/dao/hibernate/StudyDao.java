@@ -20,8 +20,4 @@ public class StudyDao extends AbstractDomainDao<Study> {
         BigInteger count = (BigInteger) q.getSingleResult();
         return (count.intValue() == 1) ? true:false;
     }
-
-    public void createProtocolSchema() {
-
-    }
 }

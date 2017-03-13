@@ -150,9 +150,9 @@ public class ChangeStudyServlet extends SecureController {
                     ProtocolInfo protocolInfo = getProtocolInfo(studyId, studyList);
                     if (protocolInfo == null)
                         break;
-                    if (StringUtils.isNotEmpty(protocolInfo.schema))
+                    if (StringUtils.isNotEmpty(protocolInfo.schema)) {
                         request.setAttribute("changeStudySchema", protocolInfo.schema);
-                    else // should this be DEFAULT_TENANT_ID from CoreResources?
+                    } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
                     request.setAttribute("uniqueStudyId", protocolInfo.uniqueStudyId);
@@ -189,6 +189,8 @@ public class ChangeStudyServlet extends SecureController {
     private void changeStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
+        String studySchema = fp.getString("changeStudySchema");
+        request.setAttribute("changeStudySchema", "public");
         String uniqueStudyId = fp.getString("uniqueStudyId");
         String prevStudyId = currentStudy.getIdentifier();
 
@@ -235,6 +237,7 @@ public class ChangeStudyServlet extends SecureController {
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
+            request.setAttribute("changeStudySchema", studySchema);
 
             if (current.getParentStudyId() > 0) {
                 /*
