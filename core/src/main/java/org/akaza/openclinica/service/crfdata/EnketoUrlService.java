@@ -264,6 +264,7 @@ public class EnketoUrlService {
             dt = dt.substring(0, 19) + " " + dt.substring(23);
             query.setDate_time(dt);
             query.setNotify(false);
+            query.setUser(dn.getUserAccountByOwnerId().getUserName());
             query.setType(COMMENT);
             queryBeans.add(query);
         }

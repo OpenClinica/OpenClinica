@@ -86,12 +86,13 @@ public class QueryFormDecorator extends FormDecorator {
                 String nodeValue = nodesetAttr.getNodeValue() + COMMENT;
 
                 if (constraintAttr != null) {
-                    String constraintValue = constraintAttr.getNodeValue() + " or " + nodeValue + " !='' ";
+                    String constraintValue = constraintAttr.getNodeValue() + " or comment-status(" + nodeValue + ")='new' or comment-status(" + nodeValue
+                            + ")='updated'";
                     constraintAttr.setNodeValue(constraintValue);
                 }
 
                 if (requiredAttr != null && requiredAttr.getNodeValue().equalsIgnoreCase("true()")) {
-                    String requiredValue = nodeValue + " ='' ";
+                    String requiredValue = nodeValue + " =''  or comment-status(" + nodeValue + ")='closed'";
                     requiredAttr.setNodeValue(requiredValue);
                 }
 
