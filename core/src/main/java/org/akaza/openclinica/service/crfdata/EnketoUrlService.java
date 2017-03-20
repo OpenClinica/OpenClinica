@@ -49,6 +49,7 @@ import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ResponseType;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -64,6 +65,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,7 @@ public class EnketoUrlService {
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
     public static final String NO_FLAVOR = "";
+    public static final String COMMENT = "comment";
 
     @Autowired
     @Qualifier("dataSource")
@@ -145,6 +148,9 @@ public class EnketoUrlService {
     @Autowired
     private XformParserHelper xformParserHelper;
 
+    @Autowired
+    private EnketoCredentials enketoCredentials;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -155,6 +161,8 @@ public class EnketoUrlService {
     public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor)
             throws Exception {
         // Call Enketo api to get edit url
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
         return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
 
@@ -162,6 +170,8 @@ public class EnketoUrlService {
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
             StudyEvent studyEvent, String flavor) throws Exception {
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
 
         String editURL = null;
         StudyEventDefinition eventDef;
@@ -248,8 +258,14 @@ public class EnketoUrlService {
             }
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
-            query.setDate_time(dn.getDateCreated().toString());
+            DateTime dateTime = new DateTime(dn.getDateCreated());
+            String dt = dateTime.toString();
+            dt = dt.replaceAll("T", " ");
+            dt = dt.substring(0, 19) + " " + dt.substring(23);
+            query.setDate_time(dt);
             query.setNotify(false);
+            query.setUser(dn.getUserAccountByOwnerId().getUserName());
+            query.setType(COMMENT);
             queryBeans.add(query);
         }
         // logs.add(logBean);

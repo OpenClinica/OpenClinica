@@ -4,9 +4,11 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 public class PFormCache {
@@ -17,6 +19,8 @@ public class PFormCache {
     HashMap<String, HashMap<String, String>> offlineUrlCache = null;
     // HashMap of context hash, HashMap of properties such as ssoid, crf version oid, etc...
     HashMap<String, HashMap<String, String>> subjectContextCache = null;
+    @Autowired
+    private EnketoCredentials enketoCredentials;
 
     private PFormCache() {
 
@@ -51,6 +55,8 @@ public class PFormCache {
     }
 
     public String getPFormURL(String studyOID, String formLayoutOID, boolean isOffline) throws Exception {
+        Study study = enketoCredentials.getParentStudy(studyOID);
+        studyOID = study.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
         if (isOffline)
