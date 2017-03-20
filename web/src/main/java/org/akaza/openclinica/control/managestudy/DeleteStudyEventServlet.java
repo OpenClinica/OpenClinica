@@ -1,45 +1,26 @@
 package org.akaza.openclinica.control.managestudy;
 
-/**
- * Created by IntelliJ IDEA.
- * User: bads
- * Date: Mar 24, 2010
- * Time: 8:33:54 PM
- * To change this template use File | Settings | File Templates.
- */
-import org.akaza.openclinica.bean.admin.CRFBean;
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.controller.helper.table.SubjectAggregateContainer;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 public class DeleteStudyEventServlet extends SecureController{
     @Override
@@ -86,7 +67,6 @@ public class DeleteStudyEventServlet extends SecureController{
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-            request.setAttribute("study", study);
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
