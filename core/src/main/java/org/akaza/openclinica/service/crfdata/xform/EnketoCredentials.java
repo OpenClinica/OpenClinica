@@ -3,10 +3,13 @@ package org.akaza.openclinica.service.crfdata.xform;
 import java.io.Serializable;
 
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 public class EnketoCredentials implements Serializable {
@@ -15,11 +18,17 @@ public class EnketoCredentials implements Serializable {
     private String ocInstanceUrl = null;
     protected static final Logger logger = LoggerFactory.getLogger(EnketoCredentials.class);
 
+    @Autowired
+    private static StudyDao studyDao;
+
     private EnketoCredentials() {
 
     }
 
     public static EnketoCredentials getInstance(String studyOid) {
+        Study study = getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
+
         EnketoCredentials credentials = new EnketoCredentials();
 
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations";
@@ -67,6 +76,27 @@ public class EnketoCredentials implements Serializable {
 
     public void setOcInstanceUrl(String ocInstanceUrl) {
         this.ocInstanceUrl = ocInstanceUrl;
+    }
+
+    public static Study getParentStudy(String studyOid) {
+        Study study = studyDao.findByOcOID(studyOid);
+        if (study.getStudy() == null) {
+            logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
+            return study;
+        } else {
+            logger.debug("The Study Oid: " + studyOid + " is a Site level Oid");
+            int parentStudyId = study.getStudy().getStudyId();
+            Study parentStudy = studyDao.findById(parentStudyId);
+            return parentStudy;
+        }
+    }
+
+    public static StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public static void setStudyDao(StudyDao studyDao) {
+        EnketoCredentials.studyDao = studyDao;
     }
 
 }

@@ -298,8 +298,6 @@ public class EventProcessor implements Processor {
         eventCrf.setDateUpdated(new Date());
         if (isAnonymous)
             eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
-        else
-            eventCrf.setStatusId(Status.AVAILABLE.getCode());
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********UPDATED EVENT CRF");
         return eventCrf;
