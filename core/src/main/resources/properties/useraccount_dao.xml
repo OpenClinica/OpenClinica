@@ -204,6 +204,34 @@
 			ORDER BY ua.date_created ASC
 		</sql>
 	</query>
+	<query>
+		<name>findAllAssignedUsersByStudy</name>
+		<sql>
+			SELECT
+			ua.user_name
+			, ua.first_name
+			, ua.last_name
+			, sur.role_name
+			, sur.study_id
+			, sur.status_id
+			, sur.date_updated
+			, sur.update_id
+			, s.name
+			, s.parent_study_id
+			, ua.user_id
+			FROM
+			user_account ua
+			, study_user_role sur
+			, study s
+			WHERE ua.user_name=sur.user_name
+			AND (sur.study_id=s.study_id)
+			AND ua.status_id=1
+			AND sur.status_id IN (1,5,7)
+			AND (s.study_id=? OR s.parent_study_id=?)
+			AND  ua.user_name NOT LIKE '%.SS_%'
+			ORDER BY ua.date_created ASC
+		</sql>
+	</query>
     <query>
         <name>findAllUsersByStudyOrSite</name>
         <sql>
