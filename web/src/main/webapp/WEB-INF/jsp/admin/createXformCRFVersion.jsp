@@ -126,6 +126,7 @@
     <thead>
      <tr>
       <td><b><fmt:message key="crf_validation_error_identifier" bundle="${resword}"/>:</b></td>
+      <td>   </td>
       <td><b><fmt:message key="crf_validation_error_reason" bundle="${resword}"/>:</b></td>
      </tr>
     </thead>
@@ -133,6 +134,7 @@
      <c:forEach items="${errorList}" var="error">
       <tr>
        <td><c:out value="${error.defaultMessage}"/></td>  
+      <td>   </td>
        <td><fmt:message key="${error.code}" bundle="${resword}"/></td>  
       </tr>
      </c:forEach>
