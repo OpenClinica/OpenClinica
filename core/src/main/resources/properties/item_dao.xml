@@ -112,7 +112,7 @@
 	</query>
 	<query>
 		<name>findAllItemsByVersionId</name>
-		<sql>select i.* from versioning_map v, item i 
+		<sql>select distinct i.* from versioning_map v, item i 
 		where v.item_id =i.item_id and v.crf_version_id=? order by i.item_id
 		</sql>
 	</query>
