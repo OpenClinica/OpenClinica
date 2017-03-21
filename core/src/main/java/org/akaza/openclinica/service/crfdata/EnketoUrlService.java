@@ -350,7 +350,8 @@ public class EnketoUrlService {
                         }
                         for (ItemGroupMetadata igm : igms) {
                             ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
-                            hashMap.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
+                            String itemValue = getItemValue(itemData, crfVersion);
+                            hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                             if (flavor.equals(QUERY_FLAVOR)) {
                                 if (itemData != null) {
                                     ObjectMapper mapper = new ObjectMapper();
@@ -360,8 +361,8 @@ public class EnketoUrlService {
                                     hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, "");
                                 }
                             }
+                            hashMapList.add(hashMap);
                         }
-                        hashMapList.add(hashMap);
                     }
                 }
             }
@@ -373,7 +374,8 @@ public class EnketoUrlService {
             if (!igms.get(0).isRepeatingGroup()) {
                 for (ItemGroupMetadata igm : igms) {
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
-                    data.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
+                    String itemValue = getItemValue(itemData, crfVersion);
+                    data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                     if (flavor.equals(QUERY_FLAVOR)) {
                         if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
@@ -503,6 +505,23 @@ public class EnketoUrlService {
         }
         // maxGroupRepeat
         return target;
+    }
+
+    private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
+        String itemValue = null;
+        if (itemData != null) {
+            itemValue = itemData.getValue();
+            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(itemData.getItem().getItemId(), crfVersion.getCrfVersionId());
+
+            // Convert space separated Enketo multiselect values to comma separated OC
+            // multiselect
+            // values
+            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+            if (responseTypeId == 3 || responseTypeId == 7) {
+                itemValue = itemValue.replaceAll(",", " ");
+            }
+        }
+        return itemValue;
     }
 
 }
