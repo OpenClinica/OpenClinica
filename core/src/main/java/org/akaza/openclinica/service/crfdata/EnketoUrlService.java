@@ -361,8 +361,9 @@ public class EnketoUrlService {
                                     hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, "");
                                 }
                             }
-                            hashMapList.add(hashMap);
                         }
+                        hashMapList.add(hashMap);
+
                     }
                 }
             }
