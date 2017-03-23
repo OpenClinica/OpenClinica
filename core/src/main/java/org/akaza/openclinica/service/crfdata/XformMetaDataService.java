@@ -858,7 +858,7 @@ public class XformMetaDataService {
         crfBean.setUserAccount(userDao.findById(cmdObject.ub.getId()));
         crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         crfBean.setStudy(studyDao.findById(cmdObject.currentStudy.getId()));
-        crfBean.setOcOid(crfDao.getValidOid(new CrfBean(), cmdObject.crf.getName()));
+        crfBean.setOcOid(cmdObject.crf.getOcoid());
         crfBean.setUpdateId(cmdObject.ub.getId());
         crfBean.setDateUpdated(new Date());
         return crfBean;
