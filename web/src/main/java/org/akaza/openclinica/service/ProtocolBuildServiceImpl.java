@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
+import org.akaza.openclinica.controller.helper.ProtocolInfo;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -35,11 +36,12 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
     @Autowired
     private SchemaServiceDao schemaServiceDao;
 
-    public String process(String name, String uniqueId, UserAccountBean ub) {
+    public ProtocolInfo process(String name, String uniqueId, UserAccountBean ub) throws Exception  {
         String schemaName = null;
+        Study study = new Study();
+
         try {
             int schemaId = schemaServiceDao.getProtocolSchemaSeq();
-            Study study = new Study();
             study.setName(name);
             study.setUniqueIdentifier(uniqueId);
             // generate OC id
@@ -62,19 +64,19 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
         } catch (Exception e) {
             logger.error("Error while creating a study entry in public schema:" + schemaName);
             logger.error(e.getMessage(), e);
-            return null;
+            throw e;
         }
         createSchema(schemaName);
-        return schemaName;
+        return new ProtocolInfo(uniqueId, study.getOc_oid(), schemaName);
     }
 
-    private boolean createSchema(String schemaName) {
+    private boolean createSchema(String schemaName) throws Exception {
         try {
            schemaServiceDao.createProtocolSchema(schemaName);
         } catch (Exception e) {
             logger.error("Error while creating a liquibase schema:" + schemaName);
             logger.error(e.getMessage(), e);
-            return false;
+            throw e;
         }
         return true;
     }

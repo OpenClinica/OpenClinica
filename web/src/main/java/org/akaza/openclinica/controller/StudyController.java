@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
+import org.akaza.openclinica.controller.helper.ProtocolInfo;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -17,8 +18,10 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
 import org.akaza.openclinica.service.ProtocolBuildService;
+import org.akaza.openclinica.service.SiteBuildService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tomcat.util.net.SSLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -40,13 +44,15 @@ public class StudyController {
 
 	@Autowired
 	@Qualifier("dataSource")
-	private BasicDataSource dataSource;
+	private DataSource dataSource;
 	@Autowired
 	private StudyDao studyDao;
 	@Autowired
 	private ProtocolBuildService protocolBuildService;
 	@Autowired
 	private LiquibaseOnDemandService liquibaseOnDemandService;
+	@Autowired
+	private SiteBuildService siteBuildService;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -125,7 +131,6 @@ public class StudyController {
 	 *                    "studyOid": "S_STUDYPRO",
 	 *                    }
 	 */
-
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
@@ -449,11 +454,11 @@ public class StudyController {
 		    errorObjects.add(errorOBject);
 	    }
 
-
 	    studyDTO.setErrors(errorObjects);
 
-	    String schema = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
-		Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID, ownerUserAccount);
+	    ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+	    liquibaseOnDemandService.createPublicTables(protocolInfo);
+	    Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
 
 	    logger.debug("returning from liquibase study:" + study.getStudyId());
 
@@ -477,7 +482,7 @@ public class StudyController {
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
             responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
-			responseSuccess.setSchemaName(schema);
+			responseSuccess.setSchemaName(protocolInfo.getSchema());
             response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
         }
 
@@ -592,13 +597,15 @@ public class StudyController {
 		final String protocolId = uniqueProtocolID;
 		final String studyName = name;
 
-		// Lambda Runnable
+		// Lambda Runnablestu
 		Runnable studyTask = () -> {
 			AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
 			AsyncStudyHelper.put(protocolId, asyncStudyHelper);
-			processStudyAsync(request, errorObjects, studyDTO, validation_failed_message,
-					validation_passed_message, protocolId, studyName,
-					ownerUserAccount);
+			try {
+				processStudyAsync(request, validation_passed_message, protocolId, studyName, ownerUserAccount);
+			} catch (Exception e) {
+				logger.error("Error creating the study: " +  studyName + " in async mode:");
+			}
 			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
 			AsyncStudyHelper.put(protocolId, asyncStudyDone);
 		};
@@ -607,16 +614,17 @@ public class StudyController {
 		return response;
 	}
 
-	private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, ArrayList<ErrorObject> errorObjects, StudyDTO studyDTO,
-			String validation_failed_message, String validation_passed_message, String uniqueProtocolID, String name, UserAccountBean ownerUserAccount) {
+	private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, String validation_passed_message,
+			String uniqueProtocolID, String name, UserAccountBean ownerUserAccount) throws Exception {
 		ResponseEntity<Object> response;
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
-		String schema = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+		ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
 		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
 		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
-		Study study = liquibaseOnDemandService.process(schema, name, uniqueProtocolID, uniqueProtocolID,ownerUserAccount);
+		liquibaseOnDemandService.createPublicTables(protocolInfo);
+		Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
 
 		logger.debug("returning from liquibase study:" + study.getStudyId());
 		logger.debug("study oc_id:" + study.getOc_oid());
@@ -631,7 +639,7 @@ public class StudyController {
 		responseSuccess.setMessage(validation_passed_message);
 		responseSuccess.setStudyOid(study.getOc_oid());
 		responseSuccess.setUniqueProtocolID(uniqueProtocolID);
-		responseSuccess.setSchemaName(schema);
+		responseSuccess.setSchemaName(protocolInfo.getSchema());
 		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
 		return response;
@@ -703,14 +711,16 @@ public class StudyController {
 
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		System.out.println("I'm in Create Sites ");
+		logger.debug("Creating site(s) for protocol:" + uniqueProtocolID);
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyBean siteBean = null;
 		ResponseEntity<Object> response = null;
 
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
-
+		Locale locale = new Locale("en_US");
+		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+		ResourceBundleProvider.updateLocale(locale);
 		String name = (String) map.get("briefTitle");
 		String principalInvestigator = (String) map.get("principalInvestigator");
 		String uniqueSiteProtocolID = (String) map.get("uniqueProtocolID");
@@ -920,21 +930,15 @@ public class StudyController {
 					ownerUserAccount, parentStudy.getId());
 
 			StudyBean sBean = createStudy(siteBean, ownerUserAccount);
+			// get the schema study
+			request.setAttribute("requestSchema", parentStudy.getSchemaName());
+			StudyBean schemaStudy = getStudyByUniqId(uniqueProtocolID);
+			siteBuildService.process(schemaStudy, sBean, ownerUserAccount, userList);
 			siteDTO.setSiteOid(sBean.getOid());
 			siteDTO.setMessage(validation_passed_message);
-			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 			StudyUserRoleBean sub = null;
-			for (UserRole userRole : userList) {
-				sub = new StudyUserRoleBean();
-				sub.setRole(getSiteRole(userRole.getRole(), resterm));
-				sub.setStudyId(sBean.getId());
-				sub.setStatus(Status.AVAILABLE);
-				sub.setOwner(ownerUserAccount);
-				udao = new UserAccountDAO(dataSource);
-				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-				StudyUserRoleBean surb = createRole(assignedUserBean, sub);
-			}
-            ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
+			processUserList(userList, ownerUserAccount, sBean);
+			ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
             responseSuccess.setUniqueSiteProtocolID(siteDTO.getUniqueSiteProtocolID());
@@ -944,6 +948,21 @@ public class StudyController {
 		}
 		return response;
 
+	}
+
+	public void processUserList(List<UserRole> userList, UserAccountBean ownerUserAccount, StudyBean sBean) {
+		StudyUserRoleBean sub;
+		ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+		for (UserRole userRole : userList) {
+            sub = new StudyUserRoleBean();
+            sub.setRole(getSiteRole(userRole.getRole(), resterm));
+            sub.setStudyId(sBean.getId());
+            sub.setStatus(Status.AVAILABLE);
+            sub.setOwner(ownerUserAccount);
+            udao = new UserAccountDAO(dataSource);
+            UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
+            StudyUserRoleBean surb = createRole(assignedUserBean, sub);
+        }
 	}
 
 	/**
@@ -1203,6 +1222,13 @@ public class StudyController {
 
 	public StudyBean createStudy(StudyBean studyBean, UserAccountBean owner) {
 		sdao = new StudyDAO(dataSource);
+		StudyBean sBean = (StudyBean) sdao.create(studyBean);
+		sBean = (StudyBean) sdao.findByPK(sBean.getId());
+		return sBean;
+	}
+
+	public StudyBean createStudyWithDatasource(StudyBean studyBean, DataSource ds) {
+		sdao = new StudyDAO(ds);
 		StudyBean sBean = (StudyBean) sdao.create(studyBean);
 		sBean = (StudyBean) sdao.findByPK(sBean.getId());
 		return sBean;

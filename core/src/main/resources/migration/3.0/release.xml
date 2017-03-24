@@ -9,7 +9,6 @@
     <include file="migration/3.0/2009-04-10-3120.xml"/>
     <include file="migration/3.0/2009-04-29-3349.xml"/>
     <include file="migration/3.0/2009-05-15-3624.xml"/>
-    <include file="migration/3.0/2009-05-28-3481.xml"/>
     <include file="migration/3.0/2009-06-04-3684.xml"/>
     <include file="migration/3.0/2009-06-08-3628.xml"/>
     <include file="migration/3.0/2009-06-10-3260.xml"/>

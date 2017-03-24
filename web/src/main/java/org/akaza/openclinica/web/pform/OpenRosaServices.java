@@ -11,6 +11,7 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -93,6 +94,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
+import org.hibernate.internal.SessionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,7 +205,7 @@ public class OpenRosaServices {
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
         XFormList formList = null;
 
@@ -211,7 +213,6 @@ public class OpenRosaServices {
             if (StringUtils.isEmpty(uniqueId)) {
                 List<CrfBean> crfs = crfDao.findAll();
                 List<FormLayout> formLayouts = formLayoutDao.findAll();
-
                 formList = new XFormList();
                 for (CrfBean crf : crfs) {
                     for (FormLayout formLayout : formLayouts) {
@@ -242,6 +243,7 @@ public class OpenRosaServices {
                     }
                 }
             } else {
+                request.setAttribute("requestSchema", "public");
                 formList = getForm(request, response, studyOID, uniqueId, authorization, context);
             }
 
@@ -283,7 +285,7 @@ public class OpenRosaServices {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         // print logback's internal status
         StatusPrinter.print(lc);
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
         String flavor = getQuerySet(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
@@ -366,7 +368,7 @@ public class OpenRosaServices {
     @Produces(MediaType.TEXT_XML)
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
 
         String formLayoutOid = getFormLayoutOid(uniqueId);
@@ -442,7 +444,7 @@ public class OpenRosaServices {
     @Produces(MediaType.APPLICATION_XML)
     public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization) throws Exception {
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
 
         String xform = null;
@@ -517,7 +519,7 @@ public class OpenRosaServices {
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formLayoutMediaId") String formLayoutMediaId, @RequestHeader("Authorization") String authorization, @Context ServletContext context)
             throws Exception {
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
 
         FormLayoutMedia media = formLayoutMediaDao.findById(Integer.valueOf(formLayoutMediaId));
@@ -549,7 +551,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/downloadUsers")
     public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
-        if (!mayProceedPreview(studyOID))
+        if (!mayProceedPreview(request, studyOID))
             return null;
 
         Study study = studyDao.findByOcOID(studyOID);
@@ -931,14 +933,16 @@ public class OpenRosaServices {
         return accessPermission;
     }
 
-    private boolean mayProceedPreview(String studyOid) throws Exception {
+    private boolean mayProceedPreview( HttpServletRequest request, String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        request.setAttribute("requestSchema", study.getSchemaName());
+        StudyDAO studyDao = new StudyDAO(dataSource);
+        StudyBean studyBean = studyDao.findByOid(studyOid);
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOid()).toString(); // ACTIVE ,
         // PENDING ,
         // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled

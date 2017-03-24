@@ -36,34 +36,10 @@
     <changeSet author="kkrumlian" id="2009-04-02-3397-3">
         <comment>Add foreign Key for user_account_id</comment>
         <addForeignKeyConstraint constraintName="fk_audit_user_login_id"
-                                 referencedTableName="user_account"
+                                 referencedTableName="user_account" referencedTableSchemaName="public"
                                  referencedColumnNames="user_id"
                                  baseTableName="audit_user_login"
                                  baseColumnNames="user_account_id" />
-    </changeSet>
-    <changeSet author="kkrumlian" id="2009-04-02-3397-4">
-        <comment>Add enabled property to user_account table</comment>
-        <addColumn tableName="user_account" >
-            <column name="enabled" defaultValueBoolean="true" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2009-04-02-3397-5">
-        <comment>Add account_non_locked property to user_account table</comment>
-        <addColumn tableName="user_account" >
-            <column name="account_non_locked" defaultValueBoolean="true" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2009-04-02-3397-6">
-        <comment>Add lock_counter property to user_account table</comment>
-        <addColumn tableName="user_account" >
-            <column name="lock_counter" type="INT" defaultValueNumeric="0" >
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
     </changeSet>
     <changeSet author="kkrumlian" id="2009-04-02-3397-7">
         <comment>Create a table named configuration</comment>

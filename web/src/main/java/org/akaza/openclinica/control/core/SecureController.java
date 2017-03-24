@@ -589,7 +589,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut();
             }
-            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+            request.setAttribute("requestSchema", getRequestSchema(request));
             mayProceed();
       //      pingJobServer(request);
             processRequest();
@@ -614,6 +614,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.error(SecureController.getStackTrace(e));
 
             forwardPage(Page.ERROR);
+        }
+    }
+
+    public String getRequestSchema(HttpServletRequest request) {
+        switch(request.getRequestURI().substring(1)) {
+        case "ChangeStudy":
+        case "DeleteStudyUserRole":
+        case "DeleteUser":
+            return "public";
+        default:
+            return currentPublicStudy.getSchemaName();
         }
     }
 

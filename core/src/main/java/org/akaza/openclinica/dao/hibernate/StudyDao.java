@@ -20,4 +20,11 @@ public class StudyDao extends AbstractDomainDao<Study> {
         BigInteger count = (BigInteger) q.getSingleResult();
         return (count.intValue() == 1) ? true:false;
     }
+    public Study findByUniqueId(String uniqueId) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = " from Study do  where do.uniqueIdentifier = :uniqueId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("uniqueId", uniqueId);
+        return  (Study) q.uniqueResult();
+    }
 }

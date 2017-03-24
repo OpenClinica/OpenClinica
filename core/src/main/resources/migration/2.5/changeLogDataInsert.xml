@@ -1,62 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">    
 <!-- Data insert -->
-	<changeSet author="pgawade (generated)" id="1235684743487-217">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="1"/>
-		<column name="name" value="available"/>
-		<column name="description" value="this is the active status"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-218">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="2"/>
-		<column name="name" value="unavailable"/>
-		<column name="description" value="this is the inactive status"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-219">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="3"/>
-		<column name="name" value="private"/>
-		<column name="description"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-220">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="4"/>
-		<column name="name" value="pending"/>
-		<column name="description"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-221">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="5"/>
-		<column name="name" value="removed"/>
-		<column name="description" value="this indicates that a record is specifically removed by user"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-222">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="6"/>
-		<column name="name" value="locked"/>
-		<column name="description"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-223">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="7"/>
-		<column name="name" value="auto-removed"/>
-		<column name="description" value="this indicates that a record is removed due to the removal of its parent record"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-224">
-	    <insert tableName="status">
-		<column name="status_id" valueNumeric="8"/>
-		<column name="name" value="signed"/>
-		<column name="description" value="this indicates all StudyEvents has been signed"/>
-	    </insert>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-225">
 	<insert tableName="audit_log_event_type">
 	    <column name="audit_log_event_type_id" valueNumeric="1"/>
@@ -361,24 +305,6 @@
 	    <column name="name" value="group-calculation"/>
 	    <column name="description" value="value calculated automatically from an entire group of items"/>
 	</insert>
-    </changeSet> 
-    <changeSet author="pgawade (generated)" id="1235684743487-274">
-	    <insert tableName="user_type">
-		<column name="user_type_id" valueNumeric="1"/>
-		<column name="user_type" value="admin"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-275">
-	    <insert tableName="user_type">
-		<column name="user_type_id" valueNumeric="2"/>
-		<column name="user_type" value="user"/>
-	    </insert>
-	</changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-276">
-	    <insert tableName="user_type">
-		<column name="user_type_id" valueNumeric="3"/>
-		<column name="user_type" value="tech-admin"/>
-	    </insert>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-277">
 	    <insert tableName="study_type">
@@ -393,46 +319,7 @@
 		<column name="name" value="non-genetic"/>
 		<column name="description"/>
 	    </insert>
-    </changeSet> 
-    <changeSet author="pgawade (generated)" id="1235684743487-279">
-		    <insert tableName="user_account">
-			<column name="user_id" valueNumeric="1"/>
-			<column name="user_name" value="root"/>
-			<column name="passwd" value="25d55ad283aa400af464c76d713c07ad"/>
-			<column name="first_name" value="Root"/>
-			<column name="last_name" value="User"/>
-			<column name="email" value="openclinica_admin@example.com"/>
-			<column name="active_study" valueNumeric="1"/>
-			<column name="institutional_affiliation" value="Akaza Research"/>
-			<column name="status_id" valueNumeric="1"/>
-			<column name="owner_id" valueNumeric="1"/>
-			<column name="date_created"/>
-			<column name="date_updated" valueDate="2006-10-23"/>
-			<column name="date_lastvisit" valueDate="2006-10-23"/>
-			<column name="passwd_timestamp" valueDate="2006-10-23"/>
-			<column name="passwd_challenge_question"/>
-			<column name="passwd_challenge_answer"/>
-			<column name="phone" value="617 621 8585"/>
-			<column name="user_type_id" valueNumeric="3"/>
-			<column name="update_id" valueNumeric="1"/>
-		    </insert>
-	    </changeSet>
-	<changeSet author="kkrumlian" id="1235684743487-279-1">
-		<preConditions onFail="MARK_RAN">
-			<dbms type="postgresql" />			
-	 	</preConditions>
-        <sql splitStatements="false">
-            SELECT nextval('user_account_user_id_seq')
-        </sql>
     </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-279-2">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-        <sql>
-            SELECT USER_ID_SEQ.NEXTVAL FROM dual;
-        </sql>
-    </changeSet>    
 
     <changeSet author="kkrumlian" id="1235684743487-280-1">
 		<preConditions onFail="MARK_RAN">

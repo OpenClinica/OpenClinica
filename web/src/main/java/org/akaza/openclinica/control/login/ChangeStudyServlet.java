@@ -21,6 +21,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
+import org.akaza.openclinica.controller.helper.ProtocolInfo;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -86,6 +87,7 @@ public class ChangeStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");// action sent by user
+        request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
@@ -150,12 +152,12 @@ public class ChangeStudyServlet extends SecureController {
                     ProtocolInfo protocolInfo = getProtocolInfo(studyId, studyList);
                     if (protocolInfo == null)
                         break;
-                    if (StringUtils.isNotEmpty(protocolInfo.schema)) {
-                        request.setAttribute("changeStudySchema", protocolInfo.schema);
+                    if (StringUtils.isNotEmpty(protocolInfo.getSchema())) {
+                        request.setAttribute("changeStudySchema", protocolInfo.getSchema());
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    request.setAttribute("uniqueStudyId", protocolInfo.uniqueStudyId);
+                    request.setAttribute("uniqueStudyId", protocolInfo.getUniqueStudyId());
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
@@ -168,15 +170,6 @@ public class ChangeStudyServlet extends SecureController {
         }
     }
 
-    private class ProtocolInfo {
-        public ProtocolInfo(String uniqueStudyId, String schema) {
-            this.uniqueStudyId = uniqueStudyId;
-            this.schema = schema;
-        }
-
-        String uniqueStudyId;
-        String schema;
-    }
     private ProtocolInfo getProtocolInfo(int studyId, List<StudyBean>studyList) {
         for (StudyBean study: studyList) {
             if (study.getId() == studyId) {
@@ -192,45 +185,48 @@ public class ChangeStudyServlet extends SecureController {
         String studySchema = fp.getString("changeStudySchema");
         request.setAttribute("changeStudySchema", "public");
         String uniqueStudyId = fp.getString("uniqueStudyId");
-        String prevStudyId = currentStudy.getIdentifier();
+        String prevStudyId = currentStudy != null ? currentStudy.getIdentifier() : null;
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean current = (StudyBean) sdao.findByUniqueIdentifier(uniqueStudyId);
+        StudyBean current = sdao.findByUniqueIdentifier(uniqueStudyId);
 
         // reset study parameters -jxu 02/09/2007
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
         ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
         current.setStudyParameters(studyParameters);
-        int parentStudyId = currentStudy.getParentStudyId()>0?currentStudy.getParentStudyId():currentStudy.getId();
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-        current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
-        String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
-        if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
-            request.setAttribute("label", new Integer(nextLabel).toString());
-        }
 
-        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-        if (current.getParentStudyId() <= 0) {// top study
-            scs.setParametersForStudy(current);
+        if (currentStudy != null) {
+            int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+            StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+            current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+            String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
+            if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+                int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
+                request.setAttribute("label", new Integer(nextLabel).toString());
+            }
 
-        } else {
-            // YW <<
-            if (current.getParentStudyId() > 0) {
-                current.setParentStudyName(((StudyBean) sdao.findByPK(current.getParentStudyId())).getName());
+            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+            if (current.getParentStudyId() <= 0) {// top study
+                scs.setParametersForStudy(current);
+
+            } else {
+                // YW <<
+                if (current.getParentStudyId() > 0) {
+                    current.setParentStudyName((sdao.findByPK(current.getParentStudyId())).getName());
+
+                }
+                // YW 06-12-2007>>
+                scs.setParametersForSite(current);
 
             }
-            // YW 06-12-2007>>
-            scs.setParametersForSite(current);
-
         }
         if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("study_choosed_removed_restore_first"));
         } else {
-            session.setAttribute("study", current);
-            currentStudy = current;
+            session.setAttribute("publicStudy", current);
+            currentPublicStudy = current;
             // change user's active study id
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
             ub.setActiveStudyId(current.getId());
@@ -238,7 +234,10 @@ public class ChangeStudyServlet extends SecureController {
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
             request.setAttribute("changeStudySchema", studySchema);
-
+            StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
+            StudyBean study = sdaoStudy.findByUniqueIdentifier(uniqueStudyId);
+            session.setAttribute("study", study);
+            currentStudy = study;
             if (current.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user

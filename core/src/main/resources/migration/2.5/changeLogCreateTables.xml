@@ -942,15 +942,6 @@
             <column name="borders" type="int"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-57">
-        <createTable tableName="status">
-            <column autoIncrement="true" name="status_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="description" type="VARCHAR(1000)"/>
-        </createTable>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-58">
         <createTable tableName="study">
             <column autoIncrement="true" name="study_id" type="int">
@@ -1190,31 +1181,6 @@
             <column name="notes" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-71">
-        <createTable tableName="user_account">
-            <column autoIncrement="true" name="user_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="user_name" type="VARCHAR(64)"/>
-            <column name="passwd" type="VARCHAR(255)"/>
-            <column name="first_name" type="VARCHAR(50)"/>
-            <column name="last_name" type="VARCHAR(50)"/>
-            <column name="email" type="VARCHAR(120)"/>
-            <column name="active_study" type="int"/>
-            <column name="institutional_affiliation" type="VARCHAR(255)"/>
-            <column name="status_id" type="int"/>
-            <column name="owner_id" type="int"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
-            <column name="date_lastvisit" type="timestamp"/>
-            <column name="passwd_timestamp" type="DATE"/>
-            <column name="passwd_challenge_question" type="VARCHAR(64)"/>
-            <column name="passwd_challenge_answer" type="VARCHAR(255)"/>
-            <column name="phone" type="VARCHAR(64)"/>
-            <column name="user_type_id" type="int"/>
-            <column name="update_id" type="int"/>
-        </createTable>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-72">
         <createTable tableName="user_role">
             <column autoIncrement="true" name="role_id" type="int">
@@ -1227,14 +1193,7 @@
             <column name="role_desc" type="VARCHAR(2000)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-73">
-        <createTable tableName="user_type">
-            <column autoIncrement="true" name="user_type_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="user_type" type="VARCHAR(50)"/>
-        </createTable>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-74">
         <createTable tableName="versioning_map">
             <column name="crf_version_id" type="int"/>
@@ -1316,11 +1275,6 @@
             <column name="user_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-92">
-        <createIndex indexName="i_user_account_user_name" tableName="user_account" unique="false">
-            <column name="user_name"/>
-        </createIndex>
-    </changeSet>
 <!-- Foreign key constraints -->
     <changeSet author="pgawade (generated)" id="1236014212860-93">
             <addForeignKeyConstraint baseColumnNames="dataset_id" baseTableName="archived_dataset_file" constraintName="fk_archived_reference_dataset" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="dataset_id" referencedTableName="dataset" />
@@ -1335,28 +1289,28 @@
                 <addForeignKeyConstraint baseColumnNames="audit_id" baseTableName="audit_event_values" constraintName="fk_audit_lo_ref_audit_lo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="audit_id" referencedTableName="audit_event" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-97">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="completion_status" constraintName="fk_completi_fk_comple_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="completion_status" constraintName="fk_completi_fk_comple_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-98">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="crf" constraintName="fk_crf_crf_user_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="crf" constraintName="fk_crf_crf_user_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-99">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="crf" constraintName="fk_crf_fk_crf_fk_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="crf" constraintName="fk_crf_fk_crf_fk_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-100">
                 <addForeignKeyConstraint baseColumnNames="crf_id" baseTableName="crf_version" constraintName="fk_versioni_reference_instrume" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="crf_id" referencedTableName="crf" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-101">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="crf_version" constraintName="fk_crf_vers_crf_versi_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="crf_version" constraintName="fk_crf_vers_crf_versi_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-102">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="crf_version" constraintName="fk_crf_vers_fk_crf_ve_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="crf_version" constraintName="fk_crf_vers_fk_crf_ve_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-103">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="dataset" constraintName="fk_dataset_fk_datase_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="dataset" constraintName="fk_dataset_fk_datase_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-104">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="dataset" constraintName="fk_dataset_fk_datase_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="dataset" constraintName="fk_dataset_fk_datase_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-105">
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="dataset" constraintName="fk_dataset_fk_datase_study" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
@@ -1422,10 +1376,10 @@
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="decision_condition" constraintName="fk_decision_fk_decisi_crf_vers" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-124">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="decision_condition" constraintName="fk_decision_fk_decisi_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="decision_condition" constraintName="fk_decision_fk_decisi_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-125">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="decision_condition" constraintName="fk_decision_fk_decisi_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="decision_condition" constraintName="fk_decision_fk_decisi_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-126">
             <!-- Changed the identifier name to reduce its length during porting to Oracle; oracle has a limit of 30 characters on identifier length.
@@ -1433,7 +1387,7 @@
                 <addForeignKeyConstraint baseColumnNames="discrepancy_note_type_id" baseTableName="discrepancy_note" constraintName="dn_discrepancy_note_type_id_fk" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="discrepancy_note_type_id" referencedTableName="discrepancy_note_type" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-127">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="discrepancy_note" constraintName="discrepancy_note_owner_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="discrepancy_note" constraintName="discrepancy_note_owner_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-128">
             <!-- Changed the identifier name to reduce its length during porting to Oracle; oracle has a limit of 30 characters on identifier length.
@@ -1500,10 +1454,10 @@
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="event_crf" constraintName="fk_subject_referenc_instrument" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-142">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="event_crf" constraintName="fk_event_cr_fk_event__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="event_crf" constraintName="fk_event_cr_fk_event__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-143">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="event_crf" constraintName="fk_event_cr_fk_event__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="event_crf" constraintName="fk_event_cr_fk_event__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-144">
                 <addForeignKeyConstraint baseColumnNames="study_event_id" baseTableName="event_crf" constraintName="fk_event_cr_fk_event__study_ev" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_event_id" referencedTableName="study_event" />
@@ -1518,10 +1472,10 @@
                 <addForeignKeyConstraint baseColumnNames="default_version_id" baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-148">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="event_definition_crf" constraintName="fk_event_de_study_crf_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="event_definition_crf" constraintName="fk_event_de_study_crf_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-149">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="event_definition_crf" constraintName="fk_event_de_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="event_definition_crf" constraintName="fk_event_de_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-150">
                 <addForeignKeyConstraint baseColumnNames="study_event_definition_id" baseTableName="event_definition_crf" constraintName="fk_event_de_reference_study_ev" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_event_definition_id" referencedTableName="study_event_definition" />
@@ -1530,10 +1484,10 @@
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="event_definition_crf" constraintName="fk_study_reference_instrument" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-152">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="filter" constraintName="fk_filter_fk_query__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="filter" constraintName="fk_filter_fk_query__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-153">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="filter" constraintName="fk_filter_fk_query__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="filter" constraintName="fk_filter_fk_query__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-154">
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="filter_crf_version_map" constraintName="fk_filter_c_reference_crf_vers" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
@@ -1548,10 +1502,10 @@
                 <addForeignKeyConstraint baseColumnNames="item_reference_type_id" baseTableName="item" constraintName="fk_item_fk_item_f_item_ref" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="item_reference_type_id" referencedTableName="item_reference_type" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-158">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item" constraintName="fk_item_fk_item_u_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item" constraintName="fk_item_fk_item_u_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-159">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item" constraintName="fk_item_fk_item_s_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item" constraintName="fk_item_fk_item_s_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-160">
                 <addForeignKeyConstraint baseColumnNames="event_crf_id" baseTableName="item_data" constraintName="fk_item_reference_subject" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="event_crf_id" referencedTableName="event_crf" />
@@ -1560,10 +1514,10 @@
                 <addForeignKeyConstraint baseColumnNames="item_id" baseTableName="item_data" constraintName="fk_answer_reference_item" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="item_id" referencedTableName="item" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-162">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item_data" constraintName="fk_item_dat_fk_item_d_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item_data" constraintName="fk_item_dat_fk_item_d_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-163">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item_data" constraintName="fk_item_dat_fk_item_d_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item_data" constraintName="fk_item_dat_fk_item_d_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-164">
                 <addForeignKeyConstraint baseColumnNames="item_id" baseTableName="item_form_metadata" constraintName="fk_item_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="item_id" referencedTableName="item" />
@@ -1578,10 +1532,10 @@
                 <addForeignKeyConstraint baseColumnNames="crf_id" baseTableName="item_group" constraintName="fk_item_group_crf" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_id" referencedTableName="crf" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-168">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item_group" constraintName="fk_item_gro_fk_item_g_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="item_group" constraintName="fk_item_gro_fk_item_g_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-169">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item_group" constraintName="fk_item_gro_fk_item_g_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="item_group" constraintName="fk_item_gro_fk_item_g_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-170">
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="item_group_metadata" constraintName="fk_crf_metadata" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
@@ -1605,28 +1559,28 @@
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="section" constraintName="fk_section_version" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-177">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="section" constraintName="fk_section_fk_sectio_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="section" constraintName="fk_section_fk_sectio_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-178">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="section" constraintName="fk_section_fk_sectio_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="section" constraintName="fk_section_fk_sectio_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-179">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study" constraintName="fk_study_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study" constraintName="fk_study_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-180">
                 <addForeignKeyConstraint baseColumnNames="parent_study_id" baseTableName="study" constraintName="PROJECT_IS_CONTAINED_WITHIN_PA" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-181">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study" constraintName="fk_study_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study" constraintName="fk_study_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-182">
                 <addForeignKeyConstraint baseColumnNames="type_id" baseTableName="study" constraintName="fk_study_type" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_type_id" referencedTableName="study_type" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-183">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_event" constraintName="fk_study_ev_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_event" constraintName="fk_study_ev_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-184">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_event" constraintName="fk_study_ev_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_event" constraintName="fk_study_ev_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-185">
                 <addForeignKeyConstraint baseColumnNames="study_event_definition_id" baseTableName="study_event" constraintName="fk_study_ev_fk_study__study_ev" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_event_definition_id" referencedTableName="study_event_definition" />
@@ -1635,10 +1589,10 @@
                 <addForeignKeyConstraint baseColumnNames="study_subject_id" baseTableName="study_event" constraintName="fk_study_ev_reference_study_su" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_subject_id" referencedTableName="study_subject" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-187">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_event_definition" constraintName="fk_study_ev_fk_studye_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_event_definition" constraintName="fk_study_ev_fk_studye_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-188">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_event_definition" constraintName="fk_study_ev_fk_studye_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_event_definition" constraintName="fk_study_ev_fk_studye_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-189">
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_event_definition" constraintName="FK_STUDY_EV_FK_STUDY__STUDY" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
@@ -1650,10 +1604,10 @@
                 <addForeignKeyConstraint baseColumnNames="group_class_type_id" baseTableName="study_group_class" constraintName="fk_study_gr_fk_study__group_ty" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="group_class_type_id" referencedTableName="group_class_types" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-192">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_group_class" constraintName="fk_study_gr_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_group_class" constraintName="fk_study_gr_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-193">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_group_class" constraintName="fk_study_gr_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_group_class" constraintName="fk_study_gr_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-194">
             <!-- Changed the identifier name to reduce its length during porting to Oracle; oracle has a limit of 30 characters on identifier length.
@@ -1666,10 +1620,10 @@
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_parameter_value" constraintName="study_param_value_study_id_fk" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-196">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_subject" constraintName="fk_study_su_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_subject" constraintName="fk_study_su_fk_study__user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-197">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_subject" constraintName="fk_study_su_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_subject" constraintName="fk_study_su_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-198">
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_subject" constraintName="fk_project__reference_study2" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
@@ -1678,10 +1632,10 @@
                 <addForeignKeyConstraint baseColumnNames="subject_id" baseTableName="study_subject" constraintName="fk_study_reference_subject" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="subject_id" referencedTableName="subject" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-200">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-201">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-202">
                 <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_user_role" constraintName="fk_person_role_study_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
@@ -1693,16 +1647,16 @@
                 <addForeignKeyConstraint baseColumnNames="mother_id" baseTableName="subject" constraintName="HAS_MOTHER" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="subject_id" referencedTableName="subject" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-205">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="subject" constraintName="fk_subject_fk_subjec_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="subject" constraintName="fk_subject_fk_subjec_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-206">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="subject" constraintName="fk_subject_fk_subjec_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="subject" constraintName="fk_subject_fk_subjec_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-207">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="subject_group_map" constraintName="fk_subject__fk_sub_gr_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="subject_group_map" constraintName="fk_subject__fk_sub_gr_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-208">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="subject_group_map" constraintName="fk_subject__fk_subjec_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="subject_group_map" constraintName="fk_subject__fk_subjec_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-209">
                 <addForeignKeyConstraint baseColumnNames="study_group_class_id" baseTableName="subject_group_map" constraintName="fk_subject__fk_subjec_study_gr" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_group_class_id" referencedTableName="study_group_class" />
@@ -1713,15 +1667,7 @@
             <changeSet author="pgawade (generated)" id="1236014212860-211">
                 <addForeignKeyConstraint baseColumnNames="study_subject_id" baseTableName="subject_group_map" constraintName="fk_subject__subject_g_study_su" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="study_subject_id" referencedTableName="study_subject" />
             </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-212">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="user_account" constraintName="fk_user_acc_fk_user_f_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
-            </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-213">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="user_account" constraintName="fk_user_acc_status_re_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
-            </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-214">
-                <addForeignKeyConstraint baseColumnNames="user_type_id" baseTableName="user_account" constraintName="fk_user_acc_ref_user__user_typ" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_type_id" referencedTableName="user_type" />
-            </changeSet>
+
             <changeSet author="pgawade (generated)" id="1236014212860-215">
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="versioning_map" constraintName="fk_versioni_fk_versio_crf_vers" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>

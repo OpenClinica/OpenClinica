@@ -492,7 +492,7 @@
         <addForeignKeyConstraint baseColumnNames="assigned_user_id" baseTableName="discrepancy_note"
             constraintName="discrepancy_note_asn_u_id_fkey" deferrable="false"
             initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
-            referencedColumnNames="user_id" referencedTableName="user_account"/>
+            referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public"/>
     </changeSet>
 
     <changeSet author="pgawade" id="1235684743487-430">
@@ -515,13 +515,6 @@
         <addColumn tableName="crf">
             <column name="study_id" type="integer"/>
         </addColumn>
-    </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-434">
-        <insert tableName="status">
-            <column name="status_id" valueNumeric="10"/>
-            <column name="name" value="souce_data_verification"/>
-            <column name="description" value="indicates the element has undergone SDV"/>
-        </insert>
     </changeSet>
     <changeSet author="kkrumlian" id="1235684743487-435" dbms="postgresql">
         <sql splitStatements="false">

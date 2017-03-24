@@ -3,7 +3,9 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
+import org.akaza.openclinica.controller.helper.ProtocolInfo;
 import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
+import org.akaza.openclinica.core.OCSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
@@ -39,33 +41,34 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
     private StudyUserRoleDao studyUserRoleDao;
     @Autowired
     private SchemaServiceDao schemaServiceDao;
-    public Study process(String schemaName, String name, String uniqueId, String ocId, UserAccountBean ub) {
+    public Study process(String name, ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception {
         Study schemaStudy = null;
 
         try {
-            OCMultiTenantSpringLiquibase liquibase = (OCMultiTenantSpringLiquibase) context.getBean("liquibase");
             List schemas = new ArrayList();
-            schemas.add(schemaName);
+            schemas.add(protocolInfo.getSchema());
+            OCMultiTenantSpringLiquibase liquibase = (OCMultiTenantSpringLiquibase) context.getBean("liquibase");
             liquibase.setSchemas(schemas);
             liquibase.dynamicAfterPropertiesSet(schemas);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Created schema for this protocol", "PENDING");
-            AsyncStudyHelper.put(uniqueId, asyncStudyHelper);
+            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
+
         } catch (Exception e) {
-            logger.error("Error while creating a liquibase schema:" + schemaName);
+            logger.error("Error while creating a liquibase schema:" + protocolInfo.getSchema());
             logger.error(e.getMessage(), e);
-            return schemaStudy;
+            throw e;
         }
 
         try {
             schemaStudy = new Study();
             schemaStudy.setName(name);
-            schemaStudy.setUniqueIdentifier(uniqueId);
-            schemaStudy.setOc_oid(ocId);
+            schemaStudy.setUniqueIdentifier(protocolInfo.getUniqueStudyId());
+            schemaStudy.setOc_oid(protocolInfo.getOcId());
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            schemaServiceDao.setConnectionSchemaName(schemaName);
+            schemaServiceDao.setConnectionSchemaName(protocolInfo.getSchema());
             Integer studyId = (Integer) studyDao.save(schemaStudy);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
-            AsyncStudyHelper.put(uniqueId, asyncStudyHelper);
+            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
             StudyUserRole studyUserRole = new StudyUserRole();
             StudyUserRoleId userRoleId = new StudyUserRoleId();
             studyUserRole.setId(userRoleId);
@@ -78,10 +81,25 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             studyUserRoleDao.save(studyUserRole);
             logger.info("liquibase: studyId" + studyId);
         } catch (Exception e) {
-            logger.error("Error while creating Study and StudyUserRole:" + schemaName);
+            logger.error("Error while creating Study and StudyUserRole:" + protocolInfo.getSchema());
             logger.error(e.getMessage(), e);
+            throw e;
         }
         return schemaStudy;
+    }
+    public void createPublicTables(ProtocolInfo protocolInfo) throws Exception {
+        try {
+            List schemas = new ArrayList();
+            schemas.add(protocolInfo.getSchema());
+            OCSpringLiquibase liquibasePerSchema = (OCSpringLiquibase) context.getBean("liquibaseForeignTables", schemas);
+            liquibasePerSchema.processSchemaLiquibase(schemas);
+            AsyncStudyHelper asyncStudySchemaHelper = new AsyncStudyHelper("Created foreign tables for this protocol", "PENDING");
+            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudySchemaHelper);
+        }  catch (Exception e) {
+            logger.error("Error while creating Study and StudyUserRole:" + protocolInfo.getSchema());
+            logger.error(e.getMessage(), e);
+            throw e;
+        }
     }
 }
 

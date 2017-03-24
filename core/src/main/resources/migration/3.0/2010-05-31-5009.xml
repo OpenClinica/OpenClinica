@@ -16,7 +16,7 @@
 	</changeSet>
     <changeSet author="ahamid" id="2010-05-31-5009-3">
         <addForeignKeyConstraint constraintName="fk_old_status_id"
-                                 referencedTableName="status"
+                                 referencedTableName="status" referencedTableSchemaName="public"
                                  baseColumnNames="old_status_id"
                                  baseTableName="study"
                                  referencedColumnNames="status_id"/>

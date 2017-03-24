@@ -10,13 +10,6 @@
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource
           and Hibernate DAO injection via autowiring -->
 
-
-    <bean id="liquibase" class="org.akaza.openclinica.core.OCMultiTenantSpringLiquibase" depends-on="coreResources">
-      <property name="dataSource" ref="dataSource" />
-      <property name="changeLog" value="classpath:migration/master.xml" />
-      <property name="defaultSchema" value="s[schema]"/>
-    </bean>
-
     <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
         <property name="driverClassName" value="org.postgresql.Driver"/>
         <property name="maxTotal" value="50"/>

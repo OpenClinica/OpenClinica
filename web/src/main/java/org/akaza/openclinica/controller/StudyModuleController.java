@@ -293,7 +293,7 @@ public class StudyModuleController {
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-
+        StudyBean currentPublicStudy = (StudyBean) request.getSession().getAttribute("publicStudy");
         eventDefinitionCRFDao = new EventDefinitionCRFDAO(dataSource);
         studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         crfDao = new CRFDAO(dataSource);

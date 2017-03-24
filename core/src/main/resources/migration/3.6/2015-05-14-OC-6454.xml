@@ -14,13 +14,6 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="jkeremian" id="2015-05-14-OC-6454-2">
-		<comment>adding a column in dn_item_data_map table</comment>
-		<addColumn tableName="user_account">
-			<column name="time_zone"  type="VARCHAR(255)" defaultValue=""/>
-		</addColumn>
-	</changeSet>
-
 	<changeSet author="jkeremian" id="2015-05-14-OC-6454-3">
 		<comment>adding a column in dn_item_data_map table</comment>
 		<addColumn tableName="study_subject">

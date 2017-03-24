@@ -12,7 +12,6 @@
     <include file="migration/amethyst/2011-05-28-9305.xml"/>
     <include file="migration/amethyst/2010-07-07-5429.xml"/>
     <include file="migration/amethyst/2010-07-14-5265.xml"/>
-    <include file="migration/amethyst/2010-08-19-NA01.xml"/>
     <include file="migration/amethyst/2010-08-24-5724.xml"/>
     <include file="migration/amethyst/2010-08-26-5724.xml"/>
     <include file="migration/amethyst/2010-08-26-5732.xml"/>
