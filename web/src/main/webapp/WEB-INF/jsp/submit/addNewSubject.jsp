@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -124,6 +124,9 @@
 			</table>
 		</td>
 	</tr>
+	
+	<input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
+	<%--
 	<c:choose>
 	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
 	<tr valign="top">
@@ -166,7 +169,7 @@
 	  <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
 	</c:otherwise>
 	</c:choose>
-
+ 	--%>
 	<tr valign="top">
 	  	<td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
 		<td valign="top">
@@ -236,6 +239,8 @@
 				<tr>
 					<td valign="top"><div class="formfieldS_BG">
 						<select name="gender" class="formfieldS">
+						    <option value="f" selected><fmt:message key="female" bundle="${resword}"/></option>   
+							<!-- 20160827 by ll in this study only female
 							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
 							<c:choose>
 								<c:when test="${!empty chosenGender}">
@@ -255,6 +260,7 @@
 	                        		<option value="f"><fmt:message key="female" bundle="${resword}"/></option>
                             	</c:otherwise>
                         	</c:choose>
+                        	-->
 	                        </select>
 	            </td>
 	<td align="left">

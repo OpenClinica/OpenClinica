@@ -1,4 +1,4 @@
-package org.akaza.openclinica.i18n.core;
+﻿package org.akaza.openclinica.i18n.core;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -50,11 +50,14 @@ public final class LocaleResolver {
 	 * @return
 	 */
 	public final static Locale getLocale(HttpServletRequest request) {
+		/*Edited by ll 20160811  cn will cause dateformat error  so just use US
 	    Locale locale = getLocaleInSession(request.getSession(false));
 	    if(locale == null) {
 	        return resolveLocale(request);
 	    }
 	    return locale;
+	    */
+		return getDefaultLocale();
 	}
 
 	/*

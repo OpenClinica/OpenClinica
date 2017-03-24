@@ -34,8 +34,10 @@ public class ParticipantPortalRegistrar {
             if (response.length > 0 && response[0].getAuthorizationStatus() != null)
                 return response[0];
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
+//            
+//        	logger.error(e.getMessage());
+//            logger.error(ExceptionUtils.getStackTrace(e));
+
         }
         return null;
     }
