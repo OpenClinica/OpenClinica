@@ -251,7 +251,12 @@ public class XformMetaDataService {
                         && (readonly == null || !readonly.trim().equals("true()") || (readonly.trim().equals("true()") && calculate))) {
                     Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
-                        ResponseType responseType = getResponseType(html, xformItem);
+                        ResponseType responseType = null;
+                        if (calculate) {
+                            responseType = responseTypeDao.findByResponseTypeName("calculation");
+                        } else {
+                            responseType = getResponseType(html, xformItem);
+                        }
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, crfVersion, responseType, item,
                                 errors);
                         // add if statement
