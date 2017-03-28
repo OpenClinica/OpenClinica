@@ -72,15 +72,22 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
+        String node = itemNode.getTextContent();
+        if (StringUtils.isEmpty(node))
+            return;
         helperBean.setContainer(container);
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
-        helperBean.setItemData(getItemData(helperBean));
-        // helperBean.setResStatus(resolutionStatusDao.findByResolutionStatusId(1));
+        ItemData id = getItemData(helperBean);
+        if (id == null) {
+            helperBean.setItemData(createBlankItemData(helperBean));
+        } else {
+            helperBean.setItemData(id);
+        }
         QueriesBean queries = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            queries = objectMapper.readValue(itemNode.getTextContent(), QueriesBean.class);
+            queries = objectMapper.readValue(node, QueriesBean.class);
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw e;
@@ -135,7 +142,13 @@ public class QueryServiceImpl implements QueryService {
 
         dn.setDetailedNotes(queryBean.getComment());
         dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
-
+        String user = queryBean.getUser();
+        if (user == null) {
+            dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
+        } else {
+            UserAccount userAccountByOwnerId = userAccountDao.findByUserName(user);
+            dn.setUserAccountByOwnerId(userAccountByOwnerId);
+        }
         if (queryBean.getStatus().equals("new")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(1));
         } else if (queryBean.getStatus().equals("updated")) {
@@ -153,7 +166,6 @@ public class QueryServiceImpl implements QueryService {
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }
-        dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
         // create itemData when a query is created without an autosaved itemdata
         if (helperBean.getItemData() == null) {
             helperBean.setItemData(createBlankItemData(helperBean));

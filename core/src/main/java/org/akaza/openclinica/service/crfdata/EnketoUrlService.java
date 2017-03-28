@@ -20,6 +20,7 @@ import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
@@ -37,6 +38,7 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
@@ -49,6 +51,7 @@ import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ResponseType;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -64,6 +67,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +96,9 @@ public class EnketoUrlService {
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
     public static final String NO_FLAVOR = "";
+    public static final String COMMENT = "comment";
+    public static final String AUDIT = "audit";
+    public static final String ITEMDATA = "item_data";
 
     @Autowired
     @Qualifier("dataSource")
@@ -143,7 +150,13 @@ public class EnketoUrlService {
     private DiscrepancyNoteDao discrepancyNoteDao;
 
     @Autowired
+    private AuditLogEventDao auditLogEventDao;
+
+    @Autowired
     private XformParserHelper xformParserHelper;
+
+    @Autowired
+    private EnketoCredentials enketoCredentials;
 
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
@@ -155,6 +168,8 @@ public class EnketoUrlService {
     public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor)
             throws Exception {
         // Call Enketo api to get edit url
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
         return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
 
@@ -162,6 +177,8 @@ public class EnketoUrlService {
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
             StudyEvent studyEvent, String flavor) throws Exception {
+        Study study = enketoCredentials.getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
 
         String editURL = null;
         StudyEventDefinition eventDef;
@@ -235,9 +252,9 @@ public class EnketoUrlService {
     public QueriesBean buildQueryElement(ItemData itemdata) {
         QueriesBean queryElement = new QueriesBean();
         List<QueryBean> queryBeans = new ArrayList<>();
-        List<LogBean> logs = new ArrayList<LogBean>();
-        // LogBean logBean = new LogBean();
+        List<LogBean> logBeans = new ArrayList<LogBean>();
         List<DiscrepancyNote> dns = discrepancyNoteDao.findChildQueriesByItemData(itemdata.getItemDataId());
+
         int i = 0;
         for (DiscrepancyNote dn : dns) {
             i++;
@@ -248,17 +265,45 @@ public class EnketoUrlService {
             }
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
-            query.setDate_time(dn.getDateCreated().toString());
+            DateTime dateTime = new DateTime(dn.getDateCreated());
+            query.setDate_time(convertDateFormat(dateTime));
             query.setNotify(false);
+            query.setUser(dn.getUserAccountByOwnerId().getUserName());
+            query.setType(COMMENT);
             queryBeans.add(query);
         }
-        // logs.add(logBean);
+
+        AuditLogEvent auditLog = new AuditLogEvent();
+        auditLog.setEntityId(new Integer(itemdata.getItemDataId()));
+        auditLog.setAuditTable(ITEMDATA);
+        ArrayList<AuditLogEvent> auditLogEvents = auditLogEventDao.findByParam(auditLog, null);
+
+        for (AuditLogEvent audit : auditLogEvents) {
+            LogBean logBean = new LogBean();
+            String oldValue = audit.getOldValue() != null ? audit.getOldValue() : "";
+            String newValue = audit.getNewValue() != null ? audit.getNewValue() : "";
+            logBean.setMessage("Value Changed from \"" + oldValue + "\" to \"" + newValue + "\"");
+            DateTime dateTime = new DateTime(audit.getAuditDate());
+            logBean.setDate_time(convertDateFormat(dateTime));
+            logBean.setUser(audit.getUserAccount().getUserName());
+            logBean.setType(AUDIT);
+            logBeans.add(logBean);
+        }
+
         queryElement.setQueries(queryBeans);
-        queryElement.setLogs(logs);
-        if (dns.size() != 0)
+        queryElement.setLogs(logBeans);
+        if (queryElement.getQueries().size() != 0 || queryElement.getLogs().size() != 0)
             return queryElement;
         else
             return null;
+
+    }
+
+    private String convertDateFormat(DateTime dateTime) {
+        String dt = dateTime.toString();
+        dt = dt.replaceAll("T", " ");
+        dt = dt.substring(0, 19) + " " + dt.substring(23);
+        return dt;
     }
 
     private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, String flavor) throws Exception {
@@ -305,7 +350,8 @@ public class EnketoUrlService {
                         }
                         for (ItemGroupMetadata igm : igms) {
                             ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
-                            hashMap.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
+                            String itemValue = getItemValue(itemData, crfVersion);
+                            hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                             if (flavor.equals(QUERY_FLAVOR)) {
                                 if (itemData != null) {
                                     ObjectMapper mapper = new ObjectMapper();
@@ -317,6 +363,7 @@ public class EnketoUrlService {
                             }
                         }
                         hashMapList.add(hashMap);
+
                     }
                 }
             }
@@ -328,7 +375,8 @@ public class EnketoUrlService {
             if (!igms.get(0).isRepeatingGroup()) {
                 for (ItemGroupMetadata igm : igms) {
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
-                    data.put(igm.getItem().getName(), itemData != null ? itemData.getValue() : "");
+                    String itemValue = getItemValue(itemData, crfVersion);
+                    data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                     if (flavor.equals(QUERY_FLAVOR)) {
                         if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
@@ -458,6 +506,23 @@ public class EnketoUrlService {
         }
         // maxGroupRepeat
         return target;
+    }
+
+    private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
+        String itemValue = null;
+        if (itemData != null) {
+            itemValue = itemData.getValue();
+            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(itemData.getItem().getItemId(), crfVersion.getCrfVersionId());
+
+            // Convert space separated Enketo multiselect values to comma separated OC
+            // multiselect
+            // values
+            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+            if (responseTypeId == 3 || responseTypeId == 7) {
+                itemValue = itemValue.replaceAll(",", " ");
+            }
+        }
+        return itemValue;
     }
 
 }

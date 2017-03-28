@@ -82,10 +82,17 @@ public class QueryFormDecorator extends FormDecorator {
                 Node relevantAttr = attr.getNamedItem("relevant");
                 Node readonlyAttr = attr.getNamedItem("readonly");
                 Node requiredAttr = attr.getNamedItem("required");
-                // Node constraintAttr = attr.getNamedItem("constraint");
+                Node constraintAttr = attr.getNamedItem("constraint");
+                String nodeValue = nodesetAttr.getNodeValue() + COMMENT;
+
+                if (constraintAttr != null) {
+                    String constraintValue = constraintAttr.getNodeValue() + " or comment-status(" + nodeValue + ")='new' or comment-status(" + nodeValue
+                            + ")='updated'";
+                    constraintAttr.setNodeValue(constraintValue);
+                }
+
                 if (requiredAttr != null && requiredAttr.getNodeValue().equalsIgnoreCase("true()")) {
-                    String nodeValue = nodesetAttr.getNodeValue() + COMMENT;
-                    String requiredValue = nodeValue + "='' or comment-status(" + nodeValue + ") = 'closed'";
+                    String requiredValue = nodeValue + " =''  or comment-status(" + nodeValue + ")='closed'";
                     requiredAttr.setNodeValue(requiredValue);
                 }
 

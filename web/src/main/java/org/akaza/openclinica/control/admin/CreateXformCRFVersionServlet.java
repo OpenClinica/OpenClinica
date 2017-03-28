@@ -33,6 +33,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
@@ -41,6 +42,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
     public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
+    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     @Override
     protected void processRequest() throws Exception {
@@ -87,20 +89,30 @@ public class CreateXformCRFVersionServlet extends SecureController {
          * }
          * }
          **/
+        if (crf.getOcoid().equals("ERROR") && !StringUtils.isEmpty(crf.getDescription())) {
+            String errorMessage = crf.getDescription();
+            int index = errorMessage.indexOf("pyxform.errors.PyXFormError:");
+            errorMessage = errorMessage.substring(index + 29);
+            errors.rejectValue("name", "xform_validation_error", errorMessage);
+        } else {
 
-        List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
-        OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
-        for (Version version : crf.getVersions()) {
-            formLayoutDef = new OCodmComplexTypeDefinitionFormLayoutDef();
-            formLayoutDef.setOID(version.getName());
-            formLayoutDef.setURL(version.getArtifactURL());
-            formLayoutDefs.add(formLayoutDef);
+            List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
+            OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
+            for (Version version : crf.getVersions()) {
+                formLayoutDef = new OCodmComplexTypeDefinitionFormLayoutDef();
+                formLayoutDef.setOID(version.getName());
+                formLayoutDef.setURL(version.getArtifactURL());
+                formLayoutDefs.add(formLayoutDef);
+            }
+
+            ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName,
+                    crfDescription);
+
+            xformService.executeIndividualCrf(eicObj);
         }
-
-        ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName,
-                crfDescription);
-
-        xformService.executeIndividualCrf(eicObj);
+        if (errors.hasErrors()) {
+            request.setAttribute("errorList", errors.getAllErrors());
+        }
         forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
