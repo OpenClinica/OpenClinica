@@ -302,7 +302,7 @@ public class EnketoUrlService {
     private String convertDateFormat(DateTime dateTime) {
         String dt = dateTime.toString();
         dt = dt.replaceAll("T", " ");
-        dt = dt.substring(0, 19) + " " + dt.substring(23);
+        dt = dt.substring(0, 23) + " " + dt.substring(23);
         return dt;
     }
 
