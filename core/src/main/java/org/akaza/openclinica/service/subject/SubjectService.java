@@ -69,7 +69,7 @@ public class SubjectService implements SubjectServiceInterface {
     private StudySubjectBean createStudySubject(SubjectBean subject, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
         StudySubjectBean studySubject = new StudySubjectBean();
         studySubject.setSecondaryLabel(secondaryId);
-        studySubject.setOwner(getUserAccount());
+        studySubject.setOwner(subject.getOwner());
         studySubject.setEnrollmentDate(enrollmentDate);
         studySubject.setSubjectId(subject.getId());
         studySubject.setStudyId(studyBean.getId());
