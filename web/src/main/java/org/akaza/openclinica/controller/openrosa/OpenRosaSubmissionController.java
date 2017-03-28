@@ -146,6 +146,8 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
+        Study parentStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", parentStudy.getSchemaName());
         Study study = studyDao.findByOcOID(studyOID);
         String requestBody = null;
 
@@ -306,6 +308,8 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
+        Study parentStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", parentStudy.getSchemaName());
         Study study = studyDao.findByOcOID(studyOID);
         String requestBody = null;
         String instanceId = null;

@@ -4,6 +4,7 @@ import org.akaza.openclinica.domain.DomainObject;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.internal.SessionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate5.HibernateTemplate;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
@@ -78,22 +80,22 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 
     public Session getCurrentSession() {
         Session session = null;
-        Session oldSession = null;
         String tenant = null;
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             tenant = (String) request.getAttribute("requestSchema");
         }
-        oldSession = getSessionFactory().getCurrentSession();
+        session = getSessionFactory().getCurrentSession();
 
-        if (StringUtils.isNotEmpty(tenant) &&
-                !StringUtils.equals(tenant, oldSession.getTenantIdentifier())) {
-            logger.debug("Getting new session for tenant=" + tenant);
-            session = getSessionFactory().withOptions().tenantIdentifier(tenant).openSession();
-        } else {
-            logger.debug("session from getCurrentSession");
-            session = oldSession;
+        if (StringUtils.isNotEmpty(tenant)) {
+            SessionImpl sessionImpl = (SessionImpl) session;
+            try {
+                String currentSchema = sessionImpl.connection().getSchema();
+                if (!tenant.equals(currentSchema))
+                    sessionImpl.connection().setSchema(tenant);
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);            }
         }
 
         return session;

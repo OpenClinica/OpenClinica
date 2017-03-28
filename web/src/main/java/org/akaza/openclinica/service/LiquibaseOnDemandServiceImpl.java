@@ -66,6 +66,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setOc_oid(protocolInfo.getOcId());
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             schemaServiceDao.setConnectionSchemaName(protocolInfo.getSchema());
+            studyDao.getCurrentSession().clear();
             Integer studyId = (Integer) studyDao.save(schemaStudy);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
             AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);

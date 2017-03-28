@@ -3,22 +3,7 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="yogi" id="2017-03-14-7878-0" failOnError="false">
-        <sql splitStatements="false">
-            CREATE EXTENSION postgres_fdw;
-        </sql>
-    </changeSet>
-    <changeSet author="yogi" id="2017-03-14-7878-1" failOnError="false">
 
-        <sql splitStatements="false">
-            CREATE SERVER app_database_server FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname 'oc_test');
-        </sql>
-    </changeSet>
-    <changeSet author="yogi" id="2017-03-14-7878-2" failOnError="false">
-        <sql splitStatements="false">
-            CREATE USER MAPPING FOR CURRENT_USER SERVER app_database_server OPTIONS (user 'clinica', password 'clinica');
-        </sql>
-    </changeSet>
     <changeSet author="yogi" id="2017-03-14-7878-3" failOnError="false">
         <sql splitStatements="false">
             CREATE FOREIGN TABLE status
