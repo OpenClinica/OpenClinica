@@ -436,12 +436,16 @@
                 <version>2.0-FCS</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>javax.xml</groupId>
+                        <groupId>javax.xml.parsers</groupId>
                         <artifactId>jaxp-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
-
+            <dependency>
+                <groupId>javax.xml.parsers</groupId>
+                <artifactId>jaxp-api</artifactId>
+                <version>1.4</version>
+            </dependency>
             <!--
             <dependency>
                 <groupId>org.springframework.ws</groupId>
@@ -875,20 +879,6 @@
             <name>openclinica.jfrog.io-libs-release</name>
             <url>https://openclinica.jfrog.io/openclinica/libs-release</url>
         </repository>
-         <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>libs-release</name>
-            <url>https://dev.openclinica.com/artifactory/libs-release</url>
-        </repository>
-        <repository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>libs-snapshot</name>
-            <url>https://dev.openclinica.com/artifactory/libs-snapshot</url>
-        </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
@@ -905,20 +895,6 @@
         </repository>
     </repositories>
     <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>plugins-release</name>
-            <url>http://dev.openclinica.com/artifactory/plugins-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>plugins-snapshot</name>
-            <url>http://dev.openclinica.com/artifactory/plugins-snapshot</url>
-        </pluginRepository>
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>

@@ -142,7 +142,13 @@ public class QueryServiceImpl implements QueryService {
 
         dn.setDetailedNotes(queryBean.getComment());
         dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
-
+        String user = queryBean.getUser();
+        if (user == null) {
+            dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
+        } else {
+            UserAccount userAccountByOwnerId = userAccountDao.findByUserName(user);
+            dn.setUserAccountByOwnerId(userAccountByOwnerId);
+        }
         if (queryBean.getStatus().equals("new")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(1));
         } else if (queryBean.getStatus().equals("updated")) {
@@ -160,7 +166,6 @@ public class QueryServiceImpl implements QueryService {
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }
-        dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
         // create itemData when a query is created without an autosaved itemdata
         if (helperBean.getItemData() == null) {
             helperBean.setItemData(createBlankItemData(helperBean));
