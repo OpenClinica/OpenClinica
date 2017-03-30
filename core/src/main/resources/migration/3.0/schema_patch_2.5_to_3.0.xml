@@ -171,21 +171,7 @@
             <column name="reference"/>
         </insert>
     </changeSet>
-    <!-- Added Tables for Spring Security -->
-    <changeSet author="pgawade (generated)" id="1235684743487-402">
-        <createTable tableName="authorities">
-            <column autoIncrement="true" name="id" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="username" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="authority" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="int"/>
-        </createTable>
-    </changeSet>
+
     <!-- changeset only for oracle "authoririties" table: sequence to create a value for "id" column, trigger to insert sequence next value into "id" column -->
     <changeSet author="pgawade (generated)" id="1235684743487-433">
         <preConditions onFail="MARK_RAN">
@@ -404,14 +390,6 @@
             <column name="job_data" type="BLOB"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-415">
-        <insert tableName="authorities">
-            <column name="id" valueNumeric="1"/>
-            <column name="username" value="root"/>
-            <column name="authority" value="ROLE_USER"/>
-            <column name="version" valueNumeric="1"/>
-        </insert>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-416">
         <insert tableName="oc_qrtz_locks">
             <column name="lock_name" value="TRIGGER_ACCESS"/>
@@ -515,16 +493,6 @@
         <addColumn tableName="crf">
             <column name="study_id" type="integer"/>
         </addColumn>
-    </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-435" dbms="postgresql">
-        <sql splitStatements="false">
-            delete from authorities;
-            insert into authorities  select nextval('authorities_id_seq'), user_name,'ROLE_USER',1 from user_account;
-        </sql>
-        <rollback>
-            delete from authorities;
-            insert into authorities values (1, 'root','ROLE_USER',1);
-        </rollback>
     </changeSet>
     <changeSet author="kkrumlian" id="1235684743487-436" dbms="oracle">
         <sql>

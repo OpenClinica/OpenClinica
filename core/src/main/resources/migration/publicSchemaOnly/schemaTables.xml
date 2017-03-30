@@ -171,4 +171,89 @@
             SELECT nextval('user_account_user_id_seq')
         </sql>
     </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-8">
+        <createTable tableName="user_role">
+            <column autoIncrement="true" name="role_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="role_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="int"/>
+            <column name="role_desc" type="VARCHAR(2000)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-9">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="role_name" value="admin"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-10">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="2"/>
+            <column name="role_name" value="coordinator"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-11">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="role_name" value="director"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-12">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="4"/>
+            <column name="role_name" value="investigator"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-13">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="5"/>
+            <column name="role_name" value="ra"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-14">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="6"/>
+            <column name="role_name" value="monitor"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <!-- Added Tables for Spring Security -->
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-15">
+        <createTable tableName="authorities">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2017-03-15-7878-16" dbms="postgresql">
+        <sql splitStatements="false">
+            delete from authorities;
+            insert into authorities  select nextval('authorities_id_seq'), user_name,'ROLE_USER',1 from user_account;
+        </sql>
+        <rollback>
+            delete from authorities;
+            insert into authorities values (1, 'root','ROLE_USER',1);
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

@@ -92,7 +92,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
         try {
             List schemas = new ArrayList();
             schemas.add(protocolInfo.getSchema());
-            OCSpringLiquibase liquibasePerSchema = (OCSpringLiquibase) context.getBean("liquibaseForeignTables", schemas);
+            OCSpringLiquibase liquibasePerSchema = (OCSpringLiquibase) context.getBean("liquibaseForeignTables");
             liquibasePerSchema.processSchemaLiquibase(schemas);
             AsyncStudyHelper asyncStudySchemaHelper = new AsyncStudyHelper("Created foreign tables for this protocol", "PENDING");
             AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudySchemaHelper);

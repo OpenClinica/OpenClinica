@@ -38,13 +38,13 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="publicStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
 <h1><span class="title_manage"><fmt:message key="change_your_current_study" bundle="${restext}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <c:choose>
- <c:when test="${study != null && study.id>0}">
-  <p><fmt:message key="your_current_active_study_is" bundle="${restext}"/> <c:out value="${study.name}"/>,
+ <c:when test="${publicStudy != null && publicStudy.id>0}">
+  <p><fmt:message key="your_current_active_study_is" bundle="${restext}"/> <c:out value="${publicStudy.name}"/>,
    <c:choose>
     <c:when test="${!userRole.invalid}">
      <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${userRole.role.description}"/>.
@@ -72,7 +72,7 @@
        <c:forEach var="studyRole" items="${studies}">
            <c:set var="statusId" value="${studyRole.status.id}"/>
         <c:choose>
-         <c:when test="${study.id == studyRole.studyId}">
+         <c:when test="${publicStudy.id == studyRole.studyId}">
 
            <c:choose>
             <c:when test="${studyRole.parentStudyId > 0}">

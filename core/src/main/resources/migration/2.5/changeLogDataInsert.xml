@@ -572,54 +572,6 @@
 		<column name="description" value="place filler for completion status"/>
 	    </insert>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-307">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="1"/>
-	    <column name="role_name" value="admin"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-308">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="2"/>
-	    <column name="role_name" value="coordinator"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-309">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="3"/>
-	    <column name="role_name" value="director"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-310">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="4"/>
-	    <column name="role_name" value="investigator"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-311">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="5"/>
-	    <column name="role_name" value="ra"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-312">
-	<insert tableName="user_role">
-	    <column name="role_id" valueNumeric="6"/>
-	    <column name="role_name" value="monitor"/>
-	    <column name="parent_id" valueNumeric="1"/>
-	    <column name="role_desc"/>
-	</insert>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-313">
 	<insert tableName="export_format">
 	    <column name="export_format_id" valueNumeric="1"/>

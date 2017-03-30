@@ -50,4 +50,17 @@
             OPTIONS (schema_name 'public', table_name 'user_account');
         </sql>
     </changeSet>
+    <changeSet author="yogi" id="2017-03-14-7878-5" failOnError="false">
+    <sql splitStatements="false">
+    CREATE FOREIGN TABLE user_role
+    (
+    role_id integer,
+    role_name character varying(50),
+    parent_id integer,
+    role_desc character varying(2000),
+    ) SERVER app_database_server
+        OPTIONS (schema_name 'public', table_name 'user_account')
+    </sql>
+    </changeSet>
+
 </databaseChangeLog>

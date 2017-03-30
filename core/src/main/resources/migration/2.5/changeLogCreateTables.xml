@@ -1181,18 +1181,6 @@
             <column name="notes" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-72">
-        <createTable tableName="user_role">
-            <column autoIncrement="true" name="role_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="role_name" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="parent_id" type="int"/>
-            <column name="role_desc" type="VARCHAR(2000)"/>
-        </createTable>
-    </changeSet>
 
     <changeSet author="pgawade (generated)" id="1235684743487-74">
         <createTable tableName="versioning_map">
@@ -1553,7 +1541,7 @@
                 <addForeignKeyConstraint baseColumnNames="priv_id" baseTableName="role_privilege_map" constraintName="fk_priv_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="priv_id" referencedTableName="privilege" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-175">
-                <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="role_privilege_map" constraintName="fk_role_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="role_id" referencedTableName="user_role" />
+                <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="role_privilege_map" constraintName="fk_role_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="role_id" referencedTableName="user_role" referencedTableSchemaName="public"/>
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-176">
                 <addForeignKeyConstraint baseColumnNames="crf_version_id" baseTableName="section" constraintName="fk_section_version" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />

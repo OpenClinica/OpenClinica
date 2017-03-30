@@ -13,20 +13,6 @@
         </modifyColumn>
     </changeSet>
 
-    <changeSet author="jkeremian" id="2015-05-21-OC-5994-02">
-        <comment>increasing size of column role_name in table user_role</comment>
-        <modifyColumn tableName="user_role">
-            <column name="role_name" type="VARCHAR(64)"></column>
-        </modifyColumn>
-    </changeSet>
-
-    <changeSet author="jkeremian" id="2015-05-21-OC-5994-03">
-        <comment>increasing size of column user_name in table authorities</comment>
-        <modifyColumn tableName="authorities">
-            <column name="username" type="VARCHAR(64)"></column>
-        </modifyColumn>
-    </changeSet>
-
 
 </databaseChangeLog>
     

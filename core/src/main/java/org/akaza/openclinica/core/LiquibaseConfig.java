@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
 
 import javax.sql.DataSource;
 
@@ -28,6 +29,7 @@ public class LiquibaseConfig {
     }
 
     @Bean
+    @Scope("prototype")
     @DependsOn ("coreResources")
     public OCSpringLiquibase liquibaseForeignTables() {
         OCSpringLiquibase liquibase = new OCSpringLiquibase();
@@ -43,15 +45,6 @@ public class LiquibaseConfig {
         OCMultiTenantSpringLiquibase liquibase = new OCMultiTenantSpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:migration/master.xml");
-        return liquibase;
-    }
-
-    @Bean
-    @DependsOn ("coreResources")
-    public OCPerSchemaSpringLiquibase liquibaseMultiSchema() {
-        OCPerSchemaSpringLiquibase liquibase = new OCPerSchemaSpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:migration/master-schema.xml");
         return liquibase;
     }
 
