@@ -942,69 +942,7 @@
             <column name="borders" type="int"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-58">
-        <createTable tableName="study">
-            <column autoIncrement="true" name="study_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="parent_study_id" type="int"/>
-            <column name="unique_identifier" type="VARCHAR(30)"/>
-            <column name="secondary_identifier" type="VARCHAR(255)"/>
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="summary" type="VARCHAR(255)"/>
-            <column name="date_planned_start" type="DATE"/>
-            <column name="date_planned_end" type="DATE"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
-            <column name="owner_id" type="int"/>
-            <column name="update_id" type="int"/>
-            <column name="type_id" type="int"/>
-            <column name="status_id" type="int"/>
-            <column name="principal_investigator" type="VARCHAR(255)"/>
-            <column name="facility_name" type="VARCHAR(255)"/>
-            <column name="facility_city" type="VARCHAR(255)"/>
-            <column name="facility_state" type="VARCHAR(20)"/>
-            <column name="facility_zip" type="VARCHAR(64)"/>
-            <column name="facility_country" type="VARCHAR(64)"/>
-            <column name="facility_recruitment_status" type="VARCHAR(60)"/>
-            <column name="facility_contact_name" type="VARCHAR(255)"/>
-            <column name="facility_contact_degree" type="VARCHAR(255)"/>
-            <column name="facility_contact_phone" type="VARCHAR(255)"/>
-            <column name="facility_contact_email" type="VARCHAR(255)"/>
-            <column name="protocol_type" type="VARCHAR(30)"/>
-            <column name="protocol_description" type="VARCHAR(1000)"/>
-            <column name="protocol_date_verification" type="DATE"/>
-            <column name="phase" type="VARCHAR(30)"/>
-            <column name="expected_total_enrollment" type="int"/>
-            <column name="sponsor" type="VARCHAR(255)"/>
-            <column name="collaborators" type="VARCHAR(1000)"/>
-            <column name="medline_identifier" type="VARCHAR(255)"/>
-            <column name="url" type="VARCHAR(255)"/>
-            <column name="url_description" type="VARCHAR(255)"/>
-            <column name="conditions" type="VARCHAR(500)"/>
-            <column name="keywords" type="VARCHAR(255)"/>
-            <column name="eligibility" type="VARCHAR(500)"/>
-            <column name="gender" type="VARCHAR(30)"/>
-            <column name="age_max" type="VARCHAR(3)"/>
-            <column name="age_min" type="VARCHAR(3)"/>
-            <column name="healthy_volunteer_accepted" type="BOOLEAN"/>
-            <column name="purpose" type="VARCHAR(64)"/>
-            <column name="allocation" type="VARCHAR(64)"/>
-            <column name="masking" type="VARCHAR(30)"/>
-            <column name="control" type="VARCHAR(30)"/>
-            <column name="assignment" type="VARCHAR(30)"/>
-            <column name="endpoint" type="VARCHAR(64)"/>
-            <column name="interventions" type="VARCHAR(1000)"/>
-            <column name="duration" type="VARCHAR(30)"/>
-            <column name="selection" type="VARCHAR(30)"/>
-            <column name="timing" type="VARCHAR(30)"/>
-            <column name="official_title" type="VARCHAR(255)"/>
-            <column name="results_reference" type="BOOLEAN"/>
-            <column name="oc_oid" type="VARCHAR(40)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-59">
         <createTable tableName="study_event">
             <column autoIncrement="true" name="study_event_id" type="int">
@@ -1126,18 +1064,7 @@
             <column name="description" type="VARCHAR(1000)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-67">
-        <createTable tableName="study_user_role">
-            <column name="role_name" type="VARCHAR(40)"/>
-            <column name="study_id" type="int"/>
-            <column name="status_id" type="int"/>
-            <column name="owner_id" type="int"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
-            <column name="update_id" type="int"/>
-            <column name="user_name" type="VARCHAR(40)"/>
-        </createTable>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-68">
         <createTable tableName="subject">
             <column autoIncrement="true" name="subject_id" type="int">
@@ -1258,11 +1185,7 @@
             <column name="parent_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-91">
-        <createIndex indexName="i_study_user_role_user_name" tableName="study_user_role" unique="false">
-            <column name="user_name"/>
-        </createIndex>
-    </changeSet>
+
 <!-- Foreign key constraints -->
     <changeSet author="pgawade (generated)" id="1236014212860-93">
             <addForeignKeyConstraint baseColumnNames="dataset_id" baseTableName="archived_dataset_file" constraintName="fk_archived_reference_dataset" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="dataset_id" referencedTableName="dataset" />
@@ -1619,15 +1542,7 @@
             <changeSet author="pgawade (generated)" id="1236014212860-199">
                 <addForeignKeyConstraint baseColumnNames="subject_id" baseTableName="study_subject" constraintName="fk_study_reference_subject" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="subject_id" referencedTableName="subject" />
             </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-200">
-                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
-            </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-201">
-                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
-            </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-202">
-                <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_user_role" constraintName="fk_person_role_study_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
-            </changeSet>
+
             <changeSet author="pgawade (generated)" id="1236014212860-203">
                 <addForeignKeyConstraint baseColumnNames="father_id" baseTableName="subject" constraintName="HAS_FATHER" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="subject_id" referencedTableName="subject" />
             </changeSet>

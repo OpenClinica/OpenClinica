@@ -457,7 +457,7 @@ public class StudyController {
 	    studyDTO.setErrors(errorObjects);
 
 	    ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
-	    liquibaseOnDemandService.createPublicTables(protocolInfo);
+	    liquibaseOnDemandService.createForeignTables(protocolInfo);
 	    Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
 
 	    logger.debug("returning from liquibase study:" + study.getStudyId());
@@ -472,12 +472,6 @@ public class StudyController {
 	        studyDTO.setUniqueProtocolID(study.getUniqueIdentifier());
 	        logger.debug("study oc_id:" + study.getOc_oid());
 
-            StudyUserRoleBean sub = new StudyUserRoleBean();
-            sub.setRole(Role.COORDINATOR);
-            sub.setStudyId(study.getStudyId());
-            sub.setStatus(Status.AVAILABLE);
-            sub.setOwner(ownerUserAccount);
-            StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
@@ -623,18 +617,12 @@ public class StudyController {
 		ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
 		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
 		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
-		liquibaseOnDemandService.createPublicTables(protocolInfo);
+		liquibaseOnDemandService.createForeignTables(protocolInfo);
 		Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
 
 		logger.debug("returning from liquibase study:" + study.getStudyId());
 		logger.debug("study oc_id:" + study.getOc_oid());
 
-		StudyUserRoleBean sub = new StudyUserRoleBean();
-		sub.setRole(Role.COORDINATOR);
-		sub.setStudyId(study.getStudyId());
-		sub.setStatus(Status.AVAILABLE);
-		sub.setOwner(ownerUserAccount);
-		StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
 		ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
 		responseSuccess.setMessage(validation_passed_message);
 		responseSuccess.setStudyOid(study.getOc_oid());

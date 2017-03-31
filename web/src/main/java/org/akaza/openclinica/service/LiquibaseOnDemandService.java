@@ -9,6 +9,6 @@ import org.akaza.openclinica.domain.datamap.Study;
  */
 public interface LiquibaseOnDemandService {
     public Study process(String name, ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception;
-    public void createPublicTables(ProtocolInfo protocolInfo) throws Exception ;
+    public void createForeignTables(ProtocolInfo protocolInfo) throws Exception ;
 
 }

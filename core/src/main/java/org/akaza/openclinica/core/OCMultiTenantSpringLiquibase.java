@@ -7,9 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +33,7 @@ public class OCMultiTenantSpringLiquibase extends MultiTenantSpringLiquibase {
                 }
             }
         } catch (Exception e) {
-            logger.info("There are no tables created as of yet.", e.getMessage(), e);
+            logger.info("There is no study created as of yet.", e.getMessage());
         }
 
         super.setSchemas(schemas);

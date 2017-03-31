@@ -256,4 +256,43 @@
             insert into authorities values (1, 'root','ROLE_USER',1);
         </rollback>
     </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-18">
+        <createTable tableName="study_user_role">
+            <column name="role_name" type="VARCHAR(40)"/>
+            <column name="study_id" type="int"/>
+            <column name="status_id" type="int"/>
+            <column name="owner_id" type="int"/>
+            <column name="date_created" type="DATE"/>
+            <column name="date_updated" type="DATE"/>
+            <column name="update_id" type="int"/>
+            <column name="user_name" type="VARCHAR(64)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-19">
+        <createIndex indexName="i_study_user_role_user_name" tableName="study_user_role" unique="false">
+            <column name="user_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-20">
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-21">
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status"/>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-22">
+        <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_user_role" constraintName="fk_person_role_study_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
+    </changeSet>
+    <changeSet author="kkrumlian" id="2017-03-15-7878-22">
+        <comment>update study protocol_type</comment>
+        <update tableName="study_user_role">
+            <column name="role_name" value="Data Specialist"/>
+            <where>role_name='investigator'</where>
+        </update>
+        <rollback>
+            <update tableName="study_user_role">
+                <column name="role_name" value="investigator"/>
+                <where>role_name='Data Specialist'</where>
+            </update>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
