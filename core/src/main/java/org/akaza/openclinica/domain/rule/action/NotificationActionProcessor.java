@@ -219,6 +219,16 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		String pUserName = parentStudyBean.getOid() + "." + ssBean.getOid();
 		UserAccountBean uBean = (UserAccountBean) udao.findByUserName(pUserName);
 
+		String subjectdisplayID = ssBean.getLabel();
+    		Date subjectdenrollmentDate = ssBean.getEnrollmentDate();
+    		String sitename = ssBean.getStudyName();
+    
+	    	emailSubject = emailSubject.replaceAll("\\$\\{site.name}", sitename);
+	    	emailSubject = emailSubject.replaceAll("\\$\\{studysubject.id}", subjectdisplayID);
+	    	message = message.replaceAll("\\$\\{studysubject.id}", subjectdisplayID);
+	    	message = message.replaceAll("\\$\\{studysubject.enrollmentdate}", subjectdenrollmentDate.toString());
+	    	message = message.replaceAll("\\$\\{site.name}", sitename);
+		
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 
