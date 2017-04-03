@@ -50,7 +50,7 @@
     <xsl:template match="odm:ItemGroupDef" mode="map">
         <xsl:variable name="curatedOID">
             <xsl:variable name="formdef" select="key('form-name', OpenClinica:ItemGroupDetails/OpenClinica:PresentInForm[1]/@FormOID)"/>
-            <xsl:variable name="noprefixoid" select="replace(@OID, 'IG_', '')"/>
+            <xsl:variable name="noprefixoid" select="replace(@OID, '^IG_', '')"/>
             <xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
             <xsl:if test="string-length(@OID) &gt; 35 ">
                 <xsl:value-of select="
@@ -60,7 +60,7 @@
                 <xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
             </xsl:if>
             <xsl:if test="contains(@OID, 'UNGROUPED')">
-                <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '_')"/>
+                <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, '^F_', '_')"/>
             </xsl:if>
         </xsl:variable>
         <xsl:element name="TABLE">
@@ -123,11 +123,10 @@
         <xsl:variable name="typemap" select="$sas_typemap"/>
         <xsl:element name="COLUMN">
             <xsl:attribute name="Name">
-                <xsl:variable name="curatedItemOID" select="replace($itemdef/@OID, 'I_[A-Z]*_', '')"/>
+                <xsl:variable name="curatedItemOID" select="replace($itemdef/@OID, '^I_[A-Z0-9]*_', '')"/>
                 <xsl:variable name="noprefixTokenizedItemOid" select="tokenize($curatedItemOID,'_')"/>
                 <xsl:if test="string-length($curatedItemOID) &gt; 31 ">
-                    <xsl:value-of select="
-                        concat('_',substring(string-join(subsequence($noprefixTokenizedItemOid,1,count($noprefixTokenizedItemOid)-1),'_'),1,26),'_',$noprefixTokenizedItemOid[count($noprefixTokenizedItemOid)])"/>
+                    <xsl:value-of select="concat('_',substring(string-join(subsequence($noprefixTokenizedItemOid,1,count($noprefixTokenizedItemOid)-1),'_'),1,26),'_',$noprefixTokenizedItemOid[count($noprefixTokenizedItemOid)])"/>
                 </xsl:if>
                 <xsl:if test="string-length($curatedItemOID) &lt; 32 ">
                     <xsl:value-of select="concat('_',$curatedItemOID)"/>
