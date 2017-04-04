@@ -157,7 +157,12 @@ public class QueryServiceImpl implements QueryService {
             dn.setResolutionStatus(resolutionStatusDao.findById(4));
         }
 
-        String assignedTo = queryBean.getAssigned_to();
+        String assignedTo = "";
+        if (queryBean.getComment().startsWith("Automatic query for:")) {
+            assignedTo = "(" + helperBean.getContainer().getUser().getUserName() + ")";
+        } else {
+            assignedTo = queryBean.getAssigned_to();
+        }
         if (!StringUtils.isEmpty(assignedTo)) {
             int endIndex = assignedTo.indexOf(")");
             int begIndex = assignedTo.indexOf("(");
