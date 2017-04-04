@@ -251,7 +251,12 @@ public class XformMetaDataService {
                         && (readonly == null || !readonly.trim().equals("true()") || (readonly.trim().equals("true()") && calculate))) {
                     Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
                     if (item != null) {
-                        ResponseType responseType = getResponseType(html, xformItem);
+                        ResponseType responseType = null;
+                        if (calculate) {
+                            responseType = responseTypeDao.findByResponseTypeName("calculation");
+                        } else {
+                            responseType = getResponseType(html, xformItem);
+                        }
                         ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, crfVersion, responseType, item,
                                 errors);
                         // add if statement
@@ -858,7 +863,7 @@ public class XformMetaDataService {
         crfBean.setUserAccount(userDao.findById(cmdObject.ub.getId()));
         crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         crfBean.setStudy(studyDao.findById(cmdObject.currentStudy.getId()));
-        crfBean.setOcOid(crfDao.getValidOid(new CrfBean(), cmdObject.crf.getName()));
+        crfBean.setOcOid(cmdObject.crf.getOcoid());
         crfBean.setUpdateId(cmdObject.ub.getId());
         crfBean.setDateUpdated(new Date());
         return crfBean;
