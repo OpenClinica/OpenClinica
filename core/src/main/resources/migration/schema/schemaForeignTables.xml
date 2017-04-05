@@ -3,7 +3,19 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="yogi" id="2017-03-14-7878-2-1" failOnError="false">
+        <sql splitStatements="false">
 
+            CREATE FOREIGN TABLE authorities
+            (
+            id integer,
+            username character varying(64),
+            authority character varying(50),
+            version integer
+            ) SERVER app_database_server
+            OPTIONS (schema_name 'public', table_name 'authorities');
+        </sql>
+    </changeSet>
     <changeSet author="yogi" id="2017-03-14-7878-3" failOnError="false">
         <sql splitStatements="false">
             CREATE FOREIGN TABLE status
@@ -55,11 +67,11 @@
             CREATE FOREIGN TABLE user_role
             (
             role_id integer,
-            role_name character varying(50),
+            role_name character varying(64),
             parent_id integer,
             role_desc character varying(2000)
             ) SERVER app_database_server
-            OPTIONS (schema_name 'public', table_name 'user_account')
+            OPTIONS (schema_name 'public', table_name 'user_role')
         </sql>
     </changeSet>
     <changeSet author="yogi" id="2017-03-14-7878-6" failOnError="false">
@@ -73,7 +85,7 @@
             date_created date,
             date_updated date,
             update_id integer,
-            user_name character varying(40)
+            user_name character varying(64)
             ) SERVER app_database_server
             OPTIONS (schema_name 'public', table_name 'study_user_role')
         </sql>

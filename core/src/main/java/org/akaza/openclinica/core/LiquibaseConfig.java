@@ -35,9 +35,6 @@ public class LiquibaseConfig {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setDefaultSchema("public");
-        List<String> schemas = new ArrayList<>();
-        schemas.add("public");
-        liquibase.setSchemas(schemas);
         liquibase.setChangeLog("classpath:migration/schemaCommonTables/release.xml");
         return liquibase;
     }

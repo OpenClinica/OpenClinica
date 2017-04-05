@@ -50,8 +50,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemas.add(protocolInfo.getSchema());
             OCCommonTablesSpringLiquibase commonLiquibase = (OCCommonTablesSpringLiquibase)
                     context.getBean("liquibaseSchemaCommonTables");
-            commonLiquibase.setSchemas(schemas);
-            commonLiquibase.afterPropertiesSet();
+            commonLiquibase.processSchemaLiquibase(schemas);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Created common tables for all public and study schemas for this protocol", "PENDING");
             AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
             OCMultiTenantSpringLiquibase liquibase = (OCMultiTenantSpringLiquibase) context.getBean("liquibase");

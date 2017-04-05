@@ -17,22 +17,13 @@ import java.util.List;
  */
 public class OCCommonTablesSpringLiquibase extends SpringLiquibase {
     @Autowired DataSource dataSource;
-    List<String>schemas = null;
 
     @Override
     public void afterPropertiesSet() throws LiquibaseException {
-        processSchemaLiquibase();
+        processSchemaLiquibase(null);
     }
 
-    public List<String> getSchemas() {
-        return schemas;
-    }
-
-    public void setSchemas(List<String> schemas) {
-        this.schemas = schemas;
-    }
-
-    public void processSchemaLiquibase() throws LiquibaseException {
+    public void processSchemaLiquibase(List<String>schemas) throws LiquibaseException {
         Liquibase liquibase = null;
         if (schemas == null) {
             schemas = new ArrayList<>();

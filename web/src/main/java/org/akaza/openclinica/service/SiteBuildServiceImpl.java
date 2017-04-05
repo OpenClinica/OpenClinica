@@ -47,7 +47,6 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setParentStudyId(parentStudy.getId());
             StudyBean createdSite = studyController.createStudyWithDatasource(site, dataSource);
             StudyUserRoleBean sub = null;
-            studyController.processUserList(userList, ownerUserAccount, siteBean);
         } catch (Exception e) {
             logger.error("Error while creating a site entry" + schemaName);
             logger.error(e.getMessage(), e);

@@ -363,7 +363,7 @@ public class StudyController {
 			sub.setStudyId(sBean.getId());
 			sub.setStatus(Status.AVAILABLE);
 			sub.setOwner(ownerUserAccount);
-			StudyUserRoleBean surb = createRole(ownerUserAccount, sub);
+			StudyUserRoleBean surb = createRole(ownerUserAccount, sub, dataSource);
 
 			ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
@@ -375,7 +375,7 @@ public class StudyController {
 				sub.setOwner(ownerUserAccount);
 				udao = new UserAccountDAO(dataSource);
 				UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-				surb = createRole(assignedUserBean, sub);
+				surb = createRole(assignedUserBean, sub, dataSource);
 			}
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
@@ -949,7 +949,7 @@ public class StudyController {
             sub.setOwner(ownerUserAccount);
             udao = new UserAccountDAO(dataSource);
             UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-            StudyUserRoleBean surb = createRole(assignedUserBean, sub);
+            StudyUserRoleBean surb = createRole(assignedUserBean, sub, dataSource);
         }
 	}
 
@@ -1001,10 +1001,15 @@ public class StudyController {
 	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
 	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID)
 			throws Exception {
-		System.out.println("I'm in Create Event Definition ");
+		logger.debug("In Create Event Definition ");
+		StudyBean publicStudy = getStudyByUniqId(uniqueProtocolID);
+		request.setAttribute("requestSchema", publicStudy.getSchemaName());
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyEventDefinitionBean eventBean = null;
 		ResponseEntity<Object> response = null;
+		Locale locale = new Locale("en_US");
+		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+		ResourceBundleProvider.updateLocale(locale);
 
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
@@ -1229,7 +1234,7 @@ public class StudyController {
 		return sdBean;
 	}
 
-	public StudyUserRoleBean createRole(UserAccountBean ownerUserAccount, StudyUserRoleBean sub) {
+	public StudyUserRoleBean createRole(UserAccountBean ownerUserAccount, StudyUserRoleBean sub, DataSource dataSource) {
 		udao = new UserAccountDAO(dataSource);
 		StudyUserRoleBean studyUserRoleBean = (StudyUserRoleBean) udao.createStudyUserRole(ownerUserAccount, sub);
 		return studyUserRoleBean;
