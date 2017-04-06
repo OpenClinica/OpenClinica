@@ -5,7 +5,10 @@ package org.akaza.openclinica.dao.hibernate.multitenant;
  */
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.core.ExtendedBasicDataSource;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,62 +25,63 @@ import java.util.HashSet;
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.DEFAULT_TENANT_ID;
 
-@Component
-public class MultiTenantFilter implements Filter {
+@Component public class MultiTenantFilter implements Filter {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static String tenantKey = CURRENT_TENANT_ID;
     public static String defaultTenant = DEFAULT_TENANT_ID;
-    public static HashSet<String> excludedFileTypes = new HashSet<String>(
-            Arrays.asList(
-                    "js",
-                    "gif",
-                    "jpg",
-                    "jpeg",
-                    "png",
-                    "css",
-                    "xml"
-            ));
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public static HashSet<String> excludedFileTypes = new HashSet<String>(Arrays.asList("js", "gif", "jpg", "jpeg", "png", "css", "xml"));
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+    @Override public void init(FilterConfig filterConfig) throws ServletException {
 
     }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public DataSource getDataSource() {
+        BasicDataSource ds = new ExtendedBasicDataSource();
+        ds.setAccessToUnderlyingConnectionAllowed(true);
+        ds.setDriverClassName(CoreResources.getField("dataBase"));
+        ds.setUsername(CoreResources.getField("username"));
+        ds.setPassword(CoreResources.getField("password"));
+        ds.setUrl(CoreResources.getField("url"));
+        ds.setDriverClassName(CoreResources.getField("driver"));
+        return ds;
+    }
+
+    @Override public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String tenant = null;
         HttpServletRequest req = (HttpServletRequest) request;
         HttpSession session = req.getSession();
         // first check the header elements
-        tenant = req.getHeader("studyOid");
-        if (StringUtils.isEmpty(tenant)) {
-            tenant = req.getHeader("studyOID");
-        }
-        if (StringUtils.isEmpty(tenant)) {
-            if (req.getParameter("studyOID") != null) {
-                tenant = req.getParameter("studyOID");
-            } else if (req.getParameter("studyOid") != null) {
-                tenant = req.getParameter("studyOid");
-            } else {
-                tenant = getRequestSchema(req, session);
-                if (StringUtils.isEmpty(tenant)) {
-                    if (req.getAttribute(CURRENT_TENANT_ID) != null) {
-                        tenant = (String) req.getAttribute(CURRENT_TENANT_ID);
-                    } else if (session != null && session.getAttribute(CURRENT_TENANT_ID) != null) {
-                        tenant = (String) session.getAttribute(CURRENT_TENANT_ID);
-                    }
+        String studyOid = req.getHeader("studyOid");
+        if (StringUtils.isEmpty(studyOid)) {
+            tenant = getRequestSchema(req, session);
+            if (StringUtils.isEmpty(tenant)) {
+                if (req.getAttribute(CURRENT_TENANT_ID) != null) {
+                    tenant = (String) req.getAttribute(CURRENT_TENANT_ID);
+                } else if (session != null && session.getAttribute(CURRENT_TENANT_ID) != null) {
+                    tenant = (String) session.getAttribute(CURRENT_TENANT_ID);
                 }
             }
+
+        } else {
+            request.setAttribute("studyOid", studyOid);
         }
         if (StringUtils.isEmpty(tenant)) {
             tenant = defaultTenant;
         }
         req.setAttribute(tenantKey, tenant);
 
-        if (session != null ) {
+        if (session != null) {
             session.setAttribute(tenantKey, tenant);
         }
         chain.doFilter(req, response);
+    }
+
+    private String getSchemaFromStudyOid(String studyOid) {
+        DataSource ds = getDataSource();
+        StudyDAO studyDAO = new StudyDAO(ds);
+        StudyBean studyBean = studyDAO.findByUniqueIdentifier(studyOid);
+        return studyBean.getSchemaName();
     }
 
     private String getRequestSchema(HttpServletRequest req, HttpSession session) {
@@ -86,9 +91,9 @@ public class MultiTenantFilter implements Filter {
             return tenant;
         String ext = StringUtils.substringAfterLast(path, ".");
         if (StringUtils.isNotEmpty(ext) && excludedFileTypes.contains(ext)) {
-                return tenant;
+            return tenant;
         }
-        switch(path) {
+        switch (path) {
         case "ListStudy":
         case "ChangeStudy":
             req.setAttribute("requestSchema", "public");
@@ -107,8 +112,8 @@ public class MultiTenantFilter implements Filter {
         }
         return tenant;
     }
-    @Override
-    public void destroy() {
+
+    @Override public void destroy() {
 
     }
 }

@@ -480,10 +480,11 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(17), sb.getAgeMax());
         variables.put(new Integer(18), sb.getAgeMin());
         variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
-        // variables.put(new Integer(20), new Boolean(sb.isUsingDOB()));
+        variables.put(new Integer(20), sb.getSchemaName());
+                // variables.put(new Integer(20), new Boolean(sb.isUsingDOB()));
         // variables.put(new Integer(21), new
         // Boolean(sb.isDiscrepancyManagement()));
-        variables.put(new Integer(20), new Integer(sb.getId()));
+        variables.put(new Integer(21), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }

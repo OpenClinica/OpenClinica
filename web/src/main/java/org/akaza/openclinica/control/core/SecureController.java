@@ -92,6 +92,7 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -618,7 +619,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public String getRequestSchema(HttpServletRequest request) {
-        switch(request.getRequestURI().substring(1)) {
+        switch(StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
         case "ChangeStudy":
         case "DeleteStudyUserRole":
         case "DeleteUser":
@@ -626,6 +627,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         case "ViewUserAccount":
         case "ListUserAccounts":
         case "CreateUserAccount":
+        case "SetUserRole":
             return "public";
         default:
             return currentPublicStudy.getSchemaName();

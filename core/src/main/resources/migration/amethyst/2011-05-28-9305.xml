@@ -31,7 +31,7 @@
             <column name="requests_recovery" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="job_data" type="BLOB"/>
+            <column name="job_data" type="bytea"/>
         </createTable>
     </changeSet>
 
@@ -73,7 +73,7 @@
             <column name="end_time" type="BIGINT"/>
             <column name="calendar_name" type="VARCHAR(200)"/>
             <column name="misfire_instr" type="SMALLINT"/>
-            <column name="job_data" type="BLOB"/>
+            <column name="job_data" type="bytea"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>    

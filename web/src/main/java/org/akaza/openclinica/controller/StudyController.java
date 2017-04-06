@@ -916,7 +916,7 @@ public class StudyController {
 		} else {
 			siteBean = buildSiteBean(uniqueSiteProtocolID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate, formattedProtocolDate, secondaryProId,
 					ownerUserAccount, parentStudy.getId());
-
+			siteBean.setSchemaName(parentStudy.getSchemaName());
 			StudyBean sBean = createStudy(siteBean, ownerUserAccount);
 			// get the schema study
 			request.setAttribute("requestSchema", parentStudy.getSchemaName());

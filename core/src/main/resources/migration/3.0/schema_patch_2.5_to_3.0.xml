@@ -196,7 +196,7 @@
             <column name="trigger_group" type="VARCHAR(200)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="blob_data" type="BLOB"/>
+            <column name="blob_data" type="bytea"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-404">
@@ -204,7 +204,7 @@
             <column name="calendar_name" type="VARCHAR(200)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="calendar" type="BLOB">
+            <column name="calendar" type="bytea">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -279,7 +279,7 @@
             <column name="requests_recovery" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="job_data" type="BLOB"/>
+            <column name="job_data" type="bytea"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-408">
@@ -387,7 +387,7 @@
             <column name="end_time" type="BIGINT"/>
             <column name="calendar_name" type="VARCHAR(200)"/>
             <column name="misfire_instr" type="SMALLINT"/>
-            <column name="job_data" type="BLOB"/>
+            <column name="job_data" type="bytea"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-416">

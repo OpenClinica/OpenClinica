@@ -48,6 +48,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             StudyOidGenerator studyOidGenerator = new StudyOidGenerator();
             study.setOc_oid(studyOidGenerator.generateOid(uniqueId));
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            study.setDateCreated(new Date());
             schemaName = CoreResources.getField("schemaPrefix")+ schemaId;
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);

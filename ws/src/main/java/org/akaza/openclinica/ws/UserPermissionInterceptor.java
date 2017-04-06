@@ -1,16 +1,24 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.ws.WebServiceMessage;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.server.EndpointInterceptor;
 import org.springframework.ws.soap.SoapBody;
+import org.springframework.ws.soap.SoapHeader;
 import org.springframework.ws.soap.SoapMessage;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 import java.util.Locale;
 
 public class UserPermissionInterceptor implements EndpointInterceptor {
@@ -31,6 +39,14 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
             username = principal.toString();
         }
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            if (request != null) {
+                request.setAttribute("requestSchema", getSchemaFromStudyOid((String)request.getAttribute("studyOid")));
+            }
+        }
+
         UserAccountBean userAccountBean = ((UserAccountBean) userAccountDao.findByUserName(username));
         Boolean result = userAccountBean.getRunWebservices();
         if (!result) {
@@ -40,10 +56,15 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
             return false;
 
         } else {
-            return result;
+           return result;
         }
     }
 
+    private String getSchemaFromStudyOid(String studyOid) {
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        StudyBean studyBean = studyDAO.findByUniqueIdentifier(studyOid);
+        return studyBean.getSchemaName();
+    }
     public boolean handleResponse(MessageContext messageContext, Object endpoint) throws Exception {
         // TODO Auto-generated method stub
         return true;

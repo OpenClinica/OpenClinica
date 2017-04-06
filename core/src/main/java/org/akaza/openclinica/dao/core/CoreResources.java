@@ -456,6 +456,27 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+    public static String getRequestSchema() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            if (request.getAttribute("requestSchema") != null) {
+                return (String) request.getAttribute("requestSchema");
+            }
+        }
+        return null;
+    }
+
+    public static boolean setRequestSchema(String schema) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            request.setAttribute("requestSchema", schema);
+            return true;
+        }
+        return false;
+    }
+
     private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
         if (tenantSchema.get() == null)
             tenantSchema.set(conn.getSchema());
@@ -521,7 +542,6 @@ public class CoreResources implements ResourceLoaderAware {
 
 
 
-        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());
 
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
@@ -536,7 +556,6 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
-        DATAINFO.setProperty("schema", schema);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
         DATAINFO.setProperty("driver", driver);
 

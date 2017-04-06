@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
  */
 public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver {
 
-    public static final String DEFAULT_TENANT_ID = CoreResources.getField("schema");
+    public static final String DEFAULT_TENANT_ID = "public";
     public static final String CURRENT_TENANT_ID = "current_tenant_id";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 

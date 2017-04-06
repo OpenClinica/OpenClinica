@@ -63,7 +63,7 @@
 
     <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
           p:dataSource-ref="dataSource"
-          p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?">
+          p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM public.user_account WHERE user_name = ?">
         <property name="enableAuthorities" value="true"/>
     </bean>
 

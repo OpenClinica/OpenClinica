@@ -25,9 +25,6 @@
         <!-- Project's source control URL -->
         <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
 
-        <!-- Config file - required by liquibase plugin -->
-        <config.file>src/main/resources/datainfo.properties</config.file>
-
         <!-- Library Versions -->
         <spring.version>4.3.1.RELEASE</spring.version>
         <spring-security.version>4.1.1.RELEASE</spring-security.version>
@@ -170,7 +167,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>42.0.0</version>
+                <version>9.4.1212</version>
             </dependency>
 
 
@@ -692,14 +689,6 @@
                     <version>2.10</version>
                     <configuration>
                         <addVersionToProjectName>true</addVersionToProjectName>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-plugin</artifactId>
-                    <version>1.9.1.0</version>
-                    <configuration>
-                        <propertyFile>${config.file}</propertyFile>
                     </configuration>
                 </plugin>
                 <plugin>

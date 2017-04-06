@@ -86,6 +86,15 @@ public class ExportDatasetServlet extends SecureController {
     public String CSVFilePath;
     public ArrayList fileList;
 
+    public StudyBean getPublicStudy(String uniqueId) {
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        String studySchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        StudyBean study = studyDAO.findByUniqueIdentifier(uniqueId);
+        CoreResources.setRequestSchema(studySchema);
+        return study;
+    }
+
     @Override
     public void processRequest() throws Exception {
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
@@ -112,7 +121,8 @@ public class ExportDatasetServlet extends SecureController {
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
-        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+        StudyBean publicStudy = getPublicStudy(study.getIdentifier());
+        checkRoleByUserAndStudy(ub, publicStudy.getParentStudyId(), publicStudy.getId());
 
         //Checks if the study is current study or child of current study
         if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {

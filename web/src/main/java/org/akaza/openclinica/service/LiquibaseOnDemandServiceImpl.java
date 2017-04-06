@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,6 +72,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setUniqueIdentifier(protocolInfo.getUniqueStudyId());
             schemaStudy.setOc_oid(protocolInfo.getOcId());
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            schemaStudy.setDateCreated(new Date());
             schemaServiceDao.setConnectionSchemaName(protocolInfo.getSchema());
             studyDao.getCurrentSession().clear();
             Integer studyId = (Integer) studyDao.save(schemaStudy);
