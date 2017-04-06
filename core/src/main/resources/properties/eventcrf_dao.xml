@@ -505,6 +505,14 @@
            WHERE EVENT_CRF_ID=?
         </sql>
    </query>
+     <query>
+        <name>updateFormLayoutID</name>
+        <sql>
+            UPDATE EVENT_CRF
+            SET form_layout_id=?,  sdv_update_id=?, update_id=?, DATE_UPDATED=NOW(), sdv_status= ?
+           WHERE EVENT_CRF_ID=?
+        </sql>
+   </query>
 	<query>
 		<name>findAllCRFMigrationReportList</name>
 		<sql>
