@@ -8,10 +8,16 @@ package org.akaza.openclinica.control.admin;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -19,6 +25,7 @@ import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -38,16 +45,11 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class ViewCRFServlet extends SecureController {
 
@@ -101,82 +103,83 @@ public class ViewCRFServlet extends SecureController {
         } else {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+            FormLayoutDAO fdao = new FormLayoutDAO<>(sm.getDataSource());
             CRFBean crf = (CRFBean) cdao.findByPK(crfId);
             request.setAttribute("crfName", crf.getName());
-            ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
-            crf.setVersions(versions);
-            ArrayList< ItemGroupCrvVersionUtil> items_verified = verifyUniqueItemPlacementInGroups(	crf.getName());
+            ArrayList<CRFVersionBean> crfVersions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
+            ArrayList<FormLayoutBean> layoutVersions = (ArrayList<FormLayoutBean>) fdao.findAllByCRF(crfId);
+            crf.setVersions(layoutVersions);
+            ArrayList<ItemGroupCrvVersionUtil> items_verified = verifyUniqueItemPlacementInGroups(crf.getName());
             request.setAttribute("items", items_verified);
-            
+
             if ("admin".equalsIgnoreCase(module)) {
-                //BWP 3279: generate a table showing a list of studies associated with the CRF>>
+                // BWP 3279: generate a table showing a list of studies associated with the CRF>>
                 StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 
                 studyBeans = findStudiesForCRFId(crfId, studyDAO);
-                //Create the Jmesa table for the studies associated with the CRF
+                // Create the Jmesa table for the studies associated with the CRF
                 String studyHtml = renderStudiesTable(studyBeans);
                 request.setAttribute("studiesTableHTML", studyHtml);
-                //>>
+                // >>
             }
-             Collection<TableColumnHolder> items = populate(crf, versions);
+            Collection<TableColumnHolder> items = populate(crf, layoutVersions, crfVersions);
             request.setAttribute(CRF, crf);
             forwardPage(Page.VIEW_CRF);
 
         }
     }
 
-    
-    private  ArrayList< ItemGroupCrvVersionUtil> verifyUniqueItemPlacementInGroups(	String crfName){
-		
-		//get all items with group / version info from db 
-		 ItemDAO idao = new ItemDAO(sm.getDataSource());
-		 int check_group_count = 0;
-		 StringBuffer item_messages = null; String temp_buffer=null; //use for first record in the group
-		 ArrayList< ItemGroupCrvVersionUtil> results = new ArrayList< ItemGroupCrvVersionUtil>();
-		 ItemGroupCrvVersionUtil cur_item = null;
-		 StringBuffer error_message = null;
-		 ArrayList<ItemGroupCrvVersionUtil> item_group_crf_records=
-				 idao.findAllWithItemDetailsGroupCRFVersionMetadataByCRFId(   crfName) ;
-	   	 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
-	   		 if (results.size() == 0 || !check_group.getItemName().equals(cur_item.getItemName()) ){
-	   			 //delete ',' from versions property
-	   			cur_item = new ItemGroupCrvVersionUtil(check_group.getItemName(),check_group.getGroupName(),
-	   					check_group.getGroupOID()  , check_group.getCrfVersionName() , check_group.getCrfVersionStatus(),
-	   					check_group.getItemOID(), check_group.getItemDescription(),
-	   					check_group.getItemDataType(),check_group.getId());
-	   			cur_item.setVersions( check_group.getCrfVersionName());
-	   			temp_buffer=respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() +
-	   					respage.getString("verifyUniqueItemPlacementInGroups_5")+check_group.getCrfVersionName()+"'";
-	   			results.add(cur_item);
-	   		 }else {
-	   			 if (  check_group.getItemName().equals(cur_item.getItemName()) &&
-	   		 
-	   				 ! check_group.getGroupName().equals(cur_item.getGroupName())){
-	   				 // add message for the first item 
-		   			error_message = new StringBuffer();
-		   			error_message.append(respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
-		   			error_message.append(	respage.getString("verifyUniqueItemPlacementInGroups_5"));
-		   			error_message.append(	check_group.getCrfVersionName());
-		   		
-		   		//	if ( temp_buffer != null){cur_item.setErrorMesages(cur_item.getErrorMesages() + temp_buffer);}
-		   			if ( temp_buffer != null){cur_item.getArrErrorMesages().add( temp_buffer);}
-		   			temp_buffer=null;
-		   			cur_item.getArrErrorMesages().add(  error_message);
-		   			if (check_group.getCrfVersionStatus() == 1 && cur_item.getCrfVersionStatus()!= 1){
-		   				cur_item.setCrfVersionStatus(1);
-		   			}
-		   			
-	   			 }
-	   			cur_item.setVersions(cur_item.getVersions()+","+check_group.getCrfVersionName());
-	   		 }
-	   		
-	   		
-				 	
-	     }
-	   	 return results;
-	}
+    private ArrayList<ItemGroupCrvVersionUtil> verifyUniqueItemPlacementInGroups(String crfName) {
+
+        // get all items with group / version info from db
+        ItemDAO idao = new ItemDAO(sm.getDataSource());
+        int check_group_count = 0;
+        StringBuffer item_messages = null;
+        String temp_buffer = null; // use for first record in the group
+        ArrayList<ItemGroupCrvVersionUtil> results = new ArrayList<ItemGroupCrvVersionUtil>();
+        ItemGroupCrvVersionUtil cur_item = null;
+        StringBuffer error_message = null;
+        ArrayList<ItemGroupCrvVersionUtil> item_group_crf_records = idao.findAllWithItemDetailsGroupCRFVersionMetadataByCRFId(crfName);
+        for (ItemGroupCrvVersionUtil check_group : item_group_crf_records) {
+            if (results.size() == 0 || !check_group.getItemName().equals(cur_item.getItemName())) {
+                // delete ',' from versions property
+                cur_item = new ItemGroupCrvVersionUtil(check_group.getItemName(), check_group.getGroupName(), check_group.getGroupOID(),
+                        check_group.getCrfVersionName(), check_group.getCrfVersionStatus(), check_group.getItemOID(), check_group.getItemDescription(),
+                        check_group.getItemDataType(), check_group.getId());
+                cur_item.setVersions(check_group.getCrfVersionName());
+                temp_buffer = respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName()
+                        + respage.getString("verifyUniqueItemPlacementInGroups_5") + check_group.getCrfVersionName() + "'";
+                results.add(cur_item);
+            } else {
+                if (check_group.getItemName().equals(cur_item.getItemName()) &&
+
+                        !check_group.getGroupName().equals(cur_item.getGroupName())) {
+                    // add message for the first item
+                    error_message = new StringBuffer();
+                    error_message.append(respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName());
+                    error_message.append(respage.getString("verifyUniqueItemPlacementInGroups_5"));
+                    error_message.append(check_group.getCrfVersionName());
+
+                    // if ( temp_buffer != null){cur_item.setErrorMesages(cur_item.getErrorMesages() + temp_buffer);}
+                    if (temp_buffer != null) {
+                        cur_item.getArrErrorMesages().add(temp_buffer);
+                    }
+                    temp_buffer = null;
+                    cur_item.getArrErrorMesages().add(error_message);
+                    if (check_group.getCrfVersionStatus() == 1 && cur_item.getCrfVersionStatus() != 1) {
+                        cur_item.setCrfVersionStatus(1);
+                    }
+
+                }
+                cur_item.setVersions(cur_item.getVersions() + "," + check_group.getCrfVersionName());
+            }
+
+        }
+        return results;
+    }
+
     /*
-    Create a JMesa-based table for showing the studies associated with a CRF.
+     * Create a JMesa-based table for showing the studies associated with a CRF.
      */
     private String renderStudiesTable(List<StudyBean> studyBeans) {
 
@@ -185,17 +188,18 @@ public class ViewCRFServlet extends SecureController {
         tableFacade.setColumnProperties("name", "uniqueProtocolid", "actions");
 
         tableFacade.setItems(items);
-        //Fix column titles
+        // Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
-        //i18n caption; TODO: convert to Spring messages
+        // i18n caption; TODO: convert to Spring messages
         /*
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
-        String captionText = resourceBundle.getString("studies_using_crf");
-        if (captionText == null || "".equalsIgnoreCase(captionText)) {
-            captionText = "Studies Using this CRF for Data Entry";
-        }
-        table.setCaption(captionText);
-        */
+         * ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+         * LocaleResolver.getLocale(request));
+         * String captionText = resourceBundle.getString("studies_using_crf");
+         * if (captionText == null || "".equalsIgnoreCase(captionText)) {
+         * captionText = "Studies Using this CRF for Data Entry";
+         * }
+         * table.setCaption(captionText);
+         */
         HtmlRow row = table.getRow();
         SDVUtil sDVUtil = new SDVUtil();
 
@@ -215,7 +219,7 @@ public class ViewCRFServlet extends SecureController {
     }
 
     /*
-    Generate the rows for the study table. Each row represents a StudyBean domain object.
+     * Generate the rows for the study table. Each row represents a StudyBean domain object.
      */
     private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans) {
 
@@ -238,7 +242,7 @@ public class ViewCRFServlet extends SecureController {
     }
 
     /*
-    Fetch the studies associated with a CRF, via an event definition that uses the CRF.
+     * Fetch the studies associated with a CRF, via an event definition that uses the CRF.
      */
     private List<StudyBean> findStudiesForCRFId(int crfId, StudyDAO studyDao) {
         List<StudyBean> studyBeans = new ArrayList<StudyBean>();
@@ -257,18 +261,18 @@ public class ViewCRFServlet extends SecureController {
         return studyBeans;
     }
 
-    private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<CRFVersionBean> versions) {
-        HashMap<CRFVersionBean, ArrayList<TableColumnHolder>> hm = new HashMap<CRFVersionBean, ArrayList<TableColumnHolder>>();
+    private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<FormLayoutBean> versions, ArrayList<CRFVersionBean> crfVersions) {
+        HashMap<FormLayoutBean, ArrayList<TableColumnHolder>> hm = new HashMap<FormLayoutBean, ArrayList<TableColumnHolder>>();
         List<TableColumnHolder> tableColumnHolders = new ArrayList<TableColumnHolder>();
-        for (CRFVersionBean versionBean : versions) {
+        for (FormLayoutBean versionBean : versions) {
             hm.put(versionBean, new ArrayList<TableColumnHolder>());
         }
         List<RuleSetBean> ruleSets = getRuleSetService().getRuleSetsByCrfAndStudy(crf, currentStudy);
         ruleSets = getRuleSetService().filterByStatusEqualsAvailable(ruleSets);
         for (RuleSetBean ruleSetBean : ruleSets) {
             if (ruleSetBean.getCrfVersion() == null) {
-                for (CRFVersionBean key : hm.keySet()) {
-                    hm.get(key).addAll(createFromRuleSet(ruleSetBean, key));
+                for (CRFVersionBean crfVersion : crfVersions) {
+                    hm.get(crfVersion).addAll(createFromRuleSet(ruleSetBean, crfVersion));
                 }
             }
             if (ruleSetBean.getCrfVersion() != null) {
@@ -286,8 +290,8 @@ public class ViewCRFServlet extends SecureController {
         for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
             String ruleExpression = ruleSetRule.getRuleBean().getExpression().getValue();
             String ruleName = ruleSetRule.getRuleBean().getName();
-            TableColumnHolder tch =
-                new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName, ruleExpression, ruleSetRule.getActions(), ruleSetRule.getId());
+            TableColumnHolder tch = new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName, ruleExpression, ruleSetRule.getActions(),
+                    ruleSetRule.getId());
             tchs.add(tch);
 
         }
@@ -473,12 +477,14 @@ public class ViewCRFServlet extends SecureController {
     }
 
     private RuleSetServiceInterface getRuleSetService() {
-        ruleSetService =
-            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean(
-                    "ruleSetService");
+        ruleSetService = this.ruleSetService != null ? ruleSetService
+                : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
 
-        /*ruleSetService =
-            this.ruleSetService != null ? ruleSetService : new RuleSetService(sm.getDataSource(), getRequestURLMinusServletPath(), getContextPath());*/
+        /*
+         * ruleSetService =
+         * this.ruleSetService != null ? ruleSetService : new RuleSetService(sm.getDataSource(),
+         * getRequestURLMinusServletPath(), getContextPath());
+         */
         return ruleSetService;
     }
 
