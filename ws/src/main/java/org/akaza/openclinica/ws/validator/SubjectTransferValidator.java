@@ -23,15 +23,11 @@ import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-public class SubjectTransferValidator implements Validator {
+public class SubjectTransferValidator extends AbstractValidator implements Validator {
 
-    DataSource dataSource;
-    StudyDAO studyDAO;
     SubjectDAO subjectDao;
     StudySubjectDAO studySubjectDAO;
     StudyParameterValueDAO studyParameterValueDAO;
-    UserAccountDAO userAccountDAO;
-    BaseVSValidatorImplementation helper;
 
     public SubjectTransferValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -63,41 +59,8 @@ public class SubjectTransferValidator implements Validator {
             subjectStudyBean.setStudy(site);
  	      
         }
-        boolean isRoleVerified =  helper.verifyRole(subjectStudyBean.getUser(), study.getId(), site_id, e);//.verifyUser(subjectStudyBean.getUser(), getUserAccountDAO(), study.getId(), site_id,   e) ;
+        boolean isRoleVerified =  helper.verifyRole(subjectStudyBean.getUser(), study.getId(), site_id, e);
        if ( !isRoleVerified){ return;}
-//        StudyBean study = getStudyDAO().findByUniqueIdentifier(subjectStudyBean.getStudyUniqueId());
-//        if (study == null) {
-//            e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectStudyBean.getStudyUniqueId() }, "Study identifier you specified "
-//                + subjectStudyBean.getStudyUniqueId() + " does not correspond to a valid study.");
-//            return;
-//        }
-//        else{        subjectStudyBean.setStudy(study);}
-//   
-        
-        
-        
-//        StudyBean site = null;
-//        if (subjectStudyBean.getSiteUniqueId() != null) {
-//            site = getStudyDAO().findSiteByUniqueIdentifier(subjectStudyBean.getStudyUniqueId(), subjectStudyBean.getSiteUniqueId());
-// 	        if (site == null) {
-//	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { subjectStudyBean.getSiteUniqueId() },
-//	                    "Site identifier you specified does not correspond to a valid site.");
-//	            return;
-//	        }
-// 	       subjectStudyBean.setStudy(site);
-//       }
-        
-//        UserAccountBean ua = subjectStudyBean.getUser();
-//        StudyUserRoleBean role = ua.getRoleByStudy(study);
-//        if (role.getId() == 0 ) {
-//            e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
-//            return;
-//        }
-//        
-        
-        
-        
-        
         
         String studySubjectId = subjectStudyBean.getSubjectLabel();
         if (studySubjectId == null || studySubjectId.length() < 1) {
@@ -125,14 +88,7 @@ public class SubjectTransferValidator implements Validator {
         	
     	
     }
-    public StudyBean getPublicStudy(String uniqueId) {
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        String studySchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
-        StudyBean study = studyDAO.findByUniqueIdentifier(uniqueId);
-        CoreResources.setRequestSchema(studySchema);
-        return study;
-    }
+
     @Override
     public void validate(Object obj, Errors e) {
         SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
