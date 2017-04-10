@@ -173,21 +173,8 @@
     </changeSet>
 
     <!-- changeset only for oracle "authoririties" table: sequence to create a value for "id" column, trigger to insert sequence next value into "id" column -->
-    <changeSet author="pgawade (generated)" id="1235684743487-433">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="oracle"/>
-        </preConditions>
-        <createSequence sequenceName="AUTHORITIES_ID_SEQ"/>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-434">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="oracle"/>
-        </preConditions>
-        <sql splitStatements="false"> /* -- prompt Create trigger AUTHORITIES_BEF_TRG on table
-            AUTHORITIES -- */ create or replace trigger authorities_bef_trg before insert on
-            authorities for each row begin if :new.id is null then select AUTHORITIES_ID_SEQ.nextval
-            into :new.id from dual; end if; end; /* / */ </sql>
-    </changeSet>
+    
+    
     <changeSet author="pgawade (generated)" id="1235684743487-403">
         <createTable tableName="oc_qrtz_blob_triggers">
             <column name="trigger_name" type="VARCHAR(200)">
@@ -493,15 +480,5 @@
         <addColumn tableName="crf">
             <column name="study_id" type="integer"/>
         </addColumn>
-    </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-436" dbms="oracle">
-        <sql>
-            delete from authorities;
-            insert into authorities select AUTHORITIES_ID_SEQ.NEXTVAL,user_name,'ROLE_USER',1 from user_account;
-        </sql>
-        <rollback>
-            delete from authorities;
-            insert into authorities values (1, 'root','ROLE_USER',1);
-        </rollback>
     </changeSet>
 </databaseChangeLog>

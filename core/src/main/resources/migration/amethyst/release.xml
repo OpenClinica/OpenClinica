@@ -24,16 +24,13 @@
     <include file="migration/amethyst/2011-03-01-6567.xml"/>
     <include file="migration/amethyst/2011-03-01-7700.xml"/>
     <include file="migration/amethyst/2011-03-16-5930.xml"/>
-    <include file="migration/amethyst/2011-04-04-6336.xml"/>
 	<include file="migration/amethyst/2011-03-22-8248.xml"/>
 	<include file="migration/amethyst/2011-04-05-7475.xml"/>
-	<include file="migration/amethyst/2011-05-03-9423.xml"/>
 	<include file="migration/amethyst/2011-05-03-9430.xml"/>
 	<include file="migration/amethyst/2011-05-20-9703.xml"/>
 	<include file="migration/amethyst/2011-07-27-8874.xml"/>
 	<include file="migration/amethyst/2011-08-03-10666.xml"/>
 	<include file="migration/amethyst/2011-09-06-10813.xml"/>
-	<include file="migration/amethyst/2011-11-07-11802.xml"/>
 	<include file="migration/amethyst/2011-11-16-11950.xml"/>
 	<include file="migration/amethyst/2012-07-01-14506.xml"/>
 	<include file="migration/amethyst/2012-07-16-14454.xml"/>

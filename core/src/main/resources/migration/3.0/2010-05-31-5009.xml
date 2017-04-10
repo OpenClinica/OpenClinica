@@ -8,12 +8,6 @@
 			<column name="old_status_id" type="int" defaultValueNumeric="1"/>
 		</addColumn>
 	</changeSet>
-	<changeSet author="ahamid" id="2010-05-31-5009-2" dbms="oracle">
-		<comment>study (old_status)</comment>
-        <addColumn tableName="study">
-            <column name="old_status_id" type="int" defaultValueNumeric="1"/>
-        </addColumn>
-	</changeSet>
     <changeSet author="ahamid" id="2010-05-31-5009-3">
         <addForeignKeyConstraint constraintName="fk_old_status_id"
                                  referencedTableName="status" referencedTableSchemaName="public"

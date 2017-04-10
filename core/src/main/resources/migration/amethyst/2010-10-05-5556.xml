@@ -8,12 +8,4 @@
 		  <sql></sql>
 		</rollback>
 	</changeSet>
-	
-	<changeSet author="thickerson" id="2010-10-05-5556-2" dbms="oracle">
-		<comment>Change data type of created_date back to timestamp</comment>
-		<sql>ALTER TABLE archived_dataset_file modify date_created timestamp(0)</sql>
-		<rollback>
-		  <sql></sql>
-		</rollback>
-	</changeSet>
 </databaseChangeLog>

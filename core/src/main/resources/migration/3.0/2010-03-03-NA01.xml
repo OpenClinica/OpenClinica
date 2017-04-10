@@ -48,27 +48,7 @@
             EXECUTE PROCEDURE populate_ssid_in_didm_trigger();
         </sql>
     </changeSet>
-     <changeSet author="kkrumlian" id="2010-03-03-NA01-5">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="oracle" />
-        </preConditions>
-        <sql splitStatements="false">
-          create or replace trigger didm_update
-          after insert on dn_item_data_map
-          for each row
-          DECLARE
-         PRAGMA AUTONOMOUS_TRANSACTION;
-        begin
-          update dn_item_data_map  set study_subject_id = 
-            (
-                select DISTINCT se.study_subject_id from study_event se, event_crf ec, item_data id where 
-                id.event_crf_id = ec.event_crf_id and ec.study_event_id = se.study_event_id and id.item_data_id = dn_item_data_map.item_data_id
-            ) where study_subject_id is null;
-         COMMIT;
-        END t_autonomous_tx;
-        /* / */
-        </sql>
-    </changeSet>
+     
     <changeSet author="kkrumlian" id="2010-03-03-NA01-6">
         <comment>update discrepancy_note table</comment>
         <update tableName="discrepancy_note">

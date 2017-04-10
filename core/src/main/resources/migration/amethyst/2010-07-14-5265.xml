@@ -8,13 +8,5 @@
             </column>
 		</addColumn>
     </changeSet>
-    <changeSet author="ahamid" id="2010-07-14-5265-2" dbms="oracle">
-        <comment>item_group_metadata (repeating_group)</comment>
-		<addColumn tableName="item_group_metadata">
-			<column name="repeating_group" type="int" defaultValue="1">
-                <constraints nullable="false"/>
-            </column>
-		</addColumn>
-    </changeSet>
 
 </databaseChangeLog>

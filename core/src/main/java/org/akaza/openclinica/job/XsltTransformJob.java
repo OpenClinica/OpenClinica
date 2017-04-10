@@ -235,9 +235,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
            endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
-
-
-
             endFileStream = new FileOutputStream(endFile);
             transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
 

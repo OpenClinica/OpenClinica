@@ -231,6 +231,9 @@ public class OpenRosaSubmissionController {
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
 
         UserAccount userAccount = userAccountDao.findById(userAccountID);
+        Study parentStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", parentStudy.getSchemaName());
+
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
         Study study = studyDao.findByOcOID(studyOID);
         StudyEventDefinition sed = studyEventDefinitionDao.findById(studyEventDefinitionID);

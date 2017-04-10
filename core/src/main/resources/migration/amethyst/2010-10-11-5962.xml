@@ -13,19 +13,6 @@
 			where dn.parent_dn_id isNull
         </sql>
     </changeSet>
-     <changeSet author="ywang" id="2010-10-11-5962-2" dbms="oracle">
-    	<comment>Update Resolution Status of Parent DN As Their Last Child</comment>
-        <sql>
-            update discrepancy_note dn set resolution_status_id = (
-				select cdn.resolution_status_id from discrepancy_note cdn 
-				where dn.discrepancy_note_id = cdn.parent_dn_id
-	 			      and cdn.discrepancy_note_id = (
-		select max(idn.discrepancy_note_id) from discrepancy_note idn where  idn.parent_dn_id = cdn.parent_dn_id 
-		)
-				)
-			where dn.parent_dn_id = null
-        </sql>
-    </changeSet>
     <changeSet author="ywang" id="2010-10-11-5962-3" dbms="postgresql">
     	<comment>Create or Replace a View DN_DAYS</comment>
     	<sql>create or replace view DN_AGE_DAYS as
@@ -41,24 +28,6 @@
 					end) as age
 				from discrepancy_note dn
 				where dn.parent_dn_id isNull
-    	</sql>
-    </changeSet>
-    <changeSet author="ywang" id="2010-10-11-5962-4" dbms="oracle">
-    	<comment>Create or Replace a View DN_DAYS</comment>
-    	<sql>create or replace view DN_DAYS as
-				select dn.discrepancy_note_id, dn.resolution_status_id,
-					(case when dn.resolution_status_id in (1,2,3) then 
-				      round(sysdate - (select cdn.date_created from discrepancy_note cdn where cdn.discrepancy_note_id = (
-				        select max(idn.discrepancy_note_id) from discrepancy_note idn where idn.parent_dn_id = dn.discrepancy_note_id)))
-				   end) as days,
-				  (case when dn.resolution_status_id = 4 then 
-				      round ((select cdn.date_created from discrepancy_note cdn where cdn.discrepancy_note_id = (
-				        select max(idn.discrepancy_note_id) from discrepancy_note idn where idn.parent_dn_id = dn.discrepancy_note_id)
-				        ) - dn.date_created)
-				        when dn.resolution_status_id in (1,2,3) then round(sysdate - dn.date_created)
-				   end) as age
-				from discrepancy_note dn
-				where dn.parent_dn_id is NULL
     	</sql>
     </changeSet>
 </databaseChangeLog>

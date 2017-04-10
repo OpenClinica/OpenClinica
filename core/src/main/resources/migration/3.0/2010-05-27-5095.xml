@@ -12,12 +12,6 @@
               select substring(rule_expression.value from '[A-Z_0-9]*$') from rule_set, rule_expression where rule_set.rule_expression_id = rule_expression.id and
               rule_set.id = rs.id))</sql>
     </changeSet>
-    <changeSet author="kkrumlian" id="2010-05-27-5095-4" dbms="oracle">
-        <comment>Populate item_id with values</comment>
-        <sql>update rule_set rs set rs.item_id = (select item_id from item where oc_oid = (
-              select REGEXP_SUBSTR(rule_expression.value , '[A-Z_0-9]*$') from rule_set, rule_expression where rule_set.rule_expression_id = rule_expression.id 
-              and rule_set.id = rs.id))</sql>
-    </changeSet>
     <changeSet author="kkrumlian" id="2010-05-27-5095-5">
         <comment>Add item_group_id column to rule_set</comment>
         <addColumn tableName="rule_set">
@@ -29,11 +23,5 @@
         <sql>update rule_set rs set item_group_id = (select item_group_id from item_group where oc_oid = (
               select substring(rule_expression.value from 'IG_[A-Z_0-9]*') from rule_set, rule_expression where rule_set.rule_expression_id = rule_expression.id and
               rule_set.id = rs.id))</sql>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2010-05-27-5095-7" dbms="oracle">
-        <comment>Populate item_group_id with values</comment>
-        <sql>update rule_set rs set rs.item_group_id = (select item_group_id from item_group where oc_oid = (
-              select REGEXP_SUBSTR(rule_expression.value , 'IG_[A-Z_0-9]*') from rule_set, rule_expression where rule_set.rule_expression_id = rule_expression.id 
-              and rule_set.id = rs.id))</sql>
     </changeSet>
 </databaseChangeLog>

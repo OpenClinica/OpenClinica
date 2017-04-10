@@ -62,7 +62,7 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
 
     private String getSchemaFromStudyOid(String studyOid) {
         StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean studyBean = studyDAO.findByUniqueIdentifier(studyOid);
+        StudyBean studyBean = studyDAO.findByOid(studyOid);
         return studyBean.getSchemaName();
     }
     public boolean handleResponse(MessageContext messageContext, Object endpoint) throws Exception {

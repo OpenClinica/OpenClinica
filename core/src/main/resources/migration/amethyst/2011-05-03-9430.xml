@@ -20,25 +20,6 @@
 		 DROP FUNCTION ADD_CONSTRAINTS_ITEM_DATA_WHEN_EMPTY();
  	</sql>
   </changeSet>
-<changeSet author="jnyayapathi" id="2011-05-03-9430-2" dbms="oracle">
-    <comment>Add a constraint when no item data rows are present</comment>
-	<sql splitStatements="false">
-	    CREATE OR REPLACE PROCEDURE ITEM_DATA_CONSTRAINT
-	   		    iS
-     ITEMROWS NUMBER;	    
-     BEGIN
-      SELECT COUNT(*) into ITEMROWS FROM ITEM_DATA ;
-	    IF ITEMROWS=0 then
-         	begin
-           execute immediate   ' ALTER TABLE ITEM_DATA ADD CONSTRAINT PK_ITEM_DATA_NEW UNIQUE (ITEM_ID,EVENT_CRF_ID,ORDINAL)';
-          
-         end;
-          return;
-	    END IF;
-     return;
-	END;
- 	</sql>
-  </changeSet>
 
 
 

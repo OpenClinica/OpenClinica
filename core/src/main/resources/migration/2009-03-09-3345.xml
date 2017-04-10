@@ -12,15 +12,5 @@
             <column name="description" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="kkrumlian" id="2009-03-09-3345-2">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="oracle"/>
-        </preConditions>
-        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
-        <comment>trigger name, table name, sequence name Will need to be changed for each table.</comment>
-        <createSequence sequenceName="TEST_ID_SEQ"/>
-        <sql splitStatements="false"> create or replace trigger test_bef_trg before insert on test
-            for each row begin if :new.id is null then select TEST_ID_SEQ.nextval into :new.id from
-            dual; end if; end; </sql>
-    </changeSet>
+    
 </databaseChangeLog>

@@ -10,29 +10,11 @@
              from item where length(units) >0  
 		</createView>	
 	</changeSet>
-	<changeSet author="ywang" id="2011-03-01-6567-2" dbms="oracle">
-		<comment>create temporary view </comment>
-		<createView viewName="view_item_unit">
-             select distinct (units) as name, 
-             (case when length(regexp_replace(units, '[^a-zA-Z0-9]','',1,0)) > 37
-                  then 'MU_'||upper(substr(regexp_replace(units, '[^a-zA-Z0-9]','',1,0),0,37))
-               else 'MU_'||upper(regexp_replace(units, '[^a-zA-Z0-9]','',1,0)) end)  as temp_oid
-             from item where length(units) >0
-		</createView>	
-	</changeSet>
 	<changeSet author="ywang" id="2011-03-01-6567-3" dbms="postgresql">
 		<comment>insert into measurement_unit.name and oc_oid</comment>
 		<sql splitStatements="false">
              insert into measurement_unit (oc_oid, name) 
 	select distinct on (v.temp_oid) v.temp_oid, v.name from view_item_unit v 
-	where not exists (select mu.* from measurement_unit mu where mu.name = v.name or mu.oc_oid = v.temp_oid)
-    	</sql>
-	</changeSet>
-	<changeSet author="ywang" id="2011-03-01-6567-4" dbms="oracle">
-		<comment>insert into measurement_unit.name and oc_oid</comment>
-		<sql splitStatements="false">
-             insert into measurement_unit (oc_oid, name) 
-	select distinct v.temp_oid, v.name from view_item_unit v 
 	where not exists (select mu.* from measurement_unit mu where mu.name = v.name or mu.oc_oid = v.temp_oid)
     	</sql>
 	</changeSet>
@@ -47,28 +29,10 @@
 	and v.temp_oid in (select mu.oc_oid from measurement_unit mu where mu.oc_oid = v.temp_oid and mu.name != v.name)
     	</sql>
 	</changeSet>
-	<changeSet author="ywang" id="2011-03-01-6567-6" dbms="oracle">
-		<comment>insert into measurement_unit.name and oc_oid</comment>
-		<sql splitStatements="false">
-             insert into measurement_unit (oc_oid, name) 
-	select case when v.temp_oid = 'MU_' then v.temp_oid || trunc(dbms_random.value(0,10000000))
-	       when length(v.temp_oid) > 32 then substr(v.temp_oid,0,32)||'_'||trunc(dbms_random.value(0,10000000))
-               else v.temp_oid||'_'||trunc(dbms_random.value(0,10000000)) end, v.name from view_item_unit v 
-	where not exists (select mu.* from measurement_unit mu where mu.name = v.name) 
-	and v.temp_oid in (select mu.oc_oid from measurement_unit mu where mu.oc_oid = v.temp_oid and mu.name != v.name)
-    	</sql>
-	</changeSet>
 	<changeSet author="ywang" id="2011-03-01-6567-7" dbms="postgresql">
 		<comment>update measurement_unit.oc_oid</comment>
 		<sql splitStatements="false">
              update measurement_unit set oc_oid = 'MU_'||round(random()*10000000)
-		where measurement_unit.oc_oid = 'MU_'
-    	</sql>
-	</changeSet>
-	<changeSet author="ywang" id="2011-03-01-6567-8" dbms="oracle">
-		<comment>update measurement_unit.oc_oid</comment>
-		<sql splitStatements="false">
-             update measurement_unit set oc_oid = 'MU_'||trunc(dbms_random.value(0,10000000))
 		where measurement_unit.oc_oid = 'MU_'
     	</sql>
 	</changeSet>

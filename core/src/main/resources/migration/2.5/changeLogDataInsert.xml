@@ -329,14 +329,7 @@
             SELECT setval('study_study_id_seq', 2, true);
         </sql>
     </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-280-2">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-        <sql>
-            SELECT STUDY_ID_SEQ.NEXTVAL FROM dual;
-        </sql>
-    </changeSet>    
+        
     <changeSet author="pgawade (generated)" id="1235684743487-281">
 	<insert tableName="study_parameter">
 	    <column name="study_parameter_id" valueNumeric="13"/>

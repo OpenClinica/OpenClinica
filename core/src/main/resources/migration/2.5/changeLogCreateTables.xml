@@ -203,57 +203,7 @@
             <column name="odm_prior_metadataversion_oid" type="VARCHAR(255)"/>
             <column defaultValueBoolean="false" name="show_secondary_id" type="BOOLEAN"/>
         </createTable>
-    </changeSet>
-    <changeSet author="kkrumlian" id="235684743487-10-1">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-        <dropTable tableName="dataset"/>
-    </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-10-2">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-        <createTable tableName="dataset">
-            <column autoIncrement="true" name="dataset_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="study_id" type="int"/>
-            <column name="status_id" type="int"/>
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="description" type="VARCHAR(2000)"/>
-            <column name="sql_statement" type="VARCHAR(4000)"/>
-            <column name="num_runs" type="int"/>
-            <column name="date_start" type="DATE"/>
-            <column name="date_end" type="DATE"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
-            <column name="date_last_run" type="DATE"/>
-            <column name="owner_id" type="int"/>
-            <column name="approver_id" type="int"/>
-            <column name="update_id" type="int"/>
-            <column defaultValueBoolean="false" name="show_event_location" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_event_start" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_event_end" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_subject_dob" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_subject_gender" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_event_status" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_subject_status" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_subject_unique_id" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_subject_age_at_event" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_crf_status" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_crf_version" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_crf_int_name" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_crf_int_date" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_group_info" type="BOOLEAN"/>
-            <column defaultValueBoolean="false" name="show_disc_info" type="BOOLEAN"/>
-            <column name="odm_metadataversion_name" type="VARCHAR(255)"/>
-            <column name="odm_metadataversion_oid" type="VARCHAR(255)"/>
-            <column name="odm_prior_study_oid" type="VARCHAR(255)"/>
-            <column name="odm_prior_metadataversion_oid" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="false" name="show_secondary_id" type="BOOLEAN"/>
-        </createTable>
-    </changeSet>
+    </changeSet>        
     <changeSet author="kkrumlian" id="235684743487-10-3">
         <modifyColumn tableName="dataset">
             <column name="sql_statement" type="VARCHAR(4000)"></column>
@@ -522,33 +472,7 @@
             </column>
             <column name="update_id" type="int"/>
         </createTable>
-    </changeSet>
-    <changeSet author="kkrumlian" id="235684743487-32-1">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-        <dropTable tableName="filter"/>
-    </changeSet>
-    <changeSet author="kkrumlian" id="1235684743487-32-2">
-    	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-       <createTable tableName="filter">
-            <column autoIncrement="true" name="filter_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="description" type="VARCHAR(2000)"/>
-            <column name="sql_statement" type="VARCHAR(4000)"/>
-            <column name="status_id" type="int"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
-            <column name="owner_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="update_id" type="int"/>
-        </createTable>
-    </changeSet>
+    </changeSet>        
     <changeSet author="kkrumlian" id="235684743487-32-3">
         <modifyColumn tableName="filter">
             <column name="sql_statement" type="VARCHAR(4000)"></column>

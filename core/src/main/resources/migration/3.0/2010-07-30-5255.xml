@@ -32,36 +32,4 @@
 		    Select fix_duplicates_in_study_defs();
         </sql>
     </changeSet>
-    <changeSet author="thickerson" id="2010-07-30-5255-2" dbms="oracle">
-        <comment>updating ordinals in study event definition table to remove duplicates</comment>
-        <sql splitStatements="false">
-           CREATE OR REPLACE Procedure fix_duplicates_in_study_defs
-			IS      
-			maxOrdinal integer := 1;
-			
-			cursor c2 is select ordinal, count(*) as cnt from study_event_definition group by ordinal;
-			cursor c1 is select study_event_definition_id from study_event_definition sed order by study_event_definition_id;
-			
-			BEGIN
-				FOR cc in c2
-				LOOP
-					IF cc.cnt > 1 THEN
-			    		FOR c in c1
-			    			LOOP
-				
-			    				UPDATE study_event_definition set ordinal = maxOrdinal where study_event_definition_id = 
-									c.study_event_definition_id;
-								maxOrdinal := maxOrdinal +1;
-			    	
-			    			END LOOP;
-			    		EXIT;
-			    	END IF;
-			    END LOOP;
-			    RETURN;
-			END;
-			
-			EXECUTE fix_duplicates_in_study_defs();
-            DROP PROCEDURE fix_duplicates_in_study_defs;
-        </sql>
-    </changeSet>
 </databaseChangeLog>

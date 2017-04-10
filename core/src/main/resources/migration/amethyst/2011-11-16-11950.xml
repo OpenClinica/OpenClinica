@@ -117,40 +117,7 @@
     	 </sql>
     </changeSet>
     
- <changeSet author="htaycher" id="2011-11-16-11950-12">
-	<preConditions onFail="MARK_RAN">
-			<dbms type="oracle" />			
-	 	</preConditions>
-		<sql splitStatements="false">
-			/* --
-		prompt Create trigger study event restore on study_event
-		-- */
-
-CREATE OR REPLACE TRIGGER study_event_restore
-	    AFTER UPDATE ON study_event
-	    FOR EACH ROW
-	declare
-	
-		newrec  study_event%rowtype;
-	    oldrec  study_event%rowtype;
-	      
-	begin
-	/* -- */
-	newrec.STUDY_EVENT_ID              := :new.STUDY_EVENT_ID;
-	newrec.STATUS_ID	               := :new.STATUS_ID;
-	newrec.UPDATE_ID                   := :new.UPDATE_ID;
-	/* -- */
-	oldrec.STATUS_ID				   := :old.STATUS_ID;
-	
-	    IF(newrec.STATUS_ID = '1' and oldrec.STATUS_ID='5' ) THEN
-			      INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-			      VALUES (audit_log_event_audit_id_seq.nextval, '35', sysdate, NEWREC.update_id, 'study_event', NEWREC.study_event_id, 'Status', '5', '1');
-		END IF;
-		END;
-		/* -------------------------------------------------------------------------------- */
-
-		 </sql>
-	</changeSet>
+ 
 	
 	
 	

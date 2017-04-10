@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	
-	<changeSet author="kkrumlian" id="2010-05-27-5095-0" dbms="oracle">
-		<comment>Change RuleSet so study event definition id can be null</comment>
-		<sql>ALTER TABLE rule_set modify  study_event_definition_id number  NULL</sql>
-		<rollback>
-		  <sql>ALTER TABLE rule_set modify  study_event_definition_id number NOT NULL</sql>
-		</rollback>
-	</changeSet>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 	<changeSet author="kkrumlian" id="2010-05-27-5095-1" dbms="postgresql">
 		<comment>Change RuleSet so study event definition id can be null</comment>
 		<sql>ALTER TABLE rule_set ALTER COLUMN study_event_definition_id DROP NOT NULL</sql>

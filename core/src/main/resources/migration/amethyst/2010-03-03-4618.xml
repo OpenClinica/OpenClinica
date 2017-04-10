@@ -27,38 +27,4 @@
             <column name="version" type="int"/>
         </createTable>
 	</changeSet>
-    <changeSet author="kkrumlian" id="2010-03-03-4618-3" dbms="oracle">
-        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
-        <createSequence sequenceName="DYN_ITEM_FORM_METADATA_ID_SEQ"/>
-        <sql splitStatements="false"> 
-            create or replace trigger DYN_ITEM_FORM_METADATA_BEF_TRG 
-                before insert on dyn_item_form_metadata
-                    for each row begin 
-                        if :new.id is null 
-                         then select DYN_ITEM_FORM_METADATA_ID_SEQ into :new.id from dual; 
-                        end if; 
-                    end; 
-        </sql>
-        <rollback>
-            drop trigger DYN_ITEM_FORM_METADATA_BEF_TRG;
-            drop sequence DYN_ITEM_FORM_METADATA_ID_SEQ;
-        </rollback>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2010-03-03-4618-4" dbms="oracle">
-        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
-        <createSequence sequenceName="DYN_ITEM_GROUP_METADATA_ID_SEQ"/>
-        <sql splitStatements="false"> 
-            create or replace trigger DYN_ITEM_GRP_METADATA_BEF_TRG 
-                before insert on dyn_item_form_metadata
-                    for each row begin 
-                        if :new.id is null 
-                         then select DYN_ITEM_GROUP_METADATA_ID_SEQ into :new.id from dual; 
-                        end if; 
-                    end; 
-        </sql>
-        <rollback>
-            drop trigger DYN_ITEM_GRP_METADATA_BEF_TRG;
-            drop sequence DYN_ITEM_GROUP_METADATA_ID_SEQ;
-        </rollback>
-    </changeSet>
 </databaseChangeLog>

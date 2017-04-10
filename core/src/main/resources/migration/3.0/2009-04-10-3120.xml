@@ -32,21 +32,4 @@
                                  referencedTableName="study"
                                  referencedColumnNames="study_id"/>
     </changeSet>
-    <changeSet author="sshamim" id="2009-04-10-3120-3" dbms="oracle">
-        <comment>Create sequence for table study_module_status</comment>
-        <createSequence sequenceName="study_module_status_id_seq"/>
-        <sql splitStatements="false">
-            create or replace trigger study_module_status_bef_trg 
-                before insert on study_module_status
-                    for each row begin 
-                        if :new.id is null 
-                         then select study_module_status_id_seq.nextval into :new.id from dual; 
-                        end if; 
-                    end; 
-        </sql>
-        <rollback>
-            drop trigger study_module_status_bef_trg;
-            drop sequence study_module_status_id_seq;
-        </rollback>    
-    </changeSet>
 </databaseChangeLog>

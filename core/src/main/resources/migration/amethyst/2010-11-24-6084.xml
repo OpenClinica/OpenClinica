@@ -10,13 +10,6 @@
             alter table item_data DISABLE TRIGGER repeating_data_insert;
         </sql>
     </changeSet>
-    <changeSet author="kkrumlian" id="2010-11-24-6084-1-2" dbms="oracle">
-        <comment>Disable item_data triggers</comment>
-        <sql>
-            alter trigger item_data_update disable;
-            alter trigger repeating_data_insert disable;
-        </sql>
-    </changeSet>
     <changeSet author="kkrumlian" id="2010-11-24-6084-1" dbms="postgresql">
         <comment>Change date format for dataype date,pdate (MM/dd/YYYY) to ISO-8601</comment>
         <sql>
@@ -26,23 +19,6 @@
             (item_data_type_id = 9 or item_data_type_id = 10)
             and upper(value) ~* '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'; 
             
-        </sql>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2010-11-24-6084-2" dbms="oracle">
-        <comment>Change date format for dataype date,pdate (MM/dd/YYYY) to ISO-8601</comment>
-        <sql>
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,7,4) || '-' || SUBSTR(idx.value,1,2) || '-' || SUBSTR(idx.value,4,2) 
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and (idt.item_data_type_id = 9 or idt.item_data_type_id = 10)
-            ) where REGEXP_LIKE(UPPER(value),'^[0-9]{2}/[0-9]{2}/[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  (idt.item_data_type_id = 9 or idt.item_data_type_id = 10) );
         </sql>
     </changeSet>    
     <changeSet author="kkrumlian" id="2010-11-24-6084-3" dbms="postgresql">
@@ -108,177 +84,11 @@
             item_data_type_id = 10 and upper(value) like 'DEC-____';
         </sql>
     </changeSet>
-     <changeSet author="kkrumlian" id="2010-11-24-6084-4" dbms="oracle">
-        <comment>Change date format for dataype pdate (MMM-YYYY) to ISO-8601</comment>
-        <sql>
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '01'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-            ) where REGEXP_LIKE(UPPER(value),'^JAN-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '02'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-            ) where REGEXP_LIKE(UPPER(value),'^FEB-[0-9]{4}') and
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '03'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^MAR-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '04'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^APR-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '05'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^MAY-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '06'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^JUN-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '07'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^JUL-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '08'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^AUG-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '09'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^SEP-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '10'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^OCT-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '11'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^NOV-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-            update ITEM_DATA set value = 
-            ( 
-                select SUBSTR(idx.value,5,4) || '-' || '12'
-                from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10
-               
-            ) where REGEXP_LIKE(UPPER(value),'^DEC-[0-9]{4}') and 
-            item_data_id = ( select idx.item_data_id  from item_data idx,item i,item_data_type idt where
-                idx.item_id = i.item_id and
-                idx.item_data_id = ITEM_DATA.item_data_id and
-                i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
-        </sql>
-    </changeSet>
     <changeSet author="kkrumlian" id="2010-11-24-6084-5" dbms="postgresql">
         <comment>Disable item_data triggers</comment>
         <sql>
             alter table item_data ENABLE TRIGGER item_data_update;
             alter table item_data ENABLE TRIGGER repeating_data_insert;
-        </sql>
-    </changeSet>
-    <changeSet author="kkrumlian" id="2010-11-24-6084-6" dbms="oracle">
-        <comment>Disable item_data triggers</comment>
-        <sql>
-            alter trigger item_data_update enable;
-            alter trigger repeating_data_insert enable;
         </sql>
     </changeSet>
 </databaseChangeLog>

@@ -7,13 +7,6 @@
         <renameColumn tableName="event_crf" oldColumnName="prev_status" newColumnName="old_status_id" />
     </changeSet>
 
-    <changeSet author="ahamid" id="2010-12-02-6421-2"  dbms="oracle">
-        <comment>Disable trigger EVENT_CRF_UPDATE</comment>
-        <sql splitStatements="false">
-            alter trigger EVENT_CRF_UPDATE disable
-        </sql>
-    </changeSet>
-
     <changeSet author="ahamid" id="2010-12-02-6421-3" dbms="postgresql">
 		<comment>Update null values</comment>
 		<sql>ALTER TABLE event_crf
@@ -21,21 +14,9 @@
         </sql>
 	</changeSet>
 
-    <changeSet author="ahamid" id="2010-12-02-6421-4" dbms="oracle">
-		<comment>Update null values</comment>
-		<sql>ALTER TABLE event_crf MODIFY old_status_id DEFAULT 1</sql>
-	</changeSet>
-
     <changeSet author="ahamid" id="2010-12-02-6421-5">
 		<comment>Update null values</comment>
 		<sql>UPDATE event_crf set old_status_id=1 where old_status_id=null or old_status_id=0</sql>
 	</changeSet>
-
-    <changeSet author="kkrumlian" id="2010-12-02-6421-6"  dbms="oracle">
-       <comment>Enable trigger EVENT_CRF_UPDATE</comment>
-       <sql splitStatements="false">
-           alter trigger EVENT_CRF_UPDATE enable
-       </sql>
-   </changeSet>
 
 </databaseChangeLog>

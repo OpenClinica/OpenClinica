@@ -1,4 +1,5 @@
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 	<changeSet author="ywang" id="2011-02-07-7181-1">
 		<comment>Create table scd_item_metadata</comment>
 		<createTable tableName="scd_item_metadata">
@@ -12,31 +13,6 @@
 			<column name="message" type="varchar(3000)"/>
 			<column name="version" type="int"/>
 		</createTable>
-	</changeSet>
-	<!--<changeSet author="ywang" id="2011-02-07-7181-2">-->
-		<!--<preConditions onFail="MARK_RAN">-->
-  			<!--<not><indexExists indexName="i_scd_item_metadata_id" schemaName="public"/></not>-->
-		<!--</preConditions>-->
-		<!--<comment>Create index for scd_item_metadata on id column</comment>-->
-		<!--<createIndex tableName="scd_item_metadata" indexName="i_scd_item_metadata_id">-->
-    		<!--<column name="id"/>-->
-		<!--</createIndex>-->
-	<!--</changeSet>-->
-	<changeSet author="ywang" id="2011-02-07-7181-3" dbms="oracle">
-		<preConditions onFail="MARK_RAN">
-            <dbms type="oracle"/>
-        </preConditions>
-		<comment>Create a squence/trigger to imitate autoIncrement functionality for oracle</comment>
-		<createSequence sequenceName="scd_item_metadata_id_seq"/>
-		<sql splitStatements="false">
-			create trigger scd_item_metadata_bef_trg
-				before insert on scd_item_metadata
-					for each row begin
-						if :new.id is null
-							then select scd_item_metadata_id_seq.nextval into :new.id from dual;
-						end if;
-					end;
-		</sql>
 	</changeSet>
 	<changeSet author="ywang" id="2011-02-07-7181-4">
 		<comment>Add foreign key for scd_item_metadata</comment>
