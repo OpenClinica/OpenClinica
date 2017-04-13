@@ -23,6 +23,7 @@
             classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
             classpath:org/akaza/openclinica/applicationContext-core-email.xml
             classpath:org/akaza/openclinica/applicationContext-core-db.xml
+            classpath:org/akaza/openclinica/applicationContext-spring-jpa.xml
         </param-value>
     </context-param>
     <context-param>

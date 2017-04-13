@@ -516,38 +516,19 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private void setDatabaseProperties(String database) {
-        String herokuUrl= System.getenv("DATABASE_URL");
-        if (herokuUrl!=null){
-            String namepass[] = herokuUrl.split(":");
 
-            String user = namepass[1].substring(2);
-            String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
-            String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
-            String db = namepass[3].substring(5);
-            String dbpt = namepass[3].substring(0,4);
-
-            DATAINFO.setProperty("dbUser", user);
-            DATAINFO.setProperty("dbPass", pass);
-            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-
-            DATAINFO.setProperty("dbHost", dbhst);
-            DATAINFO.setProperty("db", db);
-            DATAINFO.setProperty("dbPort", dbpt);
-
-        }else{
-            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-        }
-
-
-
+        DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+        DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+        DATAINFO.setProperty("archiveUsername", DATAINFO.getProperty("archiveDbUser"));
+        DATAINFO.setProperty("archivePassword", DATAINFO.getProperty("archiveDbPass"));
 
         String url = null, driver = null, hibernateDialect = null;
+        String archiveUrl = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
+            archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/" + DATAINFO.getProperty("archiveDb") ;
         } else if (database.equalsIgnoreCase("oracle")) {
             url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
@@ -556,6 +537,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
+        DATAINFO.setProperty("archiveUrl", archiveUrl);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
         DATAINFO.setProperty("driver", driver);
 

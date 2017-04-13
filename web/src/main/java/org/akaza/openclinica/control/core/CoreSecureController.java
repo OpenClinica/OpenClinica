@@ -57,6 +57,7 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -328,7 +329,7 @@ public abstract class CoreSecureController extends HttpServlet {
         }
 
         UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
+        StudyBean currentStudy = (StudyBean) session.getAttribute("publicStudy");
         StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
@@ -402,7 +403,11 @@ public abstract class CoreSecureController extends HttpServlet {
                 } else {
                     currentStudy = new StudyBean();
                 }
-                session.setAttribute("study", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
+                session.setAttribute("publicStudy", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
+                request.setAttribute("requestSchema", currentStudy.getSchemaName());
+                StudyBean currentTenantStudy = (StudyBean) sdao.findByUniqueIdentifier(currentStudy.getIdentifier());
+                request.setAttribute("requestSchema", "public");
+                session.setAttribute("study", currentTenantStudy);
             } else if (currentStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
@@ -528,6 +533,7 @@ public abstract class CoreSecureController extends HttpServlet {
             if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut(request, response, ub);
             }
+            request.setAttribute("requestSchema", getRequestSchema(request, currentStudy.getSchemaName()));
             mayProceed(request, response);
             //   pingJobServer(request);
             processRequest(request, response);
@@ -551,6 +557,12 @@ public abstract class CoreSecureController extends HttpServlet {
 
     }
 
+    public String getRequestSchema(HttpServletRequest request, String schemaName) {
+        switch(StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
+            default:
+                return schemaName;
+        }
+    }
     /**
      * Handles the HTTP <code>GET</code> method.
      *

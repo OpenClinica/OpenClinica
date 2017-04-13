@@ -12,8 +12,19 @@ import java.util.ResourceBundle;
  */
 public enum Status implements CodedEnum {
 
-    INVALID(0, "invalid"), AVAILABLE(1, "available"), UNAVAILABLE(2, "unavailable"), PRIVATE(3, "private"), PENDING(4, "pending"), DELETED(5, "removed"), LOCKED(
-            6, "locked"), AUTO_DELETED(7, "auto-removed"), SIGNED(8, "signed"), FROZEN(9, "frozen"), SOURCE_DATA_VERIFICATION(10, "source_data_verification"),RESET(11, "reset");
+    INVALID(0, "invalid"),
+    AVAILABLE(1, "available"),
+    UNAVAILABLE(2, "unavailable"),
+    PRIVATE(3, "private"),
+    PENDING(4, "pending"),
+    DELETED(5, "removed"),
+    LOCKED(6, "locked"),
+    AUTO_DELETED(7, "auto-removed"),
+    SIGNED(8, "signed"),
+    FROZEN(9, "frozen"),
+    SOURCE_DATA_VERIFICATION(10, "source_data_verification"),
+    RESET(11, "reset"),
+    ARCHIVED(12, "archived");
 
     private int code;
     private String description;

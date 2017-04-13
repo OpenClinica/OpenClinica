@@ -46,6 +46,9 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 	@Override
 	
 	public ContainerRequest filter(ContainerRequest containerRequest) {
+		request.setAttribute("requestSchema", "public");
+		// get tenant schema
+
 		UserAccountBean userBean = (UserAccountBean)request.getSession().getAttribute("userBean");	
 		
 		
@@ -63,6 +66,9 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		}
 	
 		else{
+			request.setAttribute("requestSchema", "public");
+			StudyBean publicStudyBean = getStudyByOID(studyOID,getDataSource());
+			request.setAttribute("requestSchema", publicStudyBean.getSchemaName());
 			StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
 			if(checkAuth(studyBean,userBean)) return containerRequest;
 			else

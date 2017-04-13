@@ -629,6 +629,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         case "CreateUserAccount":
         case "SetUserRole":
         case "ListStudy":
+        case "AuditUserActivity":
+        case "EditStudyUserRole":
             return "public";
         default:
             return currentPublicStudy.getSchemaName();
