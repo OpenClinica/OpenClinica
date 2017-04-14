@@ -35,6 +35,7 @@ import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
@@ -130,6 +131,9 @@ public class EnketoUrlService {
 
     @Autowired
     private CrfDao crfDao;
+
+    @Autowired
+    private UserAccountDao userAccountDao;
 
     @Autowired
     private ItemGroupDao itemGroupDao;
@@ -260,9 +264,8 @@ public class EnketoUrlService {
             i++;
             QueryBean query = new QueryBean();
             query.setId(String.valueOf(i));
-            if (dn.getUserAccount() != null) {
-                query.setAssigned_to(dn.getUserAccount().getUserName());
-            }
+            query.setAssigned_to(dn.getUserAccountByOwnerId().getFirstName() + " " + dn.getUserAccountByOwnerId().getLastName() + " ("
+                    + dn.getUserAccountByOwnerId().getUserName() + ")");
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
             DateTime dateTime = new DateTime(dn.getDateCreated());
@@ -285,7 +288,9 @@ public class EnketoUrlService {
             logBean.setMessage("Value Changed from \"" + oldValue + "\" to \"" + newValue + "\"");
             DateTime dateTime = new DateTime(audit.getAuditDate());
             logBean.setDate_time(convertDateFormat(dateTime));
-            logBean.setUser(audit.getUserAccount().getUserName());
+            UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
+            logBean.setUser(uAccount.getUserName());
+            logBean.setAssigned_to(uAccount.getFirstName() + " " + uAccount.getLastName() + " (" + uAccount.getUserName() + ")");
             logBean.setType(AUDIT);
             logBeans.add(logBean);
         }
@@ -485,7 +490,7 @@ public class EnketoUrlService {
                 if (responseType.getResponseTypeId() == 3 || responseType.getResponseTypeId() == 7) {
                     itemValue = itemValue.replaceAll(",", " ");
                 }
-
+                
                 question.setTextContent(itemValue);
             }
             if (itemData == null || !itemData.isDeleted()) {
