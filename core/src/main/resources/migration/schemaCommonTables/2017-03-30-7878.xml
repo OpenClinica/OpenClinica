@@ -6,7 +6,7 @@
 
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-17">
         <createTable tableName="study">
-            <column autoIncrement="true" name="study_id" type="int">
+            <column autoIncrement="false" name="study_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="parent_study_id" type="int"/>

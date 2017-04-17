@@ -5,18 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
@@ -206,7 +195,9 @@ public class Study   extends DataMapDomainObject {
 	}
 
 	@Id
-	@GeneratedValue(generator = "id-generator")
+	@GeneratedValue(generator = "study-id-generator", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "study-id-generator",
+			sequenceName = "public.study_study_id_seq", initialValue = 1, allocationSize = 1)
 	@Column(name = "study_id", unique = true, nullable = false)
 	public int getStudyId() {
 		return this.studyId;

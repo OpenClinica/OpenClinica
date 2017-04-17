@@ -141,7 +141,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String, OdmClinicalDataBean>();
 
         Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-        getStudyDao().getCurrentSession().refresh(study);
         List<StudySubject> studySubjs = study.getStudySubjects();
         if (study.getStudies().size() < 1) {
             hm.put(studyOID, constructClinicalData(study, studySubjs));

@@ -295,4 +295,10 @@
             </update>
         </rollback>
     </changeSet>
+    <changeSet author="yogi" id="2017-03-15-7878-23">
+        <createSequence incrementBy="1"
+                        minValue="3"
+                        schemaName="public"
+                        sequenceName="study_study_id_seq"/>
+    </changeSet>
 </databaseChangeLog>

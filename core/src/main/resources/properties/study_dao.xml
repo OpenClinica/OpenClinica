@@ -94,7 +94,7 @@
 	</query>
 	<query>
 		<name>findNextKey</name>
-		<sql>select nextval('study_study_id_seq') as key</sql>
+		<sql>select nextval('public.study_study_id_seq') as key</sql>
 	</query>
 	<query>
 		<name>createStepOne</name>

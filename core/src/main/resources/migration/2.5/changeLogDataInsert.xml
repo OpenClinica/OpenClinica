@@ -321,14 +321,6 @@
 	    </insert>
     </changeSet>
 
-    <changeSet author="kkrumlian" id="1235684743487-280-1">
-		<preConditions onFail="MARK_RAN">
-			<dbms type="postgresql" />			
-	 	</preConditions>
-        <sql splitStatements="false">
-            SELECT setval('study_study_id_seq', 2, true);
-        </sql>
-    </changeSet>
         
     <changeSet author="pgawade (generated)" id="1235684743487-281">
 	<insert tableName="study_parameter">
