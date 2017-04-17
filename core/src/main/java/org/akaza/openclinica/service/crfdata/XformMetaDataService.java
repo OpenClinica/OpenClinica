@@ -65,7 +65,6 @@ import org.akaza.openclinica.validator.xform.ItemValidator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
 import org.slf4j.Logger;
@@ -97,6 +96,13 @@ public class XformMetaDataService {
     public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
     public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
     public static final String XLS_SUFFIX = ".xls";
+
+    public static final String GEOPOINT_DATATYPE = "geopoint";
+    public static final String GEOTRACE_DATATYPE = "geotrace";
+    public static final String GEOSHAPE_DATATYPE = "geoshape";
+    public static final String BARCODE_DATATYPE = "barcode";
+    public static final String TIME_DATATYPE = "time";
+    public static final String DATETIME_DATATYPE = "dateTime";
 
     @Autowired
     private StudyDao studyDao;
@@ -513,7 +519,7 @@ public class XformMetaDataService {
                     for (int j = 0; j < form.getChildNodes().getLength(); j++) {
                         Node node = form.getChildNodes().item(j);
                         if (node instanceof Element && !node.getNodeName().equals("meta") && !node.getNodeName().equals("formhub")) {
-                            instanceItemsPath = xformParserHelper.instanceItemPaths(node, instanceItemsPath, path + "/" + node.getNodeName());
+                            instanceItemsPath = xformParserHelper.instanceItemPaths(node, instanceItemsPath, path + "/" + node.getNodeName(), errors);
                         }
                     }
                     logger.info("list size: " + instanceItemsPath.size());
@@ -537,6 +543,7 @@ public class XformMetaDataService {
                         || bd.getReadOnly().equals("false()") || (bd.getReadOnly().equals("true()") && bd.getCalculate() != null))) {
                     itemOrderInForm++;
                     XformItem xformItem = new XformItem();
+                    xformItem.setItemDataType(bd.getType());
                     xformItem.setItemGroup(bd.getItemGroup());
                     String itemPath = bd.getNodeSet();
                     xformItem.setItemPath(itemPath);
@@ -552,11 +559,21 @@ public class XformMetaDataService {
                     } else {
                     }
                     xformItems.add(xformItem);
+                } else if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet())
+                        && (bd.getReadOnly().equals("true()") && bd.getCalculate() == null && bd.getItemGroup() != null)) {
+                    validateReadOnlyElements(bd, errors);
                 }
+
             }
 
             List<String> repeatGroupPathList = new ArrayList<>();
             repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
+
+            validateNestedRepeats(repeatGroupPathList, errors);
+
+            validateDataTypes(xformItems, errors);
+
+            validateOcGroupNotNull(xformItems, errors);
 
             List<XformGroup> repeatingXformGroups = new ArrayList();
 
@@ -572,84 +589,68 @@ public class XformMetaDataService {
                             if (repeatingXformGroup == null) {
                                 repeatingXformGroup = new XformGroup();
                                 repeatingXformGroup.setGroupName(xformItem.getItemGroup());
-                                int idx = StringUtils.ordinalIndexOf(repeatGroupPath, "/", 2);
-                                repeatingXformGroup.setGroupPath(repeatGroupPath.substring(idx));
+                                repeatingXformGroup.setGroupPath(repeatGroupPath);
                                 repeatingXformGroup.setRepeating(true);
                                 repeatingXformGroup.getItems().add(xformItem);
                             } else {
-                                if (repeatingXformGroup.getGroupName().equals(xformItem.getItemGroup())) {
-                                    repeatingXformGroup.getItems().add(xformItem);
+                                if (repeatingXformGroup.getGroupName().equals(xformItem.getItemGroup())
+                                        && repeatingXformGroup.getGroupPath().equals(repeatGroupPath)) {
                                 } else {
-                                    // AC13: All items located directly or indirectly in a repeating layout group must
-                                    // be assigned
-                                    // to the same
-                                    // data group.
-                                    // AC14: The data group assigned to an Item in a repeating layout group must not be
-                                    // assigned to
-                                    // any Item
-                                    // that is not directly or indirectly in the same repeating layout group.
-                                    errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
-                                            "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
+                                    validateItemsInRepeatingGroup(xformItem, repeatGroupPath, errors);
                                 }
+                                repeatingXformGroup.getItems().add(xformItem);
                             }
                             index = 0;
                             if (!repeatingXformGroups.contains(repeatingXformGroup))
                                 repeatingXformGroups.add(repeatingXformGroup);
                         }
                     }
-
                 }
             }
 
-            List<XformGroup> xformGroups = new ArrayList<>();
-            Set<String> groupSet = new HashSet<>();
+            boolean itemExistInRepeat;
+            List<XformItem> nonRepeatXformItems = new ArrayList<>();
             for (XformItem xformItem : xformItems) {
-                groupSet.add(xformItem.getItemGroup());
+                itemExistInRepeat = false;
+                for (XformGroup repeatingXformGroup : repeatingXformGroups) {
+                    for (XformItem xItem : repeatingXformGroup.getItems()) {
+                        if (xItem.getItemName().equals(xformItem.getItemName())) {
+                            itemExistInRepeat = true;
+                        }
+                    }
+                }
+                if (!itemExistInRepeat) {
+                    nonRepeatXformItems.add(xformItem);
+                }
+
+            }
+
+            List<XformGroup> nonRepeatingXformGroups = new ArrayList<>();
+            Set<String> groupSet = new HashSet<>();
+            for (XformItem xformItem : nonRepeatXformItems) {
+                if (xformItem.getItemGroup() != null) {
+                    groupSet.add(xformItem.getItemGroup());
+                }
             }
             for (String group : groupSet) {
                 XformGroup xformGroup = new XformGroup();
                 xformGroup.setGroupName(group);
-                xformGroups.add(xformGroup);
+                xformGroup.setRepeating(false);
+                nonRepeatingXformGroups.add(xformGroup);
             }
 
-            for (XformItem xformItem : xformItems) {
-                if (xformItem.getItemGroup() != null) {
-                    for (XformGroup xformGroup : xformGroups) {
-                        if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
-                            xformGroup.getItems().add(xformItem);
-                        }
+            for (XformItem nonRepeatXformItem : nonRepeatXformItems) {
+                for (XformGroup nonRepeatingXformGroup : nonRepeatingXformGroups) {
+                    if (nonRepeatXformItem.getItemGroup() != null && nonRepeatingXformGroup.getGroupName() != null
+                            && nonRepeatXformItem.getItemGroup().equals(nonRepeatingXformGroup.getGroupName())) {
+                        nonRepeatingXformGroup.getItems().add(nonRepeatXformItem);
                     }
                 }
             }
-
-            List<XformGroup> nonRepeatingXformGroups = new ArrayList<>();
-            for (XformGroup xformGroup : xformGroups) {
-                if (!repeatingXformGroups.contains(xformGroup)) {
-                    nonRepeatingXformGroups.add(xformGroup);
-                }
-            }
-
             List<XformGroup> allGroups = new ArrayList<>();
-            for (XformGroup repeatingXformGroup : repeatingXformGroups) {
-                allGroups.add(repeatingXformGroup);
-            }
-            for (XformGroup nonRepeatingXformGroup : nonRepeatingXformGroups) {
-                allGroups.add(nonRepeatingXformGroup);
-            }
-
-            // Repeating layout groups can be included at most one time in a nested layout groups structure
-            validateNestedRepeats(repeatGroupPathList, errors);
-
-            // itemName is unique within crf
+            validateItemsInRepeating(repeatingXformGroups, nonRepeatingXformGroups, allGroups, errors);
+            validateElementAndLayoutGroup(xformItems, errors);
             validateItemUniquenessInCRF(instanceItemsPath, errors);
-
-            // AC11: CRFs must have a data group defined for every Item (i.e., no "ungrouped" Items allowed).
-            validateOcGroupNotNull(xformItems, errors);
-
-            // verify group names compatible with group naming convention
-
-            // AC15: Items that are not directly or indirectly in a repeating layout group can be assigned to the same
-            // data group as each other.
 
             XformContainer container = new XformContainer();
             container.setGroups(allGroups);
@@ -665,6 +666,9 @@ public class XformMetaDataService {
     }
 
     // nested repeating groups not allowed more than once
+    // Repeating layout groups can be included at most one time in a nested layout groups structure
+    // OC-7671 AC7: Repeating group must not be nested inside another repeating group (directly or
+    // indirectly).
     private void validateNestedRepeats(List<String> repeatGroupList, Errors errors) {
         for (String repeatGroup : repeatGroupList) {
             int index = -1;
@@ -673,22 +677,27 @@ public class XformMetaDataService {
                 index = parentPath.lastIndexOf("/");
                 parentPath = parentPath.substring(0, index);
                 if (repeatGroupList.contains(parentPath)) {
-                    errors.rejectValue("name", "nested_repeat_group_not_allowed", "Repeat GroupPath:  " + repeatGroup);
-                    // errors.rejectValue("name", repeatGroup, resword.getString("nested_repeat_group_not_allowed"));
+                    int innerGroupLastIndex = repeatGroup.lastIndexOf("/");
+                    String innerGroupLayout = repeatGroup.substring(innerGroupLastIndex + 1);
+                    int outerGroupLastIndex = parentPath.lastIndexOf("/");
+                    String outerGroupLayout = parentPath.substring(outerGroupLastIndex + 1);
+
+                    errors.rejectValue("name", "nested_repeat_group_not_allowed",
+                            "Repeating Group <" + innerGroupLayout + "> cannot be nested within Repeating Group <" + outerGroupLayout + ">");
                 }
             }
 
         }
     }
 
-    public void validateItemUniquenessInCRF(List<String> instanceItemsPath, Errors errors) {
+    // itemName is unique within crf
+    private void validateItemUniquenessInCRF(List<String> instanceItemsPath, Errors errors) {
         List<String> itemNames = new ArrayList<>();
         for (String itemPath : instanceItemsPath) {
             int index = itemPath.lastIndexOf("/");
             String item = itemPath.substring(index + 1);
             if (itemNames.contains(item)) {
                 errors.rejectValue("name", "duplicate_item_name", "ItemName:  " + item);
-                // errors.rejectValue("name", item, resword.getString("duplicate_item_name"));
             } else {
                 itemNames.add(item);
             }
@@ -696,15 +705,97 @@ public class XformMetaDataService {
 
     }
 
-    public void validateOcGroupNotNull(List<XformItem> xformItems, Errors errors) {
+    // CRFs must have a data group defined for every Item.
+    // OC-7671 AC5: All elements with "readonly" != "yes" or "calculation" = non-null must have Item Group
+    // defined.
+    private void validateOcGroupNotNull(List<XformItem> xformItems, Errors errors) {
         for (XformItem xformItem : xformItems) {
             if (xformItem.getItemGroup() == null) {
-                errors.rejectValue("name", "group_name_missing_for_this_item", "ItemName:  " + xformItem.getItemName());
-                // errors.rejectValue("name", xformItem.getItemName(),
-                // resword.getString("group_name_missing_for_this_item"));
+                errors.rejectValue("name", "group_name_missing_for_this_item", "Element <" + xformItem.getItemName() + "> must be assigned to an Item Group");
             }
         }
+    }
 
+    // OC-7671 AC3: Only Items with supported data types can be included. Supported types are - integer,
+    // decimal, text, select_one, select_multiple, date, image, calculate, acknowledge, audio, video
+    private void validateDataTypes(List<XformItem> xformItems, Errors errors) {
+        for (XformItem xformItem : xformItems) {
+            if (xformItem.getItemDataType().equals(GEOPOINT_DATATYPE) || xformItem.getItemDataType().equals(GEOTRACE_DATATYPE)
+                    || xformItem.getItemDataType().equals(GEOSHAPE_DATATYPE) || xformItem.getItemDataType().equals(BARCODE_DATATYPE)
+                    || xformItem.getItemDataType().equals(TIME_DATATYPE) || xformItem.getItemDataType().equals(DATETIME_DATATYPE)) {
+                errors.rejectValue("name", "data_type_not_supported",
+                        "Element <" + xformItem.getItemName() + "> has an unsupported data type: <" + xformItem.getItemDataType() + ">");
+            }
+        }
+    }
+
+    // AC14: The data group assigned to an Item in a repeating layout group must not be
+    // assigned to any Item that is not directly or indirectly in the same repeating layout group.
+    // OC-7671 AC9: Items in repeating group must not have the same item group as items not in the repeating
+    // group.
+    private void validateItemsInRepeating(List<XformGroup> repeatingXformGroups, List<XformGroup> nonRepeatingXformGroups, List<XformGroup> allGroups,
+            Errors errors) {
+        List<String> groupNames = new ArrayList<>();
+        for (XformGroup repeatingXformGroup : repeatingXformGroups) {
+            allGroups.add(repeatingXformGroup);
+            if (groupNames.contains(repeatingXformGroup.getGroupName())) {
+                errors.rejectValue("name", "repeating_layout_group", "Elements in Repeating Group <" + repeatingXformGroup.getGroupName()
+                        + ">  must not have the same value in column 'bind::oc:itemgroup' as other elements");
+            } else {
+                groupNames.add(repeatingXformGroup.getGroupName());
+            }
+        }
+        for (XformGroup nonRepeatingXformGroup : nonRepeatingXformGroups) {
+            allGroups.add(nonRepeatingXformGroup);
+            if (groupNames.contains(nonRepeatingXformGroup.getGroupName())) {
+                errors.rejectValue("name", "repeating_layout_group", "Elements in Repeating Group <" + nonRepeatingXformGroup.getGroupName()
+                        + ">  must not have the same value in column 'bind::oc:itemgroup' as other elements");
+            } else {
+                groupNames.add(nonRepeatingXformGroup.getGroupName());
+            }
+        }
+    }
+
+    // OC-7671 AC2: Elements and Layout Groups may not have the same names as each other
+    private void validateElementAndLayoutGroup(List<XformItem> xformItems, Errors errors) {
+        Set<String> groupLayoutList = new HashSet<>();
+        List<String> itemList = new ArrayList<>();
+        for (XformItem xformItem : xformItems) {
+            int itemLastIndex = xformItem.getItemPath().lastIndexOf("/");
+            String itemName = xformItem.getItemPath().substring(itemLastIndex + 1);
+            String itemPath = xformItem.getItemPath().substring(0, itemLastIndex);
+            int groupLastIndex = itemPath.lastIndexOf("/");
+            String groupName = itemPath.substring(groupLastIndex + 1);
+            groupLayoutList.add(groupName);
+            itemList.add(itemName);
+        }
+        for (String groupLayout : groupLayoutList) {
+            if (itemList.contains(groupLayout)) {
+                errors.rejectValue("name", "element_and_layout_group", "Elements and/or Groups cannot have the same name: <" + groupLayout + ">");
+            }
+        }
+    }
+
+    // AC13: All items located directly or indirectly in a repeating layout group must
+    // be assigned to the same data group.
+    // OC-7671 AC8: All items in a repeating group must have the same item group.
+    private void validateItemsInRepeatingGroup(XformItem xformItem, String repeatGroupPath, Errors errors) {
+        int itemLastIndex = xformItem.getItemPath().lastIndexOf("/");
+        String itemName = xformItem.getItemPath().substring(itemLastIndex + 1);
+        int groupLastIndex = repeatGroupPath.lastIndexOf("/");
+        String repeatGroupLayout = repeatGroupPath.substring(groupLastIndex + 1);
+        errors.rejectValue("name", "repeating_layout_group_item_assigned_to_wrong_group", "    Element <" + itemName
+                + "> must have the same value in column 'bind::oc:itemgroup' as all other elements in Repeating Group <" + repeatGroupLayout + ">");
+
+    }
+
+    // OC-7671 AC4: All elements with "readonly" = "yes" and "calculation" = null must not have Item
+    // Group defined.
+    private void validateReadOnlyElements(Bind bd, Errors errors) {
+        int lastIndex = bd.getNodeSet().lastIndexOf("/");
+        String nodeName = bd.getNodeSet().substring(lastIndex + 1);
+        errors.rejectValue("name", "note_type_with_ocgroup_value",
+                "Read-only note element <" + nodeName + "> cannot have a value in column 'bind::oc:itemgroup'");
     }
 
     public FileItem getMediaFileItemFromFormManager(String fileLink, String crfOid, String formLayoutOid) {
@@ -783,6 +874,9 @@ public class XformMetaDataService {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
                             }
+                            if (eicObject.errors.hasErrors()) {
+                                return;
+                            }
 
                             // Save meta-data in database
                             try {
@@ -807,6 +901,7 @@ public class XformMetaDataService {
                 }
             }
         }
+
     }
 
     private void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {

@@ -102,7 +102,7 @@
 
 <form>
 
-<div style="width: 400px">
+<div style="width: 500px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 
@@ -127,7 +127,7 @@
      <tr>
       <td><b><fmt:message key="crf_validation_error_identifier" bundle="${resword}"/>:</b></td>
       <td>   </td>
-      <td><b><fmt:message key="crf_validation_error_reason" bundle="${resword}"/>:</b></td>
+      <td><b><fmt:message key="crf_validation_error_reason" bundle="${resword}"/></b></td>
      </tr>
     </thead>
     <tbody>
