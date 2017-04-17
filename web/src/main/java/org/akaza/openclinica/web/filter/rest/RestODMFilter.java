@@ -66,10 +66,8 @@ public class RestODMFilter implements ContainerRequestFilter,ResourceFilter {
 		}
 	
 		else{
-			request.setAttribute("requestSchema", "public");
-			StudyBean publicStudyBean = getStudyByOID(studyOID,getDataSource());
-			request.setAttribute("requestSchema", publicStudyBean.getSchemaName());
 			StudyBean studyBean = getStudyByOID(studyOID,getDataSource());
+			request.setAttribute("requestSchema", studyBean.getSchemaName());
 			if(checkAuth(studyBean,userBean)) return containerRequest;
 			else
 			{

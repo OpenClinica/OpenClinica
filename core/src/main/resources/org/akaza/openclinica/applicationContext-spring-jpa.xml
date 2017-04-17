@@ -42,13 +42,14 @@
                 <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
             </props>
         </property>
-        <property name="packagesToScan" value="org.akaza.openclinica.dao.hibernate.multitenant"/>
+        <property name="packagesToScan" value="org.akaza.openclinica.dao.hibernate,org.akaza.openclinica.dao.jpa"/>
     </bean>
 
     <!-- Configure the transaction manager bean -->
     <bean id="archiveTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <qualifier value="archival"/>
     </bean>
 
-    <jpa:repositories base-package="org.akaza.openclinica.dao.hibernate.multitenant"/>
+    <jpa:repositories base-package="org.akaza.openclinica.dao.jpa"/>
 </beans>
