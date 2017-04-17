@@ -1005,4 +1005,27 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
     }
 
+    public void updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(3, TypeNames.INT);
+        this.setTypeExpected(4, TypeNames.BOOL);
+        this.setTypeExpected(3, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(1, form_layout_id);
+        variables.put(2, user_id);
+        variables.put(3, user_id);
+        variables.put(4, false);
+        variables.put(5, event_crf_id);
+        String sql = digester.getQuery("updateFormLayoutID");
+        // this is the way to make the change transactional
+        if (con == null) {
+            this.execute(sql, variables);
+        } else {
+            this.execute(sql, variables, con);
+        }
+    }
+
 }

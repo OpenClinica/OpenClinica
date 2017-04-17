@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -67,6 +68,7 @@ import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -76,7 +78,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -119,6 +121,9 @@ public class OpenRosaServices {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudySubjectDao ssDao;
 
     @Autowired
     CrfDao crfDao;
@@ -393,8 +398,8 @@ public class OpenRosaServices {
 
         // Add user list
         MediaFile userList = new MediaFile();
-        Study study = studyDao.findByOcOID(studyOID);
-        String userXml = getUserXml(study.getStudyId());
+
+        String userXml = getUserXml(context);
         userList.setFilename("users.xml");
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
@@ -554,9 +559,7 @@ public class OpenRosaServices {
         if (!mayProceedPreview(request, studyOID))
             return null;
 
-        Study study = studyDao.findByOcOID(studyOID);
-        String userXml = getUserXml(study.getStudyId());
-
+        String userXml = getUserXml(context);
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -744,7 +747,7 @@ public class OpenRosaServices {
             for (CRFVersionBean crfVersion : crfs) {
                 String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), studyOID);
             }
         } catch (Exception e) {
             LOGGER.debug(e.getMessage());
@@ -877,7 +880,13 @@ public class OpenRosaServices {
         return attribs;
     }
 
-    private String getUserXml(Integer studyId) throws Exception {
+    private String getUserXml(ServletContext context) throws Exception {
+        HashMap<String, String> value = getSubjectContextCacheValue(context);
+        String studySubjectOid = value.get("studySubjectOID");
+
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
+        StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
+        StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -886,7 +895,7 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
+        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
         for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
@@ -1002,6 +1011,17 @@ public class OpenRosaServices {
 
     public void setXformParserHelper(XformParserHelper xformParserHelper) {
         this.xformParserHelper = xformParserHelper;
+    }
+
+    @SuppressWarnings("unchecked")
+    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context) {
+        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
+        String lastKey = null;
+        for (String key : subjectContextCache.keySet()) {
+            lastKey = key;
+        }
+        HashMap<String, String> value = (HashMap<String, String>) subjectContextCache.get(lastKey);
+        return value;
     }
 
 }

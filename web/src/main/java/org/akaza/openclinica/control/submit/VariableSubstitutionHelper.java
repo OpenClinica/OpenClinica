@@ -1,23 +1,28 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.*;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs the variable substitution in the CRF fields that support it.
@@ -35,16 +40,19 @@ public class VariableSubstitutionHelper {
     /**
      * Replaces the variables in each {@link DisplayItemBean} of the {@link DisplaySectionBean}.
      *
-     * @param section The display section to have its items processed.
-     * @param study Study associated with the display section.
-     * @param studySubject Subject associated with the display section.
+     * @param section
+     *            The display section to have its items processed.
+     * @param study
+     *            Study associated with the display section.
+     * @param studySubject
+     *            Subject associated with the display section.
      */
-    public static void replaceVariables(DisplaySectionBean section, StudyBean study, StudySubjectBean studySubject,
-                                        StudyEventDefinitionBean eventDef, StudyEventBean event, DataSource dataSource) {
+    public static void replaceVariables(DisplaySectionBean section, StudyBean study, StudySubjectBean studySubject, StudyEventDefinitionBean eventDef,
+            StudyEventBean event, DataSource dataSource) {
 
         StrSubstitutor subst = new StrSubstitutor(buildTokensMap(section, studySubject, study, eventDef, event, dataSource));
 
-        for (DisplayItemBean displayItem: section.getItems()) {
+        for (DisplayItemBean displayItem : section.getItems()) {
             ItemFormMetadataBean metadata = displayItem.getMetadata();
             metadata.setRightItemText(replace(subst, metadata.getRightItemText()));
             metadata.setLeftItemText(replace(subst, metadata.getLeftItemText()));
@@ -59,25 +67,25 @@ public class VariableSubstitutionHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> buildTokensMap(DisplaySectionBean section, StudySubjectBean studySubject,
-                                                      StudyBean study, StudyEventDefinitionBean eventDef,
-                                                      StudyEventBean event, DataSource dataSource) {
+    private static Map<String, String> buildTokensMap(DisplaySectionBean section, StudySubjectBean studySubject, StudyBean study,
+            StudyEventDefinitionBean eventDef, StudyEventBean event, DataSource dataSource) {
 
         ItemDAO itemDAO = new ItemDAO(dataSource);
 
-        List<ItemBean> items = itemDAO.findAllWithItemDataByCRFVersionId(
-                section.getCrfVersion().getId(), section.getEventCRF().getId());
+        List<ItemBean> items = itemDAO.findAllWithItemDataByFormLayoutId(section.getCrfVersion().getId(), section.getEventCRF().getId());
 
         Map<String, String> tokensMap = new HashMap<String, String>();
         tokensMap.put("studySubject", encode(studySubject.getName()));
-        if (studySubject.getOid() != null && !studySubject.getOid().isEmpty()){
+        if (studySubject.getOid() != null && !studySubject.getOid().isEmpty()) {
             tokensMap.put("studySubjectOID", encode(studySubject.getOid()));
-        }
-        else tokensMap.put("studySubjectOID", "");
+        } else
+            tokensMap.put("studySubjectOID", "");
         tokensMap.put("studyName", encode(study.getName()));
         tokensMap.put("eventName", encode(eventDef.getName()));
-        if (event == null) tokensMap.put("eventOrdinal", "");
-        else tokensMap.put("eventOrdinal", encode(Integer.toString(event.getSampleOrdinal())));
+        if (event == null)
+            tokensMap.put("eventOrdinal", "");
+        else
+            tokensMap.put("eventOrdinal", encode(Integer.toString(event.getSampleOrdinal())));
         tokensMap.put("crfName", encode(section.getCrf().getName()));
         tokensMap.put("crfVersion", encode(section.getCrfVersion().getName()));
 
@@ -86,7 +94,7 @@ public class VariableSubstitutionHelper {
 
             // If the item has multiple values, combine them in a comma-separated list
             List<String> values = new ArrayList<String>();
-            for (ItemDataBean itemData: item.getItemDataElements()) {
+            for (ItemDataBean itemData : item.getItemDataElements()) {
                 values.add(itemData.getValue());
             }
             String value = StringUtils.join(values, ',');
@@ -95,7 +103,7 @@ public class VariableSubstitutionHelper {
         }
 
         if (LOG.isDebugEnabled()) {
-            for(String key : tokensMap.keySet()) {
+            for (String key : tokensMap.keySet()) {
                 LOG.debug("Substitution context: {} = {}", key, tokensMap.get(key));
             }
         }
