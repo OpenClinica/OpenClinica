@@ -86,12 +86,12 @@ public class StudySubjectProcessor implements Processor, Ordered {
             //If Study Subject exists in a parent/sibling study, create study subject with 'FIXME-<timestamp>' label to avoid data loss and mark it
             } else if (subjectExistsInParentSiblingStudy(embeddedStudySubjectId, study)) {
                 String subjectLabel = "FIXME-" + dateFormatter.format(currentDate);
-                Subject subject = createSubject(currentDate);
+                Subject subject = createSubject(currentDate, rootUser);
                 StudySubject studySubject = createStudySubject(subjectLabel, subject, study,rootUser,currentDate,embeddedStudySubjectId);
                 container.setSubject(studySubject);
             //Study Subject does not exist. Create it
             } else {
-                Subject subject = createSubject(currentDate);
+                Subject subject = createSubject(currentDate, rootUser);
                 StudySubject studySubject = createStudySubject(embeddedStudySubjectId, subject, study,rootUser,currentDate, null);
                 container.setSubject(studySubject);
             }
@@ -103,7 +103,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
             int nextLabel = studySubjectDao.findTheGreatestLabelByStudy(study.getStudyId()) + 1;
             Date nextLabelEnd = new Date();
             logger.info(" Database call to get next study subject label took " + (nextLabelEnd.getTime() - nextLabelStart.getTime()) + "milliseconds");
-            Subject subject = createSubject(currentDate);
+            Subject subject = createSubject(currentDate, rootUser);
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
             container.setSubject(studySubject);
         }
@@ -129,9 +129,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
         return 1;
     }
     
-    private Subject createSubject(Date currentDate) {
-        UserAccount rootUser = userAccountDao.findByUserId(1);
-
+    private Subject createSubject(Date currentDate, UserAccount rootUser) {
         Subject subject = new Subject();
         subject.setUserAccount(rootUser);
         subject.setStatus(Status.AVAILABLE);
