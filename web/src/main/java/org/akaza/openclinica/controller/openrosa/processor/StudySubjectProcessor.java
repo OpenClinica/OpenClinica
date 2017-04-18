@@ -47,24 +47,16 @@ public class StudySubjectProcessor implements Processor, Ordered {
     @Override
     public void process(SubmissionContainer container) throws Exception {
         logger.info("Executing study subject processor.");
-        
+
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
-        Study teststudy = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-
         Date currentDate = new Date();
-        Date userAccountStart = new Date();
         UserAccount rootUser = userAccountDao.findByUserId(1);
-        Date userAccountEnd = new Date();
-        logger.info(" Database call to get user account took " + (userAccountEnd.getTime() - userAccountStart.getTime()) + "milliseconds");
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd.HHmmss");
 
         // Standard Participant Dashboard submission
         if (studySubjectOid != null)  {
-            Date studySubjectStart = new Date();
             StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOid);
-            Date studySubjectEnd = new Date();
-            logger.info(" Database call to get study subject took " + (studySubjectEnd.getTime() - studySubjectStart.getTime()) + "milliseconds");
             container.setSubject(studySubject);
             
             if (studySubject.getStatus() != Status.AVAILABLE) {
@@ -99,10 +91,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
         } else {
             // create Subject & Study Subject
             Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-            Date nextLabelStart = new Date();
             int nextLabel = studySubjectDao.findTheGreatestLabelByStudy(study.getStudyId()) + 1;
-            Date nextLabelEnd = new Date();
-            logger.info(" Database call to get next study subject label took " + (nextLabelEnd.getTime() - nextLabelStart.getTime()) + "milliseconds");
             Subject subject = createSubject(currentDate, rootUser);
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
             container.setSubject(studySubject);

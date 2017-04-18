@@ -96,7 +96,6 @@ public class ItemProcessor implements Processor, Ordered {
     }
 
     public void process(SubmissionContainer container) throws Exception {
-        Date itemProcessorStart = new Date();
         logger.info("Executing Item Processor.");
         ArrayList<HashMap> listOfUploadFilePaths =container.getListOfUploadFilePaths();        
 
@@ -119,51 +118,25 @@ public class ItemProcessor implements Processor, Ordered {
                 for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
-                        Date crfVersionStart = new Date();
                         CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
-                        Date crfVersionEnd = new Date();
-                        logger.info("Database call to crf_version took " + (crfVersionEnd.getTime() - crfVersionStart.getTime()) + "milliseconds");
                         EventCrf eventCrf = container.getEventCrf();
                         ArrayList<ItemData> itemDataList = new ArrayList<ItemData>();
 
                         HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
                         NodeList groupNodeList = crfNode.getChildNodes();
                         
-                        Date bulkItemStart = new Date();
                         List<Item> items = itemDao.findAllByCrfId(crfVersion.getCrf().getCrfId());
-                        Date bulkItemEnd = new Date();
-                        logger.info("Bulk call to item took " + (bulkItemEnd.getTime() - bulkItemStart.getTime()) + "milliseconds and fetched " + items.size() + "rows.");
-
-                        Date bulkItemDataStart = new Date();
                         List<ItemData> itemDatas = itemDataDao.findAllByEventCrf(container.getEventCrf().getEventCrfId());
-                        Date bulkItemDataEnd = new Date();
-                        logger.info("Bulk call to item_data took " + (bulkItemDataEnd.getTime() - bulkItemDataStart.getTime()) + "milliseconds and fetched " + itemDatas.size() + " rows.");
-
-                        Date bulkItemGroupStart = new Date();
                         List<ItemGroup> itemGroups = itemGroupDao.findAllByCrfId(container.getEventCrf().getCrfVersion().getCrf());
-                        Date bulkItemGroupEnd = new Date();
-                        logger.info("Bulk call to item_group took " + (bulkItemGroupEnd.getTime() - bulkItemGroupStart.getTime()) + "milliseconds and fetched " + itemGroups.size() + "rows.");
-
-                        Date bulkItemGroupMetadataStart = new Date();
                         List<ItemGroupMetadata> itemGroupMetadatas = itemGroupMetadataDao.findAllByCrfVersion(container.getEventCrf().getCrfVersion().getCrfVersionId());
-                        Date bulkItemGroupMetadataEnd = new Date();
-                        logger.info("Bulk call to item_group_metadata took " + (bulkItemGroupMetadataEnd.getTime() - bulkItemGroupMetadataStart.getTime()) + "milliseconds and fetched " + itemGroupMetadatas.size() + "rows.");
-
-                        Date bulkItemFormMetadataStart = new Date();
                         List<ItemFormMetadata> itemFormMetadatas = itemFormMetadataDao.findAllByCrfVersion(container.getEventCrf().getCrfVersion().getCrfVersionId());
-                        Date bulkItemFormMetadataEnd = new Date();
-                        logger.info("Bulk call to item_form_metadata took " + (bulkItemFormMetadataEnd.getTime() - bulkItemFormMetadataStart.getTime()) + "milliseconds and fetched " + itemFormMetadatas.size() + "rows.");
 
-                        
                         // Group loop
                         for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
                             Node groupNode = groupNodeList.item(k);
                             if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
                                 groupNodeName = groupNode.getNodeName();
-                                Date itemGroupStart = new Date();
                                 ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion, itemGroups);
-                                Date itemGroupEnd = new Date();
-                                logger.info("Database call to item_group took " + (itemGroupEnd.getTime() - itemGroupStart.getTime()) + "milliseconds");
                                 if (itemGroup == null) {
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
                                     continue;
@@ -183,23 +156,15 @@ public class ItemProcessor implements Processor, Ordered {
                                         
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
-                                       
-                                        Date itemStart = new Date();
+
                                         Item item = lookupItem(itemName, crfVersion, items);
-                                        Date itemEnd = new Date();
-                                        logger.info(" Database call to item took " + (itemEnd.getTime() - itemStart.getTime()) + "milliseconds");
-                   
                                         if (item == null) {
                                             logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                                             continue;
                                         }
 
-                                        Date itemMetadataStart = new Date();
                                         ItemGroupMetadata itemGroupMeta = lookupItemGroupMetadata(item.getItemId(), crfVersion.getCrfVersionId(), itemGroupMetadatas);
                                         ItemFormMetadata itemFormMetadata = lookupItemFormMetadata(item.getItemId(), crfVersion.getCrfVersionId(), itemFormMetadatas);
-                                        Date itemMetadataEnd = new Date();
-                                        logger.info(" Double Database call to Form & Group Metadata took " + (itemMetadataEnd.getTime() - itemMetadataStart.getTime()) + "milliseconds");
-
                                         Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
 
                                         // Convert space separated Enketo multiselect values to comma separated OC multiselect values
@@ -230,22 +195,16 @@ public class ItemProcessor implements Processor, Ordered {
                                         } else {
                                             itemDataList.add(newItemData);
                                         }
-                                        Date existingItemDataStart = new Date();
                                         ItemData existingItemData = lookupItemData(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal,itemDatas);
-                                        Date existingItemDataEnd = new Date();
-                                        logger.info(" Existing row database call to item_data took " + (existingItemDataEnd.getTime() - existingItemDataStart.getTime()) + "milliseconds");
                                         if (existingItemData == null) {
                                             // No existing value, create new item.
                                             if (newItemData.getOrdinal() < 0) {
                                                 newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId()) + 1);
                                                 groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                                             }
-                                            Date itemDataDoubleSaveStart = new Date();
                                             itemDataDao.saveOrUpdate(newItemData);
                                             newItemData.setStatus(Status.UNAVAILABLE);
                                             itemDataDao.saveOrUpdate(newItemData);
-                                            Date itemDataDoubleSaveEnd = new Date();
-                                            logger.info(" Double database call to item_data took " + (itemDataDoubleSaveEnd.getTime() - itemDataDoubleSaveStart.getTime()) + "milliseconds\n");
 
                                         } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                                             // Existing item. Value unchanged. Do nothing.
@@ -254,29 +213,19 @@ public class ItemProcessor implements Processor, Ordered {
                                             existingItemData.setValue(newItemData.getValue());
                                             existingItemData.setUpdateId(container.getUser().getUserId());
                                             existingItemData.setDateUpdated(new Date());
-                                            Date itemDataSingleSaveStart = new Date();
                                             itemDataDao.saveOrUpdate(existingItemData);
-                                            Date itemDataSingleSaveEnd = new Date();
-                                            logger.info(" Single database call to item_data took " + (itemDataSingleSaveEnd.getTime() - itemDataSingleSaveStart.getTime()) + "milliseconds\n");
                                         }
                                     }
                                 }
                             }
                         }
-                        //}
-
-                            // Delete rows that have been removed
-                            Date deleteMultiItemDataStart = new Date();
-                            removeDeletedRows(groupOrdinalMapping,eventCrf,crfVersion,container.getStudy(),container.getSubject(), container.getLocale(), container.getUser());
-                            Date deleteMultiItemDataEnd = new Date();
-                            logger.info("Multi-delete database call to item_data took " + (deleteMultiItemDataEnd.getTime() - deleteMultiItemDataStart.getTime()) + "milliseconds");
-                        }
+                        // Delete rows that have been removed
+                        removeDeletedRows(groupOrdinalMapping,eventCrf,crfVersion,container.getStudy(),container.getSubject(), container.getLocale(), container.getUser());
                     }
                 }
             }
-        Date itemProcessorEnd = new Date();
-        logger.info("Finished executing normal Item Processor.  Took " + (itemProcessorEnd.getTime() - itemProcessorStart.getTime()) + "milliseconds.");
-}
+        }
+    }
     
     private ItemFormMetadata lookupItemFormMetadata(Integer itemId, Integer crfVersionId, List<ItemFormMetadata> itemFormMetadataList) {
         for (ItemFormMetadata itemFormMetadata: itemFormMetadataList) {
