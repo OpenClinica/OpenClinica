@@ -16,6 +16,15 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         // TODO Auto-generated method stub
         return StudySubject.class;
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<StudySubject> findAllByStudy(Integer studyId) {
+        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", studyId);
+        return (List<StudySubject>) q.list();
+      
+    }
 
     public StudySubject findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
@@ -81,8 +90,9 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
             throw new RuntimeException("CANNOT GENERATE OID");
         }
     }
-    public int findTheGreatestLabel() {
-        List<StudySubject> allStudySubjects = super.findAll();
+
+    public int findTheGreatestLabelByStudy(Integer studyId) {
+        List<StudySubject> allStudySubjects = findAllByStudy(studyId);
         
         int greatestLabel = 0;
         for (StudySubject subject:allStudySubjects) {

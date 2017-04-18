@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 
@@ -26,5 +27,12 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
         q.setInteger("itemid", item_id);
         q.setInteger("crfversionid", crf_version_id);
         return (ItemGroupMetadata) q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ItemGroupMetadata> findAllByCrfVersion(int crf_version_id) {
+        String query = "select distinct * from item_group_metadata igm where igm.crf_version_id = " + crf_version_id;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroupMetadata.class);
+        return (List<ItemGroupMetadata>) q.list();
     }
 }

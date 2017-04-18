@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
@@ -26,6 +27,14 @@ public class ItemDao extends AbstractDomainDao<Item> {
                 + "and ifm.crf_version_id=cv.crf_version_id " + "and cv.crf_id=" + crfId;
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
         return ((Item) q.uniqueResult());
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Item> findAllByCrfId(Integer crfId) {
+        String query = "select distinct i.* from item i, item_form_metadata ifm,crf_version cv " + "where i.item_id= ifm.item_id "
+                + "and ifm.crf_version_id=cv.crf_version_id " + "and cv.crf_id=" + crfId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
+        return (List<Item>) q.list();
     }
 
     public int getItemDataTypeId(Item item) {
