@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.dao.core.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.*;
@@ -993,6 +994,16 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         }
         return al;
 
+    }
+    public StudyBean getPublicStudy (String ocId) {
+        HttpServletRequest request = CoreResources.getRequest();
+        if (request == null)
+            return null;
+        String schema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", "public");
+        StudyBean study = findByOid(ocId);
+        request.setAttribute("requestSchema", schema);
+        return study;
     }
 
 }

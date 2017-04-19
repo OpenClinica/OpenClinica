@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -77,6 +78,7 @@ public class ViewEventDefinitionServlet extends SecureController {
         } else {
             // definition id
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+            StudyBean study = (StudyBean) studyDao.findByPK(sed.getStudyId());
 
             if (currentStudy.getId() != sed.getStudyId()) {
                 addPageMessage(respage.getString("no_have_correct_privilege_current_study")
@@ -85,7 +87,7 @@ public class ViewEventDefinitionServlet extends SecureController {
                 return;
             }
             
-            checkRoleByUserAndStudy(ub, sed.getStudyId(), 0);
+            checkRoleByUserAndStudy(ub, study, studyDao);
 
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(this.currentStudy, defId);

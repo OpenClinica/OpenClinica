@@ -50,7 +50,7 @@ public class RemoveDatasetServlet extends SecureController {
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean)sdao.findByPK(dataset.getStudyId());
-        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+        checkRoleByUserAndStudy(ub, study, sdao);
         if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));

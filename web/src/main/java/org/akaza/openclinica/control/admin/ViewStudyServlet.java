@@ -63,7 +63,8 @@ public class ViewStudyServlet extends SecureController {
             forwardPage(Page.STUDY_LIST_SERVLET);
         } else {
             if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
-                checkRoleByUserAndStudy(ub, studyId, 0);
+                StudyBean study = (StudyBean) sdao.findByPK(studyId);
+                checkRoleByUserAndStudy(ub, study, sdao);
             }
 
             String viewFullRecords = fp.getString("viewFull");

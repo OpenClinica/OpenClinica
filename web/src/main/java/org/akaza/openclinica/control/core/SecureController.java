@@ -1165,11 +1165,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         return note;
     }
-    public void checkRoleByUserAndStudy(UserAccountBean ub, int studyId, int siteId){
-        StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
+    public void checkRoleByUserAndStudy(UserAccountBean ub, StudyBean tenantStudy, StudyDAO studyDAO){
+        StudyBean study = null;
+
+        if (StringUtils.isNotEmpty(tenantStudy.getSchemaName()))
+            study = tenantStudy;
+        else
+            study = studyDAO.getPublicStudy(tenantStudy.getOid());
+
+        StudyUserRoleBean studyUserRole = ub.getRoleByStudy(study.getParentStudyId());
         StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
-        if (siteId != 0) {
-            siteUserRole = ub.getRoleByStudy(siteId);
+        if (study.getId() != 0) {
+            siteUserRole = ub.getRoleByStudy(study.getId());
         }
         if(studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)){
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")

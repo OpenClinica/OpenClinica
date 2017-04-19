@@ -119,10 +119,9 @@ public class ExportDatasetServlet extends SecureController {
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
-       StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
-        StudyBean publicStudy = getPublicStudy(study.getIdentifier());
-        checkRoleByUserAndStudy(ub, publicStudy.getParentStudyId(), publicStudy.getId());
+        checkRoleByUserAndStudy(ub, study, sdao);
 
         //Checks if the study is current study or child of current study
         if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
