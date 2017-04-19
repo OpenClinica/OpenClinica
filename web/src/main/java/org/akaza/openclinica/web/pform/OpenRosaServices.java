@@ -819,6 +819,30 @@ public class OpenRosaServices {
 
     }
 
+    private StudyBean getPublicStudy(String oid) {
+        String schema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+        CoreResources.setRequestSchema(schema);
+        return studyBean;
+    }
+
+    private StudyBean getParentPublicStudy(String studyOid) {
+        StudyBean resultBean =  null;
+        String schema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            resultBean = study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            resultBean= parentStudy;
+        }
+        CoreResources.setRequestSchema(schema);
+        return resultBean;
+    }
+
     private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
 
         NamedNodeMap attribs = fetchXformAttributes(xform);
@@ -895,7 +919,11 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
+        // get public studies
+        StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
+        StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+
+        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
         for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");

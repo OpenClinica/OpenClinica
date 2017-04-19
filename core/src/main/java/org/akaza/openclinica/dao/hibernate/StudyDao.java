@@ -1,6 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,5 +28,19 @@ public class StudyDao extends AbstractDomainDao<Study> {
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("uniqueId", uniqueId);
         return  (Study) q.uniqueResult();
+    }
+
+    public Study findPublicStudy(String ocId) {
+        String schema = CoreResources.getRequestSchema();
+        if (StringUtils.isEmpty(schema))
+            return null;
+        CoreResources.setRequestSchema("public");
+        getSessionFactory().getStatistics().logSummary();
+        String query = " from Study do  where do.oc_oid = :ocId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("ocId", ocId);
+        Study study =   (Study) q.uniqueResult();
+        CoreResources.setRequestSchema(schema);
+        return study;
     }
 }

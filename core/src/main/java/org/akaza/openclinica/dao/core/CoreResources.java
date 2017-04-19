@@ -17,10 +17,12 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -42,6 +44,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
@@ -475,6 +478,27 @@ public class CoreResources implements ResourceLoaderAware {
             return true;
         }
         return false;
+    }
+
+    public static HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
+    public static StudyBean getPublicStudy (String ocId, DataSource ds) {
+        StudyDAO studyDAO = new StudyDAO(ds);
+        HttpServletRequest request = getRequest();
+        if (request == null)
+            return null;
+        String schema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", "public");
+        StudyBean study = studyDAO.findByOid(ocId);
+        request.setAttribute("requestSchema", schema);
+        return study;
     }
 
     private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {

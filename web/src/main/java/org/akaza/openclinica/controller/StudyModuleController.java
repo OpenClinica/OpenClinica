@@ -322,13 +322,16 @@ public class StudyModuleController {
         int ruleCount = ruleSetService.getCountByStudy(currentStudy);
 
         int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
-        int userCount = userDao.findAllUsersByStudy(currentStudy.getId()).size();
-        Collection childStudies = studyDao.findAllByParent(currentStudy.getId());
+        String tenantSchema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", "public");
+        int userCount = userDao.findAllUsersByStudy(currentPublicStudy.getId()).size();
+        Collection childStudies = studyDao.findAllByParent(currentPublicStudy.getId());
         Map childStudyUserCount = new HashMap();
         for (Object sb : childStudies) {
             StudyBean childStudy = (StudyBean) sb;
             childStudyUserCount.put(childStudy.getName(), userDao.findAllUsersByStudy(childStudy.getId()).size());
         }
+        request.setAttribute("requestSchema", tenantSchema);
 
         if (sms.getCrf() == 0) {
             sms.setCrf(StudyModuleStatus.NOT_STARTED);

@@ -43,6 +43,7 @@
             </props>
         </property>
         <property name="packagesToScan" value="org.akaza.openclinica.dao.hibernate,org.akaza.openclinica.dao.jpa"/>
+        <qualifier value="archiveEM"/>
     </bean>
 
     <!-- Configure the transaction manager bean -->
