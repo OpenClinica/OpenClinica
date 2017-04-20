@@ -7,34 +7,26 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class ViewCRFVersionServlet extends SecureController {
     /**
@@ -57,7 +49,8 @@ public class ViewCRFVersionServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
         ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
@@ -65,20 +58,22 @@ public class ViewCRFVersionServlet extends SecureController {
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
 
-        int crfVersionId = fp.getInt("id");
+        // int crfVersionId = fp.getInt("id");
+        int formLayoutId = fp.getInt("id");
 
-        if (crfVersionId == 0) {
+        if (formLayoutId == 0) {
             addPageMessage(respage.getString("please_choose_a_crf_to_view_details"));
             forwardPage(Page.CRF_LIST_SERVLET);
         } else {
-            CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+            // CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+            FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(formLayoutId);
             // tbh
             CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-            CRFBean crf = (CRFBean) crfdao.findByPK(version.getCrfId());
+            CRFBean crf = (CRFBean) crfdao.findByPK(formLayout.getCrfId());
             CRFVersionMetadataUtil metadataUtil = new CRFVersionMetadataUtil(sm.getDataSource());
-            ArrayList<SectionBean> sections = metadataUtil.retrieveFormMetadata(version); 
+            ArrayList<SectionBean> sections = metadataUtil.retrieveFormMetadata(formLayout);
             request.setAttribute("sections", sections);
-            request.setAttribute("version", version);
+            request.setAttribute("version", formLayout);
             // tbh
             request.setAttribute("crfname", crf.getName());
             // tbh
