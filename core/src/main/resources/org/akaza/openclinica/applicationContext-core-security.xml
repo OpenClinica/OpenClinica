@@ -14,11 +14,10 @@
     <context:annotation-config />
     <context:component-scan base-package="org.akaza.openclinica" />
 
+    <!--
     <security:authentication-manager alias="authenticationManager">
         <security:authentication-provider user-service-ref="ocUserDetailsService">
             <security:password-encoder ref="openClinicaPasswordEncoder"/>
-            <!-- <security:password-encoder hash="md5" /> -->
-            <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
         </security:authentication-provider>
         <security:authentication-provider ref="ldapAuthenticationProvider"/>
     </security:authentication-manager>
@@ -43,6 +42,7 @@
             </list>
         </property>
     </bean>
+    -->
 
     <!-- 
     <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">
@@ -61,9 +61,11 @@
     </bean>
     -->
 
+    <!--
     <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
           p:dataSource-ref="dataSource"
           p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?"/>
+    -->
 
     <!--<security:global-method-security secured-annotations="enabled">
         <security:protect-pointcut

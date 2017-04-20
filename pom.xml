@@ -872,14 +872,6 @@
             <url>https://openclinica.jfrog.io/openclinica/libs-release</url>
         </repository>
         <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>openclinica.jfrog.io-libs-release</id>
-            <name>openclinica.jfrog.io-libs-release</name>
-            <url>https://openclinica.jfrog.io/openclinica/libs-release</url>
-        </repository>
-        <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
             <url>http://repository.jboss.org/nexus/content/groups/public/</url>

@@ -5,13 +5,16 @@ package org.akaza.openclinica.config;
  */
 
 import com.auth0.spring.security.mvc.Auth0Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 
 @Configuration
@@ -26,10 +29,12 @@ public class AppConfig extends Auth0Config {
     @Override
     protected void authorizeRequests(final HttpSecurity http) throws Exception {
         System.out.println("KKKKKK");
+        http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/pages/home"));
         http.authorizeRequests()
-                .antMatchers("/css/**", "/fonts/**", "/js/**", "/login", "/logout", "/callback").permitAll()
+                .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
+                        "/js/**", "/login", "/logout", "/pages/callback", "/pages/home").permitAll()
                 .antMatchers("/partner/home").permitAll()
-                .antMatchers("/partner/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                .antMatchers("/**").hasAnyAuthority("ROLE_USER")
                 .antMatchers(securedRoute).authenticated();
     }
 
@@ -38,4 +43,7 @@ public class AppConfig extends Auth0Config {
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         return new PropertySourcesPlaceholderConfigurer();
     }
+
+
+    // authenticationProcessingFilterEntryPoint
 }
