@@ -425,7 +425,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
             ub = sm.getUserBean();
             session.setAttribute("userBean", ub);
-
+            request.setAttribute("userBean", ub);
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {

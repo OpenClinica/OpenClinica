@@ -8,6 +8,7 @@ public class PFormCacheSubjectContextEntry {
     private String crfVersionOid = null;
     private String formLayoutOid = null;
     private Integer userAccountId = null;
+    private String studyOid = null;
 
     public String getStudySubjectOid() {
         return studySubjectOid;
@@ -33,6 +34,14 @@ public class PFormCacheSubjectContextEntry {
         this.ordinal = ordinal;
     }
 
+    public String getStudyOid() {
+        return studyOid;
+    }
+
+    public void setStudyOid(String studyOid) {
+        this.studyOid = studyOid;
+    }
+
     public String getCrfVersionOid() {
         return crfVersionOid;
     }
@@ -56,5 +65,6 @@ public class PFormCacheSubjectContextEntry {
     public void setFormLayoutOid(String formLayoutOid) {
         this.formLayoutOid = formLayoutOid;
     }
+
 
 }

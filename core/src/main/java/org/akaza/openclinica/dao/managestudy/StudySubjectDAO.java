@@ -677,6 +677,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             studySubjectBean = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
             return studySubjectBean;
         } else {
+            System.out.println("RETURNING NULL");
             return null;
         }
     }

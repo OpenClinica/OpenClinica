@@ -54,12 +54,14 @@ import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -111,6 +113,8 @@ import org.w3c.dom.Node;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
+
+import static org.akaza.openclinica.control.submit.EnketoFormServlet.FORM_LAYOUT_ID;
 
 @Path("/openrosa")
 @Component
@@ -375,7 +379,7 @@ public class OpenRosaServices {
             @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
-
+        request.setAttribute("studyOid", studyOID);
         String formLayoutOid = getFormLayoutOid(uniqueId);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
 
@@ -399,7 +403,7 @@ public class OpenRosaServices {
         // Add user list
         MediaFile userList = new MediaFile();
 
-        String userXml = getUserXml(context);
+        String userXml = getUserXml(context, request);
         userList.setFilename("users.xml");
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
@@ -558,8 +562,8 @@ public class OpenRosaServices {
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
-
-        String userXml = getUserXml(context);
+        request.setAttribute("studyOid", studyOID);
+        String userXml = getUserXml(context, request);
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -747,7 +751,7 @@ public class OpenRosaServices {
             for (CRFVersionBean crfVersion : crfs) {
                 String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), studyOID);
+                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID);
             }
         } catch (Exception e) {
             LOGGER.debug(e.getMessage());
@@ -808,6 +812,12 @@ public class OpenRosaServices {
         return studyBean;
     }
 
+    private StudyBean getStudyById(int id) {
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+        return studyBean;
+    }
+
     private StudyBean getParentStudy(String studyOid) {
         StudyBean study = getStudy(studyOid);
         if (study.getParentStudyId() == 0) {
@@ -819,11 +829,11 @@ public class OpenRosaServices {
 
     }
 
-    private StudyBean getPublicStudy(String oid) {
+    private StudyBean getPublicStudy(String studyOid) {
         String schema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
         sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(studyOid);
         CoreResources.setRequestSchema(schema);
         return studyBean;
     }
@@ -904,13 +914,9 @@ public class OpenRosaServices {
         return attribs;
     }
 
-    private String getUserXml(ServletContext context) throws Exception {
-        HashMap<String, String> value = getSubjectContextCacheValue(context);
+    private String getUserXml(ServletContext context, HttpServletRequest request) throws Exception {
+        HashMap<String, String> value = getSubjectContextCacheValue(context, request);
         String studySubjectOid = value.get("studySubjectOID");
-
-        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
-        StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
-        StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -918,12 +924,19 @@ public class OpenRosaServices {
         Document doc = docBuilder.newDocument();
         Element root = doc.createElement("root");
         doc.appendChild(root);
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
 
         // get public studies
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77studySubjectOID:" + studySubjectOid);
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ssBean:" + ssBean);
+
         StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
         StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+        CoreResources.setRequestSchema("public");
+        List<UserAccount> users = userAccountDao
+            .findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
+            CoreResources.setRequestSchema(publicStudy.getSchemaName());
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
         for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
@@ -1042,14 +1055,24 @@ public class OpenRosaServices {
     }
 
     @SuppressWarnings("unchecked")
-    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context) {
+    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context, HttpServletRequest request) {
         LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
         String lastKey = null;
+        // the cache has to be studyOid based to accommodate for multiple studies
+        HashMap<String, String> resultMap = null;
         for (String key : subjectContextCache.keySet()) {
+            resultMap = (HashMap<String, String>) subjectContextCache.get(key);
+            String resultStudyOid = (String) resultMap.get("studyOid");
+            String studyOid = (String) request.getAttribute("studyOid");
+            if (StringUtils.equals(resultStudyOid, studyOid)) {
+                break;
+            }
             lastKey = key;
         }
-        HashMap<String, String> value = (HashMap<String, String>) subjectContextCache.get(lastKey);
-        return value;
+        if (resultMap == null) {
+            resultMap = (HashMap<String, String>) subjectContextCache.get(lastKey);
+        }
+        return resultMap;
     }
 
 }

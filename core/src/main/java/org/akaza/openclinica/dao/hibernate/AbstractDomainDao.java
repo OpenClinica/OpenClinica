@@ -92,8 +92,10 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
             SessionImpl sessionImpl = (SessionImpl) session;
             try {
                 String currentSchema = sessionImpl.connection().getSchema();
-                if (!tenant.equals(currentSchema))
+                if (!tenant.equals(currentSchema)) {
                     sessionImpl.connection().setSchema(tenant);
+                    System.out.println("****Changed connection to:" + tenant);
+                }
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);            }
         }
