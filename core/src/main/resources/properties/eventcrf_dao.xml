@@ -300,8 +300,8 @@
         <sql>INSERT INTO EVENT_CRF (STUDY_EVENT_ID, CRF_VERSION_ID,
             DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID, STATUS_ID,
             ANNOTATIONS, OWNER_ID,
-            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS)
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?)</sql>
+            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id)
+            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
     </query>
     <query>
         <name>update</name>
@@ -427,6 +427,13 @@
     </query>
 
     <query>
+        <name>findByEventSubjectFormLayout</name>
+        <sql>select ec.* from event_crf  ec, form_layout fl
+            where ec.form_layout_id=fl.form_layout_id
+            and ec.study_event_id=? and fl.form_layout_id=? and ec.study_subject_id=?
+        </sql>
+    </query>
+    <query>
         <name>findByEventCrfVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
             where ec.crf_version_id=cv.crf_version_id
@@ -434,6 +441,13 @@
         </sql>
     </query>
 
+    <query>
+        <name>findByEventFormLayout</name>
+        <sql>select ec.* from event_crf  ec, form_layout fl
+            where ec.form_layout_id=fl.form_layout_id
+            and ec.study_event_id=? and fl.form_layout_id=?
+        </sql>
+    </query>
     <query>
         <name>findByCrfVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
