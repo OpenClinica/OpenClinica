@@ -23,7 +23,6 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("OCOID", OCOID);
-        System.out.println("******^^^^comes in findByOcOID:");
         return (StudySubject) q.uniqueResult();
     }
 

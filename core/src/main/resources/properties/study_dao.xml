@@ -67,6 +67,12 @@
          </sql>
 	</query>
 	<query>
+		<name>findByPublicOid</name>
+		<sql>SELECT s.* FROM public.study s
+			WHERE s.OC_OID = ?
+		</sql>
+	</query>
+	<query>
         <name>findByUniqueIdentifier</name>
         <sql>SELECT s.* FROM study s
            WHERE s.unique_identifier = ?

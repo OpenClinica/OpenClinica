@@ -408,6 +408,25 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
 
     }
 
+    public StudyBean findByPublicOid(String oid) {
+        StudyBean sb = null;
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), oid);
+        ArrayList alist = this.select(digester.getQuery("findByPublicOid"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            return sb;
+        } else {
+            logger.info("returning null from find by oid...");
+            return null;
+        }
+
+    }
+
     public StudyBean findByUniqueIdentifier(String oid) {
         StudyBean sb = null;
         this.unsetTypeExpected();
@@ -996,13 +1015,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
 
     }
     public StudyBean getPublicStudy (String ocId) {
-        HttpServletRequest request = CoreResources.getRequest();
-        if (request == null)
-            return null;
-        String schema = (String) request.getAttribute("requestSchema");
-        request.setAttribute("requestSchema", "public");
-        StudyBean study = findByOid(ocId);
-        request.setAttribute("requestSchema", schema);
+        StudyBean study = findByPublicOid(ocId);
         return study;
     }
 

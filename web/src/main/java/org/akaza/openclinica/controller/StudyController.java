@@ -21,7 +21,6 @@ import org.akaza.openclinica.service.ProtocolBuildService;
 import org.akaza.openclinica.service.SiteBuildService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tomcat.util.net.SSLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
