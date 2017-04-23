@@ -18,6 +18,7 @@ import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -26,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -66,6 +68,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private CrfVersionDao crfVersionDao;
     @Autowired
     private XformParserHelper xformParserHelper;
+    @Autowired
+    FormLayoutMediaDao formLayoutMediaDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -200,12 +204,23 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 itemValue = itemValue.replaceAll(" ", ",");
             }
             if (responseTypeId == 4) {
-                for (HashMap uploadFilePath : listOfUploadFilePaths) {
-                    if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
-                        itemValue = (String) uploadFilePath.get(itemValue);
-                        break;
-                    }
+                /*
+                 * for (HashMap uploadFilePath : listOfUploadFilePaths) {
+                 * if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
+                 * itemValue = (String) uploadFilePath.get(itemValue);
+                 * break;
+                 * }
+                 * }
+                 */ FormLayoutMedia media = formLayoutMediaDao.findByEventCrfIdAndFileName(container.getEventCrf().getEventCrfId(), itemValue);
+                if (media == null) {
+                    media = new FormLayoutMedia();
                 }
+                media.setName(itemValue);
+                media.setFormLayout(formLayout);
+                media.setEventCrfId(container.getEventCrf().getEventCrfId());
+                media.setPath("/" + container.getStudy().getOc_oid() + "/");
+
+                formLayoutMediaDao.saveOrUpdate(media);
             }
 
             ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);

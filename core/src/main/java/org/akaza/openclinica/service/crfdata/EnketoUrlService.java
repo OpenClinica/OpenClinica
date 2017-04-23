@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -46,6 +47,7 @@ import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -60,7 +62,6 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
-import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -162,6 +163,9 @@ public class EnketoUrlService {
     @Autowired
     private EnketoCredentials enketoCredentials;
 
+    @Autowired
+    private FormLayoutMediaDao formLayoutMediaDao;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -220,8 +224,10 @@ public class EnketoUrlService {
             markComplete = false;
         }
         // Return Enketo URL
-        EnketoURLResponse eur = enketo.getEditURL(formLayout.getOcOid() + flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete);
-        editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
+        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
+
+        HashMap eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, mediaList);
+        editURL = eur.get("edit_url") + "&ecid=" + subjectContextKey;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
@@ -490,7 +496,7 @@ public class EnketoUrlService {
                 if (responseType.getResponseTypeId() == 3 || responseType.getResponseTypeId() == 7) {
                     itemValue = itemValue.replaceAll(",", " ");
                 }
-                
+
                 question.setTextContent(itemValue);
             }
             if (itemData == null || !itemData.isDeleted()) {
