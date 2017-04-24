@@ -11,6 +11,7 @@
                            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
 
+    <!--
     <security:http entry-point-ref="authenticationProcessingFilterEntryPoint" use-expressions="true">
 
         <security:anonymous />
@@ -42,13 +43,8 @@
         <security:intercept-url pattern="/pages/auth/api/**" access="permitAll"/>
         <security:intercept-url pattern="/pages/auth/api/v1/system/**" access="permitAll"/>
         <security:intercept-url pattern="/pages/protocolversion/**" access="permitAll"/>
-        <!--
-        <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
-          default-target-url='/MainMenu' always-use-default-target='true' />
-         -->
         <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
         <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
-        <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
         <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
         <security:session-management session-authentication-strategy-ref="sas"/>
         <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
@@ -66,10 +62,6 @@
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationFailureHandler" ref="failureHandler" />
         <property name="authenticationSuccessHandler" ref="successHandler" />
-        <!--
-        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
-        <property name="defaultTargetUrl" value="/MainMenu"/>
-         -->
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="configurationDao" ref="configurationDao"/>
         <property name="dataSource" ref="dataSource"/>
@@ -79,7 +71,7 @@
     </bean>
 
     <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
-        <property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
+        <property name="defaultTargetUrl" value="/MainMenu" />
     </bean>
 
     <bean id="failureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler" >
@@ -139,10 +131,6 @@
         <property name="clientDetailsService" ref="clientDetails" />
     </bean>
 
-    <!--<oauth:provider client-details-service-ref="clientDetails" token-services-ref="tokenServices" >
-        <oauth:verification-code user-approval-page="/oauth/confirm_access"/>
-    </oauth:provider>-->
-
     <oauth:client-details-service id="clientDetails">
         <oauth:client client-id="test" authorized-grant-types="password,authorization_code,refresh-token"/>
         <oauth:client client-id="my-trusted-client" authorized-grant-types="password,authorization_code,refresh_token"/>
@@ -157,6 +145,7 @@
         <oauth:refresh-token />
         <oauth:client-credentials />
     </oauth:authorization-server>
+    -->
 
     <bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
         <property name="dataSource" ref="dataSource"></property>
