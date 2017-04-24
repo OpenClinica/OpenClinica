@@ -927,16 +927,13 @@ public class OpenRosaServices {
         StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
 
         // get public studies
-        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77studySubjectOID:" + studySubjectOid);
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ssBean:" + ssBean);
-
         StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
         StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
         CoreResources.setRequestSchema("public");
         List<UserAccount> users = userAccountDao
             .findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
             CoreResources.setRequestSchema(publicStudy.getSchemaName());
-
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
         for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");

@@ -26,6 +26,7 @@
         <property name="username" value="s[archiveUsername]"/>
         <property name="password" value="s[archivePassword]"/>
         <property name="bigStringTryClob" value="true"/>
+        <qualifier value="archiveDS"/>
     </bean>
 
     <bean id="hibernateJpaVendorAdapter"

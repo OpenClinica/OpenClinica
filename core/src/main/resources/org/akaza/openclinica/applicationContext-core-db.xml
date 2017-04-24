@@ -10,7 +10,7 @@
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource
           and Hibernate DAO injection via autowiring -->
 
-    <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+    <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource" primary="true">
         <property name="driverClassName" value="org.postgresql.Driver"/>
         <property name="maxTotal" value="50"/>
         <property name="maxIdle" value="2"/>
@@ -26,6 +26,7 @@
         <property name="username" value="s[username]"/>
         <property name="password" value="s[password]"/>
         <property name="bigStringTryClob" value="true"/>
+        <qualifier value="dataSource"/>
     </bean>
 
     <bean id="queryStore" class="org.akaza.openclinica.dao.QueryStore" init-method="init">
