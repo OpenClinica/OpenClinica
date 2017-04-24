@@ -74,6 +74,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>1.0.7.RELEASE</version>
+        </dependency>
+
 
         <dependency>
             <groupId>net.sourceforge.pjl-comp-filter</groupId>
