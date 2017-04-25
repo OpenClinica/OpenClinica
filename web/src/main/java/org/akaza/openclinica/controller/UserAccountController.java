@@ -18,6 +18,7 @@ import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +113,6 @@ public class UserAccountController {
 		String lName = map.get("lName");
 		String institution = map.get("institution");
 		String email = map.get("email");
-		String studyName = map.get("study_name");
 		String roleName = map.get("role_name");
 		String userType = map.get("user_type");
 		String authorizeSoap = map.get("authorize_soap"); // true or false
@@ -122,7 +122,6 @@ public class UserAccountController {
 		request.setAttribute("lName", lName);
 		request.setAttribute("institution", institution);
 		request.setAttribute("email", email);
-		request.setAttribute("study_name", studyName);
 		request.setAttribute("role_name", roleName);
 
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -131,34 +130,17 @@ public class UserAccountController {
 			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
 			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
-
-		// generate password
-		String password = ""; // generate
-		SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
-		password = secm.genPassword();
-		String passwordHash = secm.encrytPassword(password, null);
+		String password = "password";
+		String passwordHash = "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8";
 
 		// Validate Entry Fields
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
-        Validator v = new Validator(request);
-		addValidationToFields(v, username);
-		HashMap errors = v.validate();
-		if (!errors.isEmpty()) {
-			logger.error("Validation Error: " + errors.toString());
-			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
-		}
-
-		StudyBean study = getStudyByName(studyName);
-		if (!study.isActive()) {
-			logger.error("The Study Name is not Valid");
-			return new ResponseEntity<HashMap>(new HashMap(), org.springframework.http.HttpStatus.BAD_REQUEST);
-		}
 
 		// Role
 		ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-		Map<Integer, String> roleMap = buildRoleMap(study, resterm);
+		Map<Integer, String> roleMap = buildRoleMap(false, resterm);
 		boolean found = false;
 		Role role = null;
 		for (Map.Entry<Integer, String> entry : roleMap.entrySet()) {
@@ -194,7 +176,7 @@ public class UserAccountController {
 		}
 		// build UserName
 
-		uBean = buildUserAccount(username, fName, lName, password, institution, study, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
+		uBean = buildUserAccount(username, fName, lName, password, institution, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
 		HashMap<String, Object> userDTO = null;
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {
@@ -216,7 +198,7 @@ public class UserAccountController {
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
-	private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution, StudyBean study, UserAccountBean ownerUserAccount, String email,
+	private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution,  UserAccountBean ownerUserAccount, String email,
 			String passwordHash, Boolean authorizeSoap, Role roleName, UserType userType) throws Exception {
 
 		UserAccountBean createdUserAccountBean = new UserAccountBean();
@@ -227,7 +209,6 @@ public class UserAccountController {
 		createdUserAccountBean.setEmail(username);
 		createdUserAccountBean.setInstitutionalAffiliation(institution);
 		createdUserAccountBean.setLastVisitDate(null);
-		createdUserAccountBean.setActiveStudyId(study.getId());
 		createdUserAccountBean.setPasswdTimestamp(null);
 		createdUserAccountBean.setPasswdChallengeQuestion("");
 		createdUserAccountBean.setPasswdChallengeAnswer("");
@@ -247,7 +228,6 @@ public class UserAccountController {
 		} while (isApiKeyExist(apiKey));
 		createdUserAccountBean.setApiKey(apiKey);
 
-		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, study.getId(), roleName, ownerUserAccount);
 		createdUserAccountBean.addUserType(userType);
 
 		authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
@@ -388,10 +368,10 @@ public class UserAccountController {
 
 	}
 
-	public Map buildRoleMap(StudyBean study, ResourceBundle resterm) {
+	public Map buildRoleMap(boolean siteFlag, ResourceBundle resterm) {
 		Map roleMap = new LinkedHashMap();
 
-		if (study.getParentStudyId() > 0) {
+		if (siteFlag) {
 			for (Iterator it = getRoles().iterator(); it.hasNext();) {
 				Role role = (Role) it.next();
 				switch (role.getId()) {

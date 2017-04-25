@@ -11,6 +11,10 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>com.openclinica</groupId>
+            <artifactId>jwt-verifier</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

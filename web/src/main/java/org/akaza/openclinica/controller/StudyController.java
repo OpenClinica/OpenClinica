@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -29,8 +30,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,6 +56,9 @@ public class StudyController {
 	private LiquibaseOnDemandService liquibaseOnDemandService;
 	@Autowired
 	private SiteBuildService siteBuildService;
+
+	@Autowired
+	UserAccountController userAccountController;
 
 	public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
@@ -389,7 +396,9 @@ public class StudyController {
 
 
     @RequestMapping(value = "/createStudy", method = RequestMethod.POST)
-    public ResponseEntity<Object> createNewSkeletonStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
+    public ResponseEntity<Object> createNewSkeletonStudy(HttpServletRequest request,
+		    @RequestBody HashMap<String, Object> map) throws Exception {
+	    ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
 	    StudyDTO studyDTO = new StudyDTO();
         StudyBean studyBean = null;
@@ -405,7 +414,7 @@ public class StudyController {
 	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
 	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
 
-	    UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+	    UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
 	    if (ownerUserAccount == null) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
 		    errorObjects.add(errorOBject);
@@ -478,7 +487,7 @@ public class StudyController {
 			responseSuccess.setSchemaName(protocolInfo.getSchema());
             response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
         }
-
+	    request.getSession().setAttribute("userContextMap", null);
 	    AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
 	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyDone);
 
@@ -486,6 +495,44 @@ public class StudyController {
 
     }
 
+    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request) {
+	    ResponseEntity<HashMap> responseEntity = null;
+		HttpSession session = request.getSession();
+		if (session == null) {
+			logger.error("Cannot proceed without a valid session.");
+			return responseEntity;
+		}
+	    Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) session.getAttribute("userContextMap");
+		if (userContextMap == null)
+			return responseEntity;
+		// we need to create a user
+	    HashMap<String, String> userMap = getUserInfo(userContextMap);
+	    try {
+		    responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+	    return responseEntity;
+    }
+
+	private HashMap<String, String> getUserInfo(Map<String, Object> userContextMap) {
+		HashMap<String, String> map = new HashMap<>();
+		String username = (String) userContextMap.get("username");
+		map.put("username", username);
+		map.put("fName", "fName");
+		map.put("lName", "lName");
+		map.put("role_name", "Data Manager");
+		switch ((String) userContextMap.get("userType")) {
+		case "Business Admin":
+			map.put("user_type", UserType.SYSADMIN.getName());
+			break;
+		}
+		map.put("authorize_soap", "false");
+		map.put("email", "kkrumlian@openclinica.com");
+		map.put("institution", "OC");
+
+		return map;
+	}
 	@RequestMapping(value = "/asyncProtocolStatus", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAyncProtocolStatus(HttpServletRequest request, @RequestParam("uniqueId") String uniqueId) throws Exception {
 		ResponseEntity<Object> response;
@@ -1287,6 +1334,27 @@ public class StudyController {
 
 	public UserAccountBean getStudyOwnerAccount(HttpServletRequest request) {
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+		if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
+			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
+			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
+			return null;
+		}
+		return ownerUserAccount;
+	}
+
+	public UserAccountBean getStudyOwnerAccountWithCreatedUser(HttpServletRequest request, ResponseEntity<HashMap> responseEntity) {
+		UserAccountBean ownerUserAccount = null;
+		if (responseEntity != null) {
+			HashMap hashMap = responseEntity.getBody();
+			if (hashMap != null && hashMap.get("username") != null) {
+				String usernmae = (String) hashMap.get("username");
+				UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+				ownerUserAccount = (UserAccountBean) userAccountDAO.findByUserName(usernmae);
+			}
+		} else {
+			ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+		}
+
 		if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
 			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
 			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");

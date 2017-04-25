@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller.helper;
 
+import org.akaza.openclinica.domain.datamap.Study;
+
 /**
  * Created by yogi on 3/16/17.
  */
@@ -14,6 +16,14 @@ public class ProtocolInfo {
         this.schema = schema;
         this.ocId = ocId;
     }
+
+    public ProtocolInfo(String uniqueStudyId, String ocId, String schema, Study study) {
+        this.uniqueStudyId = uniqueStudyId;
+        this.schema = schema;
+        this.ocId = ocId;
+        this.study = study;
+    }
+
     public String getUniqueStudyId() {
         return uniqueStudyId;
     }
@@ -38,7 +48,16 @@ public class ProtocolInfo {
         this.ocId = ocId;
     }
 
-    String uniqueStudyId;
-    String schema;
-    String ocId;
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
+    }
+
+    private String uniqueStudyId;
+    private String schema;
+    private String ocId;
+    private Study study;
 }

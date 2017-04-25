@@ -10,10 +10,12 @@ import org.akaza.openclinica.core.OCSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,9 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
     private StudyUserRoleDao studyUserRoleDao;
     @Autowired
     private SchemaServiceDao schemaServiceDao;
+    @Autowired
+    private UserAccountDao userAccountDao;
+
     public Study process(String name, ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception {
         Study schemaStudy = null;
 
@@ -71,6 +76,8 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
         }
 
         try {
+            UserAccount userAccount = userAccountDao.findByUserName(ub.getName());
+            userAccount.setActiveStudy(protocolInfo.getStudy());
             schemaStudy = new Study();
             schemaStudy.setName(name);
             schemaStudy.setUniqueIdentifier(protocolInfo.getUniqueStudyId());
@@ -80,6 +87,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaServiceDao.setConnectionSchemaName(protocolInfo.getSchema());
             studyDao.getCurrentSession().clear();
             int studyId = (Integer) studyDao.save(schemaStudy);
+            userAccountDao.saveOrUpdate(userAccount);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
             AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
             logger.info("liquibase: studyId" + studyId);

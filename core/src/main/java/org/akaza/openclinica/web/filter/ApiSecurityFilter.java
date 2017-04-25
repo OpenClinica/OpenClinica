@@ -2,6 +2,8 @@ package org.akaza.openclinica.web.filter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -11,10 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import com.openclinica.jwtverifier.authentication.UserContext;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
@@ -28,7 +37,6 @@ import sun.security.rsa.RSAPublicKeyImpl;
 import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-
 /**
  * Created by krikorkrumlian on 8/7/15.
  */
@@ -84,16 +92,23 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                     // 2. create new user if doesn't exist and update roles
                     try {
                         String accessToken = st.nextToken();
+                        final Map<String, Object> decodedToken = decode(accessToken);
                         if (accessToken != null ) {
-                            String _username = decode(accessToken).get("sub").toString();
-
+                            String _username = decodedToken.get("sub").toString();
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(_username);
-                            if (!_username.equals("") && ub.getId() != 0) {
+                            if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
+                                Authentication authentication = new UsernamePasswordAuthenticationToken(_username, null,
+                                        AuthorityUtils.createAuthorityList("ROLE_USER"));
+                                SecurityContextHolder.getContext().setAuthentication(authentication);
                                 request.getSession().setAttribute("userBean",ub);
-                            }else{
-                                unauthorized(response, "Bad credentials");
-                                return;
+                            } else {
+                                // create this user
+                                LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+                                System.out.println("userContext:" + userContextMap);
+                                setRootUserAccountBean(request);
+                                request.getSession().setAttribute("userContextMap", userContextMap);
+                                userContextMap.put("username", _username);
                             }
                         } else {
                             unauthorized(response, "Invalid authentication token");
@@ -112,6 +127,17 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private void setRootUserAccountBean(HttpServletRequest request) {
+        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
+        if (ub.getId() != 0) {
+            request.getSession().setAttribute("userBean", ub);
+        }
+
+    }
+    private void createProtocolServiceUser() {
+
+    }
     private void unauthorized(HttpServletResponse response, String message) throws IOException {
         response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
         response.sendError(401, message);
