@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
@@ -43,6 +44,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private StudyParameterValueDao studyParameterValueDao;
+    private DataSource dataSource;
 
     private XformParser xformParser;
 
@@ -51,10 +53,13 @@ public class OdmImportServiceImpl implements OdmImportService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Transactional
     public void importOdmToOC(ODM odm) {
+
+        CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(),dataSource);
 
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities

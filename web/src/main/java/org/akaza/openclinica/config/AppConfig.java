@@ -32,7 +32,7 @@ public class AppConfig extends Auth0Config {
         http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/pages/home"));
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
-                        "/js/**", "/login", "/logout", "/pages/callback", "/pages/home", "/pages/auth/api/**").permitAll()
+                        "/js/**", "/login", "/logout", "/pages/callback", "/pages/home", "/pages/auth/api/**", "/pages/protocolversion").permitAll()
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers("/**").hasAnyAuthority("ROLE_USER")
                 .antMatchers(securedRoute).authenticated();

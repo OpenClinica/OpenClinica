@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -499,6 +500,11 @@ public class CoreResources implements ResourceLoaderAware {
         StudyBean study = studyDAO.findByOid(ocId);
         request.setAttribute("requestSchema", schema);
         return study;
+    }
+
+    public static void setRequestSchemaByStudy(String ocId, DataSource ds){
+        StudyBean studyBean = getPublicStudy(ocId,ds);
+        setRequestSchema(studyBean.getSchemaName());
     }
 
     private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
