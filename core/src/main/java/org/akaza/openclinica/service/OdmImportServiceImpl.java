@@ -83,13 +83,13 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         Crf[] fmCrfs = getAllCrfsByProtIdFromFormManager(study);
 
-        ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
+/*        ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
         if (surRoles.size() == 0) {
             studyUserRoleId = new StudyUserRoleId();
             studyUserRole = new StudyUserRole();
             studyUserRole = getStudyUserRoleDao().saveOrUpdate(populateUserRole(study, userAccount, studyUserRole, studyUserRoleId));
         }
-
+*/
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions);
@@ -202,7 +202,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
             List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
-            String crfDescription = odmFormDef.getFormDetails().getDescription();
+    //        String crfDescription = odmFormDef.getFormDetails().getDescription();
+            String crfDescription="";
             String crfName = odmFormDef.getName();
             saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, crfDescription);
         }
@@ -222,6 +223,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         ub.setId(userAccount.getUserId());
         ub.setActiveStudyId(currentStudy.getId());
 
+        if(fmCrfs!=null){
         for (Crf crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
                 ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, true, crfName,
@@ -229,7 +231,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                 xformService.executeIndividualCrf(eicObj);
             }
         }
-
+        }
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
@@ -508,7 +510,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
     public Crf[] getAllCrfsByProtIdFromFormManager(Study study) {
         // String protocolId = study.getUniqueIdentifier();
-        String protocolId = study.getOc_oid();
+      //  String protocolId = study.getOc_oid();
+        String protocolId="KK25";
 
         String url = FM_BASEURL + protocolId + "/forms";
         RestTemplate restTemplate = new RestTemplate();
