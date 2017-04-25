@@ -41,7 +41,9 @@ public class CallbackController extends Auth0CallbackHandler {
         super.handle(req, res);
         Auth0User user = SessionUtils.getAuth0User(req);
         String _username = user.getNickname();
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName(user.getUserId());
+        ub.setName(user.getNickname());
+        userAccountDAO.update(ub);
         if (!_username.equals("") && ub.getId() != 0) {
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
         } else {

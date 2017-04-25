@@ -8,6 +8,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
@@ -68,7 +69,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             throw e;
         }
         createSchema(schemaName);
-        return new ProtocolInfo(uniqueId, study.getOc_oid(), schemaName);
+        return new ProtocolInfo(uniqueId, study.getOc_oid(), schemaName, study);
     }
 
     private boolean createSchema(String schemaName) throws Exception {
