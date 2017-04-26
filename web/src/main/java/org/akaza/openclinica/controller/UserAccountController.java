@@ -177,7 +177,7 @@ public class UserAccountController {
 		// build UserName
 
 		uBean = buildUserAccount(username, fName, lName, password, institution, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
-		HashMap<String, Object> userDTO = null;
+		HashMap<String, Object> userDTO = new HashMap<String, Object>();
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {
 			createUserAccount(uBean);
@@ -186,15 +186,12 @@ public class UserAccountController {
 			logger.info("***New User Account is created***");
 			System.out.println("***New User Account is created***");
 			uBean.setPasswd(password);
-
-			userDTO = new HashMap<String, Object>();
-
-			userDTO.put("username", uBean.getName());
-			userDTO.put("password", uBean.getPasswd());
-			userDTO.put("firstName", uBean.getFirstName());
-			userDTO.put("lastName", uBean.getLastName());
-			userDTO.put("apiKey", uBean.getApiKey());
 		}
+		userDTO.put("username", uBean.getName());
+		userDTO.put("password", uBean.getPasswd());
+		userDTO.put("firstName", uBean.getFirstName());
+		userDTO.put("lastName", uBean.getLastName());
+		userDTO.put("apiKey", uBean.getApiKey());
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 

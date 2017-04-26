@@ -384,26 +384,6 @@
             <version>4.5.2</version>
         </dependency>
         <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-api</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.spring.security</groupId>
-            <artifactId>stormpath-spring-security-core</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-httpclient</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.spring</groupId>
-            <artifactId>stormpath-default-spring-boot-starter</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.akaza.openclinica.odm</groupId>
             <artifactId>openclinica-odm</artifactId>
         </dependency>
@@ -487,7 +467,6 @@
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>
-        <stormpath.version>1.0.4</stormpath.version>
     </properties>
 
 </project>
