@@ -403,7 +403,7 @@ public class OpenRosaServices {
         // Add user list
         MediaFile userList = new MediaFile();
 
-        String userXml = getUserXml(context, request);
+        String userXml = getUserXml(context, studyOID);
         userList.setFilename("users.xml");
         userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
@@ -563,7 +563,7 @@ public class OpenRosaServices {
         if (!mayProceedPreview(request, studyOID))
             return null;
         request.setAttribute("studyOid", studyOID);
-        String userXml = getUserXml(context, request);
+        String userXml = getUserXml(context, studyOID);
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -914,8 +914,8 @@ public class OpenRosaServices {
         return attribs;
     }
 
-    private String getUserXml(ServletContext context, HttpServletRequest request) throws Exception {
-        HashMap<String, String> value = getSubjectContextCacheValue(context, request);
+    private String getUserXml(ServletContext context, String studyOID) throws Exception {
+        HashMap<String, String> value = getSubjectContextCacheValue(context, studyOID);
         String studySubjectOid = value.get("studySubjectOID");
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -1052,7 +1052,7 @@ public class OpenRosaServices {
     }
 
     @SuppressWarnings("unchecked")
-    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context, HttpServletRequest request) {
+    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context, String studyOid) {
         LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
         String lastKey = null;
         // the cache has to be studyOid based to accommodate for multiple studies
@@ -1060,7 +1060,6 @@ public class OpenRosaServices {
         for (String key : subjectContextCache.keySet()) {
             resultMap = (HashMap<String, String>) subjectContextCache.get(key);
             String resultStudyOid = (String) resultMap.get("studyOid");
-            String studyOid = (String) request.getAttribute("studyOid");
             if (StringUtils.equals(resultStudyOid, studyOid)) {
                 break;
             }
