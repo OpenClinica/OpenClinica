@@ -1,12 +1,11 @@
 package org.akaza.openclinica.service.crfdata.xform;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.apache.commons.codec.binary.Base64;
@@ -99,8 +98,8 @@ public class EnketoAPI {
         return null;
     }
 
-    public HashMap<String, String> getEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
-            List<FormLayoutMedia> mediaList) {
+    public EnketoURLResponse getEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList) {
         String crfOid = formLayout.getOcOid() + flavor;
         if (enketoURL == null)
             return null;
@@ -114,29 +113,27 @@ public class EnketoAPI {
             String instanceId = encoder.encodePassword(hashString, null);
 
             URL eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
-            // URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
+            // URL eURL = new URL(enketoURL + "/api/v2/instance/iframe");
 
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
-            List<String> attachementList = null;
-            if (mediaList != null) {
-                attachementList = new ArrayList<>();
-            }
+
+            InstanceAttachment attachment = new InstanceAttachment();
+
             for (FormLayoutMedia media : mediaList) {
                 String fileName = media.getName();
-                String downLoadUrl = "http://oc.local:8081/OpenClinica/rest2/openrosa/S_STUDY1/downloadMedia?formLayoutMediaId%3d"
-                        + media.getFormLayoutMediaId();
-                String instanceAttachement = fileName + "-+-+-" + downLoadUrl;
-                attachementList.add(instanceAttachement);
+                String baseUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+                String downLoadUrl = baseUrl + "/downloadMedia?formLayoutMediaId=" + media.getFormLayoutMediaId();
+                attachment.setAdditionalProperty(fileName, downLoadUrl);
             }
 
             HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-            EnketoEditURLRequest enketoEditUrl = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, String.valueOf(markComplete));
-            HashMap<String, String> body = enketoEditUrl.getEnketoEditUrlObject(enketoEditUrl, attachementList);
-            HttpEntity<HashMap> request = new HttpEntity<HashMap>(body, headers);
+            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, String.valueOf(markComplete), attachment);
+            HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
-            ResponseEntity<HashMap> response = rest.postForEntity(eURL.toString(), request, HashMap.class);
+            ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);
             if (response != null)
                 return response.getBody();
             else

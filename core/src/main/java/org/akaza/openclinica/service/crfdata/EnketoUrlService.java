@@ -62,6 +62,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -226,8 +227,8 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
 
-        HashMap eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, mediaList);
-        editURL = eur.get("edit_url") + "&ecid=" + subjectContextKey;
+        EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList);
+        editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
