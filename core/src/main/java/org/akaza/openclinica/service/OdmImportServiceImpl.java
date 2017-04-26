@@ -57,7 +57,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     @Transactional
-    public void importOdmToOC(ODM odm) {
+    public void importOdmToOC(ODM odm, String boardId) {
 
         CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(),dataSource);
 
@@ -81,7 +81,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
 
-        Crf[] fmCrfs = getAllCrfsByProtIdFromFormManager(study);
+        Crf[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId);
+
 
 /*        ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
         if (surRoles.size() == 0) {
@@ -508,12 +509,11 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.formLayoutDao = formLayoutDao;
     }
 
-    public Crf[] getAllCrfsByProtIdFromFormManager(Study study) {
+    public Crf[] getAllCrfsByProtIdFromFormManager(String boardId) {
         // String protocolId = study.getUniqueIdentifier();
       //  String protocolId = study.getOc_oid();
-        String protocolId="KK25";
 
-        String url = FM_BASEURL + protocolId + "/forms";
+        String url = FM_BASEURL + boardId + "/forms";
         RestTemplate restTemplate = new RestTemplate();
         Crf[] crfs = null;
         try {
