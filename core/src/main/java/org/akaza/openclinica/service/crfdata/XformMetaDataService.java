@@ -1006,6 +1006,7 @@ public class XformMetaDataService {
                     media.setFormLayout(formLayout);
                     media.setName(fileName);
                     media.setPath(dir);
+                    media.setEventCrfId(0);
                     formLayoutMediaDao.saveOrUpdate(media);
                 }
             }

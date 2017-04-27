@@ -238,7 +238,7 @@ public class OpenRosaServices {
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                             form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
 
-                            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+                            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
                             if (mediaList != null && mediaList.size() > 0) {
                                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
                             }
@@ -337,7 +337,7 @@ public class OpenRosaServices {
             form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
             if (flavor.equals(QUERY_FLAVOR)) {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY);
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY);
@@ -379,7 +379,7 @@ public class OpenRosaServices {
 
         Manifest manifest = new Manifest();
 
-        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
 
         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {

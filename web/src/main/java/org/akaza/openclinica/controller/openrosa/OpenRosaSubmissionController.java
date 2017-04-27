@@ -1,7 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
-import org.akaza.openclinica.control.submit.UploadFileServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CompletionStatusDao;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
@@ -550,12 +548,13 @@ public class OpenRosaSubmissionController {
         }
 
         File uploadedFile = new File(dirToSaveUploadedFileIn + File.separator + fileName);
-        try {
-            uploadedFile = new UploadFileServlet().new OCFileRename().rename(uploadedFile, item.getInputStream());
-        } catch (IOException e) {
-            throw new OpenClinicaSystemException(e.getMessage());
-        }
-
+        /*
+         * try {
+         * uploadedFile = new UploadFileServlet().new OCFileRename().rename(uploadedFile, item.getInputStream());
+         * } catch (IOException e) {
+         * throw new OpenClinicaSystemException(e.getMessage());
+         * }
+         */
         try {
             item.write(uploadedFile);
         } catch (Exception e) {

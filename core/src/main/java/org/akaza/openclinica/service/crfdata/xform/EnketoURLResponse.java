@@ -1,5 +1,8 @@
 package org.akaza.openclinica.service.crfdata.xform;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,7 +13,9 @@ public class EnketoURLResponse {
     private String offline_url = null;
     private String iframe_url = null;
     private String code = null;
-    private boolean complete_button=true;
+    private boolean complete_button = true;
+    private InstanceAttachment instanceAttachments;
+    private Map<String, String> additionalProperties = new HashMap<String, String>();
 
     private String single_fieldsubmission_iframe_url = null;
 
@@ -61,6 +66,7 @@ public class EnketoURLResponse {
     public void setIframe_url(String iframe_url) {
         this.iframe_url = iframe_url;
     }
+
     public String getSingle_fieldsubmission_iframe_url() {
         return single_fieldsubmission_iframe_url;
     }
@@ -69,13 +75,12 @@ public class EnketoURLResponse {
         this.single_fieldsubmission_iframe_url = single_fieldsubmission_iframe_url;
     }
 
-	public boolean isComplete_button() {
-		return complete_button;
-	}
+    public boolean isComplete_button() {
+        return complete_button;
+    }
 
-	public void setComplete_button(boolean complete_button) {
-		this.complete_button = complete_button;
-	}
-
+    public void setComplete_button(boolean complete_button) {
+        this.complete_button = complete_button;
+    }
 
 }
