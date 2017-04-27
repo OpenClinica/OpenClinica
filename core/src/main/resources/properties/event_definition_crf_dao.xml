@@ -199,6 +199,18 @@
 		</sql>
 	</query>
 	<query>
+		<name>findForStudyByStudyEventIdAndFormLayoutId</name>
+		<sql>
+			SELECT EDC.*
+			FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, Form_Layout fl
+			WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+				AND EDC.crf_id = fl.crf_id
+				AND SE.study_event_id = ?
+				AND fl.form_layout_id = ?
+				AND EDC.parent_id is null
+		</sql>
+	</query>
+	<query>
 		<name>findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId</name>
 		<sql>
 			SELECT EDC.*
@@ -207,6 +219,20 @@
 				AND EDC.crf_id = CV.crf_id
 				AND SE.study_event_id = ?
 				AND CV.crf_version_id = ?
+				AND (EDC.study_id = ? or EDC.study_id = ?)
+				AND EDC.event_definition_crf_id not in
+				(select parent_id from event_definition_crf where study_id=?)
+		</sql>
+	</query>
+	<query>
+		<name>findByStudyEventIdAndFormLayoutIdAndSiteIdAndParentStudyId</name>
+		<sql>
+			SELECT EDC.*
+			FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, Form_layout fl
+			WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+				AND EDC.crf_id = fl.crf_id
+				AND SE.study_event_id = ?
+				AND fl.form_layout_id = ?
 				AND (EDC.study_id = ? or EDC.study_id = ?)
 				AND EDC.event_definition_crf_id not in
 				(select parent_id from event_definition_crf where study_id=?)

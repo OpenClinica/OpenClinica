@@ -3,6 +3,7 @@ package org.akaza.openclinica.domain.xform;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.validation.Errors;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -78,7 +79,7 @@ public class XformParserHelper {
         }
     }
 
-    public List<String> instanceItemPaths(Node outerNode, List<String> list, String path) {
+    public List<String> instanceItemPaths(Node outerNode, List<String> list, String path, Errors errors) {
         int outerNodeLength = outerNode.getChildNodes().getLength();
         if (outerNodeLength == 0)
             list.add(path);
@@ -86,7 +87,11 @@ public class XformParserHelper {
             Node node = outerNode.getChildNodes().item(b);
             if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
                 if (node.hasChildNodes() && node.getChildNodes().getLength() != 1) {
-                    list = instanceItemPaths(node, list, path + "/" + node.getNodeName());
+                    list = instanceItemPaths(node, list, path + "/" + node.getNodeName(), errors);
+                } else if (node.hasChildNodes() && node.getChildNodes().getLength() == 1) {
+                    // OC-7671 AC6: The "default" attribute must be null for all elements.
+                    errors.rejectValue("name", "default_values_not_supported_in_xform",
+                            "Element <" + node.getNodeName() + "> cannot have a value in column 'default'");
                 } else {
                     list.add(path + "/" + node.getNodeName());
                 }

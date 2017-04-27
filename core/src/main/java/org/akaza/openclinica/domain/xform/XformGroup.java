@@ -62,10 +62,22 @@ public class XformGroup {
         if (getClass() != obj.getClass())
             return false;
         XformGroup other = (XformGroup) obj;
+        if (groupDescription == null) {
+            if (other.groupDescription != null)
+                return false;
+        } else if (!groupDescription.equals(other.groupDescription))
+            return false;
         if (groupName == null) {
             if (other.groupName != null)
                 return false;
         } else if (!groupName.equals(other.groupName))
+            return false;
+        if (groupPath == null) {
+            if (other.groupPath != null)
+                return false;
+        } else if (!groupPath.equals(other.groupPath))
+            return false;
+        if (isRepeating != other.isRepeating)
             return false;
         return true;
     }
