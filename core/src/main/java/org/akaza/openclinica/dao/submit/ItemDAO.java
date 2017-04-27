@@ -266,6 +266,13 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         return this.executeFindAllQuery("findAllItemsByVersionId", variables);
     }
 
+    public ArrayList findAllItemsByLayoutId(int layoudId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(layoudId));
+
+        return this.executeFindAllQuery("findAllItemsByLayoutId", variables);
+    }
+
     public ArrayList findAllVersionsByItemId(int itemId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));

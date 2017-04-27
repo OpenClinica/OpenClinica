@@ -1,15 +1,5 @@
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,10 +13,20 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
+
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 8, 2007
  */
-public class ItemGroupDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class ItemGroupDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
 
     public ItemGroupDAO(DataSource ds) {
         super(ds);
@@ -287,7 +287,6 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         this.unsetTypeExpected();
         setTypesExpected();
 
-        
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(1, Id);
         List listofMaps = this.select(digester.getQuery("findGroupByCRFVersionID"), variables);
@@ -331,6 +330,23 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         } else {
             return null;
         }
+    }
+
+    public List<ItemGroupBean> findGroupByLayoutId(int formLayoutId) {
+        this.unsetTypeExpected();
+        setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(formLayoutId));
+
+        List listofMaps = this.select(digester.getQuery("findGroupByLayoutId"), variables);
+
+        List<ItemGroupBean> beanList = new ArrayList<ItemGroupBean>();
+        ItemGroupBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemGroupBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
     }
 
     public List<ItemGroupBean> findOnlyGroupsByCRFVersionID(int Id) {
@@ -377,6 +393,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         }
         return beanList;
     }
+
     public List<ItemGroupBean> findLegitGroupAllBySectionId(int sectionId) {
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -391,6 +408,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         }
         return beanList;
     }
+
     public Object getEntityFromHashMap(HashMap hm) {
         ItemGroupBean formGroupBean = new ItemGroupBean();
         super.setEntityAuditInformation(formGroupBean, hm);
@@ -411,27 +429,27 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         variables.put(new Integer(1), name);
         this.execute(digester.getQuery("deleteTestGroup"), variables);
     }
-    
+
     public Boolean isItemGroupRepeatingBasedOnAllCrfVersions(String groupOid) {
-    	Boolean result = false;
+        Boolean result = false;
         setTypesExpected();
         HashMap<Integer, String> variables = new HashMap<Integer, String>();
         variables.put(1, groupOid);
 
         String sql = digester.getQuery("isItemGroupRepeatingBasedOnAllCrfVersions");
 
-        ArrayList rows = this.select(sql,variables);
+        ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
             result = count > 0 ? true : false;
-        } 
+        }
         return result;
     }
-    
-    public Boolean isItemGroupRepeatingBasedOnCrfVersion(String groupOid,Integer crfVersion) {
-    	Boolean result = false;
+
+    public Boolean isItemGroupRepeatingBasedOnCrfVersion(String groupOid, Integer crfVersion) {
+        Boolean result = false;
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(1, groupOid);
@@ -439,16 +457,15 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
 
         String sql = digester.getQuery("isItemGroupRepeatingBasedOnCrfVersion");
 
-        ArrayList rows = this.select(sql,variables);
+        ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
             result = count > 0 ? true : false;
-        } 
+        }
         return result;
     }
-    
 
     public ItemGroupBean findTopOneGroupBySectionId(int sectionId) {
         ItemGroupBean formGroupBean = new ItemGroupBean();
@@ -465,18 +482,19 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
         }
         return formGroupBean;
     }
+
     @Override
     public ArrayList<V> select(String query, HashMap variables) {
         clearSignals();
 
         ArrayList results = new ArrayList();
-        V  value;
+        V value;
         K key;
         ResultSet rs = null;
         Connection con = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         PreparedStatement ps = null;
-        
+
         try {
             con = ds.getConnection();
             CoreResources.setSchema(con);
@@ -487,25 +505,22 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
                 throw new SQLException();
             }
 
-           ps = con.prepareStatement(query);
-           
-       
+            ps = con.prepareStatement(query);
+
             ps = psf.generate(ps);// enter variables here!
             key = (K) ps.toString();
-            if((results=(V) cache.get(key))==null)
-            {
-            rs = ps.executeQuery();
-            results = this.processResultRows(rs);
-            if(results!=null){
-                cache.put(key,results);
+            if ((results = (V) cache.get(key)) == null) {
+                rs = ps.executeQuery();
+                results = this.processResultRows(rs);
+                if (results != null) {
+                    cache.put(key, results);
+                }
             }
-            }
-            
-           // if (logger.isInfoEnabled()) {
-                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
-          //  }
+
+            // if (logger.isInfoEnabled()) {
+            logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+            // }
             signalSuccess();
-              
 
         } catch (SQLException sqle) {
             signalFailure(sqle);

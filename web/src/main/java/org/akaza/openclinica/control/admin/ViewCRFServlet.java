@@ -16,7 +16,6 @@ import java.util.List;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -24,7 +23,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -102,11 +100,11 @@ public class ViewCRFServlet extends SecureController {
             forwardPage(Page.CRF_LIST);
         } else {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+            // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             FormLayoutDAO fdao = new FormLayoutDAO<>(sm.getDataSource());
             CRFBean crf = (CRFBean) cdao.findByPK(crfId);
             request.setAttribute("crfName", crf.getName());
-            ArrayList<CRFVersionBean> crfVersions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
+            // ArrayList<CRFVersionBean> crfVersions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
             ArrayList<FormLayoutBean> layoutVersions = (ArrayList<FormLayoutBean>) fdao.findAllByCRF(crfId);
             crf.setVersions(layoutVersions);
             ArrayList<ItemGroupCrvVersionUtil> items_verified = verifyUniqueItemPlacementInGroups(crf.getName());
@@ -122,7 +120,7 @@ public class ViewCRFServlet extends SecureController {
                 request.setAttribute("studiesTableHTML", studyHtml);
                 // >>
             }
-            Collection<TableColumnHolder> items = populate(crf, layoutVersions, crfVersions);
+            Collection<TableColumnHolder> items = populate(crf, layoutVersions);
             request.setAttribute(CRF, crf);
             forwardPage(Page.VIEW_CRF);
 
@@ -261,7 +259,7 @@ public class ViewCRFServlet extends SecureController {
         return studyBeans;
     }
 
-    private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<FormLayoutBean> versions, ArrayList<CRFVersionBean> crfVersions) {
+    private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<FormLayoutBean> versions) {
         HashMap<FormLayoutBean, ArrayList<TableColumnHolder>> hm = new HashMap<FormLayoutBean, ArrayList<TableColumnHolder>>();
         List<TableColumnHolder> tableColumnHolders = new ArrayList<TableColumnHolder>();
         for (FormLayoutBean versionBean : versions) {
@@ -271,12 +269,12 @@ public class ViewCRFServlet extends SecureController {
         ruleSets = getRuleSetService().filterByStatusEqualsAvailable(ruleSets);
         for (RuleSetBean ruleSetBean : ruleSets) {
             if (ruleSetBean.getCrfVersion() == null) {
-                for (CRFVersionBean crfVersion : crfVersions) {
-                    hm.get(crfVersion).addAll(createFromRuleSet(ruleSetBean, crfVersion));
+                for (FormLayoutBean version : versions) {
+                    hm.get(version).addAll(createFromRuleSet(ruleSetBean, version));
                 }
             }
             if (ruleSetBean.getCrfVersion() != null) {
-                hm.get(ruleSetBean.getCrfVersion()).addAll(createFromRuleSet(ruleSetBean, ruleSetBean.getCrfVersion()));
+                hm.get(ruleSetBean.getCrfVersion()).addAll(createFromRuleSet(ruleSetBean, ruleSetBean.getFormLayout()));
             }
         }
         for (ArrayList<TableColumnHolder> list : hm.values()) {
@@ -285,12 +283,12 @@ public class ViewCRFServlet extends SecureController {
         return tableColumnHolders;
     }
 
-    private List<TableColumnHolder> createFromRuleSet(RuleSetBean ruleSet, CRFVersionBean crfVersion) {
+    private List<TableColumnHolder> createFromRuleSet(RuleSetBean ruleSet, FormLayoutBean version) {
         List<TableColumnHolder> tchs = new ArrayList<TableColumnHolder>();
         for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
             String ruleExpression = ruleSetRule.getRuleBean().getExpression().getValue();
             String ruleName = ruleSetRule.getRuleBean().getName();
-            TableColumnHolder tch = new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName, ruleExpression, ruleSetRule.getActions(),
+            TableColumnHolder tch = new TableColumnHolder(version.getName(), version.getId(), ruleName, ruleExpression, ruleSetRule.getActions(),
                     ruleSetRule.getId());
             tchs.add(tch);
 

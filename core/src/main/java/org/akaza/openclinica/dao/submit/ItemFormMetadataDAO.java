@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
-import org.akaza.openclinica.exception.OpenClinicaException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,17 +21,27 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.crfdata.InstantOnChangePairContainer;
+import org.akaza.openclinica.exception.OpenClinicaException;
+
 /**
  * @author ssachs
  */
-public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends EntityDAO {
+public class ItemFormMetadataDAO<K extends String, V extends ArrayList> extends EntityDAO {
 
     @Override
     protected void setDigesterName() {
         digesterName = SQLFactory.getInstance().DAO_ITEMFORMMETADATA;
     }
-
-
 
     private void setQueryNames() {
         getCurrentPKName = "getCurrentPK";
@@ -52,7 +50,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
     public ItemFormMetadataDAO(DataSource ds) {
         super(ds);
-      //  setCache(new EhCacheWrapper("ItemFormMetadataDAO",R);
+        // setCache(new EhCacheWrapper("ItemFormMetadataDAO",R);
     }
 
     public ItemFormMetadataDAO(DataSource ds, DAODigester digester) {
@@ -242,7 +240,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
      * (non-Javadoc)
      *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAll(java.lang.String,
-     *      boolean, java.lang.String)
+     * boolean, java.lang.String)
      */
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) throws OpenClinicaException {
         // Auto-generated method stub
@@ -273,15 +271,15 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
     /*
      * <query>
-        <name>findAllCountHiddenByCRFVersionId</name>
-        <sql>
-           select count(i.*) as number from item i, item_form_metadata ifm
-           where i.item_id = ifm.item_id
-           and ifm.crf_version_id=?
-           and ifm.required=true
-           and ifm.show_item=false
-        </sql>
-    </query>
+     * <name>findAllCountHiddenByCRFVersionId</name>
+     * <sql>
+     * select count(i.*) as number from item i, item_form_metadata ifm
+     * where i.item_id = ifm.item_id
+     * and ifm.crf_version_id=?
+     * and ifm.required=true
+     * and ifm.show_item=false
+     * </sql>
+     * </query>
      */
     public int findCountAllHiddenByCRFVersionId(int crfVersionId) {
         int answer = 0;
@@ -302,12 +300,12 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         // what about those shown but in a hidden section?
         /*
          * select count(i.*) as number from item i, item_form_metadata ifm, item_group_metadata igm
-           where i.item_id = ifm.item_id
-           and ifm.item_id = igm.item_id
-           and ifm.crf_version_id=?
-           and ifm.required=true
-           and ifm.show_item=true
-           and igm.show_group=false
+         * where i.item_id = ifm.item_id
+         * and ifm.item_id = igm.item_id
+         * and ifm.crf_version_id=?
+         * and ifm.required=true
+         * and ifm.show_item=true
+         * and igm.show_group=false
          */
         int answer2 = 0;
 
@@ -322,15 +320,15 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
     /*
      * <query>
-        <name>findAllCountHiddenButShownByCRFVersionId</name>
-        <sql>
-           select count(dyn.*) as number from item_form_metadata ifm, dyn_item_form_metadata dyn
-           where dyn.item_form_metadata_id = ifm.item_form_metadata_id
-           and dyn.event_crf_id = ?
-           and ifm.required=true
-           and dyn.show_item=true
-        </sql>
-    </query>
+     * <name>findAllCountHiddenButShownByCRFVersionId</name>
+     * <sql>
+     * select count(dyn.*) as number from item_form_metadata ifm, dyn_item_form_metadata dyn
+     * where dyn.item_form_metadata_id = ifm.item_form_metadata_id
+     * and dyn.event_crf_id = ?
+     * and ifm.required=true
+     * and dyn.show_item=true
+     * </sql>
+     * </query>
      */
     public int findCountAllHiddenButShownByEventCRFId(int eventCrfId) {
         int answer = 0;
@@ -371,7 +369,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         return answer;
     }
 
-    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndShownByCrfVersionId(int crfVersionId)  {
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndShownByCrfVersionId(int crfVersionId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
@@ -391,8 +389,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         return answer;
     }
 
-    
-    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndHiddenByCrfVersionId(int crfVersionId)  {
+    public ArrayList<ItemFormMetadataBean> findAllItemsRequiredAndHiddenByCrfVersionId(int crfVersionId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
@@ -412,7 +409,6 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         return answer;
     }
 
-    
     public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -435,10 +431,9 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
     }
 
     public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndResponseTypeId(int crfVersionId, int responseTypeId) throws OpenClinicaException {
-     //Caching purpose
-        V  value;
+        // Caching purpose
+        V value;
         K key;
-
 
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
@@ -452,13 +447,12 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
         String sql = digester.getQuery("findAllByCRFVersionIdAndResponseTypeId");
 
-        key = (K) (sql+","+crfVersionId+","+responseTypeId);
+        key = (K) (sql + "," + crfVersionId + "," + responseTypeId);
 
-        if((alist=(V) cache.get(key))==null)
-        {
-         alist = this.select(sql, variables);
-         if(alist!=null)
-             cache.put(key, alist);
+        if ((alist = (V) cache.get(key)) == null) {
+            alist = this.select(sql, variables);
+            if (alist != null)
+                cache.put(key, alist);
         }
 
         Iterator it = alist.iterator();
@@ -470,8 +464,6 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
         return answer;
     }
-
-
 
     public ArrayList<ItemFormMetadataBean> findAllByItemId(int itemId) {
 
@@ -758,7 +750,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
      * (non-Javadoc)
      *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAllByPermission(java.lang.Object,
-     *      int, java.lang.String, boolean, java.lang.String)
+     * int, java.lang.String, boolean, java.lang.String)
      */
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase)
             throws OpenClinicaException {
@@ -770,15 +762,16 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
      * (non-Javadoc)
      *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAllByPermission(java.lang.Object,
-     *      int)
+     * int)
      */
     public Collection findAllByPermission(Object objCurrentUser, int intActionType) throws OpenClinicaException {
         // Auto-generated method stub
         return null;
     }
-    private void logMe(String message){
+
+    private void logMe(String message) {
         logger.debug(message);
-      //  System.out.println(message);
+        // System.out.println(message);
     }
 
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
@@ -790,19 +783,69 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         this.setTypeExpected(30, TypeNames.INT);// repeat_max
         this.setTypeExpected(31, TypeNames.STRING);// section_name
 
-        logMe("Current Thread:::"+Thread.currentThread()+"types Expected?");
+        logMe("Current Thread:::" + Thread.currentThread() + "types Expected?");
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(itemId));
         variables.put(new Integer(2), new Integer(crfVersionId));
 
-
         String sql = digester.getQuery("findByItemIdAndCRFVersionId");
 
-        logMe("Thread?"+Thread.currentThread()+"SQL?"+sql+"variables?"+variables);
+        logMe("Thread?" + Thread.currentThread() + "SQL?" + sql + "variables?" + variables);
 
         ArrayList alist = this.select(sql, variables);
 
+        Iterator it = alist.iterator();
 
+        ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
+        HashMap hm = new HashMap();
+        if (it.hasNext()) {
+            hm = (HashMap) it.next();
+            ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap(hm);
+        }
+        // EntityBean eb =
+        // this.executeFindByPKQuery("findByItemIdAndCRFVersionId", variables);
+
+        /*
+         * if (!ifmb.isActive()) { return new ItemFormMetadataBean(); } else {
+         */
+        // ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
+        String versionName = (String) hm.get("cvname");
+        String groupLabel = (String) hm.get("group_label");
+        String sectionName = (String) hm.get("section_name");
+        Integer repeatMax = (Integer) hm.get("repeat_max");
+        int repeatMaxInt = repeatMax != null ? repeatMax.intValue() : 0;
+        // caught an NPE here, tbh 082007?
+        // new Integer((Integer)hm.get("repeat_max")).intValue();
+        ifmb.setCrfVersionName(versionName);
+        ifmb.setGroupLabel(groupLabel);
+        // logger.info(">>>added group name: "+groupLabel);
+        ifmb.setSectionName(sectionName);
+        // logger.info("<<<added section name: "+sectionName);
+        ifmb.setRepeatMax(repeatMaxInt);
+        // return (ItemFormMetadataBean) eb;
+        return ifmb;
+        // }
+    }
+
+    public ItemFormMetadataBean findByItemIdAndFormLayoutId(int itemId, int layoutId) {
+        this.setTypesExpected();
+        // TODO note to come back here, tbh
+        this.setTypeExpected(28, TypeNames.STRING);// version name
+        // add more here for display, tbh 082007
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
+
+        logMe("Current Thread:::" + Thread.currentThread() + "types Expected?");
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(new Integer(2), new Integer(layoutId));
+
+        String sql = digester.getQuery("findByItemIdAndFormLayoutId");
+
+        logMe("Thread?" + Thread.currentThread() + "SQL?" + sql + "variables?" + variables);
+
+        ArrayList alist = this.select(sql, variables);
 
         Iterator it = alist.iterator();
 
@@ -854,6 +897,22 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         }
     }
 
+    public ItemFormMetadataBean findByItemIdAndFormLayoutIdNotInIGM(int itemId, int formLayoutId) {
+        this.setTypesExpected();
+
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(new Integer(2), new Integer(formLayoutId));
+
+        EntityBean eb = this.executeFindByPKQuery("findByItemIdAndFormLayoutIdNotInIGM", variables);
+
+        if (!eb.isActive()) {
+            return new ItemFormMetadataBean();
+        } else {
+            return (ItemFormMetadataBean) eb;
+        }
+    }
+
     public ResponseSetBean findResponseSetByPK(int id) {
         this.unsetTypeExpected();
         int ind = 1;
@@ -882,6 +941,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
     /**
      * Find all ItemFormMetadataBean which is simple_conditional_display
+     * 
      * @param sectionId
      * @return
      */
@@ -922,18 +982,19 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         this.setTypeExpected(1, TypeNames.INT);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), sectionId);
-        //String sql = "select ifm.item_form_metadata_id from item_form_metadata ifm, response_set rs"
-        //    +" where rs.response_type_id = 10 and ifm.section_id = ? and ifm.response_set_id = rs.response_set_id limit 1";
-        ArrayList alist = this.select(digester.getQuery("instantTypeExistsInSection"),variables);
-        for(Iterator it = alist.iterator(); it.hasNext();) {
+        // String sql = "select ifm.item_form_metadata_id from item_form_metadata ifm, response_set rs"
+        // +" where rs.response_type_id = 10 and ifm.section_id = ? and ifm.response_set_id = rs.response_set_id limit
+        // 1";
+        ArrayList alist = this.select(digester.getQuery("instantTypeExistsInSection"), variables);
+        for (Iterator it = alist.iterator(); it.hasNext();) {
             HashMap row = (HashMap) it.next();
             id = (Integer) row.get("item_form_metadata_id");
         }
         return id != null && id > 0;
     }
 
-    public Map<Integer,List<InstantOnChangePairContainer>> sectionInstantMapInSameSection(int crfVersionId) {
-        Map<Integer,List<InstantOnChangePairContainer>> pairs = new HashMap<Integer,List<InstantOnChangePairContainer>>();
+    public Map<Integer, List<InstantOnChangePairContainer>> sectionInstantMapInSameSection(int crfVersionId) {
+        Map<Integer, List<InstantOnChangePairContainer>> pairs = new HashMap<Integer, List<InstantOnChangePairContainer>>();
         this.setInstantTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), crfVersionId);
@@ -952,7 +1013,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
             instantItemPair.setOriginItemId((Integer) row.get("o_item_id"));
             instantItemPair.setOriginItemGroupOid((String) row.get("o_ig_oid"));
             Boolean isUng = Boolean.FALSE;
-            if("Ungrouped".equalsIgnoreCase((String) row.get("o_ig_name"))) {
+            if ("Ungrouped".equalsIgnoreCase((String) row.get("o_ig_name"))) {
                 isUng = Boolean.TRUE;
             }
             instantItemPair.setOriginUngrouped(isUng);
@@ -963,7 +1024,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
             instantItemPair.setDestItemId((Integer) row.get("d_item_id"));
             instantItemPair.setDestItemGroupOid((String) row.get("d_ig_oid"));
             isUng = Boolean.FALSE;
-            if("Ungrouped".equalsIgnoreCase((String) row.get("d_ig_name"))) {
+            if ("Ungrouped".equalsIgnoreCase((String) row.get("d_ig_name"))) {
                 isUng = Boolean.TRUE;
             }
             instantItemPair.setDestUngrouped(isUng);
@@ -972,8 +1033,8 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
             instantItemPair.setDestRepeating(isRep);
             instantItemPair.setDestItemFormMetadataId((Integer) row.get("d_ifm_id"));
             instantItemPair.setOptionValue((String) row.get("option_name"));
-            if(pairs.containsKey(sectionId)) {
-                ((ArrayList<InstantOnChangePairContainer>)pairs.get(sectionId)).add(instantItemPair);
+            if (pairs.containsKey(sectionId)) {
+                ((ArrayList<InstantOnChangePairContainer>) pairs.get(sectionId)).add(instantItemPair);
             } else {
                 List<InstantOnChangePairContainer> ins = new ArrayList<InstantOnChangePairContainer>();
                 ins.add(instantItemPair);
@@ -985,16 +1046,18 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
 
     private void setInstantTypesExpected() {
         this.unsetTypeExpected();
-        /*oifm.section_id as o_sec_id, oit.item_id as o_item_id, oig.oc_oid as o_ig_oid,
-    oig.name as o_ig_name, oigm.repeating_group as o_repeating,
-    idfm.section_id as d_sec_id, difm.item_id as d_item_id, dig.oc_oid as d_ig_oid,
-    dig.name as d_ig_name, digm.repeating_group as d_repeating,
-    difm.item_form_metadata_id as d_ifm_id, ri.option_name */
-        int ind = 1; //o_sec_id
+        /*
+         * oifm.section_id as o_sec_id, oit.item_id as o_item_id, oig.oc_oid as o_ig_oid,
+         * oig.name as o_ig_name, oigm.repeating_group as o_repeating,
+         * idfm.section_id as d_sec_id, difm.item_id as d_item_id, dig.oc_oid as d_ig_oid,
+         * dig.name as d_ig_name, digm.repeating_group as d_repeating,
+         * difm.item_form_metadata_id as d_ifm_id, ri.option_name
+         */
+        int ind = 1; // o_sec_id
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // o_item_id 2
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; //o_ig_oid 3
+        ind++; // o_ig_oid 3
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // o_ig_name 4
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -1016,15 +1079,15 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
         this.setTypeExpected(ind, TypeNames.STRING);
     }
 
-/**
- * need to use this method when you want the results to be cached. i.e they do not get updated.
- */
+    /**
+     * need to use this method when you want the results to be cached. i.e they do not get updated.
+     */
     @Override
     public ArrayList<V> select(String query, HashMap variables) {
         clearSignals();
 
         ArrayList results = new ArrayList();
-        V  value;
+        V value;
         K key;
         ResultSet rs = null;
         Connection con = null;
@@ -1041,25 +1104,22 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
                 throw new SQLException();
             }
 
-           ps = con.prepareStatement(query);
-
+            ps = con.prepareStatement(query);
 
             ps = psf.generate(ps);// enter variables here!
             key = (K) ps.toString();
-            if((results=(V) cache.get(key))==null)
-            {
-            rs = ps.executeQuery();
-            results = this.processResultRows(rs);
-            if(results!=null){
-                cache.put(key,results);
-            }
+            if ((results = (V) cache.get(key)) == null) {
+                rs = ps.executeQuery();
+                results = this.processResultRows(rs);
+                if (results != null) {
+                    cache.put(key, results);
+                }
             }
 
-         //   if (logger.isInfoEnabled()) {
-                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
-         //   }
+            // if (logger.isInfoEnabled()) {
+            logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+            // }
             signalSuccess();
-
 
         } catch (SQLException sqle) {
             signalFailure(sqle);
