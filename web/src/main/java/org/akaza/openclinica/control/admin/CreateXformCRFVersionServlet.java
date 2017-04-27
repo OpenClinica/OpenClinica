@@ -91,8 +91,13 @@ public class CreateXformCRFVersionServlet extends SecureController {
          **/
         if (crf.getOcoid().equals("ERROR") && !StringUtils.isEmpty(crf.getDescription())) {
             String errorMessage = crf.getDescription();
-            int index = errorMessage.indexOf("pyxform.errors.PyXFormError:");
-            errorMessage = errorMessage.substring(index + 29);
+            int pyxformIndex = errorMessage.indexOf("pyxform.errors.PyXFormError:");
+            int errorEvaluatingIndex = errorMessage.indexOf("Error evaluating");
+            if (pyxformIndex != -1) {
+                errorMessage = errorMessage.substring(pyxformIndex + 29);
+            } else if (errorEvaluatingIndex != -1) {
+                errorMessage = errorMessage.substring(errorEvaluatingIndex);
+            }
             errors.rejectValue("name", "xform_validation_error", errorMessage);
         } else {
 
