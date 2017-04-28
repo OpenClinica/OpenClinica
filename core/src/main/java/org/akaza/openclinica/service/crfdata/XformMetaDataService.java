@@ -1000,7 +1000,7 @@ public class XformMetaDataService {
             if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
                     && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX)) {
 
-                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFilePath(formLayout.getFormLayoutId(), dir);
+                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdFileNameForNoteTypeMedia(formLayout.getFormLayoutId(), fileName, dir);
                 if (media == null) {
                     media = new FormLayoutMedia();
                     media.setFormLayout(formLayout);

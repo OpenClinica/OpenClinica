@@ -84,9 +84,9 @@ public class ViewNotesServlet extends SecureController {
         }
 
         FormProcessor fp = new FormProcessor(request);
-        if(fp.getString("showMoreLink").equals("")){
+        if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
-        }else {
+        } else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
 
@@ -139,7 +139,7 @@ public class ViewNotesServlet extends SecureController {
         // so we can go back later
         session.setAttribute(WIN_LOCATION, "ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module + " &removeSession=1");
 
-        boolean hasAResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 5;
+        boolean hasAResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 6;
         Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute(RESOLUTION_STATUS);
         // remove the session if there is no resolution status
         if (!hasAResolutionStatus && resolutionStatusIds != null) {
@@ -169,8 +169,6 @@ public class ViewNotesServlet extends SecureController {
         ItemDAO itemDao = new ItemDAO(sm.getDataSource());
         EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
-
-
         ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink);
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
@@ -190,14 +188,14 @@ public class ViewNotesServlet extends SecureController {
         factory.setDiscNoteType(discNoteType);
         factory.setResolutionStatus(resolutionStatus);
         factory.setViewNotesService(resolveViewNotesService());
-        //factory.setResolutionStatusIds(resolutionStatusIds);
+        // factory.setResolutionStatusIds(resolutionStatusIds);
         TableFacade tf = factory.createTable(request, response);
 
         Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummary());
-        Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
+        Map<String, String> totalMap = generateDiscrepancyNotesTotal(stats);
 
         int grandTotal = 0;
-        for (String typeName: totalMap.keySet()) {
+        for (String typeName : totalMap.keySet()) {
             String total = totalMap.get(typeName);
             grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
         }
@@ -218,7 +216,7 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("grandTotal", grandTotal);
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-        	List<DiscrepancyNoteBean> allNotes = factory.findAllNotes(tf);
+            List<DiscrepancyNoteBean> allNotes = factory.findAllNotes(tf);
             request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
@@ -237,7 +235,7 @@ public class ViewNotesServlet extends SecureController {
 
         for (String resStatus : stats.keySet()) {
             Map<String, String> dnTypeMap = stats.get(resStatus);
-            for (String dnType: dnTypeMap.keySet()) {
+            for (String dnType : dnTypeMap.keySet()) {
                 String stringVal = dnTypeMap.get(dnType);
                 int val = (stringVal.equals("--") ? 0 : Integer.parseInt(stringVal));
                 totals[DiscrepancyNoteType.getByName(dnType).getId()] += val;
@@ -318,8 +316,7 @@ public class ViewNotesServlet extends SecureController {
 
     protected ViewNotesService resolveViewNotesService() {
         if (viewNotesService == null) {
-            viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(
-                    getServletContext()).getBean("viewNotesService");
+            viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("viewNotesService");
         }
         return viewNotesService;
 

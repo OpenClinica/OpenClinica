@@ -397,9 +397,12 @@ public class OpenRosaServices {
         // Add user list
         MediaFile userList = new MediaFile();
 
-        String userXml = getUserXml(context);
+        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
+        if (subjectContextCache != null) {
+            String userXml = getUserXml(context);
+            userList.setHash((DigestUtils.md5Hex(userXml)));
+        }
         userList.setFilename("users.xml");
-        userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
         manifest.add(userList);
 

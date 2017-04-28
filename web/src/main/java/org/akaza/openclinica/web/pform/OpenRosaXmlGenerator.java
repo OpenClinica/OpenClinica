@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
@@ -102,11 +104,15 @@ public class OpenRosaXmlGenerator {
     public String buildForm(String formId) throws Exception {
         try {
             CRFVersionDAO versionDAO = new CRFVersionDAO(dataSource);
-            CRFVersionBean crfVersion = versionDAO.findByOid(formId);
+            FormLayoutDAO fldao = new FormLayoutDAO<>(dataSource);
+            FormLayoutBean formLayout = fldao.findByOid(formId);
+
             CRFDAO crfDAO = new CRFDAO(dataSource);
-            CRFBean crf = (CRFBean) crfDAO.findByPK(crfVersion.getCrfId());
+            CRFBean crf = (CRFBean) crfDAO.findByPK(formLayout.getCrfId());
             CRFVersionMetadataUtil metadataUtil = new CRFVersionMetadataUtil(dataSource);
-            ArrayList<SectionBean> crfSections = metadataUtil.retrieveFormMetadata(crfVersion);
+            ArrayList<SectionBean> crfSections = metadataUtil.retrieveFormMetadata(formLayout);
+            ArrayList<CRFVersionBean> crfVersions = versionDAO.findAllByCRFId(crf.getId());
+            CRFVersionBean crfVersion = crfVersions.get(0);
 
             StringWriter writer = new StringWriter();
             IOUtils.copy(getClass().getResourceAsStream("/properties/xform_template.xml"), writer, "UTF-8");
@@ -118,10 +124,11 @@ public class OpenRosaXmlGenerator {
                 setFormPaging(html);
             String xformMinusInstance = buildStringXForm(html);
             String preInstance = xformMinusInstance.substring(0, xformMinusInstance.indexOf("<instance>"));
-            String instance = buildInstance(html.getHead().getModel(), crfVersion, crfSections);
+            String instance = buildInstance(html.getHead().getModel(), formLayout, crfVersion, crfSections);
             String nodeset = xformMinusInstance.substring(xformMinusInstance.indexOf("</instance>") + "</instance>".length());
             // add nodeset for instanceId
-            String postInstance = "<bind calculate=\"concat('uuid:', uuid())\" nodeset=\"/" + crfVersion.getOid() + "/meta/instanceID\" readonly=\"true()\" type=\"string\"/>" + nodeset;
+            String postInstance = "<bind calculate=\"concat('uuid:', uuid())\" nodeset=\"/" + formLayout.getOid()
+                    + "/meta/instanceID\" readonly=\"true()\" type=\"string\"/>" + nodeset;
             logger.debug(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
@@ -142,11 +149,11 @@ public class OpenRosaXmlGenerator {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private ArrayList<ItemGroupBean> getItemGroupBeansByCrfVersion(CRFVersionBean crfVersion) throws Exception {
+    private ArrayList<ItemGroupBean> getItemGroupBeansByFormLayout(FormLayoutBean formLayout) throws Exception {
         ArrayList<ItemGroupBean> itemGroupBeans = null;
 
         igdao = new ItemGroupDAO(dataSource);
-        itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByCRFVersionID(crfVersion.getId());
+        itemGroupBeans = (ArrayList<ItemGroupBean>) igdao.findGroupByLayoutId(formLayout.getId());
         return itemGroupBeans;
     }
 
@@ -214,7 +221,6 @@ public class OpenRosaXmlGenerator {
 
         ItemGroupMetadataDAO itemGroupMetadataDAO = new ItemGroupMetadataDAO(dataSource);
         itemGroupMetadataBean = (ArrayList<ItemGroupMetadataBean>) itemGroupMetadataDAO.findMetaByGroupAndCrfVersion(itemGroupBean.getId(), crfVersion.getId());
-
         return itemGroupMetadataBean.get(0);
     }
 
@@ -424,8 +430,8 @@ public class OpenRosaXmlGenerator {
                     // Add the Item SubHeader
                     setSubHeaderWidget(item, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group, itemExpression);
                     // Add the Item itself
-                    setItemWidget(item, responseTypeId, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group,
-                            isItemRequired, responseLayout, itemExpression);
+                    setItemWidget(item, responseTypeId, itemFormMetadataBean, itemGroupBean, bindList, factory, isGroupRepeating, repeat, group, isItemRequired,
+                            responseLayout, itemExpression);
 
                     if (itemGroupId != itemGroupBean.getId()) {
                         groups.add(group);
@@ -452,12 +458,12 @@ public class OpenRosaXmlGenerator {
      * @return
      * @throws Exception
      */
-    private String buildInstance(Model model, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
+    private String buildInstance(Model model, FormLayoutBean formLayout, CRFVersionBean crfVersion, ArrayList<SectionBean> crfSections) throws Exception {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder build = docFactory.newDocumentBuilder();
         Document doc = build.newDocument();
-        Element crfElement = doc.createElement(crfVersion.getOid());
-        crfElement.setAttribute("id", crfVersion.getOid());
+        Element crfElement = doc.createElement(formLayout.getOid());
+        crfElement.setAttribute("id", formLayout.getOid());
         doc.appendChild(crfElement);
         crfElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:jr", "http://openrosa.org/javarosa");
 
@@ -470,7 +476,7 @@ public class OpenRosaXmlGenerator {
             crfElement.appendChild(sectionElm);
         }
 
-        ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByCrfVersion(crfVersion);
+        ArrayList<ItemGroupBean> itemGroupBeans = getItemGroupBeansByFormLayout(formLayout);
         for (ItemGroupBean itemGroupBean : itemGroupBeans) {
             ItemGroupMetadataBean itemGroupMetadataBean = getItemGroupMetadataByGroup(itemGroupBean, crfVersion);
 
@@ -510,7 +516,6 @@ public class OpenRosaXmlGenerator {
         Element instanceId = doc.createElement("instanceID");
         meta.appendChild(instanceId);
         crfElement.appendChild(meta);
-
 
         TransformerFactory transformFactory = TransformerFactory.newInstance();
         Transformer transformer = transformFactory.newTransformer();

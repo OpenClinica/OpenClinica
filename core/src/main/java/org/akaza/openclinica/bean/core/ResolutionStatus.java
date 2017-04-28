@@ -41,6 +41,8 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "images/icon_flagWhite.gif");
 
+    public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(6, "Closed_Modified", null, "images/icon_flagBlack.gif");
+
     private String iconFilePath;
 
     public boolean isInvalid() {
@@ -55,6 +57,10 @@ public class ResolutionStatus extends Term {
         return this == ResolutionStatus.CLOSED;
     }
 
+    public boolean isClosedModified() {
+        return this == ResolutionStatus.CLOSED_MODIFIED;
+    }
+
     public boolean isUpdated() {
         return this == ResolutionStatus.UPDATED;
     }
@@ -67,7 +73,7 @@ public class ResolutionStatus extends Term {
         return this == ResolutionStatus.NOT_APPLICABLE;
     }
 
-    private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE };
+    private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE, CLOSED_MODIFIED };
 
     public static ResolutionStatus[] getMembers() {
         return members;
@@ -128,4 +134,5 @@ public class ResolutionStatus extends Term {
 
         ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
     }
+
 }
