@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class StudyBean extends AuditableEntityBean {
     private String medlineIdentifier = "";
     private boolean resultsReference = false;
     private String schemaName = "";
+    private ProtocolEnvEnum envType;
+    private String uuid;
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;
@@ -267,6 +270,21 @@ public class StudyBean extends AuditableEntityBean {
         return schemaName;
     }
 
+    public ProtocolEnvEnum getEnvType() {
+        return this.envType;
+    }
+
+    public void setEnvType(ProtocolEnvEnum envType) {
+        this.envType = envType;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
     /**
      * @param collaborators
      *            The collaborators to set.

@@ -37,17 +37,13 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
     @Autowired
     private SchemaServiceDao schemaServiceDao;
 
-    public ProtocolInfo process(String name, String uniqueId, UserAccountBean ub) throws Exception  {
+    public ProtocolInfo process(Study study, UserAccountBean ub, String role) throws Exception  {
         String schemaName = null;
-        Study study = new Study();
 
         try {
             int schemaId = schemaServiceDao.getProtocolSchemaSeq();
-            study.setName(name);
-            study.setUniqueIdentifier(uniqueId);
             // generate OC id
             StudyOidGenerator studyOidGenerator = new StudyOidGenerator();
-            study.setOc_oid(studyOidGenerator.generateOid(uniqueId));
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             study.setDateCreated(new Date());
             schemaName = CoreResources.getField("schemaPrefix")+ schemaId;
@@ -58,7 +54,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             studyUserRole.setId(userRoleId);
             userRoleId.setUserName(ub.getName());
             userRoleId.setOwnerId(ub.getOwnerId());
-            userRoleId.setRoleName(Role.COORDINATOR.getName());
+            userRoleId.setRoleName(role);
             userRoleId.setStudyId(studyId);
             userRoleId.setStatusId(org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
             userRoleId.setDateCreated(new Date());
@@ -69,7 +65,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             throw e;
         }
         createSchema(schemaName);
-        return new ProtocolInfo(uniqueId, study.getOc_oid(), schemaName, study);
+        return new ProtocolInfo(schemaName, study);
     }
 
     private boolean createSchema(String schemaName) throws Exception {

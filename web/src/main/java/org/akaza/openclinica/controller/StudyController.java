@@ -14,6 +14,7 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -410,6 +411,9 @@ public class StudyController {
 
         String uniqueProtocolID = (String) map.get("uniqueProtocolID");
         String name = (String) map.get("briefTitle");
+		String oid = (String) map.get("oid");
+		String uuid = (String) map.get("uuid");
+		String envType = (String) map.get("envType");
 
 	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
 	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
@@ -420,25 +424,42 @@ public class StudyController {
 		    errorObjects.add(errorOBject);
 
 	    }
-	    if (uniqueProtocolID == null) {
+	    if (StringUtils.isEmpty(uniqueProtocolID)) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
 		    errorObjects.add(errorOBject);
 	    } else {
 		    uniqueProtocolID = uniqueProtocolID.trim();
 	    }
-	    if (name == null) {
+	    if (StringUtils.isEmpty(name)) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
 		    errorObjects.add(errorOBject);
 	    } else {
 		    name = name.trim();
+	    }
+	    if (StringUtils.isEmpty(oid)) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
+		    errorObjects.add(errorOBject);
+	    } else {
+		    oid = oid.trim();
+	    }
+	    if (StringUtils.isEmpty(uuid)) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
+		    errorObjects.add(errorOBject);
+	    } else {
+		    uuid = uuid.trim();
 	    }
 	    Locale locale = new Locale("en_US");
 	    request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 	    ResourceBundleProvider.updateLocale(locale);
 	    request.setAttribute("uniqueProId", uniqueProtocolID);
 	    request.setAttribute("name", name); // Brief Title
+	    request.setAttribute("oid", oid);
+	    request.setAttribute("uuid", uuid);
+	    String role = authorizedToCreateProtocol(request, uuid);
+		request.setAttribute("role", role);
 	    Validator v0 = new Validator(request);
 	    v0.addValidation("name", Validator.NO_BLANKS);
+
 	    HashMap vError0 = v0.validate();
 	    if (!vError0.isEmpty()) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
@@ -453,32 +474,61 @@ public class StudyController {
 		    errorObjects.add(errorOBject);
 	    }
 
-	    Validator v6 = new Validator(request);
-	    HashMap vError6 = v6.validate();
-	    if (uniqueProtocolID != null)
-		    validateUniqueProId(request, vError6);
-	    if (!vError6.isEmpty()) {
-		    ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+	    Validator v2 = new Validator(request);
+	    v2.addValidation("oid", Validator.NO_BLANKS);
+	    HashMap vError2 = v2.validate();
+	    if (!vError2.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "oid");
 		    errorObjects.add(errorOBject);
 	    }
 
+	    Validator v3 = new Validator(request);
+	    v3.addValidation("uuid", Validator.NO_BLANKS);
+	    HashMap vError3 = v3.validate();
+	    if (!vError3.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "uuid");
+		    errorObjects.add(errorOBject);
+	    }
+
+	    Validator v4 = new Validator(request);
+	    v4.addValidation("role", Validator.NO_LEADING_OR_TRAILING_SPACES);
+	    HashMap vError4 = v4.validate();
+	    if (!vError4.isEmpty()) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot have leading or trailing spaces.", "role");
+		    errorObjects.add(errorOBject);
+	    }
+
+	    if (errorObjects != null && errorObjects.size() != 0) {
+		    studyDTO.setMessage(validation_failed_message);
+		    response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+		    return response;
+	    }
 	    studyDTO.setErrors(errorObjects);
-
-	    ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+		String ocRole = getOCRole(role, false);
+	    Study study = new Study();
+	    study.setUniqueIdentifier(uniqueProtocolID);
+	    study.setName(name);
+	    study.setOc_oid(oid);
+	    study.setEnvType(ProtocolEnvEnum.valueOf(envType));
+	    Study byOidEnvType = studyDao.findByOidEnvType(oid, ProtocolEnvEnum.valueOf(envType));
+	    if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
+		    return getResponseSuccess(byOidEnvType);
+	    }
+	    ProtocolInfo protocolInfo = protocolBuildService.process(study, ownerUserAccount, ocRole);
 	    liquibaseOnDemandService.createForeignTables(protocolInfo);
-	    Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
+	    Study schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
 
-	    logger.debug("returning from liquibase study:" + study.getStudyId());
+	    logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
             studyDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
         } else {
 
-            studyDTO.setStudyOid(study.getOc_oid());
+            studyDTO.setStudyOid(schemaStudy.getOc_oid());
             studyDTO.setMessage(validation_passed_message);
-	        studyDTO.setUniqueProtocolID(study.getUniqueIdentifier());
-	        logger.debug("study oc_id:" + study.getOc_oid());
+	        studyDTO.setUniqueProtocolID(schemaStudy.getUniqueIdentifier());
+	        logger.debug("study oc_id:" + schemaStudy.getOc_oid());
 
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
@@ -493,6 +543,72 @@ public class StudyController {
 
 	    return response;
 
+    }
+
+    private String authorizedToCreateProtocol(HttpServletRequest request, String currentProtocolId) {
+		String role = null;
+	    LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
+	    if (userContextMap == null)
+	    	return role;
+	    ArrayList<LinkedHashMap<String, String>> roles =  (ArrayList<LinkedHashMap<String, String>>) userContextMap.get("roles");
+	    if (roles == null)
+	    	return role;
+	    for (LinkedHashMap<String, String> roleByProtocol : roles) {
+		    if (StringUtils.equals(currentProtocolId, roleByProtocol.get("protocolId"))) {
+		    	return roleByProtocol.get("roleName");
+		    }
+	    }
+	    return role;
+    }
+
+    private String getOCRole(String givenRole, boolean siteFlag) {
+	    ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+	    String key = null;
+	    for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
+		    Role role = (Role) it.next();
+		    switch (role.getId()) {
+		    case 2:
+			    key = "Study_Coordinator";
+			    break;
+		    case 3:
+			    key = "Study_Director";
+			    break;
+		    case 4:
+			    key = "Investigator";
+			    break;
+		    case 5:
+			    key = "Data_Entry_Person";
+			    break;
+		    case 6:
+			    key = "Monitor";
+			    break;
+		    default:
+		    	break;
+			    // logger.info("No role matched when setting role description");
+		    }
+		    String value = resterm.getString(key).trim();
+			if (StringUtils.equals(givenRole, value))
+				return value;
+	    }
+	    return null;
+    }
+
+	private ArrayList getRoles() {
+		ArrayList roles = Role.toArrayList();
+		roles.remove(Role.ADMIN);
+
+		return roles;
+	}
+
+	private  ResponseEntity<Object> getResponseSuccess(Study existingStudy) {
+
+	    ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+	    responseSuccess.setMessage("Existing Protocol");
+	    responseSuccess.setStudyOid(existingStudy.getOc_oid());
+	    responseSuccess.setUniqueProtocolID(existingStudy.getUniqueIdentifier());
+	    responseSuccess.setSchemaName(existingStudy.getSchemaName());
+	    ResponseEntity<Object>response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+	    return response;
     }
 
     private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request) {
@@ -564,6 +680,7 @@ public class StudyController {
 
 	@RequestMapping(value = "/createStudyAsync", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewSkeletonStudyAsync(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
+		ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyDTO studyDTO = new StudyDTO();
 		StudyBean studyBean = null;
@@ -575,32 +692,51 @@ public class StudyController {
 
 		String uniqueProtocolID = (String) map.get("uniqueProtocolID");
 		String name = (String) map.get("briefTitle");
+		String oid = (String) map.get("oid");
+		String uuid = (String) map.get("uuid");
+		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
+		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
 
-		UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
+		UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
 		if (ownerUserAccount == null) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type", "Owner Account");
 			errorObjects.add(errorOBject);
 
 		}
-		if (uniqueProtocolID == null) {
+		if (StringUtils.isEmpty(uniqueProtocolID)) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
 			errorObjects.add(errorOBject);
 		} else {
 			uniqueProtocolID = uniqueProtocolID.trim();
 		}
-		if (name == null) {
+		if (StringUtils.isEmpty(name)) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
 			errorObjects.add(errorOBject);
 		} else {
 			name = name.trim();
+		}
+		if (StringUtils.isEmpty(oid)) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
+			errorObjects.add(errorOBject);
+		} else {
+			oid = oid.trim();
+		}
+		if (StringUtils.isEmpty(uuid)) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
+			errorObjects.add(errorOBject);
+		} else {
+			uuid = uuid.trim();
 		}
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
 		request.setAttribute("uniqueProId", uniqueProtocolID);
 		request.setAttribute("name", name); // Brief Title
+		request.setAttribute("oid", oid);
+		request.setAttribute("uuid", uuid);
 		Validator v0 = new Validator(request);
 		v0.addValidation("name", Validator.NO_BLANKS);
+
 		HashMap vError0 = v0.validate();
 		if (!vError0.isEmpty()) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
@@ -615,39 +751,40 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 		}
 
-		Validator v6 = new Validator(request);
-		HashMap vError6 = v6.validate();
-		if (uniqueProtocolID != null)
-			validateUniqueProId(request, vError6);
-		if (!vError6.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+		Validator v2 = new Validator(request);
+		v1.addValidation("oid", Validator.NO_BLANKS);
+		HashMap vError2 = v2.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "oid");
+			errorObjects.add(errorOBject);
+		}
+
+		Validator v3 = new Validator(request);
+		v1.addValidation("uuid", Validator.NO_BLANKS);
+		HashMap vError3 = v3.validate();
+		if (!vError1.isEmpty()) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "uuid");
 			errorObjects.add(errorOBject);
 		}
 
 		studyDTO.setErrors(errorObjects);
-		if (errorObjects != null && errorObjects.size() != 0) {
-			studyDTO.setMessage(validation_failed_message);
-			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		} else {
-			String studyLink = StringUtils.replace(request.getRequestURL().toString(),
-					"createStudyAsync", "asyncProtocolStatus?uniqueId=" + uniqueProtocolID);
-			studyDTO.setUniqueProtocolID(studyLink);
-			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.SEE_OTHER);
-		}
-		final String protocolId = uniqueProtocolID;
-		final String studyName = name;
+
+		Study study = new Study();
+		study.setUniqueIdentifier(uniqueProtocolID);
+		study.setName(name);
+		study.setOc_oid(oid);
 
 		// Lambda Runnablestu
 		Runnable studyTask = () -> {
-			AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
-			AsyncStudyHelper.put(protocolId, asyncStudyHelper);
+			final AsyncStudyHelper asyncStudyHelper1 = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
+			AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper1);
 			try {
-				processStudyAsync(request, validation_passed_message, protocolId, studyName, ownerUserAccount);
+				processStudyAsync(request, validation_passed_message, study, ownerUserAccount);
 			} catch (Exception e) {
-				logger.error("Error creating the study: " +  studyName + " in async mode:");
+				logger.error("Error creating the study: " +  study.getName() + " in async mode:");
 			}
 			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
-			AsyncStudyHelper.put(protocolId, asyncStudyDone);
+			AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyDone);
 		};
 		new Thread(studyTask).start();
 
@@ -655,24 +792,24 @@ public class StudyController {
 	}
 
 	private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, String validation_passed_message,
-			String uniqueProtocolID, String name, UserAccountBean ownerUserAccount) throws Exception {
+			Study study, UserAccountBean ownerUserAccount) throws Exception {
 		ResponseEntity<Object> response;
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ProtocolInfo protocolInfo = protocolBuildService.process(name, uniqueProtocolID, ownerUserAccount);
+		ProtocolInfo protocolInfo = protocolBuildService.process(study, ownerUserAccount, null);
 		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
-		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
+		AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper);
 		liquibaseOnDemandService.createForeignTables(protocolInfo);
-		Study study = liquibaseOnDemandService.process(name, protocolInfo, ownerUserAccount);
+		Study schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
 
-		logger.debug("returning from liquibase study:" + study.getStudyId());
-		logger.debug("study oc_id:" + study.getOc_oid());
+		logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
+		logger.debug("study oc_id:" + schemaStudy.getOc_oid());
 
 		ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
 		responseSuccess.setMessage(validation_passed_message);
-		responseSuccess.setStudyOid(study.getOc_oid());
-		responseSuccess.setUniqueProtocolID(uniqueProtocolID);
+		responseSuccess.setStudyOid(schemaStudy.getOc_oid());
+		responseSuccess.setUniqueProtocolID(schemaStudy.getUniqueIdentifier());
 		responseSuccess.setSchemaName(protocolInfo.getSchema());
 		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 

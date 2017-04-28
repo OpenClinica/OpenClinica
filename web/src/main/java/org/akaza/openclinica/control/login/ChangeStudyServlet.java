@@ -157,7 +157,7 @@ public class ChangeStudyServlet extends SecureController {
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    request.setAttribute("uniqueStudyId", protocolInfo.getUniqueStudyId());
+                    request.setAttribute("uniqueStudyId", protocolInfo.getStudyBean().getIdentifier());
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
@@ -173,7 +173,7 @@ public class ChangeStudyServlet extends SecureController {
     private ProtocolInfo getProtocolInfo(int studyId, List<StudyBean>studyList) {
         for (StudyBean study: studyList) {
             if (study.getId() == studyId) {
-                ProtocolInfo protocolInfo = new ProtocolInfo(study.getIdentifier(), study.getSchemaName());
+                ProtocolInfo protocolInfo = new ProtocolInfo(study.getSchemaName(), study);
                 return protocolInfo;
             }
         }

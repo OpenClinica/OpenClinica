@@ -8,7 +8,7 @@ import org.akaza.openclinica.domain.datamap.Study;
  * Created by yogi on 2/23/17.
  */
 public interface LiquibaseOnDemandService {
-    public Study process(String name, ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception;
+    public Study process(ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception;
     public void createForeignTables(ProtocolInfo protocolInfo) throws Exception ;
 
 }

@@ -52,7 +52,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
     @Autowired
     private UserAccountDao userAccountDao;
 
-    public Study process(String name, ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception {
+    public Study process(ProtocolInfo protocolInfo, UserAccountBean ub) throws Exception {
         Study schemaStudy = null;
 
         try {
@@ -62,12 +62,12 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
                     context.getBean("liquibaseSchemaCommonTables");
             commonLiquibase.processSchemaLiquibase(schemas);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Created common tables for all public and study schemas for this protocol", "PENDING");
-            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
+            AsyncStudyHelper.put(protocolInfo.getStudy().getUniqueIdentifier(), asyncStudyHelper);
             OCMultiTenantSpringLiquibase liquibase = (OCMultiTenantSpringLiquibase) context.getBean("liquibase");
             liquibase.setSchemas(schemas);
             liquibase.dynamicAfterPropertiesSet(schemas);
             AsyncStudyHelper asyncStudyHelper2 = new AsyncStudyHelper("Created schema for this protocol", "PENDING");
-            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper2);
+            AsyncStudyHelper.put(protocolInfo.getStudy().getUniqueIdentifier(), asyncStudyHelper2);
 
         } catch (Exception e) {
             logger.error("Error while creating a liquibase schema:" + protocolInfo.getSchema());
@@ -79,17 +79,18 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             UserAccount userAccount = userAccountDao.findByUserName(ub.getName());
             userAccount.setActiveStudy(protocolInfo.getStudy());
             schemaStudy = new Study();
-            schemaStudy.setName(name);
-            schemaStudy.setUniqueIdentifier(protocolInfo.getUniqueStudyId());
-            schemaStudy.setOc_oid(protocolInfo.getOcId());
+            schemaStudy.setName(protocolInfo.getStudy().getName());
+            schemaStudy.setUniqueIdentifier(protocolInfo.getStudy().getUniqueIdentifier());
+            schemaStudy.setOc_oid(protocolInfo.getStudy().getOc_oid());
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             schemaStudy.setDateCreated(new Date());
+            schemaStudy.setEnvType(protocolInfo.getStudy().getEnvType());
             schemaServiceDao.setConnectionSchemaName(protocolInfo.getSchema());
             studyDao.getCurrentSession().clear();
             int studyId = (Integer) studyDao.save(schemaStudy);
             userAccountDao.saveOrUpdate(userAccount);
             AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol created in the new schema", "PENDING");
-            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudyHelper);
+            AsyncStudyHelper.put(protocolInfo.getStudy().getUniqueIdentifier(), asyncStudyHelper);
             logger.info("liquibase: studyId" + studyId);
         } catch (Exception e) {
             logger.error("Error while creating Study and StudyUserRole:" + protocolInfo.getSchema());
@@ -105,7 +106,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             OCSpringLiquibase liquibasePerSchema = (OCSpringLiquibase) context.getBean("liquibaseForeignTables");
             liquibasePerSchema.processSchemaLiquibase(schemas);
             AsyncStudyHelper asyncStudySchemaHelper = new AsyncStudyHelper("Created foreign tables for this protocol", "PENDING");
-            AsyncStudyHelper.put(protocolInfo.getUniqueStudyId(), asyncStudySchemaHelper);
+            AsyncStudyHelper.put(protocolInfo.getStudy().getUniqueIdentifier(), asyncStudySchemaHelper);
         }  catch (Exception e) {
             logger.error("Error while creating Study and StudyUserRole:" + protocolInfo.getSchema());
             logger.error(e.getMessage(), e);
