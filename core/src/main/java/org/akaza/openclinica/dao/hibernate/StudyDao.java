@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
@@ -29,6 +30,16 @@ public class StudyDao extends AbstractDomainDao<Study> {
         q.setParameter("uniqueId", uniqueId);
         return  (Study) q.uniqueResult();
     }
+
+    public Study findByOidEnvType(String oid, ProtocolEnvEnum envType) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = " from Study do  where do.oc_oid = :oid and do.envType = :envType";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("oid", oid);
+        q.setParameter("envType", envType);
+        return  (Study) q.uniqueResult();
+    }
+
 
     public Study findPublicStudy(String ocId) {
         String schema = CoreResources.getRequestSchema();

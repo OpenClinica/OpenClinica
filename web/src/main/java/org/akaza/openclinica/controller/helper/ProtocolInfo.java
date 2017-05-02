@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.domain.datamap.Study;
 
 /**
@@ -7,29 +8,15 @@ import org.akaza.openclinica.domain.datamap.Study;
  */
 
 public class ProtocolInfo {
-    public ProtocolInfo(String uniqueStudyId, String schema) {
-        this.uniqueStudyId = uniqueStudyId;
-        this.schema = schema;
-    }
-    public ProtocolInfo(String uniqueStudyId, String ocId, String schema) {
-        this.uniqueStudyId = uniqueStudyId;
-        this.schema = schema;
-        this.ocId = ocId;
-    }
 
-    public ProtocolInfo(String uniqueStudyId, String ocId, String schema, Study study) {
-        this.uniqueStudyId = uniqueStudyId;
+    public ProtocolInfo(String schema, Study study) {
         this.schema = schema;
-        this.ocId = ocId;
         this.study = study;
     }
 
-    public String getUniqueStudyId() {
-        return uniqueStudyId;
-    }
-
-    public void setUniqueStudyId(String uniqueStudyId) {
-        this.uniqueStudyId = uniqueStudyId;
+    public ProtocolInfo(String schema, StudyBean study) {
+        this.schema = schema;
+        this.studyBean = study;
     }
 
     public String getSchema() {
@@ -40,14 +27,6 @@ public class ProtocolInfo {
         this.schema = schema;
     }
 
-    public String getOcId() {
-        return ocId;
-    }
-
-    public void setOcId(String ocId) {
-        this.ocId = ocId;
-    }
-
     public Study getStudy() {
         return study;
     }
@@ -56,8 +35,15 @@ public class ProtocolInfo {
         this.study = study;
     }
 
-    private String uniqueStudyId;
+    public StudyBean getStudyBean() {
+        return studyBean;
+    }
+
+    public void setStudyBean(StudyBean studyBean) {
+        this.studyBean = studyBean;
+    }
+
     private String schema;
-    private String ocId;
     private Study study;
+    private StudyBean studyBean;
 }

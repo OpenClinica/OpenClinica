@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.ProtocolInfo;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,5 +11,5 @@ import org.slf4j.LoggerFactory;
  */
 public interface ProtocolBuildService {
     Logger logger = LoggerFactory.getLogger(ProtocolBuildService.class);
-    public ProtocolInfo process(String name, String uniqueId, UserAccountBean ub) throws Exception ;
+    public ProtocolInfo process(Study study, UserAccountBean ub, String role) throws Exception ;
 }

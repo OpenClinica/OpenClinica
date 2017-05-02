@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -54,61 +55,6 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
 
     @Override
     public void setTypesExpected() {
-        // 1 study_id serial NOT NULL,
-        // 2 parent_study_id numeric,
-        // 3 unique_identifier varchar(30),
-        // 4 secondary_identifier varchar(255),
-        // 5 name varchar(60),
-        // 6 summary varchar(255),
-        // 7 date_planned_start date,
-        // 8 date_planned_end date,
-        // 9 date_created date,
-        // 10 date_updated date,
-        // 11 owner_id numeric,
-        // 12 update_id numeric,
-        // 13 type_id numeric,
-        // 14 status_id numeric,
-        // 15 principal_investigator varchar(255),
-        // 16 facility_name varchar(255),
-        // 17 facility_city varchar(255),
-        // 18 facility_state varchar(20),
-        // 19 facility_zip varchar(64),
-        // 20 facility_country varchar(64),
-        // 21 facility_recruitment_status varchar(60),
-        // 22 facility_contact_name varchar(255),
-        // 23 facility_contact_degree varchar(255),
-        // 24 facility_contact_phone varchar(255),
-        // 25 facility_contact_email varchar(255),
-        // 26 protocol_type varchar(30),
-        // 27 protocol_description varchar(1000),
-        // 28 protocol_date_verification date,
-        // 29 phase varchar(30),
-        // 30 expected_total_enrollment numeric,
-        // 31 sponsor varchar(255),
-        // 32 collaborators varchar(1000),
-        // 33 medline_identifier varchar(255),
-        // 34 url varchar(255),
-        // 35 url_description varchar(255),
-        // 36 conditions varchar(500),
-        // 37 keywords varchar(255),
-        // 38 eligibility varchar(500),
-        // 39 gender varchar(30),
-        // 40 age_max varchar(3),
-        // 41 age_min varchar(3),
-        // 42 healthy_volunteer_accepted bool,
-        // 43 purpose varchar(64),
-        // 44 allocation varchar(64),
-        // 45 masking varchar(30),
-        // 46 control varchar(30),
-        // 47 "assignment" varchar(30),
-        // 48 endpoint varchar(64),
-        // 49 interventions varchar(1000),
-        // 50 duration varchar(30),
-        // 51 selection varchar(30),
-        // 52 timing varchar(30),
-        // 53 official_title varchar(50)
-        // 54 results_reference boolean
-
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);// sid
         this.setTypeExpected(2, TypeNames.INT);// parent id
@@ -140,7 +86,6 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(28, TypeNames.DATE);// pdateverif
         this.setTypeExpected(29, TypeNames.STRING);// phase
         this.setTypeExpected(30, TypeNames.INT);// expectotenroll
-        // this.setTypeExpected(31, TypeNames.BOOL);//genetic
         this.setTypeExpected(31, TypeNames.STRING);// sponsor
         this.setTypeExpected(32, TypeNames.STRING);// collab
         this.setTypeExpected(33, TypeNames.STRING);// medline
@@ -166,9 +111,10 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(53, TypeNames.STRING);// official_title
         this.setTypeExpected(54, TypeNames.BOOL);// results_reference
         this.setTypeExpected(55, TypeNames.STRING);// oc oid
-        // this.setTypeExpected(56, TypeNames.BOOL);//discrepancy_management
         this.setTypeExpected(56, TypeNames.INT);
         this.setTypeExpected(57, TypeNames.STRING);// schema name
+        this.setTypeExpected(58, TypeNames.STRING);// uuid
+        this.setTypeExpected(59, TypeNames.STRING);// env type
     }
 
     /**
@@ -501,10 +447,9 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(18), sb.getAgeMin());
         variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
         variables.put(new Integer(20), sb.getSchemaName());
-                // variables.put(new Integer(20), new Boolean(sb.isUsingDOB()));
-        // variables.put(new Integer(21), new
-        // Boolean(sb.isDiscrepancyManagement()));
-        variables.put(new Integer(21), new Integer(sb.getId()));
+        variables.put(new Integer(21), sb.getUuid());
+        variables.put(new Integer(22), sb.getEnvType());
+        variables.put(new Integer(23), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -637,6 +582,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
         eb.setSchemaName((String) hm.get("schema_name"));
+        eb.setEnvType(ProtocolEnvEnum.valueOf((String)hm.get("env_type")));
         return eb;
     }
 

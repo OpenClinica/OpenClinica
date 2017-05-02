@@ -213,6 +213,7 @@ public class MainMenuServlet extends SecureController {
             //            }
 
         } else {// a new user's first log in
+
             studies = (ArrayList) sdao.findAllByUser(ub.getName());
             request.setAttribute("studies", studies);
             session.setAttribute("userBean1", ub);

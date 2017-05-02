@@ -10,6 +10,7 @@ package org.akaza.openclinica.bean.login;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ResourceBundle;
@@ -34,7 +35,17 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     private Role role;
 
+    public String getEnvType() {
+        return envType;
+    }
+
+    public void setEnvType(String envType) {
+        this.envType = envType;
+    }
+
     private int studyId;
+
+    private String envType;
 
     // not in the database, and not guaranteed to correspond to studyId; studyId
     // is authoritative

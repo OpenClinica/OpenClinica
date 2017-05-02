@@ -1052,9 +1052,6 @@
      <changeSet author="pgawade (generated)" id="1236014212860-78">
 	<addUniqueConstraint columnNames="oc_oid" constraintName="uniq_item_group_oc_oid" tableName="item_group"/>
      </changeSet>
-     <changeSet author="pgawade (generated)" id="1236014212860-79">
-	<addUniqueConstraint columnNames="oc_oid" constraintName="uniq_study_oid" tableName="study"/>
-     </changeSet>
      <changeSet author="pgawade (generated)" id="1236014212860-80">
 	<!-- Changed the identifier name to reduce its length during porting to Oracle; oracle has a limit of 30 characters on identifier length.
 	<addUniqueConstraint columnNames="oc_oid" constraintName="uniq_study_event_definition_oid" tableName="study_event_definition"/> -->

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="yshridhare" id="2017-04-27-OC-8046-02">
+        <comment>adding a uuid column to study table</comment>
+        <addColumn tableName="study">
+            <column name="uuid" type="VARCHAR(64)"/>
+        </addColumn>
+        <addColumn tableName="study">
+            <column name="env_type" type="VARCHAR(32)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="yshridhare" id="2017-04-27-OC-8046-03">
+        <addUniqueConstraint columnNames="oc_oid, env_type"
+                             constraintName="oid_env_type_constraint"
+                             tableName="study"/>
+    </changeSet>
+    <changeSet author="yshridhare" id="2017-04-27-OC-8046-04">
+        <addUniqueConstraint columnNames="unique_identifier, env_type"
+                         constraintName="uid_env_type_constraint"
+                         tableName="study"/>
+
+    </changeSet>
+</databaseChangeLog>
