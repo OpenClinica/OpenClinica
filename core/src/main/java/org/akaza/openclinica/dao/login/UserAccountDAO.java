@@ -648,6 +648,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.STRING);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.STRING);
+        this.setTypeExpected(4, TypeNames.STRING);
         HashMap allStudyUserRoleBeans = new HashMap();
 
         HashMap variables = new HashMap();
@@ -660,10 +661,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
             String roleName = (String) hm.get("role_name");
             String studyName = (String) hm.get("name");
             Integer studyId = (Integer) hm.get("study_id");
+            String envType = (String) hm.get("env_type");
             StudyUserRoleBean sur = new StudyUserRoleBean();
             sur.setRoleName(roleName);
             sur.setStudyId(studyId.intValue());
             sur.setStudyName(studyName);
+            sur.setEnvType(envType);
             allStudyUserRoleBeans.put(studyId, sur);
         }
 

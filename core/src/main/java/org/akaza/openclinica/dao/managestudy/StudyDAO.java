@@ -22,6 +22,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -581,6 +582,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
         eb.setSchemaName((String) hm.get("schema_name"));
+        eb.setEnvType(ProtocolEnvEnum.valueOf((String)hm.get("env_type")));
         return eb;
     }
 

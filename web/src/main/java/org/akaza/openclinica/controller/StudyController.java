@@ -588,7 +588,7 @@ public class StudyController {
 		    }
 		    String value = resterm.getString(key).trim();
 			if (StringUtils.equals(givenRole, value))
-				return value;
+				return Role.getByDesc(value).getName();
 	    }
 	    return null;
     }
