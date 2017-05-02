@@ -32,7 +32,19 @@ public class AppConfig extends Auth0Config {
         http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/pages/home"));
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
-                        "/js/**", "/login", "/logout", "/pages/callback", "/pages/home", "/pages/auth/api/**", "/pages/protocolversion/**").permitAll()
+                        "/js/**", "/login", "/logout",
+                        "/pages/callback",
+                        "/pages/home",
+                        "/pages/auth/api/**",
+                        "/pages/protocolversion/**",
+                        "/rest2/openrosa/**",
+                        "/pages/odmk/**",
+                        "/pages/openrosa/**",
+                        "/pages/accounts/**",
+                        "/pages/itemdata/**",
+                        "/pages/auth/api/v1/studies/**",
+                        "/pages/odmss/**"
+                ).permitAll()
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers("/**").hasAnyAuthority("ROLE_USER")
                 .antMatchers(securedRoute).authenticated();

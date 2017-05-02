@@ -59,9 +59,6 @@ public class CallbackController extends Auth0CallbackHandler {
             userAccountDAO.update(ub);
             updateStudyUsedRoles(ub, user);
         }
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(user.getUserId());
-        ub.setName(user.getNickname());
-        userAccountDAO.update(ub);
         if (!_username.equals("") && ub.getId() != 0) {
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
         } else {
