@@ -8,6 +8,7 @@ import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.service.CallbackService;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
@@ -37,29 +38,17 @@ public class CallbackController extends Auth0CallbackHandler {
     protected HttpSession session;
     public static final String USER_BEAN_NAME = "userBean";
     private String realm = "Protected";
-    @Autowired
-    private DataSource dataSource;
-    @Autowired StudyUserRoleDao studyUserRoleDao;
+    @Autowired CallbackService callbackService;
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
     protected void callback(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
-
-        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 
         SessionUtils.setState(req, "nonce=123456");
         NonceUtils.addNonceToStorage(req);
         super.handle(req, res);
         Auth0User user = SessionUtils.getAuth0User(req);
-        String _username = user.getNickname();
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName(user.getUserId());
-        if (StringUtils.isEmpty(ub.getName())) {
-            ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
-        } else {
-            ub.setName(user.getNickname());
-            userAccountDAO.update(ub);
-            updateStudyUsedRoles(ub, user);
-        }
-        if (!_username.equals("") && ub.getId() != 0) {
+        UserAccountBean ub = callbackService.isCallbackSuccessful(req, user);
+        if (ub != null) {
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
         } else {
             unauthorized(res, "Bad credentials");
@@ -67,16 +56,6 @@ public class CallbackController extends Auth0CallbackHandler {
         }
     }
 
-    @Modifying
-    private void updateStudyUsedRoles(UserAccountBean ub, Auth0User user) {
-        Transaction transaction = studyUserRoleDao.getCurrentSession().beginTransaction();
-        Query query=studyUserRoleDao.getCurrentSession().createQuery("update StudyUserRole set id.userName=:userName where id.userName=:prevUser");
-        query.setParameter("userName", user.getNickname());
-        query.setParameter("prevUser", user.getUserId());
-        int modifications=query.executeUpdate();
-        logger.info(modifications + " studyUserRole rows have been updated from user:" + ub.getName() + " to user:" + user.getNickname());
-        transaction.commit();
-    }
     private void unauthorized(HttpServletResponse response, String message) throws IOException {
         response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
         response.sendError(401, message);
