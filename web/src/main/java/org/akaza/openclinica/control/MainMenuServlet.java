@@ -96,7 +96,7 @@ public class MainMenuServlet extends SecureController {
             request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
             request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
         }
-       
+
         logger.info("is ub a ldapuser??" + ub.isLdapUser());
 
         if (currentStudy == null) {

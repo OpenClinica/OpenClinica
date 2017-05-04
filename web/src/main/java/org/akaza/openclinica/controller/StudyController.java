@@ -20,6 +20,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
 import org.akaza.openclinica.service.ProtocolBuildService;
+import org.akaza.openclinica.service.SchemaCleanupService;
 import org.akaza.openclinica.service.SiteBuildService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -57,6 +58,8 @@ public class StudyController {
 	private LiquibaseOnDemandService liquibaseOnDemandService;
 	@Autowired
 	private SiteBuildService siteBuildService;
+	@Autowired
+    private SchemaCleanupService schemaCleanupService;
 
 	@Autowired
 	UserAccountController userAccountController;
@@ -514,9 +517,21 @@ public class StudyController {
 	    if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
 		    return getResponseSuccess(byOidEnvType);
 	    }
-	    ProtocolInfo protocolInfo = protocolBuildService.process(study, ownerUserAccount, ocRole);
-	    liquibaseOnDemandService.createForeignTables(protocolInfo);
-	    Study schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
+
+	    ProtocolInfo protocolInfo = null;
+	    Study schemaStudy = null;
+	    try {
+		    protocolInfo = protocolBuildService.process(study, ownerUserAccount, ocRole);
+		    liquibaseOnDemandService.createForeignTables(protocolInfo);
+		    schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
+	    } catch (Exception e) {
+            try {
+            	schemaCleanupService.dropSchema(protocolInfo);
+            } catch (Exception schemaEx) {
+            	throw new Exception("Schema cleanup failed.");
+            }
+		    throw e;
+	    }
 
 	    logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
