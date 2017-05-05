@@ -24,7 +24,7 @@
 			<!-- KK variable -->
 			<xsl:variable name="curatedOID">
             	<xsl:variable name="formdef" select="key('form-name', OpenClinica:ItemGroupDetails/OpenClinica:PresentInForm[1]/@FormOID)"/>
-            	<xsl:variable name="noprefixoid" select="replace(@OID, 'IG_', '')"/>
+            	<xsl:variable name="noprefixoid" select="replace(@OID, '^IG_', '')"/>
             	<xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
             	<xsl:if test="string-length(@OID) &gt; 35 ">
                 	<xsl:value-of select="
@@ -34,7 +34,7 @@
                 	<xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
             	</xsl:if>
             	<xsl:if test="contains(@OID, 'UNGROUPED')">
-                	<xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, 'F_', '_')"/>
+                	<xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, '^F_', '_')"/>
             	</xsl:if>
         	</xsl:variable>
 
@@ -74,7 +74,7 @@
 	</xsl:template>
 	<xsl:template name="get_item_oid">
 		<xsl:param name="oid"/>
-		<xsl:variable name="curatedItemOID" select="replace($oid, 'I_[A-Z]*_', '')"/>
+		<xsl:variable name="curatedItemOID" select="replace($oid, '^I_[A-Z0-9]*_', '')"/>
         <xsl:variable name="noprefixTokenizedItemOid" select="tokenize($curatedItemOID,'_')"/>
         	<xsl:if test="string-length($curatedItemOID) &gt; 31 ">
             	<xsl:value-of select="
