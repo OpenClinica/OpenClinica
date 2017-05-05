@@ -223,7 +223,7 @@ public class XformMetaDataService {
                 usedGroupOids.add(itemGroup.getOcOid());
                 itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             } else {
-                itemGroup.setName(xformGroup.getGroupDescription());
+                itemGroup.setName(xformGroup.getGroupName());
                 itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             }
             boolean isRepeating = xformGroup.isRepeating();
