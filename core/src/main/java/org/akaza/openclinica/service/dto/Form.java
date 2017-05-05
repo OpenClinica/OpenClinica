@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties
-public class Crf {
+public class Form {
 
     @JsonProperty("description")
     private String description;
@@ -26,7 +26,7 @@ public class Crf {
     @JsonProperty("protocolId")
     private String protocolId;
     @JsonProperty("versions")
-    private List<Version> versions = new ArrayList<Version>();
+    private List<FormVersion> versions = new ArrayList<FormVersion>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -136,7 +136,7 @@ public class Crf {
      *         The versions
      */
     @JsonProperty("versions")
-    public List<Version> getVersions() {
+    public List<FormVersion> getVersions() {
         return versions;
     }
 
@@ -146,7 +146,7 @@ public class Crf {
      *            The versions
      */
     @JsonProperty("versions")
-    public void setVersions(List<Version> versions) {
+    public void setVersions(List<FormVersion> versions) {
         this.versions = versions;
     }
 

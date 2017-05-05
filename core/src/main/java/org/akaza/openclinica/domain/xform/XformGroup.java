@@ -8,6 +8,7 @@ public class XformGroup {
     private String groupDescription = null;
     private ArrayList<XformItem> items = null;
     private boolean isRepeating = false;
+    private String groupOid;
 
     public XformGroup() {
         items = new ArrayList<XformItem>();
@@ -80,6 +81,14 @@ public class XformGroup {
         if (isRepeating != other.isRepeating)
             return false;
         return true;
+    }
+
+    public String getGroupOid() {
+        return groupOid;
+    }
+
+    public void setGroupOid(String groupOid) {
+        this.groupOid = groupOid;
     }
 
 }
