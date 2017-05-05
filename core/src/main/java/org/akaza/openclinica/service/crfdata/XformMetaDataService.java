@@ -219,7 +219,7 @@ public class XformMetaDataService {
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
-                itemGroup.setOcOid(itemGroupDao.getValidOid(new ItemGroup(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
+                itemGroup.setOcOid(xformGroup.getGroupOid());
                 usedGroupOids.add(itemGroup.getOcOid());
                 itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             } else {
@@ -350,7 +350,7 @@ public class XformMetaDataService {
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
-            item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
+            item.setOcOid(xformItem.getItemOid());
             usedItemOids.add(item.getOcOid());
             item = itemDao.saveOrUpdate(item);
         }
