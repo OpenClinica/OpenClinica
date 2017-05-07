@@ -154,15 +154,12 @@ public class QueryServiceImpl implements QueryService {
 
         String assignedTo = "";
         if (queryBean.getComment().startsWith("Automatic query for:")) {
-            assignedTo = "(" + helperBean.getContainer().getUser().getUserName() + ")";
+            assignedTo = helperBean.getContainer().getUser().getUserName();
         } else {
             assignedTo = queryBean.getAssigned_to();
         }
         if (!StringUtils.isEmpty(assignedTo)) {
-            int endIndex = assignedTo.indexOf(")");
-            int begIndex = assignedTo.indexOf("(");
-            String userName = assignedTo.substring(begIndex + 1, endIndex);
-            UserAccount userAccount = userAccountDao.findByUserName(userName);
+            UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }

@@ -104,10 +104,11 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
                     List<String> instanceItemsPath = new ArrayList<>();
                     instanceItemsPath = xformParserHelper.instanceItemPaths(instanceNode, instanceItemsPath, "", null);
-                    // int idx = StringUtils.ordinalIndexOf(instanceItemsPath.get(0), "/", 2);
                     List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(container.getCrfVersion().getCrfVersionId());
+                    int idx = instanceItemsPath.get(0).lastIndexOf("/");
+                    String rPath = instanceItemsPath.get(0).substring(idx + 1);
                     for (ItemGroup ig : itemGroups) {
-                        if (ig.getLayoutGroupPath() != null && ig.getLayoutGroupPath().equals(instanceItemsPath.get(0))) {
+                        if (ig.getLayoutGroupPath() != null && ig.getLayoutGroupPath().equals(rPath)) {
                             itemGroup = ig;
                             break;
                         }
