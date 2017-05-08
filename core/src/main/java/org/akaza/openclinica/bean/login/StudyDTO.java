@@ -21,7 +21,7 @@ public class StudyDTO {
     private String message;
     private ArrayList<UserRole> assignUserRoles;
 	private String studyCreationLink;
-	
+
 	public StudyDTO() {
 		super();
 	}

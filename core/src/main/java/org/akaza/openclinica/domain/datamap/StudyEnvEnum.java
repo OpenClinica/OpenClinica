@@ -8,10 +8,10 @@ package org.akaza.openclinica.domain.datamap;
  * Enum representing the types of environment to which the protocol can be published
  */
 
-public enum ProtocolEnvEnum {
+public enum StudyEnvEnum {
     PROD("prod"),TEST("test");
     private String env;
-    ProtocolEnvEnum(String env) {
+    StudyEnvEnum(String env) {
         this.env = env;
     }
     @Override

@@ -10,7 +10,6 @@ package org.akaza.openclinica.bean.login;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ResourceBundle;

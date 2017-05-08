@@ -219,11 +219,8 @@ public class UserAccountController {
 		createdUserAccountBean.setPasswd(passwordHash);
 		createdUserAccountBean.setRunWebservices(authorizeSoap);
 
-		String apiKey = null;
-		do {
-			apiKey = getRandom32ChApiKey();
-		} while (isApiKeyExist(apiKey));
-		createdUserAccountBean.setApiKey(apiKey);
+
+		createdUserAccountBean.setApiKey(username);
 
 		createdUserAccountBean.addUserType(userType);
 

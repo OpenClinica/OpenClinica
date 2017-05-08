@@ -33,11 +33,11 @@ public class CallbackServiceImpl implements CallbackService {
     public UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         String _username = user.getNickname();
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName(user.getUserId());
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(user.getUserId());
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
         } else {
-            ub.setName(user.getNickname());
+            ub.setName(_username);
             userAccountDAO.update(ub);
             updateStudyUsedRoles(ub, user);
         }

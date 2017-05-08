@@ -15,8 +15,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.type.*;
-import org.hibernate.type.EnumType;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -98,7 +96,7 @@ public class Study   extends DataMapDomainObject {
 	private Integer version;
 	private String schemaName;
 	private String uuid;
-	private ProtocolEnvEnum envType;
+	private StudyEnvEnum envType;
 
 	public Study() {
 	}
@@ -809,11 +807,11 @@ public class Study   extends DataMapDomainObject {
 
 	@Column(name = "env_type")
 	@Enumerated(STRING)
-	public ProtocolEnvEnum getEnvType() {
+	public StudyEnvEnum getEnvType() {
 		return envType;
 	}
 
-	public void setEnvType(ProtocolEnvEnum envType) {
+	public void setEnvType(StudyEnvEnum envType) {
 		this.envType = envType;
 	}
 

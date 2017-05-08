@@ -1,12 +1,10 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
@@ -18,7 +16,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return Study.class;
     }
 
-    public boolean doesProtocolExist(String uniqueId, String schemaName) {
+    public boolean doesStudyExist(String uniqueId, String schemaName) {
         Query q = getCurrentSession().createNativeQuery("select count(*) from " + schemaName + ".study where unique_identifier='" + uniqueId + "'");
         BigInteger count = (BigInteger) q.getSingleResult();
         return (count.intValue() == 1) ? true:false;
@@ -31,7 +29,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return  (Study) q.uniqueResult();
     }
 
-    public Study findByOidEnvType(String oid, ProtocolEnvEnum envType) {
+    public Study findByOidEnvType(String oid, StudyEnvEnum envType) {
         getSessionFactory().getStatistics().logSummary();
         String query = " from Study do  where do.oc_oid = :oid and do.envType = :envType";
         Query q = getCurrentSession().createQuery(query);

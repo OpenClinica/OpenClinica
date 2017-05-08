@@ -21,7 +21,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
-import org.akaza.openclinica.controller.helper.ProtocolInfo;
+import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -149,15 +149,15 @@ public class ChangeStudyServlet extends SecureController {
                 if (studyWithRole.getStudyId() == studyId) {
                     request.setAttribute("studyId", new Integer(studyId));
                     session.setAttribute("studyWithRole", studyWithRole);
-                    ProtocolInfo protocolInfo = getProtocolInfo(studyId, studyList);
-                    if (protocolInfo == null)
+                    StudyInfoObject studyInfoObject = getProtocolInfo(studyId, studyList);
+                    if (studyInfoObject == null)
                         break;
-                    if (StringUtils.isNotEmpty(protocolInfo.getSchema())) {
-                        request.setAttribute("changeStudySchema", protocolInfo.getSchema());
+                    if (StringUtils.isNotEmpty(studyInfoObject.getSchema())) {
+                        request.setAttribute("changeStudySchema", studyInfoObject.getSchema());
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    request.setAttribute("uniqueStudyId", protocolInfo.getStudyBean().getIdentifier());
+                    request.setAttribute("uniqueStudyId", studyInfoObject.getStudyBean().getIdentifier());
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
@@ -170,11 +170,11 @@ public class ChangeStudyServlet extends SecureController {
         }
     }
 
-    private ProtocolInfo getProtocolInfo(int studyId, List<StudyBean>studyList) {
+    private StudyInfoObject getProtocolInfo(int studyId, List<StudyBean>studyList) {
         for (StudyBean study: studyList) {
             if (study.getId() == studyId) {
-                ProtocolInfo protocolInfo = new ProtocolInfo(study.getSchemaName(), study);
-                return protocolInfo;
+                StudyInfoObject studyInfoObject = new StudyInfoObject(study.getSchemaName(), study);
+                return studyInfoObject;
             }
         }
         return null;

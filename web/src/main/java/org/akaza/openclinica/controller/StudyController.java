@@ -9,20 +9,19 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
-import org.akaza.openclinica.controller.helper.ProtocolInfo;
+import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.domain.datamap.ProtocolEnvEnum;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
-import org.akaza.openclinica.service.ProtocolBuildService;
+import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.SchemaCleanupService;
 import org.akaza.openclinica.service.SiteBuildService;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +31,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.text.ParseException;
@@ -53,7 +50,7 @@ public class StudyController {
 	@Autowired
 	private StudyDao studyDao;
 	@Autowired
-	private ProtocolBuildService protocolBuildService;
+	private StudyBuildService studyBuildService;
 	@Autowired
 	private LiquibaseOnDemandService liquibaseOnDemandService;
 	@Autowired
@@ -76,12 +73,12 @@ public class StudyController {
 	 * @apiName createNewStudy
 	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 3.8.0
-	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} uniqueProtococlId Study unique study ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
 	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
 	 * @apiParam {String} sponsor Sponsor name.
-	 * @apiParam {String} protocolType 'Interventional' or ' Observational'
+	 * @apiParam {String} studyType 'Interventional' or ' Observational'
 	 * @apiParam {String} status 'Available' or 'Design'
 	 * @apiParam {String} briefSummary Study Summary
 	 * @apiParam {Date} startDate Start date
@@ -93,11 +90,11 @@ public class StudyController {
 	 *                 You need to provide your Api-key to be connected.
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
-	 *                  "briefTitle": "Study Protocol ID Name",
+	 *                  "briefTitle": "Study Study ID Name",
 	 *                  "principalInvestigator": "Principal Investigator Name",
 	 *                  "expectedTotalEnrollment": "10",
 	 *                  "sponsor": "Sponsor Name",
-	 *                  "protocolType": "Interventional",
+	 *                  "studyType": "Interventional",
 	 *                  "status": "available",
 	 *                  "assignUserRoles": [
 	 *                  { "username": "usera", "role": "Data Manager" },
@@ -106,7 +103,7 @@ public class StudyController {
 	 *                  { "username": "userd", "role": "Monitor" },
 	 *                  { "username": "usere", "role": "Data Entry Person" }
 	 *                  ],
-	 *                  "uniqueProtocolID": "Study Protocol ID",
+	 *                  "uniqueStudyID": "Study Study ID",
 	 *                  "briefSummary": "Study Summary",
 	 *                  "startDate": "2011-11-11"
 	 *                  }
@@ -118,9 +115,9 @@ public class StudyController {
 	 *                  "principalInvestigator": "Principal Investigator Name",
 	 *                  "expectedTotalEnrollment": "10",
 	 *                  "sponsor": "Sponsor Name",
-	 *                  "protocolType": "Interventional",
+	 *                  "studyType": "Interventional",
 	 *                  "errors": [
-	 *                  {"field": "UniqueProtocolId","resource": "Study Object","code": "Unique Protocol Id exist in the System"}
+	 *                  {"field": "UniqueStudyId","resource": "Study Object","code": "Unique Study Id exist in the System"}
 	 *                  ],
 	 *                  "startDate": "2011-11-11",
 	 *                  "assignUserRoles": [
@@ -128,8 +125,8 @@ public class StudyController {
 	 *                  {"username": "userb","role": "Study Director"},
 	 *                  {"username": "userc","role": "Data Specialist"}
 	 *                  ],
-	 *                  "uniqueProtocolID": "Study Protocol ID",
-	 *                  "briefTitle": "Study Protocol ID",
+	 *                  "uniqueStudyID": "Study Study ID",
+	 *                  "briefTitle": "Study Study ID",
 	 *                  "briefSummary": "Study Summary",
 	 *                  "studyOid": null
 	 *                  }
@@ -137,7 +134,7 @@ public class StudyController {
 	 *                    HTTP/1.1 200 OK
 	 *                    {
 	 *                    "message": "SUCCESS",
-	 *                    "uniqueProtocolID": "Study Protocol ID",
+	 *                    "uniqueStudyID": "Study Study ID",
 	 *                    "studyOid": "S_STUDYPRO",
 	 *                    }
 	 */
@@ -152,12 +149,12 @@ public class StudyController {
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
 
-		String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+		String uniqueStudyID = (String) map.get("uniqueStudyID");
 		String name = (String) map.get("briefTitle");
 		String principalInvestigator = (String) map.get("principalInvestigator");
 		String briefSummary = (String) map.get("briefSummary");
 		String sponsor = (String) map.get("sponsor");
-		String protocolType = (String) map.get("protocolType");
+		String studyType = (String) map.get("studyType");
 		String startDate = (String) map.get("startDate");
 		String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
 		String status = (String) map.get("status");
@@ -187,13 +184,13 @@ public class StudyController {
 			}
 		}
 
-		StudyDTO studyDTO = buildStudyDTO(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, expectedTotalEnrollment, protocolType, status, startDate, userList);
+		StudyDTO studyDTO = buildStudyDTO(uniqueStudyID, name, briefSummary, principalInvestigator, sponsor, expectedTotalEnrollment, studyType, status, startDate, userList);
 
-		if (uniqueProtocolID == null) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+		if (uniqueStudyID == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
 			errorObjects.add(errorOBject);
 		} else {
-			uniqueProtocolID = uniqueProtocolID.trim();
+			uniqueStudyID = uniqueStudyID.trim();
 		}
 		if (name == null) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
@@ -219,11 +216,11 @@ public class StudyController {
 		} else {
 			sponsor = sponsor.trim();
 		}
-		if (protocolType == null) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ProtocolType");
+		if (studyType == null) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "StudyType");
 			errorObjects.add(errorOBject);
 		} else {
-			protocolType = protocolType.trim();
+			studyType = studyType.trim();
 		}
 		if (startDate == null) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "StartDate");
@@ -254,7 +251,7 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 		}
 
-		request.setAttribute("uniqueProId", uniqueProtocolID);
+		request.setAttribute("uniqueProId", uniqueStudyID);
 		request.setAttribute("name", name); // Brief Title
 		request.setAttribute("prinInvestigator", principalInvestigator);
 		request.setAttribute("description", briefSummary);
@@ -301,7 +298,7 @@ public class StudyController {
 		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
 		HashMap vError1 = v1.validate();
 		if (!vError1.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 		Validator v2 = new Validator(request);
@@ -335,10 +332,10 @@ public class StudyController {
 
 		Validator v6 = new Validator(request);
 		HashMap vError6 = v6.validate();
-		if (uniqueProtocolID != null)
+		if (uniqueStudyID != null)
 			validateUniqueProId(request, vError6);
 		if (!vError6.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Study Object", "Unique Study Id exist in the System", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 
@@ -350,8 +347,8 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 		}
 
-		if (protocolType != null && !verifyProtocolTypeExist(protocolType)) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Protocol Type is not Valid", "ProtocolType");
+		if (studyType != null && !verifyStudyTypeExist(studyType)) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Study Type is not Valid", "StudyType");
 			errorObjects.add(errorOBject);
 		}
 
@@ -361,7 +358,7 @@ public class StudyController {
 			studyDTO.setMessage(validation_failed_message);
 			response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 		} else {
-			studyBean = buildStudyBean(uniqueProtocolID, name, briefSummary, principalInvestigator, sponsor, Integer.valueOf(expectedTotalEnrollment), protocolType, status, formattedDate,
+			studyBean = buildStudyBean(uniqueStudyID, name, briefSummary, principalInvestigator, sponsor, Integer.valueOf(expectedTotalEnrollment), studyType, status, formattedDate,
 					ownerUserAccount);
 
 			StudyBean sBean = createStudy(studyBean, ownerUserAccount);
@@ -390,7 +387,7 @@ public class StudyController {
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
-            responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
+            responseSuccess.setUniqueStudyID(studyDTO.getUniqueProtocolID());
 
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		}
@@ -412,14 +409,14 @@ public class StudyController {
         String validation_failed_message = "VALIDATION FAILED";
         String validation_passed_message = "SUCCESS";
 
-        String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+        String uniqueStudyID = (String) map.get("uniqueStudyID");
         String name = (String) map.get("briefTitle");
 		String oid = (String) map.get("oid");
 		String uuid = (String) map.get("uuid");
 		String envType = (String) map.get("envType");
 
-	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
-	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
+	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
+	    AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
 
 	    UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
 	    if (ownerUserAccount == null) {
@@ -427,11 +424,11 @@ public class StudyController {
 		    errorObjects.add(errorOBject);
 
 	    }
-	    if (StringUtils.isEmpty(uniqueProtocolID)) {
-		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+	    if (StringUtils.isEmpty(uniqueStudyID)) {
+		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
 		    errorObjects.add(errorOBject);
 	    } else {
-		    uniqueProtocolID = uniqueProtocolID.trim();
+		    uniqueStudyID = uniqueStudyID.trim();
 	    }
 	    if (StringUtils.isEmpty(name)) {
 		    ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
@@ -454,11 +451,11 @@ public class StudyController {
 	    Locale locale = new Locale("en_US");
 	    request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 	    ResourceBundleProvider.updateLocale(locale);
-	    request.setAttribute("uniqueProId", uniqueProtocolID);
+	    request.setAttribute("uniqueProId", uniqueStudyID);
 	    request.setAttribute("name", name); // Brief Title
 	    request.setAttribute("oid", oid);
 	    request.setAttribute("uuid", uuid);
-	    String role = authorizedToCreateProtocol(request, uuid);
+	    String role = authorizedToCreateStudy(request, uuid);
 		request.setAttribute("role", role);
 	    Validator v0 = new Validator(request);
 	    v0.addValidation("name", Validator.NO_BLANKS);
@@ -473,7 +470,7 @@ public class StudyController {
 	    v1.addValidation("uniqueProId", Validator.NO_BLANKS);
 	    HashMap vError1 = v1.validate();
 	    if (!vError1.isEmpty()) {
-		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+		    ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
 		    errorObjects.add(errorOBject);
 	    }
 
@@ -509,24 +506,24 @@ public class StudyController {
 	    studyDTO.setErrors(errorObjects);
 		String ocRole = getOCRole(role, false);
 	    Study study = new Study();
-	    study.setUniqueIdentifier(uniqueProtocolID);
+	    study.setUniqueIdentifier(uniqueStudyID);
 	    study.setName(name);
 	    study.setOc_oid(oid);
-	    study.setEnvType(ProtocolEnvEnum.valueOf(envType));
-	    Study byOidEnvType = studyDao.findByOidEnvType(oid, ProtocolEnvEnum.valueOf(envType));
+	    study.setEnvType(StudyEnvEnum.valueOf(envType));
+	    Study byOidEnvType = studyDao.findByOidEnvType(oid, StudyEnvEnum.valueOf(envType));
 	    if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
 		    return getResponseSuccess(byOidEnvType);
 	    }
 
-	    ProtocolInfo protocolInfo = null;
+	    StudyInfoObject studyInfoObject = null;
 	    Study schemaStudy = null;
 	    try {
-		    protocolInfo = protocolBuildService.process(study, ownerUserAccount, ocRole);
-		    liquibaseOnDemandService.createForeignTables(protocolInfo);
-		    schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
+		    studyInfoObject = studyBuildService.process(study, ownerUserAccount, ocRole);
+		    liquibaseOnDemandService.createForeignTables(studyInfoObject);
+		    schemaStudy = liquibaseOnDemandService.process(studyInfoObject, ownerUserAccount);
 	    } catch (Exception e) {
             try {
-            	schemaCleanupService.dropSchema(protocolInfo);
+            	schemaCleanupService.dropSchema(studyInfoObject);
             } catch (Exception schemaEx) {
             	throw new Exception("Schema cleanup failed.");
             }
@@ -548,19 +545,19 @@ public class StudyController {
             ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
             responseSuccess.setMessage(studyDTO.getMessage());
             responseSuccess.setStudyOid(studyDTO.getStudyOid());
-            responseSuccess.setUniqueProtocolID(studyDTO.getUniqueProtocolID());
-			responseSuccess.setSchemaName(protocolInfo.getSchema());
+            responseSuccess.setUniqueStudyID(studyDTO.getUniqueProtocolID());
+			responseSuccess.setSchemaName(studyInfoObject.getSchema());
             response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
         }
 	    request.getSession().setAttribute("userContextMap", null);
-	    AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
-	    AsyncStudyHelper.put(uniqueProtocolID, asyncStudyDone);
+	    AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
+	    AsyncStudyHelper.put(uniqueStudyID, asyncStudyDone);
 
 	    return response;
 
     }
 
-    private String authorizedToCreateProtocol(HttpServletRequest request, String currentProtocolId) {
+    private String authorizedToCreateStudy(HttpServletRequest request, String currentStudyId) {
 		String role = null;
 	    LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
 	    if (userContextMap == null)
@@ -568,9 +565,9 @@ public class StudyController {
 	    ArrayList<LinkedHashMap<String, String>> roles =  (ArrayList<LinkedHashMap<String, String>>) userContextMap.get("roles");
 	    if (roles == null)
 	    	return role;
-	    for (LinkedHashMap<String, String> roleByProtocol : roles) {
-		    if (StringUtils.equals(currentProtocolId, roleByProtocol.get("protocolId"))) {
-		    	return roleByProtocol.get("roleName");
+	    for (LinkedHashMap<String, String> roleByStudy : roles) {
+		    if (StringUtils.equals(currentStudyId, roleByStudy.get("protocolId"))) {
+		    	return roleByStudy.get("roleName");
 		    }
 	    }
 	    return role;
@@ -618,9 +615,9 @@ public class StudyController {
 	private  ResponseEntity<Object> getResponseSuccess(Study existingStudy) {
 
 	    ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
-	    responseSuccess.setMessage("Existing Protocol");
+	    responseSuccess.setMessage("Existing Study");
 	    responseSuccess.setStudyOid(existingStudy.getOc_oid());
-	    responseSuccess.setUniqueProtocolID(existingStudy.getUniqueIdentifier());
+	    responseSuccess.setUniqueStudyID(existingStudy.getUniqueIdentifier());
 	    responseSuccess.setSchemaName(existingStudy.getSchemaName());
 	    ResponseEntity<Object>response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 	    return response;
@@ -664,8 +661,8 @@ public class StudyController {
 
 		return map;
 	}
-	@RequestMapping(value = "/asyncProtocolStatus", method = RequestMethod.GET)
-	public ResponseEntity<Object> getAyncProtocolStatus(HttpServletRequest request, @RequestParam("uniqueId") String uniqueId) throws Exception {
+	@RequestMapping(value = "/asyncStudyStatus", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAyncStudyStatus(HttpServletRequest request, @RequestParam("uniqueId") String uniqueId) throws Exception {
 		ResponseEntity<Object> response;
 
 		AsyncStudyHelper asyncStudyHelper = AsyncStudyHelper.get(uniqueId);
@@ -676,15 +673,15 @@ public class StudyController {
 			Study s = studyDao.findByColumnName(uniqueId, "uniqueIdentifier");
 			HttpStatus httpStatus;
 			if (s != null && StringUtils.isNotEmpty(s.getSchemaName())) {
-				if (studyDao.doesProtocolExist(uniqueId, s.getSchemaName())) {
-					asyncStudyHelper = new AsyncStudyHelper("Protocol Found", "ACTIVE");
+				if (studyDao.doesStudyExist(uniqueId, s.getSchemaName())) {
+					asyncStudyHelper = new AsyncStudyHelper("Study Found", "ACTIVE");
 					httpStatus = HttpStatus.OK;
 				} else {
-					asyncStudyHelper = new AsyncStudyHelper("Protocol Not Found", "ERROR");
+					asyncStudyHelper = new AsyncStudyHelper("Study Not Found", "ERROR");
 					httpStatus = HttpStatus.NOT_FOUND;
 				}
 			} else {
-				asyncStudyHelper = new AsyncStudyHelper("Protocol Not Found", "ERROR");
+				asyncStudyHelper = new AsyncStudyHelper("Study Not Found", "ERROR");
 				httpStatus = HttpStatus.NOT_FOUND;
 			}
 			response = new ResponseEntity<Object>(asyncStudyHelper, httpStatus);
@@ -705,12 +702,12 @@ public class StudyController {
 		String validation_failed_message = "VALIDATION FAILED";
 		String validation_passed_message = "SUCCESS";
 
-		String uniqueProtocolID = (String) map.get("uniqueProtocolID");
+		String uniqueStudyID = (String) map.get("uniqueStudyID");
 		String name = (String) map.get("briefTitle");
 		String oid = (String) map.get("oid");
 		String uuid = (String) map.get("uuid");
-		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
-		AsyncStudyHelper.put(uniqueProtocolID, asyncStudyHelper);
+		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
+		AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
 
 		UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
 		if (ownerUserAccount == null) {
@@ -718,11 +715,11 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 
 		}
-		if (StringUtils.isEmpty(uniqueProtocolID)) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueProtocolID");
+		if (StringUtils.isEmpty(uniqueStudyID)) {
+			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
 			errorObjects.add(errorOBject);
 		} else {
-			uniqueProtocolID = uniqueProtocolID.trim();
+			uniqueStudyID = uniqueStudyID.trim();
 		}
 		if (StringUtils.isEmpty(name)) {
 			ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
@@ -745,7 +742,7 @@ public class StudyController {
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
-		request.setAttribute("uniqueProId", uniqueProtocolID);
+		request.setAttribute("uniqueProId", uniqueStudyID);
 		request.setAttribute("name", name); // Brief Title
 		request.setAttribute("oid", oid);
 		request.setAttribute("uuid", uuid);
@@ -762,7 +759,7 @@ public class StudyController {
 		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
 		HashMap vError1 = v1.validate();
 		if (!vError1.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 
@@ -785,20 +782,20 @@ public class StudyController {
 		studyDTO.setErrors(errorObjects);
 
 		Study study = new Study();
-		study.setUniqueIdentifier(uniqueProtocolID);
+		study.setUniqueIdentifier(uniqueStudyID);
 		study.setName(name);
 		study.setOc_oid(oid);
 
 		// Lambda Runnablestu
 		Runnable studyTask = () -> {
-			final AsyncStudyHelper asyncStudyHelper1 = new AsyncStudyHelper("Protocol Creation Started", "PENDING", LocalTime.now());
+			final AsyncStudyHelper asyncStudyHelper1 = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
 			AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper1);
 			try {
 				processStudyAsync(request, validation_passed_message, study, ownerUserAccount);
 			} catch (Exception e) {
 				logger.error("Error creating the study: " +  study.getName() + " in async mode:");
 			}
-			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating protocol", "ACTIVE");
+			AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
 			AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyDone);
 		};
 		new Thread(studyTask).start();
@@ -812,11 +809,11 @@ public class StudyController {
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
-		ProtocolInfo protocolInfo = protocolBuildService.process(study, ownerUserAccount, null);
-		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Protocol added to Public schema", "PENDING");
+		StudyInfoObject studyInfoObject = studyBuildService.process(study, ownerUserAccount, null);
+		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study added to Public schema", "PENDING");
 		AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper);
-		liquibaseOnDemandService.createForeignTables(protocolInfo);
-		Study schemaStudy = liquibaseOnDemandService.process(protocolInfo, ownerUserAccount);
+		liquibaseOnDemandService.createForeignTables(studyInfoObject);
+		Study schemaStudy = liquibaseOnDemandService.process(studyInfoObject, ownerUserAccount);
 
 		logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 		logger.debug("study oc_id:" + schemaStudy.getOc_oid());
@@ -824,32 +821,32 @@ public class StudyController {
 		ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
 		responseSuccess.setMessage(validation_passed_message);
 		responseSuccess.setStudyOid(schemaStudy.getOc_oid());
-		responseSuccess.setUniqueProtocolID(schemaStudy.getUniqueIdentifier());
-		responseSuccess.setSchemaName(protocolInfo.getSchema());
+		responseSuccess.setUniqueStudyID(schemaStudy.getUniqueIdentifier());
+		responseSuccess.setSchemaName(studyInfoObject.getSchema());
 		response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
 		return response;
 	}
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/sites Create a site
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueStudyId/sites Create a site
 	 * @apiName createNewSite
 	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 3.8.0
-	 * @apiParam {String} uniqueProtococlId Study unique protocol ID.
+	 * @apiParam {String} uniqueProtococlId Study unique study ID.
 	 * @apiParam {String} briefTitle Brief Title .
 	 * @apiParam {String} principalInvestigator Principal Investigator Name.
 	 * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
-	 * @apiParam {String} secondaryProtocolID Site Secondary Protocol Id  (Optional)
+	 * @apiParam {String} secondaryStudyID Site Secondary Study Id  (Optional)
 	 * @apiParam {Date} startDate Start date
-	 * @apiParam {Date} protocolDateVerification protocol Verification date
+	 * @apiParam {Date} studyDateVerification study Verification date
 	 * @apiParam {Array} assignUserRoles Assign Users to Roles for this Study.
 	 * @apiGroup Site
 	 * @apiHeader {String} api_key Users unique access-key.
 	 * @apiDescription Create a Site
 	 * @apiParamExample {json} Request-Example:
 	 *                  {
-	 *                  "briefTitle": "Site Protocol ID Name",
+	 *                  "briefTitle": "Site Study ID Name",
 	 *                  "principalInvestigator": "Principal Investigator Name",
 	 *                  "expectedTotalEnrollment": "10",
 	 *                  "assignUserRoles": [
@@ -858,32 +855,32 @@ public class StudyController {
 	 *                  { "username" : "dm_normal", "role" : "Monitor"},
 	 *                  { "username" : "sd_root", "role" : "Data Entry Person"}
 	 *                  ],
-	 *                  "uniqueProtocolID": "Site Protocol ID",
+	 *                  "uniqueStudyID": "Site Study ID",
 	 *                  "startDate": "2011-11-11",
-	 *                  "secondaryProtocolID" : "Secondary Protocol ID 1" ,
-	 *                  "protocolDateVerification" : "2011-10-14"
+	 *                  "secondaryStudyID" : "Secondary Study ID 1" ,
+	 *                  "studyDateVerification" : "2011-10-14"
 	 *                  }
 	 *
 	 * @apiErrorExample {json} Error-Response:
 	 *                  HTTP/1.1 400 Bad Request
 	 *                  {
 	 *                  "message": "VALIDATION FAILED",
-	 *                  "protocolDateVerification": "2011-10-14",
+	 *                  "studyDateVerification": "2011-10-14",
 	 *                  "principalInvestigator": "Principal Investigator Name",
 	 *                  "expectedTotalEnrollment": "10",
 	 *                  "errors": [
-	 *                  { "field": "UniqueProtocolId", "resource": "Site Object","code": "Unique Protocol Id exist in the System" }
+	 *                  { "field": "UniqueStudyId", "resource": "Site Object","code": "Unique Study Id exist in the System" }
 	 *                  ],
-	 *                  "secondaryProId": "Secondary Protocol ID 1",
+	 *                  "secondaryProId": "Secondary Study ID 1",
 	 *                  "siteOid": null,
-	 *                  "briefTitle": "Site Protocol ID Name",
+	 *                  "briefTitle": "Site Study ID Name",
 	 *                  "assignUserRoles": [
 	 *                  { "role": "Investigator", "username": "userc"},
 	 *                  { "role": "Clinical Research Coordinator", "username": "userb"},
 	 *                  { "role": "Monitor","username": "dm_normal"},
 	 *                  { "role": "Data Entry Person","username": "sd_root"}
 	 *                  ],
-	 *                  "uniqueSiteProtocolID": "Site Protocol ID",
+	 *                  "uniqueSiteStudyID": "Site Study ID",
 	 *                  "startDate": "2011-11-11"
 	 *                  }
 	 * @apiSuccessExample {json} Success-Response:
@@ -891,13 +888,13 @@ public class StudyController {
 	 *                    {
 	 *                    "message": "SUCCESS",
 	 *                    "siteOid": "S_SITEPROT",
-	 *                    "uniqueSiteProtocolID": "Site Protocol IDqq"
+	 *                    "uniqueSiteStudyID": "Site Study IDqq"
 	 *                    }
 	 */
 
-	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		logger.debug("Creating site(s) for protocol:" + uniqueProtocolID);
+	@RequestMapping(value = "/{uniqueStudyID}/sites", method = RequestMethod.POST)
+	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueStudyID") String uniqueStudyID) throws Exception {
+		logger.debug("Creating site(s) for study:" + uniqueStudyID);
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyBean siteBean = null;
 		ResponseEntity<Object> response = null;
@@ -909,11 +906,11 @@ public class StudyController {
 		ResourceBundleProvider.updateLocale(locale);
 		String name = (String) map.get("briefTitle");
 		String principalInvestigator = (String) map.get("principalInvestigator");
-		String uniqueSiteProtocolID = (String) map.get("uniqueProtocolID");
+		String uniqueSiteStudyID = (String) map.get("uniqueStudyID");
 		String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
 		String startDate = (String) map.get("startDate");
-		String protocolDateVerification = (String) map.get("protocolDateVerification");
-		String secondaryProId = (String) map.get("secondaryProtocolID");
+		String studyDateVerification = (String) map.get("studyDateVerification");
+		String secondaryProId = (String) map.get("secondaryStudyID");
 		ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
 		ArrayList<UserRole> userList = new ArrayList<>();
@@ -939,13 +936,13 @@ public class StudyController {
 			}
 		}
 
-		SiteDTO siteDTO = buildSiteDTO(uniqueSiteProtocolID, name, principalInvestigator, expectedTotalEnrollment, startDate, protocolDateVerification, secondaryProId, userList);
+		SiteDTO siteDTO = buildSiteDTO(uniqueSiteStudyID, name, principalInvestigator, expectedTotalEnrollment, startDate, studyDateVerification, secondaryProId, userList);
 
-		if (uniqueSiteProtocolID == null) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "UniqueProtocolID");
+		if (uniqueSiteStudyID == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "UniqueStudyID");
 			errorObjects.add(errorOBject);
 		} else {
-			uniqueSiteProtocolID = uniqueSiteProtocolID.trim();
+			uniqueSiteStudyID = uniqueSiteStudyID.trim();
 		}
 		if (name == null) {
 			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "BriefTitle");
@@ -965,11 +962,11 @@ public class StudyController {
 		} else {
 			startDate = startDate.trim();
 		}
-		if (protocolDateVerification == null) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ProtocolDateVerification");
+		if (studyDateVerification == null) {
+			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "StudyDateVerification");
 			errorObjects.add(errorOBject);
 		} else {
-			protocolDateVerification = protocolDateVerification.trim();
+			studyDateVerification = studyDateVerification.trim();
 		}
 		if (expectedTotalEnrollment == null) {
 			ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
@@ -986,18 +983,18 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 		}
 
-		request.setAttribute("uniqueProId", uniqueSiteProtocolID);
+		request.setAttribute("uniqueProId", uniqueSiteStudyID);
 		request.setAttribute("name", name);
 		request.setAttribute("prinInvestigator", principalInvestigator);
 		request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
 		request.setAttribute("startDate", startDate);
-		request.setAttribute("protocolDateVerification", protocolDateVerification);
+		request.setAttribute("studyDateVerification", studyDateVerification);
 		request.setAttribute("secondProId", secondaryProId);
 
 		String format = "yyyy-MM-dd";
 		SimpleDateFormat formatter = null;
 		Date formattedStartDate = null;
-		Date formattedProtocolDate = null;
+		Date formattedStudyDate = null;
 
 		if (startDate != "" && startDate != null) {
 			try {
@@ -1015,28 +1012,28 @@ public class StudyController {
 			}
 		}
 
-		if (protocolDateVerification != "" && protocolDateVerification != null) {
+		if (studyDateVerification != "" && studyDateVerification != null) {
 			try {
 				formatter = new SimpleDateFormat(format);
-				formattedProtocolDate = formatter.parse(protocolDateVerification);
+				formattedStudyDate = formatter.parse(studyDateVerification);
 			} catch (ParseException e) {
-				ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
+				ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format", "StudyDateVerification");
 				errorObjects.add(errorOBject);
 			}
-			if (formattedProtocolDate != null) {
-				if (!protocolDateVerification.equals(formatter.format(formattedProtocolDate))) {
-					ErrorObject errorOBject = createErrorObject("Site Object", "The Protocol Verification Date format is not a valid 'yyyy-MM-dd' format", "ProtocolDateVerification");
+			if (formattedStudyDate != null) {
+				if (!studyDateVerification.equals(formatter.format(formattedStudyDate))) {
+					ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format", "StudyDateVerification");
 					errorObjects.add(errorOBject);
 				}
 			}
 		}
 
-		StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+		StudyBean parentStudy = getStudyByUniqId(uniqueStudyID);
 		if (parentStudy == null) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Protocol Id provided in the URL is not a valid Protocol Id", "Unique Study Protocol Id");
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id", "Unique Study Study Id");
 			errorObjects.add(errorOBject);
 		} else if (parentStudy.getParentStudyId() != 0) {
-			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Protocol Id provided in the URL is not a valid Study Protocol Id", "Unique Study Protocol Id");
+			ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id", "Unique Study Study Id");
 			errorObjects.add(errorOBject);
 		}
 
@@ -1054,7 +1051,7 @@ public class StudyController {
 		v1.addValidation("uniqueProId", Validator.NO_BLANKS);
 		HashMap vError1 = v1.validate();
 		if (!vError1.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 		Validator v2 = new Validator(request);
@@ -1074,10 +1071,10 @@ public class StudyController {
 
 		Validator v6 = new Validator(request);
 		HashMap vError6 = v6.validate();
-		if (uniqueProtocolID != null)
+		if (uniqueStudyID != null)
 			validateUniqueProId(request, vError6);
 		if (!vError6.isEmpty()) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "Unique Protocol Id exist in the System", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Site Object", "Unique Study Id exist in the System", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 
@@ -1094,7 +1091,7 @@ public class StudyController {
 			errorObjects.add(errorOBject);
 		}
 		if (request.getAttribute("uniqueProId") != null && ((String) request.getAttribute("uniqueProId")).length() > 30) {
-			ErrorObject errorOBject = createErrorObject("Site Object", "UniqueProtocolId Length exceeds the max length 30", "UniqueProtocolId");
+			ErrorObject errorOBject = createErrorObject("Site Object", "UniqueStudyId Length exceeds the max length 30", "UniqueStudyId");
 			errorObjects.add(errorOBject);
 		}
 		if (request.getAttribute("prinInvestigator") != null && ((String) request.getAttribute("prinInvestigator")).length() > 255) {
@@ -1112,13 +1109,13 @@ public class StudyController {
 			siteDTO.setMessage(validation_failed_message);
 			response = new ResponseEntity(siteDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 		} else {
-			siteBean = buildSiteBean(uniqueSiteProtocolID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate, formattedProtocolDate, secondaryProId,
+			siteBean = buildSiteBean(uniqueSiteStudyID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate, formattedStudyDate, secondaryProId,
 					ownerUserAccount, parentStudy.getId());
 			siteBean.setSchemaName(parentStudy.getSchemaName());
 			StudyBean sBean = createStudy(siteBean, ownerUserAccount);
 			// get the schema study
 			request.setAttribute("requestSchema", parentStudy.getSchemaName());
-			StudyBean schemaStudy = getStudyByUniqId(uniqueProtocolID);
+			StudyBean schemaStudy = getStudyByUniqId(uniqueStudyID);
 			siteBuildService.process(schemaStudy, sBean, ownerUserAccount, userList);
 			siteDTO.setSiteOid(sBean.getOid());
 			siteDTO.setMessage(validation_passed_message);
@@ -1127,7 +1124,7 @@ public class StudyController {
 			ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
-            responseSuccess.setUniqueSiteProtocolID(siteDTO.getUniqueSiteProtocolID());
+            responseSuccess.setUniqueSiteStudyID(siteDTO.getUniqueSiteProtocolID());
 
 			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
@@ -1152,11 +1149,11 @@ public class StudyController {
 	}
 
 	/**
-	 * @api {post} /pages/auth/api/v1/studies/:uniqueProtocolId/eventdefinitions Create a study event
+	 * @api {post} /pages/auth/api/v1/studies/:uniqueStudyId/eventdefinitions Create a study event
 	 * @apiName createEventDefinition
 	 * @apiPermission Authenticate using api-key. admin
 	 * @apiVersion 3.8.0
-	 * @apiParam {String} uniqueProtocolId Study unique protocol ID.
+	 * @apiParam {String} uniqueStudyId Study unique study ID.
 	 * @apiParam {String} name Event Name.
 	 * @apiParam {String} description Event Description.
 	 * @apiParam {String} category Category Name.
@@ -1196,11 +1193,11 @@ public class StudyController {
 	 *                    "eventDefOid": "SE_EVENTNAME"
 	 *                    }
 	 */
-	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
-	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID)
+	@RequestMapping(value = "/{uniqueStudyID}/eventdefinitions", method = RequestMethod.POST)
+	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueStudyID") String uniqueStudyID)
 			throws Exception {
 		logger.debug("In Create Event Definition ");
-		StudyBean publicStudy = getStudyByUniqId(uniqueProtocolID);
+		StudyBean publicStudy = getStudyByUniqId(uniqueStudyID);
 		request.setAttribute("requestSchema", publicStudy.getSchemaName());
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyEventDefinitionBean eventBean = null;
@@ -1270,12 +1267,12 @@ public class StudyController {
 		request.setAttribute("type", type);
 		request.setAttribute("repeating", repeating);
 
-		StudyBean parentStudy = getStudyByUniqId(uniqueProtocolID);
+		StudyBean parentStudy = getStudyByUniqId(uniqueStudyID);
 		if (parentStudy == null) {
-			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Protocol Id provided in the URL is not a valid Protocol Id", "Unique Study Protocol Id");
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Id", "Unique Study Study Id");
 			errorObjects.add(errorOBject);
 		} else if (parentStudy.getParentStudyId() != 0) {
-			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Protocol Id provided in the URL is not a valid Study Protocol Id", "Unique Study Protocol Id");
+			ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Study Id", "Unique Study Study Id");
 			errorObjects.add(errorOBject);
 		}
 
@@ -1359,10 +1356,10 @@ public class StudyController {
 
 	}
 
-	public Boolean verifyProtocolTypeExist(String protocolType) {
+	public Boolean verifyStudyTypeExist(String studyType) {
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-		if (!protocolType.equals(resadmin.getString("interventional")) && !protocolType.equals(resadmin.getString("observational"))) {
-			System.out.println("Protocol Type not supported");
+		if (!studyType.equals(resadmin.getString("interventional")) && !studyType.equals(resadmin.getString("observational"))) {
+			System.out.println("Study Type not supported");
 			return false;
 		}
 		return true;
@@ -1392,16 +1389,16 @@ public class StudyController {
 		return sed;
 	}
 
-	public StudyBean buildSiteBean(String uniqueSiteProtocolId, String name, String principalInvestigator, int expectedTotalEnrollment, Date startDate, Date protocolDateVerification,
+	public StudyBean buildSiteBean(String uniqueSiteStudyId, String name, String principalInvestigator, int expectedTotalEnrollment, Date startDate, Date studyDateVerification,
 			String secondaryProId, UserAccountBean owner, int parentStudyId) {
 
 		StudyBean study = new StudyBean();
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 
 		study.setDatePlannedStart(startDate);
-		study.setProtocolDateVerification(protocolDateVerification);
+		study.setProtocolDateVerification(studyDateVerification);
 		study.setSecondaryIdentifier(secondaryProId);
-		study.setIdentifier(uniqueSiteProtocolId);
+		study.setIdentifier(uniqueSiteStudyId);
 		study.setName(name);
 		study.setPrincipalInvestigator(principalInvestigator);
 		study.setExpectedTotalEnrollment(expectedTotalEnrollment);
@@ -1477,7 +1474,7 @@ public class StudyController {
 		for (StudyBean thisBean : allStudies) {
 			if (request.getAttribute("uniqueProId") != null && request.getAttribute("uniqueProId").equals(thisBean.getIdentifier())) {
 				ResourceBundle resexception = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getExceptionsBundle();
-				Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
+				Validator.addError(errors, "uniqueProId", resexception.getString("unique_study_id_existed"));
 				break;
 			}
 		}
@@ -1526,7 +1523,7 @@ public class StudyController {
 		return null;
 	}
 
-	public StudyDTO buildStudyDTO(String uniqueProtocolID, String name, String briefSummary, String principalInvestigator, String sponsor, String expectedTotalEnrollment, String protocolType,
+	public StudyDTO buildStudyDTO(String uniqueStudyID, String name, String briefSummary, String principalInvestigator, String sponsor, String expectedTotalEnrollment, String studyType,
 			String status, String startDate, ArrayList<UserRole> userList) {
 		if (status != null) {
 			if (status.equals(""))
@@ -1534,12 +1531,12 @@ public class StudyController {
 		}
 
 		StudyDTO studyDTO = new StudyDTO();
-		studyDTO.setUniqueProtocolID(uniqueProtocolID);
+		studyDTO.setUniqueProtocolID(uniqueStudyID);
 		studyDTO.setBriefTitle(name);
 		studyDTO.setPrincipalInvestigator(principalInvestigator);
 		studyDTO.setBriefSummary(briefSummary);
 		studyDTO.setSponsor(sponsor);
-		studyDTO.setProtocolType(protocolType);
+		studyDTO.setProtocolType(studyType);
 		studyDTO.setStatus(status);
 		studyDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
 		studyDTO.setStartDate(startDate);
@@ -1547,25 +1544,25 @@ public class StudyController {
 		return studyDTO;
 	}
 
-    public StudyDTO buildNewStudyDTO(String uniqueProtocolID, String name) {
+    public StudyDTO buildNewStudyDTO(String uniqueStudyID, String name) {
         StudyDTO studyDTO = new StudyDTO();
-        studyDTO.setUniqueProtocolID(uniqueProtocolID);
+        studyDTO.setUniqueProtocolID(uniqueStudyID);
         studyDTO.setBriefTitle(name);
         studyDTO.setStatus("design");
         return studyDTO;
     }
 
-	public SiteDTO buildSiteDTO(String uniqueSiteProtocolID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate, String protocolDateVerification,
+	public SiteDTO buildSiteDTO(String uniqueSiteStudyID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate, String studyDateVerification,
 			String secondaryProId, ArrayList<UserRole> userList) {
 
 		SiteDTO siteDTO = new SiteDTO();
-		siteDTO.setUniqueSiteProtocolID(uniqueSiteProtocolID);
+		siteDTO.setUniqueSiteProtocolID(uniqueSiteStudyID);
 		siteDTO.setBriefTitle(name);
 		siteDTO.setPrincipalInvestigator(principalInvestigator);
 		siteDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
 		siteDTO.setStartDate(startDate);
 		siteDTO.setSecondaryProId(secondaryProId);
-		siteDTO.setProtocolDateVerification(protocolDateVerification);
+		siteDTO.setProtocolDateVerification(studyDateVerification);
 		siteDTO.setAssignUserRoles(userList);
 		return siteDTO;
 	}
@@ -1581,14 +1578,14 @@ public class StudyController {
 		return eventDefinitionDTO;
 	}
 
-	public StudyBean buildStudyBean(String uniqueProtocolId, String name, String briefSummary, String principalInvestigator, String sponsor, int expectedTotalEnrollment, String protocolType,
+	public StudyBean buildStudyBean(String uniqueStudyId, String name, String briefSummary, String principalInvestigator, String sponsor, int expectedTotalEnrollment, String studyType,
 			String status, Date startDate, UserAccountBean owner) {
 
 		StudyBean study = new StudyBean();
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-		if (protocolType.equals(resadmin.getString("interventional"))) {
+		if (studyType.equals(resadmin.getString("interventional"))) {
 			study.setProtocolType("interventional");
-		} else if (protocolType.equals(resadmin.getString("observational"))) {
+		} else if (studyType.equals(resadmin.getString("observational"))) {
 			study.setProtocolType("observational");
 		}
 		ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
@@ -1597,7 +1594,7 @@ public class StudyController {
 		else if (resword.getString("design").equalsIgnoreCase(status) || status.equals(""))
 			study.setStatus(Status.PENDING);
 
-		study.setIdentifier(uniqueProtocolId);
+		study.setIdentifier(uniqueStudyId);
 		study.setName(name);
 		study.setPrincipalInvestigator(principalInvestigator);
 		study.setSummary(briefSummary);
@@ -1610,7 +1607,7 @@ public class StudyController {
 		return study;
 	}
 
-    public StudyBean buildNewStudyBean(String uniqueProtocolId, String name, UserAccountBean accountBean) {
+    public StudyBean buildNewStudyBean(String uniqueStudyId, String name, UserAccountBean accountBean) {
 
         StudyBean study = new StudyBean();
         ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
@@ -1618,7 +1615,7 @@ public class StudyController {
         ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
         study.setStatus(Status.PENDING);
 
-        study.setIdentifier(uniqueProtocolId);
+        study.setIdentifier(uniqueStudyId);
         study.setName(name);
         study.setOwner(accountBean);
         return study;

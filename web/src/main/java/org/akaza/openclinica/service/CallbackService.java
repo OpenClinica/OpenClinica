@@ -2,8 +2,6 @@ package org.akaza.openclinica.service;
 
 import com.auth0.Auth0User;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.controller.helper.ProtocolInfo;
-import org.akaza.openclinica.domain.datamap.Study;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -7,14 +7,14 @@ import org.akaza.openclinica.domain.datamap.Study;
  * Created by yogi on 3/16/17.
  */
 
-public class ProtocolInfo {
+public class StudyInfoObject {
 
-    public ProtocolInfo(String schema, Study study) {
+    public StudyInfoObject(String schema, Study study) {
         this.schema = schema;
         this.study = study;
     }
 
-    public ProtocolInfo(String schema, StudyBean study) {
+    public StudyInfoObject(String schema, StudyBean study) {
         this.schema = schema;
         this.studyBean = study;
     }

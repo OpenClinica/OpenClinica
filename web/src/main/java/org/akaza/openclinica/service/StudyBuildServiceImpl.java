@@ -1,14 +1,12 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
-import org.akaza.openclinica.controller.helper.ProtocolInfo;
+import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
@@ -25,9 +23,9 @@ import java.util.Date;
 /**
  * Created by yogi on 11/10/16.
  */
-@Service("protocolBuildService")
+@Service("studyBuildService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
-public class ProtocolBuildServiceImpl implements ProtocolBuildService {
+public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired
@@ -37,7 +35,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
     @Autowired
     private SchemaServiceDao schemaServiceDao;
 
-    public ProtocolInfo process(Study study, UserAccountBean ub, String role) throws Exception  {
+    public StudyInfoObject process(Study study, UserAccountBean ub, String role) throws Exception  {
         String schemaName = null;
 
         try {
@@ -65,7 +63,7 @@ public class ProtocolBuildServiceImpl implements ProtocolBuildService {
             throw e;
         }
         createSchema(schemaName);
-        return new ProtocolInfo(schemaName, study);
+        return new StudyInfoObject(schemaName, study);
     }
 
     private boolean createSchema(String schemaName) throws Exception {
