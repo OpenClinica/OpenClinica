@@ -271,8 +271,7 @@ public class EnketoUrlService {
             i++;
             QueryBean query = new QueryBean();
             query.setId(String.valueOf(i));
-            query.setAssigned_to(dn.getUserAccountByOwnerId().getFirstName() + " " + dn.getUserAccountByOwnerId().getLastName() + " ("
-                    + dn.getUserAccountByOwnerId().getUserName() + ")");
+            query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             query.setComment(dn.getDetailedNotes());
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
             DateTime dateTime = new DateTime(dn.getDateCreated());
@@ -297,7 +296,7 @@ public class EnketoUrlService {
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
             logBean.setUser(uAccount.getUserName());
-            logBean.setAssigned_to(uAccount.getFirstName() + " " + uAccount.getLastName() + " (" + uAccount.getUserName() + ")");
+            logBean.setAssigned_to(uAccount.getUserName());
             logBean.setType(AUDIT);
             logBeans.add(logBean);
         }
