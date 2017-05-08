@@ -566,7 +566,7 @@ public class StudyController {
 	    if (roles == null)
 	    	return role;
 	    for (LinkedHashMap<String, String> roleByStudy : roles) {
-		    if (StringUtils.equals(currentStudyId, roleByStudy.get("protocolId"))) {
+		    if (StringUtils.equals(currentStudyId, roleByStudy.get("studyId"))) {
 		    	return roleByStudy.get("roleName");
 		    }
 	    }
