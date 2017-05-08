@@ -269,7 +269,7 @@
 		<name>findByItemIdAndFormLayoutIdNotInIGM</name>
 		<sql>
 			SELECT m.*, rs.response_type_id, rs.label, rs.options_text, rs.options_values
-			FROM item_form_metadata m, response_set rs , form_layout_id fl ,versioning_map vm
+			FROM item_form_metadata m, response_set rs , form_layout fl ,versioning_map vm
 			WHERE m.item_id=?
 				AND fl.form_layout_id=?
 				AND vm.form_layout_id = fl.form_layout_id
