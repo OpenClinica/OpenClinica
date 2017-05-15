@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -44,16 +43,13 @@ import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
@@ -66,9 +62,7 @@ import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -76,11 +70,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import freemarker.template.Configuration;
@@ -272,7 +262,7 @@ public class EnketoUrlService {
             QueryBean query = new QueryBean();
             query.setId(String.valueOf(i));
             query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
-            query.setComment(dn.getDetailedNotes());
+            query.setComment(escapedValue(dn.getDetailedNotes()));
             query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
             DateTime dateTime = new DateTime(dn.getDateCreated());
             query.setDate_time(convertDateFormat(dateTime));
@@ -291,7 +281,7 @@ public class EnketoUrlService {
             LogBean logBean = new LogBean();
             String oldValue = audit.getOldValue() != null ? audit.getOldValue() : "";
             String newValue = audit.getNewValue() != null ? audit.getNewValue() : "";
-            logBean.setMessage("Value Changed from \"" + oldValue + "\" to \"" + newValue + "\"");
+            logBean.setMessage("Value Changed from \"" + escapedValue(oldValue) + "\" to \"" + escapedValue(newValue) + "\"");
             DateTime dateTime = new DateTime(audit.getAuditDate());
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
@@ -427,98 +417,6 @@ public class EnketoUrlService {
         return instance;
     }
 
-    private void processQueryElement(Document doc, String itemName, ItemData itemData, Element groupElement) throws JsonProcessingException {
-        if (itemData == null)
-            return;
-
-        List<DnItemDataMap> dnItemDataMaps = itemData.getDnItemDataMaps();
-        if (CollectionUtils.isEmpty(dnItemDataMaps)) {
-            return;
-        }
-        dnItemDataMaps.sort((d1, d2) -> d2.getDiscrepancyNote().getDateCreated().compareTo(d1.getDiscrepancyNote().getDateCreated()));
-
-        QueriesBean queriesBean = new QueriesBean();
-        // create a json query list
-        ListIterator<DnItemDataMap> queryIterator = dnItemDataMaps.listIterator();
-        while (queryIterator.hasNext()) {
-            DnItemDataMap dnItemDataMap = queryIterator.next();
-            DiscrepancyNote discrepancyNote = dnItemDataMap.getDiscrepancyNote();
-            if (StringUtils.isNotEmpty(discrepancyNote.getDetailedNotes())) {
-                QueryBean queryBean = new QueryBean();
-                queryBean.setComment(discrepancyNote.getDetailedNotes());
-                UserAccount owner = discrepancyNote.getUserAccountByOwnerId();
-                String queryCreator = owner.getFirstName() + " " + owner.getLastName() + " (" + owner.getUserName() + ")";
-                queryBean.setUser(queryCreator);
-                UserAccount userAccount = discrepancyNote.getUserAccount();
-                String assignedTo = userAccount.getFirstName() + " " + userAccount.getLastName() + " (" + userAccount.getUserName() + ")";
-                queryBean.setAssigned_to(assignedTo);
-                queryBean.setDate_time(discrepancyNote.getDateCreated().toString());
-                queriesBean.getQueries().add(queryBean);
-            }
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonQueries = mapper.writeValueAsString(queriesBean);
-        Element queryElement = doc.createElement(itemName + OC_QUERY_SUFFIX);
-        queryElement.setTextContent(jsonQueries);
-        groupElement.appendChild(queryElement);
-    }
-
-    private List<Node> appendRepeatGroupElements(List<Node> target, List<ItemData> itemDatas, Node groupNode, CrfVersion crfVersion, EventCrf eventCrf,
-            Item item, Document doc) throws JsonProcessingException {
-
-        // Get max repeat in item data
-        int maxGroupRepeat = itemDataDao.getMaxGroupRepeat(eventCrf.getEventCrfId(), item.getItemId());
-        boolean hasItemData = false;
-        int i = 0;
-        for (ItemData itemData : itemDatas) {
-            // for (int i = 0; i < maxGroupRepeat; i++) {
-            Element groupElement = null;
-
-            groupElement = doc.createElement(groupNode.getNodeName());
-            // Element repeatOrdinal = null;
-            // repeatOrdinal = doc.createElement("OC.REPEAT_ORDINAL");
-            // repeatOrdinal.setTextContent(String.valueOf(i + 1));
-            // groupElement.appendChild(repeatOrdinal);
-            // add enketo related attributes
-            groupElement.setAttribute(ENKETO_ORDINAL, String.valueOf(i + 1));
-            groupElement.setAttribute(ENKETO_LAST_USED_ORDINAL, String.valueOf(maxGroupRepeat));
-            // groupElement.appendChild(repeatOrdinal);
-
-            if (itemDatas.size() == 0) {
-                hasItemData = false;
-            }
-            Element question = null;
-            question = doc.createElement(item.getName());
-            if (itemData != null && itemData.getValue() != null && !itemData.getValue().equals("")) {
-                ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                ResponseType responseType = responseTypeDao.findByItemFormMetaDataId(itemMetadata.getItemFormMetadataId());
-                String itemValue = itemData.getValue();
-                if (responseType.getResponseTypeId() == 3 || responseType.getResponseTypeId() == 7) {
-                    itemValue = itemValue.replaceAll(",", " ");
-                }
-
-                question.setTextContent(itemValue);
-            }
-            if (itemData == null || !itemData.isDeleted()) {
-                hasItemData = true;
-                groupElement.appendChild(question);
-                // add the corresponding query element
-                // processQueryElement(doc, item.getName(), itemData, groupElement);
-            }
-
-            // ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i +
-            // 1);
-            // ItemFormMetadata itemMetadata = item.getItemFormMetadatas().iterator().next();
-            i++;
-
-            if (hasItemData) {
-                target.add(groupElement);
-            }
-        }
-        // maxGroupRepeat
-        return target;
-    }
-
     private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
         String itemValue = null;
         if (itemData != null) {
@@ -533,7 +431,16 @@ public class EnketoUrlService {
                 itemValue = itemValue.replaceAll(",", " ");
             }
         }
-        return itemValue;
+        return escapedValue(itemValue);
+    }
+
+    private String escapedValue(String value) {
+        if (value != null) {
+            value = value.replaceAll("&", "&amp;");
+            value = value.replaceAll("<", "&lt;");
+            value = value.replaceAll(">", "&gt;");
+        }
+        return value;
     }
 
 }
