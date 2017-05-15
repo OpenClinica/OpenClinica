@@ -26,7 +26,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -592,7 +592,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return executeFindAllQuery("findAllDefnIdandStudyIdForSite", variables);
     }
 
-    public List findAllCrfMigrationDoesNotPerform(CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
+    public List findAllCrfMigrationDoesNotPerform(FormLayoutBean sourceCrfVersionBean, FormLayoutBean targetCrfVersionBean,
             ArrayList<String> studyEventDefnlist, ArrayList<String> sitelist) {
         HashMap variables = new HashMap();
         String eventStr = StringUtils.join(studyEventDefnlist, ",");

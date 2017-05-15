@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.controller.helper.HelperObject;
 import org.akaza.openclinica.controller.helper.ReportLog;
 import org.akaza.openclinica.controller.helper.TransferObject;
@@ -53,6 +54,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
@@ -188,7 +190,8 @@ public class BatchCRFMigrationController implements Runnable {
      *                    {
      *                    "errors": [],
      *                    "reportPreview":
-     *                    "Batch CRF version migration is running. You will receive an email once the process is complete"
+     *                    "Batch CRF version migration is running. You will receive an email once the process is
+     *                    complete"
      *                    ,
      *                    "subjectCount": 8,
      *                    "eventCrfCount": 12,
@@ -315,7 +318,6 @@ public class BatchCRFMigrationController implements Runnable {
         return helperObject.getReportLog();
     }
 
-
     public void executeMigrationAction(HelperObject helperObject, EventCRFBean eventCRFBean) {
         Session session = helperObject.getSession();
 
@@ -378,11 +380,13 @@ public class BatchCRFMigrationController implements Runnable {
         ArrayList<String> sitelist = transferObject.getSites();
         ArrayList<String> sitelistFiltered = new ArrayList<String>();
 
-        CRFVersionBean sourceCrfVersionBean = cvdao().findByOid(sourceCrfVersion);
-        CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
+        // CRFVersionBean sourceCrfVersionBean = cvdao().findByOid(sourceCrfVersion);
+        FormLayoutBean sourceCrfVersionBean = fldao().findByOid(sourceCrfVersion);
+        // CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
+        FormLayoutBean targetCrfVersionBean = fldao().findByOid(targetCrfVersion);
 
         StudyBean stBean = sdao().findByOid(studyOid);
-		if (stBean == null || !stBean.getStatus().isAvailable() || stBean.getParentStudyId() != 0) {
+        if (stBean == null || !stBean.getStatus().isAvailable() || stBean.getParentStudyId() != 0) {
             reportLog.getErrors().add(resterms.getString("The_OID_of_the_Target_Study_that_you_provided_is_invalid"));
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -408,7 +412,8 @@ public class BatchCRFMigrationController implements Runnable {
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
-		if (sourceCrfVersionBean.getCrfId() != targetCrfVersionBean.getCrfId() || !sourceCrfVersionBean.getStatus().isAvailable() || !targetCrfVersionBean.getStatus().isAvailable()) {
+        if (sourceCrfVersionBean.getCrfId() != targetCrfVersionBean.getCrfId() || !sourceCrfVersionBean.getStatus().isAvailable()
+                || !targetCrfVersionBean.getStatus().isAvailable()) {
             reportLog.getErrors().add(resterms.getString("The_OID_of_the_CRF_Version_that_you_provided_is_invalid"));
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -471,9 +476,8 @@ public class BatchCRFMigrationController implements Runnable {
         for (EventDefinitionCRFBean crfMigrationDoesNotPerform : crfMigrationDoesNotPerformList) {
             StudyEventDefinitionBean seddBean = (StudyEventDefinitionBean) seddao().findByPK(crfMigrationDoesNotPerform.getStudyEventDefinitionId());
             StudyBean sssBean = (StudyBean) sdao().findByPK(crfMigrationDoesNotPerform.getStudyId());
-            reportLog.getCanNotMigrate().add(
-                    resterms.getString("CRF_Version_Migration_cannot_be_performed_for") + " " + sssBean.getName() + " " + seddBean.getName() + ". "
-                            + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
+            reportLog.getCanNotMigrate().add(resterms.getString("CRF_Version_Migration_cannot_be_performed_for") + " " + sssBean.getName() + " "
+                    + seddBean.getName() + ". " + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
         }
 
         List<EventCRFBean> eventCrfListToMigrate = ecdao().findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
@@ -540,6 +544,10 @@ public class BatchCRFMigrationController implements Runnable {
     @SuppressWarnings("rawtypes")
     private CRFVersionDAO cvdao() {
         return new CRFVersionDAO(dataSource);
+    }
+
+    private FormLayoutDAO fldao() {
+        return new FormLayoutDAO(dataSource);
     }
 
     private AuditDAO auditDao() {
@@ -624,7 +632,6 @@ public class BatchCRFMigrationController implements Runnable {
                 + reportLog.getSubjectCount() + "\n");
         sb.append(resterms.getString("Number_of_Event_CRF_affected_by_migration") + ": " + reportLog.getEventCrfCount() + "\n");
         sb.append(text1.toString() + "\n");
-
 
         if (reportLog.getErrors().size() != 0) {
             sb.append(resterms.getString("Errors") + ":\n" + text2.toString() + "\n");
@@ -721,10 +728,9 @@ public class BatchCRFMigrationController implements Runnable {
             StudyBean sBean = (StudyBean) sdao().findByPK(ssBean.getStudyId());
             StudyEventBean seBean = (StudyEventBean) sedao().findByPK(eventCrfToMigrate.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
-            reportLog.getLogs().add(
-                    cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","
-                            + ssBean.getLabel() + ","
-                            + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
+            reportLog.getLogs()
+                    .add(cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","
+                            + ssBean.getLabel() + "," + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
         }
         tx.commit();
         session.close();
@@ -750,19 +756,19 @@ public class BatchCRFMigrationController implements Runnable {
                 + resterms.getString("Thank_you_Your_OpenClinica_System"));
 
         logger.info(body.toString());
-        openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(), resterms.getString("Batch_Migration_Complete_For") + " "
-                + stBean.getName(), body.toString(), true);
+        openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
+                resterms.getString("Batch_Migration_Complete_For") + " " + stBean.getName(), body.toString(), true);
     }
 
     public void fillHelperObject(HelperObject helperObject) {
-       helperObject.setUrlBase(CoreResources.getField("sysURL").split("/MainMenu")[0]);
-       helperObject.setOpenClinicaMailSender(openClinicaMailSender);
-       helperObject.setDataSource(dataSource);
-       helperObject.setResterms(resterms);
-       helperObject.setEventCrfDao(eventCrfDao);
-       helperObject.setStudyEventDao(studyEventDao);
-       helperObject.setStudySubjectDao(studySubjectDao);
-       helperObject.setCrfVersionDao(crfVersionDao);
-       helperObject.setSessionFactory(sessionFactory);
-   }
+        helperObject.setUrlBase(CoreResources.getField("sysURL").split("/MainMenu")[0]);
+        helperObject.setOpenClinicaMailSender(openClinicaMailSender);
+        helperObject.setDataSource(dataSource);
+        helperObject.setResterms(resterms);
+        helperObject.setEventCrfDao(eventCrfDao);
+        helperObject.setStudyEventDao(studyEventDao);
+        helperObject.setStudySubjectDao(studySubjectDao);
+        helperObject.setCrfVersionDao(crfVersionDao);
+        helperObject.setSessionFactory(sessionFactory);
+    }
 }

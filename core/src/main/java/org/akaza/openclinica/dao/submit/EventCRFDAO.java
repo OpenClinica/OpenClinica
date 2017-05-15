@@ -330,7 +330,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findAllByStudySubject", variables);
     }
 
-    public List<EventCRFBean> findAllCRFMigrationReportList(CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
+    public List<EventCRFBean> findAllCRFMigrationReportList(FormLayoutBean sourceCrfVersionBean, FormLayoutBean targetCrfVersionBean,
             ArrayList<String> studyEventDefnlist, ArrayList<String> sitelist) {
         HashMap<Integer, Object> variables = new HashMap();
         String eventStr = StringUtils.join(studyEventDefnlist, ",");

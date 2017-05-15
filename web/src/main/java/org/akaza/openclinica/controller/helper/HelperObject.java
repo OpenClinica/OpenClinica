@@ -9,8 +9,8 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -21,8 +21,8 @@ import org.hibernate.SessionFactory;
 
 public class HelperObject {
     List<EventCRFBean> eventCrfListToMigrate;
-    CRFVersionBean sourceCrfVersionBean;
-    CRFVersionBean targetCrfVersionBean;
+    FormLayoutBean sourceCrfVersionBean;
+    FormLayoutBean targetCrfVersionBean;
     ReportLog reportLog;
     StudyBean stBean;
     CRFBean cBean;
@@ -43,19 +43,19 @@ public class HelperObject {
         // TODO Auto-generated constructor stub
     }
 
-    public CRFVersionBean getSourceCrfVersionBean() {
+    public FormLayoutBean getSourceCrfVersionBean() {
         return sourceCrfVersionBean;
     }
 
-    public void setSourceCrfVersionBean(CRFVersionBean sourceCrfVersionBean) {
+    public void setSourceCrfVersionBean(FormLayoutBean sourceCrfVersionBean) {
         this.sourceCrfVersionBean = sourceCrfVersionBean;
     }
 
-    public CRFVersionBean getTargetCrfVersionBean() {
+    public FormLayoutBean getTargetCrfVersionBean() {
         return targetCrfVersionBean;
     }
 
-    public void setTargetCrfVersionBean(CRFVersionBean targetCrfVersionBean) {
+    public void setTargetCrfVersionBean(FormLayoutBean targetCrfVersionBean) {
         this.targetCrfVersionBean = targetCrfVersionBean;
     }
 
@@ -186,6 +186,5 @@ public class HelperObject {
     public void setSession(Session session) {
         this.session = session;
     }
-
 
 }
