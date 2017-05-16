@@ -552,7 +552,7 @@ public class XformMetaDataService {
         formLayout.setUserAccount(userDao.findById(cmdObject.ub.getId()));
         formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         formLayout.setRevisionNotes(cmdObject.version.getDescription());
-        formLayout.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), formLayout.getName()));
+        formLayout.setOcOid(cmdObject.version.getOcoid());
         formLayout.setXform(null);
         formLayout.setXformName(cmdObject.container.getInstanceName());
         formLayout.setUrl(cmdObject.formLayoutUrl);

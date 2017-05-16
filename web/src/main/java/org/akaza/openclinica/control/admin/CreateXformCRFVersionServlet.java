@@ -10,14 +10,12 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
-import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.FormArtifactTransferObj;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
-import org.akaza.openclinica.service.dto.Form;
 import org.akaza.openclinica.service.dto.FormVersion;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -54,26 +52,10 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ServletFileUpload upload = new ServletFileUpload(factory);
         List<FileItem> items = upload.parseRequest(request);
         String crfName = retrieveFormFieldValue(items, "crfName");
-        int crfId = Integer.valueOf(retrieveFormFieldValue(items, "crfId"));
-        String crfDescription = "";
         DataBinder dataBinder = new DataBinder(new FormVersion());
         Errors errors = dataBinder.getBindingResult();
 
-        String crfOid = "";
-        if (crfId != 0) {
-            CrfBean crfBean = crfDao.findByCrfId(crfId);
-            crfName = crfBean.getName();
-            if (crfBean != null) {
-                crfOid = crfBean.getOcOid();
-            }
-        } else {
-            String url = FM_BASEURL + currentStudy.getOid() + "/forms/" + crfName;
-            RestTemplate restTemplate = new RestTemplate();
-            Form resp = restTemplate.getForObject(url, Form.class);
-            crfOid = resp.getOcoid();
-        }
-
-        FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOid(), crfOid);
+        FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOid(), crfName);
         if (transferObj.getErr().size() != 0) {
             for (ErrorObj er : transferObj.getErr()) {
                 errors.rejectValue("name", er.getCode(), er.getMessage());
@@ -127,12 +109,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
-    private FormArtifactTransferObj getFormArtifactsFromFM(List<FileItem> files, String studyOid, String formOid) {
+    private FormArtifactTransferObj getFormArtifactsFromFM(List<FileItem> files, String studyOid, String crfName) {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + formOid + "/artifacts";
+        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + crfName + "/artifacts";
         map.add("file", byteArrayResources);
 
         for (FileItem file : files) {
