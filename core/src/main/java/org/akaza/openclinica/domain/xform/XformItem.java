@@ -1,5 +1,7 @@
 package org.akaza.openclinica.domain.xform;
 
+import java.util.List;
+
 public class XformItem {
     String itemPath = null;
     String itemName = null;
@@ -15,6 +17,8 @@ public class XformItem {
     private String optionsText;
     private String optionsValues;
     private String itemOid;
+    private boolean published = false;
+    private List<String> versions;
 
     public String getItemPath() {
         return itemPath;
@@ -126,6 +130,22 @@ public class XformItem {
 
     public void setItemOid(String itemOid) {
         this.itemOid = itemOid;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public List<String> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<String> versions) {
+        this.versions = versions;
     }
 
 }
