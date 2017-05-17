@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.hibernate.Session;
@@ -36,6 +37,7 @@ public class HelperObject {
     StudyEventDao studyEventDao;
     StudySubjectDao studySubjectDao;
     CrfVersionDao crfVersionDao;
+    FormLayoutDao formLayoutDao;
     SessionFactory sessionFactory;
     Session session;
 
@@ -185,6 +187,14 @@ public class HelperObject {
 
     public void setSession(Session session) {
         this.session = session;
+    }
+
+    public FormLayoutDao getFormLayoutDao() {
+        return formLayoutDao;
+    }
+
+    public void setFormLayoutDao(FormLayoutDao formLayoutDao) {
+        this.formLayoutDao = formLayoutDao;
     }
 
 }

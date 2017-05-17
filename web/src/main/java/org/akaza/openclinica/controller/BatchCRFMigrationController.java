@@ -31,7 +31,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.controller.helper.HelperObject;
@@ -42,8 +41,8 @@ import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -52,12 +51,11 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -92,10 +90,10 @@ public class BatchCRFMigrationController implements Runnable {
     private StudySubjectDao studySubjectDao;
 
     @Autowired
-    private StudyEventDao studyEventDao;
+    private FormLayoutDao formLayoutDao;
 
     @Autowired
-    private CrfVersionDao crfVersionDao;
+    private StudyEventDao studyEventDao;
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -106,8 +104,8 @@ public class BatchCRFMigrationController implements Runnable {
 
     ResourceBundle resterms;
     List<EventCRFBean> eventCrfListToMigrate;
-    CRFVersionBean sourceCrfVersionBean;
-    CRFVersionBean targetCrfVersionBean;
+    FormLayoutBean sourceCrfVersionBean;
+    FormLayoutBean targetCrfVersionBean;
     ReportLog reportLog;
     StudyBean stBean;
     CRFBean cBean;
@@ -323,14 +321,14 @@ public class BatchCRFMigrationController implements Runnable {
 
         EventCrf eventCrf = helperObject.getEventCrfDao().findById(eventCRFBean.getId());
         StudyEvent studyEvent = helperObject.getStudyEventDao().findById(eventCRFBean.getStudyEventId());
-        CrfVersion crfVersion = helperObject.getCrfVersionDao().findById(helperObject.getTargetCrfVersionBean().getId());
+        FormLayout formLayout = helperObject.getFormLayoutDao().findById(helperObject.getTargetCrfVersionBean().getId());
         StudySubject studySubject = helperObject.getStudySubjectDao().findById(eventCRFBean.getStudySubjectId());
 
         eventCrf.setSdvStatus(false);
         eventCrf.setDateUpdated(new Date());
         eventCrf.setSdvUpdateId(helperObject.getUserAccountBean().getId());
         eventCrf.setUpdateId(helperObject.getUserAccountBean().getId());
-        eventCrf.setCrfVersion(crfVersion);
+        eventCrf.setFormLayout(formLayout);
         session.saveOrUpdate(eventCrf);
 
         String status_before_update = null;
@@ -380,9 +378,7 @@ public class BatchCRFMigrationController implements Runnable {
         ArrayList<String> sitelist = transferObject.getSites();
         ArrayList<String> sitelistFiltered = new ArrayList<String>();
 
-        // CRFVersionBean sourceCrfVersionBean = cvdao().findByOid(sourceCrfVersion);
         FormLayoutBean sourceCrfVersionBean = fldao().findByOid(sourceCrfVersion);
-        // CRFVersionBean targetCrfVersionBean = cvdao().findByOid(targetCrfVersion);
         FormLayoutBean targetCrfVersionBean = fldao().findByOid(targetCrfVersion);
 
         StudyBean stBean = sdao().findByOid(studyOid);
@@ -542,10 +538,6 @@ public class BatchCRFMigrationController implements Runnable {
     }
 
     @SuppressWarnings("rawtypes")
-    private CRFVersionDAO cvdao() {
-        return new CRFVersionDAO(dataSource);
-    }
-
     private FormLayoutDAO fldao() {
         return new FormLayoutDAO(dataSource);
     }
@@ -768,7 +760,7 @@ public class BatchCRFMigrationController implements Runnable {
         helperObject.setEventCrfDao(eventCrfDao);
         helperObject.setStudyEventDao(studyEventDao);
         helperObject.setStudySubjectDao(studySubjectDao);
-        helperObject.setCrfVersionDao(crfVersionDao);
+        helperObject.setFormLayoutDao(formLayoutDao);
         helperObject.setSessionFactory(sessionFactory);
     }
 }
