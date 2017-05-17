@@ -10,6 +10,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
@@ -54,6 +55,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
         String crfName = retrieveFormFieldValue(items, "crfName");
         DataBinder dataBinder = new DataBinder(new FormVersion());
         Errors errors = dataBinder.getBindingResult();
+        int crfId = Integer.valueOf(retrieveFormFieldValue(items, "crfId"));
+
+        if (crfId != 0) {
+            CrfBean crfBean = crfDao.findByCrfId(crfId);
+            crfName = crfBean.getName();
+        }
 
         FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOid(), crfName);
         if (transferObj.getErr().size() != 0) {
