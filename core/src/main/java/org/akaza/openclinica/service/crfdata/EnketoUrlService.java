@@ -436,9 +436,7 @@ public class EnketoUrlService {
 
     private String escapedValue(String value) {
         if (value != null) {
-            value = value.replaceAll("&", "&amp;");
-            value = value.replaceAll("<", "&lt;");
-            value = value.replaceAll(">", "&gt;");
+            value = value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         }
         return value;
     }
