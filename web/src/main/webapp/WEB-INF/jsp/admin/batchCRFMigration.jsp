@@ -150,7 +150,7 @@
 			<td><select name="selectedSourceVersion"
 				id="selectedSourceVersion">
 					<option value="-1">-Select-</option>
-					<c:forEach var="version" items="${crf.versions}">
+					<c:forEach var="version" items="${crf.formLayouts}">
 						<option value="<c:out value="${version.oid}"/>">&nbsp;
 							<c:out value="${version.name}" />&nbsp;
 						</option>
@@ -162,7 +162,7 @@
 			<td><select name="selectedTargetVersion"
 				id="selectedTargetVersion">
 					<option value="-1">-Select-</option>
-					<c:forEach var="version" items="${crf.versions}">
+					<c:forEach var="version" items="${crf.formLayouts}">
 						<option value="<c:out value="${version.oid}" />">&nbsp;
 							<c:out value="${version.name}" />&nbsp;
 						</option>

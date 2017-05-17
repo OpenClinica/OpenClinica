@@ -13,26 +13,28 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 @SuppressWarnings("serial")
 public class BatchCRFMigrationServlet extends SecureController {
 
     private static String CRF_ID = "crfId";
     private static String CRF = "crf";
+
     /**
      *
      */
@@ -54,14 +56,13 @@ public class BatchCRFMigrationServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-
         FormProcessor fp = new FormProcessor(request);
-        
-        ArrayList<CRFVersionBean> crfVersionList=null;
+
+        ArrayList<CRFVersionBean> crfVersionList = null;
+        ArrayList<FormLayoutBean> formLayoutList = null;
         ArrayList<StudyEventDefinitionBean> eventList = null;
         ArrayList<StudyBean> siteList = null;
-        
-        
+
         // checks which module the requests are from, manage or admin
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -72,20 +73,31 @@ public class BatchCRFMigrationServlet extends SecureController {
             forwardPage(Page.CRF_LIST);
         } else {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+            // CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
+            FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
             CRFBean crf = (CRFBean) cdao.findByPK(crfId);
             request.setAttribute("crfName", crf.getName());
-            ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
+            // ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
+            ArrayList<FormLayoutBean> formLayouts = (ArrayList<FormLayoutBean>) fldao.findAllByCRF(crfId);
+
             crfVersionList = new ArrayList<CRFVersionBean>();
-             for(CRFVersionBean version:versions){
-                 if(version.getStatus().isAvailable())
-                     crfVersionList.add(version);
-             }                       
-            crf.setVersions(crfVersionList);
+            formLayoutList = new ArrayList<FormLayoutBean>();
+
+            for (FormLayoutBean version : formLayouts) {
+                if (version.getStatus().isAvailable())
+                    formLayoutList.add(version);
+            }
+            // for (CRFVersionBean version : versions) {
+            // if (version.getStatus().isAvailable())
+            // crfVersionList.add(version);
+            // }
+            // crf.setVersions(crfVersionList);
+            crf.setFormLayouts(formLayoutList);
+
             ArrayList<StudyBean> listOfSites = (ArrayList<StudyBean>) sdao().findAllByParent(currentStudy.getId());
             siteList = new ArrayList<StudyBean>();
             StudyBean studyBean = new StudyBean();
-            studyBean.setOid(currentStudy.getOid()); 
+            studyBean.setOid(currentStudy.getOid());
             studyBean.setName(resterm.getString("Study_Level_Subjects_Only"));
             siteList.add(studyBean);
             for (StudyBean s : listOfSites) {
@@ -93,7 +105,7 @@ public class BatchCRFMigrationServlet extends SecureController {
                     siteList.add(s);
                 }
             }
-     
+
             ArrayList<StudyEventDefinitionBean> listOfDefn = seddao().findAllByStudy(currentStudy);
             eventList = new ArrayList<StudyEventDefinitionBean>();
             for (StudyEventDefinitionBean d : listOfDefn) {
@@ -101,14 +113,13 @@ public class BatchCRFMigrationServlet extends SecureController {
                     eventList.add(d);
                 }
             }
-    
-            // if coming from change crf version -> display message
-     String crfVersionChangeMsg = fp.getString("isFromCRFVersionBatchChange");
-     if ( crfVersionChangeMsg!= null && !crfVersionChangeMsg.equals("")){
-         addPageMessage(crfVersionChangeMsg);
-    }
 
-            
+            // if coming from change crf version -> display message
+            String crfVersionChangeMsg = fp.getString("isFromCRFVersionBatchChange");
+            if (crfVersionChangeMsg != null && !crfVersionChangeMsg.equals("")) {
+                addPageMessage(crfVersionChangeMsg);
+            }
+
             request.setAttribute("study", currentStudy);
             request.setAttribute("siteList", siteList);
             request.setAttribute("eventList", eventList);
@@ -117,7 +128,6 @@ public class BatchCRFMigrationServlet extends SecureController {
 
         }
     }
-
 
     @SuppressWarnings("rawtypes")
     private StudyDAO sdao() {
@@ -128,7 +138,5 @@ public class BatchCRFMigrationServlet extends SecureController {
     private StudyEventDefinitionDAO seddao() {
         return new StudyEventDefinitionDAO(sm.getDataSource());
     }
-
-
 
 }

@@ -21,7 +21,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
@@ -32,11 +32,12 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.apache.commons.lang.StringUtils;
+
 /**
  * @author jxu
  *
  */
-public class StudySubjectDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class StudySubjectDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
 
     // private DAODigester digester;
 
@@ -108,8 +109,8 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // time_zone
-//        this.setTypeExpected(ind, TypeNames.INT);
- //       ind++; //
+        // this.setTypeExpected(ind, TypeNames.INT);
+        // ind++; //
     }
 
     public void setTypesExpectedFilter() {
@@ -207,7 +208,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         eb.setSecondaryLabel((String) hm.get("secondary_label"));
         eb.setOid((String) hm.get("oc_oid"));
         eb.setStudyName((String) hm.get("unique_identifier"));
-//        eb.setEventStartDate((Date) hm.get("date_start"));
+        // eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         eb.setTime_zone((String) hm.get("time_zone"));
         return eb;
@@ -253,7 +254,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             sql = sql + sort.execute("");
             sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
-        //System.out.println(sql);
+        // System.out.println(sql);
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
@@ -681,7 +682,8 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         }
     }
 
-    public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart, int rowEnd) {
+    public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart,
+            int rowEnd) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpected();
         String partialSql;
@@ -690,26 +692,26 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
-     // Order by Clause for the defect id 0005480
+        // Order by Clause for the defect id 0005480
 
         partialSql = sort.execute("");
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-        	if(partialSql.equals(""))
-            sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd ;
-        	else
-        	sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd ;
+            if (partialSql.equals(""))
+                sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd;
+            else
+                sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd;
 
             sql = sql + partialSql;
         } else {
 
-        	sql = sql + partialSql;
-           if(partialSql.equals(""))
-            sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-           else
-        	   sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            sql = sql + partialSql;
+            if (partialSql.equals(""))
+                sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            else
+                sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
 
-        //System.out.println("SQL: "+sql);
+        // System.out.println("SQL: "+sql);
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
@@ -739,15 +741,14 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         }
     }
 
-
-
-    public Integer getTotalCountStudySubjectForCrfMigration(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+    public Integer getTotalCountStudySubjectForCrfMigration(FormLayoutBean sourceCrfVersionBean, FormLayoutBean targetCrfVersionBean,
+            ArrayList<String> studyEventDefnlist, ArrayList<String> sitelist) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        String eventStr =StringUtils.join(studyEventDefnlist, ",");
-        String siteStr =StringUtils.join(sitelist, ",");
+        String eventStr = StringUtils.join(studyEventDefnlist, ",");
+        String siteStr = StringUtils.join(sitelist, ",");
         variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
         variables.put(2, eventStr);
         variables.put(3, siteStr);
@@ -767,14 +768,14 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         }
     }
 
-
-    public Integer getTotalEventCrfCountForCrfMigration(CRFVersionBean sourceCrfVersionBean , CRFVersionBean targetCrfVersionBean ,ArrayList<String> studyEventDefnlist ,ArrayList<String>  sitelist) {
+    public Integer getTotalEventCrfCountForCrfMigration(FormLayoutBean sourceCrfVersionBean, FormLayoutBean targetCrfVersionBean,
+            ArrayList<String> studyEventDefnlist, ArrayList<String> sitelist) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        String eventStr =StringUtils.join(studyEventDefnlist, ",");
-        String siteStr =StringUtils.join(sitelist, ",");
+        String eventStr = StringUtils.join(studyEventDefnlist, ",");
+        String siteStr = StringUtils.join(sitelist, ",");
         variables.put(new Integer(1), new Integer(sourceCrfVersionBean.getId()));
         variables.put(2, eventStr);
         variables.put(3, siteStr);
@@ -793,7 +794,6 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             return null;
         }
     }
-
 
     public Integer getCountofStudySubjectsAtStudy(StudyBean currentStudy) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
@@ -977,7 +977,8 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         }
     }
 
-    public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, StudyAuditLogFilter filter, StudyAuditLogSort sort, int rowStart, int rowEnd) {
+    public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, StudyAuditLogFilter filter, StudyAuditLogSort sort, int rowStart,
+            int rowEnd) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpectedFilter();
 
@@ -995,7 +996,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
 
-        //System.out.println("SQL: " + sql);
+        // System.out.println("SQL: " + sql);
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
@@ -1082,11 +1083,11 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
      */
     @Override
     public EntityBean update(EntityBean eb) {
-   	 Connection con = null;
-   	 return update( eb, con);
-   }
+        Connection con = null;
+        return update(eb, con);
+    }
 
-    /* this function allows to run transactional updates for an action*/
+    /* this function allows to run transactional updates for an action */
     public EntityBean update(EntityBean eb, Connection con) {
         StudySubjectBean sb = (StudySubjectBean) eb;
         HashMap variables = new HashMap();
@@ -1113,9 +1114,9 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
             variables.put(new Integer(ind), enrollmentDate);
             ind++;
         }
-      // date_updated is set to now()
-      //  variables.put(new Integer(ind), new java.util.Date());
-      //  ind++;
+        // date_updated is set to now()
+        // variables.put(new Integer(ind), new java.util.Date());
+        // ind++;
         variables.put(new Integer(ind), new Integer(sb.getUpdater().getId()));
         ind++;
         variables.put(new Integer(ind), sb.getSecondaryLabel());
@@ -1131,10 +1132,10 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++;
 
         String sql = digester.getQuery("update");
-        if ( con == null){
-        	this.execute(sql, variables, nullVars);
-        }else{
-        	this.execute(sql, variables, nullVars, con);
+        if (con == null) {
+            this.execute(sql, variables, nullVars);
+        } else {
+            this.execute(sql, variables, nullVars, con);
         }
         return sb;
     }
@@ -1265,62 +1266,66 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             HashMap hm = (HashMap) it.next();
-            studySubjectIds += (String) hm.get("study_subject_id")+",";
+            studySubjectIds += (String) hm.get("study_subject_id") + ",";
         }
-        studySubjectIds = studySubjectIds.endsWith(",")?studySubjectIds.substring(0, studySubjectIds.length()-1):studySubjectIds;
+        studySubjectIds = studySubjectIds.endsWith(",") ? studySubjectIds.substring(0, studySubjectIds.length() - 1) : studySubjectIds;
         return studySubjectIds;
     }
-    //Jn: Commenting out the studySubjectDao's caching since its used only in one place in dataentry and is causing issues when trying to add new subject to a study event via createNewStudyEvent
-   /* @Override
-    public ArrayList<V> select(String query, HashMap variables) {
-        clearSignals();
-
-        ArrayList results = new ArrayList();
-        V  value;
-        K key;
-        ResultSet rs = null;
-        Connection con = null;
-        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
-        PreparedStatement ps = null;
-
-        try {
-            con = ds.getConnection();
-            if (con.isClosed()) {
-                if (logger.isWarnEnabled())
-                    logger.warn("Connection is closed: GenericDAO.select!");
-                throw new SQLException();
-            }
-
-           ps = con.prepareStatement(query);
-
-
-            ps = psf.generate(ps);// enter variables here!
-            key = (K) ps.toString();
-            if((results=(V) cache.get(key))==null)
-            {
-            rs = ps.executeQuery();
-            results = this.processResultRows(rs);
-            if(results!=null){
-                cache.put(key,results);
-            }
-            }
-
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
-            signalSuccess();
-
-
-        } catch (SQLException sqle) {
-            signalFailure(sqle);
-            if (logger.isWarnEnabled()) {
-                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
-                sqle.printStackTrace();
-            }
-        } finally {
-            this.closeIfNecessary(con, rs, ps);
-        }
-        return results;
-
-    }*/
+    // Jn: Commenting out the studySubjectDao's caching since its used only in one place in dataentry and is causing
+    // issues when trying to add new subject to a study event via createNewStudyEvent
+    /*
+     * @Override
+     * public ArrayList<V> select(String query, HashMap variables) {
+     * clearSignals();
+     * 
+     * ArrayList results = new ArrayList();
+     * V value;
+     * K key;
+     * ResultSet rs = null;
+     * Connection con = null;
+     * PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+     * PreparedStatement ps = null;
+     * 
+     * try {
+     * con = ds.getConnection();
+     * if (con.isClosed()) {
+     * if (logger.isWarnEnabled())
+     * logger.warn("Connection is closed: GenericDAO.select!");
+     * throw new SQLException();
+     * }
+     * 
+     * ps = con.prepareStatement(query);
+     * 
+     * 
+     * ps = psf.generate(ps);// enter variables here!
+     * key = (K) ps.toString();
+     * if((results=(V) cache.get(key))==null)
+     * {
+     * rs = ps.executeQuery();
+     * results = this.processResultRows(rs);
+     * if(results!=null){
+     * cache.put(key,results);
+     * }
+     * }
+     * 
+     * if (logger.isInfoEnabled()) {
+     * logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+     * }
+     * signalSuccess();
+     * 
+     * 
+     * } catch (SQLException sqle) {
+     * signalFailure(sqle);
+     * if (logger.isWarnEnabled()) {
+     * logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " +
+     * sqle.getMessage());
+     * sqle.printStackTrace();
+     * }
+     * } finally {
+     * this.closeIfNecessary(con, rs, ps);
+     * }
+     * return results;
+     * 
+     * }
+     */
 }
