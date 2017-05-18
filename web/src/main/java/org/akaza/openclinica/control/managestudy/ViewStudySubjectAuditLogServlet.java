@@ -96,7 +96,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
         ArrayList studySubjectAudits = new ArrayList();
@@ -195,7 +194,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 for (int j = 0; j < eventCRFs.size(); j++) {
                     // Link CRF and CRF Versions
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
-                    // eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
                     eventCRF.setFormLayout((FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId()));
                     eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
                     // Get the event crf audits
