@@ -10,7 +10,6 @@
             AS 'DECLARE
             pk INTEGER;
             se_id INTEGER;
-            form_layout_id INTEGER;
             entity_name_value TEXT;
             BEGIN
                 IF (TG_OP = ''UPDATE'') THEN
@@ -20,11 +19,8 @@
                         SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
                         SELECT INTO entity_name_value ''Status'';
                         IF(NEW.status_id = ''5'') THEN
-                            SELECT INTO se_id se.study_event_id FROM study_event se WHERE se.study_event_definition_id = NEW.study_event_definition_id;
-                            SELECT INTO form_layout_id ec.form_layout_id FROM event_crf ec, study_event se WHERE se.study_event_definition_id = NEW.study_event_definition_id and ec.study_event_id = se.study_event_id;
-
-                            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, study_event_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id, event_crf_version_id)
-                                        VALUES (pk, ''13'',se_id, now(), NEW.update_id, ''event_definition_crf'', NEW.event_definition_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_definition_crf_id, form_layout_id);
+                            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+                                        VALUES (pk, ''13'', now(), NEW.update_id, ''event_definition_crf'', NEW.event_definition_crf_id, entity_name_value, OLD.status_id, NEW.status_id);
                         END IF;
                     END IF;
                     RETURN NULL;  /*return values ignored for ''after'' triggers*/
