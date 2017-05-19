@@ -9,7 +9,6 @@
             CREATE OR REPLACE FUNCTION event_definition_crf_trigger() RETURNS "trigger"
             AS 'DECLARE
             pk INTEGER;
-            se_id INTEGER;
             entity_name_value TEXT;
             BEGIN
                 IF (TG_OP = ''UPDATE'') THEN
