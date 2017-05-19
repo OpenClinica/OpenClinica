@@ -66,5 +66,4 @@ public class LiquibaseConfig {
         liquibase.setChangeLog("classpath:migration/master.xml");
         return liquibase;
     }
-
 }

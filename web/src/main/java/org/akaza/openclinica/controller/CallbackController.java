@@ -4,19 +4,12 @@ import com.auth0.Auth0User;
 import com.auth0.NonceUtils;
 import com.auth0.SessionUtils;
 import com.auth0.spring.security.mvc.Auth0CallbackHandler;
-import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.CallbackService;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -24,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import java.io.IOException;
 
 /**
