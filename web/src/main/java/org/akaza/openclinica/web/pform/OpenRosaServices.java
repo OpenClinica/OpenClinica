@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -40,15 +41,10 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -66,6 +62,7 @@ import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -75,15 +72,12 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.web.pform.formlist.Form;
-import org.akaza.openclinica.web.pform.formlist.QueryFormDecorator;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
-import org.akaza.openclinica.web.pform.formlist.XFormObject;
 import org.akaza.openclinica.web.pform.manifest.Manifest;
 import org.akaza.openclinica.web.pform.manifest.MediaFile;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -103,7 +97,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
@@ -117,6 +110,9 @@ public class OpenRosaServices {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudySubjectDao ssDao;
 
     @Autowired
     CrfDao crfDao;
@@ -222,18 +218,11 @@ public class OpenRosaServices {
                             // TODO: For now all XForms get a date based hash to
                             // trick Enketo into always downloading
                             // TODO: them.
-                            if (formLayout.getXformName() != null) {
-                                form.setHash(DigestUtils.md5Hex(formLayout.getXform()));
-                            } else {
-                                Calendar cal = Calendar.getInstance();
-                                cal.setTime(new Date());
-                                form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
-                            }
 
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
                             form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
 
-                            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+                            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
                             if (mediaList != null && mediaList.size() > 0) {
                                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
                             }
@@ -304,13 +293,11 @@ public class OpenRosaServices {
             }
         }
 
-        String xform = "";
         XFormList formList = null;
 
         try {
             formList = new XFormList();
             XForm form = new XForm(crf, formLayout);
-            XFormObject formObj = new XFormObject();
 
             // TODO: Need to generate hash based on contents of
             // XForm. Will be done in a later story.
@@ -319,20 +306,11 @@ public class OpenRosaServices {
             // TODO: them.
             // TODO Uncomment this before checking in
             if (StringUtils.isNotEmpty(xformOutput)) {
-                xform = xformOutput;
-            } else {
-                xform = formLayout.getXform();
-                formObj.setXform(xform);
-                Form queryForm = new QueryFormDecorator(formObj);
-                xform = queryForm.decorate(xformParserHelper);
+                form.setHash(DigestUtils.md5Hex(xformOutput));
             }
 
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            form.setHash(DigestUtils.md5Hex(String.valueOf(cal.getTimeInMillis())));
-
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+            List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
             if (flavor.equals(QUERY_FLAVOR)) {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY);
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY);
@@ -374,7 +352,7 @@ public class OpenRosaServices {
 
         Manifest manifest = new Manifest();
 
-        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutId(formLayout.getFormLayoutId());
+        List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
 
         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
         if (mediaList != null && mediaList.size() > 0) {
@@ -391,10 +369,13 @@ public class OpenRosaServices {
 
         // Add user list
         MediaFile userList = new MediaFile();
-        Study study = studyDao.findByOcOID(studyOID);
-        String userXml = getUserXml(study.getStudyId());
+
+        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
+        if (subjectContextCache != null) {
+            String userXml = getUserXml(context);
+            userList.setHash((DigestUtils.md5Hex(userXml)));
+        }
         userList.setFilename("users.xml");
-        userList.setHash((DigestUtils.md5Hex(userXml)));
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
         manifest.add(userList);
 
@@ -472,23 +453,8 @@ public class OpenRosaServices {
         }
 
         try {
-            XFormObject formObj = new XFormObject();
-
-            if (StringUtils.isNotEmpty(formLayout.getXform())) {
-                if (flavor.equals(QUERY_FLAVOR)) {
-                    if (StringUtils.isNotEmpty(xformOutput)) {
-                        xform = xformOutput;
-                    } else {
-                        xform = formLayout.getXform();
-                        formObj.setXform(xform);
-                        Form queryForm = new QueryFormDecorator(formObj);
-                        xform = queryForm.decorate(xformParserHelper);
-                    }
-                }
+            if (StringUtils.isNotEmpty(xformOutput)) {
                 xform = xformOutput;
-            } else {
-                OpenRosaXmlGenerator generator = new OpenRosaXmlGenerator(coreResources, dataSource, ruleActionPropertyDao);
-                xform = generator.buildForm(formId);
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -552,9 +518,7 @@ public class OpenRosaServices {
         if (!mayProceedPreview(studyOID))
             return null;
 
-        Study study = studyDao.findByOcOID(studyOID);
-        String userXml = getUserXml(study.getStudyId());
-
+        String userXml = getUserXml(context);
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -742,7 +706,7 @@ public class OpenRosaServices {
             for (CRFVersionBean crfVersion : crfs) {
                 String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), studyOID);
             }
         } catch (Exception e) {
             LOGGER.debug(e.getMessage());
@@ -814,45 +778,6 @@ public class OpenRosaServices {
 
     }
 
-    private String updateRepeatGroupsWithOrdinal(String xform) throws Exception {
-
-        NamedNodeMap attribs = fetchXformAttributes(xform);
-        InputStream is = new ByteArrayInputStream(xform.getBytes());
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(false);
-        Document doc = factory.newDocumentBuilder().parse(is);
-        List<String> repeatGroupList = new ArrayList<>();
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
-        XPathExpression expr = xpath.compile("/html/body");
-
-        Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-        repeatGroupList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupList);
-
-        for (String repeatGroup : repeatGroupList) {
-            expr = xpath.compile("/html/head/model/instance[1]" + repeatGroup);
-            Element group = (Element) expr.evaluate(doc, XPathConstants.NODE);
-            Element ordinal = doc.createElement("OC.REPEAT_ORDINAL");
-            group.appendChild(ordinal);
-
-        }
-
-        TransformerFactory transformFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.INDENT, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        DOMSource source = new DOMSource(doc);
-        transformer.transform(source, result);
-        String modifiedXform = writer.toString();
-        modifiedXform = applyXformAttributes(modifiedXform, attribs);
-        logger.debug("Finalized xform source: " + modifiedXform);
-        return modifiedXform;
-    }
-
     public String applyXformAttributes(String xform, NamedNodeMap attribs) throws Exception {
         String defaultNamespace = null;
         for (int i = 0; i < attribs.getLength(); i++) {
@@ -875,7 +800,13 @@ public class OpenRosaServices {
         return attribs;
     }
 
-    private String getUserXml(Integer studyId) throws Exception {
+    private String getUserXml(ServletContext context) throws Exception {
+        HashMap<String, String> value = getSubjectContextCacheValue(context);
+        String studySubjectOid = value.get("studySubjectOID");
+
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
+        StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
+        StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -884,7 +815,7 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(studyId);
+        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
         for (UserAccount userAccount : users) {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
@@ -998,6 +929,17 @@ public class OpenRosaServices {
 
     public void setXformParserHelper(XformParserHelper xformParserHelper) {
         this.xformParserHelper = xformParserHelper;
+    }
+
+    @SuppressWarnings("unchecked")
+    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context) {
+        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
+        String lastKey = null;
+        for (String key : subjectContextCache.keySet()) {
+            lastKey = key;
+        }
+        HashMap<String, String> value = (HashMap<String, String>) subjectContextCache.get(lastKey);
+        return value;
     }
 
 }

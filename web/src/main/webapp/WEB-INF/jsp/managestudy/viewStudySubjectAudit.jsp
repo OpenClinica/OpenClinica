@@ -179,7 +179,7 @@
 
                         <tr>
                             <td class="table_header_column"><c:out value="${deletedEventCRF.crfName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${deletedEventCRF.crfVersion}"/>&nbsp;</td>
+                            <td class="table_header_column"><c:out value="${deletedEventCRF.formLayout}"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${deletedEventCRF.deletedBy}"/>&nbsp;</td>
                             <td class="table_header_column"><fmt:formatDate value="${deletedEventCRF.deletedDate}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
                         </tr>
@@ -294,7 +294,7 @@
                 </tr>
                 <tr>
                     <td class="table_header_column"><c:out value="${eventCRF.crf.name}"/>&nbsp;</td>
-                    <td class="table_header_column"><c:out value="${eventCRF.crfVersion.name}"/>&nbsp;</td>
+                    <td class="table_header_column"><c:out value="${eventCRF.formLayout.name}"/>&nbsp;</td>
                     <td class="table_header_column">
 						<fmt:formatDate value="${eventCRF.dateInterviewed}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;
                     	<%--<c:out value="${eventCRF.dateInterviewed}"/>&nbsp;--%>

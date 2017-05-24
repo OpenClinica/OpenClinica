@@ -17,12 +17,12 @@
 			
 		BEGIN
 			IF (TG_OP = ''UPDATE'') THEN
-				IF(OLD.crf_version_id <![CDATA[<>]]> NEW.crf_version_id) THEN
+				IF(OLD.form_layout_id <![CDATA[<>]]> NEW.form_layout_id) THEN
 				 /*---------------*/
 
 				    SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				   SELECT INTO crf_old_name cf.name FROM crf_version cf WHERE cf.crf_version_id = OLD.crf_version_id;
-				    SELECT INTO crf_new_name cf.name FROM crf_version cf WHERE cf.crf_version_id = NEW.crf_version_id;
+				   SELECT INTO crf_old_name fl.name FROM form_layout fl WHERE fl.form_layout_id = OLD.form_layout_id;
+				    SELECT INTO crf_new_name fl.name FROM form_layout fl WHERE fl.form_layout_id = NEW.form_layout_id;
 				    
 				    
 				    

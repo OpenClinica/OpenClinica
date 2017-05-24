@@ -4,7 +4,7 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.dto.Crf;
+import org.akaza.openclinica.service.dto.Form;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 
 public class FormLayoutDTO {
@@ -14,7 +14,7 @@ public class FormLayoutDTO {
     private FormLayout formLayout;
     private CrfBean crf;
     private String url;
-    private Crf[] fmCrfs;
+    private Form[] fmCrfs;
 
     public FormLayoutDTO(FormLayoutDTO formLayoutObj) {
         this.odmFormDef = formLayoutObj.odmFormDef;
@@ -70,11 +70,11 @@ public class FormLayoutDTO {
         this.url = url;
     }
 
-    public Crf[] getFmCrfs() {
+    public Form[] getFmCrfs() {
         return fmCrfs;
     }
 
-    public void setFmCrfs(Crf[] fmCrfs) {
+    public void setFmCrfs(Form[] fmCrfs) {
         this.fmCrfs = fmCrfs;
     }
 

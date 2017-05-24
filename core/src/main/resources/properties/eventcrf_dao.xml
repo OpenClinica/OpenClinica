@@ -300,8 +300,8 @@
         <sql>INSERT INTO EVENT_CRF (STUDY_EVENT_ID, CRF_VERSION_ID,
             DATE_INTERVIEWED, INTERVIEWER_NAME, COMPLETION_STATUS_ID, STATUS_ID,
             ANNOTATIONS, OWNER_ID,
-            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS)
-            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?)</sql>
+            DATE_CREATED, STUDY_SUBJECT_ID, VALIDATE_STRING, VALIDATOR_ANNOTATIONS,Form_Layout_Id)
+            VALUES (?,?,?,?,?,?,?,?,NOW(),?, ?, ?,?)</sql>
     </query>
     <query>
         <name>update</name>
@@ -427,6 +427,13 @@
     </query>
 
     <query>
+        <name>findByEventSubjectFormLayout</name>
+        <sql>select ec.* from event_crf  ec, form_layout fl
+            where ec.form_layout_id=fl.form_layout_id
+            and ec.study_event_id=? and fl.form_layout_id=? and ec.study_subject_id=?
+        </sql>
+    </query>
+    <query>
         <name>findByEventCrfVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
             where ec.crf_version_id=cv.crf_version_id
@@ -434,6 +441,13 @@
         </sql>
     </query>
 
+    <query>
+        <name>findByEventFormLayout</name>
+        <sql>select ec.* from event_crf  ec, form_layout fl
+            where ec.form_layout_id=fl.form_layout_id
+            and ec.study_event_id=? and fl.form_layout_id=?
+        </sql>
+    </query>
     <query>
         <name>findByCrfVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
@@ -505,19 +519,27 @@
            WHERE EVENT_CRF_ID=?
         </sql>
    </query>
+     <query>
+        <name>updateFormLayoutID</name>
+        <sql>
+            UPDATE EVENT_CRF
+            SET form_layout_id=?,  sdv_update_id=?, update_id=?, DATE_UPDATED=NOW(), sdv_status= ?
+           WHERE EVENT_CRF_ID=?
+        </sql>
+   </query>
 	<query>
 		<name>findAllCRFMigrationReportList</name>
 		<sql>
 			select ec.* from event_crf ec
 			JOIN study_subject ss on ss.study_subject_id = ec.study_subject_id
 			JOIN study_event se on se.study_event_id = ec.study_event_id
-			JOIN crf_version cv on cv.crf_version_id = ec.crf_version_id
+			JOIN form_layout fl on fl.form_layout_id = ec.form_layout_id
 			JOIN study_event_definition sed on sed.study_event_definition_id= se.study_event_definition_id
             JOIN study s on s.study_id=ss.study_id			
-			LEFT JOIN event_definition_crf edc on (edc.crf_id = cv.crf_id and
+			LEFT JOIN event_definition_crf edc on (edc.crf_id = fl.crf_id and
 			edc.study_id = ss.study_id and edc.study_event_definition_id=
 			se.study_event_definition_id)
-			where ec.crf_version_id=?  
+			where ec.form_layout_id=?  
 			and
             (sed.oc_oid = ANY(string_to_array(?,',')))  
                   and    

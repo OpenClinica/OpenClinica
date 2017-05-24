@@ -1,12 +1,15 @@
 package org.akaza.openclinica.web.pform;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.servlet.ServletContext;
 
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 public class PFormCache {
@@ -16,7 +19,9 @@ public class PFormCache {
     // HashMap of study, HashMap of crfVersionOID, pFormURL
     HashMap<String, HashMap<String, String>> offlineUrlCache = null;
     // HashMap of context hash, HashMap of properties such as ssoid, crf version oid, etc...
-    HashMap<String, HashMap<String, String>> subjectContextCache = null;
+    LinkedHashMap<String, HashMap<String, String>> subjectContextCache = null;
+    @Autowired
+    private EnketoCredentials enketoCredentials;
 
     private PFormCache() {
 
@@ -25,7 +30,7 @@ public class PFormCache {
     private PFormCache(ServletContext context) {
         urlCache = (HashMap<String, HashMap<String, String>>) context.getAttribute("pformURLCache");
         offlineUrlCache = (HashMap<String, HashMap<String, String>>) context.getAttribute("pformOfflineURLCache");
-        subjectContextCache = (HashMap<String, HashMap<String, String>>) context.getAttribute("subjectContextCache");
+        subjectContextCache = (LinkedHashMap<String, HashMap<String, String>>) context.getAttribute("subjectContextCache");
 
         if (urlCache == null) {
             urlCache = new HashMap<String, HashMap<String, String>>();
@@ -36,7 +41,7 @@ public class PFormCache {
             context.setAttribute("pformOfflineURLCache", offlineUrlCache);
         }
         if (subjectContextCache == null) {
-            subjectContextCache = new HashMap<String, HashMap<String, String>>();
+            subjectContextCache = new LinkedHashMap<String, HashMap<String, String>>();
             context.setAttribute("subjectContextCache", subjectContextCache);
         }
 
@@ -51,6 +56,8 @@ public class PFormCache {
     }
 
     public String getPFormURL(String studyOID, String formLayoutOID, boolean isOffline) throws Exception {
+        Study study = enketoCredentials.getParentStudy(studyOID);
+        studyOID = study.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
         if (isOffline)
@@ -111,6 +118,7 @@ public class PFormCache {
         String hashString = studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
         String hashOutput = encoder.encodePassword(hashString, null);
+        subjectContextCache.remove(hashOutput);
         subjectContextCache.put(hashOutput, contextMap);
         return hashOutput;
     }

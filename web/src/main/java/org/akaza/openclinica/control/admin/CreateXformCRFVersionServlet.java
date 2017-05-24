@@ -1,27 +1,23 @@
 package org.akaza.openclinica.control.admin;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
+import org.akaza.openclinica.service.crfdata.FormArtifactTransferObj;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
-import org.akaza.openclinica.service.dto.Crf;
-import org.akaza.openclinica.service.dto.Version;
+import org.akaza.openclinica.service.dto.FormVersion;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.fileupload.FileItem;
@@ -41,6 +37,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
     public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
+    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     @Override
     protected void processRequest() throws Exception {
@@ -56,67 +53,36 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ServletFileUpload upload = new ServletFileUpload(factory);
         List<FileItem> items = upload.parseRequest(request);
         String crfName = retrieveFormFieldValue(items, "crfName");
-        int crfId = Integer.valueOf(retrieveFormFieldValue(items, "crfId"));
-        String crfDescription = "";
-        DataBinder dataBinder = new DataBinder(new CrfVersion());
+        DataBinder dataBinder = new DataBinder(new FormVersion());
         Errors errors = dataBinder.getBindingResult();
+        int crfId = Integer.valueOf(retrieveFormFieldValue(items, "crfId"));
 
-        String crfOid = "";
         if (crfId != 0) {
             CrfBean crfBean = crfDao.findByCrfId(crfId);
             crfName = crfBean.getName();
-            if (crfBean != null) {
-                crfOid = crfBean.getOcOid();
+        }
+
+        FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOid(), crfName);
+        if (transferObj.getErr().size() != 0) {
+            for (ErrorObj er : transferObj.getErr()) {
+                errors.rejectValue("name", er.getCode(), er.getMessage());
             }
         } else {
-            String url = FM_BASEURL + currentStudy.getOid() + "/forms/" + crfName;
-            RestTemplate restTemplate = new RestTemplate();
-            Crf resp = restTemplate.getForObject(url, Crf.class);
-            crfOid = resp.getOcoid();
-        }
-
-        Crf crf = getFormArtifactsFromFM(items, currentStudy.getOid(), crfOid);
-        /**
-         * ODM odm = new ODM();
-         * ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
-         * List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
-         * for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
-         * if (crfOid.equals(odmFormDef.getOID())) {
-         * List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
-         * break;
-         * }
-         * }
-         **/
-
-        List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
-        OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
-        for (Version version : crf.getVersions()) {
-            formLayoutDef = new OCodmComplexTypeDefinitionFormLayoutDef();
-            formLayoutDef.setOID(version.getName());
-            formLayoutDef.setURL(version.getArtifactURL());
-            formLayoutDefs.add(formLayoutDef);
-        }
-
-        ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, items, currentStudy, ub, false, crfName,
-                crfDescription);
-
-        xformService.executeIndividualCrf(eicObj);
-        forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
-    }
-
-    private void itemBelongsToRepeatGroup(List<String> repeatGroupList, String itemPath) {
-        for (String repeatGroup : repeatGroupList) {
-            int index = -1;
-            String parentPath = itemPath;
-            while (index != 0) {
-                index = parentPath.lastIndexOf("/");
-                parentPath = parentPath.substring(0, index);
-                if (repeatGroupList.contains(parentPath)) {
-
-                }
+            List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = new ArrayList<>();
+            OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef;
+            for (FormVersion version : transferObj.getForm().getVersions()) {
+                formLayoutDef = new OCodmComplexTypeDefinitionFormLayoutDef();
+                formLayoutDef.setOID(version.getName());
+                formLayoutDef.setURL(version.getArtifactURL());
+                formLayoutDefs.add(formLayoutDef);
             }
-
+            ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(transferObj.getForm(), formLayoutDefs, errors, currentStudy, ub, false, null);
+            xformService.executeIndividualCrf(eicObj);
         }
+        if (errors.hasErrors()) {
+            request.setAttribute("errorList", errors.getAllErrors());
+        }
+        forwardPage(Page.CREATE_XFORM_CRF_VERSION_SERVLET);
     }
 
     private String retrieveFormFieldValue(List<FileItem> items, String fieldName) throws Exception {
@@ -126,42 +92,6 @@ public class CreateXformCRFVersionServlet extends SecureController {
         }
         logger.warn("Form field '" + fieldName + "' missing from xform submission.");
         return "";
-    }
-
-    private void saveAttachedMedia(List<FileItem> items, CrfBean crf, FormLayout formLayout) {
-        boolean hasFiles = false;
-        for (FileItem item : items) {
-            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
-                hasFiles = true;
-        }
-
-        if (hasFiles) {
-            // Create the directory structure for saving the media
-            String dir = Utils.getCrfMediaFilePathWithoutSysPath(crf.getOcOid(), formLayout.getOcOid());
-            if (!new File(dir).exists()) {
-                new File(dir).mkdirs();
-                logger.debug("Made the directory " + dir);
-            }
-            // Save any media files
-            for (FileItem item : items) {
-                if (!item.isFormField()) {
-
-                    String fileName = item.getName();
-                    // Some browsers IE 6,7 getName returns the whole path
-                    int startIndex = fileName.lastIndexOf('\\');
-                    if (startIndex != -1) {
-                        fileName = fileName.substring(startIndex + 1, fileName.length());
-                    }
-
-                    File uploadedFile = new File(dir + File.separator + fileName);
-                    try {
-                        item.write(uploadedFile);
-                    } catch (Exception e) {
-                        throw new OpenClinicaSystemException(e.getMessage());
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -186,12 +116,12 @@ public class CreateXformCRFVersionServlet extends SecureController {
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
-    private Crf getFormArtifactsFromFM(List<FileItem> files, String studyOid, String formOid) {
+    private FormArtifactTransferObj getFormArtifactsFromFM(List<FileItem> files, String studyOid, String crfName) {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + formOid + "/artifacts";
+        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + crfName + "/artifacts";
         map.add("file", byteArrayResources);
 
         for (FileItem file : files) {
@@ -212,7 +142,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
 
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         // TODO: replace with Crf object instead of String object
-        Crf response = restTemplate.postForObject(uploadFilesUrl, requestEntity, Crf.class);
+        FormArtifactTransferObj response = restTemplate.postForObject(uploadFilesUrl, requestEntity, FormArtifactTransferObj.class);
 
         return response;
     }

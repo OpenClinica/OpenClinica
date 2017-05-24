@@ -60,9 +60,10 @@
 			<groupId>com.sun.xml.wss</groupId>
 			<artifactId>xws-security</artifactId>
 		</dependency>
-
-
-
+		<dependency>
+		  <groupId>javax.xml.parsers</groupId>
+		  <artifactId>jaxp-api</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

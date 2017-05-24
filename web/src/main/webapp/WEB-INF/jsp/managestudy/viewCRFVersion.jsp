@@ -44,7 +44,7 @@
 
 <jsp:useBean scope='request' id='sections' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='crfname' class='java.lang.String'/>
-<jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.FormLayoutBean'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 <h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  </span></h1>

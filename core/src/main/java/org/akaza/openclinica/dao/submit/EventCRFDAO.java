@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -222,6 +223,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(9), new Integer(ecb.getStudySubjectId()));
         variables.put(new Integer(10), ecb.getValidateString());
         variables.put(new Integer(11), ecb.getValidatorAnnotations());
+        variables.put(new Integer(12), new Integer(ecb.getFormLayoutId()));
 
         executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -328,7 +330,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findAllByStudySubject", variables);
     }
 
-    public List<EventCRFBean> findAllCRFMigrationReportList(CRFVersionBean sourceCrfVersionBean, CRFVersionBean targetCrfVersionBean,
+    public List<EventCRFBean> findAllCRFMigrationReportList(FormLayoutBean sourceCrfVersionBean, FormLayoutBean targetCrfVersionBean,
             ArrayList<String> studyEventDefnlist, ArrayList<String> sitelist) {
         HashMap<Integer, Object> variables = new HashMap();
         String eventStr = StringUtils.join(studyEventDefnlist, ",");
@@ -439,6 +441,15 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findByEventSubjectVersion", variables);
     }
 
+    public ArrayList findByEventSubjectFormLayout(StudyEventBean studyEvent, StudySubjectBean studySubject, FormLayoutBean formLayout) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(formLayout.getId()));
+        variables.put(new Integer(3), new Integer(studySubject.getId()));
+
+        return executeFindAllQuery("findByEventSubjectFormLayout", variables);
+    }
+
     // TODO: to get rid of warning refactor executeFindAllQuery method in
     // superclass
     public EventCRFBean findByEventCrfVersion(StudyEventBean studyEvent, CRFVersionBean crfVersion) {
@@ -448,6 +459,20 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(2), new Integer(crfVersion.getId()));
 
         ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByEventCrfVersion", variables);
+        if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
+            eventCrfBean = eventCrfs.get(0);
+        }
+        return eventCrfBean;
+
+    }
+
+    public EventCRFBean findByEventFormLayout(StudyEventBean studyEvent, FormLayoutBean formLayout) {
+        EventCRFBean eventCrfBean = null;
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(formLayout.getId()));
+
+        ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByEventFormLayout", variables);
         if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
             eventCrfBean = eventCrfs.get(0);
         }
@@ -997,6 +1022,29 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(4, false);
         variables.put(5, event_crf_id);
         String sql = digester.getQuery("updateCRFVersionID");
+        // this is the way to make the change transactional
+        if (con == null) {
+            this.execute(sql, variables);
+        } else {
+            this.execute(sql, variables, con);
+        }
+    }
+
+    public void updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(3, TypeNames.INT);
+        this.setTypeExpected(4, TypeNames.BOOL);
+        this.setTypeExpected(3, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(1, form_layout_id);
+        variables.put(2, user_id);
+        variables.put(3, user_id);
+        variables.put(4, false);
+        variables.put(5, event_crf_id);
+        String sql = digester.getQuery("updateFormLayoutID");
         // this is the way to make the change transactional
         if (con == null) {
             this.execute(sql, variables);

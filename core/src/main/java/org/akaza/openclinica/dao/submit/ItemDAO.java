@@ -27,21 +27,22 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
+
 /**
  * @author thickerson
  * 
  * 
  */
-public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
     public ItemDAO(DataSource ds) {
@@ -250,7 +251,6 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return this.executeFindAllQuery("findAllBySectionIdOrderedByItemFormMetadataOrdinal", variables);
     }
 
-    
     public ArrayList findAllUngroupedParentsBySectionId(int sectionId, int crfVersionId) {
         HashMap variables = new HashMap();
         variables.put(1, sectionId);
@@ -264,6 +264,13 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         variables.put(new Integer(1), new Integer(versionId));
 
         return this.executeFindAllQuery("findAllItemsByVersionId", variables);
+    }
+
+    public ArrayList findAllItemsByLayoutId(int layoudId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(layoudId));
+
+        return this.executeFindAllQuery("findAllItemsByLayoutId", variables);
     }
 
     public ArrayList findAllVersionsByItemId(int itemId) {
@@ -313,8 +320,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return beanList;
     }
 
-    
-    public List<ItemBean> findAllItemsByGroupIdAndSectionIdOrdered(int id, int crfVersionId , int sectionId) {
+    public List<ItemBean> findAllItemsByGroupIdAndSectionIdOrdered(int id, int crfVersionId, int sectionId) {
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(1, id);
@@ -331,13 +337,12 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return beanList;
     }
 
-    
-    public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId,int sectionId) {
+    public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId, int sectionId) {
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(1, id);
         variables.put(2, crfVersionId);
-        variables.put(3,sectionId);
+        variables.put(3, sectionId);
         String sql = digester.getQuery("findAllItemsByGroupIdForPrint");
         List listofMaps = this.select(sql, variables);
         List<ItemBean> beanList = new ArrayList<ItemBean>();
@@ -348,6 +353,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         }
         return beanList;
     }
+
     public ItemBean findItemByGroupIdandItemOid(int id, String itemOid) {
         ItemBean bean;
         this.setTypesExpected();
@@ -401,7 +407,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
-        
+
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
 
@@ -504,12 +510,12 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
         return this.executeFindAllQuery("findAllRequiredBySectionId", variables);
     }
-    
-    public Map<String,Integer> mapAllItemNameAndItemIdInSection(Integer sectionId) {
-        Map<String,Integer> nameIdMap = new HashMap<String,Integer>();
+
+    public Map<String, Integer> mapAllItemNameAndItemIdInSection(Integer sectionId) {
+        Map<String, Integer> nameIdMap = new HashMap<String, Integer>();
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT); //item_id
-        this.setTypeExpected(2, TypeNames.STRING); //(item)name
+        this.setTypeExpected(1, TypeNames.INT); // item_id
+        this.setTypeExpected(2, TypeNames.STRING); // (item)name
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sectionId));
         String sql = digester.getQuery("findIdAndNamesInSection");
@@ -523,14 +529,14 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         }
         return nameIdMap;
     }
-    
-    public Map<String,String> mapAllChildAndParentNameInSection(Integer sectionId) {
-        Map<String,String> nameMap = new HashMap<String,String>();
+
+    public Map<String, String> mapAllChildAndParentNameInSection(Integer sectionId) {
+        Map<String, String> nameMap = new HashMap<String, String>();
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.STRING);//(item)name
-        this.setTypeExpected(2, TypeNames.INT);//item_id
-        this.setTypeExpected(3, TypeNames.STRING);//parent_name
-        this.setTypeExpected(4, TypeNames.INT);//parent_id
+        this.setTypeExpected(1, TypeNames.STRING);// (item)name
+        this.setTypeExpected(2, TypeNames.INT);// item_id
+        this.setTypeExpected(3, TypeNames.STRING);// parent_name
+        this.setTypeExpected(4, TypeNames.INT);// parent_id
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sectionId));
         variables.put(new Integer(2), new Integer(sectionId));
@@ -547,19 +553,19 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         }
         return nameMap;
     }
-    
+
     @Override
     public ArrayList<V> select(String query, HashMap variables) {
         clearSignals();
 
         ArrayList results = new ArrayList();
-        V  value;
+        V value;
         K key;
         ResultSet rs = null;
         Connection con = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         PreparedStatement ps = null;
-        
+
         try {
             con = ds.getConnection();
             CoreResources.setSchema(con);
@@ -570,26 +576,23 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
                 throw new SQLException();
             }
 
-           ps = con.prepareStatement(query);
-           
-       
+            ps = con.prepareStatement(query);
+
             ps = psf.generate(ps);// enter variables here!
-            logger.debug("query is..."+ps.toString());
+            logger.debug("query is..." + ps.toString());
             key = (K) ps.toString();
-            if((results=(V) cache.get(key))==null)
-            {
-            rs = ps.executeQuery();
-            results = this.processResultRows(rs);
-            if(results!=null){
-                cache.put(key,results);
+            if ((results = (V) cache.get(key)) == null) {
+                rs = ps.executeQuery();
+                results = this.processResultRows(rs);
+                if (results != null) {
+                    cache.put(key, results);
+                }
             }
-            }
-            
-           // if (logger.isInfoEnabled()) {
-                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
-          //  }
+
+            // if (logger.isInfoEnabled()) {
+            logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+            // }
             signalSuccess();
-              
 
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -603,48 +606,46 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return results;
 
     }
-	
-	    
-//    select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, value
-//
-//    from item_data id, item i 
-//    where id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal;
-    
-    public ArrayList<ItemBean> findAllWithItemDataByCRFVersionId(int crfVersionId,int eventCRFId) {
+
+    // select name, ordinal, oc_oid, item_data_id, i.item_id as item_id, value
+    //
+    // from item_data id, item i
+    // where id.item_id=i.item_id and event_crf_id = ? order by i.item_id,ordinal;
+
+    public ArrayList<ItemBean> findAllWithItemDataByFormLayoutId(int crfVersionId, int eventCRFId) {
         this.unsetTypeExpected();
-        
-        this.setTypeExpected(1, TypeNames.STRING);//(item)name
-        this.setTypeExpected(2, TypeNames.INT);//ordinal
-        this.setTypeExpected(3, TypeNames.STRING);//oc_oid
-        this.setTypeExpected(4, TypeNames.INT);//item_data_id
-        this.setTypeExpected(5, TypeNames.INT);//item_id
-        this.setTypeExpected(6, TypeNames.STRING);//(item)value
-        
-        
+
+        this.setTypeExpected(1, TypeNames.STRING);// (item)name
+        this.setTypeExpected(2, TypeNames.INT);// ordinal
+        this.setTypeExpected(3, TypeNames.STRING);// oc_oid
+        this.setTypeExpected(4, TypeNames.INT);// item_data_id
+        this.setTypeExpected(5, TypeNames.INT);// item_id
+        this.setTypeExpected(6, TypeNames.STRING);// (item)value
+
         ArrayList<ItemBean> answer = new ArrayList<ItemBean>();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(crfVersionId));
         variables.put(new Integer(2), new Integer(eventCRFId));
-        
-        String sql = digester.getQuery("findAllWithItemDataByCRFVersionId");
+
+        String sql = digester.getQuery("findAllWithItemDataByFormLayoutId");
 
         ArrayList rows = super.select(sql, variables);
         Iterator it = rows.iterator();
-        int cur_item_id=0;
+        int cur_item_id = 0;
         ItemBean item_bean = null;
         ItemDataBean item_data_bean = null;
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer id = (Integer) row.get("item_id");
-            if (cur_item_id!= id.intValue() ){
-            	item_bean = new ItemBean();
-            	answer.add(item_bean);
-            	cur_item_id = id.intValue();
-            	item_bean.setId(cur_item_id);
-            	item_bean.setName((String) row.get("name"));
-            	item_bean.setOid((String) row.get("oc_oid"));
-            	
+            if (cur_item_id != id.intValue()) {
+                item_bean = new ItemBean();
+                answer.add(item_bean);
+                cur_item_id = id.intValue();
+                item_bean.setId(cur_item_id);
+                item_bean.setName((String) row.get("name"));
+                item_bean.setOid((String) row.get("oc_oid"));
+
             }
             item_data_bean = new ItemDataBean();
             item_data_bean.setValue((String) row.get("value"));
@@ -652,31 +653,32 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
             item_data_bean.setId(((Integer) row.get("item_data_id")).intValue());
             item_data_bean.setItemId(cur_item_id);
             item_bean.addItemDataElement(item_data_bean);
-           
+
         }
 
         return answer;
     }
-/*
- * select  distinct item.name as item_name, item_group.name as group_name,  item_group.oc_oid as group_oid ,
-crf_version.name as version_name, crf_version.status_id as v_status
- from item, item_group  , item_group_metadata, crf_version
- where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
- and item_group_metadata.crf_version_id = crf_version.crf_version_id
- and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
- 
- */
-    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemGroupCRFVersionMetadataByCRFId( String  crfName) {
+
+    /*
+     * select distinct item.name as item_name, item_group.name as group_name, item_group.oc_oid as group_oid ,
+     * crf_version.name as version_name, crf_version.status_id as v_status
+     * from item, item_group , item_group_metadata, crf_version
+     * where item.item_id= item_group_metadata.item_id and item_group_metadata.item_group_id = item_group.item_group_id
+     * and item_group_metadata.crf_version_id = crf_version.crf_version_id
+     * and item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+     * 
+     */
+    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemGroupCRFVersionMetadataByCRFId(String crfName) {
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.STRING);//(crf)name
-        this.setTypeExpected(2, TypeNames.STRING);//(crf)name
-        this.setTypeExpected(3, TypeNames.STRING);//(crf)name
-        this.setTypeExpected(4, TypeNames.STRING);//(crf)name
-        this.setTypeExpected(5, TypeNames.INT);//(crf)name
-        
+        this.setTypeExpected(1, TypeNames.STRING);// (crf)name
+        this.setTypeExpected(2, TypeNames.STRING);// (crf)name
+        this.setTypeExpected(3, TypeNames.STRING);// (crf)name
+        this.setTypeExpected(4, TypeNames.STRING);// (crf)name
+        this.setTypeExpected(5, TypeNames.INT);// (crf)name
+
         HashMap variables = new HashMap();
-        variables.put(new Integer (1), crfName);
-       
+        variables.put(new Integer(1), crfName);
+
         String sql = digester.getQuery("findAllWithItemGroupCRFVersionMetadataByCRFId");
         ArrayList rows = this.select(sql, variables);
         ItemGroupCrvVersionUtil item = null;
@@ -691,36 +693,36 @@ crf_version.name as version_name, crf_version.status_id as v_status
             item.setGroupName((String) row.get("group_name"));
             item.setGroupOID((String) row.get("group_oid"));
             item_group_crfversion_info.add(item);
-           
+
         }
         return item_group_crfversion_info;
     }
-    
+
     /*
-     * select  distinct item.name as item_name, item.description as description, item.item_id as item_id, 
-item.item_data_type_id as data_type, item.oc_oid as item_oid,
-item_group.name as group_name,  item_group.oc_oid as group_oid ,
-crf_version.name as version_name, crf_version.status_id as v_status
+     * select distinct item.name as item_name, item.description as description, item.item_id as item_id,
+     * item.item_data_type_id as data_type, item.oc_oid as item_oid,
+     * item_group.name as group_name, item_group.oc_oid as group_oid ,
+     * crf_version.name as version_name, crf_version.status_id as v_status
      */
-    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemDetailsGroupCRFVersionMetadataByCRFId( String  crfName) {
+    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemDetailsGroupCRFVersionMetadataByCRFId(String crfName) {
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.STRING);//(crf)name
-        this.setTypeExpected(2, TypeNames.STRING);//(crf)description
-        this.setTypeExpected(3, TypeNames.INT);//(crf)item_id
-        this.setTypeExpected(4, TypeNames.INT);//(crf)data_type
-        this.setTypeExpected(5, TypeNames.STRING);//(crf)item_oid
-        this.setTypeExpected(6, TypeNames.STRING);//(crf)group_name
-        this.setTypeExpected(7, TypeNames.STRING);//(crf)group_oid
-        this.setTypeExpected(8, TypeNames.STRING);//(crf)version_name
-        this.setTypeExpected(9, TypeNames.INT);//(crf)v_status
-        
+        this.setTypeExpected(1, TypeNames.STRING);// (crf)name
+        this.setTypeExpected(2, TypeNames.STRING);// (crf)description
+        this.setTypeExpected(3, TypeNames.INT);// (crf)item_id
+        this.setTypeExpected(4, TypeNames.INT);// (crf)data_type
+        this.setTypeExpected(5, TypeNames.STRING);// (crf)item_oid
+        this.setTypeExpected(6, TypeNames.STRING);// (crf)group_name
+        this.setTypeExpected(7, TypeNames.STRING);// (crf)group_oid
+        this.setTypeExpected(8, TypeNames.STRING);// (crf)version_name
+        this.setTypeExpected(9, TypeNames.INT);// (crf)v_status
+
         HashMap variables = new HashMap();
-        variables.put(new Integer (1), crfName);
-       
+        variables.put(new Integer(1), crfName);
+
         String sql = digester.getQuery("findAllWithItemDetailsGroupCRFVersionMetadataByCRFId");
         ArrayList rows = this.select(sql, variables);
         ItemGroupCrvVersionUtil item = null;
-        ItemDataType itemDT= null;
+        ItemDataType itemDT = null;
         ArrayList<ItemGroupCrvVersionUtil> item_group_crfversion_info = new ArrayList<ItemGroupCrvVersionUtil>();
         Iterator it = rows.iterator();
         while (it.hasNext()) {
@@ -731,19 +733,19 @@ crf_version.name as version_name, crf_version.status_id as v_status
             item.setCrfVersionStatus(((Integer) row.get("v_status")).intValue());
             item.setGroupName((String) row.get("group_name"));
             item.setGroupOID((String) row.get("group_oid"));
-            this.setTypeExpected(2, TypeNames.STRING);//(crf)
-            this.setTypeExpected(3, TypeNames.INT);//(crf)item_id
-            this.setTypeExpected(4, TypeNames.INT);//(crf)data_type
-            this.setTypeExpected(5, TypeNames.STRING);//(crf)item_oid
-         
+            this.setTypeExpected(2, TypeNames.STRING);// (crf)
+            this.setTypeExpected(3, TypeNames.INT);// (crf)item_id
+            this.setTypeExpected(4, TypeNames.INT);// (crf)data_type
+            this.setTypeExpected(5, TypeNames.STRING);// (crf)item_oid
+
             item.setItemDescription((String) row.get("description"));
             item.setItemOID((String) row.get("item_oid"));
             itemDT = ItemDataType.get((Integer) row.get("data_type"));
-            
+
             item.setItemDataType(itemDT.getDescription());
             item.setId((Integer) row.get("item_id"));
             item_group_crfversion_info.add(item);
-           
+
         }
         return item_group_crfversion_info;
     }
