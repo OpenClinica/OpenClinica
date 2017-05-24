@@ -33,7 +33,7 @@ public class CallbackController extends Auth0CallbackHandler {
     @Autowired CallbackService callbackService;
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
-    protected void callback(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    protected void callback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
 
         SessionUtils.setState(req, "nonce=123456");
         NonceUtils.addNonceToStorage(req);

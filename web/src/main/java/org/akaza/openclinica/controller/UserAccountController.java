@@ -184,7 +184,6 @@ public class UserAccountController {
 			uBean.setUpdater(uBean.getOwner());
 			updateUserAccount(uBean);
 			logger.info("***New User Account is created***");
-			System.out.println("***New User Account is created***");
 			uBean.setPasswd(password);
 		}
 		userDTO.put("username", uBean.getName());
@@ -192,6 +191,7 @@ public class UserAccountController {
 		userDTO.put("firstName", uBean.getFirstName());
 		userDTO.put("lastName", uBean.getLastName());
 		userDTO.put("apiKey", uBean.getApiKey());
+		request.setAttribute("createdUaBean", uBean);
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
@@ -203,7 +203,7 @@ public class UserAccountController {
 		createdUserAccountBean.setName(username);
 		createdUserAccountBean.setFirstName(fName);
 		createdUserAccountBean.setLastName(lName);
-		createdUserAccountBean.setEmail(username);
+		createdUserAccountBean.setEmail(email);
 		createdUserAccountBean.setInstitutionalAffiliation(institution);
 		createdUserAccountBean.setLastVisitDate(null);
 		createdUserAccountBean.setPasswdTimestamp(null);

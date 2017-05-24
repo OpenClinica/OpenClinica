@@ -9,6 +9,6 @@ import javax.servlet.http.HttpServletRequest;
  * Created by yogi on 5/3/17.
  */
 public interface CallbackService {
-    UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user);
+    UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception;
 }
 

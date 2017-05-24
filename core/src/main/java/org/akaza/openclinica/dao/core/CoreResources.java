@@ -17,11 +17,13 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -207,6 +209,15 @@ public class CoreResources implements ResourceLoaderAware {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public static void setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
+        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
+        if (ub.getId() != 0) {
+            request.getSession().setAttribute("userBean", ub);
+        }
+
     }
 
     /**

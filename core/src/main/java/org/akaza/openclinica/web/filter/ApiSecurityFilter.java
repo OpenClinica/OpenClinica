@@ -16,9 +16,11 @@ import javax.sql.DataSource;
 import com.openclinica.jwtverifier.authentication.UserContext;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,10 +39,13 @@ import sun.security.rsa.RSAPublicKeyImpl;
 import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.logging.Logger;
+
 /**
  * Created by krikorkrumlian on 8/7/15.
  */
 public class ApiSecurityFilter extends OncePerRequestFilter {
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private String realm = "Protected";
 
@@ -106,7 +111,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 // create this user
                                 LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                                 System.out.println("userContext:" + userContextMap);
-                                setRootUserAccountBean(request);
+                                CoreResources.setRootUserAccountBean(request, dataSource);
                                 request.getSession().setAttribute("userContextMap", userContextMap);
                                 userContextMap.put("username", _username);
                             }
@@ -127,14 +132,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void setRootUserAccountBean(HttpServletRequest request) {
-        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
-        if (ub.getId() != 0) {
-            request.getSession().setAttribute("userBean", ub);
-        }
-
-    }
     private void createProtocolServiceUser() {
 
     }
