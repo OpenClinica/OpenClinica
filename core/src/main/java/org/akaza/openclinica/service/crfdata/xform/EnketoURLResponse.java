@@ -1,8 +1,5 @@
 package org.akaza.openclinica.service.crfdata.xform;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,8 +11,6 @@ public class EnketoURLResponse {
     private String iframe_url = null;
     private String code = null;
     private boolean complete_button = true;
-    private InstanceAttachment instanceAttachments;
-    private Map<String, String> additionalProperties = new HashMap<String, String>();
 
     private String single_fieldsubmission_iframe_url = null;
 

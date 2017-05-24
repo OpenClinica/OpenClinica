@@ -8,6 +8,10 @@ public class PFormCacheSubjectContextEntry {
     private String crfVersionOid = null;
     private String formLayoutOid = null;
     private Integer userAccountId = null;
+    private String itemName = null;
+    private Integer itemRepeatOrdinal = null;
+    private boolean isItemInRepeatingGroup = false;
+    private String itemRepeatGroupName = null;
 
     public String getStudySubjectOid() {
         return studySubjectOid;
@@ -55,6 +59,38 @@ public class PFormCacheSubjectContextEntry {
 
     public void setFormLayoutOid(String formLayoutOid) {
         this.formLayoutOid = formLayoutOid;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public Integer getItemRepeatOrdinal() {
+        return itemRepeatOrdinal;
+    }
+
+    public void setItemRepeatOrdinal(Integer itemRepeatOrdinal) {
+        this.itemRepeatOrdinal = itemRepeatOrdinal;
+    }
+
+    public boolean isItemInRepeatingGroup() {
+        return isItemInRepeatingGroup;
+    }
+
+    public void setItemInRepeatingGroup(boolean isItemInRepeatingGroup) {
+        this.isItemInRepeatingGroup = isItemInRepeatingGroup;
+    }
+
+    public String getItemRepeatGroupName() {
+        return itemRepeatGroupName;
+    }
+
+    public void setItemRepeatGroupName(String itemRepeatGroupName) {
+        this.itemRepeatGroupName = itemRepeatGroupName;
     }
 
 }

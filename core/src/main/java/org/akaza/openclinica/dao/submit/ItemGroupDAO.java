@@ -71,6 +71,7 @@ public class ItemGroupDAO<K extends String, V extends ArrayList> extends Auditab
         this.setTypeExpected(7, TypeNames.INT); // owner_id
         this.setTypeExpected(8, TypeNames.INT); // update_id
         this.setTypeExpected(9, TypeNames.STRING); // oc_oid
+        this.setTypeExpected(10, TypeNames.STRING); // layout_group_path
 
     }
 
@@ -416,6 +417,7 @@ public class ItemGroupDAO<K extends String, V extends ArrayList> extends Auditab
         formGroupBean.setName((String) hm.get("name"));
         formGroupBean.setCrfId((Integer) hm.get("crf_id"));
         formGroupBean.setOid((String) hm.get("oc_oid"));
+        formGroupBean.setLayoutGroupPath((String) hm.get("layout_group_path"));
 
         return formGroupBean;
     }

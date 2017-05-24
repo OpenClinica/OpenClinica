@@ -183,6 +183,13 @@ public class EnketoUrlService {
         StudyEventDefinition eventDef;
         StudySubject subject;
 
+        String goTo = null;
+        if (subjectContext.getItemName() != null) {
+            goTo = (subjectContext.isItemInRepeatingGroup())
+                    ? "//" + subjectContext.getItemRepeatGroupName() + "[" + subjectContext.getItemRepeatOrdinal() + "]//" + subjectContext.getItemName()
+                    : "//" + subjectContext.getItemName();
+        }
+
         if (studyEvent == null) {
             // Lookup relevant data
             eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(subjectContext.getStudyEventDefinitionId());
@@ -217,8 +224,20 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
 
-        EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList);
-        editURL = eur.getEdit_url() + "&ecid=" + subjectContextKey;
+        EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
+                goTo);
+        editURL = eur.getEdit_url();
+        int hashIndex = editURL.lastIndexOf("#");
+        String part1 = "";
+        String part2 = "";
+        if (hashIndex != -1) {
+            part1 = editURL.substring(0, hashIndex);
+            part2 = editURL.substring(hashIndex);
+            editURL = part1 + "&ecid=" + subjectContextKey + part2;
+        } else {
+            editURL = editURL + "&ecid=" + subjectContextKey;
+        }
+
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return editURL;
