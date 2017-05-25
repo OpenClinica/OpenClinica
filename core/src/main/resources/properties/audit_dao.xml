@@ -58,11 +58,11 @@
 		<name>findDeletedEventCRFsFromAuditEvent</name>
 		<sql>
             SELECT distinct on (ale.event_crf_id) ale.study_event_id as study_event_id, crf.name as crf_name,
-                             cv.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date, ale.event_crf_id
+                             fl.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date, ale.event_crf_id
                 FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
                     JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
-                    JOIN crf_version cv on ale.event_crf_version_id=cv.crf_version_id
-                    JOIN crf crf on cv.crf_id=crf.crf_id
+                    JOIN form_layout fl on ale.event_crf_version_id=fl.form_layout_id
+                    JOIN crf crf on fl.crf_id=crf.crf_id
                 WHERE ale.audit_log_event_type_id=? AND ale.study_event_id=?;
 		</sql>
 	</query>
@@ -70,11 +70,11 @@
 		<name>findDeletedEventCRFsFromAuditEventByEventCRFStatus</name>
 		<sql>
             SELECT ale.study_event_id as study_event_id, crf.name as crf_name,
-                             cv.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date, ale.event_crf_id
+                             fl.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date, ale.event_crf_id
                 FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
                     JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
-                    JOIN crf_version cv on ale.event_crf_version_id=cv.crf_version_id
-                    JOIN crf crf on cv.crf_id=crf.crf_id
+                    JOIN form_layout fl on ale.event_crf_version_id=fl.form_layout_id
+                    JOIN crf crf on fl.crf_id=crf.crf_id
                 WHERE ale.audit_log_event_type_id=? AND ale.study_event_id=? 
                 order by ale.audit_date;
 		</sql>
