@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
+    public final String FM_BASEURL = "http://138.197.70.61:8080/api/protocol/";
     // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     @Override

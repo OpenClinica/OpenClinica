@@ -19,7 +19,8 @@ public class EnketoFormServlet extends SecureController {
     private static final long serialVersionUID = 6508949502349649137L;
 
     public static final String ORIGINATING_PAGE = "originatingPage";
-    public static final String FORM_URL = "formURL";
+    public static final String FORM_URL1 = "formURL1";
+    public static final String FORM_URL2 = "formURL2";
     public static final String CRF_VERSION_ID = "crfVersionId";
     public static final String FORM_LAYOUT_ID = "formLayoutId";
     public static final String STUDY_EVENT_ID = "studyEventId";
@@ -59,7 +60,16 @@ public class EnketoFormServlet extends SecureController {
         } else {
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, study.getOc_oid(), QUERY_FLAVOR);
         }
-        request.setAttribute(FORM_URL, formUrl);
+        int hashIndex = formUrl.lastIndexOf("#");
+        String part1 = formUrl;
+        String part2 = "";
+        if (hashIndex != -1) {
+            part1 = formUrl.substring(0, hashIndex);
+            part2 = formUrl.substring(hashIndex);
+        }
+        request.setAttribute(FORM_URL1, part1);
+        request.setAttribute(FORM_URL2, part2);
+
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
 

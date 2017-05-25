@@ -16,6 +16,9 @@ public class EnketoEditURLRequest {
     private String return_url = null;
     private String instance = null;
     private String complete_button = null;
+    @JsonProperty("go_to")
+    private String goTo = null;
+
     @JsonProperty("instance_attachments")
     private InstanceAttachment instanceAttachments;
     @JsonIgnore
@@ -42,7 +45,7 @@ public class EnketoEditURLRequest {
     }
 
     public EnketoEditURLRequest(String server_url, String form_id, String instance_id, String return_url, String instance, String complete_button,
-            InstanceAttachment instanceAttachments) {
+            InstanceAttachment instanceAttachments, String goTo) {
         this.server_url = server_url;
         this.form_id = form_id;
         this.instance_id = instance_id;
@@ -50,6 +53,7 @@ public class EnketoEditURLRequest {
         this.instance = instance;
         this.complete_button = complete_button;
         this.instanceAttachments = instanceAttachments;
+        this.goTo = goTo;
     }
 
     public String getServer_url() {
