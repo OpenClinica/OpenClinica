@@ -98,6 +98,17 @@ public class Study   extends DataMapDomainObject {
 	private String uuid;
 	private StudyEnvEnum envType;
 
+	@Column(name = "study_env_uuid", unique = true, nullable = false)
+	public String getStudyEnvUuid() {
+		return studyEnvUuid;
+	}
+
+	public void setStudyEnvUuid(String studyEnvUuid) {
+		this.studyEnvUuid = studyEnvUuid;
+	}
+
+	private String studyEnvUuid;
+
 	public Study() {
 	}
 

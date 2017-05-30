@@ -100,6 +100,11 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                         final Map<String, Object> decodedToken = decode(accessToken);
                         if (accessToken != null ) {
                             String _username = decodedToken.get("sub").toString();
+                            LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+                            logger.debug("userContext:" + userContextMap);
+                            userContextMap.put("username", _username);
+                            CoreResources.setRootUserAccountBean(request, dataSource);
+                            request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(_username);
                             if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
@@ -108,12 +113,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 SecurityContextHolder.getContext().setAuthentication(authentication);
                                 request.getSession().setAttribute("userBean",ub);
                             } else {
-                                // create this user
-                                LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
-                                System.out.println("userContext:" + userContextMap);
                                 CoreResources.setRootUserAccountBean(request, dataSource);
-                                request.getSession().setAttribute("userContextMap", userContextMap);
-                                userContextMap.put("username", _username);
                             }
                         } else {
                             unauthorized(response, "Invalid authentication token");

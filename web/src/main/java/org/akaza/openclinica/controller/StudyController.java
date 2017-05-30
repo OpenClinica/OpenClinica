@@ -11,11 +11,14 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyUserRole;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
@@ -39,6 +42,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
@@ -49,6 +54,8 @@ public class StudyController {
 	private DataSource dataSource;
 	@Autowired
 	private StudyDao studyDao;
+	@Autowired
+	private StudyUserRoleDao studyUserRoleDao;
 	@Autowired
 	private StudyBuildService studyBuildService;
 	@Autowired
@@ -142,7 +149,10 @@ public class StudyController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
 		    @RequestBody HashMap<String, Object> map) throws Exception {
-	    ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
+		boolean testFlag = true;
+		UserAccount userAccount = new UserAccount();
+		userAccount.setUserName("svadla");
+		ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
 	    StudyDTO studyDTO = new StudyDTO();
         StudyBean studyBean = null;
@@ -154,9 +164,21 @@ public class StudyController {
 
         String uniqueStudyID = (String) map.get("uniqueStudyID");
         String name = (String) map.get("briefTitle");
-		String oid = (String) map.get("oid");
+		String studyEnvOid = (String) map.get("studyEnvOid");
+		String studyEnvUuid = (String) map.get("studyEnvUuid");
+		Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyEnvOid);
+		String envType = "";
+		String oid="";
+		if (m.find()) {
+			if (m.groupCount() != 2) {
+				ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "envType");
+				errorObjects.add(errorOBject);
+			} else {
+				oid = m.group(1);
+				envType = m.group(2);
+			}
+		}
 		String uuid = (String) map.get("uuid");
-		String envType = (String) map.get("envType");
 
 	    AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
 	    AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
@@ -191,15 +213,23 @@ public class StudyController {
 	    } else {
 		    uuid = uuid.trim();
 	    }
-	    Locale locale = new Locale("en_US");
+        if (StringUtils.isEmpty(studyEnvUuid)) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "studyEnvUuid");
+            errorObjects.add(errorOBject);
+        } else {
+            studyEnvUuid = studyEnvUuid.trim();
+        }
+
+        Locale locale = new Locale("en_US");
 	    request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 	    ResourceBundleProvider.updateLocale(locale);
 	    request.setAttribute("uniqueProId", uniqueStudyID);
 	    request.setAttribute("name", name); // Brief Title
 	    request.setAttribute("oid", oid);
 	    request.setAttribute("uuid", uuid);
-	    String role = authorizedToCreateStudy(request, uuid);
-		request.setAttribute("role", role);
+	    request.setAttribute("envType", envType);
+        request.setAttribute("studyEnvUuid", studyEnvUuid);
+
 	    Validator v0 = new Validator(request);
 	    v0.addValidation("name", Validator.NO_BLANKS);
 
@@ -247,12 +277,14 @@ public class StudyController {
 		    return response;
 	    }
 	    studyDTO.setErrors(errorObjects);
-		String ocRole = getOCRole(role, false);
+
 	    Study study = new Study();
 	    study.setUniqueIdentifier(uniqueStudyID);
 	    study.setName(name);
 	    study.setOc_oid(oid);
 	    study.setEnvType(StudyEnvEnum.valueOf(envType));
+	    study.setStudyEnvUuid(studyEnvUuid);
+	    study.setUuid(uuid);
 	    Study byOidEnvType = studyDao.findByOidEnvType(oid, StudyEnvEnum.valueOf(envType));
 	    if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
 		    return getResponseSuccess(byOidEnvType);
@@ -261,7 +293,7 @@ public class StudyController {
 	    StudyInfoObject studyInfoObject = null;
 	    Study schemaStudy = null;
 	    try {
-		    studyInfoObject = studyBuildService.process(study, ownerUserAccount, ocRole);
+		    studyInfoObject = studyBuildService.process(request, study, ownerUserAccount);
 		    liquibaseOnDemandService.createForeignTables(studyInfoObject);
 		    schemaStudy = liquibaseOnDemandService.process(studyInfoObject, ownerUserAccount);
 	    } catch (Exception e) {
@@ -300,61 +332,6 @@ public class StudyController {
 
     }
 
-    private String authorizedToCreateStudy(HttpServletRequest request, String currentStudyId) {
-		String role = null;
-	    LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
-	    if (userContextMap == null)
-	    	return role;
-	    ArrayList<LinkedHashMap<String, String>> roles =  (ArrayList<LinkedHashMap<String, String>>) userContextMap.get("roles");
-	    if (roles == null)
-	    	return role;
-	    for (LinkedHashMap<String, String> roleByStudy : roles) {
-		    if (StringUtils.equals(currentStudyId, roleByStudy.get("studyId"))) {
-		    	return roleByStudy.get("roleName");
-		    }
-	    }
-	    return role;
-    }
-
-    private String getOCRole(String givenRole, boolean siteFlag) {
-	    ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-	    String key = null;
-	    for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
-		    Role role = (Role) it.next();
-		    switch (role.getId()) {
-		    case 2:
-			    key = "Study_Coordinator";
-			    break;
-		    case 3:
-			    key = "Study_Director";
-			    break;
-		    case 4:
-			    key = "Investigator";
-			    break;
-		    case 5:
-			    key = "Data_Entry_Person";
-			    break;
-		    case 6:
-			    key = "Monitor";
-			    break;
-		    default:
-		    	break;
-			    // logger.info("No role matched when setting role description");
-		    }
-		    String value = resterm.getString(key).trim();
-			if (StringUtils.equals(givenRole, value))
-				return Role.getByDesc(value).getName();
-	    }
-	    return null;
-    }
-
-	private ArrayList getRoles() {
-		ArrayList roles = Role.toArrayList();
-		roles.remove(Role.ADMIN);
-
-		return roles;
-	}
-
 	private  ResponseEntity<Object> getResponseSuccess(Study existingStudy) {
 
 	    ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
@@ -366,7 +343,7 @@ public class StudyController {
 	    return response;
     }
 
-    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request) {
+    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request) throws Exception {
 	    ResponseEntity<HashMap> responseEntity = null;
 		HttpSession session = request.getSession();
 		if (session == null) {
@@ -376,12 +353,20 @@ public class StudyController {
 	    Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) session.getAttribute("userContextMap");
 		if (userContextMap == null)
 			return responseEntity;
-		// we need to create a user
 	    HashMap<String, String> userMap = getUserInfo(userContextMap);
-	    try {
-		    responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
-	    } catch (Exception e) {
-		    e.printStackTrace();
+	    String username = userMap.get("username");
+
+	    UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+
+	    if ((ub == null)
+			    || (ub.getId() == 0)) {
+		    // we need to create the user
+		    try {
+			    responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
+		    } catch (Exception e) {
+			    logger.error(e.getLocalizedMessage());
+			    throw e;
+		    }
 	    }
 	    return responseEntity;
     }
@@ -552,7 +537,7 @@ public class StudyController {
 		Locale locale = new Locale("en_US");
 		request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
 		ResourceBundleProvider.updateLocale(locale);
-		StudyInfoObject studyInfoObject = studyBuildService.process(study, ownerUserAccount, null);
+		StudyInfoObject studyInfoObject = studyBuildService.process(request, study, ownerUserAccount);
 		AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study added to Public schema", "PENDING");
 		AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper);
 		liquibaseOnDemandService.createForeignTables(studyInfoObject);

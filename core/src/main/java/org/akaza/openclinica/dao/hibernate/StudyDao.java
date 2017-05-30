@@ -38,6 +38,13 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return  (Study) q.uniqueResult();
     }
 
+    public Study findByStudyEnvUuid(String studyEnvUuid) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = " from Study do  where do.studyEnvUuid = :studyEnvUuid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyEnvUuid", studyEnvUuid);
+        return  (Study) q.uniqueResult();
+    }
 
     public Study findPublicStudy(String ocId) {
         String schema = CoreResources.getRequestSchema();
