@@ -6,6 +6,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -17,9 +19,6 @@ import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-
 
 public class DownloadStudyMetadataServlet extends SecureController {
     public static String STUDY_ID = "studyId";
@@ -42,15 +41,15 @@ public class DownloadStudyMetadataServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy,getRuleSetRuleDao());
+        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao());
         AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
         ArrayList<String> xmlnsList = new ArrayList<String>();
         xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
         xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
         xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
         odmb.setXmlnsList(xmlnsList);
@@ -59,7 +58,7 @@ public class DownloadStudyMetadataServlet extends SecureController {
         adc.setOdmbean(odmb);
         mdc.collectFileData();
         adc.collectFileData();
-        
+
         FullReportBean report = new FullReportBean();
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
@@ -67,19 +66,19 @@ public class DownloadStudyMetadataServlet extends SecureController {
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion("oc1.3");
         report.createStudyMetaOdmXml(Boolean.FALSE);
-       
+
         request.setAttribute("generate", report.getXmlOutput().toString().trim());
         Page finalTarget = Page.EXPORT_DATA_CUSTOM;
         finalTarget.setFileName("/WEB-INF/jsp/extract/downloadStudyMetadata.jsp");
         forwardPage(finalTarget);
     }
-    
+
     private CoreResources getCoreResources() {
         return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
     }
-    
+
     private RuleSetRuleDao getRuleSetRuleDao() {
         return (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao");
     }
-    
+
 }

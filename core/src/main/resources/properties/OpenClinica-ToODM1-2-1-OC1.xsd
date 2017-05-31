@@ -5,7 +5,7 @@
            elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import schemaLocation="OpenClinica-ODM1-2-1-OC1-foundation.xsd"
 	           namespace="http://www.openclinica.org/ns/odm_ext_v121/v3.1" />
-	<xs:redefine schemaLocation="http://www.cdisc.org/schema/odm/v1.2.1/ODM1-2-1-foundation.xsd">
+	<xs:redefine schemaLocation="ODM1-2-1-foundation.xsd">
 		<xs:complexType name="ODMcomplexTypeDefinition-MetaDataVersion">
 			<xs:complexContent>
 				<xs:extension base="ODMcomplexTypeDefinition-MetaDataVersion">

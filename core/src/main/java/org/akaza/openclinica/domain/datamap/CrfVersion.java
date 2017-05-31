@@ -22,6 +22,7 @@ import javax.persistence.UniqueConstraint;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.apache.commons.fileupload.FileItem;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -57,7 +58,8 @@ public class CrfVersion extends DataMapDomainObject {
     private List<Section> sections;
     private List<EventDefinitionCrf> eventDefinitionCrfs;
     private Set decisionConditions = new HashSet(0);
-    private Set<ItemGroupMetadata> itemGroupMetadatas;;
+    private Set<ItemGroupMetadata> itemGroupMetadatas;
+    private List<FileItem> fileItems;
 
     public CrfVersion() {
     }
@@ -125,7 +127,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.status = status;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "crf_id", nullable = false)
     public CrfBean getCrf() {
         return this.crf;
@@ -238,7 +240,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.versioningMaps = versioningMaps;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "crfVersion")
     public List<EventCrf> getEventCrfs() {
         return this.eventCrfs;
     }
@@ -287,6 +289,15 @@ public class CrfVersion extends DataMapDomainObject {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @javax.persistence.Transient
+    public List<FileItem> getFileItems() {
+        return fileItems;
+    }
+
+    public void setFileItems(List<FileItem> fileItems) {
+        this.fileItems = fileItems;
     }
 
 }

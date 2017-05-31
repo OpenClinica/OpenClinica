@@ -332,7 +332,7 @@ public class UserAccountController {
 		studyUserRole.setStatus(Status.AVAILABLE);
 		studyUserRole.setOwner(ownerUserAccount);
 		createdUserAccountBean.addRole(studyUserRole);
-		createdUserAccountBean.setAccountNonLocked(false);
+		//createdUserAccountBean.setAccountNonLocked(false);
 		return createdUserAccountBean;
 	}
 

@@ -86,7 +86,7 @@
 <!-- default version label here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_current_crf_version_title" bundle="${resword}"/>:</td>
-<td><c:out value="${crfVersionName}"/></td></tr>
+<td><c:out value="${formLayoutName}"/></td></tr>
 
 <tr><td>
 <fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>:</td>
@@ -106,7 +106,7 @@
 <tr><td>
 <table cellpadding="2" cellspacing="2" border="0" >
 <tr>
-<td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '<c:out value="${crfVersionName}"/>'</td></tr>
+<td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '<c:out value="${formLayoutName}"/>'</td></tr>
 <tr>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_name" bundle="${resword}"/></td>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_oid" bundle="${resword}"/></td>
@@ -136,8 +136,7 @@
 <td>
 <table cellpadding="2" cellspacing="2" border="0"  >
 <tr>
-<td class="table_header_row" style="color: #789EC5;"  colspan="3"><fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: '
-<c:out value="${selectedVersionName}"/>'</td>
+<td class="table_header_row" style="color: #789EC5;"  colspan="3"><fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: '<c:out value="${selectedVersionName}"/>'</td>
 </tr>
 <tr>
 <td class="table_header_row"><fmt:message key="confirm_CRF_version_field_name" bundle="${resword}"/></td>
@@ -167,15 +166,16 @@
 
 <table border="0" colspan="2"><tr><td>
 <form method="POST" action="${pageContext.request.contextPath}/pages/managestudy/changeCRFVersion" >
-<input type="hidden" name="newCRFVersionId" value="${selectedVersionId}">
+<input type="hidden" name="newFormLayoutId" value="${selectedVersionId}">
 
 <input type="hidden" name="studySubjectId" value="${studySubjectId}">
 <input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
 <input type="hidden" name="studySubjectLabel" value="${studySubjectLabel}">
-<input type="hidden" name="crfversionId" value="${crfversionId}">
+<input type="hidden" name="formLayoutId" value="${formLayoutId}">
 <input type="hidden" name="crfId" value="${crfId}">
 <input type="hidden" name="crfName" value="${crfName}">
-<input type="hidden" name="crfVersionName" value="${crfVersionName}">
+<input type="hidden" name="formLayoutName" value="${formLayoutName}">
+<input type="hidden" name="selectedVersionName" value="${selectedVersionName}">
 <input type="hidden" name="eventCRFId" value="${eventCRFId}">
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">

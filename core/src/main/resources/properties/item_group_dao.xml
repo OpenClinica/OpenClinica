@@ -80,6 +80,18 @@
       and ifm.item_id = igm.item_id     
     </sql>
   </query>
+  <query>
+    <name>findGroupByLayoutId</name>
+    <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm,
+      form_layout fl ,versioning_map vm
+      where fl.form_layout_id=?
+      and vm.form_layout_id=fl.form_layout_id      
+      and ig.item_group_id = igm.item_group_id
+      and igm.item_id = vm.item_id     
+    </sql>
+  </query>
+
     <!-- Find by section id, but only legitimate groups, not those named Ungrouped-->
     <query>
     <name>findLegitGroupBySectionId</name>

@@ -137,7 +137,6 @@
     </bean>
 
     <bean id="odmImportServiceImpl" class="org.akaza.openclinica.service.OdmImportServiceImpl" autowire="byName">
-        <constructor-arg ref="dataSource"/>
         <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
@@ -146,9 +145,22 @@
         <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>        
         <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>        
         <property name="studyDao" ref="studyDaoDomain"/>
+        <property name="studyParameterValueDao" ref="studyParameterValueDao"/>
         <property name="xformParser" ref="xformParser"/>
     </bean>
+    <bean id = "enketoCredentials" class="org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
+        <property name="studyDao" ref="studyDaoDomain"/>
+    </bean>
 
+    <bean id="xformParserHelper" class="org.akaza.openclinica.domain.xform.XformParserHelper"/>
+
+    <bean id="xformParser" class="org.akaza.openclinica.domain.xform.XformParser">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="coreResources" ref="coreResources"/>
+    </bean>
+<!-- moved from core-security-->
+    <bean id="xformService" class="org.akaza.openclinica.service.crfdata.XformMetaDataService"/>
+    <bean id="responseSetService" class="org.akaza.openclinica.service.crfdata.ResponseSetService"/>
 
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>

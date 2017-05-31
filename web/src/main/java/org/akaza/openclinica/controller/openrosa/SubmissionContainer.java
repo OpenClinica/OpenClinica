@@ -5,37 +5,75 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.springframework.validation.Errors;
-import static org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-
 
 public class SubmissionContainer {
     private String requestBody = null;
+    private String instanceId = null;
     private HashMap<String, String> subjectContext = null;
     private Study study = null;
     private StudyEvent studyEvent = null;
     private StudySubject subject = null;
     private UserAccount user = null;
     private EventCrf eventCrf = null;
+    private CrfVersion crfVersion = null;
+    private FormLayout formLayout = null;
     private List<ItemData> items = null;
     private Errors errors = null;
     private Locale locale = null;
     private ArrayList<HashMap> listOfUploadFilePaths;
     private ProcessorEnum processorEnum;
+    private boolean fieldSubmissionFlag;
 
-    public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,ArrayList<HashMap> listOfUploadFilePaths) {
+    public enum FieldRequestTypeEnum {
+        EDIT_FIELD, DELETE_FIELD, NEW_FIELD, FORM_FIELD
+    };
+
+    public FieldRequestTypeEnum getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(FieldRequestTypeEnum requestType) {
+        this.requestType = requestType;
+    }
+
+    private FieldRequestTypeEnum requestType;
+
+    public SubmissionContainer(Study study, String requestBody, HashMap<String, String> subjectContext, Errors errors, Locale locale,
+            ArrayList<HashMap> listOfUploadFilePaths, FieldRequestTypeEnum requestType, String instanceId) {
         this.study = study;
         this.requestBody = requestBody;
         this.subjectContext = subjectContext;
         this.errors = errors;
         this.locale = locale;
-        this.listOfUploadFilePaths=listOfUploadFilePaths;
+        this.listOfUploadFilePaths = listOfUploadFilePaths;
+        this.requestType = requestType;
+        this.instanceId = instanceId;
+    }
+
+    public CrfVersion getCrfVersion() {
+        return crfVersion;
+    }
+
+    public void setCrfVersion(CrfVersion crfVersion) {
+        this.crfVersion = crfVersion;
+    }
+
+    public boolean isFieldSubmissionFlag() {
+        return fieldSubmissionFlag;
+    }
+
+    public void setFieldSubmissionFlag(boolean fieldSubmissionFlag) {
+        this.fieldSubmissionFlag = fieldSubmissionFlag;
     }
 
     public ProcessorEnum getProcessorEnum() {
@@ -132,6 +170,22 @@ public class SubmissionContainer {
 
     public void setListOfUploadFilePaths(ArrayList<HashMap> listOfUploadFilePaths) {
         this.listOfUploadFilePaths = listOfUploadFilePaths;
+    }
+
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
 }

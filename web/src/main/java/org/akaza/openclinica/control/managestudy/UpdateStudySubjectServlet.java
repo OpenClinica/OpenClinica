@@ -90,8 +90,6 @@ public class UpdateStudySubjectServlet extends SecureController {
             }
 
             StudySubjectBean sub = (StudySubjectBean) subdao.findByPK(studySubId);
-            sub.setLabel(decodeForHtml(sub.getLabel()));
-            sub.setSecondaryLabel(decodeForHtml(sub.getSecondaryLabel()));
 
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
@@ -132,6 +130,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             }
 
             if ("show".equalsIgnoreCase(action)) {
+
                 session.setAttribute("studySub", sub);
                 // below added tbh 092007
                 String enrollDateStr = sub.getEnrollmentDate()!=null ?
@@ -147,8 +146,6 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             } else if ("submit".equalsIgnoreCase(action)) {// submit to DB
                 StudySubjectBean subject = (StudySubjectBean) session.getAttribute("studySub");
-                subject.setLabel(encodeForHtml(subject.getLabel()));
-                subject.setSecondaryLabel(encodeForHtml(subject.getSecondaryLabel()));
                 subject.setUpdater(ub);
                 subdao.update(subject);
 
@@ -224,16 +221,14 @@ public class UpdateStudySubjectServlet extends SecureController {
             //currentRole.getRoleName().equals(Role.STUDYDIRECTOR) || currentRole.getRoleName().equals(Role.COORDINATOR)) {
 
             v.addValidation("label", Validator.NO_BLANKS);
-
-            if (!StringUtil.isBlank(fp.getString("label")))
-                v.addValidation("label", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+            v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            v.addValidation("secondaryLabel", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
 
             String eDateString = fp.getString("enrollmentDate");
             if (!StringUtil.isBlank(eDateString)) {
                 v.addValidation("enrollmentDate", Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation("enrollmentDate");
             }
-
 
             errors = v.validate();
 
@@ -252,24 +247,6 @@ public class UpdateStudySubjectServlet extends SecureController {
                 }
             }
 
-            if (!errors.containsKey("label")) {
-                String safeLabel = encodeForHtml(fp.getString("label"));
-                if (safeLabel.length() > 30) {
-                    Validator.addError(errors, "label", resexception.getString("character_limits_exceeded_after_escaping"));
-                }
-            }
-
-            String secondLabel = fp.getString("secondaryLabel");
-            if (!StringUtil.isBlank(secondLabel)) {
-                if (secondLabel.length() > 30) {
-                    Validator.addError(errors, "secondaryLabel", "The input you provided is not less than or equal to 30 characters long");   
-                } else if (!errors.containsKey("secondaryLabel")) {
-                    String safeSecondaryLabel = encodeForHtml(secondLabel);
-                    if (safeSecondaryLabel.length() > 30) {
-                        Validator.addError(errors, "secondaryLabel", resexception.getString("character_limits_exceeded_after_escaping"));
-                    }
-                }
-            }
             sub.setLabel(fp.getString("label"));
             sub.setSecondaryLabel(fp.getString("secondaryLabel"));
 

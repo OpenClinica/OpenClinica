@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.akaza.openclinica</groupId>
@@ -20,6 +20,7 @@
 
         <skipTests>false</skipTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
 
         <!-- Project's source control URL -->
         <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
@@ -34,9 +35,21 @@
     </properties>
     <profiles>
         <profile>
+            <id>walkme-design</id>
+            <properties>
+                <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/test/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
+            </properties>
+        </profile>
+        <profile>
             <id>codeship</id>
             <properties>
                 <db.test>107.170.116.150</db.test>
+            </properties>
+        </profile>
+	<profile>
+            <id>jenkins</id>
+            <properties>
+                <db.test>162.243.236.131</db.test>
             </properties>
         </profile>
         <profile>
@@ -72,11 +85,6 @@
                                                 <ignore/>
                                             </action>
                                         </pluginExecution>
-                                        <!-- <pluginExecution> <pluginExecutionFilter> <groupId>org.codehaus.mojo</groupId>
-                                            <artifactId>buildnumber-maven-plugin</artifactId> <versionRange>[1.0.0,)</versionRange>
-                                            <goals> <goal>create</goal> </goals> <configuration> <doUpdate>false</doUpdate>
-                                            <getRevisionOnlyOnce>true</getRevisionOnlyOnce> </configuration> </pluginExecutionFilter>
-                                            <action> <ignore /> </action> </pluginExecution> -->
                                     </pluginExecutions>
                                 </lifecycleMappingMetadata>
                             </configuration>
@@ -97,7 +105,7 @@
             <dependency>
                 <groupId>org.akaza.openclinica.odm</groupId>
                 <artifactId>openclinica-odm</artifactId>
-                <version>2.2</version>
+                <version>2.3</version>
             </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -108,11 +116,6 @@
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz-oracle</artifactId>
                 <version>2.1.7</version>
-            </dependency>
-            <dependency>
-                <groupId>log4jdbc</groupId>
-                <artifactId>log4jdbc4</artifactId>
-                <version>1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -160,8 +163,9 @@
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core</artifactId>
-                <version>2.2.0.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -174,11 +178,6 @@
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache-web</artifactId>
                 <version>2.0.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-jdk14</artifactId>
-                <version>1.6.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -261,14 +260,9 @@
                 <version>1.7</version>
             </dependency>
             <dependency>
-                <groupId>com.ecyrd.speed4j</groupId>
-                <artifactId>speed4j</artifactId>
-                <version>0.12</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
-                <version>1.2.1</version>
+                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -289,11 +283,6 @@
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>taglibs</groupId>
-                <artifactId>standard</artifactId>
-                <version>1.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
@@ -423,7 +412,7 @@
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
-                <version>2.3.19</version>
+                <version>2.3.25-incubating</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -440,20 +429,34 @@
                 <artifactId>jaxb-impl</artifactId>
                 <version>2.1.5</version>
             </dependency>
+
             <dependency>
                 <groupId>com.sun.xml.wss</groupId>
                 <artifactId>xws-security</artifactId>
-                <version>3.0</version>
+                <version>2.0-FCS</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.parsers</groupId>
+                        <artifactId>jaxp-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+            <dependency>
+                <groupId>javax.xml.parsers</groupId>
+                <artifactId>jaxp-api</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <!--
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core-tiger</artifactId>
                 <version>1.5.6</version>
             </dependency>
+            -->
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-security</artifactId>
-                <version>2.2.2.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.soap</groupId>
@@ -485,41 +488,23 @@
                 <artifactId>dbunit</artifactId>
                 <version>2.5.2</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.6</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.6</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>1.7.6</version>
+                <version>1.7.21</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.7.6</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>1.1.2</version>
+                <version>1.7.21</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.1.2</version>
             </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-access</artifactId>
-                <version>1.1.2</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
                 <artifactId>janino</artifactId>
@@ -534,6 +519,12 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -617,11 +608,7 @@
                 <artifactId>antlr</artifactId>
                 <version>2.7.6</version>
             </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.apache.ws.commons.schema</groupId>
                 <artifactId>XmlSchema</artifactId>
@@ -643,17 +630,6 @@
                 <version>1.8</version>
             </dependency>
             <dependency>
-                <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
-                <version>2.1.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-web</artifactId>
-                <version>${spring-security.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
@@ -668,10 +644,8 @@
                 <artifactId>spring-beans</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-         </dependencies>
-
+        </dependencies>
     </dependencyManagement>
-
 
     <!-- These dependencies are used by _all_ child projects -->
     <build>
@@ -712,39 +686,10 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.6</version>
-                    <configuration>
-                        <outputDirectory>${openclinica.distros.dir}</outputDirectory>
-                        <descriptors>
-                            <descriptor>${project.basedir}/src/assemble/openclinica-assemble.xml</descriptor>
-                        </descriptors>
-                        <appendAssemblyId>false</appendAssemblyId>
-                        <finalName>${assembly.name}-${project.version}</finalName>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
                     <version>2.10</version>
                     <configuration>
                         <addVersionToProjectName>true</addVersionToProjectName>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.cargo</groupId>
-                    <artifactId>cargo-maven2-plugin</artifactId>
-                    <version>1.5.0</version>
-                    <configuration>
-                        <!-- Container configuration -->
-                        <container>
-                            <containerId>tomcat6x</containerId>
-                            <home>${catalina.home}</home>
-                        </container>
-                        <configuration>
-                            <home>${catalina.home}</home>
-                            <type>existing</type>
-                        </configuration>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -828,6 +773,23 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/global_functions_javascript.js</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.8</version>
                 <executions>
@@ -882,14 +844,6 @@
                 </includes>
             </testResource>
         </testResources>
-
-        <!--
-        <filters>
-            <filter>src/main/filters/default.properties</filter>
-            <filter>src/main/filters/${config.id}.properties</filter>
-        </filters>
-        -->
-
     </build>
     <scm>
         <connection>scm:git:${git.url}</connection>
@@ -902,15 +856,9 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>central</id>
-            <name>libs-release</name>
-            <url>http://dev.openclinica.com/artifactory/libs-release</url>
-        </repository>
-        <repository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>libs-snapshot</name>
-            <url>http://dev.openclinica.com/artifactory/libs-snapshot</url>
+            <id>openclinica.jfrog.io-libs-release</id>
+            <name>openclinica.jfrog.io-libs-release</name>
+            <url>https://openclinica.jfrog.io/openclinica/libs-release</url>
         </repository>
         <repository>
             <id>jboss-public-repository-group</id>
@@ -928,20 +876,6 @@
         </repository>
     </repositories>
     <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>plugins-release</name>
-            <url>http://dev.openclinica.com/artifactory/plugins-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>plugins-snapshot</name>
-            <url>http://dev.openclinica.com/artifactory/plugins-snapshot</url>
-        </pluginRepository>
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>

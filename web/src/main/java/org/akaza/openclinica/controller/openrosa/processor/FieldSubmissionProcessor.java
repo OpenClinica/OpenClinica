@@ -1,7 +1,6 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -17,7 +16,7 @@ public class FieldSubmissionProcessor implements Processor {
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
         logger.info("Executing Field Submission Processor.");
-        if (container.getProcessorEnum() != ProcessorEnum.FIELD_SUBMISSION_RPOCESSOR)
+        if (!container.isFieldSubmissionFlag())
             return ProcessorEnum.PROCEED;
 
         container.setRequestBody(parseFieldSubmission(container.getRequestBody()));

@@ -25,7 +25,6 @@
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.oid}"/>&nbsp;</td>
   <td class="table_cell">(<fmt:message key="original" bundle="${resword}"/>)</td>
     <%--oid space --%>
-  <td class="table_cell">&nbsp;</td>
   <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
   <td class="table_cell"><c:out value="${currRow.bean.owner.name}"/></td>
   <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.status.name}"/></td>
@@ -58,6 +57,13 @@
                    onMouseUp="javascript:setImage('bt_NewVersion1','images/bt_NewVersion.gif');"><img
               name="bt_NewVersion1" src="images/bt_NewVersion.gif" border="0" alt="<fmt:message key="create_new_version" bundle="${resword}"/>" title="<fmt:message key="create_new_version" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
+                  <c:if test="${module=='manage'}">
+        <td><a href="BatchCRFMigration?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
+                   onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
+                   onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
+                   name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" title="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" align="left" hspace="6"></a>
+               </td>                        
+                  </c:if>
           </c:when>
           <c:otherwise>
             <td><a href="RestoreCRF?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${currRow.bean.id}"/>"
@@ -84,7 +90,6 @@
   </c:choose>
   <tr valign="top">
     <td class="table_cell"><c:out value="${version.name}"/></td>
-    <td class="table_cell"><c:out value="${version.oid}"/></td>    
     <td class="table_cell"><fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${version.owner.name}"/></td>
     <td class="table_cell <c:out value='${className}'/>"><c:out value="${version.status.name}"/></td>

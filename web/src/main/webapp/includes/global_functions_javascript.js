@@ -418,7 +418,7 @@ function clearInputElementValues(trElement) {
     var myId="";
     var defValDelimiter = "-----";
 	var defValDelimiterValues = ",";
-  
+
     if(tdElements){
         for(var i = 0; i < tdElements.length; i++) {
         try {
@@ -455,38 +455,38 @@ function clearInputElementValues(trElement) {
                                         inputs[j].getAttribute("type").indexOf("checkbox") != -1 ){
     									inputs[j].removeAttribute("checked");
                                         inputs[j].checked=false;
-										
-										if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+
+										if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{
     										var def_temp = defVal.split(defValDelimiter);
     										var lookedId = def_temp[0];
 											var def_tmp= def_temp[1];
-											
+
 											if(inputs[j].getAttribute("id")==lookedId && def_temp.size() == 2 && def_tmp.length>0) {
 												var defValuesArrayCheckbox=def_temp[1].split("_____");
 												var defValForCheckBox = defValuesArrayCheckbox[0].split(defValDelimiterValues);
 												var allValuesForCheckbox = defValuesArrayCheckbox[1].split("|||||");
-						
+
 												for (var i_count = 0; i_count < allValuesForCheckbox.length; i_count++){
     												var cur_checkbox = allValuesForCheckbox[i_count];
     												var cur_checkbox_text_value = cur_checkbox.split(".....");
-				
+
     												if ( cur_checkbox_text_value.length==2 && inputs[j].value == cur_checkbox_text_value[0] &&
     													(defValForCheckBox.indexOf (cur_checkbox_text_value[1])!= -1
 														|| defValForCheckBox.indexOf (cur_checkbox_text_value[0])!= -1)){
     													inputs[j].checked=true;
 													}
     											}
-    											
+
     										}
-    										
-    										
+
+
     									}
-										
+
                                 }
-    							
+
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
-	                           if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+	                           if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{
 	                        	    var lookedId = defVal.split(defValDelimiter)[0];
 	                        		if(inputs[j].getAttribute("id")==lookedId) {
 	                        			inputs[j].setAttribute("value",defVal.split(defValDelimiter)[1]); defVal="";}
@@ -557,7 +557,7 @@ function clearInputElementValues(trElement) {
                          if(selects[h]){
                              options = selects[h].getElementsByTagName("option");
                              var def_temp="";
- 							if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+ 							if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{
  									def_temp = defVal.split(defValDelimiter);
  	                        	    var lookedId = def_temp[0];
  	                        		if(selects[h].getAttribute("id")==lookedId) {
@@ -619,11 +619,11 @@ function detectIEWindowsNew(userAgentString) {
 		  return false;
 		 else if (ieversion>=7 || ieversion>=6)
 		  return true;
-		 
-		  
+
+
 		  }
 		  return false;
-  
+
 }
 /*A METHOD CALLED BY THE WEB 2.0 FORMS JS LIBRARY, AFTER LINE 942.
  BWP: 08/21/2008; The method sets a discrepancy note icon to a certain image, to prevent the copying of
@@ -643,7 +643,7 @@ function changeDNoteIcon(trElement) {
                     if(hrefElements[j].childNodes){
                         for(var h = 0; h < hrefElements[j].childNodes.length; h++){
                             checkImgIcon(hrefElements[j].childNodes[h]);
-							
+
                         }
                     }
                 }
@@ -1216,7 +1216,7 @@ function openPrintCRFWindow(inURL) {
 function processPrintCRFRequest(url) {
 	url = encodeURI(url);
   openPrintCRFWindow(url);
-  //var pdfUrl = url.replace("/html/print/", "/pdf/print/");	
+  //var pdfUrl = url.replace("/html/print/", "/pdf/print/");
   //openPrintCRFWindow(pdfUrl);
 }
 
@@ -1841,3 +1841,17 @@ if(BrowserDetect.browser=='Explorer' && BrowserDetect.version<7)
 	document.write('.dropdown { background-image: url(images/dropdown_BG.gif); }');
 	document.write('</style>');
 }
+
+
+// Walkme snippet
+(function() {
+    var walkme = document.createElement('script');
+    walkme.type = 'text/javascript';
+    walkme.async = true;
+    walkme.src = '${walkme.url}';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(walkme, s);
+    window._walkmeConfig = {
+        smartLoad: true
+    };
+})();

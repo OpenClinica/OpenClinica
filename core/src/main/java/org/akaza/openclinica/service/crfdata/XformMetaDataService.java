@@ -1,16 +1,19 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionMediaDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataTypeDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -24,7 +27,8 @@ import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.CrfVersionMedia;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemDataType;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
@@ -38,26 +42,51 @@ import org.akaza.openclinica.domain.datamap.VersioningMapId;
 import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
-import org.akaza.openclinica.domain.xform.XformUtils;
-import org.akaza.openclinica.domain.xform.dto.Bind;
-import org.akaza.openclinica.domain.xform.dto.Group;
-import org.akaza.openclinica.domain.xform.dto.Html;
-import org.akaza.openclinica.domain.xform.dto.UserControl;
-import org.akaza.openclinica.validator.xform.ItemValidator;
+import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.service.dto.FormVersion;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class XformMetaDataService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String FORM_SUFFIX = "form.xml";
+    public static final String INSTANCE_SUFFIX = "instance.tpl";
+    public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
+    public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
+    public static final String XLS_SUFFIX = ".xls";
+
+    public static final String GEOPOINT_DATATYPE = "geopoint";
+    public static final String GEOTRACE_DATATYPE = "geotrace";
+    public static final String GEOSHAPE_DATATYPE = "geoshape";
+    public static final String BARCODE_DATATYPE = "barcode";
+    public static final String TIME_DATATYPE = "time";
+    public static final String DATETIME_DATATYPE = "dateTime";
+    public static String VERSION = "data_group.json";
 
     @Autowired
     private StudyDao studyDao;
@@ -75,7 +104,10 @@ public class XformMetaDataService {
     private CrfVersionDao crfVersionDao;
 
     @Autowired
-    private CrfVersionMediaDao crfVersionMediaDao;
+    private FormLayoutDao formLayoutDao;
+
+    @Autowired
+    private FormLayoutMediaDao formLayoutMediaDao;
 
     @Autowired
     private ItemGroupDao itemGroupDao;
@@ -104,25 +136,11 @@ public class XformMetaDataService {
     @Autowired
     private ResponseSetService responseSetService;
 
-    public Errors runService(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html, String submittedCrfName,
-            String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText,
-            List<FileItem> formItems) {
+    @Autowired
+    private XformParserHelper xformParserHelper;
 
-        // Create container for holding validation errors
-        DataBinder dataBinder = new DataBinder(new CrfVersion());
-        Errors errors = dataBinder.getBindingResult();
-
-        try {
-            createCRFMetaData(version, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription,
-                    submittedRevisionNotes, submittedXformText, formItems, errors);
-        } catch (Exception e) {
-            // Transaction has been rolled back due to an exception.
-            // TODO: Should we add an error message here?
-            logger.error("Error encountered while saving CRF: " + e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return errors;
-    }
+    @Autowired
+    private XformParser xformParser;
 
     @Transactional
     public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
@@ -158,141 +176,97 @@ public class XformMetaDataService {
             crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
 
         } else {
-
             // Create new CRF Version
             crfVersion = new CrfVersion();
-            crfVersion.setName(submittedCrfVersionName);
-            crfVersion.setDescription(submittedCrfVersionDescription);
-            crfVersion.setCrf(crf);
-            crfVersion.setUserAccount(userDao.findById(ub.getId()));
-            crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            crfVersion.setRevisionNotes(submittedRevisionNotes);
-            crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crf.getOcOid(), crfVersion.getName()));
-            crfVersion.setXform(submittedXformText);
-            crfVersion.setXformName(container.getInstanceName());
-            Integer crfVersionId = (Integer) crfVersionDao.save(crfVersion);
-            crfVersion.setCrfVersionId(crfVersionId);
-        }
-        // Create Section
-        Section section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
-        if (section == null) {
-            section = new Section();
-            section.setCrfVersion(crfVersion);
-            section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            section.setLabel("");
-            section.setTitle("");
-            section.setSubtitle("");
-            section.setPageNumberLabel("");
-            section.setOrdinal(1);
-            section.setUserAccount(userDao.findById(ub.getId())); // not null
-            section.setBorders(0);
-            sectionDao.saveOrUpdate(section);
+            crfVersion = populateCrfVersion(crfBean, crfVersion, cmdObject);
+            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+
+            // Create Section
             section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+            if (section == null) {
+                section = new Section();
+                section = populateCrfVersion(section, crfVersion, cmdObject);
+                sectionDao.saveOrUpdate(section);
+                section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
+            }
         }
-        createGroups(container, html, submittedXformText, crf, crfVersion, section, ub, errors);
+        createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
 
-        saveMedia(formItems, crf, crfVersion);
-
-        if (errors.hasErrors()) {
+        if (cmdObject.errors.hasErrors()) {
             logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
             throw new RuntimeException("Encountered validation errors while saving CRF.");
         }
-        return crfVersion;
+        return formLayout;
     }
 
-    private void saveMedia(List<FileItem> items, CrfBean crf, CrfVersion version) {
-        boolean hasFiles = false;
-        for (FileItem item : items) {
-            if (!item.isFormField() && item.getName() != null && !item.getName().isEmpty())
-                hasFiles = true;
-        }
-
-        if (hasFiles) {
-            String dir = Utils.getCrfMediaFilePath(crf, version);
-            // Save any media files
-            for (FileItem item : items) {
-                if (!item.isFormField()) {
-
-                    String fileName = item.getName();
-                    // Some browsers IE 6,7 getName returns the whole path
-                    int startIndex = fileName.lastIndexOf('\\');
-                    if (startIndex != -1) {
-                        fileName = fileName.substring(startIndex + 1, fileName.length());
-                    }
-
-                    CrfVersionMedia media = new CrfVersionMedia();
-                    media.setCrfVersion(version);
-                    media.setName(fileName);
-                    media.setPath(dir);
-                    crfVersionMediaDao.saveOrUpdate(media);
-
-                }
-            }
-        }
-    }
-
-    private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion version, Section section,
-            UserAccountBean ub, Errors errors) throws Exception {
+    private void createGroups(XformContainer container, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout, Section section, UserAccountBean ub,
+            Errors errors) throws Exception {
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
         ArrayList<String> usedItemOids = new ArrayList<String>();
-        List<Group> htmlGroups = html.getBody().getGroup();
 
-        for (Group htmlGroup : htmlGroups) {
-            XformGroup xformGroup = container.findGroupByRef(htmlGroup.getRef());
+        // for (Group htmlGroup : htmlGroups) {
+        for (XformGroup xformGroup : container.getGroups()) {
+
+            // XformGroup xformGroup = container.findGroupByRef(htmlGroup.getRef());
             ItemGroup itemGroup = itemGroupDao.findByNameCrfId(xformGroup.getGroupName(), crf);
 
             if (itemGroup == null) {
                 itemGroup = new ItemGroup();
                 itemGroup.setName(xformGroup.getGroupName());
+                itemGroup.setLayoutGroupPath(xformGroup.getGroupPath());
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
-                itemGroup.setOcOid(itemGroupDao.getValidOid(new ItemGroup(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
+                itemGroup.setOcOid(xformGroup.getGroupOid());
                 usedGroupOids.add(itemGroup.getOcOid());
-                Integer itemGroupId = (Integer) itemGroupDao.save(itemGroup);
-                itemGroup.setItemGroupId(itemGroupId);
-            }
-            List<UserControl> widgets = null;
-            boolean isRepeating = false;
-            if (htmlGroup.getRepeat() != null && htmlGroup.getRepeat().getUsercontrol() != null) {
-                widgets = htmlGroup.getRepeat().getUsercontrol();
-                isRepeating = true;
+                itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             } else {
-                widgets = htmlGroup.getUsercontrol();
+                itemGroup.setName(xformGroup.getGroupName());
+                itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             }
-            // Create Item specific DB entries: item, response_set,item_form_metadata,versioning_map,item_group_metadata
-            for (UserControl widget : widgets) {
+            boolean isRepeating = xformGroup.isRepeating();
+            // Create Item specific DB entries: item,
+            // response_set,item_form_metadata,versioning_map,item_group_metadata
+            // for (UserControl widget : widgets) {
 
-                // Skip reserved name and read-only items here
-                XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
-                String readonly = html.getHead().getModel().getBindByNodeSet(widget.getRef()).getReadOnly();
-                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
-                        && (readonly == null || !readonly.trim().equals("true()"))) {
-                    Item item = createItem(html, widget, xformGroup, xformItem, crf, ub, usedItemOids, errors);
-                    if (item != null) {
-                        ResponseType responseType = getResponseType(html, xformItem);
-                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, version, responseType, item, errors);
-                        // add if statement
-                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
-                        if (ifmd == null) {
-                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, version, itemOrdinal);
-                        }
-                        createVersioningMap(version, item);
-                        //
-                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), version.getCrfVersionId());
-                        if (igmd == null) {
-                            igmd = createItemGroupMetadata(html, item, version, itemGroup, isRepeating, itemOrdinal);
-                        }
-                        itemOrdinal++;
+            for (XformItem xformItem : xformGroup.getItems()) {
+
+                Item item = createItem(xformGroup, xformItem, crf, ub, usedItemOids, errors);
+                if (item != null) {
+                    ResponseType responseType = getResponseType(xformItem);
+                    ResponseSet responseSet = responseSetService.getResponseSet(xformItem, crfVersion, responseType, item, errors);
+                    // add if statement
+                    ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    if (ifmd == null) {
+                        ifmd = createItemFormMetadata(xformItem, item, responseSet, section, crfVersion, itemOrdinal);
+                    } else {
+                        ifmd.setRequired(xformItem.isRequired());
+                        ifmd.setLeftItemText(xformItem.getLeftItemText());
+                        ifmd.setItem(item);
+                        ifmd.setResponseSet(responseSet);
+                        ifmd = itemFormMetadataDao.saveOrUpdate(ifmd);
                     }
+                    ArrayList<VersioningMap> vm = versioningMapDao.findByVersionIdFormLayoutIdAndItemId(crfVersion.getCrfVersionId(),
+                            formLayout.getFormLayoutId(), item.getItemId(), itemOrdinal);
+                    if (vm.size() == 0) {
+                        createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
+                    }
+                    //
+                    ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    if (igmd == null) {
+                        igmd = createItemGroupMetadata(item, crfVersion, itemGroup, isRepeating, itemOrdinal);
+                    }
+                    itemOrdinal++;
+
                 }
+
             }
         }
 
     }
 
-    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion version, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
+    private ItemGroupMetadata createItemGroupMetadata(Item item, CrfVersion crfVersion, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);
         itemGroupMetadata.setHeader("");
@@ -309,7 +283,7 @@ public class XformMetaDataService {
         }
         itemGroupMetadata.setRepeatArray("");
         itemGroupMetadata.setRowStartNumber(0);
-        itemGroupMetadata.setCrfVersion(version);
+        itemGroupMetadata.setCrfVersion(crfVersion);
         itemGroupMetadata.setItem(item);
         itemGroupMetadata.setOrdinal(itemOrdinal);
         itemGroupMetadata.setShowGroup(true);
@@ -317,28 +291,27 @@ public class XformMetaDataService {
         return itemGroupMetadata;
     }
 
-    private void createVersioningMap(CrfVersion version, Item item) {
-
+    private void createVersioningMap(CrfVersion crfVersion, Item item, FormLayout formLayout, int itemOrderInForm) {
         VersioningMapId versioningMapId = new VersioningMapId();
-        versioningMapId.setCrfVersionId(version.getCrfVersionId());
+        versioningMapId.setCrfVersionId(crfVersion.getCrfVersionId());
         versioningMapId.setItemId(item.getItemId());
+        versioningMapId.setFormLayoutId(formLayout.getFormLayoutId());
+        versioningMapId.setItemOrderInForm(itemOrderInForm);
 
         VersioningMap versioningMap = new VersioningMap();
-        versioningMap.setCrfVersion(version);
-        versioningMap.setItem(item);
         versioningMap.setVersionMapId(versioningMapId);
         versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion version,
+    private ItemFormMetadata createItemFormMetadata(XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
             Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
-        itemFormMetadata.setCrfVersionId(version.getCrfVersionId());
+        itemFormMetadata.setCrfVersionId(crfVersion.getCrfVersionId());
         itemFormMetadata.setResponseSet(responseSet);
         itemFormMetadata.setItem(item);
         itemFormMetadata.setSubheader("");
         itemFormMetadata.setHeader("");
-        itemFormMetadata.setLeftItemText(getLeftItemText(html, xformItem));
+        itemFormMetadata.setLeftItemText(xformItem.getLeftItemText());
         itemFormMetadata.setRightItemText("");
         itemFormMetadata.setParentId(0);
         itemFormMetadata.setSection(section);
@@ -349,10 +322,7 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        if (getItemFormMetadataRequired(html, xformItem))
-            itemFormMetadata.setRequired(true);
-        else
-            itemFormMetadata.setRequired(false);
+        itemFormMetadata.setRequired(xformItem.isRequired());
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
@@ -361,141 +331,293 @@ public class XformMetaDataService {
         return itemFormMetadata;
     }
 
-    private Item createItem(Html html, UserControl widget, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub,
-            ArrayList<String> usedItemOids, Errors errors) throws Exception {
-        ItemDataType newDataType = getItemDataType(html, xformItem);
-
-        if (newDataType == null) {
-            logger.error("Found unsupported item type for item: " + xformItem.getItemName());
-            return null;
-        }
+    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, ArrayList<String> usedItemOids, Errors errors)
+            throws Exception {
+        ItemDataType newDataType = getItemDataType(xformItem);
 
         Item item = itemDao.findByNameCrfId(xformItem.getItemName(), crf.getCrfId());
-        ItemDataType oldDataType = null;
         if (item != null) {
-            oldDataType = itemDataTypeDao.findByItemDataTypeId(itemDao.getItemDataTypeId(item));
+            item.setDescription(xformItem.getItemDescription());
+            item = itemDao.saveOrUpdate(item);
         } else {
             item = new Item();
             item.setName(xformItem.getItemName());
-            item.setDescription("");
+            item.setDescription(xformItem.getItemDescription());
             item.setUnits("");
             item.setPhiStatus(false);
             item.setItemDataType(newDataType);
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
-            item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
+            item.setOcOid(xformItem.getItemOid());
             usedItemOids.add(item.getOcOid());
-            Integer itemId = (Integer) itemDao.save(item);
-            item.setItemId(itemId);
+            item = itemDao.saveOrUpdate(item);
         }
-        ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType);
-        DataBinder dataBinder = new DataBinder(item);
-        Errors itemErrors = dataBinder.getBindingResult();
-        validator.validate(item, itemErrors);
-        errors.addAllErrors(itemErrors);
 
-        return itemDao.findByOcOID(item.getOcOid());
+        return item;
     }
 
-    private String getLeftItemText(Html html, XformItem xformItem) {
-        for (Group group : html.getBody().getGroup()) {
-            if (group.getRepeat() != null && group.getRepeat().getUsercontrol() != null) {
-                for (UserControl control : group.getRepeat().getUsercontrol()) {
-                    if (control.getRef().equals(xformItem.getItemPath())) {
-                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                            return control.getLabel().getLabel();
-                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
-                            String ref = control.getLabel().getRef();
-                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
-                            return XformUtils.getDefaultTranslation(html, itextKey);
-                        } else
-                            return "";
+    private ItemDataType getItemDataType(XformItem xformItem) {
+        String dataType = xformItem.getItemDataType();
+
+        if (dataType.equals("string"))
+            return itemDataTypeDao.findByItemDataTypeCode("ST");
+        else if (dataType.equals("int"))
+            return itemDataTypeDao.findByItemDataTypeCode("INT");
+        else if (dataType.equals("decimal"))
+            return itemDataTypeDao.findByItemDataTypeCode("REAL");
+        else if (dataType.equals("select") || dataType.equals("select1"))
+            return itemDataTypeDao.findByItemDataTypeCode("ST");
+        else if (dataType.equals("binary"))
+            return itemDataTypeDao.findByItemDataTypeCode("FILE");
+        else if (dataType.equals("date"))
+            return itemDataTypeDao.findByItemDataTypeCode("DATE");
+        else
+            return null;
+
+    }
+
+    private ResponseType getResponseType(XformItem xformItem) {
+        String responseType = xformItem.getItemDataType();
+
+        if (responseType.equals("string"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("int"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("decimal"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("date"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("select"))
+            return responseTypeDao.findByResponseTypeName("checkbox");
+        else if (responseType.equals("select1"))
+            return responseTypeDao.findByResponseTypeName("radio");
+        else if (responseType.equals("binary"))
+            return responseTypeDao.findByResponseTypeName("file");
+        else if (responseType.equals("calculate"))
+            return responseTypeDao.findByResponseTypeName("calculation");
+        else
+            return null;
+    }
+
+    public FileItem getMediaFileItemFromFormManager(String fileLink, String crfOid, String formLayoutOid) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        ResponseEntity<byte[]> response = restTemplate.exchange(fileLink, HttpMethod.GET, entity, byte[].class, "1");
+        FileItem fileItem = null;
+        if (response.getStatusCode() == HttpStatus.OK) {
+            String fileName = "";
+            FileOutputStream output = null;
+            try {
+                String disposition = response.getHeaders().get("Content-Disposition").get(0);
+                fileName = disposition.replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
+                String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
+                if (!new File(dir).exists()) {
+                    new File(dir).mkdirs();
+                    logger.debug("Made the directory " + dir);
+                }
+                File file = new File(dir + fileName);
+                output = new FileOutputStream(file);
+                IOUtils.write(response.getBody(), output);
+                fileItem = new DiskFileItem("media_file", response.getHeaders().get("Content-Type").get(0), false, fileName, 100000000, file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (output != null) {
+                        output.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return fileItem;
+    }
+
+    public void executeIndividualCrf(ExecuteIndividualCrfObject eicObject) {
+        for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
+
+            List<String> fileLinks = null;
+            String vForm = "";
+            RestTemplate rest = new RestTemplate();
+            if (eicObject.form != null) {
+                List<FormVersion> versions = eicObject.form.getVersions();
+                for (FormVersion version : versions) {
+                    if (version.getName().equals(formLayoutDef.getOID())) {
+                        fileLinks = version.getFileLinks();
+                        for (String fileLink : fileLinks) {
+                            if (fileLink.endsWith(VERSION)) {
+                                vForm = rest.getForObject(fileLink, String.class);
+                                break;
+                            }
+                        }
+
+                        if (!eicObject.errors.hasErrors()) {
+                            ObjectMapper mapper = new ObjectMapper();
+                            TypeReference<List<XformGroup>> mapType = new TypeReference<List<XformGroup>>() {
+                            };
+                            List<XformGroup> jsonList = null;
+                            try {
+                                jsonList = mapper.readValue(vForm, mapType);
+                            } catch (JsonParseException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (JsonMappingException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            XformContainer xformContainer = new XformContainer();
+                            xformContainer.setGroups(jsonList);
+                            eicObject.setContainer(xformContainer);
+
+                            if (eicObject.errors.hasErrors()) {
+                                return;
+                            }
+                            // Save meta-data in database
+                            saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
+                        }
                     }
                 }
+            }
+        }
 
-            } else {
-                for (UserControl control : group.getUsercontrol()) {
-                    if (control.getRef().equals(xformItem.getItemPath())) {
-                        if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                            return control.getLabel().getLabel();
-                        else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
-                            String ref = control.getLabel().getRef();
-                            String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
-                            return XformUtils.getDefaultTranslation(html, itextKey);
-                        } else
-                            return "";
-                    }
+    }
+
+    public void saveFormMetadata(ExecuteIndividualCrfObject eicObj, FormVersion version, XformContainer container,
+            OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef, List<String> fileLinks) {
+
+        try {
+            try {
+                FormLayout formLayout = createCRFMetaData(
+                        new CrfMetaDataObject(eicObj.form, version, container, eicObj.getCurrentStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
+                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.form.getOcoid(), version.getOcoid());
+                saveMediaFiles(fileLinks, eicObj.form.getOcoid(), formLayout);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (RuntimeException e) {
+            logger.error("Error encountered while saving CRF: " + e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            if (!eicObj.errors.hasErrors())
+                throw e;
+        }
+    }
+
+    private void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {
+        // Create the directory structure for saving the media
+        String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
+        if (!new File(dir).exists()) {
+            new File(dir).mkdirs();
+            logger.debug("Made the directory " + dir);
+        }
+        // Save any media files
+        for (String fileLink : fileLinks) {
+            String fileName = "";
+            int startIndex = fileLink.lastIndexOf('/');
+            if (startIndex != -1) {
+                fileName = fileLink.substring(startIndex + 1);
+            }
+            saveAttachedFiles(fileLink, dir, fileName);
+        }
+    }
+
+    public void saveAttachedFiles(String uri, String dir, String fileName) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class, "1");
+
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            FileOutputStream output = new FileOutputStream(new File(dir + File.separator + fileName));
+            IOUtils.write(response.getBody(), output);
+        }
+    }
+
+    private FormLayout populateFormLayout(FormLayout formLayout, CrfBean crfBean, CrfMetaDataObject cmdObject) {
+        formLayout.setName(cmdObject.version.getName());
+        formLayout.setDescription(cmdObject.version.getDescription());
+        formLayout.setCrf(crfBean);
+        formLayout.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        formLayout.setRevisionNotes(cmdObject.version.getDescription());
+        formLayout.setOcOid(cmdObject.version.getOcoid());
+        formLayout.setXform(null);
+        formLayout.setXformName(cmdObject.container.getInstanceName());
+        formLayout.setUrl(cmdObject.formLayoutUrl);
+        return formLayout;
+
+    }
+
+    private CrfBean populateCrf(CrfBean crfBean, CrfMetaDataObject cmdObject) {
+        crfBean.setName(cmdObject.crf.getName());
+        crfBean.setDescription(cmdObject.crf.getDescription());
+        crfBean.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        crfBean.setStudy(studyDao.findById(cmdObject.currentStudy.getId()));
+        crfBean.setOcOid(cmdObject.crf.getOcoid());
+        crfBean.setUpdateId(cmdObject.ub.getId());
+        crfBean.setDateUpdated(new Date());
+        return crfBean;
+    }
+
+    private CrfVersion populateCrfVersion(CrfBean crfBean, CrfVersion crfVersion, CrfMetaDataObject cmdObject) {
+        crfVersion.setName(cmdObject.version.getName());
+        crfVersion.setDescription(cmdObject.version.getDescription());
+        crfVersion.setCrf(crfBean);
+        crfVersion.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        crfVersion.setRevisionNotes(cmdObject.version.getDescription());
+        crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), crfVersion.getName()));
+        return crfVersion;
+    }
+
+    private Section populateCrfVersion(Section section, CrfVersion crfVersion, CrfMetaDataObject cmdObject) {
+        section.setCrfVersion(crfVersion);
+        section.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        section.setLabel("");
+        section.setTitle("");
+        section.setSubtitle("");
+        section.setPageNumberLabel("");
+        section.setOrdinal(1);
+        section.setUserAccount(userDao.findById(cmdObject.ub.getId())); // not null
+        section.setBorders(0);
+        return section;
+    }
+
+    private void saveMediaFiles(List<String> fileLinks, String crfOid, FormLayout formLayout) throws IOException {
+        // Create the directory structure for saving the media
+        String dir = Utils.getCrfMediaFilePathWithoutSysPath(crfOid, formLayout.getOcOid());
+        for (String fileLink : fileLinks) {
+            String fileName = "";
+            int startIndex = fileLink.lastIndexOf('/');
+            if (startIndex != -1) {
+                fileName = fileLink.substring(startIndex + 1);
+            }
+            if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
+                    && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX)) {
+
+                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdFileNameForNoteTypeMedia(formLayout.getFormLayoutId(), fileName, dir);
+                if (media == null) {
+                    media = new FormLayoutMedia();
+                    media.setFormLayout(formLayout);
+                    media.setName(fileName);
+                    media.setPath(dir);
+                    media.setEventCrfId(0);
+                    formLayoutMediaDao.saveOrUpdate(media);
                 }
             }
         }
-        return "";
-    }
-
-    private ItemDataType getItemDataType(Html html, XformItem xformItem) {
-        String dataType = "";
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getType() != null && !bind.getType().equals("")) {
-                dataType = bind.getType();
-
-                if (dataType.equals("string"))
-                    return itemDataTypeDao.findByItemDataTypeCode("ST");
-                else if (dataType.equals("int"))
-                    return itemDataTypeDao.findByItemDataTypeCode("INT");
-                else if (dataType.equals("decimal"))
-                    return itemDataTypeDao.findByItemDataTypeCode("REAL");
-                else if (dataType.equals("select") || dataType.equals("select1"))
-                    return itemDataTypeDao.findByItemDataTypeCode("ST");
-                else if (dataType.equals("binary"))
-                    return itemDataTypeDao.findByItemDataTypeCode("FILE");
-                else if (dataType.equals("date"))
-                    return itemDataTypeDao.findByItemDataTypeCode("DATE");
-            }
-        }
-        return null;
-    }
-
-    private boolean getItemFormMetadataRequired(Html html, XformItem xformItem) {
-        boolean required = false;
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
-                if (bind.getRequired().equals("true()"))
-                    required = true;
-                else if (bind.getRequired().equals("false()"))
-                    required = false;
-            }
-        }
-        return required;
-    }
-
-    private ResponseType getResponseType(Html html, XformItem xformItem) {
-        String responseType = "";
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getType() != null && !bind.getType().equals("")) {
-                responseType = bind.getType();
-
-                if (responseType.equals("string"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("int"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("decimal"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("date"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("select"))
-                    return responseTypeDao.findByResponseTypeName("checkbox");
-                else if (responseType.equals("select1"))
-                    return responseTypeDao.findByResponseTypeName("radio");
-                else if (responseType.equals("binary"))
-                    return responseTypeDao.findByResponseTypeName("file");
-                else
-                    return null;
-            }
-        }
-        return null;
     }
 
 }

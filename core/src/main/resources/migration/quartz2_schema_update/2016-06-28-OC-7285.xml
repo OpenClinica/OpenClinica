@@ -253,4 +253,10 @@
             <column name="TRIGGER_GROUP"></column>
         </createIndex>
     </changeSet>
+    <changeSet id="2016-06-28-7285-10" author="kkrumlian">
+        <addColumn tableName="OC_QRTZ_FIRED_TRIGGERS">
+            <column name="SCHED_TIME" type="BIGINT"></column>
+        </addColumn>
+        <addNotNullConstraint tableName="OC_QRTZ_FIRED_TRIGGERS" columnName="SCHED_TIME"/>
+    </changeSet>
 </databaseChangeLog>

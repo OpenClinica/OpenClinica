@@ -1,14 +1,16 @@
 package org.akaza.openclinica.bean.submit;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 7, 2007
  */
-public class ItemGroupBean extends AuditableEntityBean {
+public class ItemGroupBean extends AuditableEntityBean implements Serializable {
 
     private Integer crfId = 0;
     private ItemGroupMetadataBean meta = new ItemGroupMetadataBean();
@@ -17,7 +19,8 @@ public class ItemGroupBean extends AuditableEntityBean {
     private ArrayList items = new ArrayList();
     private String oid;
     private OidGenerator oidGenerator;
-    
+    String layoutGroupPath;
+
     public ItemGroupBean() {
         super();
         crfId = 0;
@@ -26,10 +29,6 @@ public class ItemGroupBean extends AuditableEntityBean {
         oidGenerator = new ItemGroupOidGenerator();
     }
 
-    
-    
-    
-    
     /**
      * @return the crfId
      */
@@ -84,12 +83,20 @@ public class ItemGroupBean extends AuditableEntityBean {
         this.itemGroupMetaBeans = itemGroupMetaBeans;
     }
 
-	public ArrayList getItems() {
-		return items;
-	}
+    public ArrayList getItems() {
+        return items;
+    }
 
-	public void setItems(ArrayList items) {
-		this.items = items;
-	}
-    
+    public void setItems(ArrayList items) {
+        this.items = items;
+    }
+
+    public String getLayoutGroupPath() {
+        return layoutGroupPath;
+    }
+
+    public void setLayoutGroupPath(String layoutGroupPath) {
+        this.layoutGroupPath = layoutGroupPath;
+    }
+
 }

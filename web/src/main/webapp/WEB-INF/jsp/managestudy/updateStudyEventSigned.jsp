@@ -494,7 +494,7 @@
 <!--
                             <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
                             -->
-                             <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+                             <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
                             
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
@@ -516,7 +516,7 @@
 <!--
                             <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
                             -->
-                             <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+                             <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
@@ -536,7 +536,7 @@
 <!--
          <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
    -->                         
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.crfVersion.oid}"/>')"
+    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
                             
                                 onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                                 onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"

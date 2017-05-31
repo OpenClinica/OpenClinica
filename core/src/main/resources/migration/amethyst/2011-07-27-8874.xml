@@ -12,15 +12,15 @@
             pk INTEGER;
             entity_name_value TEXT;
             std_evnt_id INTEGER;
-            crf_version_id INTEGER;
+            form_layout_id INTEGER;
         BEGIN
             IF (TG_OP = ''INSERT'' and length(NEW.value)>0) THEN
 				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
 				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
 		        SELECT INTO std_evnt_id ec.study_event_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
-		        SELECT INTO crf_version_id ec.crf_version_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
+		        SELECT INTO form_layout_id ec.form_layout_id FROM event_crf ec WHERE ec.event_crf_id = NEW.event_crf_id;
 		        INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, reason_for_change, new_value, event_crf_id, study_event_id, event_crf_version_id)
-		                VALUES (pk, ''1'', now(), NEW.owner_id, ''item_data'', NEW.item_data_id, entity_name_value, ''initial value'', NEW.value, NEW.event_crf_id, std_evnt_id, crf_version_id);
+		                VALUES (pk, ''1'', now(), NEW.owner_id, ''item_data'', NEW.item_data_id, entity_name_value, ''initial value'', NEW.value, NEW.event_crf_id, std_evnt_id, form_layout_id);
 				RETURN NULL;
             END IF;
         RETURN NULL;

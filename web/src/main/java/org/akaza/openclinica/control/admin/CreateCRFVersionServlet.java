@@ -7,6 +7,19 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -36,19 +49,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 /**
  * Create a new CRF verison by uploading excel file
@@ -425,8 +425,8 @@ public class CreateCRFVersionServlet extends SecureController {
                     // *** now change the code here to generate sstable, tbh
                     // 06/07
                     htab = new SpreadSheetTableRepeating(inStream, ub,
-                    // SpreadSheetTable htab = new SpreadSheetTable(new
-                    // FileInputStream(theDir + tempFile), ub,
+                            // SpreadSheetTable htab = new SpreadSheetTable(new
+                            // FileInputStream(theDir + tempFile), ub,
                             version.getName(), locale, currentStudy.getId());
 
                     htab.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));

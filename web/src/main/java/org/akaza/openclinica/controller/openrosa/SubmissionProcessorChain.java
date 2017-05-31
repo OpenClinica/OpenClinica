@@ -1,11 +1,10 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import java.util.List;
-
-import org.akaza.openclinica.controller.openrosa.processor.InstanceIdProcessor;
 import org.akaza.openclinica.controller.openrosa.processor.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class SubmissionProcessorChain {

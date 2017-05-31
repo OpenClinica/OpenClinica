@@ -1,75 +1,65 @@
 package org.akaza.openclinica.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.domain.xform.XformContainer;
-import org.akaza.openclinica.domain.xform.XformGroup;
-import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
-import org.akaza.openclinica.domain.xform.dto.Html;
+import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
-import org.akaza.openclinica.service.dto.Crf;
-import org.akaza.openclinica.service.dto.Version;
+import org.akaza.openclinica.service.dto.Form;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.cdisc.ns.odm.v130_sb.EventType;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormDef;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionFormRef;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionGlobalVariables;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionMetaDataVersion;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionStudy;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionStudyEventDef;
-import org.cdisc.ns.odm.v130_sb.ODMcomplexTypeDefinitionStudyEventRef;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionConfigurationParameters;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionEventDefinitionDetails;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutDef;
-import org.openclinica.ns.odm_ext_v130.v31_sb.OCodmComplexTypeDefinitionFormLayoutRef;
+import org.cdisc.ns.odm.v130.EventType;
+import org.cdisc.ns.odm.v130.ODM;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionGlobalVariables;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionMetaDataVersion;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudy;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventDef;
+import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventRef;
+import org.cdisc.ns.odm.v130.YesOrNo;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionEventDefinitionDetails;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class OdmImportServiceImpl implements OdmImportService {
+    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
+    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     private UserAccountDao userAccountDao;
     private StudyUserRoleDao studyUserRoleDao;
@@ -77,9 +67,11 @@ public class OdmImportServiceImpl implements OdmImportService {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private CrfDao crfDao;
     private CrfVersionDao crfVersionDao;
+    private FormLayoutDao formLayoutDao;
+    private FormLayoutMediaDao formLayoutMediaDao;
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
-    private DataSource dataSource;
+    private StudyParameterValueDao studyParameterValueDao;
 
     private XformParser xformParser;
 
@@ -88,11 +80,10 @@ public class OdmImportServiceImpl implements OdmImportService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
-        super();
-        this.dataSource = dataSource;
     }
 
-    public void importOdmToOC(org.cdisc.ns.odm.v130_sb.ODM odm) {
+    @Transactional
+    public void importOdmToOC(ODM odm) {
 
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities
@@ -100,27 +91,21 @@ public class OdmImportServiceImpl implements OdmImportService {
         Study study = saveOrUpdateStudy(odm, userAccount, odmStudy);
 
         ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
-        String str = portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
+        portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
 
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        StudyParameterValue spv = getStudyParameterValueDao().findByStudyIdParameter(study.getStudyId(), "participantPortal");
         // Update OC Study configuration
-        spv.setStudyId(study.getStudyId());
-        spv.setParameter("participantPortal");
+        if (spv == null) {
+            spv = new StudyParameterValue();
+            spv.setStudy(study);
+        }
         spv.setValue("enabled");
-        if (spv.getId() > 0)
-            spvdao.update(spv);
-        else
-            spvdao.create(spv);
-
-        // StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        // pStatus.setValue("enabled");
-        // spvdao.update(pStatus);
+        spv = getStudyParameterValueDao().saveOrUpdate(spv);
 
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
 
-        Crf[] fmCrfs = getCrfsFromFormManager(study);
+        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(study);
 
         ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
         if (surRoles.size() == 0) {
@@ -134,8 +119,10 @@ public class OdmImportServiceImpl implements OdmImportService {
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions);
 
         CrfBean crf = null;
-        CrfVersion crfVersion = null;
+        FormLayout formLayout = null;
+
         saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs);
+
         List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
             for (ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef : odmStudyEventDefs) {
@@ -144,6 +131,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                     studyEventDefinition.setOrdinal(odmStudyEventRef.getOrderNumber().intValue());
                     studyEventDefinition = getStudyEventDefDao().saveOrUpdate(studyEventDefinition);
 
+                    List<EventDefinitionCrf> jsonEventDefCrfList = new ArrayList<>();
                     EventDefinitionCrf eventDefinitionCrf = null;
                     for (ODMcomplexTypeDefinitionFormRef odmFormRef : odmStudyEventDef.getFormRef()) {
                         crf = getCrfDao().findByOcOID(odmFormRef.getFormOID());
@@ -151,26 +139,53 @@ public class OdmImportServiceImpl implements OdmImportService {
                         eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
                                 studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
 
-                        String defaultVersionOid = null;
+                        String defaultVersionName = null;
                         OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
                         List<OCodmComplexTypeDefinitionFormLayoutRef> formLayoutRefs = odmFormRef.getFormLayoutRef();
                         if (formLayoutRefs.size() == 1 && formLayoutRefs.get(0).getIsDefaultVersion() == null) {
-                            defaultVersionOid = formLayoutRefs.get(0).getOID();
+                            defaultVersionName = formLayoutRefs.get(0).getOID();
                         } else {
                             for (OCodmComplexTypeDefinitionFormLayoutRef formLayoutRef : formLayoutRefs) {
                                 if (formLayoutRef.getIsDefaultVersion().equalsIgnoreCase("Yes")) {
-                                    defaultVersionOid = formLayoutRef.getOID();
+                                    defaultVersionName = formLayoutRef.getOID();
                                 }
                             }
                         }
-                        if (defaultVersionOid == null) {
-                            defaultVersionOid = formLayoutRefs.get(0).getOID();
+                        if (defaultVersionName == null) {
+                            defaultVersionName = formLayoutRefs.get(0).getOID();
                         }
+                        formLayout = getFormLayoutDao().findByNameCrfId(defaultVersionName, crf.getCrfId());
+                        EventDefinitionCrfDTO edcObj = new EventDefinitionCrfDTO();
+                        edcObj.setUserAccount(userAccount);
+                        edcObj.setConf(conf);
+                        edcObj.setCrf(crf);
+                        edcObj.setEventDefinitionCrf(eventDefinitionCrf);
+                        edcObj.setOdmFormRef(odmFormRef);
+                        edcObj.setStudy(study);
+                        edcObj.setFormLayout(formLayout);
+                        edcObj.setStudyEventDefinition(studyEventDefinition);
 
-                        crfVersion = getCrfVersionDao().findByOcOID(defaultVersionOid);
-                        eventDefinitionCrf = saveOrUpdateEventDefnCrf(userAccount, study, studyEventDefinition, crf, crfVersion, eventDefinitionCrf, conf);
-                        saveOrUpdateEventDefnCrfTag(userAccount, studyEventDefinition, crf, eventDefinitionCrf, conf);
+                        EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
+                        populateEDCTagParameter.setConf(conf);
+
+                        populateEDCTagParameter.setConf(conf);
+                        populateEDCTagParameter.setEventDefinitionCrf(eventDefinitionCrf);
+                        populateEDCTagParameter.setUserAccount(userAccount);
+
+                        eventDefinitionCrf = saveOrUpdateEventDefnCrf(new EventDefinitionCrfDTO(edcObj));
+                        saveOrUpdateEDCTag(new EDCTagDTO(populateEDCTagParameter), studyEventDefinition, crf);
+                        jsonEventDefCrfList.add(eventDefinitionCrf);
                     }
+
+                    List<EventDefinitionCrf> ocEventDefCrfList = getEventDefinitionCrfDao()
+                            .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId());
+                    for (EventDefinitionCrf ocEventDefCrf : ocEventDefCrfList) {
+                        if (!jsonEventDefCrfList.contains(ocEventDefCrf)) {
+                            ocEventDefCrf.setStatusId(Status.DELETED.getCode());
+                            getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
+                        }
+                    }
+
                 }
             }
 
@@ -178,82 +193,72 @@ public class OdmImportServiceImpl implements OdmImportService {
 
     }
 
-    private void saveOrUpdateEventDefnCrfTag(UserAccount userAccount, StudyEventDefinition studyEventDefinition, CrfBean crf,
-            EventDefinitionCrf eventDefinitionCrf, OCodmComplexTypeDefinitionConfigurationParameters conf) {
+    private void saveOrUpdateEDCTag(EDCTagDTO edcTagObj, StudyEventDefinition studyEventDefinition, CrfBean crf) {
         EventDefinitionCrfTag eventDefinitionCrfTag;
         int tagId = 2; // Offline
         String crfPath = studyEventDefinition.getOc_oid() + "." + crf.getOcOid();
         eventDefinitionCrfTag = getEventDefinitionCrfTagDao().findByCrfPathAndTagId(tagId, crfPath);
+        edcTagObj.setTagId(tagId);
+        edcTagObj.setCrfPath(crfPath);
         if (eventDefinitionCrfTag == null) {
             eventDefinitionCrfTag = new EventDefinitionCrfTag();
-            eventDefinitionCrfTag = getEventDefinitionCrfTagDao()
-                    .saveOrUpdate(populateEDCTag(eventDefinitionCrf, userAccount, conf, tagId, crfPath, eventDefinitionCrfTag));
+            edcTagObj.setEventDefinitionCrfTag(eventDefinitionCrfTag);
+            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(populateEDCTag(new EDCTagDTO(edcTagObj)));
         } else {
-            eventDefinitionCrfTag = getEventDefinitionCrfTagDao()
-                    .saveOrUpdate(updateEDCTag(eventDefinitionCrf, userAccount, conf, tagId, crfPath, eventDefinitionCrfTag));
+            edcTagObj.setEventDefinitionCrfTag(eventDefinitionCrfTag);
+            eventDefinitionCrfTag = getEventDefinitionCrfTagDao().saveOrUpdate(updateEDCTag(new EDCTagDTO(edcTagObj)));
         }
     }
 
-    private EventDefinitionCrf saveOrUpdateEventDefnCrf(UserAccount userAccount, Study study, StudyEventDefinition studyEventDefinition, CrfBean crf,
-            CrfVersion crfVersion, EventDefinitionCrf eventDefinitionCrf, OCodmComplexTypeDefinitionConfigurationParameters conf) {
+    private EventDefinitionCrf saveOrUpdateEventDefnCrf(EventDefinitionCrfDTO edcObj) {
+        EventDefinitionCrf eventDefinitionCrf = edcObj.getEventDefinitionCrf();
         if (eventDefinitionCrf == null) {
             eventDefinitionCrf = new EventDefinitionCrf();
-            eventDefinitionCrf = getEventDefinitionCrfDao()
-                    .saveOrUpdate(populateEventDefinitionCrf(eventDefinitionCrf, userAccount, crf, crfVersion, conf, study, studyEventDefinition));
+            edcObj.setEventDefinitionCrf(eventDefinitionCrf);
+            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
         } else {
-            eventDefinitionCrf = getEventDefinitionCrfDao()
-                    .saveOrUpdate(updateEventDefinitionCrf(eventDefinitionCrf, userAccount, crf, crfVersion, conf, study, studyEventDefinition));
+            eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(updateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
         }
         return eventDefinitionCrf;
     }
 
-    private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Crf[] fmCrfs) {
-        CrfBean crf;
-        CrfVersion version;
+    private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs) {
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
-            crf = getCrfDao().findByOcOID(odmFormDef.getOID());
-
-            if (crf == null) {
-                crf = new CrfBean();
-                crf.setOcOid(odmFormDef.getOID());
-                crf = getCrfDao().saveOrUpdate(populateCrf(odmFormDef, userAccount, crf, study));
-            } else {
-                crf = getCrfDao().saveOrUpdate(updateCrf(odmFormDef, userAccount, crf, study));
-            }
-            version = saveOrUpdateCrfVersion(userAccount, crf, odmFormDef, fmCrfs);
-            if (version.getXform() != null) {
-                try {
-                    parseCrfVersion(crf, version, study, userAccount);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            String crfOid = odmFormDef.getOID();
+            List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
+            // String crfDescription = odmFormDef.getFormDetails().getDescription();
+            String crfName = odmFormDef.getName();
+            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName);
         }
+
     }
 
-    private CrfVersion saveOrUpdateCrfVersion(UserAccount userAccount, CrfBean crf, ODMcomplexTypeDefinitionFormDef odmFormDef, Crf[] fmCrfs) {
-        CrfVersion crfVersion = null;
-        List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
-        for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
+    private void saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
+            UserAccount userAccount, Study study, String crfName) {
 
-            crfVersion = getCrfVersionDao().findByOcOID(formLayoutDef.getOID());
-            String url = formLayoutDef.getURL();
-            if (crfVersion == null) {
-                crfVersion = new CrfVersion();
-                crfVersion.setOcOid(formLayoutDef.getOID());
-                crfVersion = getCrfVersionDao().saveOrUpdate(populateCrfVersion(odmFormDef, userAccount, crfVersion, crf, url, fmCrfs));
-            } else {
-                crfVersion = getCrfVersionDao().saveOrUpdate(updateCrfVersion(odmFormDef, userAccount, crfVersion, crf, url, fmCrfs));
+        DataBinder dataBinder = new DataBinder(new FormLayout());
+        Errors errors = dataBinder.getBindingResult();
+        StudyBean currentStudy = new StudyBean();
+        currentStudy.setId(study.getStudyId());
+
+        UserAccountBean ub = new UserAccountBean();
+        ub.setId(userAccount.getUserId());
+        ub.setActiveStudyId(currentStudy.getId());
+
+        for (Form crf : fmCrfs) {
+            if (crf.getOcoid().equals(crfOid)) {
+                ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, currentStudy, ub, true, null);
+                xformService.executeIndividualCrf(eicObj);
             }
         }
-        return crfVersion;
+
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
             List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions) {
         StudyEventDefinition studyEventDefinition;
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = odmMetadataVersions.get(0).getStudyEventDef();
+        List<StudyEventDefinition> jsonEventList = new ArrayList<>();
         for (ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef : odmStudyEventDefs) {
 
             studyEventDefinition = getStudyEventDefDao().findByOcOID(odmStudyEventDef.getOID());
@@ -264,11 +269,20 @@ public class OdmImportServiceImpl implements OdmImportService {
             } else {
                 studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
             }
+            jsonEventList.add(studyEventDefinition);
         }
+        List<StudyEventDefinition> ocEventList = getStudyEventDefDao().findAll(); // findAllNonRemovedEvents
+        for (StudyEventDefinition ocEvent : ocEventList) {
+            if (!jsonEventList.contains(ocEvent)) {
+                ocEvent.setStatus(Status.DELETED);
+                getStudyEventDefDao().saveOrUpdate(ocEvent);
+            }
+        }
+
         return odmStudyEventDefs;
     }
 
-    private Study saveOrUpdateStudy(org.cdisc.ns.odm.v130_sb.ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy) {
+    private Study saveOrUpdateStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy) {
         ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables = odmStudy.getGlobalVariables();
         String studyOid = odm.getStudy().get(0).getOID();
         Study study = getStudyDao().findByOcOID(studyOid);
@@ -325,7 +339,6 @@ public class OdmImportServiceImpl implements OdmImportService {
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
         studyEventDefinition.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        // studyEventDefinition.setType(odmStudyEventDef.getType().value());
         if (odmStudyEventDef.getStudyEventDefElementExtension().size() != 0) {
             OCodmComplexTypeDefinitionEventDefinitionDetails eventDetails = odmStudyEventDef.getStudyEventDefElementExtension().get(0);
             if (eventDetails != null && eventDetails.getCategory() != null) {
@@ -347,79 +360,31 @@ public class OdmImportServiceImpl implements OdmImportService {
         return studyEventDefinition;
     }
 
-    private CrfBean populateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crf, Study study) {
-        crf.setStudy(study);
-        crf.setName(odmFormDef.getName());
-        crf.setUserAccount(userAccount);
-        crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        return crf;
-    }
-
-    private CrfBean updateCrf(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfBean crf, Study study) {
-        crf = populateCrf(odmFormDef, userAccount, crf, study);
-        crf.setUpdateId(userAccount.getUserId());
-        crf.setDateUpdated(new Date());
-        return crf;
-    }
-
-    private CrfVersion populateCrfVersion(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfVersion crfVersion, CrfBean crf, String url,
-            Crf[] fmCrfs) {
-        for (Crf fmCrf : fmCrfs) {
-            if (fmCrf.getOcoid().equals(crf.getOcOid())) {
-                for (Version version : fmCrf.getVersions()) {
-                    if (version.getOcoid().equals(crfVersion.getOcOid())) {
-                        crfVersion.setDescription("Description");
-                        crfVersion.setRevisionNotes("Revision");
-                        crfVersion.setName(version.getName());
-                        if (version.getFileLinks() != null) {
-                            for (String fileLink : version.getFileLinks()) {
-                                if (fileLink.endsWith(".xml")) {
-                                    crfVersion.setXform(getXFormFromFormManager(fileLink));
-                                    crfVersion.setXformName("default");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        crfVersion.setCrf(crf);
-        crfVersion.setUrl(url);
-        crfVersion.setUserAccount(userAccount);
-        crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        return crfVersion;
-    }
-
-    private CrfVersion updateCrfVersion(ODMcomplexTypeDefinitionFormDef odmFormDef, UserAccount userAccount, CrfVersion crfVersion, CrfBean crf, String url,
-            Crf[] fmCrfs) {
-        crfVersion = populateCrfVersion(odmFormDef, userAccount, crfVersion, crf, url, fmCrfs);
-        crfVersion.setUpdateId(userAccount.getUserId());
-        crfVersion.setDateUpdated(new Date());
-        return crfVersion;
-    }
-
     private UserAccount getCurrentUser() {
         UserAccount ub = getUserAccountDao().findById(1);
         return ub;
     }
 
-    private EventDefinitionCrf populateEventDefinitionCrf(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount, CrfBean crf, CrfVersion crfVersion,
-            OCodmComplexTypeDefinitionConfigurationParameters conf, Study study, StudyEventDefinition studyEventDefinition) {
-        eventDefinitionCrf.setStudy(study);
-        eventDefinitionCrf.setStudyEventDefinition(studyEventDefinition);
-        eventDefinitionCrf.setCrf(crf);
-        eventDefinitionCrf.setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
-        eventDefinitionCrf.setUserAccount(userAccount);
-        eventDefinitionCrf.setCrfVersion(crfVersion);
-        setConfigurationProperties(conf, eventDefinitionCrf);
-        return eventDefinitionCrf;
+    private EventDefinitionCrf populateEventDefinitionCrf(EventDefinitionCrfDTO edcObj) {
+        edcObj.getEventDefinitionCrf().setStudy(edcObj.getStudy());
+        edcObj.getEventDefinitionCrf().setStudyEventDefinition(edcObj.getStudyEventDefinition());
+        edcObj.getEventDefinitionCrf().setCrf(edcObj.getCrf());
+        edcObj.getEventDefinitionCrf().setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
+        edcObj.getEventDefinitionCrf().setUserAccount(edcObj.getUserAccount());
+        edcObj.getEventDefinitionCrf().setCrfVersion(edcObj.getCrfVersion());
+        setConfigurationProperties(edcObj.getConf(), edcObj.getEventDefinitionCrf());
+        if (edcObj.getOdmFormRef().getMandatory().equals(YesOrNo.YES)) {
+            edcObj.getEventDefinitionCrf().setRequiredCrf(true);
+        } else {
+            edcObj.getEventDefinitionCrf().setRequiredCrf(false);
+        }
+        return edcObj.getEventDefinitionCrf();
     }
 
-    private EventDefinitionCrf updateEventDefinitionCrf(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount, CrfBean crf, CrfVersion crfVersion,
-            OCodmComplexTypeDefinitionConfigurationParameters conf, Study study, StudyEventDefinition studyEventDefinition) {
-        eventDefinitionCrf = populateEventDefinitionCrf(eventDefinitionCrf, userAccount, crf, crfVersion, conf, study, studyEventDefinition);
-        eventDefinitionCrf.setUpdateId(userAccount.getUserId());
+    private EventDefinitionCrf updateEventDefinitionCrf(EventDefinitionCrfDTO edcObj) {
+        EventDefinitionCrf eventDefinitionCrf = edcObj.getEventDefinitionCrf();
+        eventDefinitionCrf = populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj));
+        eventDefinitionCrf.setUpdateId(edcObj.getUserAccount().getUserId());
         eventDefinitionCrf.setDateUpdated(new Date());
 
         return eventDefinitionCrf;
@@ -441,27 +406,28 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             eventDefinitionCrf.setHideCrf(false);
         }
+        eventDefinitionCrf.setSubmissionUrl(conf.getSubmissionUrl());
+
         return eventDefinitionCrf;
     }
 
-    private EventDefinitionCrfTag populateEDCTag(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount,
-            OCodmComplexTypeDefinitionConfigurationParameters conf, int tagId, String crfPath, EventDefinitionCrfTag eventDefinitionCrfTag) {
-        if (conf.getOffline().equalsIgnoreCase("Yes")) {
-            eventDefinitionCrfTag.setActive(true);
+    private EventDefinitionCrfTag populateEDCTag(EDCTagDTO edcTagObj) {
+        if (edcTagObj.getConf().getOffline().equalsIgnoreCase("Yes")) {
+            edcTagObj.getEventDefinitionCrfTag().setActive(true);
         } else {
-            eventDefinitionCrfTag.setActive(false);
+            edcTagObj.getEventDefinitionCrfTag().setActive(false);
         }
-        eventDefinitionCrfTag.setTagId(tagId);
-        eventDefinitionCrfTag.setPath(crfPath);
-        eventDefinitionCrfTag.setDateCreated(new Date());
-        eventDefinitionCrfTag.setUserAccount(userAccount);
-        return eventDefinitionCrfTag;
+        edcTagObj.getEventDefinitionCrfTag().setTagId(edcTagObj.getTagId());
+        edcTagObj.getEventDefinitionCrfTag().setPath(edcTagObj.getCrfPath());
+        edcTagObj.getEventDefinitionCrfTag().setDateCreated(new Date());
+        edcTagObj.getEventDefinitionCrfTag().setUserAccount(edcTagObj.getUserAccount());
+        return edcTagObj.getEventDefinitionCrfTag();
     }
 
-    private EventDefinitionCrfTag updateEDCTag(EventDefinitionCrf eventDefinitionCrf, UserAccount userAccount,
-            OCodmComplexTypeDefinitionConfigurationParameters conf, int tagId, String crfPath, EventDefinitionCrfTag eventDefinitionCrfTag) {
-        eventDefinitionCrfTag = populateEDCTag(eventDefinitionCrf, userAccount, conf, tagId, crfPath, eventDefinitionCrfTag);
-        eventDefinitionCrfTag.setUpdateId(userAccount.getUserId());
+    private EventDefinitionCrfTag updateEDCTag(EDCTagDTO edcTagObj) {
+        EventDefinitionCrfTag eventDefinitionCrfTag = edcTagObj.getEventDefinitionCrfTag();
+        eventDefinitionCrfTag = populateEDCTag(new EDCTagDTO(edcTagObj));
+        eventDefinitionCrfTag.setUpdateId(edcTagObj.getUserAccount().getUserId());
         eventDefinitionCrfTag.setDateUpdated(new Date());
         return eventDefinitionCrfTag;
     }
@@ -546,181 +512,35 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.xformService = xformService;
     }
 
-    public Crf[] getCrfsFromFormManager(Study study) {
-        String protocolId = study.getUniqueIdentifier();
-        // String url = "http://159.203.83.212:8080/api/protocol/" + protocolId + "/forms";
-        String url = "http://fm.openclinica.info:8080/api/protocol/" + protocolId + "/forms";
+    public StudyParameterValueDao getStudyParameterValueDao() {
+        return studyParameterValueDao;
+    }
 
+    public void setStudyParameterValueDao(StudyParameterValueDao studyParameterValueDao) {
+        this.studyParameterValueDao = studyParameterValueDao;
+    }
+
+    public FormLayoutDao getFormLayoutDao() {
+        return formLayoutDao;
+    }
+
+    public void setFormLayoutDao(FormLayoutDao formLayoutDao) {
+        this.formLayoutDao = formLayoutDao;
+    }
+
+    public Form[] getAllCrfsByProtIdFromFormManager(Study study) {
+        // String protocolId = study.getUniqueIdentifier();
+        String protocolId = study.getOc_oid();
+
+        String url = FM_BASEURL + protocolId + "/forms";
         RestTemplate restTemplate = new RestTemplate();
-        Crf[] crfs = null;
+        Form[] crfs = null;
         try {
-            crfs = (Crf[]) restTemplate.getForObject(url, Crf[].class);
+            crfs = (Form[]) restTemplate.getForObject(url, Form[].class);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.info(e.getMessage());
         }
         return crfs;
-    }
-
-    public String getXFormFromFormManager(String fileLink) {
-        String xform = "";
-        RestTemplate restTemplate = new RestTemplate();
-        try {
-            xform = restTemplate.getForObject(fileLink, String.class);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return xform;
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void parseCrfVersion(CrfBean crf, CrfVersion version, Study study, UserAccount userAccount) throws Exception {
-        String submittedCrfName = crf.getName();
-        String submittedCrfVersionName = version.getName();
-        String submittedCrfVersionDescription = version.getDescription();
-        String submittedRevisionNotes = version.getRevisionNotes();
-        String submittedXformText = version.getXform();
-
-        // Create container for holding validation errors
-        DataBinder dataBinder = new DataBinder(new CrfVersion());
-        Errors errors = dataBinder.getBindingResult();
-
-        // Validate all upload form fields were populated
-        CRFVersionDAO cvdao = new CRFVersionDAO<>(dataSource);
-        CRFVersionBean crfVersion = (CRFVersionBean) cvdao.findByPK(version.getCrfVersionId());
-
-        validateFormFields(errors, crfVersion, submittedCrfName, submittedCrfVersionName, submittedCrfVersionDescription, submittedRevisionNotes,
-                submittedXformText);
-
-        if (!errors.hasErrors()) {
-
-            // Parse instance and xform
-            XformContainer container = parseInstance(submittedXformText);
-            Html html = xformParser.unMarshall(submittedXformText);
-            List<FileItem> items = new ArrayList<>();
-            StudyDAO sdao = new StudyDAO<>(dataSource);
-            StudyBean currentStudy = (StudyBean) sdao.findByPK(study.getStudyId());
-            UserAccountDAO udao = new UserAccountDAO(dataSource);
-            UserAccountBean ub = (UserAccountBean) udao.findByPK(userAccount.getUserId());
-            ub.setActiveStudyId(currentStudy.getId());
-            udao.update(ub);
-            // Save meta-data in database
-
-            try {
-                xformService.createCRFMetaData(crfVersion, container, currentStudy, ub, html, submittedCrfName, submittedCrfVersionName,
-                        submittedCrfVersionDescription, submittedRevisionNotes, submittedXformText, items, errors);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    private XformContainer parseInstance(String xform) throws Exception {
-
-        // Could use the following xpath to get all leaf nodes in the case
-        // of multiple levels of groups: //*[count(./*) = 0]
-        // For now will assume a structure of /form/item or /form/group/item
-        Document doc = null;
-        try {
-            InputStream stream = new ByteArrayInputStream(xform.getBytes(StandardCharsets.UTF_8));
-            doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
-
-            NodeList instances = doc.getElementsByTagName("instance");
-
-            // All whitespace outside tags gets parsed as Text objects and returned
-            // by the various Node methods. We need to ignore these and
-            // focus on actual Elements
-
-            Element instance = null;
-            // List<XformItem> items = new ArrayList<XformItem>();
-            List<XformGroup> groups = new ArrayList<XformGroup>();
-
-            // Get the primary instance
-            for (int i = 0; i < instances.getLength(); i++) {
-                Element curInstance = (Element) instances.item(i);
-                if (curInstance instanceof Element) {
-                    instance = curInstance;
-                    break;
-                }
-            }
-
-            // Get the form element
-            Element form = null;
-            for (int i = 0; i < instance.getChildNodes().getLength(); i++) {
-                Node curNode = instance.getChildNodes().item(i);
-                if (curNode instanceof Element) {
-                    form = (Element) curNode;
-                    break;
-                }
-            }
-
-            // Get the groups and grouped items
-            for (int i = 0; i < form.getChildNodes().getLength(); i++) {
-                if (form.getChildNodes().item(i) instanceof Element && ((Element) form.getChildNodes().item(i)).hasChildNodes()
-                        && !((Element) form.getChildNodes().item(i)).getTagName().equals("meta")) {
-                    Element group = (Element) form.getChildNodes().item(i);
-                    XformGroup newGroup = new XformGroup();
-                    newGroup.setGroupName(group.getTagName());
-                    newGroup.setGroupPath("/" + form.getTagName() + "/" + group.getTagName());
-                    groups.add(newGroup);
-                    for (int j = 0; j < group.getChildNodes().getLength(); j++) {
-                        if (group.getChildNodes().item(j) instanceof Element) {
-                            Element item = (Element) group.getChildNodes().item(j);
-                            XformItem newItem = new XformItem();
-                            newItem.setItemPath("/" + form.getTagName() + "/" + group.getTagName() + "/" + item.getTagName());
-                            newItem.setItemName(item.getTagName());
-                            // group is null;
-                            newGroup.getItems().add(newItem);
-                        }
-                    }
-                }
-            }
-            XformContainer container = new XformContainer();
-            container.setGroups(groups);
-            container.setInstanceName(form.getTagName());
-            return container;
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            throw new Exception(e);
-        }
-    }
-
-    private void validateFormFields(Errors errors, CRFVersionBean version, String submittedCrfName, String submittedCrfVersionName,
-            String submittedCrfVersionDescription, String submittedRevisionNotes, String submittedXformText) {
-
-        // Verify CRF Name is populated
-        if (version.getCrfId() == 0 && (submittedCrfName == null || submittedCrfName.equals(""))) {
-            DataBinder crfDataBinder = new DataBinder(new CrfBean());
-            Errors crfErrors = crfDataBinder.getBindingResult();
-            crfErrors.rejectValue("name", "crf_val_crf_name_blank", "CRF Name");
-            errors.addAllErrors(crfErrors);
-        }
-
-        DataBinder crfVersionDataBinder = new DataBinder(new CrfVersion());
-        Errors crfVersionErrors = crfVersionDataBinder.getBindingResult();
-
-        // Verify CRF Version Name is populated
-        if (submittedCrfVersionName == null || submittedCrfVersionName.equals("")) {
-            crfVersionErrors.rejectValue("name", "crf_ver_val_name_blank", "Version Name");
-        }
-
-        // Verify CRF Version Description is populated
-        if (submittedCrfVersionDescription == null || submittedCrfVersionDescription.equals("")) {
-            crfVersionErrors.rejectValue("description", "crf_ver_val_desc_blank", "Version Description");
-        }
-
-        // Verify CRF Version Revision Notes is populated
-        if (submittedRevisionNotes == null || submittedRevisionNotes.equals("")) {
-            crfVersionErrors.rejectValue("revisionNotes", "crf_ver_val_rev_notes_blank", "Revision Notes");
-        }
-
-        // Verify Xform text is populated
-        if (submittedXformText == null || submittedXformText.equals("")) {
-            crfVersionErrors.rejectValue("xform", "crf_ver_val_xform_blank", "Xform");
-        }
-        errors.addAllErrors(crfVersionErrors);
     }
 
 }

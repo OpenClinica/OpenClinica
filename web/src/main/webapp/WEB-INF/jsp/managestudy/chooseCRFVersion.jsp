@@ -67,10 +67,10 @@ $.noConflict();
 <input type="hidden" name="studySubjectId" value="${studySubjectId}">
 <input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
 <input type="hidden" name="studySubjectLabel" value="${studySubjectLabel}">
-<input type="hidden" name="crfversionId" value="${crfversionId}">
+<input type="hidden" name="formLayoutId" value="${formLayoutId}">
 <input type="hidden" name="crfId" value="${crfBean.id}">
 <input type="hidden" name="crfName" value="${crfName}">
-<input type="hidden" name="crfVersionName" value="${crfVersionName}">
+<input type="hidden" name="formLayoutName" value="${formLayoutName}">
 <input type="hidden" name="eventCRFId" value="${eventCRFId}">
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
@@ -110,7 +110,7 @@ $.noConflict();
 <!-- default version label here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_current_crf_version_title" bundle="${resword}"/></td>
-<td><c:out value="${crfVersionName}"/></td></tr>
+<td><c:out value="${formLayoutName}"/></td></tr>
 <tr><td>
 <!-- select new version here -->
 <fmt:message key="choose_CRF_version_combo_title" bundle="${resword}"/></td>
@@ -119,7 +119,7 @@ $.noConflict();
 <select name="selectedVersionId" id="selectedVersion">
 <option value="-1" >-Select-</option>
 <c:forEach var="version" items="${crfBean.versions}">
-<c:if test="${version.id != crfversionId}">
+<c:if test="${version.id != formLayoutId}">
 <option value="<c:out value="${version.id}" />" >&nbsp;<c:out value="${version.name}" />&nbsp;</option>
 </c:if>
 </c:forEach>
@@ -137,7 +137,7 @@ $.noConflict();
 <table cellpadding="0" cellspacing="0" border="1" class="shaded_table" >
 <tr>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_name" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_oid" bundle="${resword}"/></td>
+<td class="table_header_row" style="color: #789EC5;"><fmt:message key="layout_oid" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_created" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="owner" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
@@ -154,10 +154,10 @@ $.noConflict();
 <td  class="table_cell"  > <fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/>&nbsp;</td>
 <td  class="table_cell"  > <c:out value="${crfBean.owner.name}" />&nbsp;</td>
 <!-- <td  class="table_cell"  > <c:out value="${version.status.name}" />&nbsp;</td>-->
-<td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == crfversionId}">X</c:if>&nbsp;</td>
+<td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == formLayoutId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
+href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&formLayoutId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
 <img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
 &nbsp;

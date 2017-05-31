@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM form_layout WHERE 
+		form_layout_ID = ?</sql>
+	</query>
+	<query>
+        <name>findByOID</name>
+        <sql>SELECT * FROM form_layout WHERE 
+        OC_OID = ?</sql>
+    </query>
+	<query>
+		<name>findByFullName</name>
+		<sql>SELECT cv.* FROM form_layout cv, CRF c WHERE 
+		cv.CRF_ID = c.CRF_ID AND cv.NAME = ? AND c.NAME = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM form_layout order by DATE_CREATED desc</sql>
+	</query>
+	<query>
+        <name>findAllByOid</name>
+        <sql>SELECT * FROM form_layout where oc_oid=?</sql>
+    </query>
+	<query>
+		<name>findAllByCRF</name>
+		<sql>SELECT * FROM form_layout WHERE crf_id =? order by DATE_CREATED desc </sql>
+	</query>
+	<query>
+		<name>findAllActiveByCRF</name>
+		<sql>SELECT * FROM form_layout WHERE crf_id =? and status_id =1 order by DATE_CREATED desc </sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO form_layout (CRF_ID, STATUS_ID, NAME,
+		DESCRIPTION, OWNER_ID,
+		DATE_CREATED, REVISION_NOTES, OC_OID, XFORM) 
+		VALUES (?,?,?,?,?,NOW(),?,?,?)</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>UPDATE form_layout SET CRF_ID=?,STATUS_ID=?,NAME=?,
+		DESCRIPTION=?,DATE_UPDATED=NOW(),UPDATE_ID=?,REVISION_NOTES =? WHERE 
+		form_layout_ID=?</sql>
+	</query>
+	<query>
+		<name>findItemFromMap</name>
+		<sql>select v.item_id, i.name,i.owner_id from versioning_map v, item i 
+		where v.item_id =i.item_id and v.form_layout_id=?
+		</sql>
+	</query>
+	<query>
+		<name>isItemUsedByOtherVersion</name>
+		<sql>
+		 SELECT DISTINCT v1.item_id
+		 FROM versioning_map v1, versioning_map v2
+		 WHERE v1.item_id = v2.item_id
+		 	AND v1.form_layout_id != v2.form_layout_id
+		 	AND v1.form_layout_id = ?
+		</sql>
+	</query>
+    <query>
+     <name>findNotSharedItemsByVersion</name>
+     <sql>
+      select v.item_id,i.name,i.owner_id
+      from versioning_map v, item i 
+      where v.item_id =i.item_id
+      and v.form_layout_id=?
+      and v.item_id not in
+         (SELECT DISTINCT v.item_id
+      FROM versioning_map v
+      WHERE v.form_layout_id != ? )
+      
+     </sql>
+    </query>
+    
+    <query>
+     <name>findDefCRFVersionsByStudyEvent</name>
+     <sql>
+      SELECT cv.* FROM study_event_definition sed,event_definition_crf edc, form_layout cv
+      WHERE sed.study_event_definition_id = edc.study_event_definition_id
+       AND edc.default_version_id = cv.form_layout_id AND edc.participant_form = true
+       AND sed.study_event_definition_id = ?
+     </sql>
+    </query>
+    
+	<query>
+		<name>findItemUsedByOtherVersion</name>
+		<sql>select v.item_id, i.name,i.owner_id from versioning_map v, item i 
+		where v.item_id =i.item_id and v.form_layout_id!=?
+		</sql>
+	</query>	
+	
+	<query>
+		<name>hasItemData</name>
+		<sql>select item_data_id from item_data where item_id=?</sql>
+	</query>
+	
+	<!-- all deletes are not prepareStatements-->
+    <query>
+        <name>delete</name>
+        <sql>delete from form_layout where form_layout_id=</sql>
+    </query>    
+    <query>
+        <name>deleteFormLayoutMediaByVersion</name>
+        <sql>delete from form_layout_media where form_layout_id=</sql>
+    </query>    
+	<query>
+		<name>deleteItemsByVersion</name>
+		<sql>delete from item where item_id=</sql>
+	</query>
+	<query>
+		<name>deleteItemMapByVersion</name>
+		<sql>delete from versioning_map where form_layout_id=</sql>
+	</query>
+	<query>
+		<name>deleteSectionsByVersion</name>
+		<sql>delete from section where form_layout_id=</sql>
+	</query>
+	<query>
+		<name>deleteScdItemMetadataByVersion</name>
+		<sql>delete from scd_item_metadata scd where scd.scd_item_form_metadata_id in (
+				select ifm.item_form_metadata_id from item_form_metadata ifm 
+				where ifm.show_item=false and ifm.form_layout_id=
+		</sql>
+	</query>
+	<query>
+		<name>deleteItemMetaDataByVersion</name>
+		<sql>delete from item_form_metadata where form_layout_id=</sql>
+	</query>
+    <query>
+		<name>deleteResponseSetByVersion</name>
+		<sql>delete from response_set where version_id=</sql>
+	</query>
+	<query>
+		<name>deleteItemGroupMetaByVersion</name>
+		<sql>delete from item_group_metadata where form_layout_id=</sql>
+	</query>
+	<query>
+		<name>getCRFIdFromFormLayoutId</name>
+		<sql>SELECT crf_id FROM form_layout WHERE form_layout_id=?</sql>
+	</query>
+	<query>
+		<name>findAllByCRFId</name>
+		<sql>SELECT * FROM form_layout WHERE crf_id=?</sql>
+	</query>
+	<!--ADDED by tbh, 1-8-05, shouldn't we have our own xml file for item_form_metadata? -->
+	<query>
+		<name>findAllBySectionId</name>
+		<sql>SELECT ifm.*,rs.response_type_id,
+		rs.label,rs.options_text,rs.options_values
+		FROM ITEM_FORM_METADATA IFM, RESPONSE_SET RS WHERE IFM.RESPONSE_SET_ID = RS.RESPONSE_SET_ID AND SECTION_ID=?</sql>
+	</query>
+	<query>
+		<name>findCRFVersionId</name>
+		<sql>SELECT form_layout_ID FROM form_layout WHERE CRF_ID=? AND NAME =? </sql>
+	</query>
+    <query>
+        <name>buildFormLayoutById</name>
+        <sql>select * from form_layout where form_layout_id in (
+        select distinct form_layout_id from event_crf where study_subject_id = ?)</sql>
+    </query>
+	
+</queries>

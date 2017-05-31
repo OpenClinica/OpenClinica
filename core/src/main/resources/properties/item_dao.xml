@@ -112,8 +112,14 @@
 	</query>
 	<query>
 		<name>findAllItemsByVersionId</name>
-		<sql>select i.* from versioning_map v, item i 
+		<sql>select distinct i.* from versioning_map v, item i 
 		where v.item_id =i.item_id and v.crf_version_id=? order by i.item_id
+		</sql>
+	</query>
+	<query>
+		<name>findAllItemsByLayoutId</name>
+		<sql>select distinct i.* from versioning_map v, item i 
+		where v.item_id =i.item_id and v.form_layout_id=? order by i.item_id
 		</sql>
 	</query>
     <query>
@@ -227,12 +233,12 @@
         </sql>
     </query>
 	    <query>
-        <name>findAllWithItemDataByCRFVersionId</name>
+        <name>findAllWithItemDataByFormLayoutId</name>
         <sql>
              select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, 
            value from item_data id, item i,versioning_map v
             where 
-            v.item_id =i.item_id and v.crf_version_id=? and
+            v.item_id =i.item_id and v.form_layout_id=? and
             id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal;
 
 

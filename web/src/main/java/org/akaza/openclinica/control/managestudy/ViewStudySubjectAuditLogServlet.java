@@ -8,18 +8,22 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -31,17 +35,12 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author jsampson
@@ -56,18 +55,20 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-//        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
-//            return;
-//        }
-//        if (ub.isSysAdmin()) {
-//            return;
-//        }
-//        Role r = currentRole.getRole();
-//        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
-//            return;
-//        }
-//        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-//        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+        // if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+        // return;
+        // }
+        // if (ub.isSysAdmin()) {
+        // return;
+        // }
+        // Role r = currentRole.getRole();
+        // if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+        // return;
+        // }
+        // addPageMessage(respage.getString("no_have_correct_privilege_current_study") +
+        // respage.getString("change_study_contact_sysadmin"));
+        // throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
+        // "1");
         if (ub.isSysAdmin()) {
             return;
         }
@@ -78,7 +79,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_study_director"), "1");
-        
+
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
         ArrayList studySubjectAudits = new ArrayList();
         ArrayList eventCRFAudits = new ArrayList();
@@ -111,12 +112,10 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
             StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
-            studySubject.setLabel(decodeForHtml(studySubject.getLabel()));
-            studySubject.setSecondaryLabel(decodeForHtml(studySubject.getSecondaryLabel()));
             StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
-            //Check if this StudySubject would be accessed from the Current Study
-            if(studySubject.getStudyId() != currentStudy.getId()){
-                if(currentStudy.getParentStudyId() > 0){
+            // Check if this StudySubject would be accessed from the Current Study
+            if (studySubject.getStudyId() != currentStudy.getId()) {
+                if (currentStudy.getParentStudyId() > 0) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
                     return;
@@ -124,7 +123,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
                     Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
                     if (!sites.contains(study.getId())) {
-                        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                        addPageMessage(
+                                respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                         forwardPage(Page.MENU_SERVLET);
                         return;
                     }
@@ -136,17 +136,15 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getId(), "collectDob").getValue());
-            String collectdob="used";
-                if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
-                	collectdob="yearOnly";
-                }else if (study.getStudyParameterConfig().getCollectDob().equals("3")) {
-                	collectdob="notUsed";                
-                }else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
-                	collectdob="used";                
-                }
-                
-                
-                
+            String collectdob = "used";
+            if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
+                collectdob = "yearOnly";
+            } else if (study.getStudyParameterConfig().getCollectDob().equals("3")) {
+                collectdob = "notUsed";
+            } else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
+                collectdob = "used";
+            }
+
             request.setAttribute("collectdob", collectdob);
             request.setAttribute("subject", subject);
 
@@ -162,11 +160,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 if (auditBean.getAuditEventTypeId() == 3) {
                     auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
                     auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
-                }
-
-                if (auditBean.getAuditEventTypeId() == 4) {
-                    auditBean.setOldValue(decodeForHtml(auditBean.getOldValue()));
-                    auditBean.setNewValue(decodeForHtml(auditBean.getNewValue()));
                 }
             }
             studySubjectAudits.addAll(studySubjectAuditEvents);
@@ -201,7 +194,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 for (int j = 0; j < eventCRFs.size(); j++) {
                     // Link CRF and CRF Versions
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
-                    eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
+                    eventCRF.setFormLayout((FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId()));
                     eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
                     // Get the event crf audits
                     eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
@@ -209,10 +202,10 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 }
             }
             ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
-            for (Object o :eventCRFAudits) {
-                AuditBean ab = (AuditBean)o;
+            for (Object o : eventCRFAudits) {
+                AuditBean ab = (AuditBean) o;
                 if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
-                    ItemDataBean idBean = (ItemDataBean)itemDataDao.findByPK(ab.getEntityId());
+                    ItemDataBean idBean = (ItemDataBean) itemDataDao.findByPK(ab.getEntityId());
                     ab.setOrdinal(idBean.getOrdinal());
                 }
             }

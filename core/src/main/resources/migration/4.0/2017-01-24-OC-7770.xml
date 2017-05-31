@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jkeremian" id="2017-01-24-OC-7770-1">
+        <createTable tableName="form_layout">
+            <column autoIncrement="true" name="form_layout_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="crf_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(4000)"/>
+            <column name="revision_notes" type="VARCHAR(255)"/>
+            <column name="status_id" type="int"/>
+            <column name="date_created" type="DATE"/>
+            <column name="date_updated" type="DATE"/>
+            <column name="owner_id" type="int"/>
+            <column name="update_id" type="int"/>
+            <column name="oc_oid" type="VARCHAR(40)">            
+                <constraints nullable="false"/>
+            </column>
+			<column name="xform" type="text"/>
+            <column name="xform_name" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>            
+        </createTable>
+                <addForeignKeyConstraint baseColumnNames="crf_id" baseTableName="form_layout" constraintName="fk_form_layout_reference_instrume" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="crf_id" referencedTableName="crf" />
+                <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="form_layout" constraintName="fk_form_layout_form_layout_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+                <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="form_layout" constraintName="fk_form_layout_fk_form_layout_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" />
+    	        <addUniqueConstraint columnNames="oc_oid" constraintName="uniq_form_layout_oc_oid" tableName="form_layout"/>
+    </changeSet>
+
+	<changeSet author="jkeremian" id="2017-01-24-OC-7770-2">
+			<sql splitStatements="false">
+    CREATE INDEX form_layout_idx_crf on form_layout USING btree (crf_id);
+	CREATE INDEX i_form_layout_name ON form_layout USING btree (name);
+	CREATE INDEX i_form_layout_oc_oid ON form_layout USING btree (oc_oid);
+	CREATE INDEX i_form_layout_status_id ON form_layout USING btree (status_id);
+			</sql>			
+		</changeSet>
+
+
+
+
+    <changeSet author="jkeremian" id="2017-01-24-OC-7770-3">
+        <comment>adding a mapping table for CRF associated media</comment>
+        <createTable tableName="form_layout_media">
+            <column autoIncrement="true" name="form_layout_media_id" type="serial">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="form_layout_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_crf_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jkeremian" id="2017-01-24-OC-7770-4">
+        <addForeignKeyConstraint baseColumnNames="form_layout_id" baseTableName="form_layout_media" constraintName="fk_form_layout_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="form_layout_id" referencedTableName="form_layout" />
+    </changeSet>
+    
+    
+    
+        <changeSet author="jkeremian" id="2017-01-24-OC-7770-6">
+        <comment>adding form_layout_id column in event_crf</comment>
+        <addColumn tableName="event_crf">
+                <column name="form_layout_id" type="int"/>
+        </addColumn>
+    </changeSet>
+    
+    
+        <changeSet author="jkeremian" id="2017-01-24-OC-7770-8">
+                <dropForeignKeyConstraint baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst"/>
+            </changeSet>
+    
+    	<changeSet author="jkeremian" id="2017-01-30-OC-7778-01" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Event Crf Table</comment>
+		<sql>
+        ALTER TABLE event_crf ADD CONSTRAINT duplicate_event_crf_uniqueness_key UNIQUE (study_event_id, study_subject_id, form_layout_id);
+        </sql>
+	</changeSet>
+    
+    	<changeSet author="jkeremian" id="2017-01-30-OC-7778-02" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Form_Layout Table</comment>
+		<sql>
+        ALTER TABLE form_layout ADD CONSTRAINT duplicate_form_layout_uniqueness_key UNIQUE (crf_id, name);
+        </sql>
+	</changeSet>
+    
+    
+    
+            <changeSet author="jkeremian" id="2017-01-24-OC-7770-9">
+        <comment>adding form_layout_id column in versioning_map</comment>
+        <addColumn tableName="versioning_map">
+            <column name="form_layout_id" type="int"/>
+            <column name="item_order_in_form" type="int"/>            
+        </addColumn>
+    </changeSet>
+
+
+            <changeSet author="jkeremian" id="2017-01-24-OC-7770-10">
+                <addForeignKeyConstraint baseColumnNames="form_layout_id" baseTableName="versioning_map" constraintName="fk_versioni_fk_versio_form_layout" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="form_layout_id" referencedTableName="form_layout" />
+            </changeSet>
+
+    
+    	<changeSet author="jkeremian" id="2017-01-24-OC-7770-11" dbms="postgresql">
+		<comment>Apply Uniqueness Constraint to Versioning_map Table</comment>
+		<sql>
+        ALTER TABLE versioning_map ADD CONSTRAINT duplicate_item_form_layout_item_in_form_ordinal_uniqueness_key UNIQUE (form_layout_id, item_id,item_order_in_form);
+        </sql>
+	</changeSet>
+    
+    
+    
+</databaseChangeLog>

@@ -26,11 +26,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
@@ -107,10 +102,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.ecyrd.speed4j</groupId>
-            <artifactId>speed4j</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <scope>compile</scope>
@@ -156,11 +147,7 @@
             <artifactId>mail</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -226,11 +213,6 @@
             <artifactId>quartz-oracle</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4jdbc</groupId>
-            <artifactId>log4jdbc4</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
@@ -249,10 +231,6 @@
             <artifactId>spring-aop</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.owasp.esapi</groupId>
-            <artifactId>esapi</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-web</artifactId>
         </dependency>
@@ -260,23 +238,18 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
+            <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <!-- @pgawade 22-Nov-2010 Added the logback access; it will be needed to
-            get the web application usage pattern data -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -347,43 +320,19 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-plugin</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- LOGGING -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
+        <dependency>
+  <groupId>org.freemarker</groupId>
+  <artifactId>freemarker</artifactId>
+</dependency>
     </dependencies>
     <!-- @pgawade 16-NOV-2010 unit tests through maven -->
 
@@ -427,5 +376,15 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>local</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
 </project>

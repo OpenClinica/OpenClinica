@@ -11,7 +11,7 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -19,7 +19,7 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -55,7 +55,6 @@ public class AnonymousFormControllerV2 {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-
     /**
      * @api {post} /pages/api/v2/anonymousform/form Retrieve anonymous form URL
      * @apiName getEnketoForm
@@ -73,7 +72,8 @@ public class AnonymousFormControllerV2 {
      * @apiSuccessExample {json} Success-Response:
      *                    HTTP/1.1 200 OK
      *                    {
-     *                    "url": "http://localhost:8006/::YYYi?iframe=true&ecid=abb764d026830e98b895ece6d9dcaf3c5e817983cc00a4ebfaabcb6c3700b4d5",
+     *                    "url":
+     *                    "http://localhost:8006/::YYYi?iframe=true&ecid=abb764d026830e98b895ece6d9dcaf3c5e817983cc00a4ebfaabcb6c3700b4d5",
      *                    "offline": "false"
      *                    }
      */
@@ -81,7 +81,8 @@ public class AnonymousFormControllerV2 {
     @RequestMapping(value = "/form", method = RequestMethod.POST)
     public ResponseEntity<AnonymousUrlResponse> getEnketoForm(@RequestBody HashMap<String, String> map) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        EventDefinitionCrfTagService tagService = (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfTagService");
+        EventDefinitionCrfTagService tagService = (EventDefinitionCrfTagService) SpringServletAccess.getApplicationContext(context)
+                .getBean("eventDefinitionCrfTagService");
         String formUrl = null;
         String studyOid = map.get("studyOid");
 
@@ -91,7 +92,6 @@ public class AnonymousFormControllerV2 {
         String submissionUri = map.get("submissionUri");
         if (submissionUri != "" && submissionUri != null) {
 
-
             StudyBean study = getStudy(studyOid);
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
@@ -99,23 +99,25 @@ public class AnonymousFormControllerV2 {
             if (edcBeans.size() != 0) {
                 EventDefinitionCRFBean edcBean = edcBeans.get(0);
                 CRFDAO crfdao = new CRFDAO(dataSource);
-                CRFVersionDAO cvdao = new CRFVersionDAO(dataSource);
+                FormLayoutDAO fldao = new FormLayoutDAO(dataSource);
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
 
-                CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(edcBean.getDefaultVersionId());
-                CRFBean crf = (CRFBean) crfdao.findByPK(crfVersionBean.getCrfId());
+                FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(edcBean.getDefaultVersionId());
+                CRFBean crf = (CRFBean) crfdao.findByPK(formLayout.getCrfId());
                 StudyBean sBean = (StudyBean) sdao.findByPK(edcBean.getStudyId());
                 StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(edcBean.getStudyEventDefinitionId());
 
                 String tagPath = sedBean.getOid() + "." + crf.getOid();
 
-                boolean isOffline = tagService.getEventDefnCrfOfflineStatus(2,tagPath,true);
+                boolean isOffline = tagService.getEventDefnCrfOfflineStatus(2, tagPath, true);
                 String offline = null;
-                if (isOffline) offline = "true";
-                else offline = "false";
+                if (isOffline)
+                    offline = "true";
+                else
+                    offline = "false";
 
-                formUrl = createAnonymousEnketoUrl(sBean.getOid(), crfVersionBean, edcBean, isOffline);
-                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl, offline, crf.getName(), crfVersionBean.getDescription());
+                formUrl = createAnonymousEnketoUrl(sBean.getOid(), formLayout, edcBean, isOffline);
+                AnonymousUrlResponse anonResponse = new AnonymousUrlResponse(formUrl, offline, crf.getName(), formLayout.getDescription());
 
                 return new ResponseEntity<AnonymousUrlResponse>(anonResponse, org.springframework.http.HttpStatus.OK);
             } else {
@@ -142,18 +144,21 @@ public class AnonymousFormControllerV2 {
         return studyBean;
     }
 
-    private String createAnonymousEnketoUrl(String studyOID, CRFVersionBean crfVersion, EventDefinitionCRFBean edcBean, boolean isOffline) throws Exception {
+    private String createAnonymousEnketoUrl(String studyOID, FormLayoutBean formLayout, EventDefinitionCRFBean edcBean, boolean isOffline) throws Exception {
         StudyBean parentStudyBean = getParentStudy(studyOID);
         PFormCache cache = PFormCache.getInstance(context);
-        String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), crfVersion.getOid(), isOffline);
-        String contextHash = cache.putAnonymousFormContext(studyOID, crfVersion.getOid(),edcBean.getStudyEventDefinitionId());
+        String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), formLayout.getOid(), isOffline);
+        String contextHash = cache.putAnonymousFormContext(studyOID, formLayout.getOid(), edcBean.getStudyEventDefinitionId());
         String url = null;
-        if (isOffline) url = enketoURL.split("#",2)[0] + "?" + FORM_CONTEXT + "=" + contextHash + "#" + enketoURL.split("#",2)[1];
-        else url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
-        logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
+        if (isOffline)
+            url = enketoURL.split("#", 2)[0] + "?" + FORM_CONTEXT + "=" + contextHash + "#" + enketoURL.split("#", 2)[1];
+        else
+            url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
+        logger.debug("Enketo URL for " + formLayout.getName() + "= " + url);
         return url;
 
     }
+
     private boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean siteStudy = getStudy(studyOid);
@@ -161,13 +166,18 @@ public class AnonymousFormControllerV2 {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
+                                                                                                            // PENDING ,
+                                                                                                            // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
-        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
-        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus  + "   siteStatus: " + siteStatus);
-        if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
+                + "   siteStatus: " + siteStatus);
+        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: "
+                + siteStatus);
+        if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available")
+                && pManageStatus.equalsIgnoreCase("ACTIVE")) {
             accessPermission = true;
         }
 
@@ -218,7 +228,6 @@ public class AnonymousFormControllerV2 {
         public void setDescription(String description) {
             this.description = description;
         }
-
 
     }
 

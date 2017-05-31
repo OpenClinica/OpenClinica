@@ -7,23 +7,8 @@
  */
 package org.akaza.openclinica.domain.rule;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,26 +20,45 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 /**
- * <p> RuleSetBean, Holds a collection of Rules & Actions </p>
+ * <p>
+ * RuleSetBean, Holds a collection of Rules & Actions
+ * </p>
+ * 
  * @author Krikor Krumlian
  */
 @Entity
 @Table(name = "rule_set")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class RuleSetBean extends AbstractAuditableMutableDomainObject {
+public class RuleSetBean extends AbstractAuditableMutableDomainObject implements Serializable {
 
     private StudyEventDefinitionBean studyEventDefinition;
     private StudyBean study;
     private CRFBean crf;
     private CRFVersionBean crfVersion;
+    private FormLayoutBean formLayout;
     private ItemBean item;
-	private boolean runSchedule=false;
+    private boolean runSchedule = false;
     private String runTime;
 
-    
-	private RunOnSchedule runOnSchedule;
+    private RunOnSchedule runOnSchedule;
     private List<RuleSetRuleBean> ruleSetRules;
     private ExpressionBean target;
     private ExpressionBean originalTarget;
@@ -85,7 +89,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     public void addRuleSetRuleForDisplay(RuleSetRuleBean ruleSetRuleBean) {
         if (this.ruleSetRules == null)
             this.ruleSetRules = new ArrayList<RuleSetRuleBean>();
-        //ruleSetRuleBean.setRuleSetBean(this); Need to comment this so no bi direction established
+        // ruleSetRuleBean.setRuleSetBean(this); Need to comment this so no bi direction established
         ruleSetRules.add(ruleSetRuleBean);
     }
 
@@ -161,8 +165,9 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getItemName() {
-    	if(getItem()==null) return "";
-    	return getItem().getName();
+        if (getItem() == null)
+            return "";
+        return getItem().getName();
     }
 
     @Transient
@@ -172,9 +177,10 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getItemNameWithOid() {
-       if(getItemName()!=null&& !getItemName().isEmpty())
-    	return getItemName() + " (" + getItem().getOid() + ")";
-       else return "";
+        if (getItemName() != null && !getItemName().isEmpty())
+            return getItemName() + " (" + getItem().getOid() + ")";
+        else
+            return "";
     }
 
     // Getters & Setters
@@ -307,7 +313,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * @param studyEventDefinitionId the studyEventDefinitionId to set
+     * @param studyEventDefinitionId
+     *            the studyEventDefinitionId to set
      */
     public void setStudyEventDefinitionId(Integer studyEventDefinitionId) {
         this.studyEventDefinitionId = studyEventDefinitionId;
@@ -321,7 +328,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * @param studyId the studyId to set
+     * @param studyId
+     *            the studyId to set
      */
     public void setStudyId(Integer studyId) {
         this.studyId = studyId;
@@ -335,7 +343,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * @param crfId the crfId to set
+     * @param crfId
+     *            the crfId to set
      */
     public void setCrfId(Integer crfId) {
         this.crfId = crfId;
@@ -349,7 +358,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * @param crfVersionId the crfVersionId to set
+     * @param crfVersionId
+     *            the crfVersionId to set
      */
     public void setCrfVersionId(Integer crfVersionId) {
         this.crfVersionId = crfVersionId;
@@ -410,44 +420,45 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
                 return false;
         } else if (!runTime.equals(other.runTime))
             return false;
+        if (expressions == null && other.expressions != null)
+            return false;
+        if (expressions != null && other.expressions == null)
+            return false;
+        if (expressions.size() != other.expressions.size())
+            return false;
         return true;
     }
 
     @JoinColumn(name = "run_time")
-	public String getRunTime() {
-		return runTime;
-	}
+    public String getRunTime() {
+        return runTime;
+    }
 
-	public void setRunTime(String runTime) {
-		this.runTime = runTime;
-	}
+    public void setRunTime(String runTime) {
+        this.runTime = runTime;
+    }
 
-
-    
     @Transient
-	public RunOnSchedule getRunOnSchedule() {
-		return runOnSchedule;
-	}
+    public RunOnSchedule getRunOnSchedule() {
+        return runOnSchedule;
+    }
 
+    public void setRunOnSchedule(RunOnSchedule runOnSchedule) {
+        this.runOnSchedule = runOnSchedule;
+    }
 
-
-	public void setRunOnSchedule(RunOnSchedule runOnSchedule) {
-		this.runOnSchedule = runOnSchedule;
-	}
-
-	
     @JoinColumn(name = "run_schedule")
-	public boolean isRunSchedule() {
-		return runSchedule;
-	}
+    public boolean isRunSchedule() {
+        return runSchedule;
+    }
 
-	public void setRunSchedule(boolean runSchedule) {
-		this.runSchedule = runSchedule;
-	}
+    public void setRunSchedule(boolean runSchedule) {
+        this.runSchedule = runSchedule;
+    }
 
-
-
-
-
+    @Transient
+    public FormLayoutBean getFormLayout() {
+        return formLayout;
+    }
 
 }

@@ -1,5 +1,15 @@
 package org.akaza.openclinica.web.crfdata;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -13,7 +23,8 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -32,14 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
 /**
  * 
  * @author thickerson, daniel
@@ -288,9 +291,9 @@ public class DataImportService {
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
                                 && eventCrfBean.getStatus().isAvailable()) {
-                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean);
+                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);
                         } else {
-                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
+                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean, true);
                         }
                         eventCrfInts.add(new Integer(eventCrfBean.getId()));
                     }

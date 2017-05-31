@@ -1,13 +1,11 @@
 package org.akaza.openclinica.job;
 
-import org.quartz.InterruptableJob;
-import org.quartz.JobExecutionContext;
-import org.quartz.StatefulJob;
-import org.quartz.UnableToInterruptJobException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-public class XsltStatefulJob extends XsltTransformJob implements StatefulJob, InterruptableJob {
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
+public class XsltStatefulJob extends XsltTransformJob implements InterruptableJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(XsltStatefulJob.class);
 

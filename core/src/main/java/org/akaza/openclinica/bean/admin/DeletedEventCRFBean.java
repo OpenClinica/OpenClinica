@@ -9,19 +9,20 @@ public class DeletedEventCRFBean {
     private int studyEventId;
     private String crfName;
     private String crfVersion;
+    private String formLayout;
     private String deletedBy;
     private Date deletedDate;
     private int deletedEventCrfId;
-    
+
     public int getDeletedEventCrfId() {
-		return deletedEventCrfId;
-	}
+        return deletedEventCrfId;
+    }
 
-	public void setDeletedEventCrfId(int deletedEventCrfId) {
-		this.deletedEventCrfId = deletedEventCrfId;
-	}
+    public void setDeletedEventCrfId(int deletedEventCrfId) {
+        this.deletedEventCrfId = deletedEventCrfId;
+    }
 
-	public int getStudyEventId() {
+    public int getStudyEventId() {
         return studyEventId;
     }
 
@@ -60,4 +61,13 @@ public class DeletedEventCRFBean {
     public void setDeletedDate(Date deletedDate) {
         this.deletedDate = deletedDate;
     }
+
+    public String getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(String formLayout) {
+        this.formLayout = formLayout;
+    }
+
 }

@@ -31,6 +31,13 @@
 	</query>
 
 	<query>
+		<name>findByLayoutId</name>
+		<sql>
+		SELECT * FROM SECTION s,versioning_map vm WHERE vm.form_layout_id=?
+		AND vm.crf_version_id=s.crf_version_id limit 1
+		</sql>
+	</query>
+	<query>
 		<name>findAllByCRFVersion</name>
 		<sql>SELECT * FROM section WHERE crf_version_id=?
 		order by section_id ASC</sql>

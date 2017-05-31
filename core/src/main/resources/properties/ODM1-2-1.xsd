@@ -12,9 +12,9 @@
     <!--
           import ODM foundation schemas
       -->
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
-    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"   schemaLocation="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"/>
-    <xs:include                                                 schemaLocation="http://www.cdisc.org/schema/odm/v1.2.1/ODM1-2-1-foundation.xsd"/>
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"   schemaLocation="xmldsig-core-schema.xsd"/>
+    <xs:include                                                 schemaLocation="ODM1-2-1-foundation.xsd"/>
 
 
 
