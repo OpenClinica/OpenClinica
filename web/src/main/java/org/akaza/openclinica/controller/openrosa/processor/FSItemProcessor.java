@@ -18,6 +18,7 @@ import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
@@ -26,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
@@ -55,6 +57,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private QueryService queryService;
     @Autowired
     private ItemDataDao itemDataDao;
+    @Autowired
+    private EventCrfDao eventCrfDao;
     @Autowired
     private ItemDao itemDao;
     @Autowired
@@ -172,6 +176,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+                    resetSdvStatus(container);
 
                     // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, existingItemData);
@@ -234,6 +239,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             if (existingItemData == null) {
                 newItemData.setStatus(Status.UNAVAILABLE);
                 itemDataDao.saveOrUpdate(newItemData);
+                resetSdvStatus(container);
 
             } else if (existingItemData.getValue().equals(newItemData.getValue())) {
 
@@ -244,6 +250,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 existingItemData.setUpdateId(container.getUser().getUserId());
                 existingItemData.setDateUpdated(new Date());
                 itemDataDao.saveOrUpdate(existingItemData);
+                resetSdvStatus(container);
             }
         }
 
@@ -257,6 +264,13 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private ItemData lookupFieldItemData(ItemGroup itemGroup, Integer ordinal, SubmissionContainer container) {
         return itemDataDao.findByEventCrfGroupOrdinal(container.getEventCrf(), itemGroup.getItemGroupId(), ordinal);
+    }
+
+    private void resetSdvStatus(SubmissionContainer container) {
+        EventCrf eventCrf = container.getEventCrf();
+        eventCrf.setSdvStatus(false);
+        eventCrf.setSdvUpdateId(container.getUser().getUserId());
+        eventCrfDao.saveOrUpdate(eventCrf);
     }
 
 }
