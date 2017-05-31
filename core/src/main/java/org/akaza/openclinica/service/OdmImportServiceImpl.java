@@ -238,7 +238,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                 xformService.executeIndividualCrf(eicObj);
             }
         }
-        }
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,

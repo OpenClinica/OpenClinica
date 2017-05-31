@@ -378,7 +378,7 @@ public class OpenRosaServices {
 
         LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
         if (subjectContextCache != null) {
-            String userXml = getUserXml(context);
+            String userXml = getUserXml(context,studyOID);
             userList.setHash((DigestUtils.md5Hex(userXml)));
         }
         userList.setFilename("users.xml");
@@ -917,6 +917,30 @@ public class OpenRosaServices {
             in.close();
             out.close();
         }
+    }
+
+    private StudyBean getPublicStudy(String studyOid) {
+        String schema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByOid(studyOid);
+        CoreResources.setRequestSchema(schema);
+        return studyBean;
+    }
+
+    private StudyBean getParentPublicStudy(String studyOid) {
+        StudyBean resultBean =  null;
+        String schema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        StudyBean study = getStudy(studyOid);
+        if (study.getParentStudyId() == 0) {
+            resultBean = study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            resultBean= parentStudy;
+        }
+        CoreResources.setRequestSchema(schema);
+        return resultBean;
     }
 
     private String getFormLayoutOid(String uniqueId) {
